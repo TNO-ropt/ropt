@@ -49,7 +49,7 @@ watch:
   - src
 
 nav:
-  - "About `ropt`": index.md
+  - "About ropt": index.md
   - Usage:
       - "Introduction": usage/robust_optimization.md
       - "Running Optimizations": usage/running.md
