@@ -1,0 +1,74 @@
+site_name: ropt Documentation
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.expand
+    - content.code.copy
+    - content.code.annotate
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [src, examples]
+          options:
+            show_source: false
+            show_bases: true
+            show_root_toc_entry: false
+            show_root_heading: true
+            show_root_full_path: true
+            show_root_members_full_path: false
+            heading_level: 2
+            members_order: source
+
+markdown_extensions:
+  - admonition
+  - def_list
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.snippets:
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+watch:
+  - src
+
+nav:
+  - "About `ropt`": index.md
+  - Usage:
+      - "Introduction": usage/robust_optimization.md
+      - "Running Optimizations": usage/running.md
+  - Reference:
+      - "Configuration":
+          - "Plan configuration": reference/plan_config.md
+          - "Optimizer configuration": reference/enopt_config.md
+      - "Optimization":
+          - "Ensemble optimizer": reference/optimization.md
+          - "Function evaluations": reference/evaluator.md
+          - "Optimization results": reference/results.md
+          - "Reporting": reference/reporting.md
+      - "Plugins":
+          - "Plugin manager": reference/plugins.md
+          - "Optimizer backends": reference/optimizer_backends.md
+          - "Sampler backends": reference/sampler_backends.md
+          - "Realization filters": reference/realization_filters.md
+          - "Function transforms": reference/function_transforms.md
+          - "Optimization steps": reference/optimization_steps.md
+      - "Enumerations": reference/enums.md
+      - "Exceptions": reference/exceptions.md
+      - "Utilities": reference/utilities.md

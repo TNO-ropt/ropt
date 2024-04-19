@@ -1,0 +1,101 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ropt"
+description = "The ropt ensemble optimizer library"
+readme = "README.md"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Natural Language :: English",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+]
+requires-python = ">=3.8"
+dynamic = ["version"]
+dependencies = [
+    "numpy",
+    "pydantic",
+    "scipy",
+    "importlib-metadata; python_version<'3.10'",
+    "typing-extensions; python_version<'3.9'",
+]
+
+[project.optional-dependencies]
+test = ["ruff", "mypy", "pytest", "pandas-stubs", "types-tabulate"]
+docs = ["mkdocs", "mkdocstrings[python]", "mkdocs-material"]
+storage = ["pandas", "xarray", "netcdf4", "tabulate"]
+parsl = ["parsl"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["ropt"]
+
+[tool.setuptools.package-data]
+ropt = ["py.typed"]
+
+[tool.setuptools.dynamic]
+version = { attr = "ropt.version.__version__" }
+
+[tool.setuptools_scm]
+write_to = "src/ropt/version.py"
+
+[tool.pytest.ini_options]
+markers = ["slow: slow test marker"]
+filterwarnings = [
+    "error",
+    'ignore:.*Pydantic will allow any object with no validation.*:UserWarning',          # 3.8
+    'ignore:\nPyarrow will become a required dependency of pandas.*:DeprecationWarning',
+    'ignore:datetime.datetime.utcfromtimestamp\(\) is deprecated.*:DeprecationWarning',  # 3.12
+]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "AIR",
+    "COM812",
+    "COM819",
+    "D206",
+    "E501",
+    "DJ",
+    "FA",
+    "ISC001",
+    "PGH",
+    "UP",
+    "ANN101",
+    "ANN102",
+    "FIX002",
+    "S101",
+    "TD002",
+    "TD003",
+    "Q",
+    "W191",
+]
+
+[tool.ruff.format]
+exclude = ["src/ropt/version.py", "build"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E402", "D", "ANN401", "FBT", "PLR2004", "PLR0913"]
+"examples/*" = ["INP001", "T201"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ropt"]
+
+[tool.mypy]
+strict = true
+plugins = ["numpy.typing.mypy_plugin", "pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["scipy.*", "dakota"]
+ignore_missing_imports = true
