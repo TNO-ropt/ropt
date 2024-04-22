@@ -5,9 +5,8 @@
 Research (TNO). All files in this repository are released under the GNU General
 Public License v3.0 (a copy is provided in the LICENSE file).
 
-Detailed documentation and examples can be found in the online manual (on
-[GitHubPages](https://tno-ropt.github.io/ropt/) or on [Read the
-Docs](https://ropt.readthedocs.io/)).
+Detailed documentation and examples can be found in the online
+[manual](https://tno-ropt.github.io/ropt/).
 
 ## Dependencies
 `ropt` has been tested with Python versions 3.8-3.12.
