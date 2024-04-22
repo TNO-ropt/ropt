@@ -13,16 +13,34 @@ Docs](https://ropt.readthedocs.io/)).
 `ropt` has been tested with Python versions 3.8-3.12.
 
 `ropt` requires one or more optimization backends to function. A backend based
-on optimizers included in [SciPy](https://scipy.org/) is installed by default.
+on optimizers included with [SciPy](https://scipy.org/) is installed by default.
 
 ## Installation
-To install, enter the `ropt` distribution directory and execute:
+From PyPI:
+```bash
+pip install ropt
+```
+
+The following optional-dependencies can be installed:
+
+- `storage` : Enables `pandas`, `xarrays` and netCDF support.
+- `parsl`   : Enables the parsl-based evaluator functionality.
+
+To install both:
+```bash
+pip install ropt[storage,parsl]
+```
+
+
+## Development
+The `ropt` source distribution can be found on
+[GitHub](https://github.com/tno-ropt/ropt). To install from source, enter the
+`ropt` distribution directory and execute:
 
 ```bash
 pip install .
 ```
 
-## Documentation
 Documentation is written using [`MkDocs`](https://www.mkdocs.org/) and
 [`mkdocstrings`](https://mkdocstrings.github.io/). To view it, install the
 necessary dependencies and start the `MkDocs` built-in server within the `ropt`

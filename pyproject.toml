@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ropt"
 description = "The ropt ensemble optimizer module"
-readme = "README-PyPI.md"
+readme = "README.md"
 classifiers = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
