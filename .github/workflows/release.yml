@@ -6,7 +6,7 @@ on:
         - 'v0.[0-9]+.[0-9]+'
 
 jobs:
-  deploy-release:
+  deploy-to-pypi:
     runs-on: ubuntu-22.04
     environment:
         name: deploy-to-pypi
@@ -21,7 +21,7 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: "3.10"
-    - name: Build and deploy distribution
+    - name: Build and deploy
       run: |
         python -m pip install --upgrade pip
         python -m pip install build
@@ -39,16 +39,18 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: "3.10"
-    - name: Install dependencies
+    - name: Initialize deployment
+      id: docs
       run: |
         python -m pip install --upgrade pip
         python -m pip install .[docs]
         python -m pip install mike
-    - name: Retrieve major and minor versions
-      run: |
-        echo "MAJOR=$(python -c 'from ropt import version; print(version.version_tuple[0])')" >> $GITHUB_ENV
-        echo "MINOR=$(python -c 'from ropt import version; print(version.version_tuple[1])')" >> $GITHUB_ENV
-    - name: Deploy documentation
+        echo "MAJOR=$(python -c 'from ropt import version; print(version.version_tuple[0])')" >> $GITHUB_OUTPUT
+        echo "MINOR=$(python -c 'from ropt import version; print(version.version_tuple[1])')" >> $GITHUB_OUTPUT
+    - name: Deploy
+      env:
+        MAJOR: ${{ steps.docs.outputs.MAJOR }}
+        MINOR: ${{ steps.docs.outputs.MINOR }}
       run: |
         git config --global user.name "${{ github.actor }}"
         git config --global user.email "${{ github.actor }}@users.noreply.github.com"
