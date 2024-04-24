@@ -32,6 +32,7 @@ jobs:
       run: |
         python -m mkdocs build --strict
     - name: Deploy docs
+      if: github.event_name == 'push'
       run: |
         git config --global user.name "${{ github.actor }}"
         git config --global user.email "${{ github.actor }}@users.noreply.github.com"
