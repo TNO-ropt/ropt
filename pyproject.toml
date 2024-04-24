@@ -31,7 +31,8 @@ dependencies = [
 [project.optional-dependencies]
 test = ["ruff", "mypy", "pytest", "pandas-stubs", "types-tabulate"]
 docs = ["mkdocs", "mkdocstrings[python]", "mkdocs-material"]
-storage = ["pandas", "xarray", "netcdf4", "tabulate"]
+pandas = ["pandas", "tabulate"]
+xarray = ["xarray", "netcdf4"]
 parsl = ["parsl"]
 
 [tool.setuptools.packages.find]

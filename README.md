@@ -8,11 +8,13 @@ Public License v3.0 (a copy is provided in the LICENSE file).
 Detailed documentation and examples can be found in the online
 [manual](https://tno-ropt.github.io/ropt/).
 
+
 ## Dependencies
 `ropt` has been tested with Python versions 3.8-3.12.
 
 `ropt` requires one or more optimization backends to function. A backend based
 on optimizers included with [SciPy](https://scipy.org/) is installed by default.
+
 
 ## Installation
 From PyPI:
@@ -20,21 +22,26 @@ From PyPI:
 pip install ropt
 ```
 
-The following optional-dependencies can be installed:
+The following optional-dependencies can be installed to enable extra functionality:
 
-- `storage` : Enables `pandas`, `xarrays` and netCDF support.
-- `parsl`   : Enables the parsl-based evaluator functionality.
+- `pandas` : Enables support for `pandas` export and tabular output.
+- `xarray` : Enables support for xarray and writing netCDF files.
+- `parsl`  : Enables the parsl-based evaluator functionality.
 
-To install both:
+Install with:
 ```bash
-pip install ropt[storage,parsl]
+pip install ropt[<dep>]
+```
+where \<dep\> is one of the optional dependencies listed above. To install all:
+```bash
+pip install ropt[pandas,xarray,parsl]
 ```
 
 
 ## Development
 The `ropt` source distribution can be found on
 [GitHub](https://github.com/tno-ropt/ropt). To install from source, enter the
-`ropt` distribution directory and execute:
+distribution directory and execute:
 
 ```bash
 pip install .
