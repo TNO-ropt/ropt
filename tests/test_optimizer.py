@@ -134,12 +134,13 @@ def test_all_failed_realizations_not_supported(
 ) -> None:
     enopt_config["realizations"] = {"realization_min_success": 0}
 
+    def handle_finished(event: OptimizationEvent) -> None:
+        assert event.exit_code == OptimizerExitCode.TOO_FEW_REALIZATIONS
+
     functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
     optimizer = EnsembleOptimizer(evaluator(functions))
-    with pytest.raises(
-        ConfigError, match="Failed function evaluations by the optimizer"
-    ):
-        optimizer.start_optimization(plan=[{"config": enopt_config}, {"optimizer": {}}])
+    optimizer.add_observer(EventType.FINISHED_OPTIMIZER_STEP, handle_finished)
+    optimizer.start_optimization(plan=[{"config": enopt_config}, {"optimizer": {}}])
 
 
 def test_user_abort(enopt_config: Any, evaluator: Any) -> None:

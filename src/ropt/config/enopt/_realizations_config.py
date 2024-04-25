@@ -52,6 +52,12 @@ class RealizationsConfig(EnOptBaseModel):
     successful realizations. By default, it is set equal to the number of
     realizations, i.e., there are no missing values allowed by default.
 
+    Note:
+        The value of `realization_min_success` can be set to zero. Some
+        optimizers can handle this and will proceed with the optimization even
+        if all realizations fail. However, most optimizers cannot handle this
+        and will behave as if the value is set to one.
+
     Attributes:
         names:                   Optional names of the realizations
         weights:                 The weights of the realizations (default: 1)
