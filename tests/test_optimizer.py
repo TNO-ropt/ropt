@@ -129,6 +129,19 @@ def test_failed_realizations(enopt_config: Any, evaluator: Any) -> None:
     optimizer.start_optimization(plan=[{"config": enopt_config}, {"optimizer": {}}])
 
 
+def test_all_failed_realizations_not_supported(
+    enopt_config: Any, evaluator: Any
+) -> None:
+    enopt_config["realizations"] = {"realization_min_success": 0}
+
+    functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
+    optimizer = EnsembleOptimizer(evaluator(functions))
+    with pytest.raises(
+        ConfigError, match="Failed function evaluations by the optimizer"
+    ):
+        optimizer.start_optimization(plan=[{"config": enopt_config}, {"optimizer": {}}])
+
+
 def test_user_abort(enopt_config: Any, evaluator: Any) -> None:
     last_evaluation = 100
 

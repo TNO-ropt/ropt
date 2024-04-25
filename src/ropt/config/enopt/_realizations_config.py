@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Optional
 
 import numpy as np
-from pydantic import PositiveInt, model_validator
+from pydantic import NonNegativeInt, model_validator
 
 from ropt.config.utils import (
     Array1D,
@@ -61,7 +61,7 @@ class RealizationsConfig(EnOptBaseModel):
 
     names: Optional[UniqueNames] = None
     weights: Array1D = np.array(1.0)
-    realization_min_success: Optional[PositiveInt] = None
+    realization_min_success: Optional[NonNegativeInt] = None
 
     @model_validator(mode="after")
     def _broadcast_normalize_and_check(self) -> RealizationsConfig:

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Optional, Tuple
 import numpy as np
 
 from ropt.enums import ConstraintType, OptimizerExitCode
-from ropt.exceptions import OptimizationAborted
+from ropt.exceptions import ConfigError, OptimizationAborted
 from ropt.results import (
     BoundConstraints,
     FunctionResults,
@@ -63,7 +63,15 @@ class Optimizer:
         *,
         return_functions: bool,
         return_gradients: bool,
+        allow_nan: bool = False,
     ) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
+        if (
+            self._enopt_config.realizations.realization_min_success < 1
+            and not allow_nan
+        ):
+            msg = "Failed function evaluations by the optimizer"
+            raise ConfigError(msg)
+
         assert return_functions or return_gradients
 
         self._check_stopping_criteria()
