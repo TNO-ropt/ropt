@@ -384,40 +384,53 @@ class EnsembleEvaluator:
     ) -> Functions:
         # Individual objective and constraint functions are calculated from the
         # realizations using one or more function transforms:
-        objectives = _calculate_transformed_functions(
-            self._config,
-            self._function_transforms,
-            objectives,
-            objective_weights,
-            failed_realizations,
-        )
-        if constraints is not None:
-            constraints = _calculate_transformed_functions(
+        if np.all(failed_realizations):
+            objectives = np.empty(
+                self._config.objective_functions.weights.size, dtype=np.float64
+            )
+            objectives.fill(np.nan)
+            if constraints is not None:
+                assert self._config.nonlinear_constraints is not None
+                constraints = np.empty(
+                    self._config.nonlinear_constraints.rhs_values, dtype=np.float64
+                )
+                constraints.fill(np.nan)
+            weighted_objective = np.array(np.nan)
+        else:
+            objectives = _calculate_transformed_functions(
                 self._config,
                 self._function_transforms,
-                constraints,
-                constraint_weights,
+                objectives,
+                objective_weights,
                 failed_realizations,
-                constraints=True,
             )
-        else:
-            constraints = None
+            if constraints is not None:
+                constraints = _calculate_transformed_functions(
+                    self._config,
+                    self._function_transforms,
+                    constraints,
+                    constraint_weights,
+                    failed_realizations,
+                    constraints=True,
+                )
+            else:
+                constraints = None
 
-        if self._objective_auto_scales is None:
-            self._objective_auto_scales = _compute_auto_scales(
-                objectives, self._config.objective_functions.auto_scale
-            )
-        if constraints is not None and self._constraint_auto_scales is None:
-            assert self._config.nonlinear_constraints is not None
-            self._constraint_auto_scales = _compute_auto_scales(
-                constraints, self._config.nonlinear_constraints.auto_scale
-            )
+            if self._objective_auto_scales is None:
+                self._objective_auto_scales = _compute_auto_scales(
+                    objectives, self._config.objective_functions.auto_scale
+                )
+            if constraints is not None and self._constraint_auto_scales is None:
+                assert self._config.nonlinear_constraints is not None
+                self._constraint_auto_scales = _compute_auto_scales(
+                    constraints, self._config.nonlinear_constraints.auto_scale
+                )
 
-        weighted_objective = _calculate_weighted_function(
-            objectives,
-            self._config.objective_functions.weights,
-            self._get_objective_scales(self._objective_auto_scales),
-        )
+            weighted_objective = _calculate_weighted_function(
+                objectives,
+                self._config.objective_functions.weights,
+                self._get_objective_scales(self._objective_auto_scales),
+            )
 
         return Functions.create(
             config=self._config,
