@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Optional, Tuple
 import numpy as np
 
 from ropt.enums import ConstraintType, OptimizerExitCode
-from ropt.exceptions import ConfigError, OptimizationAborted
+from ropt.exceptions import OptimizationAborted
 from ropt.results import (
     BoundConstraints,
     FunctionResults,
@@ -65,13 +65,6 @@ class Optimizer:
         return_gradients: bool,
         allow_nan: bool = False,
     ) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
-        if (
-            self._enopt_config.realizations.realization_min_success < 1
-            and not allow_nan
-        ):
-            msg = "Failed function evaluations by the optimizer"
-            raise ConfigError(msg)
-
         assert return_functions or return_gradients
 
         self._check_stopping_criteria()
@@ -92,6 +85,7 @@ class Optimizer:
             variables,
             compute_functions=return_functions,
             compute_gradients=return_gradients,
+            allow_nan=allow_nan,
         )
 
         # Functions and gradients might need to be scaled:
@@ -157,6 +151,7 @@ class Optimizer:
         *,
         compute_functions: bool = False,
         compute_gradients: bool = False,
+        allow_nan: bool = False,
     ) -> Tuple[Results, ...]:
         assert compute_functions or compute_gradients
         self._optimizer_step.start_evaluation()
@@ -167,13 +162,27 @@ class Optimizer:
         )
         results = self._augment_results(results)
         self._optimizer_step.finish_evaluation(results)
+
+        # If the configuration allows for zero successful realizations, there
+        # will always be results. However, they may all be equal to `np.nan`. If
+        # the optimizer does not set the allow_nan flag, it cannot handle such a
+        # case, and we need to check for it:
+        assert self._enopt_config.realizations.realization_min_success is not None
+        check_failures = (
+            self._enopt_config.realizations.realization_min_success < 1
+            and not allow_nan
+        )
         for result in results:
-            if (isinstance(result, FunctionResults) and result.functions is None) or (
-                isinstance(result, GradientResults) and result.gradients is None
+            assert isinstance(result, (FunctionResults, GradientResults))
+            if (
+                (isinstance(result, FunctionResults) and result.functions is None)
+                or (isinstance(result, GradientResults) and result.gradients is None)
+                or (check_failures and np.all(result.realizations.failed_realizations))
             ):
                 raise OptimizationAborted(
                     exit_code=OptimizerExitCode.TOO_FEW_REALIZATIONS
                 )
+
         return results
 
     def _augment_results(self, results: Tuple[Results, ...]) -> Tuple[Results, ...]:
