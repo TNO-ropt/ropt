@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.18">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.19">
     
     
       
@@ -1268,7 +1268,7 @@ function and gradient evaluations that the optimizer needs.</p>
 
 
 <h4 id="ropt.plugins.optimizer.protocol.OptimizerCallback.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">return_functions</span><span class="p">,</span> <span class="n">return_gradients</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">return_functions</span><span class="p">,</span> <span class="n">return_gradients</span><span class="p">,</span> <span class="n">allow_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 </h4>
 
@@ -1284,8 +1284,8 @@ vector at a time.</p>
 <p>The <code>return_functions</code> and <code>return_gradients</code> flags determine whether
 functions and/or gradients are to be evaluated. The results are returned
 as a tuple of arrays, one for functions and constraints, the other for
-gradients. If one of <code>return_functions</code> or <code>return_gradients</code> is <code>False</code>,
-the corresponding result is an empty array.</p>
+gradients. If one of <code>return_functions</code> or <code>return_gradients</code> is
+<code>False</code>, the corresponding result is an empty array.</p>
 <p>Multiple function evaluations are returned as a matrix where the rows
 are the result vectors for each evaluation. The first element of a
 result vector is the value of the objective value, and the remaining
@@ -1295,6 +1295,11 @@ are returned as a matrix. The first row contains the gradient of the
 objective function, while the remaining rows contain the gradients of
 the non-linear constraints. Gradient-based methods currently support
 only a single evaluation, hence there is also only a single result.</p>
+<p>In most cases, the optimizer cannot handle failed function evaluations,
+which are indicated by <code>NaN</code> values. Some optimizers, in particular
+those that use multiple function evaluations do determine a next step
+are robust in this regard. By returning <code>allow_nan=True</code>, these
+optimizers can indicate that this is the case.</p>
 
 
 
@@ -1316,7 +1321,7 @@ only a single evaluation, hence there is also only a single result.</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>The variable vector or matrix to evaluate.</p>
+              <p>The variable vector or matrix to evaluate</p>
             </div>
           </td>
           <td>
@@ -1330,7 +1335,7 @@ only a single evaluation, hence there is also only a single result.</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>If <code>True</code>, evaluate and return functions.</p>
+              <p>If <code>True</code>, evaluate and return functions</p>
             </div>
           </td>
           <td>
@@ -1344,11 +1349,25 @@ only a single evaluation, hence there is also only a single result.</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>If <code>True</code>, evaluate and return gradients.</p>
+              <p>If <code>True</code>, evaluate and return gradients</p>
             </div>
           </td>
           <td>
               <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>allow_nan</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>If <code>True</code>, accept <code>NaN</code> values</p>
+            </div>
+          </td>
+          <td>
+                <code>False</code>
           </td>
         </tr>
     </tbody>
@@ -2043,7 +2062,7 @@ manual for details on these options.</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.3220b9d7.min.js"></script>
+      <script src="../../assets/javascripts/bundle.dd8806f2.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       
