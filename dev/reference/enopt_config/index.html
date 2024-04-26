@@ -2320,6 +2320,13 @@ there may be a hard minimum to the amount of values that is needed. The
 successful realizations. By default, it is set equal to the number of
 realizations, i.e., there are no missing values allowed by default.</p>
 
+<details class="note" open>
+  <summary>Note</summary>
+  <p>The value of <code>realization_min_success</code> can be set to zero. Some
+optimizers can handle this and will proceed with the optimization even
+if all realizations fail. However, most optimizers cannot handle this
+and will behave as if the value is set to one.</p>
+</details>
 
 
   <p><span class="doc-section-title">Attributes:</span></p>
