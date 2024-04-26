@@ -30,7 +30,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["ruff", "mypy", "pytest", "pandas-stubs", "types-tabulate"]
-docs = ["mkdocs", "mkdocstrings[python]", "mkdocs-material"]
+docs = ["mkdocs", "mkdocstrings[python]", "mkdocs-material", "mike"]
 pandas = ["pandas", "tabulate"]
 xarray = ["xarray", "netcdf4"]
 parsl = ["parsl"]
