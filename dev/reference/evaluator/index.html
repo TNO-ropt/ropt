@@ -1787,7 +1787,7 @@ least the <code>done()</code>, <code>exception()</code>, and <code>result()</cod
 
 
 <h4 id="ropt.evaluator.ConcurrentEvaluator.launch" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">launch</span><span class="p">(</span><span class="n">batch_id</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">launch</span><span class="p">(</span><span class="n">batch_id</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">active</span><span class="p">)</span></code>
   
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -1814,7 +1814,9 @@ that contain results should be returned.</p>
 passed by the <a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.EnsembleOptimizer"><code>EnsembleOptimizer</code></a>
 object.</p>
 <p>The <code>context</code> argument with optional information is passed from the
-<code>__call__</code> method unchanged.</p>
+<code>__call__</code> method unchanged. The <code>active</code> document passes a boolean
+vector indicating which realizations are active. It not <code>None</code> it should
+take precedence over the corresponding field in the <code>context</code> variable.</p>
 
 
 
@@ -1865,6 +1867,20 @@ object.</p>
           <td>
             <div class="doc-md-description">
               <p>Evaluator context.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>active</code></td>
+          <td>
+                <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Optional active realizations.</p>
             </div>
           </td>
           <td>
