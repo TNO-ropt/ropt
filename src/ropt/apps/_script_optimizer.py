@@ -191,7 +191,7 @@ class ScriptOptimizer:
     def __init__(  # noqa: PLR0913
         self,
         plan: Sequence[Dict[str, Any]],
-        tasks: Dict[str, str],
+        tasks: List[Tuple[str, str]],
         work_dir: Union[Path, str],
         *,
         job_dir: Optional[Union[Path, str]] = None,
@@ -214,8 +214,8 @@ class ScriptOptimizer:
 
         Args:
             plan:                  The optimization plan to run
-            tasks:                 A dictionary mapping task names to strings
-                                   containing bash code
+            tasks:                 A list of tuples mapping task names to
+                                   strings containing bash code
             work_dir:              Working directory
             job_dir:               The directory to store files generated during
                                    optimization
@@ -283,7 +283,7 @@ class ScriptOptimizer:
         )
 
         tasks: List[ScriptTask] = []
-        for task_name, script in self._tasks.items():
+        for task_name, script in self._tasks:
             substituted_script = Template(script).safe_substitute(
                 work_dir=self._work_dir, realization=realization
             )

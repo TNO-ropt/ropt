@@ -43,7 +43,7 @@ tasks = {
         --realization ${realization} \
         --coefficients ${work_dir}/../coefficients.json \
         --out rosenbrock""",
-}
+}.items()
 
 # Make data files for the problem:
 rng = default_rng(seed=5)
