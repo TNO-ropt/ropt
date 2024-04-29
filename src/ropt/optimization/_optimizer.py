@@ -84,7 +84,6 @@ class Optimizer:
             variables = nested_results.evaluations.variables.copy()
             self._fixed_variables = variables.copy()
 
-        # TODO: After a nested step, we may be able to re-use its result:
         results = self._run_evaluations(
             variables,
             compute_functions=return_functions,
