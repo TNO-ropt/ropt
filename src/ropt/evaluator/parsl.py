@@ -67,17 +67,19 @@ class ParslEvaluator(ConcurrentEvaluator):
         provider: Optional[ExecutionProvider] = None,
         max_threads: int = 4,
         retries: int = 0,
+        enable_cache: bool = True,
     ) -> None:
         """Create a parsl evaluator object.
 
         Args:
-            provider:    Parsl execution provider to use. By default `LocalProvider`
-            workflow:    Callback to start a single workflow run
-            monitor:     Monitor function
-            max_threads: Maximum number of threads for local execution. Defaults to 4
-            retries:     Number of retries upon failure of a task. Defaults to 0
+            provider:     Parsl execution provider to use. By default `LocalProvider`
+            workflow:     Callback to start a single workflow run
+            monitor:      Monitor function
+            max_threads:  Maximum number of threads for local execution. Defaults to 4
+            retries:      Number of retries upon failure of a task. Defaults to 0
+            enable_cache: If `True` enable function value caching.
         """
-        super().__init__()
+        super().__init__(enable_cache=enable_cache)
 
         self._batch_id: int
         self._variables: NDArray[np.float64]
@@ -110,6 +112,7 @@ class ParslEvaluator(ConcurrentEvaluator):
         batch_id: int,
         variables: NDArray[np.float64],
         context: EvaluatorContext,
+        active: Optional[NDArray[np.bool_]],
     ) -> Dict[int, ConcurrentTask]:
         """Launch the parsl task.
 
@@ -122,7 +125,7 @@ class ParslEvaluator(ConcurrentEvaluator):
         self._jobs = {
             job_idx: self._workflow(batch_id, job_idx, variables, context)
             for job_idx in range(variables.shape[0])
-            if context.active is None or context.active[job_idx]
+            if active is None or active[job_idx]
         }
         return {idx: futures[-1] for idx, futures in self._jobs.items()}
 

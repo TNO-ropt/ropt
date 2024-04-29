@@ -59,7 +59,7 @@ class ConcurrentTestEvaluator(ConcurrentEvaluator):
     def __init__(
         self, functions: Tuple[Callable[..., Any], ...], fail_index: int = -1
     ) -> None:
-        super().__init__()
+        super().__init__(enable_cache=True)
 
         self._executor = ThreadPoolExecutor(max_workers=4)
         self._functions = functions
@@ -72,6 +72,7 @@ class ConcurrentTestEvaluator(ConcurrentEvaluator):
         batch_id: int,  # noqa: ARG002
         variables: NDArray[np.float64],
         context: EvaluatorContext,  # noqa: ARG002
+        active: Optional[NDArray[np.bool_]],
     ) -> Dict[int, ConcurrentTask]:
         self._tasks = {
             idx: TaskTestEvaluator(
@@ -83,6 +84,7 @@ class ConcurrentTestEvaluator(ConcurrentEvaluator):
                 ),
             )
             for idx in range(variables.shape[0])
+            if active is None or active[idx]
         }
         return self._tasks
 
@@ -90,6 +92,9 @@ class ConcurrentTestEvaluator(ConcurrentEvaluator):
         for idx, task in self._tasks.items():
             if task.future.exception() is not None:
                 print(f"error in evaluation {idx}")  # noqa: T201
+
+    def disable_functions(self) -> None:
+        self._functions = (lambda _0, _1: 0.0, lambda _0, _1: 0.0)
 
 
 def test_concurrent(enopt_config: Any, test_functions: Any) -> None:
@@ -122,3 +127,34 @@ def test_concurrent_exception(
     assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
     captured = capsys.readouterr()
     assert "error in evaluation 2" in captured.out
+
+
+def test_concurrent_cache(enopt_config: Any, test_functions: Any) -> None:
+    evaluator = ConcurrentTestEvaluator(test_functions)
+
+    optimizer = EnsembleOptimizer(evaluator)
+    results1 = optimizer.start_optimization(
+        plan=[
+            {"config": enopt_config},
+            {"optimizer": {"id": "opt"}},
+            {"tracker": {"id": "optimum", "source": "opt"}},
+        ],
+    )
+    assert results1 is not None
+    assert np.allclose(results1.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+
+    # Disable the functions, not the evaluator fully relies on its cache:
+    evaluator.disable_functions()
+
+    optimizer = EnsembleOptimizer(evaluator)
+    results2 = optimizer.start_optimization(
+        plan=[
+            {"config": enopt_config},
+            {"optimizer": {"id": "opt"}},
+            {"tracker": {"id": "optimum", "source": "opt"}},
+        ],
+    )
+    assert results2 is not None
+    assert np.all(
+        np.equal(results1.evaluations.variables, results2.evaluations.variables)
+    )
