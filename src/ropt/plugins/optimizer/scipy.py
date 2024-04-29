@@ -507,6 +507,7 @@ class SciPyOptimizer:
     ) -> Tuple[Optional[NDArray[np.float64]], Optional[NDArray[np.float64]]]:
         new_function = None
         new_gradient = None
+        allow_nan = self._algorithm == "differential_evolution"
         if (
             compute_functions
             and compute_gradients
@@ -514,10 +515,16 @@ class SciPyOptimizer:
         ):
             with redirect_stdout(self._stdout):
                 new_function, _ = self._optimizer_callback(
-                    variables, return_functions=True, return_gradients=False
+                    variables,
+                    return_functions=True,
+                    return_gradients=False,
+                    allow_nan=allow_nan,
                 )
                 _, new_gradient = self._optimizer_callback(
-                    variables, return_functions=False, return_gradients=True
+                    variables,
+                    return_functions=False,
+                    return_gradients=True,
+                    allow_nan=allow_nan,
                 )
         else:
             with redirect_stdout(self._stdout):
@@ -525,7 +532,10 @@ class SciPyOptimizer:
                     variables,
                     return_functions=compute_functions,
                     return_gradients=compute_gradients,
+                    allow_nan=allow_nan,
                 )
+        if allow_nan:
+            new_function = np.where(np.isnan(new_function), np.inf, new_function)
         return new_function, new_gradient
 
     def _parse_options(self) -> Dict[str, Any]:

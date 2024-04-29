@@ -192,6 +192,51 @@ def test_scipy_bound_constraints(
         assert np.allclose(result.evaluations.variables, [0.15, 0.0, 0.2], atol=0.02)
 
 
+def test_scipy_bound_constraints_differential_evolution(
+    enopt_config: Any, evaluator: Any, test_functions: Any
+) -> None:
+    enopt_config["optimizer"]["algorithm"] = "differential_evolution"
+    enopt_config["variables"]["lower_bounds"] = [0.15, 0.0, 0.0]
+    enopt_config["variables"]["upper_bounds"] = [0.5, 0.5, 0.2]
+    enopt_config["variables"]["initial_values"][0] = 0.2
+    enopt_config["optimizer"]["options"] = {"seed": 123}
+    enopt_config["realizations"] = {"realization_min_success": 0}
+    optimizer = EnsembleOptimizer(evaluator())
+    result1 = optimizer.start_optimization(
+        plan=[
+            {"config": enopt_config},
+            {"optimizer": {"id": "opt"}},
+            {"tracker": {"id": "optimum", "source": "opt"}},
+        ],
+    )
+    assert result1 is not None
+    assert np.allclose(result1.evaluations.variables, [0.15, 0.0, 0.2], atol=0.03)
+
+    counter = 0
+
+    def _add_nan(x: Any, c: Any) -> Any:
+        nonlocal counter
+        counter += 1
+        if counter == 2:
+            counter = 0
+            return np.nan
+        return test_functions[0](x, c)
+
+    optimizer = EnsembleOptimizer(evaluator((_add_nan, test_functions[1])))
+    result2 = optimizer.start_optimization(
+        plan=[
+            {"config": enopt_config},
+            {"optimizer": {"id": "opt"}},
+            {"tracker": {"id": "optimum", "source": "opt"}},
+        ],
+    )
+    assert result2 is not None
+    assert np.allclose(result2.evaluations.variables, [0.15, 0.0, 0.2], atol=0.03)
+    assert not np.all(
+        np.equal(result1.evaluations.variables, result2.evaluations.variables)
+    )
+
+
 @pytest.mark.parametrize("method", sorted(_CONSTRAINT_SUPPORT_LINEAR_EQ))
 def test_scipy_eq_linear_constraints(
     enopt_config: Any, method: str, evaluator: Any
