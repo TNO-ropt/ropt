@@ -111,3 +111,11 @@ class Optimizer(Protocol):
         Args:
             initial_values: Vector of variables to start the optimization with.
         """
+
+    @property
+    def allow_nan(self) -> bool:
+        """Return `True` if a `NaN` is a valid function value.
+
+        Returns:
+            `True` if `NaN` is allowed.
+        """

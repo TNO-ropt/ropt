@@ -44,12 +44,17 @@ class Optimizer:
         # For implementing max_functions:
         self._completed_functions = 0
 
+        # Whether NaN values are allowed:
+        self._allow_nan = False
+
     def start(self, variables: NDArray[np.float64]) -> OptimizerExitCode:
         self._fixed_variables = variables.copy()
 
         optimizer = self._plugin_manager.get_backend(
             "optimizer", self._enopt_config.optimizer.backend
         )(self._enopt_config, self._optimizer_callback)
+        self._allow_nan = optimizer.allow_nan
+
         exit_code = OptimizerExitCode.OPTIMIZER_STEP_FINISHED
         try:
             optimizer.start(variables)
@@ -63,7 +68,6 @@ class Optimizer:
         *,
         return_functions: bool,
         return_gradients: bool,
-        allow_nan: bool = False,
     ) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
         assert return_functions or return_gradients
 
@@ -85,7 +89,6 @@ class Optimizer:
             variables,
             compute_functions=return_functions,
             compute_gradients=return_gradients,
-            allow_nan=allow_nan,
         )
 
         # Functions and gradients might need to be scaled:
@@ -151,7 +154,6 @@ class Optimizer:
         *,
         compute_functions: bool = False,
         compute_gradients: bool = False,
-        allow_nan: bool = False,
     ) -> Tuple[Results, ...]:
         assert compute_functions or compute_gradients
         self._optimizer_step.start_evaluation()
@@ -170,7 +172,7 @@ class Optimizer:
         assert self._enopt_config.realizations.realization_min_success is not None
         check_failures = (
             self._enopt_config.realizations.realization_min_success < 1
-            and not allow_nan
+            and not self._allow_nan
         )
         for result in results:
             assert isinstance(result, (FunctionResults, GradientResults))
