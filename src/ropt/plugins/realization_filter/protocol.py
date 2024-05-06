@@ -3,13 +3,15 @@
 Realization filters can be added via the plugin mechanism to implement
 additional ways to filter the realizations that are used to calculate functions
 and gradients. Any object that follows the
-[`RealizationFilter`][ropt.plugins.realization_filter.protocol.RealizationFilter]
+[`RealizationFilter`][ropt.plugins.realization_filter.protocol.RealizationFilterProtocol]
 protocol may be installed as a plugin.
 """
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional, Protocol
+
+from ropt.plugins.protocol import PluginProtocol
 
 if TYPE_CHECKING:
     import numpy as np
@@ -18,7 +20,7 @@ if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
 
 
-class RealizationFilter(Protocol):
+class RealizationFilterProtocol(Protocol):
     """Protocol for realization filter classes."""
 
     def __init__(self, enopt_config: EnOptConfig, filter_index: int) -> None:  # D107
@@ -55,4 +57,18 @@ class RealizationFilter(Protocol):
 
         Returns:
             A vector of weights of the realizations.
+        """
+
+
+class RealizationFilterPluginProtocol(PluginProtocol, Protocol):
+    """RealizationFilter plugin protocol."""
+
+    def create(
+        self, enopt_config: EnOptConfig, filter_index: int
+    ) -> RealizationFilterProtocol:
+        """Initialize the realization filter plugin.
+
+        Args:
+            enopt_config: The configuration of the optimizer
+            filter_index: The index of the transform to use
         """

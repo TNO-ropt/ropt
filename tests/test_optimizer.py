@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from copy import deepcopy
 from functools import partial
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, cast
 
 import numpy as np
 import pytest
@@ -8,22 +10,26 @@ from numpy.typing import NDArray
 
 from ropt.config.enopt import EnOptConfig
 from ropt.config.enopt.constants import DEFAULT_SEED
-from ropt.config.plan import StepConfig
 from ropt.enums import ConstraintType, EventType, OptimizerExitCode
-from ropt.events import OptimizationEvent
 from ropt.exceptions import ConfigError
 from ropt.optimization import EnsembleOptimizer, Plan, PlanContext
 from ropt.plugins import PluginManager
 from ropt.plugins.optimization_steps.evaluator import DefaultEvaluatorStep
+from ropt.plugins.optimization_steps.protocol import (
+    OptimizationStepsPluginProtocol,
+    OptimizationStepsProtocol,
+)
 from ropt.report import ResultsDataFrame
 from ropt.results import FunctionResults, GradientResults
+
+if TYPE_CHECKING:
+    from ropt.events import OptimizationEvent
 
 
 @pytest.fixture(name="enopt_config")
 def enopt_config_fixture() -> Dict[str, Any]:
     return {
         "optimizer": {
-            "algorithm": "slsqp",
             "tolerance": 1e-5,
             "max_functions": 20,
         },
@@ -611,7 +617,6 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
         "max_functions": 4,
     }
     opt_config2 = {
-        "algorithm": "slsqp",
         "speculative": True,
         "max_functions": 3,
     }
@@ -706,7 +711,7 @@ def test_two_optimizers_nested(enopt_config: Any, evaluator: Any) -> None:
 
 def test_parallelize(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["optimizer"] = {
-        "algorithm": "differential_evolution",
+        "method": "differential_evolution",
         "max_iterations": 10,
         "options": {"seed": 123, "tol": 1e-10},
     }
@@ -1039,10 +1044,10 @@ def test_restart_metadata(enopt_config: Any, evaluator: Any) -> None:
     assert reporter.frame["metadata.restart"].to_list() == 3 * [0] + 3 * [1]
 
 
-class ModifyConfig:
+class ModifyConfigStep:
     def __init__(
         self,
-        _0: StepConfig,
+        _0: Dict[str, Any],
         _1: PlanContext,
         plan: Plan,
         weights: NDArray[np.float64],
@@ -1055,6 +1060,24 @@ class ModifyConfig:
             {"objective_functions": {"weights": self._weights}}
         )
         return False
+
+
+class ModifyConfig(OptimizationStepsProtocol):
+    def __init__(self, context: PlanContext, plan: Plan) -> None:
+        self._context = context
+        self._plan = plan
+
+    def get_step(self, config: Dict[str, Any]) -> Any:
+        weights = config["modify"]["weights"]
+        return ModifyConfigStep(config, self._context, self._plan, weights)
+
+
+class ModifyConfigPlugin(OptimizationStepsPluginProtocol):
+    def create(self, context: PlanContext, plan: Plan) -> ModifyConfig:
+        return ModifyConfig(context, plan)
+
+    def is_supported(self, method: str) -> bool:
+        return method in {"modify"}
 
 
 def test_modify_enopt_in_plan(enopt_config: Any, evaluator: Any) -> None:
@@ -1072,20 +1095,16 @@ def test_modify_enopt_in_plan(enopt_config: Any, evaluator: Any) -> None:
     assert not np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
 
     plugin_manager = PluginManager()
-    plugin_manager.add_backends(
+    plugin_manager.add_plugins(
         "optimization_step",
-        {
-            "modify_backend": lambda config, context, plan: ModifyConfig(
-                config, context, plan, weights
-            )
-        },
+        {"modify_plugin": ModifyConfigPlugin()},
     )
 
     optimizer = EnsembleOptimizer(evaluator(), plugin_manager=plugin_manager)
     results = optimizer.start_optimization(
         plan=[
             {"config": enopt_config},
-            {"backend": "modify_backend", "type": "default"},
+            {"modify": {"weights": weights}},
             {"optimizer": {"id": "opt"}},
             {"tracker": {"id": "optimum", "source": "opt"}},
         ],
@@ -1094,25 +1113,43 @@ def test_modify_enopt_in_plan(enopt_config: Any, evaluator: Any) -> None:
     assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
-class EvaluatorWithProcess(DefaultEvaluatorStep):
+class EvaluatorWithProcessStep(DefaultEvaluatorStep):
     def __init__(
         self,
         config: Dict[str, Any],
         context: PlanContext,
         plan: Plan,
-        completed: List[FunctionResults],
     ) -> None:
         super().__init__(config, context, plan)
-        self._completed = completed
+        self._completed = config["completed"]
 
     def process(self, results: FunctionResults) -> None:
         self._completed.append(results)
 
 
-@pytest.mark.parametrize("backend", ["default", "evaluator_backend"])
+class EvaluatorWithProcess((OptimizationStepsProtocol)):
+    def __init__(self, context: PlanContext, plan: Plan) -> None:
+        self._context = context
+        self._plan = plan
+
+    def get_step(self, config: Dict[str, Any]) -> Any:
+        return EvaluatorWithProcessStep(
+            config["evaluator_with_process"], self._context, self._plan
+        )
+
+
+class EvaluatorWithProcessPlugin(OptimizationStepsPluginProtocol):
+    def create(self, context: PlanContext, plan: Plan) -> EvaluatorWithProcess:
+        return EvaluatorWithProcess(context, plan)
+
+    def is_supported(self, _: str) -> bool:
+        return True
+
+
+@pytest.mark.parametrize("method", ["evaluator", "evaluator_with_process"])
 @pytest.mark.parametrize("init_from", [None, "last", "optimum"])
 def test_evaluator_step(
-    enopt_config: Any, evaluator: Any, init_from: str, backend: str
+    enopt_config: Any, evaluator: Any, init_from: str, method: str
 ) -> None:
     completed: List[FunctionResults] = []
 
@@ -1127,19 +1164,15 @@ def test_evaluator_step(
     enopt_config["optimizer"]["max_functions"] = 4
 
     plugin_manager = PluginManager()
-    if backend == "evaluator_backend":
-        plugin_manager.add_backends(
+    if method == "evaluator_with_process":
+        plugin_manager.add_plugins(
             "optimization_step",
-            {
-                "evaluator_backend": lambda config, context, plan: EvaluatorWithProcess(
-                    config.model_extra["evaluator"], context, plan, completed
-                )
-            },
+            {"evaluator_plugin": EvaluatorWithProcessPlugin()},
         )
 
     optimizer = EnsembleOptimizer(evaluator(), plugin_manager=plugin_manager)
     optimizer.add_observer(EventType.FINISHED_EVALUATION, _track_evaluations)
-    if backend == "default":
+    if method == "evaluator":
         optimizer.add_observer(EventType.FINISHED_EVALUATOR_STEP, _track_evaluations)
 
     plan = [
@@ -1147,20 +1180,20 @@ def test_evaluator_step(
         {"optimizer": {"id": "opt"}},
     ]
     if init_from is None:
-        plan.append({"backend": backend, "evaluator": {}})
+        plan.append({method: {"completed": completed}})
     elif init_from == "last":
         plan.extend(
             [
                 {"tracker": {"id": "last", "source": "opt", "type": "last_result"}},
                 {"update_config": {"initial_variables": "last"}},
-                {"backend": backend, "evaluator": {}},
+                {method: {"completed": completed}},
             ]
         )
     else:
         plan.extend(
             [
                 {"update_config": {"initial_variables": "optimum"}},
-                {"backend": backend, "evaluator": {}},
+                {method: {"completed": completed}},
             ]
         )
     plan.append({"tracker": {"id": "optimum", "source": "opt"}})

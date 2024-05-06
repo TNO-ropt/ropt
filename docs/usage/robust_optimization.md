@@ -41,7 +41,7 @@ with numerous variables, utilizing numerical calculations that preclude
 straightforward analytical differentiation.
 
 `ropt` leverages standard optimization algorithms, such as those available in
-the [SciPy](https://www.scipy.org) package. These algorithms typically follow an
+the [SciPy](https://www.scipy.org) package. These methods typically follow an
 iterative approach, necessitating repeated assessments of the objective function
 and, in many cases, its gradient. Currently, it is assumed that the functions
 are not easily differentiated analytically. One of the core functions of `ropt`
@@ -55,9 +55,9 @@ code, for example, utilizing distributed resources like HPC clusters. `ropt`
 optionally provides its own code for this purpose.
 
 While many optimization scenarios involve a single run of a particular
-algorithm, there are cases where it proves beneficial to conduct multiple runs
+method, there are cases where it proves beneficial to conduct multiple runs
 using the same or different algorithms. For example, when dealing with a mix of
 continuous and discrete variables, it might be advantageous to employ different
-algorithms for each variable type. `ropt` facilitates this by offering a
+methods for each variable type. `ropt` facilitates this by offering a
 mechanism to run a workflow containing multiple optimizers, potentially of
 different types, in an alternating or nested fashion.

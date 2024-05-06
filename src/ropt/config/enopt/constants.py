@@ -22,15 +22,3 @@ DEFAULT_PERTURBATION_TYPE = PerturbationType.ABSOLUTE
 
 See also: [`PerturbationType`][ropt.enums.PerturbationType].
 """
-
-DEFAULT_OPTIMIZATION_BACKEND = "scipy"
-"""Default optimization backend."""
-
-DEFAULT_SAMPLER_BACKEND = "scipy"
-"""Default sampler backend."""
-
-DEFAULT_REALIZATION_FILTER_BACKEND = "default"
-"""Default realization backend."""
-
-DEFAULT_FUNCTION_TRANSFORM_BACKEND = "default"
-"""Default function transform backend."""

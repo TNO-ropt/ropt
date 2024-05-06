@@ -1,7 +1,6 @@
 ::: ropt.config.plan
     options:
         members:
-            - StepConfig
             - PlanConfig
             - OptimizerStepConfig
             - TrackerStepConfig

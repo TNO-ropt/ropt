@@ -9,13 +9,15 @@ from ropt.config.enopt import EnOptConfig
 from ropt.enums import OptimizerExitCode
 from ropt.exceptions import ConfigError, OptimizationAborted
 
+from .protocol import FunctionTranformPluginProtocol, FunctionTransformProtocol
+
 _MIN_STDDEV_REALIZATIONS = 2
 
 
-class DefaultFunctionTransform:
+class DefaultFunctionTransform(FunctionTransformProtocol):
     """The default function transform plugin.
 
-    This backend currently implements two methods:
+    This plugin currently implements two methods:
 
     `mean`:
     :  Calculate the combined functions as a weighted mean of the function
@@ -33,17 +35,16 @@ class DefaultFunctionTransform:
         """Initialize the function transform object.
 
         See the
-        [ropt.plugins.function_transform.protocol.FunctionTransform][]
+        [ropt.plugins.function_transform.protocol.FunctionTransformProtocol][]
         protocol.
 
         # noqa
         """
         self._enopt_config = enopt_config
         self._transform_config = enopt_config.function_transforms[transform_index]
-        if self._transform_config.method is None:
+        _, _, self._method = self._transform_config.method.lower().rpartition("/")
+        if self._method == "default":
             self._method = "mean"
-        else:
-            self._method = self._transform_config.method.lower()
         if self._method == "stddev" and self._enopt_config.gradient.merge_realizations:
             msg = (
                 "The stddev transform does not support merging "
@@ -57,7 +58,7 @@ class DefaultFunctionTransform:
         """Calculate a function from function values for each realization.
 
         See the
-        [ropt.plugins.function_transform.protocol.FunctionTransform][]
+        [ropt.plugins.function_transform.protocol.FunctionTransformProtocol][]
         protocol.
 
         # noqa
@@ -79,7 +80,7 @@ class DefaultFunctionTransform:
         """Calculate a gradient from gradients of the realizations.
 
         See the
-        [ropt.plugins.function_transform.protocol.FunctionTransform][]
+        [ropt.plugins.function_transform.protocol.FunctionTransformProtocol][]
         protocol.
 
         # noqa
@@ -150,3 +151,27 @@ class DefaultFunctionTransform:
             norm * np.dot((functions - mean[..., np.newaxis]) ** 2, weights)
         )
         return norm, mean, stddev
+
+
+class DefaultFunctionTransformPlugin(FunctionTranformPluginProtocol):
+    """Default filter transform plugin class."""
+
+    def create(
+        self, enopt_config: EnOptConfig, transform_index: int
+    ) -> DefaultFunctionTransform:
+        """Initialize the realization filter plugin.
+
+        See the [ropt.plugins.function_transform.protocol.FunctionTranformPluginProtocol][] protocol.
+
+        # noqa
+        """
+        return DefaultFunctionTransform(enopt_config, transform_index)
+
+    def is_supported(self, method: str) -> bool:
+        """Check if a method is supported.
+
+        See the [ropt.plugins.protocol.Plugin][] protocol.
+
+        # noqa
+        """
+        return method.lower() in {"default", "mean", "stddev"}

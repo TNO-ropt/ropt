@@ -46,19 +46,18 @@ class VariablesConfig(EnOptBaseModel):
 
     Info: Variable Names
         `ropt` does not use the names itself, and names can be of arbitrary
-        type, as long as they are unique. However, some optimization backends or
-        external code might need a string representation of each name, which can
-        be obtained using the
+        type, as long as they are unique. However, some optimizers or external
+        code might need a string representation of each name, which can be
+        obtained using the
         [`get_formatted_names`][ropt.config.enopt.VariablesConfig.get_formatted_names]
         method. The `delimiters` attribute is used by this method to convert the
         special case of names consisting of tuples of strings.
 
     The optional `types` field can be used to assign types to each variable,
     according to the [`VariableType`][ropt.enums.VariableType] enumeration. The
-    values can be used by the optimization backends to configure the algorithm
-    accordingly. If not provided, all variables are assumed to be continuous and
-    of real data type (corresponding to
-    [`VariableType.REAL`][ropt.enums.VariableType.REAL])
+    values can be used to configure the optimizer accordingly. If not provided,
+    all variables are assumed to be continuous and of real data type
+    (corresponding to [`VariableType.REAL`][ropt.enums.VariableType.REAL])
 
     The `offsets` and `scales` fields are optional: if given, they are
     broadcasted to the number of variables and used for scaling. The elements

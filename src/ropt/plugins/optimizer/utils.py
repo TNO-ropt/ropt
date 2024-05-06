@@ -1,4 +1,4 @@
-"""Utility functions for use by optimization backend.
+"""Utility functions for use by optimizer plugins.
 
 This module provides utility functions to validate supported constraints, filter
 linear constraints, and to retrieve the list of supported optimizers.
@@ -59,7 +59,7 @@ _MESSAGES = {
 
 def validate_supported_constraints(
     config: EnOptConfig,
-    algorithm: str,
+    method: str,
     supported_constraints: Dict[str, Set[str]],
     required_constraints: Dict[str, Set[str]],
 ) -> None:
@@ -67,7 +67,7 @@ def validate_supported_constraints(
 
     The keys of the supported_constraints and required_constraints dicts specify
     the type of the constraint as shown in the example below. The values are
-    sets of algorithm names that support or require the type of constraint
+    sets of method names that support or require the type of constraint
     specified by the key.
 
     For example:
@@ -81,23 +81,22 @@ def validate_supported_constraints(
 
     Args:
         config:                The ensemble optimizer configuration object
-        algorithm:             The algorithm to check
+        method:                The method to check
         supported_constraints: Specify the supported constraints
         required_constraints:  Specify the required constraints
     """
-    _validate_bounds(config, algorithm, supported_constraints, required_constraints)
+    _validate_bounds(config, method, supported_constraints, required_constraints)
     _validate_linear_constraints(
-        config, algorithm, supported_constraints, required_constraints
+        config, method, supported_constraints, required_constraints
     )
     _validate_nonlinear_constraints(
-        config, algorithm, supported_constraints, required_constraints
+        config, method, supported_constraints, required_constraints
     )
 
 
-def _check_constraint(  # noqa: PLR0913
+def _check_constraint(
     constraint_type: str,
-    algorithm: str,
-    optimizer_name: str,
+    method: str,
     supported_constraints: Dict[str, Set[str]],
     required_constraints: Dict[str, Set[str]],
     *,
@@ -110,24 +109,23 @@ def _check_constraint(  # noqa: PLR0913
         algo.lower() for algo in required_constraints.get(constraint_type, set())
     }
     msg = _MESSAGES[constraint_type]
-    if have_constraint and algorithm.lower() not in supported:
-        msg = f"{optimizer_name} optimizer {algorithm} does not support {msg}"
+    if have_constraint and method.lower() not in supported:
+        msg = f"optimizer {method} does not support {msg}"
         raise NotImplementedError(msg)
-    if not have_constraint and algorithm.lower() in required:
-        msg = f"{optimizer_name} optimizer {algorithm} requires {msg}"
+    if not have_constraint and method.lower() in required:
+        msg = f"optimizer {method} requires {msg}"
         raise NotImplementedError(msg)
 
 
 def _validate_bounds(
     config: EnOptConfig,
-    algorithm: str,
+    method: str,
     supported_constraints: Dict[str, Set[str]],
     required_constraints: Dict[str, Set[str]],
 ) -> None:
     _check_constraint(
         "bounds",
-        algorithm,
-        config.optimizer.backend,
+        method,
         supported_constraints,
         required_constraints,
         have_constraint=bool(
@@ -139,7 +137,7 @@ def _validate_bounds(
 
 def _validate_linear_constraints(
     config: EnOptConfig,
-    algorithm: str,
+    method: str,
     supported_constraints: Dict[str, Set[str]],
     required_constraints: Dict[str, Set[str]],
 ) -> None:
@@ -154,8 +152,7 @@ def _validate_linear_constraints(
 
     _check_constraint(
         "linear:ineq",
-        algorithm,
-        config.optimizer.backend,
+        method,
         supported_constraints,
         required_constraints,
         have_constraint=bool(
@@ -166,8 +163,7 @@ def _validate_linear_constraints(
 
     _check_constraint(
         "linear:eq",
-        algorithm,
-        config.optimizer.backend,
+        method,
         supported_constraints,
         required_constraints,
         have_constraint=bool(np.any(linear_constraints.types == ConstraintType.EQ)),
@@ -176,7 +172,7 @@ def _validate_linear_constraints(
 
 def _validate_nonlinear_constraints(
     config: EnOptConfig,
-    algorithm: str,
+    method: str,
     supported_constraints: Dict[str, Set[str]],
     required_constraints: Dict[str, Set[str]],
 ) -> None:
@@ -186,8 +182,7 @@ def _validate_nonlinear_constraints(
 
     _check_constraint(
         "nonlinear:ineq",
-        algorithm,
-        config.optimizer.backend,
+        method,
         supported_constraints,
         required_constraints,
         have_constraint=bool(
@@ -198,8 +193,7 @@ def _validate_nonlinear_constraints(
 
     _check_constraint(
         "nonlinear:eq",
-        algorithm,
-        config.optimizer.backend,
+        method,
         supported_constraints,
         required_constraints,
         have_constraint=bool(

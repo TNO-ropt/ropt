@@ -32,7 +32,6 @@ def enopt_config_fixture() -> Dict[str, Any]:
             "initial_values": [0.0, 0.0, 0.1],
         },
         "optimizer": {
-            "algorithm": "slsqp",
             "max_functions": 3,
         },
         "objective_functions": {

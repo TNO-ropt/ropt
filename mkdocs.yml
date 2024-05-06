@@ -69,8 +69,8 @@ nav:
           - "Reporting": reference/reporting.md
       - "Plugins":
           - "Plugin manager": reference/plugins.md
-          - "Optimizer backends": reference/optimizer_backends.md
-          - "Sampler backends": reference/sampler_backends.md
+          - "Optimizer plugins": reference/optimizer_plugins.md
+          - "Sampler plugins": reference/sampler_plugins.md
           - "Realization filters": reference/realization_filters.md
           - "Function transforms": reference/function_transforms.md
           - "Optimization steps": reference/optimization_steps.md

@@ -16,7 +16,6 @@ pd = pytest.importorskip("pandas")
 def enopt_config_fixture() -> Dict[str, Any]:
     return {
         "optimizer": {
-            "algorithm": "slsqp",
             "tolerance": 1e-5,
             "speculative": True,
             "max_functions": 3,

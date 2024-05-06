@@ -2,7 +2,7 @@
 
 import copy
 import warnings
-from typing import Any, ClassVar, Dict, Optional, Set, Tuple, Union
+from typing import Any, Dict, Optional, Set, Tuple, Union
 
 import numpy as np
 from numpy.random import Generator
@@ -11,6 +11,8 @@ from scipy.stats import norm, rv_continuous, truncnorm, uniform
 from scipy.stats.qmc import Halton, LatinHypercube, QMCEngine, Sobol, scale
 
 from ropt.config.enopt import EnOptConfig
+
+from .protocol import SamplerPluginProtocol, SamplerProtocol
 
 _STATS_SAMPLERS: Dict[str, Any] = {
     "uniform": uniform,
@@ -24,11 +26,13 @@ _QMC_ENGINES = {
     "lhs": LatinHypercube,
 }
 
+_SUPPORTED_METHODS: Set[str] = set(_STATS_SAMPLERS.keys()) | set(_QMC_ENGINES.keys())
 
-class SciPySampler:
-    """Backend class for producing sampling values via SciPy.
 
-    This backend implements the following sampling methods using the
+class SciPySampler(SamplerProtocol):
+    """Plugin class for producing sampling values via SciPy.
+
+    This plugin implements the following sampling methods using the
     corresponding methods from the SciPy stats module:
 
     - Sampling from [probability
@@ -63,15 +67,6 @@ class SciPySampler:
     manual for details on these options.
     """
 
-    SUPPORTED_METHODS: ClassVar[Set[str]] = {
-        "uniform",
-        "norm",
-        "truncnorm",
-        "sobol",
-        "halton",
-        "lhs",
-    }
-
     def __init__(
         self,
         enopt_config: EnOptConfig,
@@ -81,29 +76,28 @@ class SciPySampler:
     ) -> None:
         """Initialize the sampler object.
 
-        See the [ropt.plugins.sampler.protocol.Sampler][] protocol.
+        See the [ropt.plugins.sampler.protocol.SamplerProtocol][] protocol.
 
         # noqa
         """
         self._enopt_config = enopt_config
         self._sampler_config = enopt_config.samplers[sampler_index]
         self._variable_indices = variable_indices
-        if self._sampler_config.method is None:
+        _, _, self._method = self._sampler_config.method.lower().rpartition("/")
+        if self._method == "default":
             self._method = "norm"
-        else:
-            self._method = self._sampler_config.method.lower()
         self._rng = rng
         self._sampler: Union[rv_continuous, QMCEngine]
         self._options: Dict[str, Any]
-        if self._method not in self.SUPPORTED_METHODS:
-            msg = f"Method '{self._method}' is not implemented by the SciPy backend"
+        if self._method not in _SUPPORTED_METHODS:
+            msg = f"Method '{self._method}' is not implemented by the SciPy plugin"
             raise NotImplementedError(msg)
         self._sampler, self._options = self._init_sampler(self._sampler_config.options)
 
     def generate_samples(self) -> NDArray[np.float64]:
         """Generate a set of samples.
 
-        See the [ropt.plugins.sampler.protocol.Sampler][] protocol.
+        See the [ropt.plugins.sampler.protocol.SamplerProtocol][] protocol.
 
         # noqa
         """
@@ -197,3 +191,31 @@ class SciPySampler:
                 return _run_qmc_engine()
         else:
             return _run_qmc_engine()
+
+
+class SciPySamplerPlugin(SamplerPluginProtocol):
+    """Default sampler plugin class."""
+
+    def create(
+        self,
+        enopt_config: EnOptConfig,
+        sampler_index: int,
+        variable_indices: Optional[NDArray[np.intc]],
+        rng: Generator,
+    ) -> SciPySampler:
+        """Initialize the sampler plugin.
+
+        See the [ropt.plugins.sampler.protocol.SamplerPlugin][] protocol.
+
+        # noqa
+        """
+        return SciPySampler(enopt_config, sampler_index, variable_indices, rng)
+
+    def is_supported(self, method: str) -> bool:
+        """Check if a method is supported.
+
+        See the [ropt.plugins.protocol.Plugin][] protocol.
+
+        # noqa
+        """
+        return method.lower() in (_SUPPORTED_METHODS | {"default"})

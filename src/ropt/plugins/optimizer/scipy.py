@@ -37,12 +37,26 @@ from ropt.plugins.optimizer.utils import (
     validate_supported_constraints,
 )
 
-from .protocol import OptimizerCallback
+from .protocol import OptimizerCallback, OptimizerPluginProtocol, OptimizerProtocol
 
-# Default algorithm:
-_DEFAULT_ALGORITHM = "slsqp"
+_SUPPORTED_METHODS: Set[str] = {
+    name.lower()
+    for name in (
+        "Nelder-Mead",
+        "Powell",
+        "CG",
+        "BFGS",
+        "Newton-CG",
+        "L-BFGS-B",
+        "TNC",
+        "COBYLA",
+        "SLSQP",
+        "differential_evolution",
+    )
+}
 
-# Categorize the algorithms by the types of constraint they support or require.
+
+# Categorize the methods by the types of constraint they support or require.
 
 _CONSTRAINT_REQUIRES_BOUNDS = {
     "differential_evolution",
@@ -71,9 +85,7 @@ _CONSTRAINT_SUPPORT_NONLINEAR_INEQ = {
     name.lower() for name in ["COBYLA", "SLSQP", "differential_evolution"]
 }
 
-_SUPPORTS_PARALLELIZATION = {name.lower() for name in ["differential_evolution"]}
-
-# These algorithms do not use a gradient:
+# These methods do not use a gradient:
 _NO_GRADIENT = {
     name.lower()
     for name in ["Nelder-Mead", "Powell", "COBYLA", "differential_evolution"]
@@ -88,8 +100,8 @@ _ConstraintType = Union[
 ]
 
 
-class SciPyOptimizer:
-    """Backend class for optimization via SciPy.
+class SciPyOptimizer(OptimizerProtocol):
+    """Plugin class for optimization via SciPy.
 
     This class implements several optimizers provided by SciPy in the
     [`scipy.optimize`](https://docs.scipy.org/doc/scipy/tutorial/optimize.html)
@@ -106,10 +118,10 @@ class SciPyOptimizer:
     - SLSQP
     - differential_evolution
 
-    The optimizer to use is selected by setting the `algorithm` field in the
+    The optimizer to use is selected by setting the `method` field in the
     [`optimizer`][ropt.config.enopt.OptimizerConfig] field of
     [`EnOptConfig`][ropt.config.enopt.EnOptConfig] to the name of the algorithm.
-    Most of these algorithms support the general options set in the
+    Most of these methods support the general options set in the
     [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object. However, specific
     options that are normally passed as arguments in the SciPy functions can be
     provided via the `options` dictionary in the configuration object. Consult
@@ -133,22 +145,6 @@ class SciPyOptimizer:
           trust-exact, and trust-krylov.
     """
 
-    SUPPORTED_ALGORITHMS: ClassVar[Set[str]] = {
-        name.lower()
-        for name in (
-            "Nelder-Mead",
-            "Powell",
-            "CG",
-            "BFGS",
-            "Newton-CG",
-            "L-BFGS-B",
-            "TNC",
-            "COBYLA",
-            "SLSQP",
-            "differential_evolution",
-        )
-    }
-
     _supported_constraints: ClassVar[Dict[str, Set[str]]] = {
         "bounds": _CONSTRAINT_SUPPORT_BOUNDS,
         "linear:eq": _CONSTRAINT_SUPPORT_LINEAR_EQ,
@@ -165,26 +161,21 @@ class SciPyOptimizer:
     ) -> None:
         """Initialize the optimizer implemented by the SciPy plugin.
 
-        See the [ropt.plugins.optimizer.protocol.Optimizer][] protocol.
+        See the [ropt.plugins.optimizer.protocol.OptimizerProtocol][] protocol.
 
         # noqa
         """
         self._optimizer_callback = optimizer_callback
         self._config = config
-        backend = self._config.optimizer.backend
-        if self._config.optimizer.algorithm is None:
-            self._algorithm = _DEFAULT_ALGORITHM
-        else:
-            self._algorithm = self._config.optimizer.algorithm.lower()
-        if (
-            self._algorithm is not None
-            and self._algorithm not in self.SUPPORTED_ALGORITHMS
-        ):
-            msg = f"{backend} optimizer method {self._algorithm} is not supported"
+        _, _, self._method = self._config.optimizer.method.lower().rpartition("/")
+        if self._method == "default":
+            self._method = "slsqp"
+        if self._method not in _SUPPORTED_METHODS:
+            msg = f"SciPy optimizer algorithm {self._method} is not supported"
             raise NotImplementedError(msg)
         validate_supported_constraints(
             self._config,
-            self._algorithm,
+            self._method,
             self._supported_constraints,
             self._required_constraints,
         )
@@ -195,7 +186,7 @@ class SciPyOptimizer:
             List[Dict[str, _ConstraintType]],
         ]
 
-        if self._algorithm == "differential_evolution":
+        if self._method == "differential_evolution":
             self._constraints = (
                 self._initialize_linear_constraint_object()
                 + self._initialize_nonlinear_constraint_object()
@@ -215,7 +206,7 @@ class SciPyOptimizer:
     def start(self, initial_values: NDArray[np.float64]) -> None:
         """Start the optimization.
 
-        See the [ropt.plugins.optimizer.protocol.Optimizer][] protocol.
+        See the [ropt.plugins.optimizer.protocol.OptimizerProtocol][] protocol.
 
         # noqa
         """
@@ -239,7 +230,7 @@ class SciPyOptimizer:
         with Path(output_file).open("a", encoding="utf-8") as output, redirect_stdout(
             output,
         ):
-            if self._algorithm == "differential_evolution":
+            if self._method == "differential_evolution":
                 if self._config.optimizer.parallel:
                     self._options["updating"] = "deferred"
                     self._options["workers"] = 1
@@ -258,9 +249,9 @@ class SciPyOptimizer:
                     fun=self._function,
                     x0=initial_values,
                     tol=self._config.optimizer.tolerance,
-                    method=self._algorithm,
+                    method=self._method,
                     bounds=self._bounds,
-                    jac=(False if self._algorithm in _NO_GRADIENT else self._gradient),
+                    jac=(False if self._method in _NO_GRADIENT else self._gradient),
                     constraints=self._constraints,
                     options=self._options if self._options else None,
                 )
@@ -269,11 +260,11 @@ class SciPyOptimizer:
     def allow_nan(self) -> bool:
         """Whether NaN is allowed.
 
-        See the [ropt.plugins.optimizer.protocol.Optimizer][] protocol.
+        See the [ropt.plugins.optimizer.protocol.OptimizerProtocol][] protocol.
 
         # noqa
         """
-        return self._algorithm == "differential_evolution"
+        return self._method == "differential_evolution"
 
     def _initialize_bounds(self) -> Optional[Bounds]:
         if (
@@ -380,7 +371,7 @@ class SciPyOptimizer:
         for inx, constraint_type in enumerate(self._config.nonlinear_constraints.types):
             constr = "eq" if constraint_type == ConstraintType.EQ else "ineq"
             fun = partial(self._constraint_function, index=inx)
-            if self._algorithm == "cobyla":
+            if self._method == "cobyla":
                 constraints.append({"type": constr, "fun": fun})
             else:
                 jac = partial(self._constraint_gradient, index=inx)
@@ -468,7 +459,7 @@ class SciPyOptimizer:
         if self._parallel and variables.ndim > 1:
             variables = variables.T
 
-        if self._algorithm in _NO_GRADIENT:
+        if self._method in _NO_GRADIENT:
             get_gradient = False
 
         if (
@@ -553,7 +544,7 @@ class SciPyOptimizer:
         # work, but iterations will override it.
         iterations = self._config.optimizer.max_iterations
         if iterations is not None:
-            if self._algorithm == "tnc":
+            if self._method == "tnc":
                 options["maxfun"] = iterations
             else:
                 options["maxiter"] = iterations
@@ -562,7 +553,7 @@ class SciPyOptimizer:
             options["disp"] = True
 
         if (
-            self._algorithm == "differential_evolution"
+            self._method == "differential_evolution"
             and self._config.variables.types is not None
             and "integrality" not in options
         ):
@@ -571,3 +562,27 @@ class SciPyOptimizer:
             )
 
         return options
+
+
+class SciPyOptimizerPlugin(OptimizerPluginProtocol):
+    """Default filter transform plugin class."""
+
+    def create(
+        self, config: EnOptConfig, optimizer_callback: OptimizerCallback
+    ) -> SciPyOptimizer:
+        """Initialize the optimizer plugin.
+
+        See the [ropt.plugins.optimizer.protocol.OptimizerPluginProtocol][] protocol.
+
+        # noqa
+        """
+        return SciPyOptimizer(config, optimizer_callback)
+
+    def is_supported(self, method: str) -> bool:
+        """Check if a method is supported.
+
+        See the [ropt.plugins.protocol.PluginProtocol][] protocol.
+
+        # noqa
+        """
+        return method.lower() in (_SUPPORTED_METHODS | {"default"})

@@ -1,14 +1,16 @@
-"""This module defines the protocol to be followed by optimization backends.
+"""This module defines the protocol to be followed by optimization plugins.
 
-Optimization backends can be added via the plugin mechanism to implement
-additional optimization algorithms. Any object that follows the
-[`Optimizer`][ropt.plugins.optimizer.protocol.Optimizer]
+Optimization plugins can be added via the plugin mechanism to implement
+additional optimization methods. Any object that follows the
+[`Optimizer`][ropt.plugins.optimizer.protocol.OptimizerProtocol]
 protocol may be installed as a plugin.
 """
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Protocol, Tuple
+
+from ropt.plugins.protocol import PluginProtocol
 
 if TYPE_CHECKING:
     import numpy as np
@@ -21,10 +23,10 @@ class OptimizerCallback(Protocol):
     """Protocol for the optimizer callback.
 
     Optimization plugins implement optimizer classes according to the
-    [`Optimizer`][ropt.plugins.optimizer.protocol.Optimizer] protocol. Objects
-    of these classes are initialized with a callback function that follows the
-    call signature defined here. This callback should be used to request the
-    function and gradient evaluations that the optimizer needs.
+    [`Optimizer`][ropt.plugins.optimizer.protocol.OptimizerProtocol] protocol.
+    Objects of these classes are initialized with a callback function that
+    follows the call signature defined here. This callback should be used to
+    request the function and gradient evaluations that the optimizer needs.
     """
 
     def __call__(
@@ -41,8 +43,8 @@ class OptimizerCallback(Protocol):
         The optimizer callback expects a vector or matrix with variables to
         evaluate. Discrete optimizers may request function evaluations for
         multiple variable vectors, passed as the rows of a matrix.
-        Gradient-based algorithms may currently only pass a single variable
-        vector at a time.
+        Gradient-based methods may currently only pass a single variable vector
+        at a time.
 
         The `return_functions` and `return_gradients` flags determine whether
         functions and/or gradients are to be evaluated. The results are returned
@@ -78,7 +80,7 @@ class OptimizerCallback(Protocol):
         """
 
 
-class Optimizer(Protocol):
+class OptimizerProtocol(Protocol):
     """Protocol for optimizer classes.
 
     `ropt` employs plugins to implement optimizers that are called during an
@@ -118,4 +120,18 @@ class Optimizer(Protocol):
 
         Returns:
             `True` if `NaN` is allowed.
+        """
+
+
+class OptimizerPluginProtocol(PluginProtocol, Protocol):
+    """Optimizer plugin protocol."""
+
+    def create(
+        self, config: EnOptConfig, optimizer_callback: OptimizerCallback
+    ) -> OptimizerProtocol:
+        """Create an optimizer.
+
+        Args:
+            config:             The optimizer configuration to used
+            optimizer_callback: The optimizer callback
         """

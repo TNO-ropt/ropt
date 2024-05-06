@@ -1,6 +1,6 @@
 """Differential evaluation optimization example.
 
-This example uses the differential evolution algorithm to solve a discrete
+This example uses the differential evolution method to solve a discrete
 problem with a linear constraint.
 """
 
@@ -23,7 +23,7 @@ CONFIG: Dict[str, Any] = {
         "types": VariableType.INTEGER,
     },
     "optimizer": {
-        "algorithm": "differential_evolution",
+        "method": "differential_evolution",
         "options": {"integrality": [True, True], "seed": 4},
         "max_functions": 100,
         "parallel": True,

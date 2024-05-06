@@ -13,14 +13,12 @@ from ._config import (
     UpdateConfigStepConfig,
 )
 from ._plan_config import PlanConfig
-from ._step_config import StepConfig
 
 __all__ = [
     "EvaluatorStepConfig",
     "OptimizerStepConfig",
     "PlanConfig",
     "RestartStepConfig",
-    "StepConfig",
     "TrackerStepConfig",
     "UpdateConfigStepConfig",
 ]

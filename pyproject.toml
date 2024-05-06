@@ -35,6 +35,21 @@ pandas = ["pandas", "tabulate"]
 xarray = ["xarray", "netcdf4"]
 parsl = ["parsl"]
 
+[project.entry-points."ropt.plugins.optimizer"]
+scipy = "ropt.plugins.optimizer.scipy:SciPyOptimizerPlugin"
+
+[project.entry-points."ropt.plugins.sampler"]
+scipy = "ropt.plugins.sampler.scipy:SciPySamplerPlugin"
+
+[project.entry-points."ropt.plugins.realization_filter"]
+default = "ropt.plugins.realization_filter.default:DefaultRealizationFilterPlugin"
+
+[project.entry-points."ropt.plugins.function_transform"]
+default = "ropt.plugins.function_transform.default:DefaultFunctionTransformPlugin"
+
+[project.entry-points."ropt.plugins.optimization_step"]
+default = "ropt.plugins.optimization_steps.default:DefaultOptimizationStepsPlugin"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["ropt"]

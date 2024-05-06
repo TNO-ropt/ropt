@@ -1,17 +1,20 @@
+from __future__ import annotations
+
 import copy
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 import numpy as np
 import pytest
 from numpy.random import Generator, default_rng
-from numpy.typing import NDArray
 
 from ropt.config.enopt import EnOptConfig
 from ropt.evaluator._gradient import _perturb_variables
 from ropt.exceptions import ConfigError
 from ropt.optimization import EnsembleOptimizer
 from ropt.plugins import PluginManager
-from ropt.plugins.sampler.protocol import Sampler
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 
 @pytest.fixture(name="enopt_config")
@@ -26,7 +29,6 @@ def enopt_config_fixture() -> Dict[str, Any]:
         },
         "samplers": [
             {
-                "backend": "mocked",
                 "method": "test",
             },
         ],
@@ -42,7 +44,7 @@ def enopt_config_fixture() -> Dict[str, Any]:
     }
 
 
-class MockedSampler(Sampler):
+class MockedSampler:
     def __init__(
         self,
         enopt_config: EnOptConfig,
@@ -82,6 +84,20 @@ class MockedSampler(Sampler):
             diag = np.diag(samples[idx, ...])
             samples[idx, ...] = np.diag(diag)
         return samples
+
+
+class MockedSamplerPlugin:
+    def create(
+        self,
+        enopt_config: EnOptConfig,
+        sampler_index: int,
+        variable_indices: Optional[NDArray[np.intc]],
+        rng: Generator,
+    ) -> MockedSampler:
+        return MockedSampler(enopt_config, sampler_index, variable_indices, rng)
+
+    def is_supported(self, method: str) -> bool:
+        return method.lower() in {"test"}
 
 
 def test_sampler_simple(enopt_config: Any) -> None:
@@ -176,11 +192,11 @@ def test_sampler_order(enopt_config: Any, evaluator: Any) -> None:
 
 def test_sampler_plugin(enopt_config: Any, evaluator: Any) -> None:
     optimizer = EnsembleOptimizer(evaluator())
-    with pytest.raises(ConfigError, match="Sampler backend not supported: mocked"):
+    with pytest.raises(ConfigError, match="Method not found: test"):
         optimizer.start_optimization(plan=[{"config": enopt_config}, {"optimizer": {}}])
 
     plugin_manager = PluginManager()
-    plugin_manager.add_backends("sampler", {"mocked": MockedSampler})
+    plugin_manager.add_plugins("sampler", {"mocked": MockedSamplerPlugin()})
     optimizer = EnsembleOptimizer(evaluator(), plugin_manager)
     result = optimizer.start_optimization(
         plan=[
