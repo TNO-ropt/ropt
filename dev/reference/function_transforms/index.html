@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.20">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
     
     
       
@@ -630,11 +630,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../optimizer_backends/" class="md-nav__link">
+      <a href="../optimizer_plugins/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Optimizer backends
+    Optimizer plugins
   </span>
   
 
@@ -651,11 +651,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../sampler_backends/" class="md-nav__link">
+      <a href="../sampler_plugins/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Sampler backends
+    Sampler plugins
   </span>
   
 
@@ -754,17 +754,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.function_transform.protocol.FunctionTransform" class="md-nav__link">
+  <a href="#ropt.plugins.function_transform.protocol.FunctionTransformProtocol" class="md-nav__link">
     <span class="md-ellipsis">
-      FunctionTransform
+      FunctionTransformProtocol
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="FunctionTransform">
+    <nav class="md-nav" aria-label="FunctionTransformProtocol">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.function_transform.protocol.FunctionTransform.__init__" class="md-nav__link">
+  <a href="#ropt.plugins.function_transform.protocol.FunctionTransformProtocol.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -773,7 +773,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.function_transform.protocol.FunctionTransform.calculate_function" class="md-nav__link">
+  <a href="#ropt.plugins.function_transform.protocol.FunctionTransformProtocol.calculate_function" class="md-nav__link">
     <span class="md-ellipsis">
       calculate_function
     </span>
@@ -782,9 +782,33 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.function_transform.protocol.FunctionTransform.calculate_gradient" class="md-nav__link">
+  <a href="#ropt.plugins.function_transform.protocol.FunctionTransformProtocol.calculate_gradient" class="md-nav__link">
     <span class="md-ellipsis">
       calculate_gradient
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.function_transform.protocol.FunctionTranformPluginProtocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      FunctionTranformPluginProtocol
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="FunctionTranformPluginProtocol">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.function_transform.protocol.FunctionTranformPluginProtocol.create" class="md-nav__link">
+    <span class="md-ellipsis">
+      create
     </span>
   </a>
   
@@ -970,17 +994,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.function_transform.protocol.FunctionTransform" class="md-nav__link">
+  <a href="#ropt.plugins.function_transform.protocol.FunctionTransformProtocol" class="md-nav__link">
     <span class="md-ellipsis">
-      FunctionTransform
+      FunctionTransformProtocol
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="FunctionTransform">
+    <nav class="md-nav" aria-label="FunctionTransformProtocol">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.function_transform.protocol.FunctionTransform.__init__" class="md-nav__link">
+  <a href="#ropt.plugins.function_transform.protocol.FunctionTransformProtocol.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -989,7 +1013,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.function_transform.protocol.FunctionTransform.calculate_function" class="md-nav__link">
+  <a href="#ropt.plugins.function_transform.protocol.FunctionTransformProtocol.calculate_function" class="md-nav__link">
     <span class="md-ellipsis">
       calculate_function
     </span>
@@ -998,9 +1022,33 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.function_transform.protocol.FunctionTransform.calculate_gradient" class="md-nav__link">
+  <a href="#ropt.plugins.function_transform.protocol.FunctionTransformProtocol.calculate_gradient" class="md-nav__link">
     <span class="md-ellipsis">
       calculate_gradient
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.function_transform.protocol.FunctionTranformPluginProtocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      FunctionTranformPluginProtocol
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="FunctionTranformPluginProtocol">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.function_transform.protocol.FunctionTranformPluginProtocol.create" class="md-nav__link">
+    <span class="md-ellipsis">
+      create
     </span>
   </a>
   
@@ -1102,7 +1150,7 @@ plugins, and the default function transforms that are part of <code>ropt</code>.
       <p>This module defines the protocol to be followed by function transforms.</p>
 <p>Function transforms can be added via the plugin mechanism to implement
 additional ways to functions and gradient ensembles. Any object that follows the
-<a class="autorefs autorefs-internal" href="#ropt.plugins.function_transform.protocol.FunctionTransform"><code>FunctionTransform</code></a>
+<a class="autorefs autorefs-internal" href="#ropt.plugins.function_transform.protocol.FunctionTransformProtocol"><code>FunctionTransform</code></a>
 protocol may be installed as a plugin.</p>
 
   
@@ -1120,8 +1168,8 @@ protocol may be installed as a plugin.</p>
 
 
 
-<h3 id="ropt.plugins.function_transform.protocol.FunctionTransform" class="doc doc-heading">
-          <code>FunctionTransform</code>
+<h3 id="ropt.plugins.function_transform.protocol.FunctionTransformProtocol" class="doc doc-heading">
+          <code>FunctionTransformProtocol</code>
 
 
 </h3>
@@ -1152,7 +1200,7 @@ protocol may be installed as a plugin.</p>
 
 
 
-<h4 id="ropt.plugins.function_transform.protocol.FunctionTransform.__init__" class="doc doc-heading">
+<h4 id="ropt.plugins.function_transform.protocol.FunctionTransformProtocol.__init__" class="doc doc-heading">
           <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">transform_index</span><span class="p">)</span></code>
 
 </h4>
@@ -1215,7 +1263,7 @@ protocol may be installed as a plugin.</p>
 
 
 
-<h4 id="ropt.plugins.function_transform.protocol.FunctionTransform.calculate_function" class="doc doc-heading">
+<h4 id="ropt.plugins.function_transform.protocol.FunctionTransformProtocol.calculate_function" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">calculate_function</span><span class="p">(</span><span class="n">functions</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span></code>
 
 </h4>
@@ -1315,7 +1363,7 @@ be raised.</p>
 
 
 
-<h4 id="ropt.plugins.function_transform.protocol.FunctionTransform.calculate_gradient" class="doc doc-heading">
+<h4 id="ropt.plugins.function_transform.protocol.FunctionTransformProtocol.calculate_gradient" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">calculate_gradient</span><span class="p">(</span><span class="n">functions</span><span class="p">,</span> <span class="n">gradient</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span></code>
 
 </h4>
@@ -1420,6 +1468,109 @@ be raised.</p>
 
 </div>
 
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.plugins.function_transform.protocol.FunctionTranformPluginProtocol" class="doc doc-heading">
+          <code>FunctionTranformPluginProtocol</code>
+
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="ropt.plugins.protocol.PluginProtocol">PluginProtocol</span></code>, <code><span title="typing.Protocol">Protocol</span></code></p>
+
+  
+      <p>The function transform plugin protocol.</p>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="ropt.plugins.function_transform.protocol.FunctionTranformPluginProtocol.create" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">transform_index</span><span class="p">)</span></code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Initialize the function transform object.</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>enopt_config</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The configuration of the optimizer</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>transform_index</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The index of the transform to use</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
 
 
 
@@ -1475,10 +1626,12 @@ be raised.</p>
 
 
   <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.function_transform.protocol.FunctionTransformProtocol" href="#ropt.plugins.function_transform.protocol.FunctionTransformProtocol">FunctionTransformProtocol</a></code></p>
 
   
       <p>The default function transform plugin.</p>
-<p>This backend currently implements two methods:</p>
+<p>This plugin currently implements two methods:</p>
 <dl>
 <dt><code>mean</code>:</dt>
 <dd>Calculate the combined functions as a weighted mean of the function
@@ -1567,7 +1720,7 @@ be raised.</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.dd8806f2.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       

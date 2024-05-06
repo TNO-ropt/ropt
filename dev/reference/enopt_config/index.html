@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.20">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
     
     
       
@@ -635,42 +635,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.config.enopt.constants.DEFAULT_OPTIMIZATION_BACKEND" class="md-nav__link">
-    <span class="md-ellipsis">
-      DEFAULT_OPTIMIZATION_BACKEND
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.config.enopt.constants.DEFAULT_SAMPLER_BACKEND" class="md-nav__link">
-    <span class="md-ellipsis">
-      DEFAULT_SAMPLER_BACKEND
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.config.enopt.constants.DEFAULT_REALIZATION_FILTER_BACKEND" class="md-nav__link">
-    <span class="md-ellipsis">
-      DEFAULT_REALIZATION_FILTER_BACKEND
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.config.enopt.constants.DEFAULT_FUNCTION_TRANSFORM_BACKEND" class="md-nav__link">
-    <span class="md-ellipsis">
-      DEFAULT_FUNCTION_TRANSFORM_BACKEND
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -891,11 +855,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../optimizer_backends/" class="md-nav__link">
+      <a href="../optimizer_plugins/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Optimizer backends
+    Optimizer plugins
   </span>
   
 
@@ -912,11 +876,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../sampler_backends/" class="md-nav__link">
+      <a href="../sampler_plugins/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Sampler backends
+    Sampler plugins
   </span>
   
 
@@ -1275,42 +1239,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.config.enopt.constants.DEFAULT_OPTIMIZATION_BACKEND" class="md-nav__link">
-    <span class="md-ellipsis">
-      DEFAULT_OPTIMIZATION_BACKEND
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.config.enopt.constants.DEFAULT_SAMPLER_BACKEND" class="md-nav__link">
-    <span class="md-ellipsis">
-      DEFAULT_SAMPLER_BACKEND
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.config.enopt.constants.DEFAULT_REALIZATION_FILTER_BACKEND" class="md-nav__link">
-    <span class="md-ellipsis">
-      DEFAULT_REALIZATION_FILTER_BACKEND
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.config.enopt.constants.DEFAULT_FUNCTION_TRANSFORM_BACKEND" class="md-nav__link">
-    <span class="md-ellipsis">
-      DEFAULT_FUNCTION_TRANSFORM_BACKEND
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1601,18 +1529,17 @@ determines the number of variables.</p>
 <details class="info" open>
   <summary>Variable Names</summary>
   <p><code>ropt</code> does not use the names itself, and names can be of arbitrary
-type, as long as they are unique. However, some optimization backends or
-external code might need a string representation of each name, which can
-be obtained using the
+type, as long as they are unique. However, some optimizers or external
+code might need a string representation of each name, which can be
+obtained using the
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.VariablesConfig.get_formatted_names"><code>get_formatted_names</code></a>
 method. The <code>delimiters</code> attribute is used by this method to convert the
 special case of names consisting of tuples of strings.</p>
 </details>      <p>The optional <code>types</code> field can be used to assign types to each variable,
 according to the <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.VariableType"><code>VariableType</code></a> enumeration. The
-values can be used by the optimization backends to configure the algorithm
-accordingly. If not provided, all variables are assumed to be continuous and
-of real data type (corresponding to
-<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.VariableType.REAL"><code>VariableType.REAL</code></a>)</p>
+values can be used to configure the optimizer accordingly. If not provided,
+all variables are assumed to be continuous and of real data type
+(corresponding to <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.VariableType.REAL"><code>VariableType.REAL</code></a>)</p>
 <p>The <code>offsets</code> and <code>scales</code> fields are optional: if given, they are
 broadcasted to the number of variables and used for scaling. The elements
 <span class="arithmatex">\(x_i\)</span> of <code>initial_values</code>, <code>lower_bounds</code>, and <code>upper_bounds</code> fields are
@@ -2417,43 +2344,36 @@ and will behave as if the value is set to one.</p>
 <p>This class defines the configuration for optimizers, configured by the
 <code>optimizer</code> field in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>
 object.</p>
-<p>To perform the optimization, low-level optimization algorithms are employed,
-implemented in optimizer backends. The <code>backend</code> field is used to select the
-backend, which may be either built-in (such as the default <code>SciPy</code> backend)
-or installed separately as a plugin. A backend may implement multiple
-algorithms, and the <code>algorithm</code> field generally determines which one will be
-used.</p>
 <p>Although there may be significant differences in the parameters that can be
-used for different algorithms and backends, there are a few standard settings
-defined in this configuration object, which are forwarded to the backend:</p>
+used for different optimization methods, there are a few standard settings
+defined in this configuration object, which are forwarded to the optimizer:</p>
 <ul>
 <li>The maximum number of iterations allowed before the optimization should be
-  aborted by this optimizer. A backend may choose to ignore this option.</li>
+  aborted by this optimizer. The optimizer may choose to ignore this option.</li>
 <li>The maximum number of function evaluations allowed before the optimization
   is aborted.</li>
 <li>The convergence tolerance used as a stopping criterion. The exact
-  definition of the criterion depends on the backend. A backend may choose to
-  ignore this option.</li>
-<li>Whether gradients should be evaluated early, even if the optimizer does not
-  strictly need it yet. When evaluating on a distributed HPC cluster, this
-  may lead to better load-balancing for some backends/algorithms. This option
-  is only applied if the backend optimization algorithm knows how to make use
-  of it.</li>
-<li>Whether calculations for functions and gradients should be done separately,
-  even if the optimizer requests them to be evaluated together. This option
-  is useful when a filter is specified that deactivates some realizations
-  (see
-  <a class="autorefs autorefs-internal" href="#ropt.config.enopt.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>). In
-  this case, after evaluation of the functions, it may be possible to reduce
-  the number of evaluations for a following gradient calculation.</li>
-<li>Whether the algorithm may use parallelized function evaluations. This
-  option currently only applies to gradient-free algorithms and may be
-  ignored by the backend.</li>
-<li>An optional location of an output directory, where the backend algorithm
-  may store files.</li>
-<li>Generic backend algorithm options to be interpreted by the backend. The
-  options may be passed as an arbitrary dictionary, or as a list of strings.
-  It depends on the backend what form is required and how it is interpreted.</li>
+  definition of the criterion depends on the optimizer. The optimizer may
+  choose to ignore this option.</li>
+<li>Whether gradients should be evaluated early, even if the optimizer does
+  not strictly need it yet. When evaluating on a distributed HPC cluster,
+  this may lead to better load-balancing for some methods. This option is
+  only applied if the optimization algorithm knows how to make use of it.</li>
+<li>Whether calculations for functions and gradients should be done
+  separately, even if the optimizer requests them to be evaluated together.
+  This option is useful when a filter is specified that deactivates some
+  realizations (see
+  <a class="autorefs autorefs-internal" href="#ropt.config.enopt.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>).
+  In this case, after evaluation of the functions, it may be possible to
+  reduce the number of evaluations for a following gradient calculation.</li>
+<li>Whether the optimizer may use parallelized function evaluations. This
+  option currently only applies to gradient-free methods and may be ignored
+  by the optimizer.</li>
+<li>An optional location of an output directory, where the optimizer may store
+  files.</li>
+<li>Generic optimizer options that may be passed as an arbitrary dictionary,
+  or as a list of strings. It depends on the method what form is required
+  and how it is interpreted.</li>
 </ul>
 
 
@@ -2469,24 +2389,13 @@ defined in this configuration object, which are forwarded to the backend:</p>
     </thead>
     <tbody>
         <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.OptimizerConfig.backend">backend</span></code></td>
+          <td><code><span title="ropt.config.enopt.OptimizerConfig.method">method</span></code></td>
           <td>
                 <code>str</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>The name of the optimization backend</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.OptimizerConfig.algorithm">algorithm</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[str]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional name of the optimization algorithm used</p>
+              <p>Name of the optimization method used</p>
             </div>
           </td>
         </tr>
@@ -2565,7 +2474,7 @@ defined in this configuration object, which are forwarded to the backend:</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Optional output directory for use by the backend</p>
+              <p>Optional output directory for use by the optimizer</p>
             </div>
           </td>
         </tr>
@@ -2576,7 +2485,7 @@ defined in this configuration object, which are forwarded to the backend:</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Optional generic options for use by the backend</p>
+              <p>Optional generic options for use by the optimizer</p>
             </div>
           </td>
         </tr>
@@ -2815,15 +2724,11 @@ available during the optimization.</p>
 <p>By default, the final objective and constraint functions and their gradients
 are calculated from the individual realizations by a weighted sum. Function
 transforms are optionally used to modify this calculation.</p>
-<p>Function transforms are performed by a function transform backend, which
-provides the methods that implement the calculation of the final function or
-gradient from the individual realizations. The <code>backend</code> field is used to
-select the backend, which may be either built-in or installed separately as
-a plugin. A backend may implement multiple algorithms, and the <code>method</code>
-field determines which one will be used. To further specify how such a
-method should function, the <code>options</code> field can be used to pass a dictionary
-of key-value pairs. The interpretation of these options depends on the
-backend and the chosen method.</p>
+<p>The <code>method</code> field determines which method will be used to implement the
+calculation of the final function or gradient from the individual
+realizations. To further specify how such a method should function, the
+<code>options</code> field can be used to pass a dictionary of key-value pairs. The
+interpretation of these options depends on the chosen method.</p>
 
 
 
@@ -2838,21 +2743,9 @@ backend and the chosen method.</p>
     </thead>
     <tbody>
         <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.FunctionTransformConfig.backend">backend</span></code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The name of the function transform backend (default:
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.constants.DEFAULT_FUNCTION_TRANSFORM_BACKEND"><code>DEFAULT_FUNCTION_TRANSFORM_BACKEND</code></a>)</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
           <td><code><span title="ropt.config.enopt.FunctionTransformConfig.method">method</span></code></td>
           <td>
-                <code><span title="typing.Optional">Optional</span>[str]</code>
+                <code>str</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -2923,14 +2816,10 @@ filters are optionally used to change the weights of the individual
 realizations. For instance, this can be used to determine which subset of
 realizations should be used in calculating the final objective and
 constraint functions and their gradients by setting some weights to zero.</p>
-<p>Filtering is performed by a realization filter backend, which provides the
-methods that can be used to adjust the weights of the individual
-realizations. The <code>backend</code> field is used to select the backend, which may
-be either built-in or installed separately as a plugin. A backend may
-implement multiple algorithms, and the <code>method</code> field determines which one
-will be used. To further specify how such a method should function, the
-<code>options</code> field can be used to pass a dictionary of key-value pairs. The
-interpretation of these options depends on the backend and the chosen
+<p>The <code>method</code> field determines which method will be used to adjust the
+weights of the individual realizations. To further specify how such a method
+should function, the <code>options</code> field can be used to pass a dictionary of
+key-value pairs. The interpretation of these options depends on the| chosen
 method.</p>
 
 
@@ -2945,18 +2834,6 @@ method.</p>
       </tr>
     </thead>
     <tbody>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.RealizationFilterConfig.backend">backend</span></code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The name of the realization filter backend (default:
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.constants.DEFAULT_REALIZATION_FILTER_BACKEND"><code>DEFAULT_REALIZATION_FILTER_BACKEND</code></a>)</p>
-            </div>
-          </td>
-        </tr>
         <tr class="doc-section-item">
           <td><code><span title="ropt.config.enopt.RealizationFilterConfig.method">method</span></code></td>
           <td>
@@ -3031,14 +2908,11 @@ the index of the sampler for each variable.</p>
 deterministic or stochastic in nature. These perturbations are generally
 produced by sampler objects that produce perturbation values to add to the
 unperturbed variables.</p>
-<p>Perturbation values are produced by a sampler backend, which provides the
-methods that can be used. The <code>backend</code> field is used to select the backend,
-which may be either built-in or installed separately as a plugin. A backend
-may implement multiple algorithms, and the <code>method</code> field determines which
-one will be used. To further specify how such a method should function, the
-<code>options</code> field can be used to pass a dictionary of key-value pairs. The
-interpretation of these options depends on the backend and the chosen
-method.</p>
+<p>Perturbation values are produced by a sampler, which provides the methods
+that can be used. The <code>method</code> field determines which sampler method will be
+used. To further specify how such a method should function, the <code>options</code>
+field can be used to pass a dictionary of key-value pairs. The
+interpretation of these options depends on the chosen method.</p>
 <p>By default, a different set of perturbed variables is generated for each
 realization. By setting the <code>shared</code> flag to <code>True</code>, the sampler can be
 directed to use the same set of perturbed values for each realization.</p>
@@ -3056,21 +2930,9 @@ directed to use the same set of perturbed values for each realization.</p>
     </thead>
     <tbody>
         <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.SamplerConfig.backend">backend</span></code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The name of the sampler backend (default:
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.constants.DEFAULT_SAMPLER_BACKEND"><code>DEFAULT_SAMPLER_BACKEND</code></a>)</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
           <td><code><span title="ropt.config.enopt.SamplerConfig.method">method</span></code></td>
           <td>
-                <code><span title="typing.Optional">Optional</span>[str]</code>
+                <code>str</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -3260,90 +3122,6 @@ directed to use the same set of perturbed values for each realization.</p>
 
 </div>
 
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.config.enopt.constants.DEFAULT_OPTIMIZATION_BACKEND" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">DEFAULT_OPTIMIZATION_BACKEND</span> <span class="o">=</span> <span class="s1">&#39;scipy&#39;</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
-  </span>
-
-</h3>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Default optimization backend.</p>
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.config.enopt.constants.DEFAULT_SAMPLER_BACKEND" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">DEFAULT_SAMPLER_BACKEND</span> <span class="o">=</span> <span class="s1">&#39;scipy&#39;</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
-  </span>
-
-</h3>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Default sampler backend.</p>
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.config.enopt.constants.DEFAULT_REALIZATION_FILTER_BACKEND" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">DEFAULT_REALIZATION_FILTER_BACKEND</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
-  </span>
-
-</h3>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Default realization backend.</p>
-  </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.config.enopt.constants.DEFAULT_FUNCTION_TRANSFORM_BACKEND" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">DEFAULT_FUNCTION_TRANSFORM_BACKEND</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span></code>
-  
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
-  </span>
-
-</h3>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Default function transform backend.</p>
-  </div>
-
-</div>
-
 
 
 
@@ -3408,7 +3186,7 @@ directed to use the same set of perturbed values for each realization.</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.dd8806f2.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       

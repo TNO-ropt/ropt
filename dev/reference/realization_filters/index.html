@@ -9,14 +9,14 @@
       
       
       
-        <link rel="prev" href="../sampler_backends/">
+        <link rel="prev" href="../sampler_plugins/">
       
       
         <link rel="next" href="../function_transforms/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.20">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
     
     
       
@@ -630,11 +630,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../optimizer_backends/" class="md-nav__link">
+      <a href="../optimizer_plugins/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Optimizer backends
+    Optimizer plugins
   </span>
   
 
@@ -651,11 +651,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../sampler_backends/" class="md-nav__link">
+      <a href="../sampler_plugins/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Sampler backends
+    Sampler plugins
   </span>
   
 
@@ -733,17 +733,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilter" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterProtocol" class="md-nav__link">
     <span class="md-ellipsis">
-      RealizationFilter
+      RealizationFilterProtocol
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="RealizationFilter">
+    <nav class="md-nav" aria-label="RealizationFilterProtocol">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilter.__init__" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterProtocol.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -752,9 +752,33 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilter.get_realization_weights" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterProtocol.get_realization_weights" class="md-nav__link">
     <span class="md-ellipsis">
       get_realization_weights
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterPluginProtocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      RealizationFilterPluginProtocol
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RealizationFilterPluginProtocol">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterPluginProtocol.create" class="md-nav__link">
+    <span class="md-ellipsis">
+      create
     </span>
   </a>
   
@@ -997,17 +1021,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilter" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterProtocol" class="md-nav__link">
     <span class="md-ellipsis">
-      RealizationFilter
+      RealizationFilterProtocol
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="RealizationFilter">
+    <nav class="md-nav" aria-label="RealizationFilterProtocol">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilter.__init__" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterProtocol.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -1016,9 +1040,33 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilter.get_realization_weights" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterProtocol.get_realization_weights" class="md-nav__link">
     <span class="md-ellipsis">
       get_realization_weights
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterPluginProtocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      RealizationFilterPluginProtocol
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RealizationFilterPluginProtocol">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterPluginProtocol.create" class="md-nav__link">
+    <span class="md-ellipsis">
+      create
     </span>
   </a>
   
@@ -1162,7 +1210,7 @@ constraints.</p>
 <p>Realization filters can be added via the plugin mechanism to implement
 additional ways to filter the realizations that are used to calculate functions
 and gradients. Any object that follows the
-<a class="autorefs autorefs-internal" href="#ropt.plugins.realization_filter.protocol.RealizationFilter"><code>RealizationFilter</code></a>
+<a class="autorefs autorefs-internal" href="#ropt.plugins.realization_filter.protocol.RealizationFilterProtocol"><code>RealizationFilter</code></a>
 protocol may be installed as a plugin.</p>
 
   
@@ -1180,8 +1228,8 @@ protocol may be installed as a plugin.</p>
 
 
 
-<h3 id="ropt.plugins.realization_filter.protocol.RealizationFilter" class="doc doc-heading">
-          <code>RealizationFilter</code>
+<h3 id="ropt.plugins.realization_filter.protocol.RealizationFilterProtocol" class="doc doc-heading">
+          <code>RealizationFilterProtocol</code>
 
 
 </h3>
@@ -1212,7 +1260,7 @@ protocol may be installed as a plugin.</p>
 
 
 
-<h4 id="ropt.plugins.realization_filter.protocol.RealizationFilter.__init__" class="doc doc-heading">
+<h4 id="ropt.plugins.realization_filter.protocol.RealizationFilterProtocol.__init__" class="doc doc-heading">
           <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">filter_index</span><span class="p">)</span></code>
 
 </h4>
@@ -1275,7 +1323,7 @@ protocol may be installed as a plugin.</p>
 
 
 
-<h4 id="ropt.plugins.realization_filter.protocol.RealizationFilter.get_realization_weights" class="doc doc-heading">
+<h4 id="ropt.plugins.realization_filter.protocol.RealizationFilterProtocol.get_realization_weights" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">get_realization_weights</span><span class="p">(</span><span class="n">objectives</span><span class="p">,</span> <span class="n">constraints</span><span class="p">)</span></code>
 
 </h4>
@@ -1378,6 +1426,109 @@ before use, hence any non-negative weight value is permissable.</p>
 
 </div>
 
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.plugins.realization_filter.protocol.RealizationFilterPluginProtocol" class="doc doc-heading">
+          <code>RealizationFilterPluginProtocol</code>
+
+
+</h3>
+
+
+  <div class="doc doc-contents ">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="ropt.plugins.protocol.PluginProtocol">PluginProtocol</span></code>, <code><span title="typing.Protocol">Protocol</span></code></p>
+
+  
+      <p>RealizationFilter plugin protocol.</p>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h4 id="ropt.plugins.realization_filter.protocol.RealizationFilterPluginProtocol.create" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">filter_index</span><span class="p">)</span></code>
+
+</h4>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Initialize the realization filter plugin.</p>
+
+
+
+  <p><span class="doc-section-title">Parameters:</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="doc-section-item">
+          <td><code>enopt_config</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The configuration of the optimizer</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr class="doc-section-item">
+          <td><code>filter_index</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The index of the transform to use</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
 
 
 
@@ -1433,10 +1584,12 @@ before use, hence any non-negative weight value is permissable.</p>
 
 
   <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.realization_filter.protocol.RealizationFilterProtocol" href="#ropt.plugins.realization_filter.protocol.RealizationFilterProtocol">RealizationFilterProtocol</a></code></p>
 
   
-      <p>The default realization filter backend class.</p>
-<p>This backend currently implements four methods:</p>
+      <p>The default realization filter plugin class.</p>
+<p>This plugin currently implements four methods:</p>
 <dl>
 <dt><code>sort-objective</code>:</dt>
 <dd>Filter realizations by selecting a range of objective values. This filter
@@ -1908,7 +2061,7 @@ subtracting the right-hand-side value the following applies:</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.dd8806f2.min.js"></script>
+      <script src="../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       
