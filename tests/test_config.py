@@ -26,8 +26,7 @@ def enopt_config_fixture() -> Dict[str, Any]:
             "weights": [1.0],
         },
         "optimizer": {
-            "backend": "test",
-            "algorithm": "dummy",
+            "method": "dummy",
         },
     }
 

@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import Any, Dict
 
 from ._enopt_base_model import EnOptBaseModel
-from .constants import DEFAULT_REALIZATION_FILTER_BACKEND
 
 
 class RealizationFilterConfig(EnOptBaseModel):
@@ -24,23 +23,16 @@ class RealizationFilterConfig(EnOptBaseModel):
     realizations should be used in calculating the final objective and
     constraint functions and their gradients by setting some weights to zero.
 
-    Filtering is performed by a realization filter backend, which provides the
-    methods that can be used to adjust the weights of the individual
-    realizations. The `backend` field is used to select the backend, which may
-    be either built-in or installed separately as a plugin. A backend may
-    implement multiple algorithms, and the `method` field determines which one
-    will be used. To further specify how such a method should function, the
-    `options` field can be used to pass a dictionary of key-value pairs. The
-    interpretation of these options depends on the backend and the chosen
+    The `method` field determines which method will be used to adjust the
+    weights of the individual realizations. To further specify how such a method
+    should function, the `options` field can be used to pass a dictionary of
+    key-value pairs. The interpretation of these options depends on the| chosen
     method.
 
     Attributes:
-        backend: The name of the realization filter backend (default:
-            [`DEFAULT_REALIZATION_FILTER_BACKEND`][ropt.config.enopt.constants.DEFAULT_REALIZATION_FILTER_BACKEND])
         method:  The realization filter method
         options: Options to be passed to the filter
     """
 
-    backend: str = DEFAULT_REALIZATION_FILTER_BACKEND
     method: str
     options: Dict[str, Any] = {}  # noqa: RUF012

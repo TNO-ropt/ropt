@@ -7,9 +7,9 @@ Various types of plugins provide specific functionalities. Currently, `ropt`
 supports the following plugin types:
 
 1. [`optimizer`][ropt.plugins.optimizer]:
-    Backends that implement specific optimization algorithms.
+    Plugins that implement specific optimization methods.
 2. [`sampler`][ropt.plugins.sampler]:
-    Backends responsible for generating perturbations.
+    Plugins responsible for generating perturbations.
 3. [`realization_filter`][ropt.plugins.realization_filter]:
     Filters used to determine subsets of realizations.
 4. [`function_transform`][ropt.plugins.function_transform]:
@@ -20,20 +20,20 @@ supports the following plugin types:
 Plugins are managed by the [`PluginManager`][ropt.plugins.PluginManager] class.
 They can be built-in, installed separately using the standard entry points
 mechanism, or added dynamically using the
-[`add_backends`][ropt.plugins.PluginManager.add_backends] method. Protocols or
+[`add_plugins`][ropt.plugins.PluginManager.add_plugins] method. Protocols or
 abstract classes define the interface that plugin code must adhere to in order
 to implement the required functionality.
 
 The plugin manager object provides the
-[`get_backend`][ropt.plugins.PluginManager.get_backend] method, which `ropt`
-uses to retrieve the necessary plugin based on its type and name. Given the
-plugin's type and name, this method returns a callable (either a class or a
-factory function) that `ropt` uses to instantiate the plugin when needed.
+[`get_plugin`][ropt.plugins.PluginManager.get_plugin] method, which `ropt` uses
+to retrieve the necessary plugin based on its type and name. Given the plugin's
+type and name, this method returns a callable (either a class or a factory
+function) that `ropt` uses to instantiate the plugin when needed.
 """
 
-from ._manager import BackendType, PluginManager
+from ._manager import PluginManager, PluginType
 
 __all__ = [
-    "BackendType",
+    "PluginType",
     "PluginManager",
 ]

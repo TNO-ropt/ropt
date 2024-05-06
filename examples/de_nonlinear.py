@@ -1,6 +1,6 @@
 """Differential evaluation optimization example.
 
-This example uses the differential evolution algorithm to solve a discrete
+This example uses the differential evolution method to solve a discrete
 problem with a linear constraint, implemented as a non-linear constraint.
 """
 
@@ -23,7 +23,7 @@ CONFIG: Dict[str, Any] = {
         "upper_bounds": [10.0, 10.0],
     },
     "optimizer": {
-        "algorithm": "differential_evolution",
+        "method": "differential_evolution",
         "options": {"seed": 3},
         "max_functions": 100,
         "parallel": True,

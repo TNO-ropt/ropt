@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
-    from ropt.config.plan import PlanConfig, StepConfig
+    from ropt.config.plan import PlanConfig
     from ropt.evaluator import Evaluator
     from ropt.plugins import PluginManager
     from ropt.results import FunctionResults, Results
@@ -184,16 +184,15 @@ class Plan:
         )
 
     def _create_steps(
-        self, plan_config: Tuple[StepConfig, ...]
+        self, plan_config: Tuple[Dict[str, Any], ...]
     ) -> Tuple[Tuple[Any, ...], Tuple[TrackerStep, ...]]:
-        backend_names = {step_config.backend for step_config in plan_config}
-        backends = {
-            name: self._context.plugin_manager.get_backend("optimization_step", name)
-            for name in backend_names
-        }
         all_steps = [
-            backends[config.backend](config, self._context, self)
-            for config in plan_config
+            self._context.plugin_manager.get_plugin(
+                "optimization_step", method=next(iter(step_config))
+            )
+            .create(self._context, self)
+            .get_step(step_config)
+            for step_config in plan_config
         ]
         steps: List[Any] = []
         trackers: List[TrackerStep] = []

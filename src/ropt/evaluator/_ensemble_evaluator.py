@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Tuple
+from typing import TYPE_CHECKING, Iterator, List, Optional, Tuple
 
 import numpy as np
 
@@ -36,9 +36,9 @@ if TYPE_CHECKING:
 
     from ropt.config.enopt import EnOptConfig
     from ropt.plugins import PluginManager
-    from ropt.plugins.function_transform.protocol import FunctionTransform
-    from ropt.plugins.realization_filter.protocol import RealizationFilter
-    from ropt.plugins.sampler.protocol import Sampler
+    from ropt.plugins.function_transform.protocol import FunctionTransformProtocol
+    from ropt.plugins.realization_filter.protocol import RealizationFilterProtocol
+    from ropt.plugins.sampler.protocol import SamplerProtocol
 
     from ._evaluator import Evaluator
 
@@ -118,7 +118,7 @@ class EnsembleEvaluator:
             )
         )
 
-        # Gradient-based algorithms are currently not parallelized, and there is
+        # Gradient-based methods are currently not parallelized, and there is
         # only one function result. That function may be needed in a gradient
         # calculation, so it is cached here:
         self._cache_for_gradient = function_results[0]
@@ -600,54 +600,37 @@ class EnsembleEvaluator:
 
     def _init_realization_filters(
         self, plugin_manager: PluginManager
-    ) -> List[RealizationFilter]:
-        backend_names = {
-            filter_config.backend for filter_config in self._config.realization_filters
-        }
-        backends = {
-            name: plugin_manager.get_backend("realization_filter", name)
-            for name in backend_names
-        }
+    ) -> List[RealizationFilterProtocol]:
         return [
-            backends[filter_config.backend](self._config, idx)
+            plugin_manager.get_plugin(
+                "realization_filter", method=filter_config.method
+            ).create(self._config, idx)
             for idx, filter_config in enumerate(self._config.realization_filters)
         ]
 
     def _init_function_transforms(
         self, plugin_manager: PluginManager
-    ) -> List[FunctionTransform]:
-        backend_names = {
-            transform_config.backend
-            for transform_config in self._config.function_transforms
-        }
-        backends = {
-            name: plugin_manager.get_backend("function_transform", name)
-            for name in backend_names
-        }
+    ) -> List[FunctionTransformProtocol]:
         return [
-            backends[transform_config.backend](self._config, idx)
+            plugin_manager.get_plugin(
+                "function_transform", method=transform_config.method
+            ).create(self._config, idx)
             for idx, transform_config in enumerate(self._config.function_transforms)
         ]
 
     def _init_samplers(
         self, rng: Generator, plugin_manager: PluginManager
-    ) -> List[Sampler]:
-        samplers: List[Sampler] = []
-        backends: Dict[str, Any] = {}
+    ) -> List[SamplerProtocol]:
+        samplers: List[SamplerProtocol] = []
         for idx, sampler_config in enumerate(self._config.samplers):
             variable_indices = _get_indices(
                 idx, self._config.gradient.samplers, self._config.variables.indices
             )
             if variable_indices is None or variable_indices.size:
-                if sampler_config.backend not in backends:
-                    backends[sampler_config.backend] = plugin_manager.get_backend(
-                        "sampler", sampler_config.backend
-                    )
-                samplers.append(
-                    backends[sampler_config.backend](
-                        self._config, idx, variable_indices, rng
-                    )
+                plugin = plugin_manager.get_plugin(
+                    "sampler", method=sampler_config.method
                 )
+                samplers.append(plugin.create(self._config, idx, variable_indices, rng))
         return samplers
 
 

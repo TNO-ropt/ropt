@@ -2,13 +2,15 @@
 
 Samplers can be added via the plugin mechanism to implement additional ways to
 generate perturbed variables. Any object that follows the
-[`Sampler`][ropt.plugins.sampler.protocol.Sampler] protocol may be
+[`Sampler`][ropt.plugins.sampler.protocol.SamplerProtocol] protocol may be
 installed as a plugin.
 """
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional, Protocol
+
+from ropt.plugins.protocol import PluginProtocol
 
 if TYPE_CHECKING:
     import numpy as np
@@ -18,7 +20,7 @@ if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
 
 
-class Sampler(Protocol):
+class SamplerProtocol(Protocol):
     """Protocol for sampler classes.
 
     `ropt` employs plugins to implement samplers that are called during an
@@ -84,4 +86,24 @@ class Sampler(Protocol):
 
         Returns:
             The sampled values.
+        """
+
+
+class SamplerPluginProtocol(PluginProtocol, Protocol):
+    """Sampler plugin protocol."""
+
+    def create(
+        self,
+        enopt_config: EnOptConfig,
+        sampler_index: int,
+        variable_indices: Optional[NDArray[np.intc]],
+        rng: Generator,
+    ) -> SamplerProtocol:
+        """Create a sampler.
+
+        Arguments:
+            enopt_config:     The configuration of the optimizer.
+            sampler_index:    The index of the sampler to use.
+            variable_indices: The indices of the variables to sample.
+            rng:              A random generator object for use by stochastic samplers.
         """

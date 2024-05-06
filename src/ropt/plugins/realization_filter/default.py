@@ -11,6 +11,8 @@ from ropt.config.enopt import EnOptConfig
 from ropt.enums import ConstraintType, OptimizerExitCode
 from ropt.exceptions import ConfigError, OptimizationAborted
 
+from .protocol import RealizationFilterPluginProtocol, RealizationFilterProtocol
+
 if sys.version_info >= (3, 9):
     from typing import Annotated
 else:
@@ -112,10 +114,10 @@ class CVaRConstraintOptions(_ConfigBaseModel):
     percentile: Annotated[float, Field(gt=0.0, le=1.0)] = 0.5
 
 
-class DefaultRealizationFilter:
-    """The default realization filter backend class.
+class DefaultRealizationFilter(RealizationFilterProtocol):
+    """The default realization filter plugin class.
 
-    This backend currently implements four methods:
+    This plugin currently implements four methods:
 
     `sort-objective`:
     :  Filter realizations by selecting a range of objective values. This filter
@@ -160,7 +162,7 @@ class DefaultRealizationFilter:
         """Initialize the realization filter plugin.
 
         See the
-        [ropt.plugins.realization_filter.protocol.RealizationFilter][]
+        [ropt.plugins.realization_filter.protocol.RealizationFilterProtocol][]
         protocol.
 
         # noqa
@@ -174,29 +176,29 @@ class DefaultRealizationFilter:
             CVaRConstraintOptions,
         ]
 
-        method = self._filter_config.method.lower()
+        _, _, self._method = self._filter_config.method.lower().rpartition("/")
         options = self._filter_config.options
         if enopt_config.objective_functions.weights.size > 1 and np.any(
             enopt_config.objective_functions.auto_scale
         ):
             msg = (
-                f"{method} does not support auto-scaling for "
+                f"{self._method} does not support auto-scaling for "
                 "multi-objective optimization"
             )
             raise ConfigError(msg)
 
-        if method == "sort-objective":
+        if self._method == "sort-objective":
             self._filter_options = SortObjectiveOptions.model_validate(options)
             self._check_range(self._filter_options)
-        elif method == "sort-constraint":
+        elif self._method == "sort-constraint":
             self._filter_options = SortConstraintOptions.model_validate(options)
             self._check_range(self._filter_options)
-        elif method == "cvar-objective":
+        elif self._method == "cvar-objective":
             self._filter_options = CVaRObjectiveOptions.model_validate(options)
-        elif method == "cvar-constraint":
+        elif self._method == "cvar-constraint":
             self._filter_options = CVaRConstraintOptions.model_validate(options)
         else:
-            msg = f"Realization filter not supported: {method}"
+            msg = f"Realization filter not supported: {self._method}"
             raise ConfigError(msg)
 
     def get_realization_weights(  # D107
@@ -207,26 +209,22 @@ class DefaultRealizationFilter:
         """Return the updated weights of the realizations.
 
         See the
-        [ropt.plugins.realization_filter.protocol.RealizationFilter][]
+        [ropt.plugins.realization_filter.protocol.RealizationFilterProtocol][]
         protocol.
 
         # noqa
         """
         weights = self._enopt_config.realizations.weights
-        if self._filter_config.method == "sort-objective":
+        if self._method == "sort-objective":
             weights = self._sort_objectives(objectives)
-        elif (
-            self._filter_config.method == "sort-constraint" and constraints is not None
-        ):
+        elif self._method == "sort-constraint" and constraints is not None:
             weights = self._sort_constraint(constraints)
-        elif self._filter_config.method == "cvar-objective":
+        elif self._method == "cvar-objective":
             weights = self._cvar_objectives(objectives)
-        elif (
-            self._filter_config.method == "cvar-constraint" and constraints is not None
-        ):
+        elif self._method == "cvar-constraint" and constraints is not None:
             weights = self._cvar_constraint(constraints)
         else:
-            msg = f"Realization filter not supported: {self._filter_config.method}"
+            msg = f"Realization filter not supported: {self._method}"
             raise ConfigError(msg)
 
         if not np.any(weights > 0):
@@ -382,3 +380,32 @@ def _get_indices(
     items: List[Union[str, int]], names: Optional[Tuple[str, ...]]
 ) -> Tuple[int, ...]:
     return tuple(_get_index(item, names) for item in items)
+
+
+class DefaultRealizationFilterPlugin(RealizationFilterPluginProtocol):
+    """Default realization filter plugin class."""
+
+    def create(
+        self, enopt_config: EnOptConfig, filter_index: int
+    ) -> DefaultRealizationFilter:
+        """Initialize the realization filter plugin.
+
+        See the [ropt.plugins.realization_filter.protocol.RealizationFilterPlugin][] protocol.
+
+        # noqa
+        """
+        return DefaultRealizationFilter(enopt_config, filter_index)
+
+    def is_supported(self, method: str) -> bool:
+        """Check if a method is supported.
+
+        See the [ropt.plugins.protocol.Plugin][] protocol.
+
+        # noqa
+        """
+        return method.lower() in {
+            "sort-objective",
+            "sort-constraint",
+            "cvar-objective",
+            "cvar-constraint",
+        }

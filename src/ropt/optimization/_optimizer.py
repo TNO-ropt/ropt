@@ -50,9 +50,9 @@ class Optimizer:
     def start(self, variables: NDArray[np.float64]) -> OptimizerExitCode:
         self._fixed_variables = variables.copy()
 
-        optimizer = self._plugin_manager.get_backend(
-            "optimizer", self._enopt_config.optimizer.backend
-        )(self._enopt_config, self._optimizer_callback)
+        optimizer = self._plugin_manager.get_plugin(
+            "optimizer", method=self._enopt_config.optimizer.method
+        ).create(self._enopt_config, self._optimizer_callback)
         self._allow_nan = optimizer.allow_nan
 
         exit_code = OptimizerExitCode.OPTIMIZER_STEP_FINISHED

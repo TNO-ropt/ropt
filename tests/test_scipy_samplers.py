@@ -7,7 +7,7 @@ import pytest
 from ropt.enums import EventType
 from ropt.events import OptimizationEvent
 from ropt.optimization import EnsembleOptimizer
-from ropt.plugins.sampler.scipy import SciPySampler
+from ropt.plugins.sampler.scipy import _SUPPORTED_METHODS
 from ropt.results import GradientResults
 
 if TYPE_CHECKING:
@@ -33,7 +33,7 @@ def enopt_config_fixture() -> Dict[str, Any]:
     }
 
 
-@pytest.mark.parametrize("method", sorted(SciPySampler.SUPPORTED_METHODS))
+@pytest.mark.parametrize("method", sorted(_SUPPORTED_METHODS))
 def test_scipy_samplers_unconstrained(
     enopt_config: Any, method: str, evaluator: Any
 ) -> None:
@@ -70,7 +70,7 @@ def test_scipy_indexed_sampler(enopt_config: Any, evaluator: Any) -> None:
     assert pytest.approx(result.evaluations.variables[2]) != 0.5
 
 
-@pytest.mark.parametrize("method", sorted(SciPySampler.SUPPORTED_METHODS))
+@pytest.mark.parametrize("method", sorted(_SUPPORTED_METHODS))
 def test_scipy_samplers_shared(enopt_config: Any, method: str, evaluator: Any) -> None:
     enopt_config["realizations"] = {"weights": [1.0, 1.0]}
     enopt_config["samplers"] = [{"method": method}]

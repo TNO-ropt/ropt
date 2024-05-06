@@ -27,21 +27,22 @@ optimization problems:
   Conditional Value at Risk (CVaR) or standard-deviation-based functions.
 - Support for black-box optimization of arbitrary functions.
 - Support for running complex optimization workflows, such as multiple runs with
-  different optimization settings or even different optimization algorithms.
+  different optimization settings or even different optimization methods.
 - Support for nested optimization, allowing sub-sets of the variables to be
   optimized by optimization workflows that run as part of the black-box function
   to be optimized.
-- An interface for running various continuous and discrete optimization
-  algorithms. By default, an optimization backend based on
-  [`scipy.optimize`](https://docs.scipy.org/doc/scipy/tutorial/optimize.html) is
-  included, but additional backends can be added via a plugin mechanism. The
-  most common options of these optimizers can be configured in a uniform manner,
-  although algorithm- or package-specific options can still be passed.
+- An interface for running various continuous and discrete optimization methods.
+  By default, optimizers from the
+  [`scipy.optimize`](https://docs.scipy.org/doc/scipy/tutorial/optimize.html)
+  package are included, but additional optimizers can be added via a plugin
+  mechanism. The most common options of these optimizers can be configured in a
+  uniform manner, although algorithm- or package-specific options can still be
+  passed.
 - Efficient estimation of gradients using a Stochastic Simplex Approximate
-  Gradient (StoSAG) approach. Additional sampler backends for generating
-  perturbed values for gradient estimation can be added via a plugin mechanism.
+  Gradient (StoSAG) approach. Additional samplers for generating perturbed
+  values for gradient estimation can be added via a plugin mechanism.
 - Support for linear and non-linear constraints, if supported by the chosen
-  optimization backend.
+  optimizer.
 - Flexible configuration of the optimization process using
   [`pydantic`](https://pydantic-docs.helpmanual.io/).
 - Support for tracking and processing optimization results generated during the

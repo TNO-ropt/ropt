@@ -2,13 +2,15 @@
 
 Function transforms can be added via the plugin mechanism to implement
 additional ways to functions and gradient ensembles. Any object that follows the
-[`FunctionTransform`][ropt.plugins.function_transform.protocol.FunctionTransform]
+[`FunctionTransform`][ropt.plugins.function_transform.protocol.FunctionTransformProtocol]
 protocol may be installed as a plugin.
 """
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Protocol
+
+from ropt.plugins.protocol import PluginProtocol
 
 if TYPE_CHECKING:
     import numpy as np
@@ -17,7 +19,7 @@ if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
 
 
-class FunctionTransform(Protocol):
+class FunctionTransformProtocol(Protocol):
     """Protocol class for function transforms."""
 
     def __init__(self, enopt_config: EnOptConfig, transform_index: int) -> None:
@@ -69,4 +71,18 @@ class FunctionTransform(Protocol):
 
         Returns:
             The expected gradients.
+        """
+
+
+class FunctionTranformPluginProtocol(PluginProtocol, Protocol):
+    """The function transform plugin protocol."""
+
+    def create(
+        self, enopt_config: EnOptConfig, transform_index: int
+    ) -> FunctionTransformProtocol:
+        """Initialize the function transform object.
+
+        Args:
+            enopt_config:    The configuration of the optimizer
+            transform_index: The index of the transform to use
         """

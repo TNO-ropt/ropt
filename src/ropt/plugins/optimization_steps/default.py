@@ -1,8 +1,7 @@
 """This module implements the default optimization step plugin."""
 
-from typing import Any, Set
+from typing import Any, Dict
 
-from ropt.config.plan import StepConfig
 from ropt.exceptions import ConfigError
 from ropt.optimization import Plan, PlanContext
 
@@ -10,6 +9,7 @@ from .enopt_config import DefaultEnOptConfigStep
 from .evaluator import DefaultEvaluatorStep
 from .label import DefaultLabelStep
 from .optimizer import DefaultOptimizerStep
+from .protocol import OptimizationStepsPluginProtocol, OptimizationStepsProtocol
 from .reset_tracker import DefaultResetTrackerStep
 from .restart import DefaultRestartStep
 from .tracker import DefaultTrackerStep
@@ -27,32 +27,59 @@ _FACTORIES = {
 }
 
 
-def get_step(config: StepConfig, context: PlanContext, plan: Plan) -> Any:  # noqa: ANN401
-    """Create a step object.
+class DefaultOptimizationSteps(OptimizationStepsProtocol):
+    """Default plugin for optimization steps."""
 
-    Args:
-        config:  The generic optimization step configuration
-        context: The context of the optimization plan execution
-        plan:    The plan that requires the step
-    """
-    assert config.model_extra is not None
-    keys = set(config.model_extra.keys())
-    if len(keys) > 1:
-        msg = f"Step type is ambiguous: {keys}"
-        raise ConfigError(msg)
+    def __init__(self, context: PlanContext, plan: Plan) -> None:
+        """Create a default optimization step plugin.
 
-    for key, factory in _FACTORIES.items():
-        if key in keys:
-            return factory(config.model_extra[key], context, plan)
+        Args:
+            context: The context of the running plan.
+            plan:    The current plan.
+        """
+        self._context = context
+        self._plan = plan
 
-    msg = f"Unknown step type: {keys.pop()}"
-    raise TypeError(msg)
+    def get_step(self, config: Dict[str, Any]) -> Any:  # noqa: ANN401
+        """Get a step object.
+
+        Args:
+            config:  The generic optimization step configuration
+            context: The context of the optimization plan execution
+            plan:    The plan that requires the step
+        """
+        keys = set(config.keys())
+        if len(keys) > 1:
+            msg = f"Step type is ambiguous: {keys}"
+            raise ConfigError(msg)
+        key = keys.pop()
+
+        _, _, step_name = key.lower().rpartition("/")
+        factory = _FACTORIES.get(step_name)
+        if factory is not None:
+            return factory(config[key], self._context, self._plan)
+
+        msg = f"Unknown step type: {key}"
+        raise TypeError(msg)
 
 
-def get_default_steps() -> Set[str]:
-    """Return the default step types.
+class DefaultOptimizationStepsPlugin(OptimizationStepsPluginProtocol):
+    """Default filter transform plugin class."""
 
-    Returns:
-        A set of supported step type names.
-    """
-    return set(_FACTORIES.keys())
+    def create(self, context: PlanContext, plan: Plan) -> DefaultOptimizationSteps:
+        """Initialize the realization filter plugin.
+
+        See the [ropt.plugins.optimization_steps.protocol.OptimizationStepsPlugin][] protocol.
+
+        # noqa
+        """
+        return DefaultOptimizationSteps(context, plan)
+
+    def is_supported(self, method: str) -> bool:
+        """Check if a method is supported.
+
+        See the [ropt.plugins.protocol.Plugin][] protocol.
+
+        # noqa
+        """
+        return method.lower() in _FACTORIES
