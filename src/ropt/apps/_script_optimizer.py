@@ -203,7 +203,9 @@ class ScriptOptimizer:
         callbacks: Optional[Dict[EventType, Callable[..., None]]] = None,
         seed: Optional[int] = None,
         provider: Optional[ExecutionProvider] = None,
+        htex_kwargs: Optional[Dict[str, Any]] = None,
         max_threads: int = 4,
+        worker_restart: int = 0,
     ) -> None:
         """Initialize the optimizer.
 
@@ -226,7 +228,9 @@ class ScriptOptimizer:
             callbacks:             Dictionary of callbacks for the optimizer
             seed:                  Seed for the random number generator
             provider:              The provider that executes the jobs
+            htex_kwargs:           Keyword arguments forwarded to the htex executor
             max_threads:           Maximum number of threads for local runs
+            worker_restart:        Restart the workers every `worker_restart` batch.
         """
         self._plan = plan
         self._tasks = tasks
@@ -237,7 +241,9 @@ class ScriptOptimizer:
         self._callbacks = callbacks
         self._seed = seed
         self._provider = provider
+        self._htex_kwargs = htex_kwargs
         self._max_threads = max_threads
+        self._worker_restart = worker_restart
         self._status: Dict[int, Any] = {}
         self._optimal_result: Optional[FunctionResults] = None
 
@@ -434,6 +440,8 @@ class ScriptOptimizer:
                 monitor=self._monitor,
                 provider=self._provider,
                 max_threads=self._max_threads,
+                worker_restart=self._worker_restart,
+                htex_kwargs=self._htex_kwargs,
             )
             optimizer = EnsembleOptimizer(evaluator)
             optimizer.add_observer(
