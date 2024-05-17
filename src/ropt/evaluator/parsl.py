@@ -62,7 +62,7 @@ class ParslEvaluator(ConcurrentEvaluator):
 
     def __init__(  # noqa: PLR0913
         self,
-        workflow: Callable[..., Any],
+        function: Callable[..., Any],
         *,
         monitor: Optional[Callable[..., Any]] = None,
         provider: Optional[ExecutionProvider] = None,
@@ -78,7 +78,7 @@ class ParslEvaluator(ConcurrentEvaluator):
 
         Args:
             provider:       Parsl execution provider to use. By default `LocalProvider`
-            workflow:       Callback to start a single workflow run
+            function:       Function to evaluate
             monitor:        Monitor function
             htex_kwargs:    Keyword arguments forwarded to the htex executor
             max_threads:    Maximum number of threads for local execution. Defaults to 4
@@ -95,7 +95,7 @@ class ParslEvaluator(ConcurrentEvaluator):
         self._batch_id: int
         self._variables: NDArray[np.float64]
         self._jobs: Dict[int, List[Task]] = {}
-        self._workflow = workflow
+        self._function = function
         self._monitor = monitor
         self._executor: Union[ThreadPoolExecutor, HighThroughputExecutor]
 
@@ -153,7 +153,7 @@ class ParslEvaluator(ConcurrentEvaluator):
         if job_id == 0:
             self._jobs = {}
         self._batch_id = batch_id
-        job: List[Task] = self._workflow(batch_id, job_id, variables, context)
+        job: List[Task] = self._function(batch_id, job_id, variables, context)
         if job:
             self._jobs[job_id] = job
             return job[-1]

@@ -3,9 +3,8 @@ r"""Function Evaluations.
 An optimizer will repeatedly request function and gradient evaluations. In each
 iteration, it may require values for multiple variable vectors, and the
 gradients may be calculated from various perturbed variable vectors. To address
-this, the [EnsembleOptimizer][ropt.optimization.EnsembleOptimizer] class
-requires a function evaluator callback upon initialization, conforming to the
-[Evaluator][ropt.evaluator.Evaluator] signature.
+this, the optimizer requires a function evaluator callback upon initialization,
+conforming to the [Evaluator][ropt.evaluator.Evaluator] signature.
 
 The callback accepts a matrix containing multiple variable vectors to evaluate
 together with a [`EvaluatorContext`][ropt.evaluator.EvaluatorContext] providing

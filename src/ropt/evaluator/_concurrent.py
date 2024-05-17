@@ -65,10 +65,6 @@ class ConcurrentEvaluator(ABC):
     vector of variables, and return a future-like object, compatible with
     futures from the `concurrent.futures` module of Python, implementing at
     least the `done()`, `exception()`, and `result()` methods.
-
-    To use a class derived from `ConcurrentEvaluator`, pass the object via the
-    `evaluator` argument of the
-    [`EnsembleOptimizer`][ropt.optimization.EnsembleOptimizer] constructor.
     """
 
     def __init__(
@@ -109,9 +105,7 @@ class ConcurrentEvaluator(ABC):
         that contain results should be returned.
 
         This method is called by the `__call__` method, which implements the
-        [`Evaluator`][ropt.evaluator.Evaluator] callback signature and can be
-        passed by the [`EnsembleOptimizer`][ropt.optimization.EnsembleOptimizer]
-        object.
+        [`Evaluator`][ropt.evaluator.Evaluator] callback signature.
 
         The `context` argument with optional information is passed from the
         `__call__` method unchanged.

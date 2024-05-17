@@ -14,7 +14,8 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.optimization import EnsembleOptimizer
+from ropt.workflow import BasicWorkflow
+
 
 def rosenbrock(
     variables: NDArray[np.float64],                                   # (1)!
@@ -31,14 +32,9 @@ CONFIG = {                                                            # (4)!
     "gradient": {"perturbation_magnitudes": 1e-6}                     # (5)!
 }
 
-PLAN = [                                                              # (6)!
-    {"config": CONFIG},                                               # (7)!
-    {"optimizer": {"id": "opt"}},                                     # (8)!
-    {"tracker": {"id": "optimum", "source": "opt"}},                  # (9)!
-]
-
-optimizer = EnsembleOptimizer(rosenbrock)                             # (10)!
-optimum = optimizer.start_optimization(plan=PLAN)                     # (11)!
+workflow = BasicWorkflow(CONFIG, rosenbrock)                          # (6)!
+workflow.run()                                                        # (7)!
+optimum = workflow.results                                            # (8)
 
 print(
     optimum.evaluations.variables,
@@ -59,15 +55,9 @@ print(
 4. Create an optimizer configuration with default values except for initial
    values and perturbation magnitudes.
 5. Set perturbation magnitudes to a small value for accurate gradient estimation.
-6. The optimization plan describes the steps used to run the optimization.
-7. Set the optimizer configuration.
-8. Run the optimizer (named `opt`).
-9. Define a tracker to receive results from the optimizer, identified as
-   `optimum` with the source set to `opt`.
-10. Create an [`EnsembleOptimizer`][ropt.optimization.EnsembleOptimizer] object,
-    passing the `rosenbrock` function.
-11. Start the optimization using the given plan, returning the results from the
-    last tracker, a [`FunctionResults`][ropt.results.FunctionResults] object.
+6. Make a basic workflow that runs a single optimization.
+7. Run the optimization.
+8. Get the results.
 
 Running this will print the estimated optimal variables and the corresponding
 function value:

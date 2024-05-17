@@ -14,8 +14,8 @@ supports the following plugin types:
     Filters used to determine subsets of realizations.
 4. [`function_transform`][ropt.plugins.function_transform]:
     Code used to compute objective and constraint values from realizations.
-5. [`optimization_step`][ropt.plugins.optimization_steps]:
-    Steps evaluated within an optimization plan.
+5. [`workflow`][ropt.plugins.workflow]:
+    Implements workflow context objects and steps.
 
 Plugins are managed by the [`PluginManager`][ropt.plugins.PluginManager] class.
 They can be built-in, installed separately using the standard entry points

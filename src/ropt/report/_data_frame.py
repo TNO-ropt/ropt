@@ -80,8 +80,7 @@ class ResultsDataFrame:
         """Add results to the table.
 
         This method can be called directly from any observers connected to
-        events that produce results (see
-        [`add_observer`][ropt.optimization.EnsembleOptimizer.add_observer]).
+        events that produce results.
 
         Args:
             config:  The configuration of the optimizer generating the results

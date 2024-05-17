@@ -13,7 +13,7 @@ from parsl.app.app import python_app
 
 from ropt.evaluator import EvaluatorContext
 from ropt.evaluator.parsl import ParslEvaluator, State, Task
-from ropt.optimization import EnsembleOptimizer
+from ropt.workflow import BasicWorkflow
 
 
 @dataclass
@@ -64,7 +64,7 @@ def _run_functions(
     return result
 
 
-def parsl_workflow(
+def parsl_function(
     batch_id: int,  # noqa: ARG001
     idx: int,
     variables: NDArray[np.float64],
@@ -94,18 +94,11 @@ def parsl_monitor(batch_id: int, jobs: Dict[int, List[ParslTestTask]]) -> None:
 def test_parsl(enopt_config: Any, test_functions: Any, tmp_path: Any) -> None:
     os.chdir(tmp_path)
     evaluator = ParslEvaluator(
-        workflow=partial(parsl_workflow, functions=test_functions)
+        function=partial(parsl_function, functions=test_functions)
     )
-    optimizer = EnsembleOptimizer(evaluator)
-    result = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
-    )
-    assert result is not None
-    assert np.allclose(result.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+    variables = BasicWorkflow(enopt_config, evaluator).run().variables
+    assert variables is not None
+    assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 def test_parsl_monitor(
@@ -113,19 +106,12 @@ def test_parsl_monitor(
 ) -> None:
     os.chdir(tmp_path)
     evaluator = ParslEvaluator(
-        workflow=partial(parsl_workflow, functions=test_functions),
+        function=partial(parsl_function, functions=test_functions),
         monitor=parsl_monitor,
     )
-    optimizer = EnsembleOptimizer(evaluator)
-    result = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
-    )
-    assert result is not None
-    assert np.allclose(result.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+    variables = BasicWorkflow(enopt_config, evaluator).run().variables
+    assert variables is not None
+    assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
     captured = capsys.readouterr()
     assert "batch: 0, job: 0, task: 0 has finished" in captured.out
 
@@ -135,18 +121,11 @@ def test_parsl_exception(
 ) -> None:
     os.chdir(tmp_path)
     evaluator = ParslEvaluator(
-        workflow=partial(parsl_workflow, functions=test_functions, fail_index=2),
+        function=partial(parsl_function, functions=test_functions, fail_index=2),
         monitor=parsl_monitor,
     )
-    optimizer = EnsembleOptimizer(evaluator)
-    result = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
-    )
-    assert result is not None
-    assert np.allclose(result.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+    variables = BasicWorkflow(enopt_config, evaluator).run().variables
+    assert variables is not None
+    assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
     captured = capsys.readouterr()
     assert "error in job 2" in captured.out

@@ -8,8 +8,9 @@ from ropt.config.plan import OptimizerStepConfig
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.evaluator import EnsembleEvaluator
 from ropt.exceptions import ConfigError
-from ropt.optimization import Optimizer, OptimizerStep, Plan
+from ropt.optimization import OptimizerStep, Plan
 from ropt.utils import scaling
+from ropt.workflow import Optimizer
 
 if TYPE_CHECKING:
     import numpy as np

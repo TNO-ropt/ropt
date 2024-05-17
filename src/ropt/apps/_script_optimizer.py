@@ -11,6 +11,7 @@ from shutil import rmtree
 from string import Template
 from traceback import format_exception
 from typing import (
+    TYPE_CHECKING,
     Any,
     Callable,
     DefaultDict,
@@ -31,13 +32,16 @@ from parsl.providers.base import ExecutionProvider
 from tabulate import tabulate
 
 from ropt.config.enopt import EnOptConfig
-from ropt.enums import EventType, OptimizerExitCode
+from ropt.config.workflow import WorkflowConfig
+from ropt.enums import OptimizerExitCode
 from ropt.evaluator import EvaluatorContext
 from ropt.evaluator.parsl import ParslEvaluator, State, Task
 from ropt.events import OptimizationEvent
 from ropt.exceptions import ConfigError
-from ropt.optimization import EnsembleOptimizer
-from ropt.results import FunctionResults
+from ropt.workflow import OptimizerContext, Workflow
+
+if TYPE_CHECKING:
+    from ropt.results import FunctionResults
 
 
 def _make_dict(
@@ -191,7 +195,7 @@ class ScriptOptimizer:
 
     def __init__(  # noqa: PLR0913
         self,
-        plan: Sequence[Dict[str, Any]],
+        workflow: Dict[str, Any],
         tasks: Dict[str, str],
         work_dir: Union[Path, str],
         *,
@@ -201,7 +205,6 @@ class ScriptOptimizer:
         get_function_files: Callable[
             [EnOptConfig], Tuple[Tuple[str, ...], Tuple[str, ...]]
         ] = get_function_files,
-        callbacks: Optional[Dict[EventType, Callable[..., None]]] = None,
         seed: Optional[int] = None,
         provider: Optional[ExecutionProvider] = None,
         htex_kwargs: Optional[Dict[str, Any]] = None,
@@ -218,7 +221,7 @@ class ScriptOptimizer:
         using the `work_dir` parameter of the `run()` method.
 
         Args:
-            plan:                  The optimization plan to run
+            workflow:              The optimization workflow to run
             tasks:                 A dictionary mapping task names to strings
                                    containing bash code
             work_dir:              Working directory
@@ -228,7 +231,6 @@ class ScriptOptimizer:
                                    reports
             variable_export_depth: The depth parameter for exporting variables
             get_function_files:    Callable to retrieve function file names
-            callbacks:             Dictionary of callbacks for the optimizer
             seed:                  Seed for the random number generator
             provider:              The provider that executes the jobs
             htex_kwargs:           Keyword arguments forwarded to the htex executor
@@ -237,13 +239,12 @@ class ScriptOptimizer:
             polling:               How often should be polled for status
             max_submit:            Maximum number of variables to submit simultaneously
         """
-        self._plan = plan
+        self._workflow_config = workflow
         self._tasks = tasks
         self._work_dir = Path(work_dir).resolve()
         self._job_labels = job_labels
         self._variable_export_depth = variable_export_depth
         self._get_function_files = get_function_files
-        self._callbacks = callbacks
         self._seed = seed
         self._provider = provider
         self._htex_kwargs = htex_kwargs
@@ -266,7 +267,7 @@ class ScriptOptimizer:
         handler.setFormatter(formatter)
         self._logger.addHandler(handler)
 
-    def _workflow(
+    def _function(
         self,
         batch_id: int,
         job_idx: int,
@@ -452,7 +453,7 @@ class ScriptOptimizer:
     def _handle_finished_optimizer(self, event: OptimizationEvent) -> None:
         self._log_exit_code(event)
 
-    def run(self) -> Dict[str, Optional[FunctionResults]]:
+    def run(self) -> Workflow:
         """Run the optimization."""
         cwd = Path.cwd()
         Path.mkdir(self._work_dir, parents=True, exist_ok=True)
@@ -461,7 +462,7 @@ class ScriptOptimizer:
         try:
             self._set_logger()
             evaluator = ParslEvaluator(
-                self._workflow,
+                self._function,
                 monitor=self._monitor,
                 provider=self._provider,
                 max_threads=self._max_threads,
@@ -470,19 +471,14 @@ class ScriptOptimizer:
                 polling=self._polling,
                 max_submit=self._max_submit,
             )
-            optimizer = EnsembleOptimizer(evaluator)
-            optimizer.add_observer(
-                EventType.FINISHED_OPTIMIZER_STEP,
-                self._handle_finished_optimizer,
-            )
-            if self._callbacks is not None:
-                for event, callback in self._callbacks.items():
-                    optimizer.add_observer(event, callback)
-            optimizer.start_optimization(self._plan, seed=self._seed)
+            context = OptimizerContext(evaluator=evaluator, seed=self._seed)
+            config = WorkflowConfig.model_validate(self._workflow_config)
+            workflow = Workflow(config, context)
+            workflow.run()
         finally:
             os.chdir(cwd)
 
-        return optimizer.results
+        return workflow
 
 
 def _format_list(values: List[int]) -> str:

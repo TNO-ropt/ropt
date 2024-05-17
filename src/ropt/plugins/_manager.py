@@ -12,6 +12,7 @@ from ropt.plugins.optimization_steps.base import OptimizationStepsPlugin
 from ropt.plugins.optimizer.base import OptimizerPlugin
 from ropt.plugins.realization_filter.base import RealizationFilterPlugin
 from ropt.plugins.sampler.base import SamplerPlugin
+from ropt.plugins.workflow.base import WorkflowPlugin
 
 if TYPE_CHECKING:
     from ropt.plugins.base import Plugin
@@ -27,6 +28,7 @@ PluginType = Literal[
     "realization_filter",
     "function_transform",
     "optimization_step",
+    "workflow",
 ]
 """ Plugin Types Supported by `ropt`
 
@@ -73,6 +75,7 @@ _PLUGIN_TYPES = {
     "optimization_step": OptimizationStepsPlugin,
     "sampler": SamplerPlugin,
     "realization_filter": RealizationFilterPlugin,
+    "workflow": WorkflowPlugin,
 }
 
 
@@ -107,6 +110,7 @@ class PluginManager:
             "realization_filter": {},
             "function_transform": {},
             "optimization_step": {},
+            "workflow": {},
         }
 
         for plugin_type in self._plugins:

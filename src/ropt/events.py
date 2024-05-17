@@ -16,10 +16,8 @@ if TYPE_CHECKING:
 class OptimizationEvent:
     """The `OptimizationEvent` class stores optimization event data.
 
-    After initializing an
-    [`EnsembleOptimizer`][ropt.optimization.EnsembleOptimizer] object to run an
-    optimization plan, callbacks can be connected to react to events triggered
-    during the execution of the plan. These callbacks accept a single
+    While running an optimization, callbacks can be connected to react to events
+    triggered during the execution of the plan. These callbacks accept a single
     `OptimizationEvent` object containing information about the event.
 
     The actual data contained in the object depends on the nature of the event.

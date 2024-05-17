@@ -7,7 +7,7 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt.evaluator import ConcurrentEvaluator, ConcurrentTask, EvaluatorContext
-from ropt.optimization import EnsembleOptimizer
+from ropt.workflow import BasicWorkflow
 
 
 @pytest.fixture(name="enopt_config")
@@ -96,32 +96,18 @@ class ConcurrentTestEvaluator(ConcurrentEvaluator):
 
 def test_concurrent(enopt_config: Any, test_functions: Any) -> None:
     evaluator = ConcurrentTestEvaluator(test_functions)
-    optimizer = EnsembleOptimizer(evaluator)
-    results = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
-    )
-    assert results is not None
-    assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+    variables = BasicWorkflow(enopt_config, evaluator).run().variables
+    assert variables is not None
+    assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 def test_concurrent_exception(
     enopt_config: Any, test_functions: Any, capsys: Any
 ) -> None:
     evaluator = ConcurrentTestEvaluator(test_functions, fail_index=2)
-    optimizer = EnsembleOptimizer(evaluator)
-    results = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
-    )
-    assert results is not None
-    assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+    variables = BasicWorkflow(enopt_config, evaluator).run().variables
+    assert variables is not None
+    assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
     captured = capsys.readouterr()
     assert "error in evaluation 2" in captured.out
 
@@ -129,29 +115,13 @@ def test_concurrent_exception(
 def test_concurrent_cache(enopt_config: Any, test_functions: Any) -> None:
     evaluator = ConcurrentTestEvaluator(test_functions)
 
-    optimizer = EnsembleOptimizer(evaluator)
-    results1 = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
-    )
-    assert results1 is not None
-    assert np.allclose(results1.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+    variables1 = BasicWorkflow(enopt_config, evaluator).run().variables
+    assert variables1 is not None
+    assert np.allclose(variables1, [0.0, 0.0, 0.5], atol=0.02)
 
-    # Disable the functions, not the evaluator fully relies on its cache:
+    # Disable the functions, now the evaluator fully relies on its cache:
     evaluator.disable_functions()
 
-    optimizer = EnsembleOptimizer(evaluator)
-    results2 = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
-    )
-    assert results2 is not None
-    assert np.all(
-        np.equal(results1.evaluations.variables, results2.evaluations.variables)
-    )
+    variables2 = BasicWorkflow(enopt_config, evaluator).run().variables
+    assert variables2 is not None
+    assert np.all(variables1 == variables2)

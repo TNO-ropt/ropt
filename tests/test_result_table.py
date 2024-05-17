@@ -1,11 +1,13 @@
+from functools import partial
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
 import pytest
 
-from ropt.enums import EventType
-from ropt.optimization import EnsembleOptimizer
+from ropt.config.enopt import EnOptConfig
 from ropt.report import ResultsTable
+from ropt.results import Results
+from ropt.workflow import BasicWorkflow
 
 # Requires pandas:
 pd = pytest.importorskip("pandas")
@@ -33,23 +35,29 @@ def enopt_config_fixture() -> Dict[str, Any]:
     }
 
 
+def _handle_results(
+    results: Tuple[Results, ...], reporter: ResultsTable, config: EnOptConfig
+) -> None:
+    reporter.add_results(config, results)
+
+
 def test_tabular_report_no_results(
     enopt_config: Any, evaluator: Any, tmp_path: Path
 ) -> None:
-    optimizer = EnsembleOptimizer(evaluator())
+    config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsTable({}, path=tmp_path / "results.txt")
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        lambda event: reporter.add_results(event.config, event.results),  # type: ignore
-    )
-    optimizer.start_optimization(plan=[{"config": enopt_config}, {"optimizer": {}}])
+    BasicWorkflow(
+        config,
+        evaluator(),
+        callback=partial(_handle_results, reporter=reporter, config=config),
+    ).run()
     assert not Path(tmp_path / "results.txt").exists()
 
 
 def test_tabular_report_results(
     enopt_config: Any, evaluator: Any, tmp_path: Path
 ) -> None:
-    optimizer = EnsembleOptimizer(evaluator())
+    config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsTable(
         {
             "result_id": "eval-ID",
@@ -57,11 +65,11 @@ def test_tabular_report_results(
         },
         path=tmp_path / "results.txt",
     )
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        lambda event: reporter.add_results(event.config, event.results),  # type: ignore
-    )
-    optimizer.start_optimization(plan=[{"config": enopt_config}, {"optimizer": {}}])
+    BasicWorkflow(
+        config,
+        evaluator(),
+        callback=partial(_handle_results, reporter=reporter, config=config),
+    ).run()
 
     assert Path(tmp_path / "results.txt").exists()
     results = pd.read_fwf(tmp_path / "results.txt", header=[0, 1], skiprows=[2])
@@ -82,7 +90,7 @@ def test_tabular_report_data_frames_results_formatted_names(
     enopt_config: Any, evaluator: Any, tmp_path: Path
 ) -> None:
     enopt_config["variables"]["names"] = [("a", 1), ("a", 2), ("a", 3)]
-    optimizer = EnsembleOptimizer(evaluator())
+    config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsTable(
         {
             "result_id": "eval-ID",
@@ -90,11 +98,11 @@ def test_tabular_report_data_frames_results_formatted_names(
         },
         path=tmp_path / "results.txt",
     )
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        lambda event: reporter.add_results(event.config, event.results),  # type: ignore
-    )
-    optimizer.start_optimization(plan=[{"config": enopt_config}, {"optimizer": {}}])
+    BasicWorkflow(
+        config,
+        evaluator(),
+        callback=partial(_handle_results, reporter=reporter, config=config),
+    ).run()
 
     assert Path(tmp_path / "results.txt").exists()
     results = pd.read_fwf(tmp_path / "results.txt", header=[0, 1], skiprows=[2])
@@ -108,7 +116,7 @@ def test_tabular_report_data_frames_gradients(
     enopt_config: Any, evaluator: Any, tmp_path: Path
 ) -> None:
     enopt_config["variables"]["names"] = [("a", 1), ("a", 2), ("a", 3)]
-    optimizer = EnsembleOptimizer(evaluator())
+    config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsTable(
         {
             "result_id": "eval-ID",
@@ -117,11 +125,11 @@ def test_tabular_report_data_frames_gradients(
         tmp_path / "gradients.txt",
         table_type="gradients",
     )
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        lambda event: reporter.add_results(event.config, event.results),  # type: ignore
-    )
-    optimizer.start_optimization(plan=[{"config": enopt_config}, {"optimizer": {}}])
+    BasicWorkflow(
+        config,
+        evaluator(),
+        callback=partial(_handle_results, reporter=reporter, config=config),
+    ).run()
     assert Path(tmp_path / "gradients.txt").exists()
     gradients = pd.read_fwf(tmp_path / "gradients.txt", header=[0, 1], skiprows=[2])
     assert (
@@ -136,37 +144,12 @@ def test_tabular_report_data_frames_gradients(
     assert len(gradients) == 3
 
 
-def test_tabular_report_data_frames_filter(
-    enopt_config: Any, evaluator: Any, tmp_path: Path
-) -> None:
-    enopt_config["variables"]["names"] = [("a", 1), ("a", 2), ("a", 3)]
-    optimizer = EnsembleOptimizer(evaluator())
-    reporter = ResultsTable(
-        {
-            "result_id": "eval-ID",
-            "evaluations.variables": "Variables",
-        },
-        path=tmp_path / "results.txt",
-        filters={"result_id": lambda x: x > 2},
-    )
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        lambda event: reporter.add_results(event.config, event.results),  # type: ignore
-    )
-    optimizer.start_optimization(plan=[{"config": enopt_config}, {"optimizer": {}}])
-
-    assert Path(tmp_path / "results.txt").exists()
-    results = pd.read_fwf(tmp_path / "results.txt", header=[0, 1], skiprows=[2])
-    assert len(results) == 1
-    assert results.iloc[0, 0] == [4]
-
-
 @pytest.mark.parametrize("min_header_len", [None, 4])
 def test_tabular_report_data_frames_min_header_len(
     enopt_config: Any, evaluator: Any, tmp_path: Path, min_header_len: Optional[int]
 ) -> None:
     enopt_config["variables"]["names"] = [("a", 1), ("a", 2), ("a", 3)]
-    optimizer = EnsembleOptimizer(evaluator())
+    config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsTable(
         {
             "result_id": "eval-ID",
@@ -175,11 +158,11 @@ def test_tabular_report_data_frames_min_header_len(
         path=tmp_path / "results.txt",
         min_header_len=min_header_len,
     )
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        lambda event: reporter.add_results(event.config, event.results),  # type: ignore
-    )
-    optimizer.start_optimization(plan=[{"config": enopt_config}, {"optimizer": {}}])
+    BasicWorkflow(
+        config,
+        evaluator(),
+        callback=partial(_handle_results, reporter=reporter, config=config),
+    ).run()
 
     assert Path(tmp_path / "results.txt").exists()
     with Path.open(tmp_path / "results.txt") as fp:

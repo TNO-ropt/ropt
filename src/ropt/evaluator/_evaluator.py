@@ -116,9 +116,7 @@ class EvaluatorResult:
 class Evaluator(Protocol):
     """Protocol for evaluator objects or callables.
 
-    The [`EnsembleOptimizer`][ropt.optimization.EnsembleOptimizer] object,
-    running an optimization, requires a callback argument upon initialization
-    that follows this protocol.
+    The optimizers require a callback that follows this protocol.
     """
 
     def __call__(

@@ -1,12 +1,12 @@
-from typing import Any, Dict
+from functools import partial
+from typing import Any, Dict, Tuple
 
 import pytest
 
 from ropt.config.enopt import EnOptConfig
-from ropt.enums import EventType
-from ropt.events import OptimizationEvent
-from ropt.optimization import EnsembleOptimizer
 from ropt.report import ResultsDataFrame
+from ropt.results import Results
+from ropt.workflow import BasicWorkflow
 
 # Requires pandas:
 pd = pytest.importorskip("pandas")
@@ -34,30 +34,36 @@ def enopt_config_fixture() -> Dict[str, Any]:
     }
 
 
+def _handle_results(
+    results: Tuple[Results, ...], reporter: ResultsDataFrame, config: EnOptConfig
+) -> None:
+    reporter.add_results(config, results)
+
+
 def test_dataframe_results_no_results(enopt_config: Any, evaluator: Any) -> None:
-    optimizer = EnsembleOptimizer(evaluator())
+    config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsDataFrame(set())
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        lambda event: reporter.add_results(event.config, event.results),  # type: ignore
-    )
-    optimizer.start_optimization(plan=[{"config": enopt_config}, {"optimizer": {}}])
+    BasicWorkflow(
+        config,
+        evaluator(),
+        callback=partial(_handle_results, reporter=reporter, config=config),
+    ).run()
     assert reporter.frame.empty
 
 
 def test_dataframe_results_function_results(enopt_config: Any, evaluator: Any) -> None:
-    optimizer = EnsembleOptimizer(evaluator())
+    config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsDataFrame(
         {
             "result_id",
             "evaluations.variables",
         },
     )
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        lambda event: reporter.add_results(event.config, event.results),  # type: ignore
-    )
-    optimizer.start_optimization(plan=[{"config": enopt_config}, {"optimizer": {}}])
+    BasicWorkflow(
+        config,
+        evaluator(),
+        callback=partial(_handle_results, reporter=reporter, config=config),
+    ).run()
 
     assert len(reporter.frame) == 3
     assert list(reporter.frame.columns.get_level_values(level=0)) == [
@@ -69,18 +75,18 @@ def test_dataframe_results_function_results_formatted_names(
     enopt_config: Any, evaluator: Any
 ) -> None:
     enopt_config["variables"]["names"] = [("a", 1), ("a", 2), ("a", 3)]
-    optimizer = EnsembleOptimizer(evaluator())
+    config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsDataFrame(
         {
             "result_id",
             "evaluations.variables",
         },
     )
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        lambda event: reporter.add_results(event.config, event.results),  # type: ignore
-    )
-    optimizer.start_optimization(plan=[{"config": enopt_config}, {"optimizer": {}}])
+    BasicWorkflow(
+        config,
+        evaluator(),
+        callback=partial(_handle_results, reporter=reporter, config=config),
+    ).run()
 
     assert len(reporter.frame) == 3
     assert list(reporter.frame.columns.get_level_values(level=0)) == [
@@ -90,7 +96,7 @@ def test_dataframe_results_function_results_formatted_names(
 
 def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["variables"]["names"] = [("a", 1), ("a", 2), ("a", 3)]
-    optimizer = EnsembleOptimizer(evaluator())
+    config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsDataFrame(
         {
             "result_id",
@@ -98,11 +104,11 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
         },
         table_type="gradients",
     )
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        lambda event: reporter.add_results(event.config, event.results),  # type: ignore
-    )
-    optimizer.start_optimization(plan=[{"config": enopt_config}, {"optimizer": {}}])
+    BasicWorkflow(
+        config,
+        evaluator(),
+        callback=partial(_handle_results, reporter=reporter, config=config),
+    ).run()
 
     assert len(reporter.frame) == 3
     assert list(reporter.frame.columns.get_level_values(level=0)) == [
@@ -111,7 +117,6 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
 
 
 def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
-    optimizer = EnsembleOptimizer(evaluator())
     reporter = ResultsDataFrame(
         {
             "result_id",
@@ -121,14 +126,12 @@ def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
         },
     )
 
-    def handler(event: OptimizationEvent) -> None:
-        assert event.results is not None
-        for item in event.results:
+    def handler(results: Tuple[Results, ...]) -> None:
+        for item in results:
             item.metadata["foo"] = {"bar": 1}
-        reporter.add_results(EnOptConfig.model_validate(enopt_config), event.results)
+        reporter.add_results(EnOptConfig.model_validate(enopt_config), results)
 
-    optimizer.add_observer(EventType.FINISHED_EVALUATION, handler)
-    optimizer.start_optimization(plan=[{"config": enopt_config}, {"optimizer": {}}])
+    BasicWorkflow(enopt_config, evaluator(), callback=handler).run()
 
     assert len(reporter.frame) == 3
     assert list(reporter.frame.columns.get_level_values(level=0)) == [
@@ -137,22 +140,18 @@ def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
 
 
 def test_dataframe_results_metadata_step_id(enopt_config: Any, evaluator: Any) -> None:
-    optimizer = EnsembleOptimizer(evaluator())
     reporter = ResultsDataFrame(
         {
             "result_id",
             "evaluations.variables",
-            "metadata.step_id",
+            "metadata.step_name",
         },
     )
 
-    def handler(event: OptimizationEvent) -> None:
-        assert event.results is not None
-        reporter.add_results(EnOptConfig.model_validate(enopt_config), event.results)
+    def handler(results: Tuple[Results, ...]) -> None:
+        reporter.add_results(EnOptConfig.model_validate(enopt_config), results)
 
-    optimizer.add_observer(EventType.FINISHED_EVALUATION, handler)
-    optimizer.start_optimization(
-        plan=[{"config": enopt_config}, {"optimizer": {"id": "opt"}}]
-    )
-
-    assert reporter.frame["metadata.step_id"].to_list() == ["opt"] * 3
+    runner = BasicWorkflow(enopt_config, evaluator(), callback=handler)
+    runner.workflow_config["steps"][0]["name"] = "opt"
+    runner.run()
+    assert reporter.frame["metadata.step_name"].to_list() == ["opt"] * 3

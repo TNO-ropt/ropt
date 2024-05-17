@@ -158,14 +158,12 @@ def test_check_variable_arrays_types() -> None:
     config["types"] = VariableType.INTEGER
     variables = VariablesConfig.model_validate(config)
     assert variables.types is not None
-    assert np.all(
-        np.equal(variables.types, [VariableType.INTEGER, VariableType.INTEGER])
-    )
+    assert np.all(variables.types == [VariableType.INTEGER, VariableType.INTEGER])
 
     config["types"] = [VariableType.INTEGER, VariableType.REAL]
     variables = VariablesConfig.model_validate(config)
     assert variables.types is not None
-    assert np.all(np.equal(variables.types, [VariableType.INTEGER, VariableType.REAL]))
+    assert np.all(variables.types == [VariableType.INTEGER, VariableType.REAL])
 
 
 def test_get_formatted_names() -> None:

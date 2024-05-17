@@ -50,6 +50,9 @@ default = "ropt.plugins.function_transform.default:DefaultFunctionTransformPlugi
 [project.entry-points."ropt.plugins.optimization_step"]
 default = "ropt.plugins.optimization_steps.default:DefaultOptimizationStepsPlugin"
 
+[project.entry-points."ropt.plugins.workflow"]
+default = "ropt.plugins.workflow.default:DefaultWorkflowPlugin"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["ropt"]

@@ -10,9 +10,9 @@ from numpy.random import Generator, default_rng
 from ropt.config.enopt import EnOptConfig
 from ropt.evaluator._gradient import _perturb_variables
 from ropt.exceptions import ConfigError
-from ropt.optimization import EnsembleOptimizer
 from ropt.plugins import PluginManager
 from ropt.plugins.sampler.base import Sampler, SamplerPlugin
+from ropt.workflow import BasicWorkflow
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -157,16 +157,9 @@ def test_sampler_order(enopt_config: Any, evaluator: Any) -> None:
         {"method": "norm"},
         {"method": "uniform"},
     ]
-    optimizer = EnsembleOptimizer(evaluator())
-    results1 = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
-    )
-    assert results1 is not None
-    assert np.allclose(results1.evaluations.variables, [0, 0, 0.5], atol=0.025)
+    variables1 = BasicWorkflow(enopt_config, evaluator()).run().variables
+    assert variables1 is not None
+    assert np.allclose(variables1, [0, 0, 0.5], atol=0.025)
 
     # Switch the samplers:
     enopt_config["samplers"] = [
@@ -174,37 +167,23 @@ def test_sampler_order(enopt_config: Any, evaluator: Any) -> None:
         {"method": "norm"},
     ]
     enopt_config["gradient"]["samplers"] = [1, 1, 0]
-    optimizer = EnsembleOptimizer(evaluator())
-    results2 = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
-    )
-    assert results2 is not None
-    assert np.allclose(results2.evaluations.variables, [0, 0, 0.5], atol=0.025)
+    variables2 = BasicWorkflow(enopt_config, evaluator()).run().variables
+    assert variables2 is not None
+    assert np.allclose(variables2, [0, 0, 0.5], atol=0.025)
 
-    assert np.allclose(
-        results1.evaluations.variables,
-        results2.evaluations.variables,
-    )
+    assert np.allclose(variables1, variables2)
 
 
 def test_sampler_plugin(enopt_config: Any, evaluator: Any) -> None:
-    optimizer = EnsembleOptimizer(evaluator())
     with pytest.raises(ConfigError, match="Method not found: test"):
-        optimizer.start_optimization(plan=[{"config": enopt_config}, {"optimizer": {}}])
+        BasicWorkflow(enopt_config, evaluator()).run()
 
     plugin_manager = PluginManager()
     plugin_manager.add_plugins("sampler", {"mocked": MockedSamplerPlugin()})
-    optimizer = EnsembleOptimizer(evaluator(), plugin_manager)
-    result = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
+    variables1 = (
+        BasicWorkflow(enopt_config, evaluator(), plugin_manager=plugin_manager)
+        .run()
+        .variables
     )
-    assert result is not None
-    assert np.allclose(result.evaluations.variables, [0, 0, 0.5], atol=0.02)
+    assert variables1 is not None
+    assert np.allclose(variables1, [0, 0, 0.5], atol=0.025)

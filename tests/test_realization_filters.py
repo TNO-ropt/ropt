@@ -1,18 +1,17 @@
 from functools import partial
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from ropt.enums import ConstraintType, EventType
-from ropt.events import OptimizationEvent
-from ropt.optimization import EnsembleOptimizer
+from ropt.enums import ConstraintType
 from ropt.plugins.realization_filter.default import (
     _get_cvar_weights_from_percentile,
     _sort_and_select,
 )
 from ropt.results import FunctionResults, GradientResults, Results
+from ropt.workflow import BasicWorkflow
 
 
 @pytest.fixture(name="enopt_config")
@@ -107,9 +106,9 @@ def _constraint_function(variables: NDArray[np.float64], context: Any) -> float:
     return float(result)
 
 
-def _track_results(event: OptimizationEvent, result_list: List[Results]) -> None:
-    assert event.results is not None
-    result_list.extend(event.results)
+def _track_results(results: Tuple[Results, ...], result_list: List[Results]) -> None:
+    assert results
+    result_list.extend(results)
 
 
 @pytest.mark.parametrize("split_evaluations", [True, False])
@@ -125,16 +124,9 @@ def test_sort_filter_on_objectives(
 
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations
 
-    optimizer = EnsembleOptimizer(evaluator(functions))
-    results = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
-    )
-    assert results is not None
-    assert not np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+    variables = BasicWorkflow(enopt_config, evaluator(functions)).run().variables
+    assert variables is not None
+    assert not np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
     enopt_config["realization_filters"] = [
         {
@@ -148,19 +140,15 @@ def test_sort_filter_on_objectives(
     ]
     enopt_config["objective_functions"]["realization_filters"] = [0, 0]
 
-    optimizer = EnsembleOptimizer(evaluator(functions))
     result_list: List[Results] = []
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        partial(_track_results, result_list=result_list),
-    )
-
-    results = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
+    results = (
+        BasicWorkflow(
+            enopt_config,
+            evaluator(functions),
+            callback=partial(_track_results, result_list=result_list),
+        )
+        .run()
+        .results
     )
     assert results is not None
     assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
@@ -211,18 +199,15 @@ def test_sort_filter_on_objectives_with_constraints(
     ]
     enopt_config["objective_functions"]["realization_filters"] = [0, 0]
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
-    optimizer = EnsembleOptimizer(evaluator(functions))
     result_list: List[Results] = []
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        partial(_track_results, result_list=result_list),
-    )
-    results = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
+    results = (
+        BasicWorkflow(
+            enopt_config,
+            evaluator(functions),
+            callback=partial(_track_results, result_list=result_list),
+        )
+        .run()
+        .results
     )
     assert results is not None
     assert np.allclose(results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.02)
@@ -280,18 +265,15 @@ def test_sort_filter_on_constraints(
     ]
     enopt_config["objective_functions"]["realization_filters"] = [0, 0]
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
-    optimizer = EnsembleOptimizer(evaluator(functions))
     result_list: List[Results] = []
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        partial(_track_results, result_list=result_list),
-    )
-    results = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
+    results = (
+        BasicWorkflow(
+            enopt_config,
+            evaluator(functions),
+            callback=partial(_track_results, result_list=result_list),
+        )
+        .run()
+        .results
     )
     assert results is not None
     assert np.allclose(results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.02)
@@ -338,12 +320,13 @@ def test_sort_filter_mixed(  # noqa: C901
 
     objective_values: List[NDArray[np.float64]] = []
 
-    def _add_objective(event: OptimizationEvent) -> None:
-        if event.results is not None:
-            for item in event.results:
+    def _add_objective(results: Tuple[Results, ...]) -> None:
+        if results:
+            for item in results:
                 if isinstance(item, FunctionResults):
                     assert item.functions is not None
                     objective_values.append(item.functions.weighted_objective)
+        _track_results(results, result_list=result_list)
 
     # Apply the filtering to all objectives, giving the expected result.
     enopt_config["realization_filters"] = [
@@ -358,20 +341,11 @@ def test_sort_filter_mixed(  # noqa: C901
     ]
     enopt_config["objective_functions"]["realization_filters"] = [0, 0, 0, 0]
 
-    optimizer = EnsembleOptimizer(evaluator(functions))
-    optimizer.add_observer(EventType.FINISHED_EVALUATION, _add_objective)
-
     result_list: List[Results] = []
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        partial(_track_results, result_list=result_list),
-    )
-    results = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
+    results = (
+        BasicWorkflow(enopt_config, evaluator(functions), callback=_add_objective)
+        .run()
+        .results
     )
     assert results is not None
     assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
@@ -404,20 +378,11 @@ def test_sort_filter_mixed(  # noqa: C901
     ]
     enopt_config["objective_functions"]["realization_filters"] = [0, 0, -1, -1]
 
-    optimizer = EnsembleOptimizer(evaluator(functions))
-    optimizer.add_observer(EventType.FINISHED_EVALUATION, _add_objective)
-
     result_list = []
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        partial(_track_results, result_list=result_list),
-    )
-    results = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
+    results = (
+        BasicWorkflow(enopt_config, evaluator(functions), callback=_add_objective)
+        .run()
+        .results
     )
     assert results is not None
     assert not np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
@@ -457,16 +422,9 @@ def test_cvar_filter_on_objectives(
 
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations
 
-    optimizer = EnsembleOptimizer(evaluator(functions))
-    results = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
-    )
-    assert results is not None
-    assert not np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+    variables = BasicWorkflow(enopt_config, evaluator(functions)).run().variables
+    assert variables is not None
+    assert not np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
     enopt_config["realization_filters"] = [
         {
@@ -478,18 +436,15 @@ def test_cvar_filter_on_objectives(
         },
     ]
     enopt_config["objective_functions"]["realization_filters"] = [0, 0]
-    optimizer = EnsembleOptimizer(evaluator(functions))
     result_list: List[Results] = []
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        partial(_track_results, result_list=result_list),
-    )
-    results = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
+    results = (
+        BasicWorkflow(
+            enopt_config,
+            evaluator(functions),
+            callback=partial(_track_results, result_list=result_list),
+        )
+        .run()
+        .results
     )
     assert results is not None
     assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
@@ -539,18 +494,15 @@ def test_cvar_filter_on_objectives_with_constraints(
     ]
     enopt_config["objective_functions"]["realization_filters"] = [0, 0]
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
-    optimizer = EnsembleOptimizer(evaluator(functions))
     result_list: List[Results] = []
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        partial(_track_results, result_list=result_list),
-    )
-    results = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
+    results = (
+        BasicWorkflow(
+            enopt_config,
+            evaluator(functions),
+            callback=partial(_track_results, result_list=result_list),
+        )
+        .run()
+        .results
     )
     assert results is not None
     assert np.allclose(results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.02)
@@ -607,18 +559,15 @@ def test_cvar_filter_on_constraints(
     ]
     enopt_config["objective_functions"]["realization_filters"] = [0, 0]
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
-    optimizer = EnsembleOptimizer(evaluator(functions))
     result_list: List[Results] = []
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        partial(_track_results, result_list=result_list),
-    )
-    results = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
+    results = (
+        BasicWorkflow(
+            enopt_config,
+            evaluator(functions),
+            callback=partial(_track_results, result_list=result_list),
+        )
+        .run()
+        .results
     )
     assert results is not None
     assert np.allclose(results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.02)
@@ -665,12 +614,13 @@ def test_cvar_filter_mixed(  # noqa: C901
 
     objective_values: List[NDArray[np.float64]] = []
 
-    def _add_objective(event: OptimizationEvent) -> None:
-        if event.results is not None:
-            for item in event.results:
+    def _add_objective(results: Tuple[Results, ...]) -> None:
+        if results is not None:
+            for item in results:
                 if isinstance(item, FunctionResults):
                     assert item.functions is not None
                     objective_values.append(item.functions.weighted_objective)
+        _track_results(results, result_list=result_list)
 
     # Apply the filtering to all objectives, giving the expected result.
     enopt_config["realization_filters"] = [
@@ -684,20 +634,11 @@ def test_cvar_filter_mixed(  # noqa: C901
     ]
     enopt_config["objective_functions"]["realization_filters"] = [0, 0, 0, 0]
 
-    optimizer = EnsembleOptimizer(evaluator(functions))
-    optimizer.add_observer(EventType.FINISHED_EVALUATION, _add_objective)
-
     result_list: List[Results] = []
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        partial(_track_results, result_list=result_list),
-    )
-    results = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
+    results = (
+        BasicWorkflow(enopt_config, evaluator(functions), callback=_add_objective)
+        .run()
+        .results
     )
     assert results is not None
     assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
@@ -729,20 +670,11 @@ def test_cvar_filter_mixed(  # noqa: C901
     ]
     enopt_config["objective_functions"]["realization_filters"] = [0, 0, -1, -1]
 
-    optimizer = EnsembleOptimizer(evaluator(functions))
-    optimizer.add_observer(EventType.FINISHED_EVALUATION, _add_objective)
-
     result_list = []
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        partial(_track_results, result_list=result_list),
-    )
-    results = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
+    results = (
+        BasicWorkflow(enopt_config, evaluator(functions), callback=_add_objective)
+        .run()
+        .results
     )
     assert results is not None
     assert not np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)

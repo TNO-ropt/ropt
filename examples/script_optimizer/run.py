@@ -70,15 +70,22 @@ provider = None
 def main() -> None:
     """Run the example and check the result."""
     optimal_result = ScriptOptimizer(
-        plan=[
-            {"config": CONFIG},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
+        workflow={
+            "context": [
+                {"id": "enopt_config", "init": "enopt_config", "with": CONFIG},
+                {"id": "optimal", "init": "results_tracker"},
+            ],
+            "steps": [
+                {
+                    "run": "optimizer",
+                    "with": {"config": "$enopt_config", "update_results": ["optimal"]},
+                },
+            ],
+        },
         tasks=tasks,
         provider=provider,
         work_dir="work",
-    ).run()["optimum"]
+    ).run()["optimal"]
     if optimal_result is not None and optimal_result.functions is not None:
         print(f"BEST RESULT: {optimal_result.result_id}")
         print(f"  variables: {optimal_result.evaluations.variables}")

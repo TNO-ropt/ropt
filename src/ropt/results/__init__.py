@@ -2,8 +2,7 @@
 
 During the optimization process, functions and gradients are calculated and need
 to be reported. To streamline this process, events are triggered after new
-results become available, invoking connected callbacks with those results (see
-[`EnsembleOptimizer.add_observer`][ropt.optimization.EnsembleOptimizer.add_observer]).
+results become available, invoking connected callbacks with those results.
 The [`OptimizationEvent`][ropt.events.OptimizationEvent] object passed to the
 callbacks contains a `results` field, which consists of a tuple of
 [`Results`][ropt.results.Results] objects. These may be instances of the derived

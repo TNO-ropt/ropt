@@ -6,7 +6,7 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt.exceptions import ConfigError
-from ropt.optimization import EnsembleOptimizer
+from ropt.workflow import BasicWorkflow
 
 
 @pytest.fixture(name="enopt_config")
@@ -40,7 +40,6 @@ def test_stddev_function_transform_merge_error(
     enopt_config["objective_functions"]["weights"].extend([0.75, 0.25])
     enopt_config["objective_functions"]["function_transforms"] = [0, 0, 1, 1]
     enopt_config["function_transforms"] = [{"method": "mean"}, {"method": "stddev"}]
-    optimizer = EnsembleOptimizer(evaluator(test_functions))
     with pytest.raises(
         ConfigError,
         match=(
@@ -48,7 +47,7 @@ def test_stddev_function_transform_merge_error(
             "realizations in the gradient."
         ),
     ):
-        optimizer.start_optimization(plan=[{"config": enopt_config}, {"optimizer": {}}])
+        BasicWorkflow(enopt_config, evaluator(test_functions)).run()
 
 
 def test_mean_stddev_function_transform(
@@ -60,16 +59,9 @@ def test_mean_stddev_function_transform(
     enopt_config["objective_functions"]["weights"].extend([0.75, 0.25])
     enopt_config["objective_functions"]["function_transforms"] = [0, 0, 1, 1]
     enopt_config["function_transforms"] = [{"method": "mean"}, {"method": "stddev"}]
-    optimizer = EnsembleOptimizer(evaluator(test_functions))
-    result = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
-    )
-    assert result is not None
-    assert np.allclose(result.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+    variables = BasicWorkflow(enopt_config, evaluator(test_functions)).run().variables
+    assert variables is not None
+    assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 def _compute_distance_squared_stddev(
@@ -105,13 +97,6 @@ def test_stddev_function_transform(
 
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations
     enopt_config["function_transforms"] = [{"method": "stddev"}]
-    optimizer = EnsembleOptimizer(evaluator(functions))
-    result = optimizer.start_optimization(
-        plan=[
-            {"config": enopt_config},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
-    )
-    assert result is not None
-    assert np.allclose(result.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+    variables = BasicWorkflow(enopt_config, evaluator(functions)).run().variables
+    assert variables is not None
+    assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)

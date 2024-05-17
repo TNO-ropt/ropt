@@ -4,16 +4,15 @@ This example uses the differential evolution method to solve a discrete
 problem with a linear constraint.
 """
 
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
 
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.enums import ConstraintType, EventType, VariableType
+from ropt.enums import ConstraintType, VariableType
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.events import OptimizationEvent
-from ropt.optimization import EnsembleOptimizer
-from ropt.results import FunctionResults
+from ropt.results import FunctionResults, Results
+from ropt.workflow import BasicWorkflow
 
 CONFIG: Dict[str, Any] = {
     "variables": {
@@ -52,14 +51,13 @@ def function(variables: NDArray[np.float64], _: EvaluatorContext) -> EvaluatorRe
     return EvaluatorResult(objectives=objectives)
 
 
-def report(event: OptimizationEvent) -> None:
+def report(results: Tuple[Results, ...]) -> None:
     """Report results of an evaluation.
 
     Args:
-        event: The event containing information on the evaluation
+        results: Results from an evaluation
     """
-    assert event.results is not None
-    for item in event.results:
+    for item in results:
         if isinstance(item, FunctionResults) and item.functions is not None:
             print(f"result: {item.result_id}")
             print(f"  variables: {item.evaluations.variables}")
@@ -68,19 +66,10 @@ def report(event: OptimizationEvent) -> None:
 
 def run_optimization() -> None:
     """Run the optimization."""
-    optimizer = EnsembleOptimizer(function)
-    optimizer.add_observer(EventType.FINISHED_EVALUATION, report)
-    optimal_result = optimizer.start_optimization(
-        plan=[
-            {"config": CONFIG},
-            {"optimizer": {"id": "opt"}},
-            {"tracker": {"id": "optimum", "source": "opt"}},
-        ],
-    )
-
+    optimal_result = BasicWorkflow(CONFIG, function, callback=report).run().results
     assert optimal_result is not None
     assert optimal_result.functions is not None
-    assert np.all(np.equal(optimal_result.evaluations.variables, [3, 7]))
+    assert np.all(optimal_result.evaluations.variables == [3, 7])
     print(f"BEST RESULT: {optimal_result.result_id}")
     print(f"  variables: {optimal_result.evaluations.variables}")
     print(f"  objective: {optimal_result.functions.weighted_objective}\n")

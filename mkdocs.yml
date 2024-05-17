@@ -60,10 +60,9 @@ nav:
       - "Running Optimizations": usage/running.md
   - Reference:
       - "Configuration":
-          - "Plan configuration": reference/plan_config.md
+          - "Workflow configuration": reference/workflow_config.md
           - "Optimizer configuration": reference/enopt_config.md
       - "Optimization":
-          - "Ensemble optimizer": reference/optimization.md
           - "Function evaluations": reference/evaluator.md
           - "Optimization results": reference/results.md
           - "Reporting": reference/reporting.md
@@ -73,7 +72,7 @@ nav:
           - "Sampler plugins": reference/sampler_plugins.md
           - "Realization filters": reference/realization_filters.md
           - "Function transforms": reference/function_transforms.md
-          - "Optimization steps": reference/optimization_steps.md
+          - "Workflow objects": reference/workflow.md
       - "Enumerations": reference/enums.md
       - "Exceptions": reference/exceptions.md
       - "Utilities": reference/utilities.md

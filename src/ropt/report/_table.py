@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Dict, Literal, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, Literal, Optional, Tuple
 
 from ._data_frame import ResultsDataFrame
 from ._utils import _HAVE_PANDAS, _HAVE_TABULATE, _extract_columns, _write_table
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from ropt.results import Results
 
     if _HAVE_PANDAS:
-        import pandas as pd
+        pass
 
 
 class ResultsTable(ResultsDataFrame):
@@ -25,14 +25,11 @@ class ResultsTable(ResultsDataFrame):
     generated data frame in a tabular format to a text file.
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         columns: Dict[str, str],
         path: Path,
         *,
-        filters: Optional[
-            Dict[str, Callable[[pd.Series[Any]], pd.Series[bool]]]
-        ] = None,
         table_type: Literal["functions", "gradients"] = "functions",
         min_header_len: Optional[int] = None,
     ) -> None:
@@ -50,17 +47,6 @@ class ResultsTable(ResultsDataFrame):
         fields. For a consistent result, the minimum number of header lines can
         be specified via the `min_header_len` argument. When needed, blank lines
         will be added to reach the specified minimum number of header lines.
-
-        The optional `filters` argument can be used to pass functions that can
-        be used to filter the rows before generating the table. The keys of the
-        `filters` dictionary should be the columns to apply the filter function
-        to, and the values the filter functions, which should expect a pandas
-        series and transform those into an equally sized series of boolean
-        values. For example, to retain only realizations with the name equal to
-        2:
-
-        ```python filters = {"realization": lambda x: x == 2}
-        ```
 
         Tip: Reading the generated file.
             The resulting table can be read using a reader that can handle
@@ -83,7 +69,6 @@ class ResultsTable(ResultsDataFrame):
         Args:
             columns:        Mapping of column names for the results table
             path:           Optional location of the result file
-            filters:        Optional filter functions to remove rows
             table_type:     Type of the table
             min_header_len: Minimal number of header lines
 
@@ -98,15 +83,13 @@ class ResultsTable(ResultsDataFrame):
         super().__init__(set(columns), table_type=table_type)
         self._columns = columns
         self._path = path
-        self._filters = filters
         self._min_header_len = min_header_len
 
     def add_results(self, config: EnOptConfig, results: Tuple[Results, ...]) -> bool:
         """Add results to the table.
 
         This method can be called directly from any observers connected to
-        events that produce results (see
-        [`add_observer`][ropt.optimization.EnsembleOptimizer.add_observer]).
+        events that produce results.
 
         Args:
             config:  The configuration of the optimizer generating the results
@@ -117,10 +100,6 @@ class ResultsTable(ResultsDataFrame):
         """
         if super().add_results(config, results):
             frame = self._frame.reset_index()
-            if self._filters is not None:
-                for key, filter_ in self._filters.items():
-                    if key in frame.columns:
-                        frame = frame[filter_(frame[key])]
             table = _extract_columns(frame, mapping=self._columns)
             _write_table(table, self._path, self._min_header_len)
             return True
