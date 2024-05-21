@@ -22,7 +22,7 @@ class ConcurrentTask(ABC):
     and optional constraint values.
     """
 
-    future: Any
+    future: Optional[Any]
 
     @abstractmethod
     def get_objectives(self) -> Optional[NDArray[np.float64]]:
@@ -162,8 +162,9 @@ class ConcurrentEvaluator(ABC):
         while tasks:
             # We are modifying the dict while iterating, use a copy of the keys:
             for idx in list(tasks.keys()):
-                if tasks[idx].future.done():
-                    if tasks[idx].future.exception() is None:
+                future = tasks[idx].future
+                if future is None or future.done():
+                    if future is None or future.exception() is None:
                         objective_results[idx, :] = tasks[idx].get_objectives()
                         if constraint_results is not None:
                             constraint_results[idx, :] = tasks[idx].get_constraints()

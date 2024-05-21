@@ -7,6 +7,7 @@ from collections import abc, defaultdict
 from dataclasses import dataclass, field
 from itertools import groupby
 from pathlib import Path
+from shutil import rmtree
 from string import Template
 from traceback import format_exception
 from typing import (
@@ -276,9 +277,29 @@ class ScriptOptimizer:
             label.format(batch=batch_id, realization=realization, job=job_idx)
             for label in self._job_labels
         )
-
         path = self._job_dir / Path(*job_labels)
-        Path.mkdir(path, parents=True, exist_ok=True)
+        objective_names, constraint_names = self._get_function_files(context.config)
+        objective_paths = tuple(path / name for name in objective_names)
+        constraint_paths = tuple(path / name for name in constraint_names)
+
+        var_path = path / "var-vector.npy"
+        if all(
+            path.exists() for path in (var_path, *objective_paths, *constraint_paths)
+        ) and np.allclose(np.load(var_path), variables):
+            return [
+                ScriptTask(
+                    future=None,
+                    objective_paths=objective_paths,
+                    constraint_paths=constraint_paths,
+                )
+            ]
+
+        if not self._tasks.items():
+            return []
+
+        rmtree(path, ignore_errors=True)
+        Path.mkdir(path, parents=True)
+        np.save(var_path, variables)
 
         assert context.config.variables.names is not None
         variables_to_json(
@@ -306,10 +327,8 @@ class ScriptOptimizer:
                     realization=realization,
                 ),
             )
-
-        objective_names, constraint_names = self._get_function_files(context.config)
-        tasks[-1].objective_paths = tuple(path / name for name in objective_names)
-        tasks[-1].constraint_paths = tuple(path / name for name in constraint_names)
+        tasks[-1].objective_paths = objective_paths
+        tasks[-1].constraint_paths = constraint_paths
 
         return tasks
 

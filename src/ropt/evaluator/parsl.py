@@ -50,7 +50,7 @@ class Task(ConcurrentTask):
         exception: Any exception that may have occurred,  None otherwise
     """
 
-    future: AppFuture
+    future: Optional[AppFuture]
     state: State = State.UNKNOWN
     exception: Optional[BaseException] = None
 
@@ -150,9 +150,9 @@ class ParslEvaluator(ConcurrentEvaluator):
             for job_idx in range(variables.shape[0])
             if active is None or active[job_idx]
         }
-        return {idx: futures[-1] for idx, futures in self._jobs.items()}
+        return {idx: futures[-1] for idx, futures in self._jobs.items() if futures}
 
-    def monitor(self) -> None:
+    def monitor(self) -> None:  # noqa: C901
         """Monitor the tasks of all jobs.
 
         See the [ropt.evaluator.ConcurrentEvaluator][] abstract base class.
@@ -162,26 +162,27 @@ class ParslEvaluator(ConcurrentEvaluator):
         changed = False
         for job in self._jobs.values():
             for task in job:
-                # Make sure task.exception is update from the future:
-                if task.future.done() and task.exception is None:
-                    task.exception = task.future.exception()
+                if task.future is not None:
+                    # Update task.exception from the future:
+                    if task.future.done() and task.exception is None:
+                        task.exception = task.future.exception()
 
-                # Default is not running:
-                state: State = State.PENDING
+                    # Default is not running:
+                    state: State = State.PENDING
 
-                # Set the state:
-                if task.exception is not None:
-                    state = State.FAILED
-                elif task.future.done():
-                    state = State.SUCCESS
-                elif task.future.running():
-                    state = State.RUNNING
-                elif task.future.task_status() == "launched":
-                    state = State.LAUNCHED
+                    # Set the state:
+                    if task.exception is not None:
+                        state = State.FAILED
+                    elif task.future.done():
+                        state = State.SUCCESS
+                    elif task.future.running():
+                        state = State.RUNNING
+                    elif task.future.task_status() == "launched":
+                        state = State.LAUNCHED
 
-                # If the state changed, remember:
-                if state != task.state:
-                    task.state = state
-                    changed = True
+                    # If the state changed, remember:
+                    if state != task.state:
+                        task.state = state
+                        changed = True
         if self._monitor is not None and changed:
             self._monitor(self._batch_id, self._jobs)

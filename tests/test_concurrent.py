@@ -89,7 +89,7 @@ class ConcurrentTestEvaluator(ConcurrentEvaluator):
 
     def monitor(self) -> None:
         for idx, task in self._tasks.items():
-            if task.future.exception() is not None:
+            if task.future is not None and task.future.exception() is not None:
                 print(f"error in evaluation {idx}")  # noqa: T201
 
     def disable_functions(self) -> None:

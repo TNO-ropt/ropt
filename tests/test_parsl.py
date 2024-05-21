@@ -19,6 +19,7 @@ from ropt.optimization import EnsembleOptimizer
 @dataclass
 class ParslTestTask(Task):
     def get_objectives(self) -> Optional[NDArray[np.float64]]:
+        assert self.future is not None
         result = self.future.result()
         if result is None:
             return None
