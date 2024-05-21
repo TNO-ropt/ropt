@@ -66,7 +66,10 @@ class DefaultEvaluatorStep(EvaluatorStep):
         )
 
         if variables is None:
-            variables = self._private_plan.enopt_config.variables.initial_values
+            if self._private_config.variables is None:
+                variables = self._private_plan.enopt_config.variables.initial_values
+            else:
+                variables = self._private_config.variables
 
         exit_code = OptimizerExitCode.EVALUATION_STEP_FINISHED
         try:

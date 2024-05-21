@@ -6,6 +6,8 @@ from typing import Any, Dict, Literal, Optional, Set, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from ropt.config.utils import Array2D  # noqa: TCH001
+
 from ._plan_config import PlanConfig  # noqa: TCH001
 
 
@@ -149,8 +151,10 @@ class EvaluatorStepConfig(BaseModel):
     """
 
     id: Optional[str] = None
+    variables: Optional[Array2D] = None
 
     model_config = ConfigDict(
         extra="allow",
         validate_default=True,
+        arbitrary_types_allowed=True,
     )
