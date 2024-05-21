@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.22">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.24">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.732c4fb1.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -1230,13 +1230,13 @@
 
 
 <h2 id="ropt.evaluator" class="doc doc-heading">
-          <code>ropt.evaluator</code>
+            <code>ropt.evaluator</code>
 
 
 </h2>
 
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>Function Evaluations.</p>
 <p>An optimizer will repeatedly request function and gradient evaluations. In each
 iteration, it may require values for multiple variable vectors, and the
@@ -1250,6 +1250,7 @@ information usable by the evaluator. It returns an
 <a class="autorefs autorefs-internal" href="#ropt.evaluator.EvaluatorResult"><code>EvaluatorResult</code></a> object with the calculated
 values of the objective and constraint functions for all variable vectors and
 realizations, and optionally some additional metadata.</p>
+
 
 <details class="tip" open>
   <summary>Reusing Objective and Non-linear Constraint Values</summary>
@@ -1272,7 +1273,7 @@ run method should ensure that the calculated value of <span class="arithmatex">\
 both cases, which is most efficiently achieved by evaluating <span class="arithmatex">\(F_c\)</span> only
 once.</p>
 </details>
-  
+
 
   <div class="doc doc-children">
 
@@ -1288,7 +1289,7 @@ once.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div><h2 id="evaluator-callbacks">Evaluator callbacks</h2>
 
@@ -1298,27 +1299,26 @@ once.</p>
 
 
 <h3 id="ropt.evaluator.Evaluator" class="doc doc-heading">
-          <code>ropt.evaluator.Evaluator</code>
+            <code>ropt.evaluator.Evaluator</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents first">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
 
-  
+
       <p>Protocol for evaluator objects or callables.</p>
 <p>The <a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.EnsembleOptimizer"><code>EnsembleOptimizer</code></a> object,
 running an optimization, requires a callback argument upon initialization
 that follows this protocol.</p>
 
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -1331,15 +1331,14 @@ that follows this protocol.</p>
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.evaluator.Evaluator.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>The function evaluator callback signature.</p>
 <p>The first argument of the function should be a matrix where each column is a
 variable vector. Depending on the information passed by the second argument, all
@@ -1349,74 +1348,72 @@ calculated.</p>
 object, providing supplementary information to the evaluation function.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>variables</code></td>
-          <td>
-                <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The matrix of variables to evaluate</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>context</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.evaluator._evaluator.EvaluatorContext" href="#ropt.evaluator.EvaluatorContext">EvaluatorContext</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The evaluation context</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>variables</code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The matrix of variables to evaluate</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>context</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.evaluator._evaluator.EvaluatorContext" href="#ropt.evaluator.EvaluatorContext">EvaluatorContext</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The evaluation context</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.evaluator._evaluator.EvaluatorResult" href="#ropt.evaluator.EvaluatorResult">EvaluatorResult</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An evaluation results object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.evaluator._evaluator.EvaluatorResult" href="#ropt.evaluator.EvaluatorResult">EvaluatorResult</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>An evaluation results object.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-  </div>
+    </div>
 
 </div>
 
@@ -1424,8 +1421,7 @@ object, providing supplementary information to the evaluation function.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1434,9 +1430,9 @@ object, providing supplementary information to the evaluation function.</p>
 
 
 <h3 id="ropt.evaluator.EvaluatorContext" class="doc doc-heading">
-          <code>ropt.evaluator.EvaluatorContext</code>
+            <code>ropt.evaluator.EvaluatorContext</code>
 
-  
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
   </span>
@@ -1444,9 +1440,9 @@ object, providing supplementary information to the evaluation function.</p>
 </h3>
 
 
-  <div class="doc doc-contents first">
+    <div class="doc doc-contents first">
 
-  
+
       <p>Capture additional details for the function evaluator.</p>
 <p>Function evaluator callbacks (see <a class="autorefs autorefs-internal" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a>)
 mainly require variable vectors to evaluate objective and constraint
@@ -1472,68 +1468,67 @@ or none at all. In such cases, it suffices to examine the <code>active</code> pr
 indicating the realizations requiring evaluation.</p>
 
 
-
-  <p><span class="doc-section-title">Attributes:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.evaluator.EvaluatorContext.config">config</span></code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Configuration of the optimizer.</p>
-            </div>
-          </td>
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.evaluator.EvaluatorContext.realizations">realizations</span></code></td>
-          <td>
-                <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Realization numbers for each requested evaluation.</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.evaluator.EvaluatorContext.active_objectives">active_objectives</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Signifies which function/realization evaluations are
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.evaluator.EvaluatorContext.config">config</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration of the optimizer.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.evaluator.EvaluatorContext.realizations">realizations</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Realization numbers for each requested evaluation.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.evaluator.EvaluatorContext.active_objectives">active_objectives</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Signifies which function/realization evaluations are
                 essential for the optimizer.</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.evaluator.EvaluatorContext.active_constraints">active_constraints</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Signifies which constraint/realization evaluations are
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.evaluator.EvaluatorContext.active_constraints">active_constraints</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Signifies which constraint/realization evaluations are
                 essential for the optimizer.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1548,8 +1543,8 @@ indicating the realizations requiring evaluation.</p>
 
 
 <h4 id="ropt.evaluator.EvaluatorContext.active" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">active</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">]]</span></code>
-  
+            <code class="highlight language-python"><span class="n">active</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">]]</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-cached"><code>cached</code></small>
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -1558,8 +1553,8 @@ indicating the realizations requiring evaluation.</p>
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Return the set of active variable vectors.</p>
 <p>This property is useful for determining the realizations for which the
 objective and constraint functions need to be calculated. The index of
@@ -1567,29 +1562,28 @@ each entry corresponds to the realization number and indicates whether
 the functions should be calculated.</p>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>A boolean array.</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
-  </div>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A boolean array.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+    </div>
 
 </div>
 
@@ -1599,8 +1593,7 @@ the functions should be calculated.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1609,9 +1602,9 @@ the functions should be calculated.</p>
 
 
 <h3 id="ropt.evaluator.EvaluatorResult" class="doc doc-heading">
-          <code>ropt.evaluator.EvaluatorResult</code>
+            <code>ropt.evaluator.EvaluatorResult</code>
 
-  
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
   </span>
@@ -1619,9 +1612,9 @@ the functions should be calculated.</p>
 </h3>
 
 
-  <div class="doc doc-contents first">
+    <div class="doc doc-contents first">
 
-  
+
       <p>Store the results of a function evaluation.</p>
 <p>The objectives and constraint values are stored as a matrix, where the
 columns correspond to the index of the objective or constraint, and the rows
@@ -1639,66 +1632,65 @@ offering a way to link specific evaluations back to their corresponding
 input vectors.</p>
 
 
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.evaluator.EvaluatorResult.objectives">objectives</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The calculated objective values.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.evaluator.EvaluatorResult.constraints">constraints</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional calculated constraint values.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.evaluator.EvaluatorResult.batch_id">batch_id</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[int]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional batch ID.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.evaluator.EvaluatorResult.evaluation_ids">evaluation_ids</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional ID for each evaluation.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Attributes:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.evaluator.EvaluatorResult.objectives">objectives</span></code></td>
-          <td>
-                <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The calculated objective values.</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.evaluator.EvaluatorResult.constraints">constraints</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional calculated constraint values.</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.evaluator.EvaluatorResult.batch_id">batch_id</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[int]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional batch ID.</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.evaluator.EvaluatorResult.evaluation_ids">evaluation_ids</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional ID for each evaluation.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
 
 
-  
 
   <div class="doc doc-children">
 
@@ -1714,8 +1706,7 @@ input vectors.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div><h2 id="optional-implementations">Optional implementations</h2>
 
@@ -1725,17 +1716,17 @@ input vectors.</p>
 
 
 <h3 id="ropt.evaluator.ConcurrentEvaluator" class="doc doc-heading">
-          <code>ropt.evaluator.ConcurrentEvaluator</code>
+            <code>ropt.evaluator.ConcurrentEvaluator</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents first">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="abc.ABC">ABC</span></code></p>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
-  
+
       <p>Abstract base class for implementing a concurrent evaluator.</p>
 <p>This abstract base class provides the framework for implementing an
 evaluator that uses a concurrent executor.</p>
@@ -1748,7 +1739,7 @@ least the <code>done()</code>, <code>exception()</code>, and <code>result()</cod
 <a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.EnsembleOptimizer"><code>EnsembleOptimizer</code></a> constructor.</p>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1763,8 +1754,8 @@ least the <code>done()</code>, <code>exception()</code>, and <code>result()</cod
 
 
 <h4 id="ropt.evaluator.ConcurrentEvaluator.polling" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">polling</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span></code>
-  
+            <code class="highlight language-python"><span class="n">polling</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
   </span>
@@ -1772,23 +1763,21 @@ least the <code>done()</code>, <code>exception()</code>, and <code>result()</cod
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>The time in seconds between polling for evaluation status.</p>
-  </div>
+    </div>
 
 </div>
-
 
 
 
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.evaluator.ConcurrentEvaluator.launch" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">launch</span><span class="p">(</span><span class="n">batch_id</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">active</span><span class="p">)</span></code>
-  
+            <code class="highlight language-python"><span class="n">launch</span><span class="p">(</span><span class="n">batch_id</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">active</span><span class="p">)</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
@@ -1796,8 +1785,8 @@ least the <code>done()</code>, <code>exception()</code>, and <code>result()</cod
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Launch the evaluations and return futures.</p>
 <p>This method must implement the process of launching a batch of function
 evaluations for a set of variable vectors passed via the <code>variables</code>
@@ -1819,118 +1808,114 @@ vector indicating which realizations are active. It not <code>None</code> it sho
 take precedence over the corresponding field in the <code>context</code> variable.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>batch_id</code></td>
-          <td>
-                <code><span title="typing.Any">Any</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The ID of the batch of evaluations to run.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>variables</code></td>
-          <td>
-                <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The matrix of variables to evaluate.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>context</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.evaluator._evaluator.EvaluatorContext" href="#ropt.evaluator.EvaluatorContext">EvaluatorContext</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Evaluator context.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>active</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional active realizations.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>batch_id</code></td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the batch of evaluations to run.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>variables</code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The matrix of variables to evaluate.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>context</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.evaluator._evaluator.EvaluatorContext" href="#ropt.evaluator.EvaluatorContext">EvaluatorContext</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Evaluator context.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>active</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional active realizations.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="typing.Dict">Dict</span>[int, <a class="autorefs autorefs-internal" title="ropt.evaluator._concurrent.ConcurrentTask" href="#ropt.evaluator.ConcurrentTask">ConcurrentTask</a>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>A dictionary mapping the indices of launched evaluations to tasks.</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[int, <a class="autorefs autorefs-internal" title="ropt.evaluator._concurrent.ConcurrentTask" href="#ropt.evaluator.ConcurrentTask">ConcurrentTask</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary mapping the indices of launched evaluations to tasks.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  </div>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.evaluator.ConcurrentEvaluator.monitor" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">monitor</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">monitor</span><span class="p">()</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Monitor the states of the running evaluations.</p>
 <p>This method is called regularly in the polling loop that checks the
 futures until all results are collected. If the status of the
@@ -1938,7 +1923,7 @@ evaluations should be monitored, this method should be overridden.</p>
 <p>The time in seconds between calls in the polling loop can be modified by
 setting the <code>polling</code> attribute.</p>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1946,8 +1931,7 @@ setting the <code>polling</code> attribute.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1956,9 +1940,9 @@ setting the <code>polling</code> attribute.</p>
 
 
 <h3 id="ropt.evaluator.ConcurrentTask" class="doc doc-heading">
-          <code>ropt.evaluator.ConcurrentTask</code>
+            <code>ropt.evaluator.ConcurrentTask</code>
 
-  
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
   </span>
@@ -1966,11 +1950,11 @@ setting the <code>polling</code> attribute.</p>
 </h3>
 
 
-  <div class="doc doc-contents first">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="abc.ABC">ABC</span></code></p>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
-  
+
       <p>Abstract data class for tasks in a concurrent evaluator.</p>
 <p>These task objects should contain the future that represents the task and
 return the results of the evaluation.</p>
@@ -1978,7 +1962,7 @@ return the results of the evaluation.</p>
 and optional constraint values.</p>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1990,14 +1974,12 @@ and optional constraint values.</p>
 
 
 
-
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.evaluator.ConcurrentTask.get_objectives" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_objectives</span><span class="p">()</span></code>
-  
+            <code class="highlight language-python"><span class="n">get_objectives</span><span class="p">()</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
@@ -2005,11 +1987,12 @@ and optional constraint values.</p>
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Return the objectives calculated by the task.</p>
 <p>This method will only be called after the future is done, and if no
 exception was raised during the execution of the task.</p>
+
 
 <details class="info" open>
   <summary>Info</summary>
@@ -2017,46 +2000,43 @@ exception was raised during the execution of the task.</p>
 also employ tasks that do not return results.</p>
 </details>
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The calculated objectives.</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The calculated objectives.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  </div>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.evaluator.ConcurrentTask.get_constraints" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_constraints</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">get_constraints</span><span class="p">()</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Return the constraints calculated by the task, if available.</p>
 <p>This method will only be called after the future is done, and if no
 exception was raised during the execution of the task.</p>
@@ -2065,30 +2045,29 @@ when it is certain that there are no non-linear constraints. If there
 are non-linear constraints, this method should be overridden.</p>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The calculated constraints or <code>None</code>.</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The calculated constraints or <code>None</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  </div>
+    </div>
 
 </div>
 
@@ -2096,8 +2075,7 @@ are non-linear constraints, this method should be overridden.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2155,7 +2133,7 @@ are non-linear constraints, this method should be overridden.</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.5cfa9459.min.js"></script>
+      <script src="../../assets/javascripts/bundle.081f42fc.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       

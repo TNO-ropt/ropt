@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.22">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.24">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.732c4fb1.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -1086,16 +1086,16 @@
 
 
 <h2 id="ropt.optimization" class="doc doc-heading">
-          <code>ropt.optimization</code>
+            <code>ropt.optimization</code>
 
 
 </h2>
 
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>Code to run optimization workflows.</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1111,15 +1111,15 @@
 
 
 <h3 id="ropt.optimization.EnsembleOptimizer" class="doc doc-heading">
-          <code>EnsembleOptimizer</code>
+            <code>EnsembleOptimizer</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
+    <div class="doc doc-contents ">
 
-  
+
       <p>The Ensemble Optimizer Class.</p>
 <p>This class serves as the central component for executing an optimization
 plan. Upon initialization, an <code>EnsembleOptimizer</code> object accepts and stores
@@ -1137,7 +1137,7 @@ method is available. Upon the completion of the optimization process, the
 used to examine any stored results.</p>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1152,8 +1152,8 @@ used to examine any stored results.</p>
 
 
 <h4 id="ropt.optimization.EnsembleOptimizer.results" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">results</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">]]</span></code>
-  
+            <code class="highlight language-python"><span class="n">results</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">]]</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
@@ -1161,95 +1161,90 @@ used to examine any stored results.</p>
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Return the dictionary of results.</p>
 <p>Results may be stored during optimization and can be accessed by name
 via this property. Examples of such results include the optimal result
 encountered, but the exact nature of each result and the names to access
 them are determined by the optimization plan.</p>
-  </div>
+    </div>
 
 </div>
 
 
 
-
 <div class="doc doc-object doc-function">
-
 
 
 <h4 id="ropt.optimization.EnsembleOptimizer.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">evaluator</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">evaluator</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initialize an <code>EnsembleOptimizer</code> object.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>evaluator</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.evaluator.Evaluator" href="../evaluator/#ropt.evaluator.Evaluator">Evaluator</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>An evaluator callback</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>plugin_manager</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.PluginManager" href="../plugins/#ropt.plugins.PluginManager">PluginManager</a>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional plugin manager</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>evaluator</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.evaluator.Evaluator" href="../evaluator/#ropt.evaluator.Evaluator">Evaluator</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An evaluator callback</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>plugin_manager</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.PluginManager" href="../plugins/#ropt.plugins.PluginManager">PluginManager</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional plugin manager</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  </div>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.optimization.EnsembleOptimizer.add_observer" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">add_observer</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">add_observer</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Add a callback for an event.</p>
 <p>Throughout the optimization process, various events are triggered,
 offering opportunities to observe progress and capture intermediate
@@ -1261,151 +1256,144 @@ callbacks to the same event, and each will be executed when that event
 occurs.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>event</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The event to respond to.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>callback</code></td>
-          <td>
-                <code><span title="typing.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="ropt.events.OptimizationEvent" href="#ropt.events.OptimizationEvent">OptimizationEvent</a>], None]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The callback function to be connected.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>event</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The event to respond to.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>callback</code></td>
+            <td>
+                  <code><span title="typing.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="ropt.events.OptimizationEvent" href="#ropt.events.OptimizationEvent">OptimizationEvent</a>], None]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The callback function to be connected.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  </div>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.optimization.EnsembleOptimizer.start_optimization" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">start_optimization</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">start_optimization</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Start the optimization.</p>
 <p>This method executes the provide optimization plan. An optional seed can
 be provided to initialize the random number generator that can be used
 by the steps in the plan.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>plan</code></td>
-          <td>
-                <code><span title="typing.Sequence">Sequence</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The optimization plan to run</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>seed</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[int]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional seed of the random number generator</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>plan</code></td>
+            <td>
+                  <code><span title="typing.Sequence">Sequence</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The optimization plan to run</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>seed</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[int]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional seed of the random number generator</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.results.FunctionResults" href="../results/#ropt.results.FunctionResults">FunctionResults</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The reason for the terminating the optimization.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.results.FunctionResults" href="../results/#ropt.results.FunctionResults">FunctionResults</a>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The reason for the terminating the optimization.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-  </div>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.optimization.EnsembleOptimizer.abort_optimization" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">abort_optimization</span><span class="p">()</span></code>
-  
+            <code class="highlight language-python"><span class="n">abort_optimization</span><span class="p">()</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
   </span>
@@ -1413,8 +1401,8 @@ by the steps in the plan.</p>
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Abort the current optimization run.</p>
 <p>This method can be called from within callbacks to interrupt the ongoing
 optimization plan. The exact point at which the optimization is aborted
@@ -1422,7 +1410,7 @@ depends on the step in the plan that is executing at that point. For
 example, within a running optimizer, the process will be interrupted
 after completing the current function evaluation.</p>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1430,8 +1418,7 @@ after completing the current function evaluation.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1440,7 +1427,7 @@ after completing the current function evaluation.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1449,16 +1436,16 @@ after completing the current function evaluation.</p>
 
 
 <h2 id="ropt.events" class="doc doc-heading">
-          <code>ropt.events</code>
+            <code>ropt.events</code>
 
 
 </h2>
 
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>The optimization event class.</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1474,9 +1461,9 @@ after completing the current function evaluation.</p>
 
 
 <h3 id="ropt.events.OptimizationEvent" class="doc doc-heading">
-          <code>OptimizationEvent</code>
+            <code>OptimizationEvent</code>
 
-  
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
   </span>
@@ -1484,9 +1471,9 @@ after completing the current function evaluation.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
+    <div class="doc doc-contents ">
 
-  
+
       <p>The <code>OptimizationEvent</code> class stores optimization event data.</p>
 <p>After initializing an
 <a class="autorefs autorefs-internal" href="#ropt.optimization.EnsembleOptimizer"><code>EnsembleOptimizer</code></a> object to run an
@@ -1498,66 +1485,65 @@ Refer to the documentation of the <a class="autorefs autorefs-internal" href="..
 enumeration for more details.</p>
 
 
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.events.OptimizationEvent.event_type">event_type</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The type of the event.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.events.OptimizationEvent.config">config</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The current configuration object of the executing plan.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.events.OptimizationEvent.results">results</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional results passed with the event.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.events.OptimizationEvent.exit_code">exit_code</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.enums.OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An optional exit code.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Attributes:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.events.OptimizationEvent.event_type">event_type</span></code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The type of the event.</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.events.OptimizationEvent.config">config</span></code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The current configuration object of the executing plan.</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.events.OptimizationEvent.results">results</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional results passed with the event.</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.events.OptimizationEvent.exit_code">exit_code</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.enums.OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>An optional exit code.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
 
 
-  
 
   <div class="doc doc-children">
 
@@ -1573,8 +1559,7 @@ enumeration for more details.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1583,7 +1568,7 @@ enumeration for more details.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1641,7 +1626,7 @@ enumeration for more details.</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.5cfa9459.min.js"></script>
+      <script src="../../assets/javascripts/bundle.081f42fc.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       

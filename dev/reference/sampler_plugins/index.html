@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.22">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.24">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.732c4fb1.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -1068,13 +1068,13 @@
 
 
 <h2 id="ropt.plugins.sampler" class="doc doc-heading">
-          <code>ropt.plugins.sampler</code>
+            <code>ropt.plugins.sampler</code>
 
 
 </h2>
 
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>Plugin functionality for adding sampler plugins.</p>
 <p>Sampler plugins are managed by a <a class="autorefs autorefs-internal" href="../plugins/#ropt.plugins.PluginManager"><code>PluginManager</code></a>
 object, which returns classes or factory functions to create objects that
@@ -1086,7 +1086,7 @@ protocol.</p>
 which provides a number of methods from the
 <a href="https://docs.scipy.org/doc/scipy/reference/stats.html"><code>scipy.stats</code></a> package.</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1102,7 +1102,7 @@ which provides a number of methods from the
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1111,20 +1111,20 @@ which provides a number of methods from the
 
 
 <h2 id="ropt.plugins.sampler.protocol" class="doc doc-heading">
-          <code>ropt.plugins.sampler.protocol</code>
+            <code>ropt.plugins.sampler.protocol</code>
 
 
 </h2>
 
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>This module defines the protocol to be followed by samplers.</p>
 <p>Samplers can be added via the plugin mechanism to implement additional ways to
 generate perturbed variables. Any object that follows the
 <a class="autorefs autorefs-internal" href="#ropt.plugins.sampler.protocol.SamplerProtocol"><code>Sampler</code></a> protocol may be
 installed as a plugin.</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1140,17 +1140,17 @@ installed as a plugin.</p>
 
 
 <h3 id="ropt.plugins.sampler.protocol.SamplerProtocol" class="doc doc-heading">
-          <code>SamplerProtocol</code>
+            <code>SamplerProtocol</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
 
-  
+
       <p>Protocol for sampler classes.</p>
 <p><code>ropt</code> employs plugins to implement samplers that are called during an
 optimization workflow to generate perturbed variable vectors. Samplers
@@ -1160,7 +1160,7 @@ for the class constructor (<code>__init__</code>) and also includes a
 values.</p>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1172,19 +1172,17 @@ values.</p>
 
 
 
-
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.plugins.sampler.protocol.SamplerProtocol.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">sampler_index</span><span class="p">,</span> <span class="n">variable_indices</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">sampler_index</span><span class="p">,</span> <span class="n">variable_indices</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initialize the sampler object.</p>
 <p>The <code>samplers</code> field in the
 <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>enopt_config</code></a> configuration used by
@@ -1196,94 +1194,91 @@ sampler.</p>
 array lists the indices of the variables that are handled by this sampler.</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>enopt_config</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration of the optimizer.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>sampler_index</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The index of the sampler to use.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>variable_indices</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The indices of the variables to sample.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>rng</code></td>
+            <td>
+                  <code><span title="numpy.random.Generator">Generator</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A random generator object for use by stochastic samplers.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>enopt_config</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The configuration of the optimizer.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>sampler_index</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The index of the sampler to use.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>variable_indices</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The indices of the variables to sample.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>rng</code></td>
-          <td>
-                <code><span title="numpy.random.Generator">Generator</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>A random generator object for use by stochastic samplers.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-  </div>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.plugins.sampler.protocol.SamplerProtocol.generate_samples" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">generate_samples</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">generate_samples</span><span class="p">()</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Return an array containing sampled values.</p>
 <p>The result should be a three-dimensional array of perturbation values.
 The variable values are stored along the last axis, for each realization
@@ -1298,6 +1293,7 @@ the <code>variable_indices</code> argument of the constructor. In this case, onl
 the corresponding values along the variables axis (the last axis) should
 be set, while other values should be zero.</p>
 
+
 <details class="note" open>
   <summary>Sample scaling</summary>
   <p>Samples will be multiplied by the values given by the
@@ -1309,30 +1305,29 @@ generating them on a <code>[-1, 1]</code> range, or with a unit standard
 deviation.</p>
 </details>
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The sampled values.</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The sampled values.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1340,8 +1335,7 @@ deviation.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1350,24 +1344,23 @@ deviation.</p>
 
 
 <h3 id="ropt.plugins.sampler.protocol.SamplerPluginProtocol" class="doc doc-heading">
-          <code>SamplerPluginProtocol</code>
+            <code>SamplerPluginProtocol</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="ropt.plugins.protocol.PluginProtocol">PluginProtocol</span></code>, <code><span title="typing.Protocol">Protocol</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.plugins.protocol.PluginProtocol">PluginProtocol</span></code>, <code><span title="typing.Protocol">Protocol</span></code></p>
 
-  
+
       <p>Sampler plugin protocol.</p>
 
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -1380,90 +1373,88 @@ deviation.</p>
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.plugins.sampler.protocol.SamplerPluginProtocol.create" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">sampler_index</span><span class="p">,</span> <span class="n">variable_indices</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">sampler_index</span><span class="p">,</span> <span class="n">variable_indices</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Create a sampler.</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>enopt_config</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration of the optimizer.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>sampler_index</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The index of the sampler to use.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>variable_indices</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The indices of the variables to sample.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>rng</code></td>
+            <td>
+                  <code><span title="numpy.random.Generator">Generator</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A random generator object for use by stochastic samplers.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>enopt_config</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The configuration of the optimizer.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>sampler_index</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The index of the sampler to use.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>variable_indices</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The indices of the variables to sample.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>rng</code></td>
-          <td>
-                <code><span title="numpy.random.Generator">Generator</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>A random generator object for use by stochastic samplers.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-  </div>
+    </div>
 
 </div>
 
@@ -1471,8 +1462,7 @@ deviation.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1481,7 +1471,7 @@ deviation.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1490,17 +1480,17 @@ deviation.</p>
 
 
 <h2 id="ropt.plugins.sampler.scipy.SciPySampler" class="doc doc-heading">
-          <code>ropt.plugins.sampler.scipy.SciPySampler</code>
+            <code>ropt.plugins.sampler.scipy.SciPySampler</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents first">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.sampler.protocol.SamplerProtocol" href="#ropt.plugins.sampler.protocol.SamplerProtocol">SamplerProtocol</a></code></p>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.sampler.protocol.SamplerProtocol" href="#ropt.plugins.sampler.protocol.SamplerProtocol">SamplerProtocol</a></code></p>
 
-  
+
       <p>Plugin class for producing sampling values via SciPy.</p>
 <p>This plugin implements the following sampling methods using the
 corresponding methods from the SciPy stats module:</p>
@@ -1538,7 +1528,7 @@ object. Consult the
 manual for details on these options.</p>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1554,8 +1544,7 @@ manual for details on these options.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1613,7 +1602,7 @@ manual for details on these options.</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.5cfa9459.min.js"></script>
+      <script src="../../assets/javascripts/bundle.081f42fc.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       

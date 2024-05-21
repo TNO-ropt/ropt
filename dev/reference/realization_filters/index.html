@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.22">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.24">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.732c4fb1.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -1158,13 +1158,13 @@
 
 
 <h2 id="ropt.plugins.realization_filter" class="doc doc-heading">
-          <code>ropt.plugins.realization_filter</code>
+            <code>ropt.plugins.realization_filter</code>
 
 
 </h2>
 
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>Plugin functionality for adding realization filters.</p>
 <p>This package contains the protocol that must be followed by realization filter
 plugins, and the default realization filters that are part of <code>ropt</code>.</p>
@@ -1174,7 +1174,7 @@ values. They do this by calculating the weights that should be used for each
 realization when calculating the values of a given set of objectives and
 constraints.</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1190,7 +1190,7 @@ constraints.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1199,13 +1199,13 @@ constraints.</p>
 
 
 <h2 id="ropt.plugins.realization_filter.protocol" class="doc doc-heading">
-          <code>ropt.plugins.realization_filter.protocol</code>
+            <code>ropt.plugins.realization_filter.protocol</code>
 
 
 </h2>
 
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>This module defines the protocol to be followed by realization filters.</p>
 <p>Realization filters can be added via the plugin mechanism to implement
 additional ways to filter the realizations that are used to calculate functions
@@ -1213,7 +1213,7 @@ and gradients. Any object that follows the
 <a class="autorefs autorefs-internal" href="#ropt.plugins.realization_filter.protocol.RealizationFilterProtocol"><code>RealizationFilter</code></a>
 protocol may be installed as a plugin.</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1229,21 +1229,21 @@ protocol may be installed as a plugin.</p>
 
 
 <h3 id="ropt.plugins.realization_filter.protocol.RealizationFilterProtocol" class="doc doc-heading">
-          <code>RealizationFilterProtocol</code>
+            <code>RealizationFilterProtocol</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
 
-  
+
       <p>Protocol for realization filter classes.</p>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1255,82 +1255,77 @@ protocol may be installed as a plugin.</p>
 
 
 
-
 <div class="doc doc-object doc-function">
-
 
 
 <h4 id="ropt.plugins.realization_filter.protocol.RealizationFilterProtocol.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">filter_index</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">filter_index</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initialize the realization filter plugin.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>enopt_config</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The configuration of the optimizer</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>filter_index</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The index of the transform to use</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>enopt_config</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration of the optimizer</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>filter_index</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The index of the transform to use</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  </div>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.plugins.realization_filter.protocol.RealizationFilterProtocol.get_realization_weights" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_realization_weights</span><span class="p">(</span><span class="n">objectives</span><span class="p">,</span> <span class="n">constraints</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">get_realization_weights</span><span class="p">(</span><span class="n">objectives</span><span class="p">,</span> <span class="n">constraints</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Return the updated weights of the realizations.</p>
 <p>This method is called by the optimizer with the current values of the
 objectives and constraints. Based on these values it must decide how
@@ -1340,80 +1335,79 @@ vector.</p>
 columns contain the values of the objectives or constraints. The index
 along the row axis corresponds to the number of the realization.</p>
 
+
 <details class="tip" open>
   <summary>Normalization</summary>
   <p>The weights will be normalized to a sum of one by the optimizer
 before use, hence any non-negative weight value is permissable.</p>
 </details>
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>objectives</code></td>
-          <td>
-                <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The objectives of all realizations</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>constraints</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The constraints for all realizations</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>objectives</code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The objectives of all realizations</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>constraints</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The constraints for all realizations</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A vector of weights of the realizations.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>A vector of weights of the realizations.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-  </div>
+    </div>
 
 </div>
 
@@ -1421,8 +1415,7 @@ before use, hence any non-negative weight value is permissable.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1431,24 +1424,23 @@ before use, hence any non-negative weight value is permissable.</p>
 
 
 <h3 id="ropt.plugins.realization_filter.protocol.RealizationFilterPluginProtocol" class="doc doc-heading">
-          <code>RealizationFilterPluginProtocol</code>
+            <code>RealizationFilterPluginProtocol</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="ropt.plugins.protocol.PluginProtocol">PluginProtocol</span></code>, <code><span title="typing.Protocol">Protocol</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.plugins.protocol.PluginProtocol">PluginProtocol</span></code>, <code><span title="typing.Protocol">Protocol</span></code></p>
 
-  
+
       <p>RealizationFilter plugin protocol.</p>
 
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -1461,62 +1453,60 @@ before use, hence any non-negative weight value is permissable.</p>
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.plugins.realization_filter.protocol.RealizationFilterPluginProtocol.create" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">filter_index</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">filter_index</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initialize the realization filter plugin.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>enopt_config</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The configuration of the optimizer</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>filter_index</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The index of the transform to use</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>enopt_config</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration of the optimizer</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>filter_index</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The index of the transform to use</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1524,8 +1514,7 @@ before use, hence any non-negative weight value is permissable.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1534,7 +1523,7 @@ before use, hence any non-negative weight value is permissable.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1543,16 +1532,16 @@ before use, hence any non-negative weight value is permissable.</p>
 
 
 <h2 id="ropt.plugins.realization_filter.default" class="doc doc-heading">
-          <code>ropt.plugins.realization_filter.default</code>
+            <code>ropt.plugins.realization_filter.default</code>
 
 
 </h2>
 
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>This plugin contains realization filters that are installed by default.</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1568,7 +1557,7 @@ before use, hence any non-negative weight value is permissable.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1577,17 +1566,17 @@ before use, hence any non-negative weight value is permissable.</p>
 
 
 <h2 id="ropt.plugins.realization_filter.default.DefaultRealizationFilter" class="doc doc-heading">
-          <code>ropt.plugins.realization_filter.default.DefaultRealizationFilter</code>
+            <code>ropt.plugins.realization_filter.default.DefaultRealizationFilter</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents first">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.realization_filter.protocol.RealizationFilterProtocol" href="#ropt.plugins.realization_filter.protocol.RealizationFilterProtocol">RealizationFilterProtocol</a></code></p>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.realization_filter.protocol.RealizationFilterProtocol" href="#ropt.plugins.realization_filter.protocol.RealizationFilterProtocol">RealizationFilterProtocol</a></code></p>
 
-  
+
       <p>The default realization filter plugin class.</p>
 <p>This plugin currently implements four methods:</p>
 <dl>
@@ -1628,7 +1617,7 @@ before use, hence any non-negative weight value is permissable.</p>
 </dl>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1644,8 +1633,7 @@ before use, hence any non-negative weight value is permissable.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1654,17 +1642,17 @@ before use, hence any non-negative weight value is permissable.</p>
 
 
 <h2 id="ropt.plugins.realization_filter.default.SortObjectiveOptions" class="doc doc-heading">
-          <code>ropt.plugins.realization_filter.default.SortObjectiveOptions</code>
+            <code>ropt.plugins.realization_filter.default.SortObjectiveOptions</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents first">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
 
-  
+
       <p>Configuration settings for the <code>sort-objective</code> method.</p>
 <p>The <code>sort-objective</code> method sorts realizations according to the value of one
 or multiple objectives, and retains a number of realizations within a given
@@ -1673,55 +1661,54 @@ weighted sum of these objectives is used, using the weights given in the
 configuration of the optimizer.</p>
 
 
-
-  <p><span class="doc-section-title">Attributes:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.plugins.realization_filter.default.SortObjectiveOptions.sort">sort</span></code></td>
-          <td>
-                <code><span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<span title="pydantic.StrictStr">StrictStr</span>, <span title="pydantic.NonNegativeInt">NonNegativeInt</span>]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The indices of the objectives to sort</p>
-            </div>
-          </td>
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.plugins.realization_filter.default.SortObjectiveOptions.first">first</span></code></td>
-          <td>
-                <code><span title="pydantic.NonNegativeInt">NonNegativeInt</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Index of the first realization to use</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.plugins.realization_filter.default.SortObjectiveOptions.last">last</span></code></td>
-          <td>
-                <code><span title="pydantic.NonNegativeInt">NonNegativeInt</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Index of the last realization to use</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.SortObjectiveOptions.sort">sort</span></code></td>
+            <td>
+                  <code><span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<span title="pydantic.StrictStr">StrictStr</span>, <span title="pydantic.NonNegativeInt">NonNegativeInt</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The indices of the objectives to sort</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.SortObjectiveOptions.first">first</span></code></td>
+            <td>
+                  <code><span title="pydantic.NonNegativeInt">NonNegativeInt</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Index of the first realization to use</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.SortObjectiveOptions.last">last</span></code></td>
+            <td>
+                  <code><span title="pydantic.NonNegativeInt">NonNegativeInt</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Index of the last realization to use</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1737,8 +1724,7 @@ configuration of the optimizer.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1747,72 +1733,71 @@ configuration of the optimizer.</p>
 
 
 <h2 id="ropt.plugins.realization_filter.default.SortConstraintOptions" class="doc doc-heading">
-          <code>ropt.plugins.realization_filter.default.SortConstraintOptions</code>
+            <code>ropt.plugins.realization_filter.default.SortConstraintOptions</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents first">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
 
-  
+
       <p>Configuration settings for the <code>sort-constraint</code> method.</p>
 <p>The <code>sort-constraint</code> method sorts realizations according to the value of a
 constraint, and retains a number of realizations within a given index range
 in the sorted list.</p>
 
 
-
-  <p><span class="doc-section-title">Attributes:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.plugins.realization_filter.default.SortConstraintOptions.sort">sort</span></code></td>
-          <td>
-                <code><span title="typing.Union">Union</span>[<span title="pydantic.StrictStr">StrictStr</span>, <span title="pydantic.NonNegativeInt">NonNegativeInt</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The index of the constraint to sort</p>
-            </div>
-          </td>
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.plugins.realization_filter.default.SortConstraintOptions.first">first</span></code></td>
-          <td>
-                <code><span title="pydantic.NonNegativeInt">NonNegativeInt</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Index of the first realization to use</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.plugins.realization_filter.default.SortConstraintOptions.last">last</span></code></td>
-          <td>
-                <code><span title="pydantic.NonNegativeInt">NonNegativeInt</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Index of the last realization to use</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.SortConstraintOptions.sort">sort</span></code></td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[<span title="pydantic.StrictStr">StrictStr</span>, <span title="pydantic.NonNegativeInt">NonNegativeInt</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The index of the constraint to sort</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.SortConstraintOptions.first">first</span></code></td>
+            <td>
+                  <code><span title="pydantic.NonNegativeInt">NonNegativeInt</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Index of the first realization to use</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.SortConstraintOptions.last">last</span></code></td>
+            <td>
+                  <code><span title="pydantic.NonNegativeInt">NonNegativeInt</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Index of the last realization to use</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1828,8 +1813,7 @@ in the sorted list.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1838,17 +1822,17 @@ in the sorted list.</p>
 
 
 <h2 id="ropt.plugins.realization_filter.default.CVaRObjectiveOptions" class="doc doc-heading">
-          <code>ropt.plugins.realization_filter.default.CVaRObjectiveOptions</code>
+            <code>ropt.plugins.realization_filter.default.CVaRObjectiveOptions</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents first">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
 
-  
+
       <p>Configuration settings for the <code>cvar-objective</code> method.</p>
 <p>The <code>cvar-objective</code> method finds realizations weights by applying the CVaR
 method to the objective values. If more than one objective index is given, a
@@ -1861,44 +1845,43 @@ case of a minimization and those having the lowest values in case of
 maximizing.</p>
 
 
-
-  <p><span class="doc-section-title">Attributes:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.plugins.realization_filter.default.CVaRObjectiveOptions.sort">sort</span></code></td>
-          <td>
-                <code><span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<span title="pydantic.StrictStr">StrictStr</span>, <span title="pydantic.NonNegativeInt">NonNegativeInt</span>]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The indices of the objectives to sort</p>
-            </div>
-          </td>
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.plugins.realization_filter.default.CVaRObjectiveOptions.percentile">percentile</span></code></td>
-          <td>
-                <code><span title="typing_extensions.Annotated">Annotated</span>[float, <span title="pydantic.Field">Field</span>(gt=0.0, le=1.0)]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The CVaR percentile</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.CVaRObjectiveOptions.sort">sort</span></code></td>
+            <td>
+                  <code><span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<span title="pydantic.StrictStr">StrictStr</span>, <span title="pydantic.NonNegativeInt">NonNegativeInt</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The indices of the objectives to sort</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.CVaRObjectiveOptions.percentile">percentile</span></code></td>
+            <td>
+                  <code><span title="typing_extensions.Annotated">Annotated</span>[float, <span title="pydantic.Field">Field</span>(gt=0.0, le=1.0)]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The CVaR percentile</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1914,8 +1897,7 @@ maximizing.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1924,17 +1906,17 @@ maximizing.</p>
 
 
 <h2 id="ropt.plugins.realization_filter.default.CVaRConstraintOptions" class="doc doc-heading">
-          <code>ropt.plugins.realization_filter.default.CVaRConstraintOptions</code>
+            <code>ropt.plugins.realization_filter.default.CVaRConstraintOptions</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents first">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
 
-  
+
       <p>Configuration settings for the <code>cvar-constraint</code> method.</p>
 <p>The <code>cvar-constraint</code> method finds realizations weights by applying the CVaR
 method to the objective values.</p>
@@ -1949,44 +1931,43 @@ subtracting the right-hand-side value the following applies:</p>
 </ul>
 
 
-
-  <p><span class="doc-section-title">Attributes:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.plugins.realization_filter.default.CVaRConstraintOptions.sort">sort</span></code></td>
-          <td>
-                <code><span title="typing.Union">Union</span>[<span title="pydantic.StrictStr">StrictStr</span>, <span title="pydantic.NonNegativeInt">NonNegativeInt</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The index of the constraint to sort</p>
-            </div>
-          </td>
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.plugins.realization_filter.default.CVaRConstraintOptions.percentile">percentile</span></code></td>
-          <td>
-                <code><span title="typing_extensions.Annotated">Annotated</span>[float, <span title="pydantic.Field">Field</span>(gt=0.0, le=1.0)]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The CVaR percentile</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.CVaRConstraintOptions.sort">sort</span></code></td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[<span title="pydantic.StrictStr">StrictStr</span>, <span title="pydantic.NonNegativeInt">NonNegativeInt</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The index of the constraint to sort</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.CVaRConstraintOptions.percentile">percentile</span></code></td>
+            <td>
+                  <code><span title="typing_extensions.Annotated">Annotated</span>[float, <span title="pydantic.Field">Field</span>(gt=0.0, le=1.0)]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The CVaR percentile</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -2002,8 +1983,7 @@ subtracting the right-hand-side value the following applies:</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2061,7 +2041,7 @@ subtracting the right-hand-side value the following applies:</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.5cfa9459.min.js"></script>
+      <script src="../../assets/javascripts/bundle.081f42fc.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       

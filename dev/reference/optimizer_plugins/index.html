@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.22">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.24">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.732c4fb1.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -1218,13 +1218,13 @@
 
 
 <h2 id="ropt.plugins.optimizer" class="doc doc-heading">
-          <code>ropt.plugins.optimizer</code>
+            <code>ropt.plugins.optimizer</code>
 
 
 </h2>
 
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>Plugin functionality for adding optimization plugins.</p>
 <p>Optimization plugins are managed by a
 <a class="autorefs autorefs-internal" href="../plugins/#ropt.plugins.PluginManager"><code>PluginManager</code></a> object, which returns classes or
@@ -1243,7 +1243,7 @@ installed which provides a number of methods from the
 <a href="https://docs.scipy.org/doc/scipy/tutorial/optimize.html"><code>scipy.optimize</code></a>
 package.</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1259,7 +1259,7 @@ package.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1268,20 +1268,20 @@ package.</p>
 
 
 <h2 id="ropt.plugins.optimizer.protocol" class="doc doc-heading">
-          <code>ropt.plugins.optimizer.protocol</code>
+            <code>ropt.plugins.optimizer.protocol</code>
 
 
 </h2>
 
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>This module defines the protocol to be followed by optimization plugins.</p>
 <p>Optimization plugins can be added via the plugin mechanism to implement
 additional optimization methods. Any object that follows the
 <a class="autorefs autorefs-internal" href="#ropt.plugins.optimizer.protocol.OptimizerProtocol"><code>Optimizer</code></a>
 protocol may be installed as a plugin.</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1297,17 +1297,17 @@ protocol may be installed as a plugin.</p>
 
 
 <h3 id="ropt.plugins.optimizer.protocol.OptimizerCallback" class="doc doc-heading">
-          <code>OptimizerCallback</code>
+            <code>OptimizerCallback</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
 
-  
+
       <p>Protocol for the optimizer callback.</p>
 <p>Optimization plugins implement optimizer classes according to the
 <a class="autorefs autorefs-internal" href="#ropt.plugins.optimizer.protocol.OptimizerProtocol"><code>Optimizer</code></a> protocol.
@@ -1316,10 +1316,9 @@ follows the call signature defined here. This callback should be used to
 request the function and gradient evaluations that the optimizer needs.</p>
 
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -1332,15 +1331,14 @@ request the function and gradient evaluations that the optimizer needs.</p>
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.plugins.optimizer.protocol.OptimizerCallback.__call__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">return_functions</span><span class="p">,</span> <span class="n">return_gradients</span><span class="p">,</span> <span class="n">allow_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">return_functions</span><span class="p">,</span> <span class="n">return_gradients</span><span class="p">,</span> <span class="n">allow_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>The signature of the optimizer callback.</p>
 <p>The optimizer callback expects a vector or matrix with variables to
 evaluate. Discrete optimizers may request function evaluations for
@@ -1368,102 +1366,100 @@ are robust in this regard. By returning <code>allow_nan=True</code>, these
 optimizers can indicate that this is the case.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>variables</code></td>
-          <td>
-                <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The variable vector or matrix to evaluate</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>return_functions</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>If <code>True</code>, evaluate and return functions</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>return_gradients</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>If <code>True</code>, evaluate and return gradients</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>allow_nan</code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>If <code>True</code>, accept <code>NaN</code> values</p>
-            </div>
-          </td>
-          <td>
-                <code>False</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>variables</code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The variable vector or matrix to evaluate</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>return_functions</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>True</code>, evaluate and return functions</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>return_gradients</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>True</code>, evaluate and return gradients</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>allow_nan</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>True</code>, accept <code>NaN</code> values</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="typing.Tuple">Tuple</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>A tuple with function and gradient values.</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Tuple">Tuple</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A tuple with function and gradient values.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1471,8 +1467,7 @@ optimizers can indicate that this is the case.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1481,17 +1476,17 @@ optimizers can indicate that this is the case.</p>
 
 
 <h3 id="ropt.plugins.optimizer.protocol.OptimizerProtocol" class="doc doc-heading">
-          <code>OptimizerProtocol</code>
+            <code>OptimizerProtocol</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
 
-  
+
       <p>Protocol for optimizer classes.</p>
 <p><code>ropt</code> employs plugins to implement optimizers that are called during an
 optimization workflow. Optimizers should adhere to the <code>Optimizer</code> protocol,
@@ -1499,7 +1494,7 @@ which specifies the requirements for the class constructor (<code>__init__</code
 also includes a <code>start</code> method used to initiate the optimization process.</p>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1514,8 +1509,8 @@ also includes a <code>start</code> method used to initiate the optimization proc
 
 
 <h4 id="ropt.plugins.optimizer.protocol.OptimizerProtocol.allow_nan" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">allow_nan</span><span class="p">:</span> <span class="nb">bool</span></code>
-  
+            <code class="highlight language-python"><span class="n">allow_nan</span><span class="p">:</span> <span class="nb">bool</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
@@ -1523,154 +1518,147 @@ also includes a <code>start</code> method used to initiate the optimization proc
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Return <code>True</code> if a <code>NaN</code> is a valid function value.</p>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p><code>True</code> if <code>NaN</code> is allowed.</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
-  </div>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if <code>NaN</code> is allowed.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+    </div>
 
 </div>
-
 
 
 
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.plugins.optimizer.protocol.OptimizerProtocol.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">optimizer_callback</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">optimizer_callback</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initialize an optimizer object.</p>
 <p>The <code>config</code> object defines how the optimization run should be
 configured, while the <code>optimizer_callback</code> should be used to evaluate
 functions and gradients that are needed during optimization.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>config</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The optimizer configuration to used</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>optimizer_callback</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.plugins.optimizer.protocol.OptimizerCallback" href="#ropt.plugins.optimizer.protocol.OptimizerCallback">OptimizerCallback</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The optimizer callback</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The optimizer configuration to used</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>optimizer_callback</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.optimizer.protocol.OptimizerCallback" href="#ropt.plugins.optimizer.protocol.OptimizerCallback">OptimizerCallback</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The optimizer callback</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  </div>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.plugins.optimizer.protocol.OptimizerProtocol.start" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">start</span><span class="p">(</span><span class="n">initial_values</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">start</span><span class="p">(</span><span class="n">initial_values</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Start the optimization.</p>
 <p>This method must be implemented to run the optimization, collecting
 functions and gradients as needed by calling the callback passed upon
 initialization.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>initial_values</code></td>
-          <td>
-                <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Vector of variables to start the optimization with.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>initial_values</code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Vector of variables to start the optimization with.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1678,8 +1666,7 @@ initialization.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1688,24 +1675,23 @@ initialization.</p>
 
 
 <h3 id="ropt.plugins.optimizer.protocol.OptimizerPluginProtocol" class="doc doc-heading">
-          <code>OptimizerPluginProtocol</code>
+            <code>OptimizerPluginProtocol</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="ropt.plugins.protocol.PluginProtocol">PluginProtocol</span></code>, <code><span title="typing.Protocol">Protocol</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.plugins.protocol.PluginProtocol">PluginProtocol</span></code>, <code><span title="typing.Protocol">Protocol</span></code></p>
 
-  
+
       <p>Optimizer plugin protocol.</p>
 
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -1718,62 +1704,60 @@ initialization.</p>
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.plugins.optimizer.protocol.OptimizerPluginProtocol.create" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">optimizer_callback</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">optimizer_callback</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Create an optimizer.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>config</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The optimizer configuration to used</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>optimizer_callback</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.plugins.optimizer.protocol.OptimizerCallback" href="#ropt.plugins.optimizer.protocol.OptimizerCallback">OptimizerCallback</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The optimizer callback</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The optimizer configuration to used</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>optimizer_callback</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.optimizer.protocol.OptimizerCallback" href="#ropt.plugins.optimizer.protocol.OptimizerCallback">OptimizerCallback</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The optimizer callback</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1781,8 +1765,7 @@ initialization.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1791,7 +1774,7 @@ initialization.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1800,18 +1783,18 @@ initialization.</p>
 
 
 <h2 id="ropt.plugins.optimizer.utils" class="doc doc-heading">
-          <code>ropt.plugins.optimizer.utils</code>
+            <code>ropt.plugins.optimizer.utils</code>
 
 
 </h2>
 
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>Utility functions for use by optimizer plugins.</p>
 <p>This module provides utility functions to validate supported constraints, filter
 linear constraints, and to retrieve the list of supported optimizers.</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1823,19 +1806,17 @@ linear constraints, and to retrieve the list of supported optimizers.</p>
 
 
 
-
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="ropt.plugins.optimizer.utils.filter_linear_constraints" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">filter_linear_constraints</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">variable_indices</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">filter_linear_constraints</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">variable_indices</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Filter unnecessary constraints from a linear constraint configuration.</p>
 <p>In the case that the optimizer only optimizes a sub-set of the variables,
 linear constraints that are only formed from the unused variables are
@@ -1843,90 +1824,86 @@ superfluous. This utility function removes those constraints from a  linear
 configuration constraint.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>config</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.LinearConstraintsConfig" href="../enopt_config/#ropt.config.enopt.LinearConstraintsConfig">LinearConstraintsConfig</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The linear configuration constraint</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>variable_indices</code></td>
-          <td>
-                <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The indices of the variables used by the optimizer</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.LinearConstraintsConfig" href="../enopt_config/#ropt.config.enopt.LinearConstraintsConfig">LinearConstraintsConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The linear configuration constraint</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>variable_indices</code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The indices of the variables used by the optimizer</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.LinearConstraintsConfig" href="../enopt_config/#ropt.config.enopt.LinearConstraintsConfig">LinearConstraintsConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The filtered linear constraint configuration.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.LinearConstraintsConfig" href="../enopt_config/#ropt.config.enopt.LinearConstraintsConfig">LinearConstraintsConfig</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The filtered linear constraint configuration.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-  </div>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="ropt.plugins.optimizer.utils.validate_supported_constraints" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">validate_supported_constraints</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">supported_constraints</span><span class="p">,</span> <span class="n">required_constraints</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">validate_supported_constraints</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">supported_constraints</span><span class="p">,</span> <span class="n">required_constraints</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Check if the requested optimization features are supported or required.</p>
 <p>The keys of the supported_constraints and required_constraints dicts specify
 the type of the constraint as shown in the example below. The values are
@@ -1942,194 +1919,189 @@ specified by the key.</p>
 }</p>
 
 
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ensemble optimizer configuration object</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>method</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The method to check</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>supported_constraints</code></td>
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Set">Set</span>[str]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Specify the supported constraints</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>required_constraints</code></td>
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Set">Set</span>[str]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Specify the required constraints</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>config</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The ensemble optimizer configuration object</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>method</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The method to check</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>supported_constraints</code></td>
-          <td>
-                <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Set">Set</span>[str]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Specify the supported constraints</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>required_constraints</code></td>
-          <td>
-                <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Set">Set</span>[str]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Specify the required constraints</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-  </div>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h3 id="ropt.plugins.optimizer.utils.create_output_path" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">create_output_path</span><span class="p">(</span><span class="n">base_name</span><span class="p">,</span> <span class="n">base_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">create_output_path</span><span class="p">(</span><span class="n">base_name</span><span class="p">,</span> <span class="n">base_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Create an output path name.</p>
 <p>If the path already exists, an index is appended to it.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>base_name</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Base name of the path</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>base_dir</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="pathlib.Path">Path</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional directory to base the path in</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>name</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[str]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional optimization step name to include in the name</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>suffix</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[str]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional suffix for the resulting path</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>base_name</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Base name of the path</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>base_dir</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="pathlib.Path">Path</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional directory to base the path in</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional optimization step name to include in the name</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>suffix</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional suffix for the resulting path</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="pathlib.Path">Path</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The constructed path</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="pathlib.Path">Path</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The constructed path</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  </div>
+    </div>
 
 </div>
 
@@ -2137,7 +2109,7 @@ specified by the key.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -2146,17 +2118,17 @@ specified by the key.</p>
 
 
 <h2 id="ropt.plugins.optimizer.scipy.SciPyOptimizer" class="doc doc-heading">
-          <code>ropt.plugins.optimizer.scipy.SciPyOptimizer</code>
+            <code>ropt.plugins.optimizer.scipy.SciPyOptimizer</code>
 
 
 </h2>
 
 
-  <div class="doc doc-contents first">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.optimizer.protocol.OptimizerProtocol" href="#ropt.plugins.optimizer.protocol.OptimizerProtocol">OptimizerProtocol</a></code></p>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.optimizer.protocol.OptimizerProtocol" href="#ropt.plugins.optimizer.protocol.OptimizerProtocol">OptimizerProtocol</a></code></p>
 
-  
+
       <p>Plugin class for optimization via SciPy.</p>
 <p>This class implements several optimizers provided by SciPy in the
 <a href="https://docs.scipy.org/doc/scipy/tutorial/optimize.html"><code>scipy.optimize</code></a>
@@ -2192,6 +2164,7 @@ manual for details on these options.</p>
   differential_evolution</li>
 </ul>
 
+
 <details class="info" open>
   <summary>Info</summary>
   <ul>
@@ -2203,7 +2176,7 @@ manual for details on these options.</p>
 </ul>
 </details>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -2219,8 +2192,7 @@ manual for details on these options.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2278,7 +2250,7 @@ manual for details on these options.</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.5cfa9459.min.js"></script>
+      <script src="../../assets/javascripts/bundle.081f42fc.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       
