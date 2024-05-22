@@ -89,7 +89,7 @@ class VariablesConfig(EnOptBaseModel):
 
     names: Optional[UniqueNames] = None
     types: Optional[ArrayEnum] = None
-    initial_values: Array1D
+    initial_values: Array1D = np.array(0.0)
     lower_bounds: Array1D = np.array(-np.inf)
     upper_bounds: Array1D = np.array(np.inf)
     offsets: Optional[Array1D] = None
