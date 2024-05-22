@@ -1316,6 +1316,13 @@ running an optimization, requires a callback argument upon initialization
 that follows this protocol.</p>
 
 
+<details class="note" open>
+  <summary>Closing an evaluator.</summary>
+  <p>An evaluator might be implemented as a callable object with an
+additional <code>close</code> method. If the evaluator has indeed such a method it
+will be called when the evaluator is not needed anymore.</p>
+</details>
+
 
 
   <div class="doc doc-children">
