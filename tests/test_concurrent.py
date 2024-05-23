@@ -58,13 +58,12 @@ class ConcurrentTestEvaluator(ConcurrentEvaluator):
     def __init__(
         self, functions: Tuple[Callable[..., Any], ...], fail_index: int = -1
     ) -> None:
-        super().__init__(enable_cache=True)
+        super().__init__(enable_cache=True, polling=0.0)
 
         self._executor = ThreadPoolExecutor(max_workers=4)
         self._functions = functions
         self._fail_index = fail_index
         self._tasks: Dict[int, ConcurrentTask]
-        self.polling = 0.0
 
     def launch(
         self,

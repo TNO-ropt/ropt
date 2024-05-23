@@ -71,16 +71,15 @@ class ConcurrentEvaluator(ABC):
     [`EnsembleOptimizer`][ropt.optimization.EnsembleOptimizer] constructor.
     """
 
-    def __init__(self, *, enable_cache: bool = True) -> None:
+    def __init__(self, *, enable_cache: bool = True, polling: float = 0.1) -> None:
         """Initialize a concurrent evaluator object.
 
         Args:
-            enable_cache: Enable the caching mechanism.
+            enable_cache: Enable the caching mechanism
+            polling:      Time in seconds between checking job status
         """
-        self.polling: float = 0.1
-        "The time in seconds between polling for evaluation status."
-
         self._batch_id = 0
+        self._polling = polling
         self._cache: Optional[_Cache] = _Cache() if enable_cache else None
 
     @abstractmethod
@@ -170,7 +169,7 @@ class ConcurrentEvaluator(ABC):
                             constraint_results[idx, :] = tasks[idx].get_constraints()
                     del tasks[idx]
             self.monitor()
-            time.sleep(self.polling)
+            time.sleep(self._polling)
 
         result = EvaluatorResult(
             objectives=objective_results,

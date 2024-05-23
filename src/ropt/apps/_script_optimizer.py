@@ -207,6 +207,7 @@ class ScriptOptimizer:
         htex_kwargs: Optional[Dict[str, Any]] = None,
         max_threads: int = 4,
         worker_restart: int = 0,
+        polling: float = 0.1,
     ) -> None:
         """Initialize the optimizer.
 
@@ -231,7 +232,8 @@ class ScriptOptimizer:
             provider:              The provider that executes the jobs
             htex_kwargs:           Keyword arguments forwarded to the htex executor
             max_threads:           Maximum number of threads for local runs
-            worker_restart:        Restart the workers every `worker_restart` batch.
+            worker_restart:        Restart the workers every `worker_restart` batch
+            polling:               How often should be polled for status
         """
         self._plan = plan
         self._tasks = tasks
@@ -247,6 +249,7 @@ class ScriptOptimizer:
         self._worker_restart = worker_restart
         self._status: Dict[int, Any] = {}
         self._optimal_result: Optional[FunctionResults] = None
+        self._polling = polling
 
         self._job_dir = self._work_dir if job_dir is None else Path(job_dir)
         if not self._job_dir.is_absolute():
@@ -461,6 +464,7 @@ class ScriptOptimizer:
                 max_threads=self._max_threads,
                 worker_restart=self._worker_restart,
                 htex_kwargs=self._htex_kwargs,
+                polling=self._polling,
             )
             optimizer = EnsembleOptimizer(evaluator)
             optimizer.add_observer(

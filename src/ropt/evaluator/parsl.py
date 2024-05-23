@@ -71,6 +71,7 @@ class ParslEvaluator(ConcurrentEvaluator):
         retries: int = 0,
         worker_restart: int = 0,
         enable_cache: bool = True,
+        polling: float = 0.1,
     ) -> None:
         """Create a parsl evaluator object.
 
@@ -83,8 +84,9 @@ class ParslEvaluator(ConcurrentEvaluator):
             retries:        Number of retries upon failure of a task. Defaults to 0
             worker_restart: Restart the workers every `worker_restart` batch.
             enable_cache:   If `True` enable function value caching.
+            polling:        Time in seconds between checking job status
         """
-        super().__init__(enable_cache=enable_cache)
+        super().__init__(enable_cache=enable_cache, polling=polling)
 
         self._batch_id: int
         self._variables: NDArray[np.float64]
