@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from dataclasses import dataclass
 from itertools import count
-from typing import Any, DefaultDict, Dict, List, Optional, Tuple
+from typing import Any, DefaultDict, Dict, Iterable, List, Optional, Tuple
 
 import numpy as np
 from numpy.typing import NDArray
@@ -71,22 +71,27 @@ class ConcurrentEvaluator(ABC):
     [`EnsembleOptimizer`][ropt.optimization.EnsembleOptimizer] constructor.
     """
 
-    def __init__(self, *, enable_cache: bool = True, polling: float = 0.1) -> None:
+    def __init__(
+        self, *, enable_cache: bool = True, polling: float = 0.1, max_submit: int = 500
+    ) -> None:
         """Initialize a concurrent evaluator object.
 
         Args:
             enable_cache: Enable the caching mechanism
             polling:      Time in seconds between checking job status
+            max_submit:   Maximum number of variables to submit simultaneously
         """
         self._batch_id = 0
         self._polling = polling
+        self._max_submit = max_submit
         self._cache: Optional[_Cache] = _Cache() if enable_cache else None
 
     @abstractmethod
-    def launch(
+    def launch(  # noqa: PLR0913
         self,
         batch_id: Any,  # noqa: ANN401
         variables: NDArray[np.float64],
+        indices: Iterable[int],
         context: EvaluatorContext,
         active: Optional[NDArray[np.bool_]],
     ) -> Dict[int, ConcurrentTask]:
@@ -117,6 +122,7 @@ class ConcurrentEvaluator(ABC):
         Args:
             batch_id:  The ID of the batch of evaluations to run.
             variables: The matrix of variables to evaluate.
+            indices:   Indices of the variables to evaluate.
             context:   Evaluator context.
             active:    Optional active realizations.
 
@@ -156,20 +162,31 @@ class ConcurrentEvaluator(ABC):
             variables, context, objective_results, constraint_results
         )
 
-        tasks = self.launch(self._batch_id, variables, context, active)
-        tasks = tasks.copy()  # Use a shallow copy so we can safely modify the dict.
-        while tasks:
-            # We are modifying the dict while iterating, use a copy of the keys:
-            for idx in list(tasks.keys()):
-                future = tasks[idx].future
-                if future is None or future.done():
-                    if future is None or future.exception() is None:
-                        objective_results[idx, :] = tasks[idx].get_objectives()
-                        if constraint_results is not None:
-                            constraint_results[idx, :] = tasks[idx].get_constraints()
-                    del tasks[idx]
-            self.monitor()
-            time.sleep(self._polling)
+        start = 0
+        while start < variables.shape[0]:
+            tasks = self.launch(
+                self._batch_id,
+                variables,
+                range(start, min(start + self._max_submit, variables.shape[0])),
+                context,
+                active,
+            )
+            tasks = tasks.copy()  # Use a shallow copy so we can safely modify the dict.
+            while tasks:
+                # We are modifying the dict while iterating, use a copy of the keys:
+                for idx in list(tasks.keys()):
+                    future = tasks[idx].future
+                    if future is None or future.done():
+                        if future is None or future.exception() is None:
+                            objective_results[idx, :] = tasks[idx].get_objectives()
+                            if constraint_results is not None:
+                                constraint_results[idx, :] = tasks[
+                                    idx
+                                ].get_constraints()
+                        del tasks[idx]
+                self.monitor()
+                time.sleep(self._polling)
+            start += self._max_submit
 
         result = EvaluatorResult(
             objectives=objective_results,

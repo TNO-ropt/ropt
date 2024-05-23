@@ -208,6 +208,7 @@ class ScriptOptimizer:
         max_threads: int = 4,
         worker_restart: int = 0,
         polling: float = 0.1,
+        max_submit: int = 500,
     ) -> None:
         """Initialize the optimizer.
 
@@ -234,6 +235,7 @@ class ScriptOptimizer:
             max_threads:           Maximum number of threads for local runs
             worker_restart:        Restart the workers every `worker_restart` batch
             polling:               How often should be polled for status
+            max_submit:            Maximum number of variables to submit simultaneously
         """
         self._plan = plan
         self._tasks = tasks
@@ -250,6 +252,7 @@ class ScriptOptimizer:
         self._status: Dict[int, Any] = {}
         self._optimal_result: Optional[FunctionResults] = None
         self._polling = polling
+        self._max_submit = max_submit
 
         self._job_dir = self._work_dir if job_dir is None else Path(job_dir)
         if not self._job_dir.is_absolute():
@@ -465,6 +468,7 @@ class ScriptOptimizer:
                 worker_restart=self._worker_restart,
                 htex_kwargs=self._htex_kwargs,
                 polling=self._polling,
+                max_submit=self._max_submit,
             )
             optimizer = EnsembleOptimizer(evaluator)
             optimizer.add_observer(

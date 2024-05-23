@@ -9,7 +9,7 @@ range of compute resources.
 from dataclasses import dataclass
 from enum import Enum
 from time import sleep
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Union
 
 import numpy as np
 import parsl
@@ -72,6 +72,7 @@ class ParslEvaluator(ConcurrentEvaluator):
         worker_restart: int = 0,
         enable_cache: bool = True,
         polling: float = 0.1,
+        max_submit: int = 500,
     ) -> None:
         """Create a parsl evaluator object.
 
@@ -85,8 +86,11 @@ class ParslEvaluator(ConcurrentEvaluator):
             worker_restart: Restart the workers every `worker_restart` batch.
             enable_cache:   If `True` enable function value caching.
             polling:        Time in seconds between checking job status
+            max_submit:   Maximum number of variables to submit simultaneously
         """
-        super().__init__(enable_cache=enable_cache, polling=polling)
+        super().__init__(
+            enable_cache=enable_cache, polling=polling, max_submit=max_submit
+        )
 
         self._batch_id: int
         self._variables: NDArray[np.float64]
@@ -123,10 +127,11 @@ class ParslEvaluator(ConcurrentEvaluator):
             ),
         )
 
-    def launch(
+    def launch(  # noqa: PLR0913
         self,
         batch_id: int,
         variables: NDArray[np.float64],
+        indices: Iterable[int],
         context: EvaluatorContext,
         active: Optional[NDArray[np.bool_]],
     ) -> Dict[int, ConcurrentTask]:
@@ -146,10 +151,9 @@ class ParslEvaluator(ConcurrentEvaluator):
                 self._executor.scale_in(self._executor.connected_workers)
                 sleep(self._htex_kwargs["heartbeat_period"])
         self._batch_id = batch_id
-        self._variables = variables
         self._jobs = {
             job_idx: self._workflow(batch_id, job_idx, variables, context)
-            for job_idx in range(variables.shape[0])
+            for job_idx in indices
             if active is None or active[job_idx]
         }
         return {idx: futures[-1] for idx, futures in self._jobs.items() if futures}
