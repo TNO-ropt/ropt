@@ -1,6 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Iterable, Optional, Tuple, cast
+from typing import Any, Callable, Dict, Optional, Tuple, cast
 
 import numpy as np
 import pytest
@@ -68,24 +68,22 @@ class ConcurrentTestEvaluator(ConcurrentEvaluator):
     def launch(
         self,
         batch_id: int,  # noqa: ARG002
+        job_id: int,
         variables: NDArray[np.float64],
-        indices: Iterable[int],
         context: EvaluatorContext,  # noqa: ARG002
-        active: Optional[NDArray[np.bool_]],
-    ) -> Dict[int, ConcurrentTask]:
-        self._tasks = {
-            idx: TaskTestEvaluator(
-                future=self._executor.submit(
-                    _run_functions,
-                    self._functions,
-                    variables[idx, :],
-                    self._fail_index == idx,
-                ),
-            )
-            for idx in indices
-            if active is None or active[idx]
-        }
-        return self._tasks
+    ) -> Optional[ConcurrentTask]:
+        if job_id == 0:
+            self._tasks = {}
+        task = TaskTestEvaluator(
+            future=self._executor.submit(
+                _run_functions,
+                self._functions,
+                variables,
+                self._fail_index == job_id,
+            ),
+        )
+        self._tasks[job_id] = task
+        return task
 
     def monitor(self) -> None:
         for idx, task in self._tasks.items():

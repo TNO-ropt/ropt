@@ -9,7 +9,7 @@ range of compute resources.
 from dataclasses import dataclass
 from enum import Enum
 from time import sleep
-from typing import Any, Callable, Dict, Iterable, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import numpy as np
 import parsl
@@ -127,14 +127,13 @@ class ParslEvaluator(ConcurrentEvaluator):
             ),
         )
 
-    def launch(  # noqa: PLR0913
+    def launch(
         self,
         batch_id: int,
+        job_id: int,
         variables: NDArray[np.float64],
-        indices: Iterable[int],
         context: EvaluatorContext,
-        active: Optional[NDArray[np.bool_]],
-    ) -> Dict[int, ConcurrentTask]:
+    ) -> Optional[ConcurrentTask]:
         """Launch the parsl task.
 
         See the [ropt.evaluator.ConcurrentEvaluator][] abstract base class.
@@ -144,19 +143,21 @@ class ParslEvaluator(ConcurrentEvaluator):
         if (
             self._worker_restart > 0
             and batch_id > 0
+            and job_id == 0
             and batch_id % self._worker_restart == 0
         ):
             assert isinstance(self._executor, HighThroughputExecutor)
             while self._executor.connected_workers > 0:
                 self._executor.scale_in(self._executor.connected_workers)
                 sleep(self._htex_kwargs["heartbeat_period"])
+        if job_id == 0:
+            self._jobs = {}
         self._batch_id = batch_id
-        self._jobs = {
-            job_idx: self._workflow(batch_id, job_idx, variables, context)
-            for job_idx in indices
-            if active is None or active[job_idx]
-        }
-        return {idx: futures[-1] for idx, futures in self._jobs.items() if futures}
+        job: List[Task] = self._workflow(batch_id, job_id, variables, context)
+        if job:
+            self._jobs[job_id] = job
+            return job[-1]
+        return None
 
     def monitor(self) -> None:  # noqa: C901
         """Monitor the tasks of all jobs.

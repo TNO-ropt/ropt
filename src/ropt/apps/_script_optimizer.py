@@ -309,7 +309,7 @@ class ScriptOptimizer:
 
         assert context.config.variables.names is not None
         variables_to_json(
-            variables[job_idx],
+            variables,
             context.config.variables.names,
             path,
             depth=self._variable_export_depth,

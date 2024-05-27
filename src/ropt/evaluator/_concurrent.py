@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from dataclasses import dataclass
 from itertools import count
-from typing import Any, DefaultDict, Dict, Iterable, List, Optional, Tuple
+from typing import Any, DefaultDict, Dict, List, Optional, Tuple
 
 import numpy as np
 from numpy.typing import NDArray
@@ -87,20 +87,19 @@ class ConcurrentEvaluator(ABC):
         self._cache: Optional[_Cache] = _Cache() if enable_cache else None
 
     @abstractmethod
-    def launch(  # noqa: PLR0913
+    def launch(
         self,
         batch_id: Any,  # noqa: ANN401
+        job_id: int,
         variables: NDArray[np.float64],
-        indices: Iterable[int],
         context: EvaluatorContext,
-        active: Optional[NDArray[np.bool_]],
-    ) -> Dict[int, ConcurrentTask]:
-        """Launch the evaluations and return futures.
+    ) -> Optional[ConcurrentTask]:
+        """Launch an evaluation and return futures.
 
-        This method must implement the process of launching a batch of function
-        evaluations for a set of variable vectors passed via the `variables`
-        parameter. A unique batch ID is passed via the `batch_id`, which can be
-        optionally used.
+        This method must implement the process of launching a a single function
+        evaluation for a variable vector passed via the `variables` parameter. A
+        unique batch ID is passed via the `batch_id`, which can be optionally
+        used.
 
         This method should return a dictionary mapping the indices of the jobs
         to the tasks that will contain the result. The tasks are objects
@@ -115,19 +114,16 @@ class ConcurrentEvaluator(ABC):
         object.
 
         The `context` argument with optional information is passed from the
-        `__call__` method unchanged. The `active` document passes a boolean
-        vector indicating which realizations are active. It not `None` it should
-        take precedence over the corresponding field in the `context` variable.
+        `__call__` method unchanged.
 
         Args:
             batch_id:  The ID of the batch of evaluations to run.
+            job_id:    The ID of the job launched for the variables
             variables: The matrix of variables to evaluate.
-            indices:   Indices of the variables to evaluate.
             context:   Evaluator context.
-            active:    Optional active realizations.
 
         Returns:
-            A dictionary mapping the indices of launched evaluations to tasks.
+            The last future or `None` if no tasks were launched.
         """
 
     def monitor(self) -> None:  # noqa: B027
@@ -162,31 +158,33 @@ class ConcurrentEvaluator(ABC):
             variables, context, objective_results, constraint_results
         )
 
-        start = 0
-        while start < variables.shape[0]:
-            tasks = self.launch(
-                self._batch_id,
-                variables,
-                range(start, min(start + self._max_submit, variables.shape[0])),
-                context,
-                active,
-            )
-            tasks = tasks.copy()  # Use a shallow copy so we can safely modify the dict.
-            while tasks:
-                # We are modifying the dict while iterating, use a copy of the keys:
-                for idx in list(tasks.keys()):
-                    future = tasks[idx].future
-                    if future is None or future.done():
-                        if future is None or future.exception() is None:
-                            objective_results[idx, :] = tasks[idx].get_objectives()
-                            if constraint_results is not None:
-                                constraint_results[idx, :] = tasks[
-                                    idx
-                                ].get_constraints()
-                        del tasks[idx]
-                self.monitor()
-                time.sleep(self._polling)
-            start += self._max_submit
+        var_idx = 0
+        tasks: Dict[int, ConcurrentTask] = {}
+
+        # Keep submitting and monitoring until all variables and tasks are done:
+        while var_idx < variables.shape[0] or len(tasks) > 0:
+            # Add more tasks up to a maximum of max_submit:
+            for _ in range(self._max_submit - len(tasks)):
+                if var_idx < variables.shape[0]:
+                    if active is None or active[var_idx]:
+                        task = self.launch(
+                            self._batch_id, var_idx, variables[var_idx], context
+                        )
+                        if task is not None:
+                            tasks[var_idx] = task
+                    var_idx += 1
+
+            # Monitor the current tasks:
+            for idx in list(tasks.keys()):  # tasks changes size, hence list()
+                future = tasks[idx].future
+                if future is None or future.done():
+                    if future is None or future.exception() is None:
+                        objective_results[idx, :] = tasks[idx].get_objectives()
+                        if constraint_results is not None:
+                            constraint_results[idx, :] = tasks[idx].get_constraints()
+                    del tasks[idx]
+            self.monitor()
+            time.sleep(self._polling)
 
         result = EvaluatorResult(
             objectives=objective_results,

@@ -74,7 +74,7 @@ def parsl_workflow(
 ) -> List[ParslTestTask]:
     return [
         ParslTestTask(
-            future=_run_functions(functions, variables[idx, :], fail=idx == fail_index)
+            future=_run_functions(functions, variables, fail=idx == fail_index)
         ),
     ]
 
