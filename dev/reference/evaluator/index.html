@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.24">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.25">
     
     
       
@@ -1737,7 +1737,7 @@ least the <code>done()</code>, <code>exception()</code>, and <code>result()</cod
 
 
 <h4 id="ropt.evaluator.ConcurrentEvaluator.launch" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">launch</span><span class="p">(</span><span class="n">batch_id</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">active</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">launch</span><span class="p">(</span><span class="n">batch_id</span><span class="p">,</span> <span class="n">job_id</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -1748,11 +1748,11 @@ least the <code>done()</code>, <code>exception()</code>, and <code>result()</cod
 
     <div class="doc doc-contents ">
 
-      <p>Launch the evaluations and return futures.</p>
-<p>This method must implement the process of launching a batch of function
-evaluations for a set of variable vectors passed via the <code>variables</code>
-parameter. A unique batch ID is passed via the <code>batch_id</code>, which can be
-optionally used.</p>
+      <p>Launch an evaluation and return futures.</p>
+<p>This method must implement the process of launching a a single function
+evaluation for a variable vector passed via the <code>variables</code> parameter. A
+unique batch ID is passed via the <code>batch_id</code>, which can be optionally
+used.</p>
 <p>This method should return a dictionary mapping the indices of the jobs
 to the tasks that will contain the result. The tasks are objects
 deriving from the <a class="autorefs autorefs-internal" href="#ropt.evaluator.ConcurrentTask"><code>ConcurrentTask</code></a>
@@ -1764,9 +1764,7 @@ that contain results should be returned.</p>
 passed by the <a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.EnsembleOptimizer"><code>EnsembleOptimizer</code></a>
 object.</p>
 <p>The <code>context</code> argument with optional information is passed from the
-<code>__call__</code> method unchanged. The <code>active</code> document passes a boolean
-vector indicating which realizations are active. It not <code>None</code> it should
-take precedence over the corresponding field in the <code>context</code> variable.</p>
+<code>__call__</code> method unchanged.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1795,6 +1793,20 @@ take precedence over the corresponding field in the <code>context</code> variabl
             </td>
           </tr>
           <tr class="doc-section-item">
+            <td><code>job_id</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the job launched for the variables</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code>variables</code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
@@ -1809,20 +1821,6 @@ take precedence over the corresponding field in the <code>context</code> variabl
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>indices</code></td>
-            <td>
-                  <code><span title="typing.Iterable">Iterable</span>[int]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Indices of the variables to evaluate.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
             <td><code>context</code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.evaluator._evaluator.EvaluatorContext" href="#ropt.evaluator.EvaluatorContext">EvaluatorContext</a></code>
@@ -1830,20 +1828,6 @@ take precedence over the corresponding field in the <code>context</code> variabl
             <td>
               <div class="doc-md-description">
                 <p>Evaluator context.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>active</code></td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional active realizations.</p>
               </div>
             </td>
             <td>
@@ -1865,11 +1849,11 @@ take precedence over the corresponding field in the <code>context</code> variabl
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.Dict">Dict</span>[int, <a class="autorefs autorefs-internal" title="ropt.evaluator._concurrent.ConcurrentTask" href="#ropt.evaluator.ConcurrentTask">ConcurrentTask</a>]</code>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.evaluator._concurrent.ConcurrentTask" href="#ropt.evaluator.ConcurrentTask">ConcurrentTask</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A dictionary mapping the indices of launched evaluations to tasks.</p>
+                <p>The last future or <code>None</code> if no tasks were launched.</p>
               </div>
             </td>
           </tr>
