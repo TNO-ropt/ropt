@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.25">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -1068,13 +1068,13 @@
 
 
 <h2 id="ropt.report" class="doc doc-heading">
-          <code>ropt.report</code>
+            <code>ropt.report</code>
 
 
 </h2>
 
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>Classes for reporting optimization results.</p>
 <p>The classes in this module are designed to gather multiple results generated
 during the execution of an optimization workflow. Currently, the results can
@@ -1082,7 +1082,7 @@ be reported as a <a href="https://pandas.pydata.org/"><code>pandas</code></a> Da
 <a class="autorefs autorefs-internal" href="#ropt.report.ResultsDataFrame"><code>ResultsDataFrame</code></a> class, or as a text file in
 a tabular format using the <a class="autorefs autorefs-internal" href="#ropt.report.ResultsTable"><code>ResultsTable</code></a> class.</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1098,15 +1098,15 @@ a tabular format using the <a class="autorefs autorefs-internal" href="#ropt.rep
 
 
 <h3 id="ropt.report.ResultsDataFrame" class="doc doc-heading">
-          <code>ResultsDataFrame</code>
+            <code>ResultsDataFrame</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
+    <div class="doc doc-contents ">
 
-  
+
       <p>Generate a results report in a <code>pandas</code> DataFrame.</p>
 <p>The class is intended to be used for gathering results from
 <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a> objects and storing them as a
@@ -1118,7 +1118,7 @@ to <code>add_results</code>. The updated table can be retrieved at any time via 
 <a class="autorefs autorefs-internal" href="#ropt.report.ResultsDataFrame.frame"><code>frame</code></a> property.</p>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1133,8 +1133,8 @@ to <code>add_results</code>. The updated table can be retrieved at any time via 
 
 
 <h4 id="ropt.report.ResultsDataFrame.frame" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">frame</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span></code>
-  
+            <code class="highlight language-python"><span class="n">frame</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
@@ -1142,52 +1142,49 @@ to <code>add_results</code>. The updated table can be retrieved at any time via 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Return the function results generated so far.</p>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="pandas.DataFrame">DataFrame</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>A pandas data frame with the results.</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
-  </div>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A pandas data frame with the results.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+    </div>
 
 </div>
-
 
 
 
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.report.ResultsDataFrame.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;functions&#39;</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;functions&#39;</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initialize a ResultsDataFrame object.</p>
 <p>The set of fields used is determined by the <code>results_fields</code> argument
 passed when initializing the object. These can be any of the fields
@@ -1210,140 +1207,135 @@ should be reported: either function evaluation results (<code>functions</code>) 
 gradient results (<code>gradients</code>).</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>fields</code></td>
-          <td>
-                <code><span title="typing.Set">Set</span>[str]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The fields of the results to store</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>table_type</code></td>
-          <td>
-                <code><span title="typing.Literal">Literal</span>[&#39;functions&#39;, &#39;gradients&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The type of the table</p>
-            </div>
-          </td>
-          <td>
-                <code>&#39;functions&#39;</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>fields</code></td>
+            <td>
+                  <code><span title="typing.Set">Set</span>[str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The fields of the results to store</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>table_type</code></td>
+            <td>
+                  <code><span title="typing.Literal">Literal</span>[&#39;functions&#39;, &#39;gradients&#39;]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The type of the table</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;functions&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  </div>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.report.ResultsDataFrame.add_results" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">add_results</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">add_results</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Add results to the table.</p>
 <p>This method can be called directly from any observers connected to
 events that produce results (see
 <a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.EnsembleOptimizer.add_observer"><code>add_observer</code></a>).</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>config</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The configuration of the optimizer generating the results</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>results</code></td>
-          <td>
-                <code><span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The results to add</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration of the optimizer generating the results</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>results</code></td>
+            <td>
+                  <code><span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The results to add</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True if a result was added, else False</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>True if a result was added, else False</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-  </div>
+    </div>
 
 </div>
 
@@ -1351,8 +1343,7 @@ events that produce results (see
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1361,24 +1352,24 @@ events that produce results (see
 
 
 <h3 id="ropt.report.ResultsTable" class="doc doc-heading">
-          <code>ResultsTable</code>
+            <code>ResultsTable</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><a class="autorefs autorefs-internal" title="ropt.report._data_frame.ResultsDataFrame" href="#ropt.report.ResultsDataFrame">ResultsDataFrame</a></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.report._data_frame.ResultsDataFrame" href="#ropt.report.ResultsDataFrame">ResultsDataFrame</a></code></p>
 
-  
+
       <p>Generate files containing tables of optimization results.</p>
 <p>This class derives from the
 <a class="autorefs autorefs-internal" href="#ropt.report.ResultsDataFrame"><code>ResultsDataFrame</code></a> class and writes the
 generated data frame in a tabular format to a text file.</p>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1390,19 +1381,17 @@ generated data frame in a tabular format to a text file.</p>
 
 
 
-
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.report.ResultsTable.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;functions&#39;</span><span class="p">,</span> <span class="n">min_header_len</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;functions&#39;</span><span class="p">,</span> <span class="n">min_header_len</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initialize a results table.</p>
 <p>The <code>columns</code> parameter specifies which results are to be exported. The
 keys of the <code>columns</code> dictionary correspond to the <code>fields</code> parameter of
@@ -1425,6 +1414,7 @@ values. For example, to retain only realizations with the name equal to
 2:</p>
 <p><code>python filters = {"realization": lambda x: x == 2}</code></p>
 
+
 <details class="tip" open>
   <summary>Reading the generated file.</summary>
   <p>The resulting table can be read using a reader that can handle
@@ -1443,207 +1433,201 @@ min_header_len, empty lines will be added. For example:</p>
 </span></code></pre></div>
 </details>
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>columns</code></td>
-          <td>
-                <code><span title="typing.Dict">Dict</span>[str, str]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Mapping of column names for the results table</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>path</code></td>
-          <td>
-                <code><span title="pathlib.Path">Path</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional location of the result file</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>filters</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Callable">Callable</span>[[<span title="pandas.Series">Series</span>[<span title="typing.Any">Any</span>]], <span title="pandas.Series">Series</span>[bool]]]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional filter functions to remove rows</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>table_type</code></td>
-          <td>
-                <code><span title="typing.Literal">Literal</span>[&#39;functions&#39;, &#39;gradients&#39;]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Type of the table</p>
-            </div>
-          </td>
-          <td>
-                <code>&#39;functions&#39;</code>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code>min_header_len</code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[int]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Minimal number of header lines</p>
-            </div>
-          </td>
-          <td>
-                <code>None</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>columns</code></td>
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[str, str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Mapping of column names for the results table</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>path</code></td>
+            <td>
+                  <code><span title="pathlib.Path">Path</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional location of the result file</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>filters</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Callable">Callable</span>[[<span title="pandas.Series">Series</span>[<span title="typing.Any">Any</span>]], <span title="pandas.Series">Series</span>[bool]]]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional filter functions to remove rows</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>table_type</code></td>
+            <td>
+                  <code><span title="typing.Literal">Literal</span>[&#39;functions&#39;, &#39;gradients&#39;]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Type of the table</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;functions&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>min_header_len</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[int]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Minimal number of header lines</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-  <p><span class="doc-section-title">Raises:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code>NotImplementedError</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>If the pandas or tabulate modules are not
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>NotImplementedError</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the pandas or tabulate modules are not
                  available</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  </div>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.report.ResultsTable.add_results" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">add_results</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">add_results</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Add results to the table.</p>
 <p>This method can be called directly from any observers connected to
 events that produce results (see
 <a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.EnsembleOptimizer.add_observer"><code>add_observer</code></a>).</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>config</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The configuration of the optimizer generating the results</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>results</code></td>
-          <td>
-                <code><span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The results to add</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration of the optimizer generating the results</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>results</code></td>
+            <td>
+                  <code><span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The results to add</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True if a result was added, else False</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>True if a result was added, else False</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-  </div>
+    </div>
 
 </div>
 
@@ -1651,8 +1635,7 @@ events that produce results (see
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1661,7 +1644,7 @@ events that produce results (see
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1719,7 +1702,7 @@ events that produce results (see
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.081f42fc.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       

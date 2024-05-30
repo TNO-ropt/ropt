@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.25">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -1038,13 +1038,13 @@
 
 
 <h2 id="ropt.plugins" class="doc doc-heading">
-          <code>ropt.plugins</code>
+            <code>ropt.plugins</code>
 
 
 </h2>
 
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>The <code>plugins</code> module facilitates the integration of <code>ropt</code> plugins.</p>
 <p>The core functionality of <code>ropt</code> can be extended through plugins, which can
 either be built-in, separately installed, or dynamically added at runtime.</p>
@@ -1074,7 +1074,7 @@ to retrieve the necessary plugin based on its type and name. Given the plugin's
 type and name, this method returns a callable (either a class or a factory
 function) that <code>ropt</code> uses to instantiate the plugin when needed.</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1089,8 +1089,8 @@ function) that <code>ropt</code> uses to instantiate the plugin when needed.</p>
 
 
 <h3 id="ropt.plugins.PluginType" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">PluginType</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">,</span> <span class="s1">&#39;sampler&#39;</span><span class="p">,</span> <span class="s1">&#39;realization_filter&#39;</span><span class="p">,</span> <span class="s1">&#39;function_transform&#39;</span><span class="p">,</span> <span class="s1">&#39;optimization_step&#39;</span><span class="p">]</span></code>
-  
+            <code class="highlight language-python"><span class="n">PluginType</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">,</span> <span class="s1">&#39;sampler&#39;</span><span class="p">,</span> <span class="s1">&#39;realization_filter&#39;</span><span class="p">,</span> <span class="s1">&#39;function_transform&#39;</span><span class="p">,</span> <span class="s1">&#39;optimization_step&#39;</span><span class="p">]</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
@@ -1098,8 +1098,8 @@ function) that <code>ropt</code> uses to instantiate the plugin when needed.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Plugin Types Supported by <code>ropt</code></p>
 <p><code>ropt</code> supports various types of plugins for different functionalities:</p>
 <dl>
@@ -1127,7 +1127,7 @@ function) that <code>ropt</code> uses to instantiate the plugin when needed.</p>
   plan. The built-in plugin offers a full set of steps for executing complex
   plans.</dd>
 </dl>
-  </div>
+    </div>
 
 </div>
 
@@ -1137,22 +1137,21 @@ function) that <code>ropt</code> uses to instantiate the plugin when needed.</p>
 
 
 <h3 id="ropt.plugins.PluginManager" class="doc doc-heading">
-          <code>PluginManager</code>
+            <code>PluginManager</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
+    <div class="doc doc-contents ">
 
-  
+
       <p>The plugin manager.</p>
 
 
-  
+
 
   <div class="doc doc-children">
-
 
 
 
@@ -1165,15 +1164,14 @@ function) that <code>ropt</code> uses to instantiate the plugin when needed.</p>
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.plugins.PluginManager.__init__" class="doc doc-heading">
-          <code class="highlight language-python"><span class="fm">__init__</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">()</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Initialize the plugin manager.</p>
 <p>The plugin manager object is initialized via the entry points mechanism
 (see
@@ -1188,23 +1186,21 @@ file, add the following:</p>
 package available under the name <code>my_optimizer</code>.</p>
 <p>Plugins can also be added dynamically using the add_plugins method.</p>
 
-  </div>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.plugins.PluginManager.add_plugins" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">add_plugins</span><span class="p">(</span><span class="n">plugin_type</span><span class="p">,</span> <span class="n">plugins</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">add_plugins</span><span class="p">(</span><span class="n">plugin_type</span><span class="p">,</span> <span class="n">plugins</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Add a plugin at runtime.</p>
 <p>This method adds one or more plugins of a specific type to the plugin
 manager. The <code>plugins</code> argument maps the names of the new plugins to a
@@ -1213,176 +1209,169 @@ class that creates a plugin object.</p>
 <p>The plugin names are case-insensitive.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>plugin_type</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.plugins._manager.PluginType" href="#ropt.plugins.PluginType">PluginType</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Type of the plugin.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>plugins</code></td>
-          <td>
-                <code><span title="typing.Dict">Dict</span>[str, <span title="ropt.plugins.protocol.PluginProtocol">PluginProtocol</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Dictionary of plugins.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>plugin_type</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plugins._manager.PluginType" href="#ropt.plugins.PluginType">PluginType</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Type of the plugin.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>plugins</code></td>
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[str, <span title="ropt.plugins.protocol.PluginProtocol">PluginProtocol</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Dictionary of plugins.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  </div>
+    </div>
 
 </div>
 
-
 <div class="doc doc-object doc-function">
-
 
 
 <h4 id="ropt.plugins.PluginManager.get_plugin" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_plugin</span><span class="p">(</span><span class="n">plugin_type</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">get_plugin</span><span class="p">(</span><span class="n">plugin_type</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Retrieve a plugin by type and method name.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>plugin_type</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.plugins._manager.PluginType" href="#ropt.plugins.PluginType">PluginType</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The type of the plugin to retrieve.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>method</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The name of the method the plugin should provide.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>plugin_type</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plugins._manager.PluginType" href="#ropt.plugins.PluginType">PluginType</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The type of the plugin to retrieve.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>method</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the method the plugin should provide.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  </div>
+    </div>
 
 </div>
-
 
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.plugins.PluginManager.is_supported" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">is_supported</span><span class="p">(</span><span class="n">plugin_type</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">is_supported</span><span class="p">(</span><span class="n">plugin_type</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Check if a method is supported.</p>
 
 
-
-  <p><span class="doc-section-title">Parameters:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code>plugin_type</code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.plugins._manager.PluginType" href="#ropt.plugins.PluginType">PluginType</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The type of the plugin to retrieve.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code>method</code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The name of the method the plugin should provide.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>plugin_type</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plugins._manager.PluginType" href="#ropt.plugins.PluginType">PluginType</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The type of the plugin to retrieve.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>method</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the method the plugin should provide.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1390,8 +1379,7 @@ class that creates a plugin object.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1400,7 +1388,7 @@ class that creates a plugin object.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1458,7 +1446,7 @@ class that creates a plugin object.</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.081f42fc.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       

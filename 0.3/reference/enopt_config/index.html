@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.21">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.25">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.66ac8b77.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
       
       
 
@@ -1266,16 +1266,16 @@
 
 
 <h2 id="ropt.config.enopt" class="doc doc-heading">
-          <code>ropt.config.enopt</code>
+            <code>ropt.config.enopt</code>
 
 
 </h2>
 
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>The <code>ropt.config.enopt</code> module contains optimization configuration classes.</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -1290,17 +1290,17 @@
 
 
 <h3 id="ropt.config.enopt.EnOptConfig" class="doc doc-heading">
-          <code>EnOptConfig</code>
+            <code>EnOptConfig</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="ropt.config.enopt._enopt_config._EnOptBaseModel">_EnOptBaseModel</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.config.enopt._enopt_config._EnOptBaseModel">_EnOptBaseModel</span></code></p>
 
-  
+
       <p>The primary configuration class for a single optimization step.</p>
 <p>The fields of the <code>EnOptConfig</code> class are nested configuration classes that
 specify specific aspects of a single optimization run.</p>
@@ -1322,6 +1322,7 @@ which sampler should be used.</p>
 <p>The original values of all fields used to create the object will be stored
 internally and are available via the <code>original_inputs</code> field.</p>
 
+
 <details class="info" open>
   <summary>Info</summary>
   <p>Many of these nested classes contain fields that are
@@ -1336,143 +1337,142 @@ number of variables or equal to one, in which case that single value is
 used for all variables.</p>
 </details>
 
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.EnOptConfig.variables">variables</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt._variables_config.VariablesConfig" href="#ropt.config.enopt.VariablesConfig">VariablesConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration of the variables</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.EnOptConfig.objective_functions">objective_functions</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt._objective_functions_config.ObjectiveFunctionsConfig" href="#ropt.config.enopt.ObjectiveFunctionsConfig">ObjectiveFunctionsConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration of the objective functions</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.EnOptConfig.linear_constraints">linear_constraints</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.config.enopt._linear_constraints_config.LinearConstraintsConfig" href="#ropt.config.enopt.LinearConstraintsConfig">LinearConstraintsConfig</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration of linear constraints</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.EnOptConfig.nonlinear_constraints">nonlinear_constraints</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.config.enopt._nonlinear_constraints_config.NonlinearConstraintsConfig" href="#ropt.config.enopt.NonlinearConstraintsConfig">NonlinearConstraintsConfig</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration of non-linear constraints</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.EnOptConfig.realizations">realizations</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt._realizations_config.RealizationsConfig" href="#ropt.config.enopt.RealizationsConfig">RealizationsConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration of the realizations</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.EnOptConfig.optimizer">optimizer</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt._optimizer_config.OptimizerConfig" href="#ropt.config.enopt.OptimizerConfig">OptimizerConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration of the optimizer</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.EnOptConfig.gradient">gradient</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt._gradient_config.GradientConfig" href="#ropt.config.enopt.GradientConfig">GradientConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration for gradient calculations</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.EnOptConfig.realization_filters">realization_filters</span></code></td>
+            <td>
+                  <code><span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.config.enopt._realization_filter_config.RealizationFilterConfig" href="#ropt.config.enopt.RealizationFilterConfig">RealizationFilterConfig</a>, ...]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration of realization filters</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.EnOptConfig.function_transforms">function_transforms</span></code></td>
+            <td>
+                  <code><span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.config.enopt._function_transform_config.FunctionTransformConfig" href="#ropt.config.enopt.FunctionTransformConfig">FunctionTransformConfig</a>, ...]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration of function transforms</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.EnOptConfig.samplers">samplers</span></code></td>
+            <td>
+                  <code><span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.config.enopt._sampler_config.SamplerConfig" href="#ropt.config.enopt.SamplerConfig">SamplerConfig</a>, ...]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration of samplers</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.EnOptConfig.original_inputs">original_inputs</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The original input to the constructor</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Attributes:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.EnOptConfig.variables">variables</span></code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt._variables_config.VariablesConfig" href="#ropt.config.enopt.VariablesConfig">VariablesConfig</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Configuration of the variables</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.EnOptConfig.objective_functions">objective_functions</span></code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt._objective_functions_config.ObjectiveFunctionsConfig" href="#ropt.config.enopt.ObjectiveFunctionsConfig">ObjectiveFunctionsConfig</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Configuration of the objective functions</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.EnOptConfig.linear_constraints">linear_constraints</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.config.enopt._linear_constraints_config.LinearConstraintsConfig" href="#ropt.config.enopt.LinearConstraintsConfig">LinearConstraintsConfig</a>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Configuration of linear constraints</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.EnOptConfig.nonlinear_constraints">nonlinear_constraints</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.config.enopt._nonlinear_constraints_config.NonlinearConstraintsConfig" href="#ropt.config.enopt.NonlinearConstraintsConfig">NonlinearConstraintsConfig</a>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Configuration of non-linear constraints</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.EnOptConfig.realizations">realizations</span></code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt._realizations_config.RealizationsConfig" href="#ropt.config.enopt.RealizationsConfig">RealizationsConfig</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Configuration of the realizations</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.EnOptConfig.optimizer">optimizer</span></code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt._optimizer_config.OptimizerConfig" href="#ropt.config.enopt.OptimizerConfig">OptimizerConfig</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Configuration of the optimizer</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.EnOptConfig.gradient">gradient</span></code></td>
-          <td>
-                <code><a class="autorefs autorefs-internal" title="ropt.config.enopt._gradient_config.GradientConfig" href="#ropt.config.enopt.GradientConfig">GradientConfig</a></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Configuration for gradient calculations</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.EnOptConfig.realization_filters">realization_filters</span></code></td>
-          <td>
-                <code><span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.config.enopt._realization_filter_config.RealizationFilterConfig" href="#ropt.config.enopt.RealizationFilterConfig">RealizationFilterConfig</a>, ...]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Configuration of realization filters</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.EnOptConfig.function_transforms">function_transforms</span></code></td>
-          <td>
-                <code><span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.config.enopt._function_transform_config.FunctionTransformConfig" href="#ropt.config.enopt.FunctionTransformConfig">FunctionTransformConfig</a>, ...]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Configuration of function transforms</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.EnOptConfig.samplers">samplers</span></code></td>
-          <td>
-                <code><span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.config.enopt._sampler_config.SamplerConfig" href="#ropt.config.enopt.SamplerConfig">SamplerConfig</a>, ...]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Configuration of samplers</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.EnOptConfig.original_inputs">original_inputs</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The original input to the constructor</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
 
 
-  
 
   <div class="doc doc-children">
 
@@ -1482,8 +1482,7 @@ used for all variables.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1497,17 +1496,17 @@ used for all variables.</p>
 
 
 <h3 id="ropt.config.enopt.VariablesConfig" class="doc doc-heading">
-          <code>VariablesConfig</code>
+            <code>VariablesConfig</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
 
-  
+
       <p>The configuration class for variables.</p>
 <p>This configuration class, configured by the <code>variables</code> field in an
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object defines essential
@@ -1525,6 +1524,7 @@ number of variables, and the <code>initial_values</code>, <code>lower_bounds</co
 <code>upper_bounds</code> fields are broadcasted accordingly. If <code>names</code> is not
 provided, these fields are broadcasted to each other, and their final size
 determines the number of variables.</p>
+
 
 <details class="info" open>
   <summary>Variable Names</summary>
@@ -1546,6 +1546,7 @@ broadcasted to the number of variables and used for scaling. The elements
 rescaled by the elements <span class="arithmatex">\(o_i\)</span> and <span class="arithmatex">\(s_i\)</span> of <code>offsets</code> and <code>scales</code>: <span class="arithmatex">\((x_i -
 o_i) / s_i\)</span>.</p>
 
+
 <details class="info" open>
   <summary>Transformation of Linear Constraints</summary>
   <p>Any linear constraints defined in the <code>EnOptConfig</code> object via its
@@ -1557,124 +1558,122 @@ considered to be free to change. During optimization, only these variables
 should change while others remain fixed.</p>
 
 
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.VariablesConfig.names">names</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.UniqueNames">UniqueNames</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional names of the variables</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.VariablesConfig.types">types</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.ArrayEnum">ArrayEnum</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The type of the variables (optional).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.VariablesConfig.initial_values">initial_values</span></code></td>
+            <td>
+                  <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The initial values of the variables</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.VariablesConfig.lower_bounds">lower_bounds</span></code></td>
+            <td>
+                  <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Lower bound of the variables (default: <span class="arithmatex">\(-\infty\)</span>)</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.VariablesConfig.upper_bounds">upper_bounds</span></code></td>
+            <td>
+                  <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Upper bound of the variables (default: <span class="arithmatex">\(+\infty\)</span>)</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.VariablesConfig.offsets">offsets</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.Array1D">Array1D</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional offsets, used for scaling the variables</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.VariablesConfig.scales">scales</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.Array1D">Array1D</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional scales, used for scaling the variables</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.VariablesConfig.indices">indices</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.ArrayIndices">ArrayIndices</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional indices of variables to optimize.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.VariablesConfig.delimiters">delimiters</span></code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Delimiters used to construct names from tuples</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Attributes:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.VariablesConfig.names">names</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.UniqueNames">UniqueNames</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional names of the variables</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.VariablesConfig.types">types</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.ArrayEnum">ArrayEnum</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The type of the variables (optional).</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.VariablesConfig.initial_values">initial_values</span></code></td>
-          <td>
-                <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The initial values of the variables</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.VariablesConfig.lower_bounds">lower_bounds</span></code></td>
-          <td>
-                <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Lower bound of the variables (default: <span class="arithmatex">\(-\infty\)</span>)</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.VariablesConfig.upper_bounds">upper_bounds</span></code></td>
-          <td>
-                <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Upper bound of the variables (default: <span class="arithmatex">\(+\infty\)</span>)</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.VariablesConfig.offsets">offsets</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.Array1D">Array1D</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional offsets, used for scaling the variables</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.VariablesConfig.scales">scales</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.Array1D">Array1D</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional scales, used for scaling the variables</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.VariablesConfig.indices">indices</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.ArrayIndices">ArrayIndices</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional indices of variables to optimize.</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.VariablesConfig.delimiters">delimiters</span></code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Delimiters used to construct names from tuples</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
 
 
-  
 
   <div class="doc doc-children">
-
 
 
 
@@ -1685,15 +1684,14 @@ should change while others remain fixed.</p>
 <div class="doc doc-object doc-function">
 
 
-
 <h4 id="ropt.config.enopt.VariablesConfig.get_formatted_names" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">get_formatted_names</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">get_formatted_names</span><span class="p">()</span></code>
 
 </h4>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Return string representations of the variable names.</p>
 <p>This method converts the variable names to a tuple of strings. Each name
 is converted using its string representation unless the name is a tuple.
@@ -1705,30 +1703,29 @@ used for the missing ones. By default, the <code>:</code> character is used as t
 delimiter.</p>
 
 
-
-  <p><span class="doc-section-title">Returns:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="typing.Tuple">Tuple</span>[str, ...]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>A tuple of formatted variable names.</p>
-            </div>
-          </td>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Tuple">Tuple</span>[str, ...]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A tuple of formatted variable names.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  </div>
+    </div>
 
 </div>
 
@@ -1737,8 +1734,7 @@ delimiter.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1752,17 +1748,17 @@ delimiter.</p>
 
 
 <h3 id="ropt.config.enopt.ObjectiveFunctionsConfig" class="doc doc-heading">
-          <code>ObjectiveFunctionsConfig</code>
+            <code>ObjectiveFunctionsConfig</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
 
-  
+
       <p>The configuration class for objective functions.</p>
 <p>This configuration class defines objective functions configured by the
 <code>objective_functions</code> field in an
@@ -1788,6 +1784,7 @@ at the start of the optimization. Both the <code>scales</code> and <code>auto_sc
 will be broadcasted to have a size equal to the number of objective
 functions.</p>
 
+
 <details class="info" open>
   <summary>Info</summary>
   <p>Both the <code>scales</code> values and the values obtained by auto-scaling will be
@@ -1803,88 +1800,87 @@ use. The objects referred to are configured in the parent
 transforms</a> for more details.</p>
 
 
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.names">names</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.UniqueNames">UniqueNames</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional names of the objective functions</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.weights">weights</span></code></td>
+            <td>
+                  <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Objective functions weights (default: 1.0)</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.scales">scales</span></code></td>
+            <td>
+                  <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The scaling factors (default: 1.0)</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.auto_scale">auto_scale</span></code></td>
+            <td>
+                  <code><span title="ropt.config.utils.Array1DBool">Array1DBool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Enable/disable auto-scaling (default: <code>False</code>)</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.realization_filters">realization_filters</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.Array1DInt">Array1DInt</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional realization filter indices</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.function_transforms">function_transforms</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.Array1DInt">Array1DInt</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional function transform indices</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
-  <p><span class="doc-section-title">Attributes:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.names">names</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.UniqueNames">UniqueNames</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional names of the objective functions</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.weights">weights</span></code></td>
-          <td>
-                <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Objective functions weights (default: 1.0)</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.scales">scales</span></code></td>
-          <td>
-                <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The scaling factors (default: 1.0)</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.auto_scale">auto_scale</span></code></td>
-          <td>
-                <code><span title="ropt.config.utils.Array1DBool">Array1DBool</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Enable/disable auto-scaling (default: <code>False</code>)</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.realization_filters">realization_filters</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.Array1DInt">Array1DInt</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional realization filter indices</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.function_transforms">function_transforms</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.Array1DInt">Array1DInt</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional function transform indices</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
 
 
-  
 
   <div class="doc doc-children">
 
@@ -1894,8 +1890,7 @@ transforms</a> for more details.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -1909,17 +1904,17 @@ transforms</a> for more details.</p>
 
 
 <h3 id="ropt.config.enopt.LinearConstraintsConfig" class="doc doc-heading">
-          <code>LinearConstraintsConfig</code>
+            <code>LinearConstraintsConfig</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
 
-  
+
       <p>The configuration class for linear constraints.</p>
 <p>This class defines linear constraints configured by the <code>linear_constraints</code>
 field in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
@@ -1938,53 +1933,53 @@ but its values are limited to those of the
 <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.ConstraintType"><code>ConstraintType</code></a> enumeration.</p>
 
 
-
-  <p><span class="doc-section-title">Attributes:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.LinearConstraintsConfig.coefficients">coefficients</span></code></td>
-          <td>
-                <code><span title="ropt.config.utils.Array2D">Array2D</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The matrix of coefficients</p>
-            </div>
-          </td>
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.LinearConstraintsConfig.rhs_values">rhs_values</span></code></td>
-          <td>
-                <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The right-hand-sides of the constraint equations</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.LinearConstraintsConfig.types">types</span></code></td>
-          <td>
-                <code><span title="ropt.config.utils.ArrayEnum">ArrayEnum</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The type of each equation
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.LinearConstraintsConfig.coefficients">coefficients</span></code></td>
+            <td>
+                  <code><span title="ropt.config.utils.Array2D">Array2D</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The matrix of coefficients</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.LinearConstraintsConfig.rhs_values">rhs_values</span></code></td>
+            <td>
+                  <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The right-hand-sides of the constraint equations</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.LinearConstraintsConfig.types">types</span></code></td>
+            <td>
+                  <code><span title="ropt.config.utils.ArrayEnum">ArrayEnum</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The type of each equation
           (see <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.ConstraintType"><code>ConstraintType</code></a>)</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
 
 <details class="info" open>
   <summary>Rescaled variables</summary>
@@ -2010,7 +2005,7 @@ variables. This should be taken into account when comparing the
 difference between the equations and right-hand side to a tolerance.</p>
 </details>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -2020,8 +2015,7 @@ difference between the equations and right-hand side to a tolerance.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2035,17 +2029,17 @@ difference between the equations and right-hand side to a tolerance.</p>
 
 
 <h3 id="ropt.config.enopt.NonlinearConstraintsConfig" class="doc doc-heading">
-          <code>NonlinearConstraintsConfig</code>
+            <code>NonlinearConstraintsConfig</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
 
-  
+
       <p>The configuration class for non-linear constraints.</p>
 <p>This class defines non-linear constraints configured by the
 <code>nonlinear_constraints</code> field in an
@@ -2069,6 +2063,7 @@ the optimizer to obtain additional scaling by multiplying the values of
 optimization. Both the <code>scales</code> and <code>auto_scale</code> arrays will be broadcasted
 to have a size equal to the number of constraint functions.</p>
 
+
 <details class="info" open>
   <summary>Info</summary>
   <p>Both the <code>scales</code> values and the values obtained by auto-scaling will be
@@ -2089,100 +2084,99 @@ objects to use. These objects are configured in the parent
 transforms</a> for more details.</p>
 
 
-
-  <p><span class="doc-section-title">Attributes:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.names">names</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.UniqueNames">UniqueNames</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The names of the constraint functions (optional)</p>
-            </div>
-          </td>
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.rhs_values">rhs_values</span></code></td>
-          <td>
-                <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The right-hand-side values</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.scales">scales</span></code></td>
-          <td>
-                <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The scaling factors (default: 1.0)</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.auto_scale">auto_scale</span></code></td>
-          <td>
-                <code><span title="ropt.config.utils.Array1DBool">Array1DBool</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Enable/disable auto-scaling (default: <code>False</code>)</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.types">types</span></code></td>
-          <td>
-                <code><span title="ropt.config.utils.ArrayEnum">ArrayEnum</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The type of each non-linear constraint
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.names">names</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.UniqueNames">UniqueNames</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The names of the constraint functions (optional)</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.rhs_values">rhs_values</span></code></td>
+            <td>
+                  <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The right-hand-side values</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.scales">scales</span></code></td>
+            <td>
+                  <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The scaling factors (default: 1.0)</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.auto_scale">auto_scale</span></code></td>
+            <td>
+                  <code><span title="ropt.config.utils.Array1DBool">Array1DBool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Enable/disable auto-scaling (default: <code>False</code>)</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.types">types</span></code></td>
+            <td>
+                  <code><span title="ropt.config.utils.ArrayEnum">ArrayEnum</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The type of each non-linear constraint
                  (<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.ConstraintType"><code>ConstraintType</code></a>)</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.realization_filters">realization_filters</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.Array1DInt">Array1DInt</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional realization filter indices</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.function_transforms">function_transforms</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.Array1DInt">Array1DInt</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional function transform indices</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.realization_filters">realization_filters</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.Array1DInt">Array1DInt</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional realization filter indices</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.function_transforms">function_transforms</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.Array1DInt">Array1DInt</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional function transform indices</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -2192,8 +2186,7 @@ transforms</a> for more details.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2207,17 +2200,17 @@ transforms</a> for more details.</p>
 
 
 <h3 id="ropt.config.enopt.RealizationsConfig" class="doc doc-heading">
-          <code>RealizationsConfig</code>
+            <code>RealizationsConfig</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
 
-  
+
       <p>The configuration class for realizations.</p>
 <p>This class defines realizations configured by the <code>realizations</code> field in an
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
@@ -2247,6 +2240,7 @@ there may be a hard minimum to the amount of values that is needed. The
 successful realizations. By default, it is set equal to the number of
 realizations, i.e., there are no missing values allowed by default.</p>
 
+
 <details class="note" open>
   <summary>Note</summary>
   <p>The value of <code>realization_min_success</code> can be set to zero. Some
@@ -2255,56 +2249,55 @@ if all realizations fail. However, most optimizers cannot handle this
 and will behave as if the value is set to one.</p>
 </details>
 
-
-  <p><span class="doc-section-title">Attributes:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.RealizationsConfig.names">names</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.UniqueNames">UniqueNames</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional names of the realizations</p>
-            </div>
-          </td>
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.RealizationsConfig.weights">weights</span></code></td>
-          <td>
-                <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The weights of the realizations (default: 1)</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.RealizationsConfig.realization_min_success">realization_min_success</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="pydantic.NonNegativeInt">NonNegativeInt</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The minimum number of successful realizations
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.RealizationsConfig.names">names</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.UniqueNames">UniqueNames</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional names of the realizations</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.RealizationsConfig.weights">weights</span></code></td>
+            <td>
+                  <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The weights of the realizations (default: 1)</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.RealizationsConfig.realization_min_success">realization_min_success</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="pydantic.NonNegativeInt">NonNegativeInt</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The minimum number of successful realizations
                      (default: equal to the number of realizations)</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -2314,8 +2307,7 @@ and will behave as if the value is set to one.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2329,17 +2321,17 @@ and will behave as if the value is set to one.</p>
 
 
 <h3 id="ropt.config.enopt.OptimizerConfig" class="doc doc-heading">
-          <code>OptimizerConfig</code>
+            <code>OptimizerConfig</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
 
-  
+
       <p>The configuration class for optimizers used in the optimization.</p>
 <p>This class defines the configuration for optimizers, configured by the
 <code>optimizer</code> field in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>
@@ -2377,123 +2369,122 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
 </ul>
 
 
-
-  <p><span class="doc-section-title">Attributes:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.OptimizerConfig.method">method</span></code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Name of the optimization method used</p>
-            </div>
-          </td>
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.OptimizerConfig.max_iterations">max_iterations</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="pydantic.PositiveInt">PositiveInt</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional maximum number of iterations</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.OptimizerConfig.max_functions">max_functions</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="pydantic.PositiveInt">PositiveInt</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional maximum number of function evaluations</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.OptimizerConfig.tolerance">tolerance</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="pydantic.NonNegativeFloat">NonNegativeFloat</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional tolerance for convergence</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.OptimizerConfig.speculative">speculative</span></code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Force gradient evaluations; disabled if
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.OptimizerConfig.method">method</span></code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Name of the optimization method used</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.OptimizerConfig.max_iterations">max_iterations</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="pydantic.PositiveInt">PositiveInt</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional maximum number of iterations</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.OptimizerConfig.max_functions">max_functions</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="pydantic.PositiveInt">PositiveInt</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional maximum number of function evaluations</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.OptimizerConfig.tolerance">tolerance</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="pydantic.NonNegativeFloat">NonNegativeFloat</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional tolerance for convergence</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.OptimizerConfig.speculative">speculative</span></code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Force gradient evaluations; disabled if
               split_evaluations is True (default <code>False</code>)</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.OptimizerConfig.split_evaluations">split_evaluations</span></code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Evaluate function and gradient separately
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.OptimizerConfig.split_evaluations">split_evaluations</span></code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Evaluate function and gradient separately
               (default: <code>False</code>)</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.OptimizerConfig.parallel">parallel</span></code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Allow for parallelized evaluation (default: <code>False</code>)</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.OptimizerConfig.output_dir">output_dir</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="pathlib.Path">Path</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional output directory for use by the optimizer</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.OptimizerConfig.options">options</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>], <span title="typing.List">List</span>[str]]]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Optional generic options for use by the optimizer</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.OptimizerConfig.parallel">parallel</span></code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Allow for parallelized evaluation (default: <code>False</code>)</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.OptimizerConfig.output_dir">output_dir</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="pathlib.Path">Path</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional output directory for use by the optimizer</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.OptimizerConfig.options">options</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>], <span title="typing.List">List</span>[str]]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional generic options for use by the optimizer</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -2503,8 +2494,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2518,17 +2508,17 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
 
 
 <h3 id="ropt.config.enopt.GradientConfig" class="doc doc-heading">
-          <code>GradientConfig</code>
+            <code>GradientConfig</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
 
-  
+
       <p>The configuration class for gradient calculations.</p>
 <p>This class defines the configuration for gradient calculations, configured
 by the <code>gradients</code> field in an
@@ -2575,111 +2565,110 @@ the results of all realizations directly into an estimation of the total
 gradient.</p>
 
 
-
-  <p><span class="doc-section-title">Attributes:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.GradientConfig.number_of_perturbations">number_of_perturbations</span></code></td>
-          <td>
-                <code><span title="pydantic.PositiveInt">PositiveInt</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The number of perturbations (default:
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.constants.DEFAULT_NUMBER_OF_PERTURBATIONS"><code>DEFAULT_NUMBER_OF_PERTURBATIONS</code></a>)</p>
-            </div>
-          </td>
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.GradientConfig.perturbation_min_success">perturbation_min_success</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="pydantic.PositiveInt">PositiveInt</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The minimum number of successful function
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.GradientConfig.number_of_perturbations">number_of_perturbations</span></code></td>
+            <td>
+                  <code><span title="pydantic.PositiveInt">PositiveInt</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The number of perturbations (default:
+<a class="autorefs autorefs-internal" href="#ropt.config.enopt.constants.DEFAULT_NUMBER_OF_PERTURBATIONS"><code>DEFAULT_NUMBER_OF_PERTURBATIONS</code></a>)</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.GradientConfig.perturbation_min_success">perturbation_min_success</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="pydantic.PositiveInt">PositiveInt</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The minimum number of successful function
                       evaluations for perturbed variables (default:
                       equal to the number of perturbations)</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.GradientConfig.perturbation_magnitudes">perturbation_magnitudes</span></code></td>
-          <td>
-                <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The magnitudes of the perturbations for each variable
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.GradientConfig.perturbation_magnitudes">perturbation_magnitudes</span></code></td>
+            <td>
+                  <code><span title="ropt.config.utils.Array1D">Array1D</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The magnitudes of the perturbations for each variable
                       (default:
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.constants.DEFAULT_PERTURBATION_MAGNITUDE"><code>DEFAULT_PERTURBATION_MAGNITUDE</code></a>)</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.GradientConfig.perturbation_types">perturbation_types</span></code></td>
-          <td>
-                <code><span title="ropt.config.utils.ArrayEnum">ArrayEnum</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The type of perturbation for each variable
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.GradientConfig.perturbation_types">perturbation_types</span></code></td>
+            <td>
+                  <code><span title="ropt.config.utils.ArrayEnum">ArrayEnum</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The type of perturbation for each variable
                       (<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>,
                       default:
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.constants.DEFAULT_PERTURBATION_TYPE"><code>DEFAULT_PERTURBATION_TYPE</code></a>)</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.GradientConfig.boundary_types">boundary_types</span></code></td>
-          <td>
-                <code><span title="ropt.config.utils.ArrayEnum">ArrayEnum</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>How perturbations that violate boundary conditions
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.GradientConfig.boundary_types">boundary_types</span></code></td>
+            <td>
+                  <code><span title="ropt.config.utils.ArrayEnum">ArrayEnum</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>How perturbations that violate boundary conditions
                       are treated (see <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>),
                       default:
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE"><code>DEFAULT_PERTURBATION_BOUNDARY_TYPE</code></a>).</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.GradientConfig.samplers">samplers</span></code></td>
-          <td>
-                <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.Array1DInt">Array1DInt</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The index of the sampler to use for each variable</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.GradientConfig.merge_realizations">merge_realizations</span></code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>If all realizations should be merged for the final
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.GradientConfig.samplers">samplers</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="ropt.config.utils.Array1DInt">Array1DInt</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The index of the sampler to use for each variable</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.GradientConfig.merge_realizations">merge_realizations</span></code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If all realizations should be merged for the final
                       gradient calculation (default: <code>False</code>)</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -2689,8 +2678,7 @@ gradient.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2704,17 +2692,17 @@ gradient.</p>
 
 
 <h3 id="ropt.config.enopt.FunctionTransformConfig" class="doc doc-heading">
-          <code>FunctionTransformConfig</code>
+            <code>FunctionTransformConfig</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
 
-  
+
       <p>Configuration class for function transforms.</p>
 <p>This class defines the configuration for function transforms, which are
 configured by the <code>function_transforms</code> field in an
@@ -2731,44 +2719,43 @@ realizations. To further specify how such a method should function, the
 interpretation of these options depends on the chosen method.</p>
 
 
-
-  <p><span class="doc-section-title">Attributes:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.FunctionTransformConfig.method">method</span></code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The function transform method</p>
-            </div>
-          </td>
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.FunctionTransformConfig.options">options</span></code></td>
-          <td>
-                <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Options to be passed to the transform</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.FunctionTransformConfig.method">method</span></code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The function transform method</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.FunctionTransformConfig.options">options</span></code></td>
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Options to be passed to the transform</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -2778,8 +2765,7 @@ interpretation of these options depends on the chosen method.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2793,17 +2779,17 @@ interpretation of these options depends on the chosen method.</p>
 
 
 <h3 id="ropt.config.enopt.RealizationFilterConfig" class="doc doc-heading">
-          <code>RealizationFilterConfig</code>
+            <code>RealizationFilterConfig</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
 
-  
+
       <p>The configuration class for realization filters.</p>
 <p>This class defines the configuration for realization filters, which are
 configured by the <code>realization_filters</code> field in an
@@ -2823,44 +2809,43 @@ key-value pairs. The interpretation of these options depends on the| chosen
 method.</p>
 
 
-
-  <p><span class="doc-section-title">Attributes:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.RealizationFilterConfig.method">method</span></code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The realization filter method</p>
-            </div>
-          </td>
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.RealizationFilterConfig.options">options</span></code></td>
-          <td>
-                <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Options to be passed to the filter</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.RealizationFilterConfig.method">method</span></code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The realization filter method</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.RealizationFilterConfig.options">options</span></code></td>
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Options to be passed to the filter</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -2870,8 +2855,7 @@ method.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2885,17 +2869,17 @@ method.</p>
 
 
 <h3 id="ropt.config.enopt.SamplerConfig" class="doc doc-heading">
-          <code>SamplerConfig</code>
+            <code>SamplerConfig</code>
 
 
 </h3>
 
 
-  <div class="doc doc-contents ">
-          <p class="doc doc-class-bases">
-            Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.config.enopt._enopt_base_model.EnOptBaseModel">EnOptBaseModel</span></code></p>
 
-  
+
       <p>The sampler configuration class.</p>
 <p>This class defines the configuration for samplers, which are configured by
 the <code>samplers</code> field in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>
@@ -2918,56 +2902,55 @@ realization. By setting the <code>shared</code> flag to <code>True</code>, the s
 directed to use the same set of perturbed values for each realization.</p>
 
 
-
-  <p><span class="doc-section-title">Attributes:</span></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.SamplerConfig.method">method</span></code></td>
-          <td>
-                <code>str</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The sampler method</p>
-            </div>
-          </td>
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
         </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.SamplerConfig.options">options</span></code></td>
-          <td>
-                <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Options to be passed to the sampler</p>
-            </div>
-          </td>
-        </tr>
-        <tr class="doc-section-item">
-          <td><code><span title="ropt.config.enopt.SamplerConfig.shared">shared</span></code></td>
-          <td>
-                <code>bool</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Whether perturbation values should be shared between realizations
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.SamplerConfig.method">method</span></code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The sampler method</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.SamplerConfig.options">options</span></code></td>
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Options to be passed to the sampler</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.SamplerConfig.shared">shared</span></code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether perturbation values should be shared between realizations
     (default: <code>False</code>)</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
-  
+
 
   <div class="doc doc-children">
 
@@ -2977,8 +2960,7 @@ directed to use the same set of perturbed values for each realization.</p>
 
   </div>
 
-  </div>
-
+    </div>
 
 </div>
 
@@ -2987,7 +2969,7 @@ directed to use the same set of perturbed values for each realization.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -2996,16 +2978,16 @@ directed to use the same set of perturbed values for each realization.</p>
 
 
 <h2 id="ropt.config.enopt.constants" class="doc doc-heading">
-          <code>ropt.config.enopt.constants</code>
+            <code>ropt.config.enopt.constants</code>
 
 
 </h2>
 
-  <div class="doc doc-contents first">
-  
+    <div class="doc doc-contents first">
+
       <p>Default values used by the configuration classes.</p>
 
-  
+
 
   <div class="doc doc-children">
 
@@ -3020,8 +3002,8 @@ directed to use the same set of perturbed values for each realization.</p>
 
 
 <h3 id="ropt.config.enopt.constants.DEFAULT_SEED" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">DEFAULT_SEED</span> <span class="o">=</span> <span class="mi">1</span></code>
-  
+            <code class="highlight language-python"><span class="n">DEFAULT_SEED</span> <span class="o">=</span> <span class="mi">1</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
@@ -3029,10 +3011,10 @@ directed to use the same set of perturbed values for each realization.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Default random generator seed.</p>
-  </div>
+    </div>
 
 </div>
 
@@ -3041,8 +3023,8 @@ directed to use the same set of perturbed values for each realization.</p>
 
 
 <h3 id="ropt.config.enopt.constants.DEFAULT_NUMBER_OF_PERTURBATIONS" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">DEFAULT_NUMBER_OF_PERTURBATIONS</span> <span class="o">=</span> <span class="mi">5</span></code>
-  
+            <code class="highlight language-python"><span class="n">DEFAULT_NUMBER_OF_PERTURBATIONS</span> <span class="o">=</span> <span class="mi">5</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
@@ -3050,10 +3032,10 @@ directed to use the same set of perturbed values for each realization.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Default number of perturbations.</p>
-  </div>
+    </div>
 
 </div>
 
@@ -3062,8 +3044,8 @@ directed to use the same set of perturbed values for each realization.</p>
 
 
 <h3 id="ropt.config.enopt.constants.DEFAULT_PERTURBATION_MAGNITUDE" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">DEFAULT_PERTURBATION_MAGNITUDE</span> <span class="o">=</span> <span class="mf">0.005</span></code>
-  
+            <code class="highlight language-python"><span class="n">DEFAULT_PERTURBATION_MAGNITUDE</span> <span class="o">=</span> <span class="mf">0.005</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
@@ -3071,10 +3053,10 @@ directed to use the same set of perturbed values for each realization.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Default perturbation magnitude.</p>
-  </div>
+    </div>
 
 </div>
 
@@ -3083,8 +3065,8 @@ directed to use the same set of perturbed values for each realization.</p>
 
 
 <h3 id="ropt.config.enopt.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">DEFAULT_PERTURBATION_BOUNDARY_TYPE</span> <span class="o">=</span> <span class="n">BoundaryType</span><span class="o">.</span><span class="n">MIRROR_BOTH</span></code>
-  
+            <code class="highlight language-python"><span class="n">DEFAULT_PERTURBATION_BOUNDARY_TYPE</span> <span class="o">=</span> <span class="n">BoundaryType</span><span class="o">.</span><span class="n">MIRROR_BOTH</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
@@ -3092,11 +3074,11 @@ directed to use the same set of perturbed values for each realization.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Default perturbation boundary handling type.</p>
 <p>See also: <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>.</p>
-  </div>
+    </div>
 
 </div>
 
@@ -3105,8 +3087,8 @@ directed to use the same set of perturbed values for each realization.</p>
 
 
 <h3 id="ropt.config.enopt.constants.DEFAULT_PERTURBATION_TYPE" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">DEFAULT_PERTURBATION_TYPE</span> <span class="o">=</span> <span class="n">PerturbationType</span><span class="o">.</span><span class="n">ABSOLUTE</span></code>
-  
+            <code class="highlight language-python"><span class="n">DEFAULT_PERTURBATION_TYPE</span> <span class="o">=</span> <span class="n">PerturbationType</span><span class="o">.</span><span class="n">ABSOLUTE</span></code>
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
@@ -3114,11 +3096,11 @@ directed to use the same set of perturbed values for each realization.</p>
 </h3>
 
 
-  <div class="doc doc-contents ">
-  
+    <div class="doc doc-contents ">
+
       <p>Default perturbation type.</p>
 <p>See also: <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>.</p>
-  </div>
+    </div>
 
 </div>
 
@@ -3128,7 +3110,7 @@ directed to use the same set of perturbed values for each realization.</p>
 
   </div>
 
-  </div>
+    </div>
 
 </div>
 
@@ -3186,7 +3168,7 @@ directed to use the same set of perturbed values for each realization.</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.a7c05c9e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.081f42fc.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       
