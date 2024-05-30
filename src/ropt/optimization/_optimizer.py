@@ -221,10 +221,19 @@ class Optimizer:
             if variable_indices is None
             else gradients.weighted_objective[variable_indices]
         )
+        constraint_gradients = (
+            None
+            if gradients.constraints is None
+            else (
+                gradients.constraints.copy()
+                if variable_indices is None
+                else gradients.constraints[:, variable_indices]
+            )
+        )
         return (
             np.expand_dims(weighted_objective_gradient, axis=0)
-            if gradients.constraints is None
-            else np.vstack((weighted_objective_gradient, gradients.constraints))
+            if constraint_gradients is None
+            else np.vstack((weighted_objective_gradient, constraint_gradients))
         )
 
     def _get_constraint_scales(self, config: EnOptConfig) -> NDArray[np.float64]:
