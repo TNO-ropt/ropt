@@ -14,11 +14,11 @@ from ropt.enums import ConstraintType, EventType, OptimizerExitCode
 from ropt.exceptions import ConfigError
 from ropt.optimization import EnsembleOptimizer, Plan, PlanContext
 from ropt.plugins import PluginManager
-from ropt.plugins.optimization_steps.evaluator import DefaultEvaluatorStep
-from ropt.plugins.optimization_steps.protocol import (
-    OptimizationStepsPluginProtocol,
-    OptimizationStepsProtocol,
+from ropt.plugins.optimization_steps.base import (
+    OptimizationSteps,
+    OptimizationStepsPlugin,
 )
+from ropt.plugins.optimization_steps.evaluator import DefaultEvaluatorStep
 from ropt.report import ResultsDataFrame
 from ropt.results import FunctionResults, GradientResults
 
@@ -1062,7 +1062,7 @@ class ModifyConfigStep:
         return False
 
 
-class ModifyConfig(OptimizationStepsProtocol):
+class ModifyConfig(OptimizationSteps):
     def __init__(self, context: PlanContext, plan: Plan) -> None:
         self._context = context
         self._plan = plan
@@ -1072,7 +1072,7 @@ class ModifyConfig(OptimizationStepsProtocol):
         return ModifyConfigStep(config, self._context, self._plan, weights)
 
 
-class ModifyConfigPlugin(OptimizationStepsPluginProtocol):
+class ModifyConfigPlugin(OptimizationStepsPlugin):
     def create(self, context: PlanContext, plan: Plan) -> ModifyConfig:
         return ModifyConfig(context, plan)
 
@@ -1127,7 +1127,7 @@ class EvaluatorWithProcessStep(DefaultEvaluatorStep):
         self._completed.append(results)
 
 
-class EvaluatorWithProcess((OptimizationStepsProtocol)):
+class EvaluatorWithProcess((OptimizationSteps)):
     def __init__(self, context: PlanContext, plan: Plan) -> None:
         self._context = context
         self._plan = plan
@@ -1138,7 +1138,7 @@ class EvaluatorWithProcess((OptimizationStepsProtocol)):
         )
 
 
-class EvaluatorWithProcessPlugin(OptimizationStepsPluginProtocol):
+class EvaluatorWithProcessPlugin(OptimizationStepsPlugin):
     def create(self, context: PlanContext, plan: Plan) -> EvaluatorWithProcess:
         return EvaluatorWithProcess(context, plan)
 

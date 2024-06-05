@@ -12,7 +12,7 @@ from scipy.stats.qmc import Halton, LatinHypercube, QMCEngine, Sobol, scale
 
 from ropt.config.enopt import EnOptConfig
 
-from .protocol import SamplerPluginProtocol, SamplerProtocol
+from .base import Sampler, SamplerPlugin
 
 _STATS_SAMPLERS: Dict[str, Any] = {
     "uniform": uniform,
@@ -29,7 +29,7 @@ _QMC_ENGINES = {
 _SUPPORTED_METHODS: Set[str] = set(_STATS_SAMPLERS.keys()) | set(_QMC_ENGINES.keys())
 
 
-class SciPySampler(SamplerProtocol):
+class SciPySampler(Sampler):
     """Plugin class for producing sampling values via SciPy.
 
     This plugin implements the following sampling methods using the
@@ -76,7 +76,7 @@ class SciPySampler(SamplerProtocol):
     ) -> None:
         """Initialize the sampler object.
 
-        See the [ropt.plugins.sampler.protocol.SamplerProtocol][] protocol.
+        See the [ropt.plugins.sampler.base.Sample][] abstract base class.
 
         # noqa
         """
@@ -97,7 +97,7 @@ class SciPySampler(SamplerProtocol):
     def generate_samples(self) -> NDArray[np.float64]:
         """Generate a set of samples.
 
-        See the [ropt.plugins.sampler.protocol.SamplerProtocol][] protocol.
+        See the [ropt.plugins.sampler.base.Sampler][] abstract base class.
 
         # noqa
         """
@@ -193,7 +193,7 @@ class SciPySampler(SamplerProtocol):
             return _run_qmc_engine()
 
 
-class SciPySamplerPlugin(SamplerPluginProtocol):
+class SciPySamplerPlugin(SamplerPlugin):
     """Default sampler plugin class."""
 
     def create(
@@ -205,7 +205,7 @@ class SciPySamplerPlugin(SamplerPluginProtocol):
     ) -> SciPySampler:
         """Initialize the sampler plugin.
 
-        See the [ropt.plugins.sampler.protocol.SamplerPlugin][] protocol.
+        See the [ropt.plugins.sampler.base.SamplerPlugin][] abstract base class.
 
         # noqa
         """
@@ -214,7 +214,7 @@ class SciPySamplerPlugin(SamplerPluginProtocol):
     def is_supported(self, method: str) -> bool:
         """Check if a method is supported.
 
-        See the [ropt.plugins.protocol.Plugin][] protocol.
+        See the [ropt.plugins.base.Plugin][] abstract base class.
 
         # noqa
         """

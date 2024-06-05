@@ -1,18 +1,20 @@
-"""This module implements the protocol to be followed by step plugins."""
+"""This module implements the abstract base class for step plugins."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, Protocol
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Any, Dict
 
-from ropt.plugins.protocol import PluginProtocol
+from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
     from ropt.optimization import Plan, PlanContext
 
 
-class OptimizationStepsProtocol(Protocol):
-    """Protocol optimization step plugins."""
+class OptimizationSteps(ABC):
+    """Abstract base for optimization step plugins."""
 
+    @abstractmethod
     def __init__(self, context: PlanContext, plan: Plan) -> None:
         """Create a default optimization step plugin.
 
@@ -21,6 +23,7 @@ class OptimizationStepsProtocol(Protocol):
             plan:    The current plan.
         """
 
+    @abstractmethod
     def get_step(self, config: Dict[str, Any]) -> Any:  # noqa: ANN401
         """Get a step object.
 
@@ -31,10 +34,11 @@ class OptimizationStepsProtocol(Protocol):
         """
 
 
-class OptimizationStepsPluginProtocol(PluginProtocol, Protocol):
-    """Optimization step plugin protocol."""
+class OptimizationStepsPlugin(Plugin):
+    """Optimization step plugin base."""
 
-    def create(self, context: PlanContext, plan: Plan) -> OptimizationStepsProtocol:
+    @abstractmethod
+    def create(self, context: PlanContext, plan: Plan) -> OptimizationSteps:
         """Create an optimization step.
 
         Args:

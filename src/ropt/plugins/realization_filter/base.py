@@ -1,17 +1,18 @@
-"""This module defines the protocol to be followed by realization filters.
+"""This module defines the abstract base class for realization filters.
 
 Realization filters can be added via the plugin mechanism to implement
 additional ways to filter the realizations that are used to calculate functions
-and gradients. Any object that follows the
-[`RealizationFilter`][ropt.plugins.realization_filter.protocol.RealizationFilterProtocol]
-protocol may be installed as a plugin.
+and gradients. Any object that derives from the
+[`RealizationFilter`][ropt.plugins.realization_filter.base.RealizationFilter]
+abstract base class may be installed as a plugin.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Protocol
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Optional
 
-from ropt.plugins.protocol import PluginProtocol
+from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
     import numpy as np
@@ -20,9 +21,10 @@ if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
 
 
-class RealizationFilterProtocol(Protocol):
-    """Protocol for realization filter classes."""
+class RealizationFilter(ABC):
+    """Abstract base class for realization filter classes."""
 
+    @abstractmethod
     def __init__(self, enopt_config: EnOptConfig, filter_index: int) -> None:  # D107
         """Initialize the realization filter plugin.
 
@@ -31,6 +33,7 @@ class RealizationFilterProtocol(Protocol):
             filter_index: The index of the transform to use
         """
 
+    @abstractmethod
     def get_realization_weights(
         self,
         objectives: NDArray[np.float64],
@@ -60,12 +63,11 @@ class RealizationFilterProtocol(Protocol):
         """
 
 
-class RealizationFilterPluginProtocol(PluginProtocol, Protocol):
-    """RealizationFilter plugin protocol."""
+class RealizationFilterPlugin(Plugin):
+    """Abstract base class for realizationFilter plugins."""
 
-    def create(
-        self, enopt_config: EnOptConfig, filter_index: int
-    ) -> RealizationFilterProtocol:
+    @abstractmethod
+    def create(self, enopt_config: EnOptConfig, filter_index: int) -> RealizationFilter:
         """Initialize the realization filter plugin.
 
         Args:

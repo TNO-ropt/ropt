@@ -2,7 +2,7 @@
     options:
         members: [get_available_samplers]
 
-::: ropt.plugins.sampler.protocol
+::: ropt.plugins.sampler.base
 
 ::: ropt.plugins.sampler.scipy.SciPySampler
     options:

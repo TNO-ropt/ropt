@@ -12,6 +12,7 @@ from ropt.evaluator._gradient import _perturb_variables
 from ropt.exceptions import ConfigError
 from ropt.optimization import EnsembleOptimizer
 from ropt.plugins import PluginManager
+from ropt.plugins.sampler.base import Sampler, SamplerPlugin
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -44,7 +45,7 @@ def enopt_config_fixture() -> Dict[str, Any]:
     }
 
 
-class MockedSampler:
+class MockedSampler(Sampler):
     def __init__(
         self,
         enopt_config: EnOptConfig,
@@ -86,7 +87,7 @@ class MockedSampler:
         return samples
 
 
-class MockedSamplerPlugin:
+class MockedSamplerPlugin(SamplerPlugin):
     def create(
         self,
         enopt_config: EnOptConfig,

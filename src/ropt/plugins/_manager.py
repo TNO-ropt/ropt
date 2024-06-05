@@ -2,15 +2,19 @@
 
 from __future__ import annotations
 
-import contextlib
 import sys
 from functools import lru_cache
 from typing import TYPE_CHECKING, Any, Dict, Literal
 
 from ropt.exceptions import ConfigError
+from ropt.plugins.function_transform.base import FunctionTransformPlugin
+from ropt.plugins.optimization_steps.base import OptimizationStepsPlugin
+from ropt.plugins.optimizer.base import OptimizerPlugin
+from ropt.plugins.realization_filter.base import RealizationFilterPlugin
+from ropt.plugins.sampler.base import SamplerPlugin
 
 if TYPE_CHECKING:
-    from ropt.plugins.protocol import PluginProtocol
+    from ropt.plugins.base import Plugin
 
 if sys.version_info >= (3, 10):
     from importlib.metadata import entry_points
@@ -55,7 +59,21 @@ PluginType = Literal[
 : Optimization step plugins implement the steps evaluated during the execution
   plan. The built-in plugin offers a full set of steps for executing complex
   plans.
+
+`workflow`:
+: Workflow plugins implement the objects that execute an optimization workflow.
+  The built-in plugin offers a full set of workflow objects for executing
+  complex workflows.
 """
+
+
+_PLUGIN_TYPES = {
+    "function_transform": FunctionTransformPlugin,
+    "optimizer": OptimizerPlugin,
+    "optimization_step": OptimizationStepsPlugin,
+    "sampler": SamplerPlugin,
+    "realization_filter": RealizationFilterPlugin,
+}
 
 
 class PluginManager:
@@ -83,7 +101,7 @@ class PluginManager:
         Plugins can also be added dynamically using the add_plugins method.
         """
         # Built-in plugins, listed for all possible plugin types:
-        self._plugins: Dict[PluginType, Dict[str, PluginProtocol]] = {
+        self._plugins: Dict[PluginType, Dict[str, Plugin]] = {
             "optimizer": {},
             "sampler": {},
             "realization_filter": {},
@@ -94,9 +112,7 @@ class PluginManager:
         for plugin_type in self._plugins:
             self.add_plugins(plugin_type, _from_entry_points(plugin_type))
 
-    def add_plugins(
-        self, plugin_type: PluginType, plugins: Dict[str, PluginProtocol]
-    ) -> None:
+    def add_plugins(self, plugin_type: PluginType, plugins: Dict[str, Plugin]) -> None:
         """Add a plugin at runtime.
 
         This method adds one or more plugins of a specific type to the plugin
@@ -157,10 +173,15 @@ class PluginManager:
 
 
 @lru_cache  # Without the cache, repeated calls are very slow
-def _from_entry_points(plugin_type: str) -> Dict[str, PluginProtocol]:
-    plugins: Dict[str, PluginProtocol] = {}
+def _from_entry_points(plugin_type: str) -> Dict[str, Plugin]:
+    plugins: Dict[str, Plugin] = {}
     for entry_point in entry_points().select(group=f"ropt.plugins.{plugin_type}"):
-        with contextlib.suppress(ModuleNotFoundError):
-            plugin = entry_point.load()
-            plugins[entry_point.name] = plugin()
+        plugin = entry_point.load()
+        plugins[entry_point.name] = plugin()
+        if not isinstance(plugins[entry_point.name], _PLUGIN_TYPES[plugin_type]):
+            msg = (
+                f"Incorrect type for {plugin_type} plugin `{entry_point.name}`"
+                f": {type(plugins[entry_point.name])}"
+            )
+            raise TypeError(msg)
     return plugins

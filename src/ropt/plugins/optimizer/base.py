@@ -1,16 +1,17 @@
-"""This module defines the protocol to be followed by optimization plugins.
+"""This module defines the abstract base class for optimization plugins.
 
 Optimization plugins can be added via the plugin mechanism to implement
-additional optimization methods. Any object that follows the
-[`Optimizer`][ropt.plugins.optimizer.protocol.OptimizerProtocol]
-protocol may be installed as a plugin.
+additional optimization methods. Any object that derives from the
+[`Optimizer`][ropt.plugins.optimizer.base.Optimizer] abstract base class may be
+installed as a plugin.
 """
 
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Protocol, Tuple
 
-from ropt.plugins.protocol import PluginProtocol
+from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
     import numpy as np
@@ -22,8 +23,8 @@ if TYPE_CHECKING:
 class OptimizerCallback(Protocol):
     """Protocol for the optimizer callback.
 
-    Optimization plugins implement optimizer classes according to the
-    [`Optimizer`][ropt.plugins.optimizer.protocol.OptimizerProtocol] protocol.
+    Optimization plugins implement optimizer classes derived from the
+    [`Optimizer`][ropt.plugins.optimizer.base.Optimizer] abstract base class.
     Objects of these classes are initialized with a callback function that
     follows the call signature defined here. This callback should be used to
     request the function and gradient evaluations that the optimizer needs.
@@ -80,15 +81,17 @@ class OptimizerCallback(Protocol):
         """
 
 
-class OptimizerProtocol(Protocol):
-    """Protocol for optimizer classes.
+class Optimizer(ABC):
+    """Abstract base for optimizer classes.
 
     `ropt` employs plugins to implement optimizers that are called during an
-    optimization workflow. Optimizers should adhere to the `Optimizer` protocol,
-    which specifies the requirements for the class constructor (`__init__`) and
-    also includes a `start` method used to initiate the optimization process.
+    optimization workflow. Optimizers should derive from the `Optimizer`
+    abstract base class, which specifies the requirements for the class
+    constructor (`__init__`) and also includes a `start` method used to initiate
+    the optimization process.
     """
 
+    @abstractmethod
     def __init__(
         self, config: EnOptConfig, optimizer_callback: OptimizerCallback
     ) -> None:
@@ -103,6 +106,7 @@ class OptimizerProtocol(Protocol):
             optimizer_callback: The optimizer callback
         """
 
+    @abstractmethod
     def start(self, initial_values: NDArray[np.float64]) -> None:
         """Start the optimization.
 
@@ -115,6 +119,7 @@ class OptimizerProtocol(Protocol):
         """
 
     @property
+    @abstractmethod
     def allow_nan(self) -> bool:
         """Return `True` if a `NaN` is a valid function value.
 
@@ -123,12 +128,13 @@ class OptimizerProtocol(Protocol):
         """
 
 
-class OptimizerPluginProtocol(PluginProtocol, Protocol):
-    """Optimizer plugin protocol."""
+class OptimizerPlugin(Plugin):
+    """Abstract base calss for optimizer plugins."""
 
+    @abstractmethod
     def create(
         self, config: EnOptConfig, optimizer_callback: OptimizerCallback
-    ) -> OptimizerProtocol:
+    ) -> Optimizer:
         """Create an optimizer.
 
         Args:

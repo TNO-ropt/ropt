@@ -36,9 +36,9 @@ if TYPE_CHECKING:
 
     from ropt.config.enopt import EnOptConfig
     from ropt.plugins import PluginManager
-    from ropt.plugins.function_transform.protocol import FunctionTransformProtocol
-    from ropt.plugins.realization_filter.protocol import RealizationFilterProtocol
-    from ropt.plugins.sampler.protocol import SamplerProtocol
+    from ropt.plugins.function_transform.base import FunctionTransform
+    from ropt.plugins.realization_filter.base import RealizationFilter
+    from ropt.plugins.sampler.base import Sampler
 
     from ._evaluator import Evaluator
 
@@ -600,7 +600,7 @@ class EnsembleEvaluator:
 
     def _init_realization_filters(
         self, plugin_manager: PluginManager
-    ) -> List[RealizationFilterProtocol]:
+    ) -> List[RealizationFilter]:
         return [
             plugin_manager.get_plugin(
                 "realization_filter", method=filter_config.method
@@ -610,7 +610,7 @@ class EnsembleEvaluator:
 
     def _init_function_transforms(
         self, plugin_manager: PluginManager
-    ) -> List[FunctionTransformProtocol]:
+    ) -> List[FunctionTransform]:
         return [
             plugin_manager.get_plugin(
                 "function_transform", method=transform_config.method
@@ -620,8 +620,8 @@ class EnsembleEvaluator:
 
     def _init_samplers(
         self, rng: Generator, plugin_manager: PluginManager
-    ) -> List[SamplerProtocol]:
-        samplers: List[SamplerProtocol] = []
+    ) -> List[Sampler]:
+        samplers: List[Sampler] = []
         for idx, sampler_config in enumerate(self._config.samplers):
             variable_indices = _get_indices(
                 idx, self._config.gradient.samplers, self._config.variables.indices

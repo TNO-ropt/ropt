@@ -1,4 +1,4 @@
-"""This module defines the protocol to be followed by restart steps."""
+"""This module defines the abstract base class for restart steps."""
 
 from __future__ import annotations
 

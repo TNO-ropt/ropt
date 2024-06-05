@@ -20,9 +20,9 @@ supports the following plugin types:
 Plugins are managed by the [`PluginManager`][ropt.plugins.PluginManager] class.
 They can be built-in, installed separately using the standard entry points
 mechanism, or added dynamically using the
-[`add_plugins`][ropt.plugins.PluginManager.add_plugins] method. Protocols or
-abstract classes define the interface that plugin code must adhere to in order
-to implement the required functionality.
+[`add_plugins`][ropt.plugins.PluginManager.add_plugins] method. The interface
+that plugin code must adhere to in order to implement the required functionality
+are define by abstract base classes.
 
 The plugin manager object provides the
 [`get_plugin`][ropt.plugins.PluginManager.get_plugin] method, which `ropt` uses

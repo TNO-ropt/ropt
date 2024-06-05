@@ -1,16 +1,18 @@
-"""This module defines the protocol to be followed by function transforms.
+"""This module defines the abstract base classes for function transforms.
 
 Function transforms can be added via the plugin mechanism to implement
-additional ways to functions and gradient ensembles. Any object that follows the
-[`FunctionTransform`][ropt.plugins.function_transform.protocol.FunctionTransformProtocol]
-protocol may be installed as a plugin.
+additional ways to functions and gradient ensembles. Any object that adheres to
+the
+[`FunctionTransform`][ropt.plugins.function_transform.base.FunctionTransform]
+base class may be installed as a plugin.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Protocol
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
-from ropt.plugins.protocol import PluginProtocol
+from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
     import numpy as np
@@ -19,9 +21,10 @@ if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
 
 
-class FunctionTransformProtocol(Protocol):
-    """Protocol class for function transforms."""
+class FunctionTransform(ABC):
+    """Abstract base class for function transforms."""
 
+    @abstractmethod
     def __init__(self, enopt_config: EnOptConfig, transform_index: int) -> None:
         """Initialize the function transform object.
 
@@ -30,6 +33,7 @@ class FunctionTransformProtocol(Protocol):
             transform_index: The index of the transform to use
         """
 
+    @abstractmethod
     def calculate_function(
         self, functions: NDArray[np.float64], weights: NDArray[np.float64]
     ) -> NDArray[np.float64]:
@@ -56,6 +60,7 @@ class FunctionTransformProtocol(Protocol):
             The expected function values.
         """
 
+    @abstractmethod
     def calculate_gradient(
         self,
         functions: NDArray[np.float64],
@@ -74,12 +79,13 @@ class FunctionTransformProtocol(Protocol):
         """
 
 
-class FunctionTranformPluginProtocol(PluginProtocol, Protocol):
-    """The function transform plugin protocol."""
+class FunctionTransformPlugin(Plugin):
+    """The function transform plugin base class."""
 
+    @abstractmethod
     def create(
         self, enopt_config: EnOptConfig, transform_index: int
-    ) -> FunctionTransformProtocol:
+    ) -> FunctionTransform:
         """Initialize the function transform object.
 
         Args:

@@ -5,8 +5,8 @@ from numpy.typing import NDArray
 
 from ropt.config.enopt import EnOptConfig, GradientConfig, VariablesConfig
 from ropt.enums import BoundaryType
-from ropt.plugins.function_transform.protocol import FunctionTransformProtocol
-from ropt.plugins.sampler.protocol import SamplerProtocol
+from ropt.plugins.function_transform.base import FunctionTransform
+from ropt.plugins.sampler.base import Sampler
 
 SVD_TOLERANCE = 0.999
 MIRROR_REPEAT = 3
@@ -67,7 +67,7 @@ def _perturb_variables(
     variables: NDArray[np.float64],
     variables_config: VariablesConfig,
     gradient_config: GradientConfig,
-    samplers: List[SamplerProtocol],
+    samplers: List[Sampler],
 ) -> NDArray[np.float64]:
     if gradient_config.samplers is None:
         samples = samplers[0].generate_samples()
@@ -138,7 +138,7 @@ def _calculate_gradient(  # noqa: PLR0913
     delta_functions: NDArray[np.float64],
     failed_realizations: NDArray[np.bool_],
     weights: NDArray[np.float64],
-    transform: FunctionTransformProtocol,
+    transform: FunctionTransform,
     *,
     merge_realizations: bool,
 ) -> NDArray[np.float64]:
@@ -154,7 +154,7 @@ def _calculate_gradient(  # noqa: PLR0913
 # : disable=too-many-arguments,too-many-locals
 def _calculate_transformed_gradients(  # noqa: PLR0913
     config: EnOptConfig,
-    function_transforms: List[FunctionTransformProtocol],
+    function_transforms: List[FunctionTransform],
     variables: NDArray[np.float64],
     functions: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
@@ -195,7 +195,7 @@ def _calculate_transformed_gradients(  # noqa: PLR0913
 
 def _add_transformed_gradients(  # noqa: PLR0913
     config: EnOptConfig,
-    transform: FunctionTransformProtocol,
+    transform: FunctionTransform,
     delta_variables: NDArray[np.float64],
     functions: NDArray[np.float64],
     delta_functions: NDArray[np.float64],

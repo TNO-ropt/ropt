@@ -11,7 +11,7 @@ from ropt.config.enopt import EnOptConfig
 from ropt.enums import ConstraintType, OptimizerExitCode
 from ropt.exceptions import ConfigError, OptimizationAborted
 
-from .protocol import RealizationFilterPluginProtocol, RealizationFilterProtocol
+from .base import RealizationFilter, RealizationFilterPlugin
 
 if sys.version_info >= (3, 9):
     from typing import Annotated
@@ -114,7 +114,7 @@ class CVaRConstraintOptions(_ConfigBaseModel):
     percentile: Annotated[float, Field(gt=0.0, le=1.0)] = 0.5
 
 
-class DefaultRealizationFilter(RealizationFilterProtocol):
+class DefaultRealizationFilter(RealizationFilter):
     """The default realization filter plugin class.
 
     This plugin currently implements four methods:
@@ -162,8 +162,8 @@ class DefaultRealizationFilter(RealizationFilterProtocol):
         """Initialize the realization filter plugin.
 
         See the
-        [ropt.plugins.realization_filter.protocol.RealizationFilterProtocol][]
-        protocol.
+        [ropt.plugins.realization_filter.base.RealizationFilter][]
+        base class.
 
         # noqa
         """
@@ -209,8 +209,8 @@ class DefaultRealizationFilter(RealizationFilterProtocol):
         """Return the updated weights of the realizations.
 
         See the
-        [ropt.plugins.realization_filter.protocol.RealizationFilterProtocol][]
-        protocol.
+        [ropt.plugins.realization_filter.base.RealizationFilter][]
+        abstract base class.
 
         # noqa
         """
@@ -382,7 +382,7 @@ def _get_indices(
     return tuple(_get_index(item, names) for item in items)
 
 
-class DefaultRealizationFilterPlugin(RealizationFilterPluginProtocol):
+class DefaultRealizationFilterPlugin(RealizationFilterPlugin):
     """Default realization filter plugin class."""
 
     def create(
@@ -390,7 +390,8 @@ class DefaultRealizationFilterPlugin(RealizationFilterPluginProtocol):
     ) -> DefaultRealizationFilter:
         """Initialize the realization filter plugin.
 
-        See the [ropt.plugins.realization_filter.protocol.RealizationFilterPlugin][] protocol.
+        See the [ropt.plugins.realization_filter.base.RealizationFilterPlugin][]
+        abstract base class.
 
         # noqa
         """
@@ -399,7 +400,7 @@ class DefaultRealizationFilterPlugin(RealizationFilterPluginProtocol):
     def is_supported(self, method: str) -> bool:
         """Check if a method is supported.
 
-        See the [ropt.plugins.protocol.Plugin][] protocol.
+        See the [ropt.plugins.base.Plugin][] abstract base class.
 
         # noqa
         """

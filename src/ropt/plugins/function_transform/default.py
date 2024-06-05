@@ -9,12 +9,12 @@ from ropt.config.enopt import EnOptConfig
 from ropt.enums import OptimizerExitCode
 from ropt.exceptions import ConfigError, OptimizationAborted
 
-from .protocol import FunctionTranformPluginProtocol, FunctionTransformProtocol
+from .base import FunctionTransform, FunctionTransformPlugin
 
 _MIN_STDDEV_REALIZATIONS = 2
 
 
-class DefaultFunctionTransform(FunctionTransformProtocol):
+class DefaultFunctionTransform(FunctionTransform):
     """The default function transform plugin.
 
     This plugin currently implements two methods:
@@ -35,8 +35,8 @@ class DefaultFunctionTransform(FunctionTransformProtocol):
         """Initialize the function transform object.
 
         See the
-        [ropt.plugins.function_transform.protocol.FunctionTransformProtocol][]
-        protocol.
+        [ropt.plugins.function_transform.base.FunctionTransform][]
+        abstract base class.
 
         # noqa
         """
@@ -58,8 +58,8 @@ class DefaultFunctionTransform(FunctionTransformProtocol):
         """Calculate a function from function values for each realization.
 
         See the
-        [ropt.plugins.function_transform.protocol.FunctionTransformProtocol][]
-        protocol.
+        [ropt.plugins.function_transform.base.FunctionTransform][]
+        abstract base class.
 
         # noqa
         """
@@ -80,8 +80,8 @@ class DefaultFunctionTransform(FunctionTransformProtocol):
         """Calculate a gradient from gradients of the realizations.
 
         See the
-        [ropt.plugins.function_transform.protocol.FunctionTransformProtocol][]
-        protocol.
+        [ropt.plugins.function_transform.base.FunctionTransform][]
+        abstract base class.
 
         # noqa
         """
@@ -153,7 +153,7 @@ class DefaultFunctionTransform(FunctionTransformProtocol):
         return norm, mean, stddev
 
 
-class DefaultFunctionTransformPlugin(FunctionTranformPluginProtocol):
+class DefaultFunctionTransformPlugin(FunctionTransformPlugin):
     """Default filter transform plugin class."""
 
     def create(
@@ -161,7 +161,8 @@ class DefaultFunctionTransformPlugin(FunctionTranformPluginProtocol):
     ) -> DefaultFunctionTransform:
         """Initialize the realization filter plugin.
 
-        See the [ropt.plugins.function_transform.protocol.FunctionTranformPluginProtocol][] protocol.
+        See the [ropt.plugins.function_transform.base.FunctionTransformPlugin][]
+        abstract base class.
 
         # noqa
         """
@@ -170,7 +171,7 @@ class DefaultFunctionTransformPlugin(FunctionTranformPluginProtocol):
     def is_supported(self, method: str) -> bool:
         """Check if a method is supported.
 
-        See the [ropt.plugins.protocol.Plugin][] protocol.
+        See the [ropt.plugins.base.Plugin][] abstract base class.
 
         # noqa
         """

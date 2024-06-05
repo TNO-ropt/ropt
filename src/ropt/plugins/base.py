@@ -1,17 +1,18 @@
-"""This module defines the protocol to be followed by plugins."""
+"""This module defines the abstract base class for plugins."""
 
 from __future__ import annotations
 
-from typing import Protocol
+from abc import ABC, abstractmethod
 
 
-class PluginProtocol(Protocol):
-    """Protocol for plugin classes.
+class Plugin(ABC):
+    """Abstract base class for plugins.
 
-    `ropt`  plugins should adhere to the `Plugin` protocol, which specifies an
+    `ropt`  plugins should derive from this base class, which specifies an
     `is_supported` method.
     """
 
+    @abstractmethod
     def is_supported(self, method: str) -> bool:
         """Check wether a given method is supported.
 

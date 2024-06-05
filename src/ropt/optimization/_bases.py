@@ -1,4 +1,4 @@
-"""This module defines the protocol to be followed by optimization steps."""
+"""This module defines the abstract base classes for optimization steps."""
 
 from __future__ import annotations
 

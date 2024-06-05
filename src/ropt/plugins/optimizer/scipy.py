@@ -37,7 +37,7 @@ from ropt.plugins.optimizer.utils import (
     validate_supported_constraints,
 )
 
-from .protocol import OptimizerCallback, OptimizerPluginProtocol, OptimizerProtocol
+from .base import Optimizer, OptimizerCallback, OptimizerPlugin
 
 _SUPPORTED_METHODS: Set[str] = {
     name.lower()
@@ -100,7 +100,7 @@ _ConstraintType = Union[
 ]
 
 
-class SciPyOptimizer(OptimizerProtocol):
+class SciPyOptimizer(Optimizer):
     """Plugin class for optimization via SciPy.
 
     This class implements several optimizers provided by SciPy in the
@@ -161,7 +161,7 @@ class SciPyOptimizer(OptimizerProtocol):
     ) -> None:
         """Initialize the optimizer implemented by the SciPy plugin.
 
-        See the [ropt.plugins.optimizer.protocol.OptimizerProtocol][] protocol.
+        See the [ropt.plugins.optimizer.base.Optimizer][] abstract base class.
 
         # noqa
         """
@@ -206,7 +206,7 @@ class SciPyOptimizer(OptimizerProtocol):
     def start(self, initial_values: NDArray[np.float64]) -> None:
         """Start the optimization.
 
-        See the [ropt.plugins.optimizer.protocol.OptimizerProtocol][] protocol.
+        See the [ropt.plugins.optimizer.base.Optimizer][] abstract base class.
 
         # noqa
         """
@@ -260,7 +260,7 @@ class SciPyOptimizer(OptimizerProtocol):
     def allow_nan(self) -> bool:
         """Whether NaN is allowed.
 
-        See the [ropt.plugins.optimizer.protocol.OptimizerProtocol][] protocol.
+        See the [ropt.plugins.optimizer.base.Optimizer][] abstract base class.
 
         # noqa
         """
@@ -564,7 +564,7 @@ class SciPyOptimizer(OptimizerProtocol):
         return options
 
 
-class SciPyOptimizerPlugin(OptimizerPluginProtocol):
+class SciPyOptimizerPlugin(OptimizerPlugin):
     """Default filter transform plugin class."""
 
     def create(
@@ -572,7 +572,7 @@ class SciPyOptimizerPlugin(OptimizerPluginProtocol):
     ) -> SciPyOptimizer:
         """Initialize the optimizer plugin.
 
-        See the [ropt.plugins.optimizer.protocol.OptimizerPluginProtocol][] protocol.
+        See the [ropt.plugins.optimizer.base.OptimizerPlugin][] abstract base class.
 
         # noqa
         """
@@ -581,7 +581,7 @@ class SciPyOptimizerPlugin(OptimizerPluginProtocol):
     def is_supported(self, method: str) -> bool:
         """Check if a method is supported.
 
-        See the [ropt.plugins.protocol.PluginProtocol][] protocol.
+        See the [ropt.plugins.base.Plugin][] abstract base class.
 
         # noqa
         """

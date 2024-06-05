@@ -4,12 +4,12 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.config.enopt import EnOptConfig
-from ropt.plugins.function_transform.protocol import FunctionTransformProtocol
+from ropt.plugins.function_transform.base import FunctionTransform
 
 
 def _calculate_transformed_functions(  # noqa: PLR0913
     config: EnOptConfig,
-    function_transforms: List[FunctionTransformProtocol],
+    function_transforms: List[FunctionTransform],
     functions: NDArray[np.float64],
     realization_weights: Optional[NDArray[np.float64]],
     failed_realizations: NDArray[np.bool_],
@@ -43,7 +43,7 @@ def _calculate_transformed_functions(  # noqa: PLR0913
 
 def _add_transformed_functions(  # noqa: PLR0913
     config: EnOptConfig,
-    transform: FunctionTransformProtocol,
+    transform: FunctionTransform,
     functions: NDArray[np.float64],
     realization_weights: Optional[NDArray[np.float64]],
     failed_realizations: NDArray[np.bool_],

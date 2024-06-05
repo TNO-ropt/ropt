@@ -1,16 +1,17 @@
-"""This module defines the protocol to be followed by samplers.
+"""This module defines the abstract base class for samplers.
 
 Samplers can be added via the plugin mechanism to implement additional ways to
 generate perturbed variables. Any object that follows the
-[`Sampler`][ropt.plugins.sampler.protocol.SamplerProtocol] protocol may be
+[`Sampler`][ropt.plugins.sampler.base.Sampler] abstract base class may be
 installed as a plugin.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Protocol
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING, Optional
 
-from ropt.plugins.protocol import PluginProtocol
+from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
     import numpy as np
@@ -20,17 +21,18 @@ if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
 
 
-class SamplerProtocol(Protocol):
-    """Protocol for sampler classes.
+class Sampler(ABC):
+    """Abstract base class for sampler classes.
 
     `ropt` employs plugins to implement samplers that are called during an
     optimization workflow to generate perturbed variable vectors. Samplers
-    should adhere to the `Sampler` protocol, which specifies the requirements
-    for the class constructor (`__init__`) and also includes a
+    should derive from the `Sampler` base class, which specifies the
+    requirements for the class constructor (`__init__`) and also includes a
     `generate_samples` method used to generate samples used to create perturbed
     values.
     """
 
+    @abstractmethod
     def __init__(
         self,
         enopt_config: EnOptConfig,
@@ -57,6 +59,7 @@ class SamplerProtocol(Protocol):
             rng:              A random generator object for use by stochastic samplers.
         """
 
+    @abstractmethod
     def generate_samples(self) -> NDArray[np.float64]:
         """Return an array containing sampled values.
 
@@ -89,16 +92,17 @@ class SamplerProtocol(Protocol):
         """
 
 
-class SamplerPluginProtocol(PluginProtocol, Protocol):
-    """Sampler plugin protocol."""
+class SamplerPlugin(Plugin):
+    """Abtract base class for sampler plugins."""
 
+    @abstractmethod
     def create(
         self,
         enopt_config: EnOptConfig,
         sampler_index: int,
         variable_indices: Optional[NDArray[np.intc]],
         rng: Generator,
-    ) -> SamplerProtocol:
+    ) -> Sampler:
         """Create a sampler.
 
         Arguments:

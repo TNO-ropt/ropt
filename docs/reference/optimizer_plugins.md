@@ -1,6 +1,6 @@
 ::: ropt.plugins.optimizer
 
-::: ropt.plugins.optimizer.protocol
+::: ropt.plugins.optimizer.base
 
 ::: ropt.plugins.optimizer.utils
 
