@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../optimization/">
+        <link rel="prev" href="../enopt_config/">
       
       
         <link rel="next" href="../results/">
@@ -389,27 +389,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../plan_config/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Plan configuration
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../workflow_config/" class="md-nav__link">
         
   
@@ -491,27 +470,6 @@
             Optimization
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../optimization/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Ensemble optimizer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
             
               
                 
@@ -933,11 +891,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../optimization_steps/" class="md-nav__link">
+      <a href="../workflow/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Optimization steps
+    Workflow objects
   </span>
   
 
@@ -1244,9 +1202,8 @@
 <p>An optimizer will repeatedly request function and gradient evaluations. In each
 iteration, it may require values for multiple variable vectors, and the
 gradients may be calculated from various perturbed variable vectors. To address
-this, the <a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.EnsembleOptimizer">EnsembleOptimizer</a> class
-requires a function evaluator callback upon initialization, conforming to the
-<a class="autorefs autorefs-internal" href="#ropt.evaluator.Evaluator">Evaluator</a> signature.</p>
+this, the optimizer requires a function evaluator callback upon initialization,
+conforming to the <a class="autorefs autorefs-internal" href="#ropt.evaluator.Evaluator">Evaluator</a> signature.</p>
 <p>The callback accepts a matrix containing multiple variable vectors to evaluate
 together with a <a class="autorefs autorefs-internal" href="#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a> providing
 information usable by the evaluator. It returns an
@@ -1314,9 +1271,7 @@ once.</p>
 
 
       <p>Protocol for evaluator objects or callables.</p>
-<p>The <a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.EnsembleOptimizer"><code>EnsembleOptimizer</code></a> object,
-running an optimization, requires a callback argument upon initialization
-that follows this protocol.</p>
+<p>The optimizers require a callback that follows this protocol.</p>
 
 
 
@@ -1737,9 +1692,6 @@ evaluator that uses a concurrent executor.</p>
 vector of variables, and return a future-like object, compatible with
 futures from the <code>concurrent.futures</code> module of Python, implementing at
 least the <code>done()</code>, <code>exception()</code>, and <code>result()</code> methods.</p>
-<p>To use a class derived from <code>ConcurrentEvaluator</code>, pass the object via the
-<code>evaluator</code> argument of the
-<a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.EnsembleOptimizer"><code>EnsembleOptimizer</code></a> constructor.</p>
 
 
 
@@ -1781,9 +1733,7 @@ class, containing the future object representing the launched task and
 its result. Under the hood, other tasks may be launched, but only those
 that contain results should be returned.</p>
 <p>This method is called by the <code>__call__</code> method, which implements the
-<a class="autorefs autorefs-internal" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a> callback signature and can be
-passed by the <a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.EnsembleOptimizer"><code>EnsembleOptimizer</code></a>
-object.</p>
+<a class="autorefs autorefs-internal" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a> callback signature.</p>
 <p>The <code>context</code> argument with optional information is passed from the
 <code>__call__</code> method unchanged.</p>
 

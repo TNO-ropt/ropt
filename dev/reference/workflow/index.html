@@ -20,7 +20,7 @@
     
     
       
-        <title>Optimization steps - ropt Documentation</title>
+        <title>Workflow objects - ropt Documentation</title>
       
     
     
@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.plugins.optimization_steps" class="md-skip">
+        <a href="#ropt.plugins.workflow" class="md-skip">
           Skip to content
         </a>
       
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Optimization steps
+              Workflow objects
             
           </span>
         </div>
@@ -389,27 +389,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../plan_config/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Plan configuration
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../workflow_config/" class="md-nav__link">
         
   
@@ -491,27 +470,6 @@
             Optimization
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../optimization/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Ensemble optimizer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
             
               
                 
@@ -746,7 +704,7 @@
           
   
   <span class="md-ellipsis">
-    Optimization steps
+    Workflow objects
   </span>
   
 
@@ -757,7 +715,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization steps
+    Workflow objects
   </span>
   
 
@@ -777,11 +735,35 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.optimization_steps" class="md-nav__link">
+  <a href="#ropt.plugins.workflow" class="md-nav__link">
     <span class="md-ellipsis">
-      optimization_steps
+      workflow
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.events" class="md-nav__link">
+    <span class="md-ellipsis">
+      events
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="events">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.events.OptimizationEvent" class="md-nav__link">
+    <span class="md-ellipsis">
+      OptimizationEvent
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -897,11 +879,35 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.optimization_steps" class="md-nav__link">
+  <a href="#ropt.plugins.workflow" class="md-nav__link">
     <span class="md-ellipsis">
-      optimization_steps
+      workflow
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.events" class="md-nav__link">
+    <span class="md-ellipsis">
+      events
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="events">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.events.OptimizationEvent" class="md-nav__link">
+    <span class="md-ellipsis">
+      OptimizationEvent
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -920,21 +926,23 @@
                   
 
 
-  <h1>Optimization steps</h1>
+  <h1>Workflow objects</h1>
 
 <div class="doc doc-object doc-module">
 
 
 
-<h2 id="ropt.plugins.optimization_steps" class="doc doc-heading">
-            <code>ropt.plugins.optimization_steps</code>
+<h2 id="ropt.plugins.workflow" class="doc doc-heading">
+            <code>ropt.plugins.workflow</code>
 
 
 </h2>
 
     <div class="doc doc-contents first">
 
-      <p>Plugin functionality for adding optimization steps.</p>
+      <p>Plugin functionality for adding workflow objects.</p>
+<p>This package contains the abstract base class for workflow plugins, and the
+default workflow objects that are part of <code>ropt</code>.</p>
 
 
 
@@ -946,6 +954,145 @@
 
 
 
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="ropt.events" class="doc doc-heading">
+            <code>ropt.events</code>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+      <p>The optimization event class.</p>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.events.OptimizationEvent" class="doc doc-heading">
+            <code>OptimizationEvent</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+      <p>The <code>OptimizationEvent</code> class stores optimization event data.</p>
+<p>While running an optimization, callbacks can be connected to react to events
+triggered during the execution of the plan. These callbacks accept a single
+<code>OptimizationEvent</code> object containing information about the event.</p>
+<p>The actual data contained in the object depends on the nature of the event.
+Refer to the documentation of the <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType"><code>EventType</code></a>
+enumeration for more details.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.events.OptimizationEvent.event_type">event_type</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The type of the event.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.events.OptimizationEvent.config">config</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The current configuration object of the executing plan.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.events.OptimizationEvent.results">results</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional results passed with the event.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.events.OptimizationEvent.exit_code">exit_code</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.enums.OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An optional exit code.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 
 

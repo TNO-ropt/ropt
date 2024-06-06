@@ -389,27 +389,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../plan_config/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Plan configuration
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../workflow_config/" class="md-nav__link">
         
   
@@ -491,27 +470,6 @@
             Optimization
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../optimization/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Ensemble optimizer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
             
               
                 
@@ -846,11 +804,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../optimization_steps/" class="md-nav__link">
+      <a href="../workflow/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Optimization steps
+    Workflow objects
   </span>
   
 
@@ -1080,8 +1038,8 @@ supports the following plugin types:</p>
     Filters used to determine subsets of realizations.</li>
 <li><a class="autorefs autorefs-internal" href="../function_transforms/#ropt.plugins.function_transform"><code>function_transform</code></a>:
     Code used to compute objective and constraint values from realizations.</li>
-<li><a class="autorefs autorefs-internal" href="../optimization_steps/#ropt.plugins.optimization_steps"><code>optimization_step</code></a>:
-    Steps evaluated within an optimization plan.</li>
+<li><a class="autorefs autorefs-internal" href="../workflow/#ropt.plugins.workflow"><code>workflow</code></a>:
+    Implements workflow state objects and steps.</li>
 </ol>
 <p>Plugins are managed by the <a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager"><code>PluginManager</code></a> class.
 They can be built-in, installed separately using the standard entry points

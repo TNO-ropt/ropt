@@ -389,27 +389,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../plan_config/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Plan configuration
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../workflow_config/" class="md-nav__link">
         
   
@@ -491,27 +470,6 @@
             Optimization
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../optimization/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Ensemble optimizer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
             
               
                 
@@ -972,11 +930,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../optimization_steps/" class="md-nav__link">
+      <a href="../workflow/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Optimization steps
+    Workflow objects
   </span>
   
 
@@ -1321,9 +1279,8 @@
       <p>Data Classes for Storing Intermediate Optimization Results.</p>
 <p>During the optimization process, functions and gradients are calculated and need
 to be reported. To streamline this process, events are triggered after new
-results become available, invoking connected callbacks with those results (see
-<a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.EnsembleOptimizer.add_observer"><code>EnsembleOptimizer.add_observer</code></a>).
-The <a class="autorefs autorefs-internal" href="../optimization/#ropt.events.OptimizationEvent"><code>OptimizationEvent</code></a> object passed to the
+results become available, invoking connected callbacks with those results.
+The <a class="autorefs autorefs-internal" href="../workflow/#ropt.events.OptimizationEvent"><code>OptimizationEvent</code></a> object passed to the
 callbacks contains a <code>results</code> field, which consists of a tuple of
 <a class="autorefs autorefs-internal" href="#ropt.results.Results"><code>Results</code></a> objects. These may be instances of the derived
 <a class="autorefs autorefs-internal" href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> or
