@@ -62,8 +62,8 @@ def _to_series(
         for idx, index in enumerate(indices)
     ]
     series: pd.Series[Any]
-    index: Tuple[Any, ...] = (result_id,) if batch_id is None else (result_id, batch_id)
-    index_names = ["result_id"] if batch_id is None else ["result_id", "batch_id"]
+    index: Tuple[Any, ...] = (result_id, 0 if batch_id is None else batch_id)
+    index_names = ["result_id", "batch_id"]
     if indices:
         multi_index = pd.MultiIndex.from_product(
             indices, names=(axis.value for axis in axes)

@@ -242,11 +242,14 @@ class EnsembleEvaluator:
                 result_id=next(self._result_id_iter),
                 batch_id=g_eval_results.batch_id,
                 metadata={},
-                evaluations=GradientEvaluations(
+                evaluations=GradientEvaluations.create(
+                    config=self._config,
                     variables=variables,
                     perturbed_variables=perturbed_variables,
                     perturbed_objectives=g_eval_results.perturbed_objectives,
                     perturbed_constraints=g_eval_results.perturbed_constraints,
+                    objective_auto_scales=self._objective_auto_scales,
+                    constraint_auto_scales=self._constraint_auto_scales,
                     perturbed_evaluation_ids=g_eval_results.perturbed_evaluation_ids,
                 ),
                 realizations=Realizations(
@@ -357,11 +360,14 @@ class EnsembleEvaluator:
             result_id=next(self._result_id_iter),
             batch_id=g_eval_results.batch_id,
             metadata={},
-            evaluations=GradientEvaluations(
+            evaluations=GradientEvaluations.create(
+                config=self._config,
                 variables=variables,
                 perturbed_variables=perturbed_variables,
                 perturbed_objectives=g_eval_results.perturbed_objectives,
                 perturbed_constraints=g_eval_results.perturbed_constraints,
+                objective_auto_scales=self._objective_auto_scales,
+                constraint_auto_scales=self._constraint_auto_scales,
                 perturbed_evaluation_ids=g_eval_results.perturbed_evaluation_ids,
             ),
             realizations=Realizations(

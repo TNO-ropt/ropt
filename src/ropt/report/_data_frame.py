@@ -174,19 +174,12 @@ def _get_function_results(
         ],
     ).rename(columns=partial(_add_prefix, prefix="evaluations"))
 
-    frames = [
-        frame
-        for frame in (
-            functions,
-            bound_constraints,
-            linear_constraints,
-            nonlinear_constraints,
-            evaluations,
-        )
-        if not frame.empty
-    ]
-    return (
-        frames[0].join(list(frames[1:]), how="outer") if len(frames) > 1 else frames[0]
+    return _join_frames(
+        functions,
+        bound_constraints,
+        linear_constraints,
+        nonlinear_constraints,
+        evaluations,
     )
 
 
@@ -200,7 +193,7 @@ def _add_gradient_results(
     ):
         return pd.DataFrame()
 
-    return results.to_dataframe(
+    gradients = results.to_dataframe(
         config,
         "gradients",
         select=_get_select(results, "gradients", sub_fields),
@@ -210,3 +203,23 @@ def _add_gradient_results(
             ResultAxisName.VARIABLE,
         ],
     ).rename(columns=partial(_add_prefix, prefix="gradients"))
+
+    evaluations = results.to_dataframe(
+        config,
+        "evaluations",
+        select=_get_select(results, "evaluations", sub_fields),
+        unstack=[
+            ResultAxisName.VARIABLE,
+            ResultAxisName.OBJECTIVE,
+            ResultAxisName.NONLINEAR_CONSTRAINT,
+        ],
+    ).rename(columns=partial(_add_prefix, prefix="evaluations"))
+
+    return _join_frames(gradients, evaluations)
+
+
+def _join_frames(*args: pd.DataFrame) -> pd.DataFrame:
+    frames = [frame for frame in args if not frame.empty]
+    return (
+        frames[0].join(list(frames[1:]), how="outer") if len(frames) > 1 else frames[0]
+    )
