@@ -3379,6 +3379,10 @@ constraints gradients. It contains the following information:</p>
    constraint values arranged along the third axis. The second axis index
    indicates the perturbation number, whereas the first axis index
    represents the realization number.</li>
+<li>Scaled versions of the objective and constraint values if scaling was
+   enabled.</li>
+<li>Optional evaluation IDs that may have been passed from the evaluator,
+   identifying each calculated realization and perturbation.</li>
 </ol>
 
 
@@ -3429,7 +3433,7 @@ constraints gradients. It contains the following information:</p>
             <td>
               <div class="doc-md-description">
                 <p>The objective functions for each realization and
-                   perturbation.</p>
+                          perturbation.</p>
               </div>
             </td>
             <td>
@@ -3444,7 +3448,77 @@ constraints gradients. It contains the following information:</p>
             <td>
               <div class="doc-md-description">
                 <p>The constraint functions for each realization and
-                   perturbation.</p>
+                          perturbation.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>unscaled_variables</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional variables after scaling back.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>unscaled_perturbed_variables</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional variables after scaling back.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>scaled_perturbed_objectives</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional scaled objectives.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>scaled_perturbed_constraints</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional scaled constraints.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>perturbed_evaluation_ids</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional id of each evaluated realization.</p>
               </div>
             </td>
             <td>
