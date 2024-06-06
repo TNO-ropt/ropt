@@ -1065,9 +1065,9 @@ supports the following plugin types:</p>
 <p>Plugins are managed by the <a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager"><code>PluginManager</code></a> class.
 They can be built-in, installed separately using the standard entry points
 mechanism, or added dynamically using the
-<a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager.add_plugins"><code>add_plugins</code></a> method. Protocols or
-abstract classes define the interface that plugin code must adhere to in order
-to implement the required functionality.</p>
+<a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager.add_plugins"><code>add_plugins</code></a> method. The interface
+that plugin code must adhere to in order to implement the required functionality
+are define by abstract base classes.</p>
 <p>The plugin manager object provides the
 <a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager.get_plugin"><code>get_plugin</code></a> method, which <code>ropt</code> uses
 to retrieve the necessary plugin based on its type and name. Given the plugin's
@@ -1126,6 +1126,10 @@ function) that <code>ropt</code> uses to instantiate the plugin when needed.</p>
 <dd>Optimization step plugins implement the steps evaluated during the execution
   plan. The built-in plugin offers a full set of steps for executing complex
   plans.</dd>
+<dt><code>workflow</code>:</dt>
+<dd>Workflow plugins implement the objects that execute an optimization workflow.
+  The built-in plugin offers a full set of workflow objects for executing
+  complex workflows.</dd>
 </dl>
     </div>
 
@@ -1237,7 +1241,7 @@ class that creates a plugin object.</p>
           <tr class="doc-section-item">
             <td><code>plugins</code></td>
             <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="ropt.plugins.protocol.PluginProtocol">PluginProtocol</span>]</code>
+                  <code><span title="typing.Dict">Dict</span>[str, <span title="ropt.plugins.base.Plugin">Plugin</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">

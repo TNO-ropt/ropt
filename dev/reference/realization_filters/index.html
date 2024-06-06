@@ -723,27 +723,27 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.protocol" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.base" class="md-nav__link">
     <span class="md-ellipsis">
-      protocol
+      base
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="protocol">
+    <nav class="md-nav" aria-label="base">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterProtocol" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.base.RealizationFilter" class="md-nav__link">
     <span class="md-ellipsis">
-      RealizationFilterProtocol
+      RealizationFilter
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="RealizationFilterProtocol">
+    <nav class="md-nav" aria-label="RealizationFilter">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterProtocol.__init__" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.base.RealizationFilter.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -752,7 +752,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterProtocol.get_realization_weights" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.base.RealizationFilter.get_realization_weights" class="md-nav__link">
     <span class="md-ellipsis">
       get_realization_weights
     </span>
@@ -766,17 +766,17 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterPluginProtocol" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.base.RealizationFilterPlugin" class="md-nav__link">
     <span class="md-ellipsis">
-      RealizationFilterPluginProtocol
+      RealizationFilterPlugin
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="RealizationFilterPluginProtocol">
+    <nav class="md-nav" aria-label="RealizationFilterPlugin">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterPluginProtocol.create" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.base.RealizationFilterPlugin.create" class="md-nav__link">
     <span class="md-ellipsis">
       create
     </span>
@@ -1011,27 +1011,27 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.protocol" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.base" class="md-nav__link">
     <span class="md-ellipsis">
-      protocol
+      base
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="protocol">
+    <nav class="md-nav" aria-label="base">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterProtocol" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.base.RealizationFilter" class="md-nav__link">
     <span class="md-ellipsis">
-      RealizationFilterProtocol
+      RealizationFilter
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="RealizationFilterProtocol">
+    <nav class="md-nav" aria-label="RealizationFilter">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterProtocol.__init__" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.base.RealizationFilter.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -1040,7 +1040,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterProtocol.get_realization_weights" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.base.RealizationFilter.get_realization_weights" class="md-nav__link">
     <span class="md-ellipsis">
       get_realization_weights
     </span>
@@ -1054,17 +1054,17 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterPluginProtocol" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.base.RealizationFilterPlugin" class="md-nav__link">
     <span class="md-ellipsis">
-      RealizationFilterPluginProtocol
+      RealizationFilterPlugin
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="RealizationFilterPluginProtocol">
+    <nav class="md-nav" aria-label="RealizationFilterPlugin">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.protocol.RealizationFilterPluginProtocol.create" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.base.RealizationFilterPlugin.create" class="md-nav__link">
     <span class="md-ellipsis">
       create
     </span>
@@ -1166,8 +1166,8 @@
     <div class="doc doc-contents first">
 
       <p>Plugin functionality for adding realization filters.</p>
-<p>This package contains the protocol that must be followed by realization filter
-plugins, and the default realization filters that are part of <code>ropt</code>.</p>
+<p>This package contains the abstract base class for realization filter plugins,
+and the default realization filters that are part of <code>ropt</code>.</p>
 <p>Realization filters are used by the optimizer to determine how a set of
 realizations should be used to calculate objective and constraint function
 values. They do this by calculating the weights that should be used for each
@@ -1198,20 +1198,20 @@ constraints.</p>
 
 
 
-<h2 id="ropt.plugins.realization_filter.protocol" class="doc doc-heading">
-            <code>ropt.plugins.realization_filter.protocol</code>
+<h2 id="ropt.plugins.realization_filter.base" class="doc doc-heading">
+            <code>ropt.plugins.realization_filter.base</code>
 
 
 </h2>
 
     <div class="doc doc-contents first">
 
-      <p>This module defines the protocol to be followed by realization filters.</p>
+      <p>This module defines the abstract base class for realization filters.</p>
 <p>Realization filters can be added via the plugin mechanism to implement
 additional ways to filter the realizations that are used to calculate functions
-and gradients. Any object that follows the
-<a class="autorefs autorefs-internal" href="#ropt.plugins.realization_filter.protocol.RealizationFilterProtocol"><code>RealizationFilter</code></a>
-protocol may be installed as a plugin.</p>
+and gradients. Any object that derives from the
+<a class="autorefs autorefs-internal" href="#ropt.plugins.realization_filter.base.RealizationFilter"><code>RealizationFilter</code></a>
+abstract base class may be installed as a plugin.</p>
 
 
 
@@ -1228,8 +1228,8 @@ protocol may be installed as a plugin.</p>
 
 
 
-<h3 id="ropt.plugins.realization_filter.protocol.RealizationFilterProtocol" class="doc doc-heading">
-            <code>RealizationFilterProtocol</code>
+<h3 id="ropt.plugins.realization_filter.base.RealizationFilter" class="doc doc-heading">
+            <code>RealizationFilter</code>
 
 
 </h3>
@@ -1237,10 +1237,10 @@ protocol may be installed as a plugin.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
+              Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
 
-      <p>Protocol for realization filter classes.</p>
+      <p>Abstract base class for realization filter classes.</p>
 
 
 
@@ -1258,8 +1258,12 @@ protocol may be installed as a plugin.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.realization_filter.protocol.RealizationFilterProtocol.__init__" class="doc doc-heading">
+<h4 id="ropt.plugins.realization_filter.base.RealizationFilter.__init__" class="doc doc-heading">
             <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">filter_index</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
 
 </h4>
 
@@ -1318,8 +1322,12 @@ protocol may be installed as a plugin.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.realization_filter.protocol.RealizationFilterProtocol.get_realization_weights" class="doc doc-heading">
+<h4 id="ropt.plugins.realization_filter.base.RealizationFilter.get_realization_weights" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">get_realization_weights</span><span class="p">(</span><span class="n">objectives</span><span class="p">,</span> <span class="n">constraints</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
 
 </h4>
 
@@ -1423,8 +1431,8 @@ before use, hence any non-negative weight value is permissable.</p>
 
 
 
-<h3 id="ropt.plugins.realization_filter.protocol.RealizationFilterPluginProtocol" class="doc doc-heading">
-            <code>RealizationFilterPluginProtocol</code>
+<h3 id="ropt.plugins.realization_filter.base.RealizationFilterPlugin" class="doc doc-heading">
+            <code>RealizationFilterPlugin</code>
 
 
 </h3>
@@ -1432,10 +1440,10 @@ before use, hence any non-negative weight value is permissable.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><span title="ropt.plugins.protocol.PluginProtocol">PluginProtocol</span></code>, <code><span title="typing.Protocol">Protocol</span></code></p>
+              Bases: <code><span title="ropt.plugins.base.Plugin">Plugin</span></code></p>
 
 
-      <p>RealizationFilter plugin protocol.</p>
+      <p>Abstract base class for realizationFilter plugins.</p>
 
 
 
@@ -1453,8 +1461,12 @@ before use, hence any non-negative weight value is permissable.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.realization_filter.protocol.RealizationFilterPluginProtocol.create" class="doc doc-heading">
+<h4 id="ropt.plugins.realization_filter.base.RealizationFilterPlugin.create" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">filter_index</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
 
 </h4>
 
@@ -1574,7 +1586,7 @@ before use, hence any non-negative weight value is permissable.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.realization_filter.protocol.RealizationFilterProtocol" href="#ropt.plugins.realization_filter.protocol.RealizationFilterProtocol">RealizationFilterProtocol</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.realization_filter.base.RealizationFilter" href="#ropt.plugins.realization_filter.base.RealizationFilter">RealizationFilter</a></code></p>
 
 
       <p>The default realization filter plugin class.</p>

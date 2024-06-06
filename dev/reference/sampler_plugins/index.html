@@ -702,27 +702,27 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.protocol" class="md-nav__link">
+  <a href="#ropt.plugins.sampler.base" class="md-nav__link">
     <span class="md-ellipsis">
-      protocol
+      base
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="protocol">
+    <nav class="md-nav" aria-label="base">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.protocol.SamplerProtocol" class="md-nav__link">
+  <a href="#ropt.plugins.sampler.base.Sampler" class="md-nav__link">
     <span class="md-ellipsis">
-      SamplerProtocol
+      Sampler
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="SamplerProtocol">
+    <nav class="md-nav" aria-label="Sampler">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.protocol.SamplerProtocol.__init__" class="md-nav__link">
+  <a href="#ropt.plugins.sampler.base.Sampler.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -731,7 +731,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.protocol.SamplerProtocol.generate_samples" class="md-nav__link">
+  <a href="#ropt.plugins.sampler.base.Sampler.generate_samples" class="md-nav__link">
     <span class="md-ellipsis">
       generate_samples
     </span>
@@ -745,17 +745,17 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.protocol.SamplerPluginProtocol" class="md-nav__link">
+  <a href="#ropt.plugins.sampler.base.SamplerPlugin" class="md-nav__link">
     <span class="md-ellipsis">
-      SamplerPluginProtocol
+      SamplerPlugin
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="SamplerPluginProtocol">
+    <nav class="md-nav" aria-label="SamplerPlugin">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.protocol.SamplerPluginProtocol.create" class="md-nav__link">
+  <a href="#ropt.plugins.sampler.base.SamplerPlugin.create" class="md-nav__link">
     <span class="md-ellipsis">
       create
     </span>
@@ -966,27 +966,27 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.protocol" class="md-nav__link">
+  <a href="#ropt.plugins.sampler.base" class="md-nav__link">
     <span class="md-ellipsis">
-      protocol
+      base
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="protocol">
+    <nav class="md-nav" aria-label="base">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.protocol.SamplerProtocol" class="md-nav__link">
+  <a href="#ropt.plugins.sampler.base.Sampler" class="md-nav__link">
     <span class="md-ellipsis">
-      SamplerProtocol
+      Sampler
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="SamplerProtocol">
+    <nav class="md-nav" aria-label="Sampler">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.protocol.SamplerProtocol.__init__" class="md-nav__link">
+  <a href="#ropt.plugins.sampler.base.Sampler.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -995,7 +995,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.protocol.SamplerProtocol.generate_samples" class="md-nav__link">
+  <a href="#ropt.plugins.sampler.base.Sampler.generate_samples" class="md-nav__link">
     <span class="md-ellipsis">
       generate_samples
     </span>
@@ -1009,17 +1009,17 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.protocol.SamplerPluginProtocol" class="md-nav__link">
+  <a href="#ropt.plugins.sampler.base.SamplerPlugin" class="md-nav__link">
     <span class="md-ellipsis">
-      SamplerPluginProtocol
+      SamplerPlugin
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="SamplerPluginProtocol">
+    <nav class="md-nav" aria-label="SamplerPlugin">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.protocol.SamplerPluginProtocol.create" class="md-nav__link">
+  <a href="#ropt.plugins.sampler.base.SamplerPlugin.create" class="md-nav__link">
     <span class="md-ellipsis">
       create
     </span>
@@ -1079,8 +1079,8 @@
 <p>Sampler plugins are managed by a <a class="autorefs autorefs-internal" href="../plugins/#ropt.plugins.PluginManager"><code>PluginManager</code></a>
 object, which returns classes or factory functions to create objects that
 implement one or more sampling methods to produce perturbations. These objects
-must adhere to the <a class="autorefs autorefs-internal" href="#ropt.plugins.sampler.protocol.SamplerProtocol"><code>Sampler</code></a>
-protocol.</p>
+must adhere to the <a class="autorefs autorefs-internal" href="#ropt.plugins.sampler.base.Sampler"><code>Sampler</code></a> abstract base
+class.</p>
 <p>Samplers can be added via the plugin manager, by default the
 <a class="autorefs autorefs-internal" href="#ropt.plugins.sampler.scipy.SciPySampler"><code>SciPySampler</code></a> plugin is installed
 which provides a number of methods from the
@@ -1110,18 +1110,18 @@ which provides a number of methods from the
 
 
 
-<h2 id="ropt.plugins.sampler.protocol" class="doc doc-heading">
-            <code>ropt.plugins.sampler.protocol</code>
+<h2 id="ropt.plugins.sampler.base" class="doc doc-heading">
+            <code>ropt.plugins.sampler.base</code>
 
 
 </h2>
 
     <div class="doc doc-contents first">
 
-      <p>This module defines the protocol to be followed by samplers.</p>
+      <p>This module defines the abstract base class for samplers.</p>
 <p>Samplers can be added via the plugin mechanism to implement additional ways to
 generate perturbed variables. Any object that follows the
-<a class="autorefs autorefs-internal" href="#ropt.plugins.sampler.protocol.SamplerProtocol"><code>Sampler</code></a> protocol may be
+<a class="autorefs autorefs-internal" href="#ropt.plugins.sampler.base.Sampler"><code>Sampler</code></a> abstract base class may be
 installed as a plugin.</p>
 
 
@@ -1139,8 +1139,8 @@ installed as a plugin.</p>
 
 
 
-<h3 id="ropt.plugins.sampler.protocol.SamplerProtocol" class="doc doc-heading">
-            <code>SamplerProtocol</code>
+<h3 id="ropt.plugins.sampler.base.Sampler" class="doc doc-heading">
+            <code>Sampler</code>
 
 
 </h3>
@@ -1148,14 +1148,14 @@ installed as a plugin.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
+              Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
 
-      <p>Protocol for sampler classes.</p>
+      <p>Abstract base class for sampler classes.</p>
 <p><code>ropt</code> employs plugins to implement samplers that are called during an
 optimization workflow to generate perturbed variable vectors. Samplers
-should adhere to the <code>Sampler</code> protocol, which specifies the requirements
-for the class constructor (<code>__init__</code>) and also includes a
+should derive from the <code>Sampler</code> base class, which specifies the
+requirements for the class constructor (<code>__init__</code>) and also includes a
 <code>generate_samples</code> method used to generate samples used to create perturbed
 values.</p>
 
@@ -1175,8 +1175,12 @@ values.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.sampler.protocol.SamplerProtocol.__init__" class="doc doc-heading">
+<h4 id="ropt.plugins.sampler.base.Sampler.__init__" class="doc doc-heading">
             <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">sampler_index</span><span class="p">,</span> <span class="n">variable_indices</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
 
 </h4>
 
@@ -1271,8 +1275,12 @@ array lists the indices of the variables that are handled by this sampler.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.sampler.protocol.SamplerProtocol.generate_samples" class="doc doc-heading">
+<h4 id="ropt.plugins.sampler.base.Sampler.generate_samples" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">generate_samples</span><span class="p">()</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
 
 </h4>
 
@@ -1343,8 +1351,8 @@ deviation.</p>
 
 
 
-<h3 id="ropt.plugins.sampler.protocol.SamplerPluginProtocol" class="doc doc-heading">
-            <code>SamplerPluginProtocol</code>
+<h3 id="ropt.plugins.sampler.base.SamplerPlugin" class="doc doc-heading">
+            <code>SamplerPlugin</code>
 
 
 </h3>
@@ -1352,10 +1360,10 @@ deviation.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><span title="ropt.plugins.protocol.PluginProtocol">PluginProtocol</span></code>, <code><span title="typing.Protocol">Protocol</span></code></p>
+              Bases: <code><span title="ropt.plugins.base.Plugin">Plugin</span></code></p>
 
 
-      <p>Sampler plugin protocol.</p>
+      <p>Abtract base class for sampler plugins.</p>
 
 
 
@@ -1373,8 +1381,12 @@ deviation.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.sampler.protocol.SamplerPluginProtocol.create" class="doc doc-heading">
+<h4 id="ropt.plugins.sampler.base.SamplerPlugin.create" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">sampler_index</span><span class="p">,</span> <span class="n">variable_indices</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
 
 </h4>
 
@@ -1488,7 +1500,7 @@ deviation.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.sampler.protocol.SamplerProtocol" href="#ropt.plugins.sampler.protocol.SamplerProtocol">SamplerProtocol</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.sampler.base.Sampler" href="#ropt.plugins.sampler.base.Sampler">Sampler</a></code></p>
 
 
       <p>Plugin class for producing sampling values via SciPy.</p>
