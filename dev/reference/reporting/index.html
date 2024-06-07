@@ -1363,7 +1363,7 @@ generated data frame in a tabular format to a text file.</p>
 
 
 <h4 id="ropt.report.ResultsTable.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;functions&#39;</span><span class="p">,</span> <span class="n">min_header_len</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;functions&#39;</span><span class="p">,</span> <span class="n">min_header_len</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
@@ -1383,14 +1383,6 @@ multiple lines, and the number of lines may vary according to requested
 fields. For a consistent result, the minimum number of header lines can
 be specified via the <code>min_header_len</code> argument. When needed, blank lines
 will be added to reach the specified minimum number of header lines.</p>
-<p>The optional <code>filters</code> argument can be used to pass functions that can
-be used to filter the rows before generating the table. The keys of the
-<code>filters</code> dictionary should be the columns to apply the filter function
-to, and the values the filter functions, which should expect a pandas
-series and transform those into an equally sized series of boolean
-values. For example, to retain only realizations with the name equal to
-2:</p>
-<p><code>python filters = {"realization": lambda x: x == 2}</code></p>
 
 
 <details class="tip" open>
@@ -1448,20 +1440,6 @@ min_header_len, empty lines will be added. For example:</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>filters</code></td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Callable">Callable</span>[[<span title="pandas.Series">Series</span>[<span title="typing.Any">Any</span>]], <span title="pandas.Series">Series</span>[bool]]]]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional filter functions to remove rows</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
