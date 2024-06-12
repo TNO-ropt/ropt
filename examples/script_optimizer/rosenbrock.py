@@ -18,7 +18,7 @@ def rosenbrock(x: float, y: float, realization: int, coefficients_path: Path) ->
 def _read_point(filename: Path) -> Tuple[float, float]:
     with filename.open("r", encoding="utf-8") as f:
         variables = json.load(f)
-    return variables["x"], variables["y"]
+    return variables["x"]["1"], variables["y"]["1"]
 
 
 if __name__ == "__main__":

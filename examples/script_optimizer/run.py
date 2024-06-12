@@ -9,15 +9,15 @@ from typing import Any, Dict
 import numpy as np
 from numpy.random import default_rng
 
-from ropt.apps import ScriptOptimizer
+from ropt.apps.script_optimizer import ScriptOptimizer
 
 # Number of realizations:
 REALIZATIONS = 3
 
 
-CONFIG: Dict[str, Any] = {
+ENOPT_CONFIG: Dict[str, Any] = {
     "variables": {
-        "names": [("x",), ("y",)],
+        "names": [("x", 1), ("y", 1)],
         "initial_values": [0.75, 1.25],
     },
     "optimizer": {
@@ -51,7 +51,7 @@ a = rng.normal(loc=1.0, scale=0.1, size=REALIZATIONS)
 b = rng.normal(loc=100.0, scale=10.0, size=REALIZATIONS)
 coefficients = {
     realization: (a[idx], b[idx])
-    for idx, realization in enumerate(CONFIG["realizations"]["names"])
+    for idx, realization in enumerate(ENOPT_CONFIG["realizations"]["names"])
 }
 with Path("coefficients.json").open("w", encoding="utf-8") as file_obj:
     json.dump(coefficients, file_obj, sort_keys=True, indent=4)
@@ -70,9 +70,12 @@ provider = None
 def main() -> None:
     """Run the example and check the result."""
     optimal_result = ScriptOptimizer(
+        config={
+            "work_dir": "work",
+        },
         workflow={
             "context": [
-                {"id": "enopt_config", "init": "enopt_config", "with": CONFIG},
+                {"id": "enopt_config", "init": "enopt_config", "with": ENOPT_CONFIG},
                 {"id": "optimal", "init": "results_tracker"},
             ],
             "steps": [
@@ -83,9 +86,7 @@ def main() -> None:
             ],
         },
         tasks=tasks,
-        provider=provider,
-        work_dir="work",
-    ).run()["optimal"]
+    ).run(provider)["optimal"]
     if optimal_result is not None and optimal_result.functions is not None:
         print(f"BEST RESULT: {optimal_result.result_id}")
         print(f"  variables: {optimal_result.evaluations.variables}")
