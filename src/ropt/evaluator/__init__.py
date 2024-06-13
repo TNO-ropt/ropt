@@ -7,8 +7,8 @@ this, the optimizer requires a function evaluator callback upon initialization,
 conforming to the [Evaluator][ropt.evaluator.Evaluator] signature.
 
 The callback accepts a matrix containing multiple variable vectors to evaluate
-together with a [`EvaluatorContext`][ropt.evaluator.EvaluatorContext] providing
-information usable by the evaluator. It returns an
+together with a [`EvaluatorContext`][ropt.evaluator.EvaluatorContext] object
+providing information usable by the evaluator. It returns an
 [`EvaluatorResult`][ropt.evaluator.EvaluatorResult] object with the calculated
 values of the objective and constraint functions for all variable vectors and
 realizations, and optionally some additional metadata.

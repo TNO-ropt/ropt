@@ -20,6 +20,7 @@
     options:
         heading_level: 3
         members:
+            - __init__
             - launch
             - monitor
             - polling

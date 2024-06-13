@@ -18,8 +18,8 @@ class ConcurrentTask(ABC):
     These task objects should contain the future that represents the task and
     return the results of the evaluation.
 
-    It should implement two functions to retrieve the objective function values
-    and optional constraint values.
+    It should implement two methods to retrieve the objective function values
+    and optionally the constraint values.
     """
 
     future: Optional[Any]
@@ -45,9 +45,9 @@ class ConcurrentTask(ABC):
         This method will only be called after the future is done, and if no
         exception was raised during the execution of the task.
 
-        This has a default implementation that returns `None` and is only usable
-        when it is certain that there are no non-linear constraints. If there
-        are non-linear constraints, this method should be overridden.
+        This has a default implementation that returns `None`, which is only
+        usable when it is certain that there are no non-linear constraints. If
+        there are non-linear constraints, this method should be overridden.
 
         Returns:
             The calculated constraints or `None`.
@@ -62,15 +62,34 @@ class ConcurrentEvaluator(ABC):
     evaluator that uses a concurrent executor.
 
     The `launch` method must be implemented to start an evaluation for one
-    vector of variables, and return a future-like object, compatible with
-    futures from the `concurrent.futures` module of Python, implementing at
-    least the `done()`, `exception()`, and `result()` methods.
+    vector of variables, and return a future-like object, compatible with the
+    `concurrent.futures` module of Python, implementing at least the `done()`,
+    `exception()`, and `result()` methods. The `monitor` method can be overloaded
+    to implement specific monitoring functionality, the default implementation does
+    nothing.
+
+    The class implements an optional caching mechanism to prevent repeated
+    evaluation of functions. When enabled, all evaluation results are cached in
+    memory and reused when requested. This is in particular useful in workflows
+    with multiple or nested optimizations where often restarts occur from points
+    that already have been evaluated before.
     """
 
     def __init__(
         self, *, enable_cache: bool = True, polling: float = 0.1, max_submit: int = 500
     ) -> None:
         """Initialize a concurrent evaluator object.
+
+        Some general properties of the evaluator are fixed at initialization time:
+
+        - The cache may be enabled or disabled using the `enable_cache` parameter.
+        - While evaluations are running concurrently the evaluator will
+          regularly poll them to check their status. The `polling` parameter
+          determine the delay between polling events.
+        - When a very large number of jobs is submitted this may overwhelm the
+          evaluator, depending on the implementation. To prevent this, the jobs
+          may be submitted in smaller portions, the size of which are defined by
+          the `max_submit` argument.
 
         Args:
             enable_cache: Enable the caching mechanism
@@ -90,12 +109,12 @@ class ConcurrentEvaluator(ABC):
         variables: NDArray[np.float64],
         context: EvaluatorContext,
     ) -> Optional[ConcurrentTask]:
-        """Launch an evaluation and return futures.
+        """Launch an evaluation return a future for each job.
 
         This method must implement the process of launching a a single function
         evaluation for a variable vector passed via the `variables` parameter. A
         unique batch ID is passed via the `batch_id`, which can be optionally
-        used.
+        used by the evaluator to identify the current batch of functions.
 
         This method should return a dictionary mapping the indices of the jobs
         to the tasks that will contain the result. The tasks are objects
@@ -128,7 +147,7 @@ class ConcurrentEvaluator(ABC):
         evaluations should be monitored, this method should be overridden.
 
         The time in seconds between calls in the polling loop can be modified by
-        setting the `polling` attribute.
+        setting the `polling` attribute upon object initialization.
         """
 
     def __call__(

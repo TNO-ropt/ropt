@@ -1,11 +1,9 @@
-"""Data Classes for Storing Intermediate Optimization Results.
+"""Data classes for storing intermediate optimization results.
 
 During the optimization process, functions and gradients are calculated and need
-to be reported. To streamline this process, events are triggered after new
-results become available, invoking connected callbacks with those results.
-The [`OptimizationEvent`][ropt.events.OptimizationEvent] object passed to the
-callbacks contains a `results` field, which consists of a tuple of
-[`Results`][ropt.results.Results] objects. These may be instances of the derived
+to be reported. To streamline this process, after new results become available,
+these are passed to callbacks as a tuple of [`Results`][ropt.results.Results]
+objects. These may be instances of the derived
 [`FunctionResults`][ropt.results.FunctionResults] or
 [`GradientResults`][ropt.results.GradientResults] classes, containing results
 for function and gradient evaluations, respectively.
@@ -46,7 +44,7 @@ names:
 (<ResultAxisName.REALIZATION: 'realization'>, <ResultAxisName.OBJECTIVE: 'objective'>)
 ```
 
-Using this metadata, exporting or reporting code can refer to the optimizer
+Using this metadata, the exporting or reporting code can refer to the optimizer
 configuration to associate realization and objective names with any entry in the
 result matrix. For instance, the [`pandas`](https://pandas.pydata.org/)
 exporting code will use this to construct a multi-index for the generated data

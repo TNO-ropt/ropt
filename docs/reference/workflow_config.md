@@ -1,8 +1,8 @@
 ::: ropt.config.workflow
     options:
         members:
-            - WorfklowConfig
-            - EnvConfig
+            - WorkflowConfig
+            - ContextConfig
             - StepConfig
         group_by_category: false
         show_bases: false
