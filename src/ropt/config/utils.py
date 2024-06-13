@@ -155,31 +155,19 @@ def _check_duplicates(names: Optional[Tuple[Any, ...]]) -> Optional[Tuple[Any, .
     return names
 
 
-Array1D = Annotated[
-    NDArray[np.float64] if sys.version_info >= (3, 9) else ArrayLike,
-    BeforeValidator(_convert_1d_array),
-]
-Array2D = Annotated[
-    NDArray[np.float64] if sys.version_info >= (3, 9) else ArrayLike,
-    BeforeValidator(_convert_2d_array),
-]
-ArrayIndices = Annotated[
-    NDArray[np.intc] if sys.version_info >= (3, 9) else ArrayLike,
-    BeforeValidator(_convert_indices),
-]
-ArrayEnum = Annotated[
-    NDArray[np.ubyte] if sys.version_info >= (3, 9) else ArrayLike,
-    BeforeValidator(_convert_enum_array),
-]
-Array1DInt = Annotated[
-    NDArray[np.intc] if sys.version_info >= (3, 9) else ArrayLike,
-    BeforeValidator(_convert_1d_array_intc),
-]
-Array1DBool = Annotated[
-    NDArray[np.bool_] if sys.version_info >= (3, 9) else ArrayLike,
-    BeforeValidator(_convert_1d_array_bool),
-]
-UniqueNames = Annotated[
-    Tuple[Any, ...],
-    BeforeValidator(_check_duplicates),
-]
+if sys.version_info >= (3, 9):
+    Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
+    Array2D = Annotated[NDArray[np.float64], BeforeValidator(_convert_2d_array)]
+    ArrayIndices = Annotated[NDArray[np.intc], BeforeValidator(_convert_indices)]
+    ArrayEnum = Annotated[NDArray[np.ubyte], BeforeValidator(_convert_enum_array)]
+    Array1DInt = Annotated[NDArray[np.intc], BeforeValidator(_convert_1d_array_intc)]
+    Array1DBool = Annotated[NDArray[np.bool_], BeforeValidator(_convert_1d_array_bool)]
+    UniqueNames = Annotated[Tuple[Any, ...], BeforeValidator(_check_duplicates)]
+else:
+    Array1D = Annotated[ArrayLike, BeforeValidator(_convert_1d_array)]
+    Array2D = Annotated[ArrayLike, BeforeValidator(_convert_2d_array)]
+    ArrayIndices = Annotated[ArrayLike, BeforeValidator(_convert_indices)]
+    ArrayEnum = Annotated[ArrayLike, BeforeValidator(_convert_enum_array)]
+    Array1DInt = Annotated[ArrayLike, BeforeValidator(_convert_1d_array_intc)]
+    Array1DBool = Annotated[ArrayLike, BeforeValidator(_convert_1d_array_bool)]
+    UniqueNames = Annotated[Tuple[Any, ...], BeforeValidator(_check_duplicates)]
