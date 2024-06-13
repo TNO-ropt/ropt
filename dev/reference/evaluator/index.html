@@ -621,6 +621,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.evaluator.ConcurrentEvaluator.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.evaluator.ConcurrentEvaluator.launch" class="md-nav__link">
     <span class="md-ellipsis">
       launch
@@ -1109,6 +1118,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.evaluator.ConcurrentEvaluator.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.evaluator.ConcurrentEvaluator.launch" class="md-nav__link">
     <span class="md-ellipsis">
       launch
@@ -1205,8 +1223,8 @@ gradients may be calculated from various perturbed variable vectors. To address
 this, the optimizer requires a function evaluator callback upon initialization,
 conforming to the <a class="autorefs autorefs-internal" href="#ropt.evaluator.Evaluator">Evaluator</a> signature.</p>
 <p>The callback accepts a matrix containing multiple variable vectors to evaluate
-together with a <a class="autorefs autorefs-internal" href="#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a> providing
-information usable by the evaluator. It returns an
+together with a <a class="autorefs autorefs-internal" href="#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a> object
+providing information usable by the evaluator. It returns an
 <a class="autorefs autorefs-internal" href="#ropt.evaluator.EvaluatorResult"><code>EvaluatorResult</code></a> object with the calculated
 values of the objective and constraint functions for all variable vectors and
 realizations, and optionally some additional metadata.</p>
@@ -1689,9 +1707,16 @@ input vectors.</p>
 <p>This abstract base class provides the framework for implementing an
 evaluator that uses a concurrent executor.</p>
 <p>The <code>launch</code> method must be implemented to start an evaluation for one
-vector of variables, and return a future-like object, compatible with
-futures from the <code>concurrent.futures</code> module of Python, implementing at
-least the <code>done()</code>, <code>exception()</code>, and <code>result()</code> methods.</p>
+vector of variables, and return a future-like object, compatible with the
+<code>concurrent.futures</code> module of Python, implementing at least the <code>done()</code>,
+<code>exception()</code>, and <code>result()</code> methods. The <code>monitor</code> method can be overloaded
+to implement specific monitoring functionality, the default implementation does
+nothing.</p>
+<p>The class implements an optional caching mechanism to prevent repeated
+evaluation of functions. When enabled, all evaluation results are cached in
+memory and reused when requested. This is in particular useful in workflows
+with multiple or nested optimizations where often restarts occur from points
+that already have been evaluated before.</p>
 
 
 
@@ -1709,6 +1734,91 @@ least the <code>done()</code>, <code>exception()</code>, and <code>result()</cod
 <div class="doc doc-object doc-function">
 
 
+<h4 id="ropt.evaluator.ConcurrentEvaluator.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">enable_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">polling</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">max_submit</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Initialize a concurrent evaluator object.</p>
+<p>Some general properties of the evaluator are fixed at initialization time:</p>
+<ul>
+<li>The cache may be enabled or disabled using the <code>enable_cache</code> parameter.</li>
+<li>While evaluations are running concurrently the evaluator will
+  regularly poll them to check their status. The <code>polling</code> parameter
+  determine the delay between polling events.</li>
+<li>When a very large number of jobs is submitted this may overwhelm the
+  evaluator, depending on the implementation. To prevent this, the jobs
+  may be submitted in smaller portions, the size of which are defined by
+  the <code>max_submit</code> argument.</li>
+</ul>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>enable_cache</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Enable the caching mechanism</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>polling</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Time in seconds between checking job status</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>max_submit</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum number of variables to submit simultaneously</p>
+              </div>
+            </td>
+            <td>
+                  <code>500</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h4 id="ropt.evaluator.ConcurrentEvaluator.launch" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">launch</span><span class="p">(</span><span class="n">batch_id</span><span class="p">,</span> <span class="n">job_id</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></code>
 
@@ -1721,11 +1831,11 @@ least the <code>done()</code>, <code>exception()</code>, and <code>result()</cod
 
     <div class="doc doc-contents ">
 
-      <p>Launch an evaluation and return futures.</p>
+      <p>Launch an evaluation return a future for each job.</p>
 <p>This method must implement the process of launching a a single function
 evaluation for a variable vector passed via the <code>variables</code> parameter. A
 unique batch ID is passed via the <code>batch_id</code>, which can be optionally
-used.</p>
+used by the evaluator to identify the current batch of functions.</p>
 <p>This method should return a dictionary mapping the indices of the jobs
 to the tasks that will contain the result. The tasks are objects
 deriving from the <a class="autorefs autorefs-internal" href="#ropt.evaluator.ConcurrentTask"><code>ConcurrentTask</code></a>
@@ -1851,7 +1961,7 @@ that contain results should be returned.</p>
 futures until all results are collected. If the status of the
 evaluations should be monitored, this method should be overridden.</p>
 <p>The time in seconds between calls in the polling loop can be modified by
-setting the <code>polling</code> attribute.</p>
+setting the <code>polling</code> attribute upon object initialization.</p>
 
     </div>
 
@@ -1888,8 +1998,8 @@ setting the <code>polling</code> attribute.</p>
       <p>Abstract data class for tasks in a concurrent evaluator.</p>
 <p>These task objects should contain the future that represents the task and
 return the results of the evaluation.</p>
-<p>It should implement two functions to retrieve the objective function values
-and optional constraint values.</p>
+<p>It should implement two methods to retrieve the objective function values
+and optionally the constraint values.</p>
 
 
 
@@ -1970,9 +2080,9 @@ also employ tasks that do not return results.</p>
       <p>Return the constraints calculated by the task, if available.</p>
 <p>This method will only be called after the future is done, and if no
 exception was raised during the execution of the task.</p>
-<p>This has a default implementation that returns <code>None</code> and is only usable
-when it is certain that there are no non-linear constraints. If there
-are non-linear constraints, this method should be overridden.</p>
+<p>This has a default implementation that returns <code>None</code>, which is only
+usable when it is certain that there are no non-linear constraints. If
+there are non-linear constraints, this method should be overridden.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
