@@ -2,15 +2,15 @@ from __future__ import annotations
 
 from dataclasses import fields
 from importlib.util import find_spec
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Set, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, Final, List, Optional, Set, Tuple, Union
 
 if TYPE_CHECKING:
     from pathlib import Path
 
     from ropt.results import Results
 
-_HAVE_PANDAS = find_spec("pandas") is not None
-_HAVE_TABULATE = find_spec("tabulate") is not None
+_HAVE_PANDAS: Final = find_spec("pandas") is not None
+_HAVE_TABULATE: Final = find_spec("tabulate") is not None
 
 if TYPE_CHECKING and _HAVE_PANDAS:
     import pandas as pd  # noqa: TCH002

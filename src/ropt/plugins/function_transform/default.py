@@ -1,6 +1,6 @@
 """This module implements the default function transform plugin."""
 
-from typing import Tuple
+from typing import Final, Tuple
 
 import numpy as np
 from numpy.typing import NDArray
@@ -11,7 +11,7 @@ from ropt.exceptions import ConfigError, OptimizationAborted
 
 from .base import FunctionTransform, FunctionTransformPlugin
 
-_MIN_STDDEV_REALIZATIONS = 2
+_MIN_STDDEV_REALIZATIONS: Final = 2
 
 
 class DefaultFunctionTransform(FunctionTransform):

@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from importlib.util import find_spec
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, Optional, Type, TypeVar, Union
+from typing import TYPE_CHECKING, Dict, Final, Optional, Type, TypeVar, Union
 
 from ._gradient_evaluations import GradientEvaluations
 from ._gradients import Gradients
@@ -14,8 +14,8 @@ if TYPE_CHECKING:
 
 from ._results import Results
 
-_HAVE_XARRAY = find_spec("xarray") is not None
-_HAVE_NETCDF = find_spec("netCDF4") is not None
+_HAVE_XARRAY: Final = find_spec("xarray") is not None
+_HAVE_NETCDF: Final = find_spec("netCDF4") is not None
 
 if _HAVE_XARRAY:
     from ._xarray import _from_dataset

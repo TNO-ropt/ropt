@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from functools import singledispatchmethod
-from typing import Dict, Type, Union
+from typing import Dict, Final, Type, Union
 
 from ropt.config.workflow import ContextConfig, StepConfig  # noqa: TCH001
 from ropt.plugins.workflow.base import ContextObj, WorkflowStep  # noqa: TCH001
@@ -19,13 +19,13 @@ from ._results_tracker import DefaultResultsTrackerContext
 from ._update_context import DefaultUpdateContextStep
 from .base import WorkflowPlugin
 
-_CONTEXT_OBJECTS: Dict[str, Type[ContextObj]] = {
+_CONTEXT_OBJECTS: Final[Dict[str, Type[ContextObj]]] = {
     "results_callback": DefaultResultsCallbackContext,
     "enopt_config": DefaultEnOptConfigContext,
     "results_tracker": DefaultResultsTrackerContext,
 }
 
-_STEP_OBJECTS: Dict[str, Type[WorkflowStep]] = {
+_STEP_OBJECTS: Final[Dict[str, Type[WorkflowStep]]] = {
     "evaluator": DefaultEvaluatorStep,
     "optimizer": DefaultOptimizerStep,
     "repeat": DefaultRepeatStep,

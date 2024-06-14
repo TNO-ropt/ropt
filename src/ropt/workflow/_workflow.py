@@ -6,7 +6,7 @@ import ast
 import re
 from itertools import count
 from numbers import Number
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, Final, List, Optional
 
 import numpy as np
 from numpy.random import default_rng
@@ -20,12 +20,12 @@ if TYPE_CHECKING:
     from ropt.evaluator import Evaluator
     from ropt.plugins.workflow.base import WorkflowStep
 
-_VALID_TYPES = (int, float, bool)
-_VALID_RESULTS = (list, np.ndarray, *_VALID_TYPES)
-_UNARY_OPS = (ast.UAdd, ast.USub, ast.Not)
-_BIN_OPS = (ast.Add, ast.Sub, ast.Div, ast.FloorDiv, ast.Mult, ast.Mod, ast.Pow)
-_BOOL_OPS = (ast.Or, ast.And)
-_CMP_OPS = (ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE)
+_VALID_TYPES: Final = (int, float, bool)
+_VALID_RESULTS: Final = (list, np.ndarray, *_VALID_TYPES)
+_UNARY_OPS: Final = (ast.UAdd, ast.USub, ast.Not)
+_BIN_OPS: Final = (ast.Add, ast.Sub, ast.Div, ast.FloorDiv, ast.Mult, ast.Mod, ast.Pow)
+_BOOL_OPS: Final = (ast.Or, ast.And)
+_CMP_OPS: Final = (ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE)
 
 
 class OptimizerContext:

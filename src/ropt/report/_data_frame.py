@@ -3,19 +3,17 @@
 from __future__ import annotations
 
 from functools import partial
-from importlib.util import find_spec
 from typing import TYPE_CHECKING, Literal, Set, Tuple
 
 from ropt.enums import ResultAxisName
 from ropt.results import FunctionResults, GradientResults
 
-from ._utils import _add_metadata, _add_prefix, _get_select
+from ._utils import _HAVE_PANDAS, _add_metadata, _add_prefix, _get_select
 
 if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
     from ropt.results import Results
 
-_HAVE_PANDAS = find_spec("pandas") is not None
 if _HAVE_PANDAS:
     import pandas as pd
 

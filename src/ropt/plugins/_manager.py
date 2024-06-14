@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 from functools import lru_cache
-from typing import TYPE_CHECKING, Any, Dict, Literal
+from typing import TYPE_CHECKING, Any, Dict, Final, Literal
 
 from ropt.exceptions import ConfigError
 from ropt.plugins.function_transform.base import FunctionTransformPlugin
@@ -69,7 +69,7 @@ PluginType = Literal[
 """
 
 
-_PLUGIN_TYPES = {
+_PLUGIN_TYPES: Final = {
     "function_transform": FunctionTransformPlugin,
     "optimizer": OptimizerPlugin,
     "optimization_step": OptimizationStepsPlugin,

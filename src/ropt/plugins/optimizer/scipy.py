@@ -11,6 +11,7 @@ from typing import (
     Callable,
     ClassVar,
     Dict,
+    Final,
     List,
     Optional,
     Set,
@@ -39,7 +40,7 @@ from ropt.plugins.optimizer.utils import (
 
 from .base import Optimizer, OptimizerCallback, OptimizerPlugin
 
-_SUPPORTED_METHODS: Set[str] = {
+_SUPPORTED_METHODS: Final[Set[str]] = {
     name.lower()
     for name in (
         "Nelder-Mead",
@@ -58,10 +59,10 @@ _SUPPORTED_METHODS: Set[str] = {
 
 # Categorize the methods by the types of constraint they support or require.
 
-_CONSTRAINT_REQUIRES_BOUNDS = {
+_CONSTRAINT_REQUIRES_BOUNDS: Final = {
     "differential_evolution",
 }
-_CONSTRAINT_SUPPORT_BOUNDS = {
+_CONSTRAINT_SUPPORT_BOUNDS: Final = {
     name.lower()
     for name in [
         "Nelder-Mead",
@@ -72,26 +73,26 @@ _CONSTRAINT_SUPPORT_BOUNDS = {
         "differential_evolution",
     ]
 }
-_CONSTRAINT_SUPPORT_LINEAR_EQ = {
+_CONSTRAINT_SUPPORT_LINEAR_EQ: Final = {
     name.lower() for name in ["SLSQP", "differential_evolution"]
 }
-_CONSTRAINT_SUPPORT_LINEAR_INEQ = {
+_CONSTRAINT_SUPPORT_LINEAR_INEQ: Final = {
     name.lower() for name in ["COBYLA", "SLSQP", "differential_evolution"]
 }
-_CONSTRAINT_SUPPORT_NONLINEAR_EQ = {
+_CONSTRAINT_SUPPORT_NONLINEAR_EQ: Final = {
     name.lower() for name in ["SLSQP", "differential_evolution"]
 }
-_CONSTRAINT_SUPPORT_NONLINEAR_INEQ = {
+_CONSTRAINT_SUPPORT_NONLINEAR_INEQ: Final = {
     name.lower() for name in ["COBYLA", "SLSQP", "differential_evolution"]
 }
 
 # These methods do not use a gradient:
-_NO_GRADIENT = {
+_NO_GRADIENT: Final = {
     name.lower()
     for name in ["Nelder-Mead", "Powell", "COBYLA", "differential_evolution"]
 }
 
-_OUTPUT_FILE = "optimizer_output"
+_OUTPUT_FILE: Final = "optimizer_output"
 
 _ConstraintType = Union[
     str,

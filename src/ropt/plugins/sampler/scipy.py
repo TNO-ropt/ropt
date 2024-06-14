@@ -2,7 +2,7 @@
 
 import copy
 import warnings
-from typing import Any, Dict, Optional, Set, Tuple, Union
+from typing import Any, Dict, Final, Optional, Set, Tuple, Union
 
 import numpy as np
 from numpy.random import Generator
@@ -14,19 +14,21 @@ from ropt.config.enopt import EnOptConfig
 
 from .base import Sampler, SamplerPlugin
 
-_STATS_SAMPLERS: Dict[str, Any] = {
+_STATS_SAMPLERS: Final[Dict[str, Any]] = {
     "uniform": uniform,
     "norm": norm,
     "truncnorm": truncnorm,
 }
 
-_QMC_ENGINES = {
+_QMC_ENGINES: Final = {
     "sobol": Sobol,
     "halton": Halton,
     "lhs": LatinHypercube,
 }
 
-_SUPPORTED_METHODS: Set[str] = set(_STATS_SAMPLERS.keys()) | set(_QMC_ENGINES.keys())
+_SUPPORTED_METHODS: Final[Set[str]] = set(_STATS_SAMPLERS.keys()) | set(
+    _QMC_ENGINES.keys()
+)
 
 
 class SciPySampler(Sampler):

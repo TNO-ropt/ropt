@@ -4,16 +4,16 @@ from abc import ABC
 from dataclasses import dataclass
 from importlib.util import find_spec
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Iterable, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Dict, Final, Iterable, Optional, TypeVar, Union
 
 if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
     from ropt.enums import ResultAxisName
 
 
-_HAVE_PANDAS = find_spec("pandas") is not None
-_HAVE_XARRAY = find_spec("xarray") is not None
-_HAVE_NETCDF = find_spec("netCDF4") is not None
+_HAVE_PANDAS: Final = find_spec("pandas") is not None
+_HAVE_XARRAY: Final = find_spec("xarray") is not None
+_HAVE_NETCDF: Final = find_spec("netCDF4") is not None
 
 if TYPE_CHECKING and _HAVE_PANDAS:
     import pandas as pd  # noqa: TCH002
