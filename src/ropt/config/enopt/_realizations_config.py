@@ -74,11 +74,6 @@ class RealizationsConfig(EnOptBaseModel):
         if self.names:
             size = len(self.names)
             self.weights = broadcast_1d_array(self.weights, "weights", size)
-        else:
-            self.weights = np.array(self.weights, copy=False, ndmin=1)
-            if self.weights.ndim != 1:
-                msg = "input arrays cannot be broadcasted to an 1d array"
-                raise ValueError(msg)
 
         self.weights = normalize(self.weights)
 

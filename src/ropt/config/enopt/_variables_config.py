@@ -111,12 +111,6 @@ class VariablesConfig(EnOptBaseModel):
                 self.upper_bounds, "upper_bounds", size
             )
         else:
-            self.initial_values = np.array(self.initial_values, copy=False, ndmin=1)
-            self.lower_bounds = np.array(self.lower_bounds, copy=False, ndmin=1)
-            self.upper_bounds = np.array(self.upper_bounds, copy=False, ndmin=1)
-            if self.initial_values.ndim != 1:
-                msg = "input arrays cannot be broadcasted to an 1d array"
-                raise ValueError(msg)
             (
                 self.initial_values,
                 self.lower_bounds,

@@ -87,11 +87,6 @@ class ObjectiveFunctionsConfig(EnOptBaseModel):
             for name in ("scales", "auto_scale", "weights"):
                 setattr(self, name, broadcast_1d_array(getattr(self, name), name, size))
         else:
-            for name in ("scales", "auto_scale", "weights"):
-                setattr(self, name, np.array(getattr(self, name), copy=False, ndmin=1))
-            if self.weights.ndim != 1:
-                msg = "input arrays cannot be broadcasted to an 1d array"
-                raise ValueError(msg)
             self.scales, self.auto_scale, self.weights = broadcast_arrays(
                 self.scales, self.auto_scale, self.weights
             )

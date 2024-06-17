@@ -98,11 +98,6 @@ class NonlinearConstraintsConfig(EnOptBaseModel):
             for name in ("rhs_values", "scales", "auto_scale"):
                 setattr(self, name, broadcast_1d_array(getattr(self, name), name, size))
         else:
-            for name in ("rhs_values", "scales", "auto_scale"):
-                setattr(self, name, np.array(getattr(self, name), copy=False, ndmin=1))
-            if self.rhs_values.ndim != 1:
-                msg = "input arrays cannot be broadcasted to an 1d array"
-                raise ValueError(msg)
             self.rhs_values, self.scales, self.auto_scale = broadcast_arrays(
                 self.rhs_values, self.scales, self.auto_scale
             )

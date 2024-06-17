@@ -108,13 +108,13 @@ def check_enum_values(value: NDArray[np.ubyte], enum_type: Type[IntEnum]) -> Non
 def _convert_1d_array(array: Optional[ArrayLike]) -> Optional[NDArray[np.float64]]:
     if array is None:
         return array
-    return immutable_array(array, dtype=np.float64, ndmin=1, copy=False)
+    return immutable_array(array, dtype=np.float64, ndmin=1)
 
 
 def _convert_1d_array_intc(array: Optional[ArrayLike]) -> Optional[NDArray[np.intc]]:
     if array is None:
         return array
-    return immutable_array(array, dtype=np.intc, ndmin=1, copy=False)
+    return immutable_array(array, dtype=np.intc, ndmin=1)
 
 
 def _convert_1d_array_bool(
@@ -122,19 +122,19 @@ def _convert_1d_array_bool(
 ) -> Optional[NDArray[np.bool_]]:
     if array is None:
         return array
-    return immutable_array(array, dtype=np.bool_, ndmin=1, copy=False)
+    return immutable_array(array, dtype=np.bool_, ndmin=1)
 
 
 def _convert_2d_array(array: Optional[ArrayLike]) -> Optional[NDArray[np.float64]]:
     if array is None:
         return array
-    return immutable_array(array, dtype=np.float64, ndmin=2, copy=False)
+    return immutable_array(array, dtype=np.float64, ndmin=2)
 
 
 def _convert_enum_array(array: Optional[ArrayLike]) -> Optional[NDArray[np.ubyte]]:
     if array is None:
         return array
-    return immutable_array(array, dtype=np.ubyte, ndmin=1, copy=False)
+    return immutable_array(array, dtype=np.ubyte, ndmin=1)
 
 
 def _convert_indices(array: Optional[ArrayLike]) -> Optional[NDArray[np.intc]]:
@@ -142,7 +142,7 @@ def _convert_indices(array: Optional[ArrayLike]) -> Optional[NDArray[np.intc]]:
         return array
     return cast(
         NDArray[np.intc],
-        np.unique(immutable_array(array, dtype=np.intc, ndmin=1, copy=False)),
+        np.unique(immutable_array(array, dtype=np.intc, ndmin=1)),
     )
 
 
