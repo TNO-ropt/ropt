@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.26">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -635,6 +635,90 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.constants.BoundaryType" class="md-nav__link">
+    <span class="md-ellipsis">
+      BoundaryType
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BoundaryType">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.constants.BoundaryType.NONE" class="md-nav__link">
+    <span class="md-ellipsis">
+      NONE
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.constants.BoundaryType.TRUNCATE_BOTH" class="md-nav__link">
+    <span class="md-ellipsis">
+      TRUNCATE_BOTH
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.constants.BoundaryType.MIRROR_BOTH" class="md-nav__link">
+    <span class="md-ellipsis">
+      MIRROR_BOTH
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.constants.PerturbationType" class="md-nav__link">
+    <span class="md-ellipsis">
+      PerturbationType
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PerturbationType">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.constants.PerturbationType.ABSOLUTE" class="md-nav__link">
+    <span class="md-ellipsis">
+      ABSOLUTE
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.constants.PerturbationType.RELATIVE" class="md-nav__link">
+    <span class="md-ellipsis">
+      RELATIVE
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.constants.PerturbationType.SCALED" class="md-nav__link">
+    <span class="md-ellipsis">
+      SCALED
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1215,6 +1299,90 @@
       DEFAULT_PERTURBATION_TYPE
     </span>
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.constants.BoundaryType" class="md-nav__link">
+    <span class="md-ellipsis">
+      BoundaryType
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BoundaryType">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.constants.BoundaryType.NONE" class="md-nav__link">
+    <span class="md-ellipsis">
+      NONE
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.constants.BoundaryType.TRUNCATE_BOTH" class="md-nav__link">
+    <span class="md-ellipsis">
+      TRUNCATE_BOTH
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.constants.BoundaryType.MIRROR_BOTH" class="md-nav__link">
+    <span class="md-ellipsis">
+      MIRROR_BOTH
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.constants.PerturbationType" class="md-nav__link">
+    <span class="md-ellipsis">
+      PerturbationType
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PerturbationType">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.constants.PerturbationType.ABSOLUTE" class="md-nav__link">
+    <span class="md-ellipsis">
+      ABSOLUTE
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.constants.PerturbationType.RELATIVE" class="md-nav__link">
+    <span class="md-ellipsis">
+      RELATIVE
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.constants.PerturbationType.SCALED" class="md-nav__link">
+    <span class="md-ellipsis">
+      SCALED
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -3083,6 +3251,242 @@ directed to use the same set of perturbed values for each realization.</p>
 
 </div>
 
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.enopt.constants.BoundaryType" class="doc doc-heading">
+            <code>BoundaryType</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="enum.IntEnum">IntEnum</span></code></p>
+
+
+      <p>Enumerates the ways boundaries should be treated.</p>
+<p>When variables are perturbed their values may violate boundary constraints.
+This enumeration lists the ways these values can be modified to fix this.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.config.enopt.constants.BoundaryType.NONE" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">NONE</span> <span class="o">=</span> <span class="mi">1</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Do not modify the value.</p>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.config.enopt.constants.BoundaryType.TRUNCATE_BOTH" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">TRUNCATE_BOTH</span> <span class="o">=</span> <span class="mi">2</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Truncate the value <span class="arithmatex">\(v_i\)</span> at the lower or upper boundary (<span class="arithmatex">\(l_i\)</span>, <span class="arithmatex">\(u_i\)</span>):</p>
+<div class="arithmatex">\[
+\hat{v_i} = \begin{cases}
+    l_i &amp; \text{if $v_i &lt; l_i$}, \\
+    b_i &amp; \text{if $v_i &gt; b_i$}, \\
+    v_i &amp; \text{otherwise}
+\end{cases}
+\]</div>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.config.enopt.constants.BoundaryType.MIRROR_BOTH" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">MIRROR_BOTH</span> <span class="o">=</span> <span class="mi">3</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Mirror the value <span class="arithmatex">\(v_i\)</span> at the lower or upper boundary (<span class="arithmatex">\(l_i\)</span>, <span class="arithmatex">\(u_i\)</span>):</p>
+<div class="arithmatex">\[
+\hat{v_i} = \begin{cases}
+    2l_i - v_i &amp; \text{if $v_i &lt; l_i$}, \\
+    2b_i - v_i &amp; \text{if $v_i &gt; b_i$}, \\
+    v_i        &amp; \text{otherwise}
+\end{cases}
+\]</div>
+    </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.enopt.constants.PerturbationType" class="doc doc-heading">
+            <code>PerturbationType</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="enum.IntEnum">IntEnum</span></code></p>
+
+
+      <p>Enumerates the types of perturbations that can be applied.</p>
+<p>When applying a perturbation to a variable, generally, some value is
+generated, which is then applied to the unperturbed values (usually by
+addition). This enumeration lists the ways how this perturbation value can
+be modified before being added to the unperturbed variable.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.config.enopt.constants.PerturbationType.ABSOLUTE" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">ABSOLUTE</span> <span class="o">=</span> <span class="mi">1</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Use the perturbation value as is.</p>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.config.enopt.constants.PerturbationType.RELATIVE" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">RELATIVE</span> <span class="o">=</span> <span class="mi">2</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Multiply the perturbation value <span class="arithmatex">\(p_i\)</span> by the range defined by the bounds
+of the variables <span class="arithmatex">\(c_i\)</span>: <span class="arithmatex">\(\hat{p}_i = (c_{i,\text{max}} - c_{i,\text{min}})
+\cdot p_i\)</span>. The bounds will generally be defined in the configuration for
+the variables (see <a class="autorefs autorefs-internal" href="#ropt.config.enopt.VariablesConfig"><code>VariablesConfig</code></a>).</p>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.config.enopt.constants.PerturbationType.SCALED" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">SCALED</span> <span class="o">=</span> <span class="mi">3</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Scale each perturbation <span class="arithmatex">\(p_i\)</span> according to the scales (<span class="arithmatex">\(s_i\)</span>) for each
+variable: <span class="arithmatex">\(\hat{p}_i = p_i/s_i\)</span>. The scales <span class="arithmatex">\(s_i\)</span> will generally be defined
+in the configuration of the variables (see
+<a class="autorefs autorefs-internal" href="#ropt.config.enopt.VariablesConfig"><code>VariablesConfig</code></a>).</p>
+    </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 
 

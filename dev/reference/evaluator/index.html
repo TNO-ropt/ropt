@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.26">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -545,21 +545,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Evaluator">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.evaluator.Evaluator.__call__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __call__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -1042,21 +1027,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Evaluator">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.evaluator.Evaluator.__call__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __call__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -1303,95 +1273,6 @@ once.</p>
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.evaluator.Evaluator.__call__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-      <p>The function evaluator callback signature.</p>
-<p>The first argument of the function should be a matrix where each column is a
-variable vector. Depending on the information passed by the second argument, all
-objective and constraint functions for all vectors or for a subset are to be
-calculated.</p>
-<p>The second argument is an <a class="autorefs autorefs-internal" href="#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a>
-object, providing supplementary information to the evaluation function.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>variables</code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The matrix of variables to evaluate</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>context</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.evaluator._evaluator.EvaluatorContext" href="#ropt.evaluator.EvaluatorContext">EvaluatorContext</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The evaluation context</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.evaluator._evaluator.EvaluatorResult" href="#ropt.evaluator.EvaluatorResult">EvaluatorResult</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>An evaluation results object.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
 
 
 
