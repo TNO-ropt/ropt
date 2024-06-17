@@ -9,18 +9,18 @@
       
       
       
-        <link rel="prev" href="../enopt_config/">
+        <link rel="prev" href="../function_transforms/">
       
       
-        <link rel="next" href="../evaluator/">
+        <link rel="next" href="../enums/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.25">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
-        <title>Ensemble optimizer - ropt Documentation</title>
+        <title>Workflow objects - ropt Documentation</title>
       
     
     
@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.optimization" class="md-skip">
+        <a href="#ropt.plugins.workflow" class="md-skip">
           Skip to content
         </a>
       
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Ensemble optimizer
+              Workflow objects
             
           </span>
         </div>
@@ -141,7 +141,7 @@
       
     </form>
     <div class="md-search__output">
-      <div class="md-search__scrollwrap" data-md-scrollfix>
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
         <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
             Initializing search
@@ -389,11 +389,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../plan_config/" class="md-nav__link">
+      <a href="../workflow_config/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Plan configuration
+    Workflow configuration
   </span>
   
 
@@ -436,8 +436,6 @@
                 
   
   
-    
-  
   
   
     
@@ -446,11 +444,13 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
         
           
           <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
@@ -464,168 +464,12 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_2">
             <span class="md-nav__icon md-icon"></span>
             Optimization
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Ensemble optimizer
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  <span class="md-ellipsis">
-    Ensemble optimizer
-  </span>
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.optimization" class="md-nav__link">
-    <span class="md-ellipsis">
-      optimization
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="optimization">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.optimization.EnsembleOptimizer" class="md-nav__link">
-    <span class="md-ellipsis">
-      EnsembleOptimizer
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="EnsembleOptimizer">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.optimization.EnsembleOptimizer.results" class="md-nav__link">
-    <span class="md-ellipsis">
-      results
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.optimization.EnsembleOptimizer.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.optimization.EnsembleOptimizer.add_observer" class="md-nav__link">
-    <span class="md-ellipsis">
-      add_observer
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.optimization.EnsembleOptimizer.start_optimization" class="md-nav__link">
-    <span class="md-ellipsis">
-      start_optimization
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.optimization.EnsembleOptimizer.abort_optimization" class="md-nav__link">
-    <span class="md-ellipsis">
-      abort_optimization
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.events" class="md-nav__link">
-    <span class="md-ellipsis">
-      events
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="events">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.events.OptimizationEvent" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptimizationEvent
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
             
               
                 
@@ -702,6 +546,8 @@
                 
   
   
+    
+  
   
   
     
@@ -710,13 +556,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" checked>
         
           
           <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
@@ -730,7 +574,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_3">
             <span class="md-nav__icon md-icon"></span>
             Plugins
@@ -846,18 +690,87 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../optimization_steps/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Workflow objects
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
-    Optimization steps
+    Workflow objects
   </span>
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      workflow
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.events" class="md-nav__link">
+    <span class="md-ellipsis">
+      events
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="events">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.events.OptimizationEvent" class="md-nav__link">
+    <span class="md-ellipsis">
+      OptimizationEvent
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -966,77 +879,11 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.optimization" class="md-nav__link">
+  <a href="#ropt.plugins.workflow" class="md-nav__link">
     <span class="md-ellipsis">
-      optimization
+      workflow
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="optimization">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.optimization.EnsembleOptimizer" class="md-nav__link">
-    <span class="md-ellipsis">
-      EnsembleOptimizer
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="EnsembleOptimizer">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.optimization.EnsembleOptimizer.results" class="md-nav__link">
-    <span class="md-ellipsis">
-      results
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.optimization.EnsembleOptimizer.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.optimization.EnsembleOptimizer.add_observer" class="md-nav__link">
-    <span class="md-ellipsis">
-      add_observer
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.optimization.EnsembleOptimizer.start_optimization" class="md-nav__link">
-    <span class="md-ellipsis">
-      start_optimization
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.optimization.EnsembleOptimizer.abort_optimization" class="md-nav__link">
-    <span class="md-ellipsis">
-      abort_optimization
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1079,21 +926,23 @@
                   
 
 
-  <h1>Ensemble optimizer</h1>
+  <h1>Workflow objects</h1>
 
 <div class="doc doc-object doc-module">
 
 
 
-<h2 id="ropt.optimization" class="doc doc-heading">
-            <code>ropt.optimization</code>
+<h2 id="ropt.plugins.workflow" class="doc doc-heading">
+            <code>ropt.plugins.workflow</code>
 
 
 </h2>
 
     <div class="doc doc-contents first">
 
-      <p>Code to run optimization workflows.</p>
+      <p>Plugin functionality for adding workflow objects.</p>
+<p>This package contains the abstract base class for workflow plugins, and the
+default workflow objects that are part of <code>ropt</code>.</p>
 
 
 
@@ -1105,322 +954,6 @@
 
 
 
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.optimization.EnsembleOptimizer" class="doc doc-heading">
-            <code>EnsembleOptimizer</code>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-
-      <p>The Ensemble Optimizer Class.</p>
-<p>This class serves as the central component for executing an optimization
-plan. Upon initialization, an <code>EnsembleOptimizer</code> object accepts and stores
-a callback with the <a class="autorefs autorefs-internal" href="../evaluator/#ropt.evaluator.Evaluator"><code>Evaluator</code></a> signature.
-Before initiating the optimization, additional callbacks can be incorporated
-using the <a class="autorefs autorefs-internal" href="#ropt.optimization.EnsembleOptimizer.add_observer"><code>add_observer</code></a>
-method to respond to events occurring during the optimization. The
-optimization plan is initiated with the
-<a class="autorefs autorefs-internal" href="#ropt.optimization.EnsembleOptimizer.start_optimization"><code>start_optimization</code></a>
-method. To prematurely halt the optimization workflow from within callback
-functions, the
-<a class="autorefs autorefs-internal" href="#ropt.optimization.EnsembleOptimizer.abort_optimization"><code>abort_optimization</code></a>
-method is available. Upon the completion of the optimization process, the
-<a class="autorefs autorefs-internal" href="#ropt.optimization.EnsembleOptimizer.results"><code>results</code></a> property can be
-used to examine any stored results.</p>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h4 id="ropt.optimization.EnsembleOptimizer.results" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">results</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">]]</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-      <p>Return the dictionary of results.</p>
-<p>Results may be stored during optimization and can be accessed by name
-via this property. Examples of such results include the optimal result
-encountered, but the exact nature of each result and the names to access
-them are determined by the optimization plan.</p>
-    </div>
-
-</div>
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.optimization.EnsembleOptimizer.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">evaluator</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-      <p>Initialize an <code>EnsembleOptimizer</code> object.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>evaluator</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.evaluator.Evaluator" href="../evaluator/#ropt.evaluator.Evaluator">Evaluator</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>An evaluator callback</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>plugin_manager</code></td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.PluginManager" href="../plugins/#ropt.plugins.PluginManager">PluginManager</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional plugin manager</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.optimization.EnsembleOptimizer.add_observer" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">add_observer</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-      <p>Add a callback for an event.</p>
-<p>Throughout the optimization process, various events are triggered,
-offering opportunities to observe progress and capture intermediate
-results. This method facilitates the connection of callbacks to specific
-events. The callback should accept a single
-<a class="autorefs autorefs-internal" href="#ropt.events.OptimizationEvent">OptimizationEvent</a> object and not return
-anything. The method can be called multiple times to add multiple
-callbacks to the same event, and each will be executed when that event
-occurs.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>event</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The event to respond to.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>callback</code></td>
-            <td>
-                  <code><span title="typing.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="ropt.events.OptimizationEvent" href="#ropt.events.OptimizationEvent">OptimizationEvent</a>], None]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The callback function to be connected.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.optimization.EnsembleOptimizer.start_optimization" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">start_optimization</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-      <p>Start the optimization.</p>
-<p>This method executes the provide optimization plan. An optional seed can
-be provided to initialize the random number generator that can be used
-by the steps in the plan.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>plan</code></td>
-            <td>
-                  <code><span title="typing.Sequence">Sequence</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The optimization plan to run</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>seed</code></td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[int]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional seed of the random number generator</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.results.FunctionResults" href="../results/#ropt.results.FunctionResults">FunctionResults</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The reason for the terminating the optimization.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.optimization.EnsembleOptimizer.abort_optimization" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">abort_optimization</span><span class="p">()</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
-  </span>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-      <p>Abort the current optimization run.</p>
-<p>This method can be called from within callbacks to interrupt the ongoing
-optimization plan. The exact point at which the optimization is aborted
-depends on the step in the plan that is executing at that point. For
-example, within a running optimizer, the process will be interrupted
-after completing the current function evaluation.</p>
-
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
 
 
 
@@ -1475,10 +1008,8 @@ after completing the current function evaluation.</p>
 
 
       <p>The <code>OptimizationEvent</code> class stores optimization event data.</p>
-<p>After initializing an
-<a class="autorefs autorefs-internal" href="#ropt.optimization.EnsembleOptimizer"><code>EnsembleOptimizer</code></a> object to run an
-optimization plan, callbacks can be connected to react to events triggered
-during the execution of the plan. These callbacks accept a single
+<p>While running an optimization, callbacks can be connected to react to events
+triggered during the execution of the plan. These callbacks accept a single
 <code>OptimizationEvent</code> object containing information about the event.</p>
 <p>The actual data contained in the object depends on the nature of the event.
 Refer to the documentation of the <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType"><code>EventType</code></a>
@@ -1626,7 +1157,7 @@ enumeration for more details.</p>
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.081f42fc.min.js"></script>
+      <script src="../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       

@@ -9,18 +9,18 @@
       
       
       
-        <link rel="prev" href="../function_transforms/">
+        <link rel="prev" href="../../usage/running/">
       
       
-        <link rel="next" href="../enums/">
+        <link rel="next" href="../enopt_config/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.25">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
-        <title>Optimization steps - ropt Documentation</title>
+        <title>Workflow configuration - ropt Documentation</title>
       
     
     
@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.plugins.optimization_steps" class="md-skip">
+        <a href="#ropt.config.workflow" class="md-skip">
           Skip to content
         </a>
       
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Optimization steps
+              Workflow configuration
             
           </span>
         </div>
@@ -141,7 +141,7 @@
       
     </form>
     <div class="md-search__output">
-      <div class="md-search__scrollwrap" data-md-scrollfix>
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
         <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
             Initializing search
@@ -347,6 +347,8 @@
                 
   
   
+    
+  
   
   
     
@@ -355,13 +357,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" checked>
         
           
           <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
@@ -375,7 +375,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_1">
             <span class="md-nav__icon md-icon"></span>
             Configuration
@@ -386,18 +386,96 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../plan_config/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Workflow configuration
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
-    Plan configuration
+    Workflow configuration
   </span>
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.config.workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      workflow
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.workflow.WorkflowConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      WorkflowConfig
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.workflow.ContextConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      ContextConfig
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.workflow.StepConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      StepConfig
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -478,27 +556,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../optimization/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Ensemble optimizer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../evaluator/" class="md-nav__link">
         
   
@@ -567,8 +624,6 @@
                 
   
   
-    
-  
   
   
     
@@ -577,11 +632,13 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
         
           
           <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
@@ -595,7 +652,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_3">
             <span class="md-nav__icon md-icon"></span>
             Plugins
@@ -711,63 +768,18 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Optimization steps
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../workflow/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Optimization steps
+    Workflow objects
   </span>
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.optimization_steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      optimization_steps
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -876,11 +888,44 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.optimization_steps" class="md-nav__link">
+  <a href="#ropt.config.workflow" class="md-nav__link">
     <span class="md-ellipsis">
-      optimization_steps
+      workflow
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.workflow.WorkflowConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      WorkflowConfig
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.workflow.ContextConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      ContextConfig
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.workflow.StepConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      StepConfig
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -899,21 +944,21 @@
                   
 
 
-  <h1>Optimization steps</h1>
+  <h1>Workflow configuration</h1>
 
 <div class="doc doc-object doc-module">
 
 
 
-<h2 id="ropt.plugins.optimization_steps" class="doc doc-heading">
-            <code>ropt.plugins.optimization_steps</code>
+<h2 id="ropt.config.workflow" class="doc doc-heading">
+            <code>ropt.config.workflow</code>
 
 
 </h2>
 
     <div class="doc doc-contents first">
 
-      <p>Plugin functionality for adding optimization steps.</p>
+      <p>Configuration classes for workflows.</p>
 
 
 
@@ -925,6 +970,264 @@
 
 
 
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.workflow.WorkflowConfig" class="doc doc-heading">
+            <code>WorkflowConfig</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+      <p>Configuration for a workflow.</p>
+<p>A workflow consists of two sections: a context section defined using the
+<code>context</code> attribute, and a <code>steps</code> attribute that defines the tasks to
+perform.</p>
+<p>The <code>context</code> attribute contains the configuration of the objects that
+create and maintain the context in which the workflow runs. Context objects
+are initialized before creating and running the workflow steps.</p>
+<p>After initializing the context objects, workflow steps are configured by the
+entries given by the <code>steps</code> attribute and are initialized and executed in
+order. During workflow execution, the context objects may be inspected and
+updated by the steps. After finishing the workflow, each context object can
+be inspected to retrieve any stored results.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.workflow.WorkflowConfig.context">context</span></code></td>
+            <td>
+                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.config.workflow._workflow_config.ContextConfig" href="#ropt.config.workflow.ContextConfig">ContextConfig</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The context objects to initialize</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.workflow.WorkflowConfig.steps">steps</span></code></td>
+            <td>
+                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.config.workflow._workflow_config.StepConfig" href="#ropt.config.workflow.StepConfig">StepConfig</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The steps that are executed by the workflow</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.workflow.ContextConfig" class="doc doc-heading">
+            <code>ContextConfig</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+      <p>Configuration of a single context object.</p>
+<p>Context objects store information that is accessible to and updated by the
+steps of the workflow. They are referred to by their <code>id</code>, which is
+mandatory.</p>
+<p>The <code>init</code> string identifies the code that is run to initialize the context
+object. It is used by the plugin manager to load the code.</p>
+<p>Additional parameters needed by the context objects are configured using the
+<code>with</code> attribute. The contents of the <code>with</code> attribute depend on the type
+of the context object.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.workflow.ContextConfig.id">id</span></code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An identifier used to refer to the context object</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.workflow.ContextConfig.init">init</span></code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Identifies the code that initializes the object</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.workflow.ContextConfig.with">with</span></code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Additional parameters passed to the object</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.workflow.StepConfig" class="doc doc-heading">
+            <code>StepConfig</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+      <p>Configuration of a single step in the workflow.</p>
+<p>A step is a single action within a workflow. The <code>run</code> string identifies the
+code that executes te step. It is used by the plugin manager to load the
+code.</p>
+<p>A step may be named using the optional <code>name</code> field, which will only be used
+for informational purposes, such as in error messages or in generated reports.</p>
+<p>Additional parameter needed by the step may be configured using the <code>with</code>
+attribute. The content of the <code>with</code> attribute depends on the type of the step.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.workflow.StepConfig.name">name</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An optional name used to refer to the step</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.workflow.StepConfig.run">run</span></code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Identifies the code that runs the step</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.workflow.StepConfig.with">with</span></code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Additional parameters passed to the step</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 
 
@@ -989,7 +1292,7 @@
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.081f42fc.min.js"></script>
+      <script src="../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       

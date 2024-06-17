@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.25">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
     
     
       
@@ -141,7 +141,7 @@
       
     </form>
     <div class="md-search__output">
-      <div class="md-search__scrollwrap" data-md-scrollfix>
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
         <div class="md-search-result" data-md-component="search-result">
           <div class="md-search-result__meta">
             Initializing search
@@ -389,11 +389,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../plan_config/" class="md-nav__link">
+      <a href="../workflow_config/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Plan configuration
+    Workflow configuration
   </span>
   
 
@@ -470,27 +470,6 @@
             Optimization
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../optimization/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Ensemble optimizer
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
             
               
                 
@@ -840,11 +819,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../optimization_steps/" class="md-nav__link">
+      <a href="../workflow/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Optimization steps
+    Workflow objects
   </span>
   
 
@@ -1266,8 +1245,7 @@ gradient results (<code>gradients</code>).</p>
 
       <p>Add results to the table.</p>
 <p>This method can be called directly from any observers connected to
-events that produce results (see
-<a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.EnsembleOptimizer.add_observer"><code>add_observer</code></a>).</p>
+events that produce results.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1385,7 +1363,7 @@ generated data frame in a tabular format to a text file.</p>
 
 
 <h4 id="ropt.report.ResultsTable.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;functions&#39;</span><span class="p">,</span> <span class="n">min_header_len</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;functions&#39;</span><span class="p">,</span> <span class="n">min_header_len</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
@@ -1405,14 +1383,6 @@ multiple lines, and the number of lines may vary according to requested
 fields. For a consistent result, the minimum number of header lines can
 be specified via the <code>min_header_len</code> argument. When needed, blank lines
 will be added to reach the specified minimum number of header lines.</p>
-<p>The optional <code>filters</code> argument can be used to pass functions that can
-be used to filter the rows before generating the table. The keys of the
-<code>filters</code> dictionary should be the columns to apply the filter function
-to, and the values the filter functions, which should expect a pandas
-series and transform those into an equally sized series of boolean
-values. For example, to retain only realizations with the name equal to
-2:</p>
-<p><code>python filters = {"realization": lambda x: x == 2}</code></p>
 
 
 <details class="tip" open>
@@ -1470,20 +1440,6 @@ min_header_len, empty lines will be added. For example:</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>filters</code></td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Callable">Callable</span>[[<span title="pandas.Series">Series</span>[<span title="typing.Any">Any</span>]], <span title="pandas.Series">Series</span>[bool]]]]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional filter functions to remove rows</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -1558,8 +1514,7 @@ min_header_len, empty lines will be added. For example:</p>
 
       <p>Add results to the table.</p>
 <p>This method can be called directly from any observers connected to
-events that produce results (see
-<a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.EnsembleOptimizer.add_observer"><code>add_observer</code></a>).</p>
+events that produce results.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1702,7 +1657,7 @@ events that produce results (see
     <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.081f42fc.min.js"></script>
+      <script src="../../assets/javascripts/bundle.ad660dcc.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       
