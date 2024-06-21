@@ -733,30 +733,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.function_transform.base.Plugin" class="md-nav__link">
-    <span class="md-ellipsis">
-      Plugin
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Plugin">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.function_transform.base.Plugin.is_supported" class="md-nav__link">
-    <span class="md-ellipsis">
-      is_supported
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plugins.function_transform.base.FunctionTransform" class="md-nav__link">
     <span class="md-ellipsis">
       FunctionTransform
@@ -765,6 +741,15 @@
   
     <nav class="md-nav" aria-label="FunctionTransform">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.function_transform.base.FunctionTransform.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#ropt.plugins.function_transform.base.FunctionTransform.calculate_function" class="md-nav__link">
@@ -988,30 +973,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.function_transform.base.Plugin" class="md-nav__link">
-    <span class="md-ellipsis">
-      Plugin
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Plugin">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.function_transform.base.Plugin.is_supported" class="md-nav__link">
-    <span class="md-ellipsis">
-      is_supported
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plugins.function_transform.base.FunctionTransform" class="md-nav__link">
     <span class="md-ellipsis">
       FunctionTransform
@@ -1020,6 +981,15 @@
   
     <nav class="md-nav" aria-label="FunctionTransform">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.function_transform.base.FunctionTransform.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#ropt.plugins.function_transform.base.FunctionTransform.calculate_function" class="md-nav__link">
@@ -1178,120 +1148,6 @@ base class may be installed as a plugin.</p>
 
 
 
-<h3 id="ropt.plugins.function_transform.base.Plugin" class="doc doc-heading">
-            <code>Plugin</code>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><span title="abc.ABC">ABC</span></code></p>
-
-
-      <p>Abstract base class for plugins.</p>
-<p><code>ropt</code>  plugins should derive from this base class, which specifies an
-<code>is_supported</code> method.</p>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plugins.function_transform.base.Plugin.is_supported" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">is_supported</span><span class="p">(</span><span class="n">method</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-      <p>Check wether a given method is supported.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>method</code></td>
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The method name</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code>bool</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>True if the method is supported.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
 <h3 id="ropt.plugins.function_transform.base.FunctionTransform" class="doc doc-heading">
             <code>FunctionTransform</code>
 
@@ -1318,6 +1174,70 @@ base class may be installed as a plugin.</p>
 
 
 
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plugins.function_transform.base.FunctionTransform.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">transform_index</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Initialize the function transform object.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>enopt_config</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration of the optimizer</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>transform_index</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The index of the transform to use</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-function">
 
@@ -1542,7 +1462,7 @@ be raised.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.base.Plugin" href="#ropt.plugins.function_transform.base.Plugin">Plugin</a></code></p>
+              Bases: <code><span title="ropt.plugins.base.Plugin">Plugin</span></code></p>
 
 
       <p>The function transform plugin base class.</p>
