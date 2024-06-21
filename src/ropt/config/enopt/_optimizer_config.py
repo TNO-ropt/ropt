@@ -54,9 +54,9 @@ class OptimizerConfig(EnOptBaseModel):
         max_functions:     Optional maximum number of function evaluations
         tolerance:         Optional tolerance for convergence
         speculative:       Force gradient evaluations; disabled if
-                          split_evaluations is True (default `False`)
+                           split_evaluations is True (default `False`)
         split_evaluations: Evaluate function and gradient separately
-                          (default: `False`)
+                           (default: `False`)
         parallel:          Allow for parallelized evaluation (default: `False`)
         output_dir:        Optional output directory for use by the optimizer
         options:           Optional generic options for use by the optimizer

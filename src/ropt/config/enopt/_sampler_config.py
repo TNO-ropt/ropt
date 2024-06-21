@@ -37,7 +37,7 @@ class SamplerConfig(EnOptBaseModel):
         method:  The sampler method
         options: Options to be passed to the sampler
         shared:  Whether perturbation values should be shared between realizations
-                (default: `False`)
+                 (default: `False`)
     """
 
     method: str = "scipy/default"

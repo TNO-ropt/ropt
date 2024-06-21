@@ -19,13 +19,18 @@ class ContextConfig(BaseModel):
     object. It is used by the plugin manager to load the code.
 
     Additional parameters needed by the context objects are configured using the
-    `with` attribute. The contents of the `with` attribute depend on the type
+    `with_` attribute. The contents of the `with_` attribute depend on the type
     of the context object.
 
+    Note: `with` is an alias for `with_`
+        When parsing dictionaries into a `ContextConfig` object the name of the
+        `with_` attribute should be replaced by by `with`, i.e. without the `_`
+        suffix.
+
     Attributes:
-        id:   An identifier used to refer to the context object
-        init: Identifies the code that initializes the object
-        with: Additional parameters passed to the object
+        id:    An identifier used to refer to the context object
+        init:  Identifies the code that initializes the object
+        with_: Additional parameters passed to the object
     """
 
     id: str
@@ -55,13 +60,24 @@ class StepConfig(BaseModel):
     A step may be named using the optional `name` field, which will only be used
     for informational purposes, such as in error messages or in generated reports.
 
-    Additional parameter needed by the step may be configured using the `with`
-    attribute. The content of the `with` attribute depends on the type of the step.
+    Additional parameters needed by the step may be configured using the `with_`
+    attribute. The content of the `with_` attribute depends on the type of the
+    step.
+
+    Execution of the step can be made conditional by providing an expression via
+    the `if_` attribute. The expression will be parsed and evaluated, and the
+    step will only be executed if the result is `True`.
+
+    Note: `with` and `if` aliases
+        When parsing dictionaries into a `StepConfig` object the name of the
+        `with_` attribute should be replaced by by `with`, and the name of the
+        `if_` attribute by `if`, i.e. without the `_` suffix
 
     Attributes:
-        name: An optional name used to refer to the step
-        run:  Identifies the code that runs the step
-        with: Additional parameters passed to the step
+        name:  An optional name used to refer to the step
+        run:   Identifies the code that runs the step
+        with_: Additional parameters passed to the step
+        if_:   Optional expression for conditional evaluation
     """
 
     name: Optional[str] = None
@@ -79,8 +95,8 @@ class WorkflowConfig(BaseModel):
     """Configuration for a workflow.
 
     A workflow consists of two sections: a context section defined using the
-    `context` attribute, and a `steps` attribute that defines the tasks to
-    perform.
+    `context` attribute, and a section that defines the tasks to perform by the
+    `steps` attribute.
 
     The `context` attribute contains the configuration of the objects that
     create and maintain the context in which the workflow runs. Context objects
@@ -89,8 +105,8 @@ class WorkflowConfig(BaseModel):
     After initializing the context objects, workflow steps are configured by the
     entries given by the `steps` attribute and are initialized and executed in
     order. During workflow execution, the context objects may be inspected and
-    updated by the steps. After finishing the workflow, each context object can
-    be inspected to retrieve any stored results.
+    updated by the steps. After finishing the workflow, context objects can be
+    inspected to retrieve any stored results.
 
     Attributes:
         context: The context objects to initialize
