@@ -264,10 +264,7 @@ def _is_valid(node: ast.AST) -> bool:  # noqa: PLR0911
         )
     if isinstance(node, ast.List):
         return all(_is_valid(item) for item in node.elts)
-    if isinstance(node, ast.Name):
-        return True
-
-    return False
+    return bool(isinstance(node, ast.Name))
 
 
 class _ReplaceFields(ast.NodeTransformer):
