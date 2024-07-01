@@ -23,8 +23,8 @@ CONFIG: Dict[str, Any] = {
     },
     "optimizer": {
         "method": "differential_evolution",
-        "options": {"seed": 3},
-        "max_functions": 100,
+        "options": {"seed": 123},
+        "max_functions": 10,
         "parallel": True,
     },
     "nonlinear_constraints": {

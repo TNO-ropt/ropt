@@ -357,7 +357,7 @@ def test_optimizer_variables_subset_linear_constraints(
 def test_parallelize(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["optimizer"] = {
         "method": "differential_evolution",
-        "max_iterations": 10,
+        "max_iterations": 15,
         "options": {"seed": 123, "tol": 1e-10},
     }
     enopt_config["variables"]["lower_bounds"] = [0.15, 0.0, 0.0]
@@ -367,12 +367,11 @@ def test_parallelize(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["optimizer"]["parallel"] = False
     variables = BasicWorkflow(enopt_config, evaluator()).run().variables
     assert variables is not None
+    assert np.allclose(variables, [0.15, 0.0, 0.2], atol=3e-2)
 
     enopt_config["optimizer"]["parallel"] = True
     variables = BasicWorkflow(enopt_config, evaluator()).run().variables
     assert variables is not None
-
-    assert np.allclose(variables, [0.15, 0.0, 0.2], atol=3e-2)
     assert np.allclose(variables, [0.15, 0.0, 0.2], atol=3e-2)
 
 
