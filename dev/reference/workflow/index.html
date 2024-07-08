@@ -741,6 +741,54 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.workflow.DefaultCallbackContext" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultCallbackContext
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.workflow.DefaultCallbackWith" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultCallbackWith
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.workflow.DefaultConfigContext" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultConfigContext
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DefaultConfigContext">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.workflow.DefaultConfigContext.reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -885,6 +933,54 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.workflow.DefaultCallbackContext" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultCallbackContext
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.workflow.DefaultCallbackWith" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultCallbackWith
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.workflow.DefaultConfigContext" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultConfigContext
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DefaultConfigContext">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.workflow.DefaultConfigContext.reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -954,6 +1050,195 @@ default workflow objects that are part of <code>ropt</code>.</p>
 
 
 
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.plugins.workflow.DefaultCallbackContext" class="doc doc-heading">
+            <code>DefaultCallbackContext</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.plugins.workflow.base.ContextObj">ContextObj</span></code></p>
+
+
+      <p>The default <code>callback</code> context object.</p>
+<p>The <code>callback</code> context object is used to call a user-defined function
+whenever it is updated with new results. For instance, an optimizer step may
+add a <code>callback</code> context object to its <code>update</code> parameter, so that it will
+be updated any time new results are produced.</p>
+<p>When updated, the <code>callback</code> object calls the function defined by its
+<code>function</code> parameter with the new result as it first argument. Optionally,
+additional keyword arguments can be defined via the <code>kwargs</code> parameter,
+which are added to each function call.</p>
+<p>The parameters of the context object are parsed using the
+<a class="autorefs autorefs-internal" href="#ropt.plugins.workflow.DefaultCallbackWith"><code>DefaultCallbackWith</code></a> object.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.plugins.workflow.DefaultCallbackWith" class="doc doc-heading">
+            <code>DefaultCallbackWith</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+      <p>Parameters for the <code>callback</code> context object.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.workflow.DefaultCallbackWith.function">function</span></code></td>
+            <td>
+                  <code><span title="typing.Callable">Callable</span>[[<span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]], <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The function to call</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.workflow.DefaultCallbackWith.kwargs">kwargs</span></code></td>
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary of keyword arguments for the call</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.plugins.workflow.DefaultConfigContext" class="doc doc-heading">
+            <code>DefaultConfigContext</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.plugins.workflow.base.ContextObj">ContextObj</span></code></p>
+
+
+      <p>The default <code>config</code> context object.</p>
+<p>The <code>config</code> object is used store and modify configuration objects for
+optimizer and evaluation steps. When initializing the object, the <code>with</code>
+field is parsed as an <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.
+Optimization and evaluation steps can refer to a workflow variable of the
+same name as the <code>config</code> ID to retrieve the parsed configuration object.</p>
+<p>The <code>config</code> object can be updated with a dictionary of values to construct
+a new <code>EnOptConfig</code> object with the updated values. The original value is
+kept with the <code>config</code> object and can be recovered by resetting the <code>config</code>
+object.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plugins.workflow.DefaultConfigContext.reset" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">reset</span><span class="p">()</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Clear the stored values.</p>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 
 
