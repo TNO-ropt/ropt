@@ -27,14 +27,14 @@ class ContextObj(ABC):
     """Base class for workflow context objects."""
 
     def __init__(self, config: ContextConfig, workflow: Workflow) -> None:
-        """Initialize the workflow context object.
+        """Initialize the context object.
 
-        The `config` and `workflow` arguments are stored as `context_config` and
-        `workflow` attributes.
+        The `config` and `workflow` arguments are accessible as `context_config`
+        and `workflow` properties.
 
         Args:
-            config:   The configuration of the workflow object
-            workflow: The parent workflow
+            config:   The configuration of the context object
+            workflow: The parent workflow that contains the object
         """
         self._context_config = config
         self._workflow = workflow
@@ -46,10 +46,6 @@ class ContextObj(ABC):
         Args:
             value: The value used for the update.
         """
-
-    @abstractmethod
-    def value(self) -> Any:  # noqa: ANN401
-        """Return the value of the object."""
 
     def reset(self) -> None:  # noqa: B027
         """Resets the object to its initial state."""
@@ -71,6 +67,22 @@ class ContextObj(ABC):
             The workflow object.
         """
         return self._workflow
+
+    def get_variable(self) -> Any:  # noqa: ANN401
+        """Get a variable with the name equal to the context object ID.
+
+        Returns:
+            The value of the variable.
+        """
+        return self._workflow[self._context_config.id]
+
+    def set_variable(self, value: Any) -> None:  # noqa: ANN401
+        """Set a variable with the name equal to the context object ID.
+
+        Args:
+            value: The value
+        """
+        self._workflow[self._context_config.id] = value
 
 
 class WorkflowStep(ABC):

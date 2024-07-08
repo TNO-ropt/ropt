@@ -47,7 +47,7 @@ def test_invalid_context_ids() -> None:
         "context": [
             {
                 "id": "1optimal",
-                "init": "results_tracker",
+                "init": "results",
             },
         ],
         "steps": [],
@@ -61,11 +61,11 @@ def test_duplicate_context_ids() -> None:
         "context": [
             {
                 "id": "optimal",
-                "init": "results_tracker",
+                "init": "results",
             },
             {
                 "id": "optimal",
-                "init": "results_tracker",
+                "init": "results",
             },
         ],
         "steps": [],
@@ -81,12 +81,12 @@ def test_parse_value(enopt_config: Any, evaluator: Any) -> None:
         "context": [
             {
                 "id": "config",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config,
             },
             {
                 "id": "results",
-                "init": "results_tracker",
+                "init": "results",
             },
         ],
         "steps": [
@@ -94,7 +94,7 @@ def test_parse_value(enopt_config: Any, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$config",
-                    "update_results": ["results"],
+                    "update": ["results"],
                 },
             },
         ],
@@ -138,7 +138,7 @@ def test_parse_value(enopt_config: Any, evaluator: Any) -> None:
 
     with pytest.raises(
         WorkflowError,
-        match=re.escape("Unknown workflow variable or context object: `y`"),
+        match=re.escape("Unknown workflow variable: `y`"),
     ):
         workflow.parse_value("${{ y + 1 }}")
 
@@ -152,16 +152,16 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
         "context": [
             {
                 "id": "config",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config,
             },
             {
                 "id": "optimal1",
-                "init": "results_tracker",
+                "init": "results",
             },
             {
                 "id": "optimal2",
-                "init": "results_tracker",
+                "init": "results",
             },
         ],
         "steps": [
@@ -169,7 +169,7 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$config",
-                    "update_results": ["optimal1", "last_update"],
+                    "update": ["optimal1"],
                 },
                 "if": "${{ 1 > 0 }}",
             },
@@ -178,7 +178,7 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 "if": "1 < 0",
                 "with": {
                     "config": "$config",
-                    "update_results": ["optimal2"],
+                    "update": ["optimal2"],
                 },
             },
         ],
@@ -192,8 +192,6 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
     assert result1 is not None
     assert np.allclose(result1.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
     assert result2 is None
-    assert isinstance(workflow["last_update"], tuple)
-    assert isinstance(workflow["last_update"][0], Results)
 
 
 def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
@@ -201,20 +199,20 @@ def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
         "context": [
             {
                 "id": "config",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config,
             },
             {
                 "id": "optimal1",
-                "init": "results_tracker",
+                "init": "results",
             },
             {
                 "id": "optimal2",
-                "init": "results_tracker",
+                "init": "results",
             },
             {
                 "id": "optimal3",
-                "init": "results_tracker",
+                "init": "results",
             },
         ],
         "steps": [
@@ -222,23 +220,23 @@ def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$config",
-                    "update_results": ["optimal1"],
+                    "update": ["optimal1"],
                 },
             },
             {
                 "run": "optimizer",
                 "with": {
                     "config": "$config",
-                    "update_results": ["optimal2"],
-                    "initial_variables": "$optimal1",
+                    "update": ["optimal2"],
+                    "initial_values": "$optimal1",
                 },
             },
             {
                 "run": "optimizer",
                 "with": {
                     "config": "$config",
-                    "update_results": ["optimal3"],
-                    "initial_variables": [0, 0, 0],
+                    "update": ["optimal3"],
+                    "initial_values": [0, 0, 0],
                 },
             },
         ],
@@ -269,12 +267,12 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
         "context": [
             {
                 "id": "config",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config,
             },
             {
                 "id": "optimal",
-                "init": "results_tracker",
+                "init": "results",
             },
         ],
         "steps": [
@@ -282,14 +280,14 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$config",
-                    "update_results": ["optimal"],
+                    "update": ["optimal"],
                 },
             },
             {
-                "run": "reset_context",
+                "run": "reset",
                 "with": {
-                    "context_id": "optimal",
-                    "backup_id": "saved_results",
+                    "context": "optimal",
+                    "backup_var": "saved_results",
                 },
             },
         ],
@@ -336,29 +334,29 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
         "context": [
             {
                 "id": "enopt_config1",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config1,
             },
             {
                 "id": "enopt_config2",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config2,
             },
             {
                 "id": "optimum",
-                "init": "results_tracker",
+                "init": "results",
             },
             {
                 "id": "last",
-                "init": "results_tracker",
+                "init": "results",
                 "with": {
                     "type": "last",
                 },
             },
             {
                 "id": "callback",
-                "init": "results_callback",
-                "with": {"callback": _track_evaluations},
+                "init": "callback",
+                "with": {"function": _track_evaluations},
             },
         ],
         "steps": [
@@ -366,31 +364,31 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$enopt_config1",
-                    "update_results": ["last", "optimum", "callback"],
+                    "update": ["last", "optimum", "callback"],
                 },
             },
             {
                 "run": "optimizer",
                 "with": {
                     "config": "$enopt_config2",
-                    "update_results": ["last", "optimum", "callback"],
-                    "initial_variables": "$last",
+                    "update": ["last", "optimum", "callback"],
+                    "initial_values": "$last",
                 },
             },
             {
                 "run": "optimizer",
                 "with": {
                     "config": "$enopt_config1",
-                    "update_results": ["last", "optimum", "callback"],
-                    "initial_variables": "$last",
+                    "update": ["last", "optimum", "callback"],
+                    "initial_values": "$last",
                 },
             },
             {
                 "run": "optimizer",
                 "with": {
                     "config": "$enopt_config2",
-                    "update_results": ["optimum", "callback"],
-                    "initial_variables": "$last",
+                    "update": ["optimum", "callback"],
+                    "initial_values": "$last",
                 },
             },
         ],
@@ -424,25 +422,25 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
         "context": [
             {
                 "id": "enopt_config",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config,
             },
             {
                 "id": "enopt_config2",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config2,
             },
             {
                 "id": "last",
-                "init": "results_tracker",
+                "init": "results",
                 "with": {
                     "type": "last",
                 },
             },
             {
                 "id": "callback",
-                "init": "results_callback",
-                "with": {"callback": _track_evaluations},
+                "init": "callback",
+                "with": {"function": _track_evaluations},
             },
         ],
         "steps": [
@@ -450,15 +448,15 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$enopt_config",
-                    "update_results": ["last", "callback"],
+                    "update": ["last", "callback"],
                 },
             },
             {
                 "run": "optimizer",
                 "with": {
                     "config": "$enopt_config2",
-                    "initial_variables": "$last",
-                    "update_results": ["callback"],
+                    "initial_values": "$last",
+                    "update": ["callback"],
                 },
             },
         ],
@@ -485,12 +483,12 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
         "context": [
             {
                 "id": "enopt_config",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config,
             },
             {
                 "id": "optimum",
-                "init": "results_tracker",
+                "init": "results",
             },
         ],
         "steps": [
@@ -498,7 +496,7 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$enopt_config",
-                    "update_results": ["optimum"],
+                    "update": ["optimum"],
                 },
             },
         ],
@@ -520,7 +518,7 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
                         "run": "optimizer",
                         "with": {
                             "config": "$enopt_config",
-                            "update_results": ["optimum"],
+                            "update": ["optimum"],
                         },
                     },
                 ],
@@ -549,13 +547,13 @@ def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
         "context": [
             {
                 "id": "enopt_config",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config,
             },
             {
                 "id": "callback",
-                "init": "results_callback",
-                "with": {"callback": _track_evaluations},
+                "init": "callback",
+                "with": {"function": _track_evaluations},
             },
         ],
         "steps": [
@@ -568,7 +566,7 @@ def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
                             "run": "optimizer",
                             "with": {
                                 "config": "$enopt_config",
-                                "update_results": ["callback"],
+                                "update": ["callback"],
                             },
                         },
                     ],
@@ -602,18 +600,18 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
         "context": [
             {
                 "id": "enopt_config",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config,
             },
             {
                 "id": "last",
-                "init": "results_tracker",
+                "init": "results",
                 "with": {"type": "last"},
             },
             {
                 "id": "callback",
-                "init": "results_callback",
-                "with": {"callback": _track_evaluations},
+                "init": "callback",
+                "with": {"function": _track_evaluations},
             },
         ],
         "steps": [
@@ -626,8 +624,8 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
                             "run": "optimizer",
                             "with": {
                                 "config": "$enopt_config",
-                                "update_results": ["last", "callback"],
-                                "initial_variables": "$last",
+                                "update": ["last", "callback"],
+                                "initial_values": "$last",
                             },
                         },
                     ],
@@ -658,17 +656,17 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
         "context": [
             {
                 "id": "enopt_config",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config,
             },
             {
                 "id": "optimum",
-                "init": "results_tracker",
+                "init": "results",
             },
             {
                 "id": "callback",
-                "init": "results_callback",
-                "with": {"callback": _track_evaluations},
+                "init": "callback",
+                "with": {"function": _track_evaluations},
             },
         ],
         "steps": [
@@ -681,8 +679,8 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
                             "run": "optimizer",
                             "with": {
                                 "config": "$enopt_config",
-                                "update_results": ["optimum", "callback"],
-                                "initial_variables": "$optimum",
+                                "update": ["optimum", "callback"],
+                                "initial_values": "$optimum",
                             },
                         },
                     ],
@@ -732,17 +730,17 @@ def test_restart_optimum_with_reset(
         "context": [
             {
                 "id": "enopt_config",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config,
             },
             {
                 "id": "optimum",
-                "init": "results_tracker",
+                "init": "results",
             },
             {
                 "id": "callback",
-                "init": "results_callback",
-                "with": {"callback": _track_evaluations},
+                "init": "callback",
+                "with": {"function": _track_evaluations},
             },
         ],
         "steps": [
@@ -752,18 +750,18 @@ def test_restart_optimum_with_reset(
                     "iterations": 3,
                     "steps": [
                         {
-                            "run": "reset_context",
+                            "run": "reset",
                             "with": {
-                                "context_id": "optimum",
-                                "backup_id": "initial",
+                                "context": "optimum",
+                                "backup_var": "initial",
                             },
                         },
                         {
                             "run": "optimizer",
                             "with": {
                                 "config": "$enopt_config",
-                                "update_results": ["optimum", "callback"],
-                                "initial_variables": "$initial",
+                                "update": ["optimum", "callback"],
+                                "initial_values": "$initial",
                             },
                         },
                     ],
@@ -803,13 +801,13 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
         "context": [
             {
                 "id": "config",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config,
             },
             {
                 "id": "callback",
-                "init": "results_callback",
-                "with": {"callback": track_results},
+                "init": "callback",
+                "with": {"function": track_results},
             },
         ],
         "steps": [
@@ -817,13 +815,13 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 "run": "repeat",
                 "with": {
                     "iterations": 2,
-                    "counter_id": "counter",
+                    "counter_var": "counter",
                     "steps": [
                         {
                             "run": "optimizer",
                             "with": {
                                 "config": "$config",
-                                "update_results": ["callback"],
+                                "update": ["callback"],
                                 "metadata": {
                                     "restart": "$counter",
                                     "foo": 1,
@@ -853,12 +851,12 @@ def test_update_enopt(enopt_config: Any, evaluator: Any) -> None:
         "context": [
             {
                 "id": "config",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config,
             },
             {
                 "id": "optimum",
-                "init": "results_tracker",
+                "init": "results",
             },
         ],
         "steps": [
@@ -866,7 +864,7 @@ def test_update_enopt(enopt_config: Any, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$config",
-                    "update_results": ["optimum"],
+                    "update": ["optimum"],
                 },
             },
         ],
@@ -884,9 +882,9 @@ def test_update_enopt(enopt_config: Any, evaluator: Any) -> None:
 
     workflow_config["steps"] = [
         {
-            "run": "update_context",
+            "run": "update",
             "with": {
-                "context_id": "config",
+                "context": "config",
                 "value": {"objective_functions": {"weights": weights}},
             },
         },
@@ -906,12 +904,12 @@ def test_evaluator_step(enopt_config: Any, evaluator: Any) -> None:
         "context": [
             {
                 "id": "config",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config,
             },
             {
                 "id": "optimum",
-                "init": "results_tracker",
+                "init": "results",
             },
         ],
         "steps": [
@@ -919,7 +917,7 @@ def test_evaluator_step(enopt_config: Any, evaluator: Any) -> None:
                 "run": "evaluator",
                 "with": {
                     "config": "$config",
-                    "update_results": ["optimum"],
+                    "update": ["optimum"],
                 },
             },
         ],
@@ -934,7 +932,7 @@ def test_evaluator_step(enopt_config: Any, evaluator: Any) -> None:
     assert workflow["optimum"].functions is not None
     assert np.allclose(workflow["optimum"].functions.weighted_objective, 1.66)
 
-    workflow_config["steps"][0]["with"]["variables"] = [0, 0, 0]
+    workflow_config["steps"][0]["with"]["values"] = [0, 0, 0]
     parsed_config = WorkflowConfig.model_validate(workflow_config)
     context = OptimizerContext(evaluator=evaluator())
     workflow = Workflow(parsed_config, context)
@@ -963,17 +961,17 @@ def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
         "context": [
             {
                 "id": "config",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config,
             },
             {
                 "id": "optimum",
-                "init": "results_tracker",
+                "init": "results",
             },
             {
                 "id": "callback",
-                "init": "results_callback",
-                "with": {"callback": _track_evaluations},
+                "init": "callback",
+                "with": {"function": _track_evaluations},
             },
         ],
         "steps": [
@@ -981,8 +979,8 @@ def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
                 "run": "evaluator",
                 "with": {
                     "config": "$config",
-                    "update_results": ["optimum", "callback"],
-                    "variables": [[0, 0, 0.1], [0, 0, 0]],
+                    "update": ["optimum", "callback"],
+                    "values": [[0, 0, 0.1], [0, 0, 0]],
                 },
             },
         ],
@@ -1020,17 +1018,17 @@ def test_nested_workflow(enopt_config: Any, evaluator: Any) -> None:
         "context": [
             {
                 "id": "config",
-                "init": "enopt_config",
+                "init": "config",
                 "with": nested_config,
             },
             {
                 "id": "nested_optimum",
-                "init": "results_tracker",
+                "init": "results",
             },
             {
                 "id": "callback",
-                "init": "results_callback",
-                "with": {"callback": _track_evaluations},
+                "init": "callback",
+                "with": {"function": _track_evaluations},
             },
         ],
         "steps": [
@@ -1038,8 +1036,8 @@ def test_nested_workflow(enopt_config: Any, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$config",
-                    "update_results": ["nested_optimum", "callback"],
-                    "initial_variables": "$initial",
+                    "update": ["nested_optimum", "callback"],
+                    "initial_values": "$initial",
                 },
             },
         ],
@@ -1049,17 +1047,17 @@ def test_nested_workflow(enopt_config: Any, evaluator: Any) -> None:
         "context": [
             {
                 "id": "config",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config,
             },
             {
                 "id": "optimum",
-                "init": "results_tracker",
+                "init": "results",
             },
             {
                 "id": "callback",
-                "init": "results_callback",
-                "with": {"callback": _track_evaluations},
+                "init": "callback",
+                "with": {"function": _track_evaluations},
             },
         ],
         "steps": [
@@ -1067,11 +1065,11 @@ def test_nested_workflow(enopt_config: Any, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$config",
-                    "update_results": ["optimum", "callback"],
+                    "update": ["optimum", "callback"],
                     "nested_workflow": {
                         "workflow": inner_config,
-                        "initial_variables_id": "initial",
-                        "results_id": "nested_optimum",
+                        "initial_var": "initial",
+                        "results_var": "nested_optimum",
                     },
                 },
             },
@@ -1105,14 +1103,14 @@ def test_callback(enopt_config: Any, evaluator: Any) -> None:
         "context": [
             {
                 "id": "enopt_config",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config,
             },
             {
                 "id": "callback",
-                "init": "results_callback",
+                "init": "callback",
                 "with": {
-                    "callback": _store_value,
+                    "function": _store_value,
                     "kwargs": {
                         "count": "$counter",
                         "config": "$enopt_config",
@@ -1125,13 +1123,13 @@ def test_callback(enopt_config: Any, evaluator: Any) -> None:
                 "run": "repeat",
                 "with": {
                     "iterations": 3,
-                    "counter_id": "counter",
+                    "counter_var": "counter",
                     "steps": [
                         {
                             "run": "optimizer",
                             "with": {
                                 "config": "$enopt_config",
-                                "update_results": ["callback"],
+                                "update": ["callback"],
                                 "metadata": {
                                     "restart": "$counter",
                                 },

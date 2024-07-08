@@ -29,15 +29,15 @@ class DefaultEvaluatorStepWith(BaseModel):
     object.
 
     Attributes:
-        config:         ID of the context object that contains the optimizer configuration
-        update_results: List of the objects that are notified of new results
-        variables:      Variables to evaluate at
-        metadata:       Metadata to set in the results
+        config:   ID of the context object that contains the optimizer configuration
+        update:   List of the objects that are notified of new results
+        values:   Values to evaluate at
+        metadata: Metadata to set in the results
     """
 
     config: str
-    update_results: List[str] = []
-    variables: Optional[Union[str, Array2D]] = None
+    update: List[str] = []
+    values: Optional[Union[str, Array2D]] = None
     metadata: Dict[str, str] = {}
 
     model_config = ConfigDict(
@@ -97,8 +97,8 @@ class DefaultEvaluatorStep(WorkflowStep):
             for key, expr in self._with.metadata.items():
                 item.metadata[key] = self.workflow.parse_value(expr)
 
-        for obj_id in self._with.update_results:
-            self.workflow[obj_id] = results
+        for obj_id in self._with.update:
+            self.workflow.update_context(obj_id, results)
 
         assert results
         assert isinstance(results[0], FunctionResults)
@@ -108,13 +108,13 @@ class DefaultEvaluatorStep(WorkflowStep):
         return exit_code == OptimizerExitCode.USER_ABORT
 
     def _get_variables(self) -> NDArray[np.float64]:
-        if self._with.variables is not None:
-            parsed_variables = self.workflow.parse_value(self._with.variables)
+        if self._with.values is not None:  # noqa: PD011
+            parsed_variables = self.workflow.parse_value(self._with.values)
             if isinstance(parsed_variables, FunctionResults):
                 return parsed_variables.evaluations.variables
             if isinstance(parsed_variables, np.ndarray):
                 return parsed_variables
             if parsed_variables is not None:
-                msg = f"`{self._with.variables} does not contain variables."
+                msg = f"`{self._with.values} does not contain variables."  # noqa: PD011
                 raise WorkflowError(msg, step_name=self.step_config.name)
         return self._enopt_config.variables.initial_values

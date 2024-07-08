@@ -61,6 +61,7 @@ class Workflow:
         """
         self._workflow_config = config
         self._workflow_context = context
+        self._vars: Dict[str, Any] = {}
 
         self._plugin_manager = (
             PluginManager() if plugin_manager is None else plugin_manager
@@ -72,7 +73,6 @@ class Workflow:
             for config in config.context
         }
         self._steps = self.create_steps(config.steps)
-        self._vars: Dict[str, Any] = {}
 
     def run(self) -> bool:
         """Run the workflow.
@@ -145,7 +145,7 @@ class Workflow:
             if stripped.startswith("${{") and stripped.endswith("}}"):
                 return self._eval(stripped[3:-2].strip())
             if stripped.startswith("$"):
-                return self.__getitem__(stripped[1:])
+                return self[stripped[1:]]
             return re.sub(r"\${{(.*?)}}|\$\$|\$([^\W0-9][\w\.]*)", _substitute, value)
         return value
 
@@ -199,47 +199,54 @@ class Workflow:
         """
         return obj_id in self._context
 
-    def __contains__(self, name: str) -> bool:
-        """Check if a variable of field exists.
+    def update_context(self, name: str, value: Any) -> None:  # noqa: ANN401
+        """Update a context object.
 
         Args:
-            name: name of the field or the variable
-
-        Returns:
-            Whether the variable of field exists.
+            name:  The context
+            value: The value to use for the update
         """
-        return name in self._vars or name in self._context
-
-    def __setitem__(self, name: str, value: Any) -> None:  # noqa: ANN401
-        """Set a variable or the value of a context object.
-
-        Args:
-            name:  The variable or context
-            value: The value to assign
-        """
-        if name in self._context:
-            self._context[name].update(value)
-        else:
-            if not name.isidentifier():
-                msg = f"Not a valid variable name: `{name}`"
-                raise WorkflowError(msg)
-            self._vars[name] = value
+        if name not in self._context:
+            msg = f"not a valid context: `{name}`"
+            raise WorkflowError(msg)
+        self._context[name].update(value)
 
     def __getitem__(self, name: str) -> Any:  # noqa: ANN401
-        """Get the value of a variable or a context object.
+        """Get the value of a variable.
 
         Args:
-            name: the variable name or context object
+            name: the variable name
 
         Returns:
-            The value of the variable or context object.
+            The value of the variable.
         """
         if name in self._vars:
             return self._vars[name]
-        if name in self._context:
-            return self._context[name].value()
-        msg = f"Unknown workflow variable or context object: `{name}`"
+        msg = f"Unknown workflow variable: `{name}`"
         raise WorkflowError(msg)
+
+    def __setitem__(self, name: str, value: Any) -> None:  # noqa: ANN401
+        """Set a variable .
+
+        Args:
+            name:  The variable
+            value: The value to assign
+        """
+        if not name.isidentifier():
+            msg = f"Not a valid variable name: `{name}`"
+            raise WorkflowError(msg)
+        self._vars[name] = value
+
+    def __contains__(self, name: str) -> bool:
+        """Check if a variable exists.
+
+        Args:
+            name: name of the variable
+
+        Returns:
+            Whether the variable exists.
+        """
+        return name in self._vars
 
 
 def _is_valid(node: ast.AST) -> bool:  # noqa: PLR0911

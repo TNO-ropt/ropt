@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from copy import deepcopy
+from typing import TYPE_CHECKING, Optional
 
 from pydantic import BaseModel, ConfigDict
 
@@ -14,11 +15,11 @@ if TYPE_CHECKING:
     from ropt.workflow import Workflow
 
 
-class DefaultUpdateContextStepWith(BaseModel):
-    """Parameters used by the default update_context step."""
+class DefaultResetStepWith(BaseModel):
+    """Parameters used by the default reset step."""
 
-    context_id: str
-    value: Any
+    context: str
+    backup_var: Optional[str] = None
 
     model_config = ConfigDict(
         extra="forbid",
@@ -26,11 +27,11 @@ class DefaultUpdateContextStepWith(BaseModel):
     )
 
 
-class DefaultUpdateContextStep(WorkflowStep):
-    """The default set step."""
+class DefaultResetStep(WorkflowStep):
+    """The default reset step."""
 
     def __init__(self, config: StepConfig, workflow: Workflow) -> None:
-        """Initialize a default update_context step.
+        """Initialize a default reset context step.
 
         Args:
             config:   The configuration of the step
@@ -38,7 +39,7 @@ class DefaultUpdateContextStep(WorkflowStep):
         """
         super().__init__(config, workflow)
 
-        self._with = DefaultUpdateContextStepWith.model_validate(config.with_)
+        self._with = DefaultResetStepWith.model_validate(config.with_)
 
     def run(self) -> bool:
         """Run the reset step.
@@ -46,8 +47,11 @@ class DefaultUpdateContextStep(WorkflowStep):
         Returns:
             True if a user abort occurred, always `False`.
         """
-        if not self.workflow.has_context(self._with.context_id):
-            msg = f"Env object `{self._with.context_id}` does not exist."
+        if not self.workflow.has_context(self._with.context):
+            msg = f"Env object `{self._with.context}` does not exist."
             raise WorkflowError(msg, step_name=self.step_config.name)
-        self.workflow[self._with.context_id] = self._with.value
+        backup = deepcopy(self._workflow[self._with.context])
+        self.workflow.reset_context(self._with.context)
+        if self._with.backup_var is not None:
+            self.workflow[self._with.backup_var] = backup
         return False

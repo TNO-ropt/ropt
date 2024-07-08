@@ -75,13 +75,13 @@ def main() -> None:
         },
         workflow={
             "context": [
-                {"id": "enopt_config", "init": "enopt_config", "with": ENOPT_CONFIG},
-                {"id": "optimal", "init": "results_tracker"},
+                {"id": "enopt_config", "init": "config", "with": ENOPT_CONFIG},
+                {"id": "optimal", "init": "results"},
             ],
             "steps": [
                 {
                     "run": "optimizer",
-                    "with": {"config": "$enopt_config", "update_results": ["optimal"]},
+                    "with": {"config": "$enopt_config", "update": ["optimal"]},
                 },
             ],
         },

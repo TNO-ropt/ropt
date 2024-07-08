@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel, ConfigDict
 
@@ -14,11 +14,11 @@ if TYPE_CHECKING:
     from ropt.workflow import Workflow
 
 
-class DefaultResetContextStepWith(BaseModel):
-    """Parameters used by the default reset_context step."""
+class DefaultUpdateStepWith(BaseModel):
+    """Parameters used by the default update step."""
 
-    context_id: str
-    backup_id: Optional[str] = None
+    context: str
+    value: Any
 
     model_config = ConfigDict(
         extra="forbid",
@@ -26,11 +26,11 @@ class DefaultResetContextStepWith(BaseModel):
     )
 
 
-class DefaultResetContextStep(WorkflowStep):
-    """The default reset_context step."""
+class DefaultUpdateStep(WorkflowStep):
+    """The default update context step."""
 
     def __init__(self, config: StepConfig, workflow: Workflow) -> None:
-        """Initialize a default reset context step.
+        """Initialize a default update step.
 
         Args:
             config:   The configuration of the step
@@ -38,18 +38,16 @@ class DefaultResetContextStep(WorkflowStep):
         """
         super().__init__(config, workflow)
 
-        self._with = DefaultResetContextStepWith.model_validate(config.with_)
+        self._with = DefaultUpdateStepWith.model_validate(config.with_)
 
     def run(self) -> bool:
-        """Run the reset step.
+        """Run the update step.
 
         Returns:
             True if a user abort occurred, always `False`.
         """
-        if not self.workflow.has_context(self._with.context_id):
-            msg = f"Env object `{self._with.context_id}` does not exist."
+        if not self.workflow.has_context(self._with.context):
+            msg = f"Env object `{self._with.context}` does not exist."
             raise WorkflowError(msg, step_name=self.step_config.name)
-        if self._with.backup_id is not None:
-            self.workflow[self._with.backup_id] = self.workflow[self._with.context_id]
-        self.workflow.reset_context(self._with.context_id)
+        self.workflow.update_context(self._with.context, self._with.value)
         return False

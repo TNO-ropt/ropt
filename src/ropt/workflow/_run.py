@@ -41,12 +41,12 @@ def _basic_run_config(
         "context": [
             {
                 "id": "config",
-                "init": "enopt_config",
+                "init": "config",
                 "with": enopt_config,
             },
             {
                 "id": "optimal",
-                "init": "results_tracker",
+                "init": "results",
                 "with": {"constraint_tolerance": constraint_tolerance},
             },
         ],
@@ -55,7 +55,7 @@ def _basic_run_config(
                 "run": "optimizer",
                 "with": {
                     "config": "$config",
-                    "update_results": updates,
+                    "update": updates,
                     "exit_code": "exit_code",
                 },
             },
@@ -65,8 +65,8 @@ def _basic_run_config(
         config["context"].append(
             {
                 "id": "callback",
-                "init": "results_callback",
-                "with": {"callback": callback},
+                "init": "callback",
+                "with": {"function": callback},
             }
         )
     return config

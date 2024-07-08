@@ -17,14 +17,14 @@ class DefaultRepeatStepWith(BaseModel):
     """Parameters used by the default repeat step.
 
     Attributes:
-        iterations: The number of repetitions
-        steps:      The steps to repeat
-        counter_id: The variable or context object to update with the counter value
+        iterations:  The number of repetitions
+        steps:       The steps to repeat
+        counter_var: The variable to update with the counter value
     """
 
     iterations: int
     steps: List[StepConfig]
-    counter_id: Optional[str] = None
+    counter_var: Optional[str] = None
 
     model_config = ConfigDict(
         extra="forbid",
@@ -47,7 +47,7 @@ class DefaultRepeatStep(WorkflowStep):
         with_ = DefaultRepeatStepWith.model_validate(config.with_)
         self._num = with_.iterations
         self._steps = self.workflow.create_steps(with_.steps)
-        self._counter = with_.counter_id
+        self._counter_var = with_.counter_var
 
     def run(self) -> bool:
         """Run the steps repeatedly.
@@ -56,8 +56,8 @@ class DefaultRepeatStep(WorkflowStep):
             True if a user abort occurred.
         """
         for idx in range(self._num):
-            if self._counter is not None:
-                self.workflow[self._counter] = idx
+            if self._counter_var is not None:
+                self.workflow[self._counter_var] = idx
             if self.workflow.run_steps(self._steps):
                 return True
         return False

@@ -19,8 +19,8 @@ if TYPE_CHECKING:
     from ropt.workflow import Workflow
 
 
-class DefaultResultsTrackerWith(BaseModel):
-    """Parameters for the results_tracker context object.
+class DefaultResultsWith(BaseModel):
+    """Parameters for the results context object.
 
     The `type` parameter determines what result is tracked:
     - "optimal": Track the best result added
@@ -40,11 +40,11 @@ class DefaultResultsTrackerWith(BaseModel):
     )
 
 
-class DefaultResultsTrackerContext(ContextObj):
-    """The default results_tracker context object."""
+class DefaultResultsContext(ContextObj):
+    """The default results context object."""
 
     def __init__(self, config: ContextConfig, workflow: Workflow) -> None:
-        """Initialize a default results_tracker context object.
+        """Initialize a default results context object.
 
         Args:
             config:   The configuration of the step
@@ -52,11 +52,11 @@ class DefaultResultsTrackerContext(ContextObj):
         """
         super().__init__(config, workflow)
         self._with = (
-            DefaultResultsTrackerWith()
+            DefaultResultsWith()
             if config.with_ is None
-            else DefaultResultsTrackerWith.model_validate(config.with_)
+            else DefaultResultsWith.model_validate(config.with_)
         )
-        self._value: Optional[FunctionResults] = None
+        self.set_variable(None)
 
     def update(self, value: Tuple[Results, ...]) -> None:
         """Update the result object.
@@ -79,18 +79,14 @@ class DefaultResultsTrackerContext(ContextObj):
         results: Optional[FunctionResults] = None
         if self._with.type_ == "optimal":
             results = _update_optimal_result(
-                self._value, value, self._with.constraint_tolerance
+                self.get_variable(), value, self._with.constraint_tolerance
             )
         if self._with.type_ == "last":
             results = _get_last_result(value, self._with.constraint_tolerance)
         if results is not None:
             results = deepcopy(results)
-            self._value = results
-
-    def value(self) -> Optional[FunctionResults]:
-        """Return the optimal or last results object."""
-        return self._value
+            self.set_variable(results)
 
     def reset(self) -> None:
         """Clear the stored values."""
-        self._value = None
+        self.set_variable(None)

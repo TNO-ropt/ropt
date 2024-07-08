@@ -28,14 +28,14 @@ class DefaultNestedWorkflow(BaseModel):
     """Parameters used by the nested optimizer step.
 
     Attributes:
-        workflow:             Optional nested workflow to run during optimization
-        initial_variables_id: ID of object providing variables to the nested workflow
-        results_id:           The ID of the object in the workflow containing the result
+        workflow:    Optional nested workflow to run during optimization
+        initial_var: Name of the variable providing initial_values to the nested workflow
+        results_var: The name of the variable in the workflow containing the result
     """
 
     workflow: WorkflowConfig
-    initial_variables_id: str
-    results_id: str
+    initial_var: str
+    results_var: str
 
 
 class DefaultOptimizerStepWith(BaseModel):
@@ -44,16 +44,16 @@ class DefaultOptimizerStepWith(BaseModel):
     Optionally the initial variables to be used can be set from a context object.
 
     Attributes:
-        config:            ID of the context object that contains the optimizer configuration
-        update_results:    List of the objects that are notified of new results
-        initial_variables: Optional context object that provides variables
-        metadata:          Metadata to set in the results
-        nested_workflow:   Optional nested workflow configuration
+        config:          ID of the context object that contains the optimizer configuration
+        update:          List of the objects that are notified of new results
+        initial_values:  The initial values for the optimizer
+        metadata:        Metadata to set in the results
+        nested_workflow: Optional nested workflow configuration
     """
 
     config: str
-    update_results: List[str] = []
-    initial_variables: Optional[Union[str, Array1D]] = None
+    update: List[str] = []
+    initial_values: Optional[Union[str, Array1D]] = None
     metadata: Dict[str, Union[int, float, bool, str]] = {}
     exit_code: Optional[str] = None
     nested_workflow: Optional[DefaultNestedWorkflow] = None
@@ -126,8 +126,8 @@ class DefaultOptimizerStep(OptimizerStep):
             for key, expr in self._with.metadata.items():
                 item.metadata[key] = self.workflow.parse_value(expr)
 
-        for obj_id in self._with.update_results:
-            self.workflow[obj_id] = results
+        for obj_id in self._with.update:
+            self.workflow.update_context(obj_id, results)
 
     def run_nested_workflow(
         self, variables: NDArray[np.float64]
@@ -145,18 +145,18 @@ class DefaultOptimizerStep(OptimizerStep):
         workflow = Workflow(
             self._with.nested_workflow.workflow, self.workflow.optimizer_context
         )
-        workflow[self._with.nested_workflow.initial_variables_id] = variables
+        workflow[self._with.nested_workflow.initial_var] = variables
         aborted = workflow.run()
-        return workflow[self._with.nested_workflow.results_id], aborted
+        return workflow[self._with.nested_workflow.results_var], aborted
 
     def _get_variables(self) -> NDArray[np.float64]:
-        if self._with.initial_variables is not None:
-            parsed_variables = self.workflow.parse_value(self._with.initial_variables)
+        if self._with.initial_values is not None:
+            parsed_variables = self.workflow.parse_value(self._with.initial_values)
             if isinstance(parsed_variables, FunctionResults):
                 return parsed_variables.evaluations.variables
             if isinstance(parsed_variables, np.ndarray):
                 return parsed_variables
             if parsed_variables is not None:
-                msg = f"`{self._with.initial_variables} does not contain variables."
+                msg = f"`{self._with.initial_values} does not contain variables."
                 raise WorkflowError(msg, step_name=self.step_config.name)
         return self._enopt_config.variables.initial_values

@@ -9,28 +9,28 @@ from ropt.config.workflow import ContextConfig, StepConfig  # noqa: TCH001
 from ropt.plugins.workflow.base import ContextObj, WorkflowStep  # noqa: TCH001
 from ropt.workflow import Workflow  # noqa: TCH001
 
-from ._enopt_config import DefaultEnOptConfigContext
+from ._callback import DefaultCallbackContext
+from ._config import DefaultConfigContext
 from ._evaluator import DefaultEvaluatorStep
 from ._optimizer import DefaultOptimizerStep
 from ._repeat import DefaultRepeatStep
-from ._reset_context import DefaultResetContextStep
-from ._results_callback import DefaultResultsCallbackContext
-from ._results_tracker import DefaultResultsTrackerContext
-from ._update_context import DefaultUpdateContextStep
+from ._reset import DefaultResetStep
+from ._update import DefaultUpdateStep
 from .base import WorkflowPlugin
+from .results import DefaultResultsContext
 
 _CONTEXT_OBJECTS: Final[Dict[str, Type[ContextObj]]] = {
-    "results_callback": DefaultResultsCallbackContext,
-    "enopt_config": DefaultEnOptConfigContext,
-    "results_tracker": DefaultResultsTrackerContext,
+    "callback": DefaultCallbackContext,
+    "config": DefaultConfigContext,
+    "results": DefaultResultsContext,
 }
 
 _STEP_OBJECTS: Final[Dict[str, Type[WorkflowStep]]] = {
     "evaluator": DefaultEvaluatorStep,
     "optimizer": DefaultOptimizerStep,
     "repeat": DefaultRepeatStep,
-    "reset_context": DefaultResetContextStep,
-    "update_context": DefaultUpdateContextStep,
+    "reset": DefaultResetStep,
+    "update": DefaultUpdateStep,
 }
 
 
