@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../enums/">
+        <link rel="prev" href="../scipy_sampler/">
       
       
-        <link rel="next" href="../utilities/">
+        <link rel="next" href="../default_function_transforms/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Exceptions - ropt Documentation</title>
+        <title>Default Realization Filters - ropt Documentation</title>
       
     
     
@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.exceptions" class="md-skip">
+        <a href="#ropt.plugins.realization_filter.default.DefaultRealizationFilter" class="md-skip">
           Skip to content
         </a>
       
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Exceptions
+              Default Realization Filters
             
           </span>
         </div>
@@ -740,6 +740,8 @@
                 
   
   
+    
+  
   
   
     
@@ -748,13 +750,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" checked>
         
           
           <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
@@ -768,7 +768,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_4">
             <span class="md-nav__icon md-icon"></span>
             Default Plugins
@@ -821,10 +821,28 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../default_realization_filters/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Default Realization Filters
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -833,6 +851,69 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.default.DefaultRealizationFilter" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultRealizationFilter
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.default.SortObjectiveOptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      SortObjectiveOptions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.default.SortConstraintOptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      SortConstraintOptions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.default.CVaRObjectiveOptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      CVaRObjectiveOptions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.default.CVaRConstraintOptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      CVaRConstraintOptions
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -913,28 +994,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Exceptions
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../exceptions/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -943,96 +1006,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.exceptions" class="md-nav__link">
-    <span class="md-ellipsis">
-      exceptions
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="exceptions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.ConfigError" class="md-nav__link">
-    <span class="md-ellipsis">
-      ConfigError
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.WorkflowError" class="md-nav__link">
-    <span class="md-ellipsis">
-      WorkflowError
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="WorkflowError">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.WorkflowError.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.OptimizationAborted" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptimizationAborted
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptimizationAborted">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.OptimizationAborted.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1091,74 +1064,47 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.exceptions" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.default.DefaultRealizationFilter" class="md-nav__link">
     <span class="md-ellipsis">
-      exceptions
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="exceptions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.ConfigError" class="md-nav__link">
-    <span class="md-ellipsis">
-      ConfigError
+      DefaultRealizationFilter
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.WorkflowError" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.default.SortObjectiveOptions" class="md-nav__link">
     <span class="md-ellipsis">
-      WorkflowError
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="WorkflowError">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.WorkflowError.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
+      SortObjectiveOptions
     </span>
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.OptimizationAborted" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.default.SortConstraintOptions" class="md-nav__link">
     <span class="md-ellipsis">
-      OptimizationAborted
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptimizationAborted">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.OptimizationAborted.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
+      SortConstraintOptions
     </span>
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.default.CVaRObjectiveOptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      CVaRObjectiveOptions
+    </span>
+  </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.default.CVaRConstraintOptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      CVaRConstraintOptions
+    </span>
+  </a>
   
 </li>
       
@@ -1177,73 +1123,62 @@
                   
 
 
-  <h1>Exceptions</h1>
+  <h1>Default Realization Filters</h1>
 
-<div class="doc doc-object doc-module">
+<div class="doc doc-object doc-class">
 
 
 
-<h2 id="ropt.exceptions" class="doc doc-heading">
-            <code>ropt.exceptions</code>
+<h2 id="ropt.plugins.realization_filter.default.DefaultRealizationFilter" class="doc doc-heading">
+            <code>ropt.plugins.realization_filter.default.DefaultRealizationFilter</code>
 
 
 </h2>
 
+
     <div class="doc doc-contents first">
-
-      <p>Exceptions raised by <code>ropt</code>.</p>
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.exceptions.ConfigError" class="doc doc-heading">
-            <code>ConfigError</code>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code>Exception</code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.realization_filter.base.RealizationFilter" href="../realization_filter_plugins/#ropt.plugins.realization_filter.base.RealizationFilter">RealizationFilter</a></code></p>
 
 
-      <p>Raised when an configuration error occurs.</p>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.exceptions.WorkflowError" class="doc doc-heading">
-            <code>WorkflowError</code>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code>Exception</code></p>
-
-
-      <p>Raised when an error occurs in a workflow.</p>
+      <p>The default realization filter plugin class.</p>
+<p>This plugin currently implements four methods:</p>
+<dl>
+<dt><code>sort-objective</code>:</dt>
+<dd>Filter realizations by selecting a range of objective values. This filter
+   requires additional configuration using an options dict that can be
+   parsed into a
+   <a class="autorefs autorefs-internal" href="#ropt.plugins.realization_filter.default.SortObjectiveOptions"><code>SortObjectiveOptions</code></a>
+   class. This method sorts realizations according to the weighted sum of
+   the values of objective functions specified in the options. It then
+   selects the set of realizations from a given index range.</dd>
+<dt><code>sort-constraint</code>:</dt>
+<dd>Filter realizations by selecting a range of constraint values. This
+   filter requires additional configuration using an options dict that can
+   be parsed into a
+   <a class="autorefs autorefs-internal" href="#ropt.plugins.realization_filter.default.SortConstraintOptions"><code>SortConstraintOptions</code></a>
+   class. This method sorts realizations according to the values of
+   constraint functions specified in the options. It then selects the set of
+   realizations from a given index range.</dd>
+<dt><code>cvar-objective</code>:</dt>
+<dd>Filter realizations by selecting a range of objective values. This filter
+   requires additional configuration using an options dict that can be
+   parsed into a
+   <a class="autorefs autorefs-internal" href="#ropt.plugins.realization_filter.default.CVaRObjectiveOptions"><code>CVaRObjectiveOptions</code></a>
+   class. This method sorts realizations according to the weighted sum of
+   the values of objective functions specified in the options. It then
+   selects a percentile of the realizations, applying interpolation whenever
+   the number of selected realizations is not an integer number.</dd>
+<dt><code>cvar-constraint</code>:</dt>
+<dd>Filter realizations by selecting a range of constraint values. This
+   filter requires additional configuration using an options dict that can
+   be parsed into a
+   <a class="autorefs autorefs-internal" href="#ropt.plugins.realization_filter.default.CVaRConstraintOptions"><code>CVaRConstraintOptions</code></a>
+   class. This method sorts realizations according to the values of
+   constraint functions specified in the options. It then selects a
+   percentile of the realizations, applying interpolation whenever the
+   number of selected realizations is not an integer number.</dd>
+</dl>
 
 
 
@@ -1257,80 +1192,6 @@
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.exceptions.WorkflowError.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">step_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context_id</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-      <p>Initialize with a custom error message.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>message</code></td>
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Error message</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>step_name</code></td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[str]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional step name to add to the message</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>context_id</code></td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[str]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional context ID to add to the message</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
 
 
 
@@ -1344,22 +1205,71 @@
 
 
 
-<h3 id="ropt.exceptions.OptimizationAborted" class="doc doc-heading">
-            <code>OptimizationAborted</code>
+<h2 id="ropt.plugins.realization_filter.default.SortObjectiveOptions" class="doc doc-heading">
+            <code>ropt.plugins.realization_filter.default.SortObjectiveOptions</code>
 
 
-</h3>
+</h2>
 
 
-    <div class="doc doc-contents ">
+    <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code>Exception</code></p>
+              Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
 
 
-      <p>Raised when an optimization is aborted.</p>
-<p>When constructing the execption object an exit code must be passed that
-indicates the reason for aborting (see
-<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.OptimizerExitCode"><code>OptimizerExitCode</code></a>).</p>
+      <p>Configuration settings for the <code>sort-objective</code> method.</p>
+<p>The <code>sort-objective</code> method sorts realizations according to the value of one
+or multiple objectives, and retains a number of realizations within a given
+index range in the sorted list. If more than one objective index is given, a
+weighted sum of these objectives is used, using the weights given in the
+configuration of the optimizer.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.SortObjectiveOptions.sort">sort</span></code></td>
+            <td>
+                  <code><span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<span title="pydantic.StrictStr">StrictStr</span>, <span title="pydantic.NonNegativeInt">NonNegativeInt</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The indices of the objectives to sort</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.SortObjectiveOptions.first">first</span></code></td>
+            <td>
+                  <code><span title="pydantic.NonNegativeInt">NonNegativeInt</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Index of the first realization to use</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.SortObjectiveOptions.last">last</span></code></td>
+            <td>
+                  <code><span title="pydantic.NonNegativeInt">NonNegativeInt</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Index of the last realization to use</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 
@@ -1374,51 +1284,94 @@ indicates the reason for aborting (see
 
 
 
-<div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.exceptions.OptimizationAborted.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span></code>
+  </div>
 
-</h4>
+    </div>
 
+</div>
 
-    <div class="doc doc-contents ">
-
-      <p>Initialize an exception that aborts the optimization.</p>
+<div class="doc doc-object doc-class">
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
+
+<h2 id="ropt.plugins.realization_filter.default.SortConstraintOptions" class="doc doc-heading">
+            <code>ropt.plugins.realization_filter.default.SortConstraintOptions</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
+
+
+      <p>Configuration settings for the <code>sort-constraint</code> method.</p>
+<p>The <code>sort-constraint</code> method sorts realizations according to the value of a
+constraint, and retains a number of realizations within a given index range
+in the sorted list.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
     <table>
       <thead>
         <tr>
           <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>exit_code</code></td>
+            <td><code><span title="ropt.plugins.realization_filter.default.SortConstraintOptions.sort">sort</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.enums.OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a></code>
+                  <code><span title="typing.Union">Union</span>[<span title="pydantic.StrictStr">StrictStr</span>, <span title="pydantic.NonNegativeInt">NonNegativeInt</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The exit code indicating the reason for the abort</p>
+                <p>The index of the constraint to sort</p>
               </div>
             </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.SortConstraintOptions.first">first</span></code></td>
             <td>
-                <em>required</em>
+                  <code><span title="pydantic.NonNegativeInt">NonNegativeInt</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Index of the first realization to use</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.SortConstraintOptions.last">last</span></code></td>
+            <td>
+                  <code><span title="pydantic.NonNegativeInt">NonNegativeInt</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Index of the last realization to use</p>
+              </div>
             </td>
           </tr>
       </tbody>
     </table>
 
-    </div>
 
-</div>
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
 
 
 
@@ -1427,6 +1380,167 @@ indicates the reason for aborting (see
     </div>
 
 </div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.realization_filter.default.CVaRObjectiveOptions" class="doc doc-heading">
+            <code>ropt.plugins.realization_filter.default.CVaRObjectiveOptions</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
+
+
+      <p>Configuration settings for the <code>cvar-objective</code> method.</p>
+<p>The <code>cvar-objective</code> method finds realizations weights by applying the CVaR
+method to the objective values. If more than one objective index is given, a
+weighted sum of these objectives is used, using the weights given in the
+configuration of the optimizer.</p>
+<p>The percentile argument defines the contribution of the "worst" performing
+realizations in the distribution that is used to calculate the ensemble
+value. "Worst" is defined as those realizations having the highest values in
+case of a minimization and those having the lowest values in case of
+maximizing.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.CVaRObjectiveOptions.sort">sort</span></code></td>
+            <td>
+                  <code><span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<span title="pydantic.StrictStr">StrictStr</span>, <span title="pydantic.NonNegativeInt">NonNegativeInt</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The indices of the objectives to sort</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.CVaRObjectiveOptions.percentile">percentile</span></code></td>
+            <td>
+                  <code><span title="typing_extensions.Annotated">Annotated</span>[float, <span title="pydantic.Field">Field</span>(gt=0.0, le=1.0)]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The CVaR percentile</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.realization_filter.default.CVaRConstraintOptions" class="doc doc-heading">
+            <code>ropt.plugins.realization_filter.default.CVaRConstraintOptions</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
+
+
+      <p>Configuration settings for the <code>cvar-constraint</code> method.</p>
+<p>The <code>cvar-constraint</code> method finds realizations weights by applying the CVaR
+method to the objective values.</p>
+<p>The percentile argument defines the contribution of the "worst" performing
+realizations in the distribution that is used to calculate the ensemble
+value. The definition of worst depends on the type of the constraints. After
+subtracting the right-hand-side value the following applies:</p>
+<ul>
+<li>For LE constraints, realizations with the largest values are the worst</li>
+<li>For GE constraints, realizations with the smallest values are the worst</li>
+<li>For EQ constraints, realizations with the largest absolute values are the worst</li>
+</ul>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.CVaRConstraintOptions.sort">sort</span></code></td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[<span title="pydantic.StrictStr">StrictStr</span>, <span title="pydantic.NonNegativeInt">NonNegativeInt</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The index of the constraint to sort</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.CVaRConstraintOptions.percentile">percentile</span></code></td>
+            <td>
+                  <code><span title="typing_extensions.Annotated">Annotated</span>[float, <span title="pydantic.Field">Field</span>(gt=0.0, le=1.0)]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The CVaR percentile</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
 
 
 

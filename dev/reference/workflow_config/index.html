@@ -556,6 +556,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../workflows/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Optimization workflows
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../evaluator/" class="md-nav__link">
         
   
@@ -666,11 +687,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../plugins/" class="md-nav__link">
+      <a href="../plugin_manager/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Plugin manager
+    Plugins
   </span>
   
 
@@ -729,7 +750,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../realization_filters/" class="md-nav__link">
+      <a href="../realization_filter_plugins/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -750,7 +771,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../function_transforms/" class="md-nav__link">
+      <a href="../function_transform_plugins/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -771,11 +792,163 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow/" class="md-nav__link">
+      <a href="../workflow_plugins/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
     Workflow objects
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Default Plugins
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Default Plugins
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scipy_optimizer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SciPy Optimizer Plugin
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scipy_sampler/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SciPy Sampler Plugin
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_realization_filters/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Default Realization Filters
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_function_transforms/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Default Function Transforms
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_workflow_objects/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Default Workflow Objects
   </span>
   
 
@@ -959,6 +1132,7 @@
     <div class="doc doc-contents first">
 
       <p>Configuration classes for workflows.</p>
+<p>Optimization workflows are defined an run by <a class="autorefs autorefs-internal" href="../workflows/#ropt.workflow.Workflow"><code>Workflow</code></a> objects.</p>
 
 
 
@@ -989,13 +1163,11 @@
 <code>context</code> attribute, and a section that defines the tasks to perform by the
 <code>steps</code> attribute.</p>
 <p>The <code>context</code> attribute contains the configuration of the objects that
-create and maintain the context in which the workflow runs. Context objects
-are initialized before creating and running the workflow steps.</p>
+create and maintain the environment in which the workflow runs. Context
+objects are initialized before creating and running the workflow steps.</p>
 <p>After initializing the context objects, workflow steps are configured by the
 entries given by the <code>steps</code> attribute and are initialized and executed in
-order. During workflow execution, the context objects may be inspected and
-updated by the steps. After finishing the workflow, context objects can be
-inspected to retrieve any stored results.</p>
+order.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -1068,14 +1240,17 @@ inspected to retrieve any stored results.</p>
 
 
       <p>Configuration of a single context object.</p>
-<p>Context objects store information that is accessible to and updated by the
-steps of the workflow. They are referred to by their <code>id</code>, which is
-mandatory.</p>
+<p>Context objects process information that is provided by the steps of the
+workflow. They usually store information in workflow variables that are
+accessible to the steps and after the workflow has finished. In most cases,
+the context objects store a single result in a variable with a name equal to
+the <code>id</code> of the context object, but additional variables can be defined also.</p>
 <p>The <code>init</code> string identifies the code that is run to initialize the context
 object. It is used by the plugin manager to load the code.</p>
 <p>Additional parameters needed by the context objects are configured using the
 <code>with_</code> attribute. The contents of the <code>with_</code> attribute depend on the type
 of the context object.</p>
+<p>Context objects are referred to by their <code>id</code>, which is mandatory.</p>
 
 
 <details class="note" open>

@@ -12,7 +12,7 @@
         <link rel="prev" href="../optimizer_plugins/">
       
       
-        <link rel="next" href="../realization_filters/">
+        <link rel="next" href="../realization_filter_plugins/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -478,6 +478,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../workflows/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Optimization workflows
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../evaluator/" class="md-nav__link">
         
   
@@ -588,11 +609,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../plugins/" class="md-nav__link">
+      <a href="../plugin_manager/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Plugin manager
+    Plugins
   </span>
   
 
@@ -752,15 +773,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.scipy.SciPySampler" class="md-nav__link">
-    <span class="md-ellipsis">
-      SciPySampler
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -777,7 +789,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../realization_filters/" class="md-nav__link">
+      <a href="../realization_filter_plugins/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -798,7 +810,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../function_transforms/" class="md-nav__link">
+      <a href="../function_transform_plugins/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -819,11 +831,163 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow/" class="md-nav__link">
+      <a href="../workflow_plugins/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
     Workflow objects
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Default Plugins
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Default Plugins
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scipy_optimizer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SciPy Optimizer Plugin
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scipy_sampler/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SciPy Sampler Plugin
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_realization_filters/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Default Realization Filters
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_function_transforms/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Default Function Transforms
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_workflow_objects/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Default Workflow Objects
   </span>
   
 
@@ -1016,15 +1180,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.scipy.SciPySampler" class="md-nav__link">
-    <span class="md-ellipsis">
-      SciPySampler
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1055,13 +1210,13 @@
     <div class="doc doc-contents first">
 
       <p>Plugin functionality for adding sampler plugins.</p>
-<p>Sampler plugins are managed by a <a class="autorefs autorefs-internal" href="../plugins/#ropt.plugins.PluginManager"><code>PluginManager</code></a>
+<p>Sampler plugins are managed by a <a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>
 object, which returns classes or factory functions to create objects that
 implement one or more sampling methods to produce perturbations. These objects
 must adhere to the <a class="autorefs autorefs-internal" href="#ropt.plugins.sampler.base.Sampler"><code>Sampler</code></a> abstract base
 class.</p>
 <p>Samplers can be added via the plugin manager, by default the
-<a class="autorefs autorefs-internal" href="#ropt.plugins.sampler.scipy.SciPySampler"><code>SciPySampler</code></a> plugin is installed
+<a class="autorefs autorefs-internal" href="../scipy_sampler/#ropt.plugins.sampler.scipy.SciPySampler"><code>SciPySampler</code></a> plugin is installed
 which provides a number of methods from the
 <a href="https://docs.scipy.org/doc/scipy/reference/stats.html"><code>scipy.stats</code></a> package.</p>
 
@@ -1339,7 +1494,7 @@ deviation.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><span title="ropt.plugins.base.Plugin">Plugin</span></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.base.Plugin" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
 
 
       <p>Abtract base class for sampler plugins.</p>
@@ -1456,79 +1611,6 @@ deviation.</p>
     </div>
 
 </div>
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ropt.plugins.sampler.scipy.SciPySampler" class="doc doc-heading">
-            <code>ropt.plugins.sampler.scipy.SciPySampler</code>
-
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.sampler.base.Sampler" href="#ropt.plugins.sampler.base.Sampler">Sampler</a></code></p>
-
-
-      <p>Plugin class for producing sampling values via SciPy.</p>
-<p>This plugin implements the following sampling methods using the
-corresponding methods from the SciPy stats module:</p>
-<ul>
-<li>
-<p>Sampling from <a href="https://docs.scipy.org/doc/scipy/reference/stats.html">probability
-  distributions</a>:</p>
-<dl>
-<dt><code>uniform</code></dt>
-<dd>Uniform distribution with a default range of [-1, 1].</dd>
-<dt><code>norm</code></dt>
-<dd>Normal distribution with mean zero and standard deviation 1.</dd>
-<dt><code>truncnorm</code></dt>
-<dd>Truncated normal distribution with mean zero and standard
-  deviation 1 truncated a the range [-1, 1].</dd>
-</dl>
-</li>
-<li>
-<p>Sampling using methods from the <a href="https://docs.scipy.org/doc/scipy/reference/stats.qmc.html">Quasi-Monte Carlo
-  submodule</a>:</p>
-<dl>
-<dt><code>sobol</code></dt>
-<dd>Using Sobol sequences, scaled to -1 and 1.</dd>
-<dt><code>halton</code></dt>
-<dd>Using Halton sequences, scaled to -1 and 1.</dd>
-<dt><code>lhs</code></dt>
-<dd>Using Latin Hypercube sampling, scaled to -1 and 1.</dd>
-</dl>
-</li>
-</ul>
-<p>Specific options that are normally passed as arguments in the SciPy
-functions can be provided via the options dictionary in the configuration
-object. Consult the
-<a href="https://docs.scipy.org/doc/scipy/reference/stats.html"><code>scipy.stats</code></a>
-manual for details on these options.</p>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
 
 
 

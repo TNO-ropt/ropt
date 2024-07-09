@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../results/">
+        <link rel="prev" href="../enopt_config/">
       
       
-        <link rel="next" href="../plugin_manager/">
+        <link rel="next" href="../evaluator/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Reporting - ropt Documentation</title>
+        <title>Optimization workflows - ropt Documentation</title>
       
     
     
@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.report" class="md-skip">
+        <a href="#ropt.workflow" class="md-skip">
           Skip to content
         </a>
       
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Reporting
+              Optimization workflows
             
           </span>
         </div>
@@ -475,10 +475,28 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../workflows/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Optimization workflows
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -487,6 +505,219 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      workflow
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.BasicWorkflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      BasicWorkflow
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BasicWorkflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.BasicWorkflow.abort_optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      abort_optimization
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.OptimizerContext" class="md-nav__link">
+    <span class="md-ellipsis">
+      OptimizerContext
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OptimizerContext">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.OptimizerContext.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Workflow
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.plugin_manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      plugin_manager
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.optimizer_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      optimizer_context
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      run
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.create_steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      create_steps
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.run_steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      run_steps
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.parse_value" class="md-nav__link">
+    <span class="md-ellipsis">
+      parse_value
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.reset_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset_context
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.has_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      has_context
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.update_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_context
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.__getitem__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __getitem__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.__setitem__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __setitem__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.__contains__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __contains__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -538,28 +769,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Reporting
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../reporting/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -568,114 +781,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.report" class="md-nav__link">
-    <span class="md-ellipsis">
-      report
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="report">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.report.ResultsDataFrame" class="md-nav__link">
-    <span class="md-ellipsis">
-      ResultsDataFrame
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ResultsDataFrame">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.report.ResultsDataFrame.frame" class="md-nav__link">
-    <span class="md-ellipsis">
-      frame
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.report.ResultsDataFrame.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.report.ResultsDataFrame.add_results" class="md-nav__link">
-    <span class="md-ellipsis">
-      add_results
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.report.ResultsTable" class="md-nav__link">
-    <span class="md-ellipsis">
-      ResultsTable
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ResultsTable">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.report.ResultsTable.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.report.ResultsTable.add_results" class="md-nav__link">
-    <span class="md-ellipsis">
-      add_results
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1109,47 +1214,29 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.report" class="md-nav__link">
+  <a href="#ropt.workflow" class="md-nav__link">
     <span class="md-ellipsis">
-      report
+      workflow
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="report">
+    <nav class="md-nav" aria-label="workflow">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.report.ResultsDataFrame" class="md-nav__link">
+  <a href="#ropt.workflow.BasicWorkflow" class="md-nav__link">
     <span class="md-ellipsis">
-      ResultsDataFrame
+      BasicWorkflow
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="ResultsDataFrame">
+    <nav class="md-nav" aria-label="BasicWorkflow">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.report.ResultsDataFrame.frame" class="md-nav__link">
+  <a href="#ropt.workflow.BasicWorkflow.abort_optimization" class="md-nav__link">
     <span class="md-ellipsis">
-      frame
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.report.ResultsDataFrame.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.report.ResultsDataFrame.add_results" class="md-nav__link">
-    <span class="md-ellipsis">
-      add_results
+      abort_optimization
     </span>
   </a>
   
@@ -1161,17 +1248,59 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.report.ResultsTable" class="md-nav__link">
+  <a href="#ropt.workflow.OptimizerContext" class="md-nav__link">
     <span class="md-ellipsis">
-      ResultsTable
+      OptimizerContext
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="ResultsTable">
+    <nav class="md-nav" aria-label="OptimizerContext">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.report.ResultsTable.__init__" class="md-nav__link">
+  <a href="#ropt.workflow.OptimizerContext.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Workflow
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.plugin_manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      plugin_manager
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.optimizer_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      optimizer_context
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -1180,9 +1309,90 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.report.ResultsTable.add_results" class="md-nav__link">
+  <a href="#ropt.workflow.Workflow.run" class="md-nav__link">
     <span class="md-ellipsis">
-      add_results
+      run
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.create_steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      create_steps
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.run_steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      run_steps
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.parse_value" class="md-nav__link">
+    <span class="md-ellipsis">
+      parse_value
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.reset_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset_context
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.has_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      has_context
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.update_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_context
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.__getitem__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __getitem__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.__setitem__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __setitem__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.__contains__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __contains__
     </span>
   </a>
   
@@ -1213,26 +1423,21 @@
                   
 
 
-  <h1>Reporting</h1>
+  <h1>Optimization workflows</h1>
 
 <div class="doc doc-object doc-module">
 
 
 
-<h2 id="ropt.report" class="doc doc-heading">
-            <code>ropt.report</code>
+<h2 id="ropt.workflow" class="doc doc-heading">
+            <code>ropt.workflow</code>
 
 
 </h2>
 
     <div class="doc doc-contents first">
 
-      <p>Classes for reporting optimization results.</p>
-<p>The classes in this module are designed to gather multiple results generated
-during the execution of an optimization workflow. Currently, the results can
-be reported as a <a href="https://pandas.pydata.org/"><code>pandas</code></a> DataFrame using the
-<a class="autorefs autorefs-internal" href="#ropt.report.ResultsDataFrame"><code>ResultsDataFrame</code></a> class, or as a text file in
-a tabular format using the <a class="autorefs autorefs-internal" href="#ropt.report.ResultsTable"><code>ResultsTable</code></a> class.</p>
+      <p>Code to run optimization workflows.</p>
 
 
 
@@ -1249,8 +1454,8 @@ a tabular format using the <a class="autorefs autorefs-internal" href="#ropt.rep
 
 
 
-<h3 id="ropt.report.ResultsDataFrame" class="doc doc-heading">
-            <code>ResultsDataFrame</code>
+<h3 id="ropt.workflow.BasicWorkflow" class="doc doc-heading">
+            <code>BasicWorkflow</code>
 
 
 </h3>
@@ -1259,15 +1464,7 @@ a tabular format using the <a class="autorefs autorefs-internal" href="#ropt.rep
     <div class="doc doc-contents ">
 
 
-      <p>Generate a results report in a <code>pandas</code> DataFrame.</p>
-<p>The class is intended to be used for gathering results from
-<a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a> objects and storing them as a
-<a href="https://pandas.pydata.org/"><code>pandas</code></a> DataFrame.</p>
-<p>New results can be added to the stored DataFrame as they become available
-using the <code>add_results</code> method. The content of the DataFrame is taken from the
-fields of the <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a> objects passed during each call
-to <code>add_results</code>. The updated table can be retrieved at any time via the
-<a class="autorefs autorefs-internal" href="#ropt.report.ResultsDataFrame.frame"><code>frame</code></a> property.</p>
+      <p>Runner class for basic workflows.</p>
 
 
 
@@ -1280,15 +1477,16 @@ to <code>add_results</code>. The updated table can be retrieved at any time via 
 
 
 
-<div class="doc doc-object doc-attribute">
 
 
+<div class="doc doc-object doc-function">
 
-<h4 id="ropt.report.ResultsDataFrame.frame" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">frame</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span></code>
+
+<h4 id="ropt.workflow.BasicWorkflow.abort_optimization" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">abort_optimization</span><span class="p">()</span></code>
 
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
+      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
   </span>
 
 </h4>
@@ -1296,67 +1494,66 @@ to <code>add_results</code>. The updated table can be retrieved at any time via 
 
     <div class="doc doc-contents ">
 
-      <p>Return the function results generated so far.</p>
+      <p>Abort the current optimization run.</p>
+<p>This method can be called from within callbacks to interrupt the ongoing
+optimization plan. The exact point at which the optimization is aborted
+depends on the step in the plan that is executing at that point. For
+example, within a running optimizer, the process will be interrupted
+after completing the current function evaluation.</p>
 
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="pandas.DataFrame">DataFrame</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A pandas data frame with the results.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
     </div>
 
 </div>
 
 
 
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.workflow.OptimizerContext" class="doc doc-heading">
+            <code>OptimizerContext</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+      <p>Store the context in which a workflow runs.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.report.ResultsDataFrame.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;functions&#39;</span><span class="p">)</span></code>
+<h4 id="ropt.workflow.OptimizerContext.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">evaluator</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
 
     <div class="doc doc-contents ">
 
-      <p>Initialize a ResultsDataFrame object.</p>
-<p>The set of fields used is determined by the <code>results_fields</code> argument
-passed when initializing the object. These can be any of the fields
-defined in a <a class="autorefs autorefs-internal" href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> or a
-<a class="autorefs autorefs-internal" href="../results/#ropt.results.GradientResults"><code>GradientResults</code></a>. Most of the fields in
-these objects are nested, and the fields to export must be specified
-specifically in the form <code>field.subfield</code>. For instance, to specify the
-<code>variables</code> field of the <code>evaluations</code> field from a function result,
-the specification would be <code>evaluations.variables</code>.</p>
-<p>Note that many fields may, in fact, generate multiple columns in the
-resulting data frame. For instance, when specifying
-<code>evaluations.variables</code>, a column will be generated for each variable.
-If available, names specified in the optimizer configuration, such as
-variable names, will be used as column labels. Because the exported fields
-may be multi-dimensional with names defined along each axis, for instance,
-realizations and objectives, which both can be named, the final name may
-consist of a tuple of names.</p>
-<p>The <code>table_type</code> argument is used to determine which type of results
-should be reported: either function evaluation results (<code>functions</code>) or
-gradient results (<code>gradients</code>).</p>
+      <p>Initialize the workflow context.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1371,13 +1568,13 @@ gradient results (<code>gradients</code>).</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>fields</code></td>
+            <td><code>evaluator</code></td>
             <td>
-                  <code><span title="typing.Set">Set</span>[str]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.evaluator.Evaluator" href="../evaluator/#ropt.evaluator.Evaluator">Evaluator</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The fields of the results to store</p>
+                <p>The callable for running function evaluations</p>
               </div>
             </td>
             <td>
@@ -1385,102 +1582,17 @@ gradient results (<code>gradients</code>).</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>table_type</code></td>
+            <td><code>seed</code></td>
             <td>
-                  <code><span title="typing.Literal">Literal</span>[&#39;functions&#39;, &#39;gradients&#39;]</code>
+                  <code><span title="typing.Optional">Optional</span>[int]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The type of the table</p>
+                <p>Optional seed for the random number generator</p>
               </div>
             </td>
             <td>
-                  <code>&#39;functions&#39;</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.report.ResultsDataFrame.add_results" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">add_results</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-      <p>Add results to the table.</p>
-<p>This method can be called directly from any observers connected to
-events that produce results.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>config</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The configuration of the optimizer generating the results</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>results</code></td>
-            <td>
-                  <code><span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The results to add</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code>bool</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>True if a result was added, else False</p>
-              </div>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -1502,22 +1614,17 @@ events that produce results.</p>
 
 
 
-<h3 id="ropt.report.ResultsTable" class="doc doc-heading">
-            <code>ResultsTable</code>
+<h3 id="ropt.workflow.Workflow" class="doc doc-heading">
+            <code>Workflow</code>
 
 
 </h3>
 
 
     <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.report._data_frame.ResultsDataFrame" href="#ropt.report.ResultsDataFrame">ResultsDataFrame</a></code></p>
 
 
-      <p>Generate files containing tables of optimization results.</p>
-<p>This class derives from the
-<a class="autorefs autorefs-internal" href="#ropt.report.ResultsDataFrame"><code>ResultsDataFrame</code></a> class and writes the
-generated data frame in a tabular format to a text file.</p>
+      <p>The workflow object.</p>
 
 
 
@@ -1530,124 +1637,26 @@ generated data frame in a tabular format to a text file.</p>
 
 
 
+<div class="doc doc-object doc-attribute">
 
 
-<div class="doc doc-object doc-function">
 
+<h4 id="ropt.workflow.Workflow.plugin_manager" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">plugin_manager</span><span class="p">:</span> <span class="n">PluginManager</span></code>
 
-<h4 id="ropt.report.ResultsTable.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;functions&#39;</span><span class="p">,</span> <span class="n">min_header_len</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
 
 </h4>
 
 
     <div class="doc doc-contents ">
 
-      <p>Initialize a results table.</p>
-<p>The <code>columns</code> parameter specifies which results are to be exported. The
-keys of the <code>columns</code> dictionary correspond to the <code>fields</code> parameter of
-the <a class="autorefs autorefs-internal" href="#ropt.report.ResultsDataFrame"><code>ResultsDataFrame</code></a> parent class. The
-values are the corresponding titles of the columns of the table that is
-generated. As described in the documentation of the parent class, a
-single field may generate multiple columns, each with unique names
-(i.e., variable names). These are handled by adding the name to the
-column name below the main title. As a result, the header may consist of
-multiple lines, and the number of lines may vary according to requested
-fields. For a consistent result, the minimum number of header lines can
-be specified via the <code>min_header_len</code> argument. When needed, blank lines
-will be added to reach the specified minimum number of header lines.</p>
+      <p>Return the plugin manager used by the workflow.</p>
 
 
-<details class="tip" open>
-  <summary>Reading the generated file.</summary>
-  <p>The resulting table can be read using a reader that can handle
-fixed-width columns, such as the read_fwf function of pandas. However,
-the header will need to skip a number of header lines. The
-min_header_len argument can be used to set the minimum number of lines
-in the header. If the generated header has fewer lines than
-min_header_len, empty lines will be added. For example:</p>
-<div class="language-py highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># For a table generated with `min_header_len=3`:</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_fwf</span><span class="p">(</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">&quot;results.txt&quot;</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">header</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)),</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">skip_blank_lines</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">skiprows</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span>
-</span></code></pre></div>
-</details>
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>columns</code></td>
-            <td>
-                  <code><span title="typing.Dict">Dict</span>[str, str]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Mapping of column names for the results table</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>path</code></td>
-            <td>
-                  <code><span title="pathlib.Path">Path</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional location of the result file</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>table_type</code></td>
-            <td>
-                  <code><span title="typing.Literal">Literal</span>[&#39;functions&#39;, &#39;gradients&#39;]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Type of the table</p>
-              </div>
-            </td>
-            <td>
-                  <code>&#39;functions&#39;</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>min_header_len</code></td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[int]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Minimal number of header lines</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
+    <p><span class="doc-section-title">Returns:</span></p>
     <table>
       <thead>
         <tr>
@@ -1658,36 +1667,78 @@ min_header_len, empty lines will be added. For example:</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code>NotImplementedError</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the pandas or tabulate modules are not
-                 available</p>
+                <p>The plugin manager.</p>
               </div>
             </td>
           </tr>
       </tbody>
     </table>
-
     </div>
 
 </div>
 
-<div class="doc doc-object doc-function">
+<div class="doc doc-object doc-attribute">
 
 
-<h4 id="ropt.report.ResultsTable.add_results" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">add_results</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span></code>
+
+<h4 id="ropt.workflow.Workflow.optimizer_context" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">optimizer_context</span><span class="p">:</span> <span class="n">OptimizerContext</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
 
 </h4>
 
 
     <div class="doc doc-contents ">
 
-      <p>Add results to the table.</p>
-<p>This method can be called directly from any observers connected to
-events that produce results.</p>
+      <p>Return the optimizer context of the workflow.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.workflow._workflow.OptimizerContext" href="#ropt.workflow.OptimizerContext">OptimizerContext</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The optimizer context object used by the workflow.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+    </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.workflow.Workflow.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Initialize a workflow object.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1704,11 +1755,11 @@ events that produce results.</p>
           <tr class="doc-section-item">
             <td><code>config</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.workflow.WorkflowConfig" href="../workflow_config/#ropt.config.workflow.WorkflowConfig">WorkflowConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The configuration of the optimizer generating the results</p>
+                <p>Optimizer configuration</p>
               </div>
             </td>
             <td>
@@ -1716,13 +1767,159 @@ events that produce results.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>results</code></td>
+            <td><code>context</code></td>
             <td>
-                  <code><span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.workflow._workflow.OptimizerContext" href="#ropt.workflow.OptimizerContext">OptimizerContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The results to add</p>
+                <p>Context in which the workflow executes</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>plugin_manager</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional plugin manager</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.workflow.Workflow.run" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">run</span><span class="p">()</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Run the workflow.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether a user abort occurred.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.workflow.Workflow.create_steps" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">create_steps</span><span class="p">(</span><span class="n">step_configs</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Create step objects from step configs.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>step_configs</code></td>
+            <td>
+                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.config.workflow.StepConfig" href="../workflow_config/#ropt.config.workflow.StepConfig">StepConfig</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configurations of the steps.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.workflow.Workflow.run_steps" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">run_steps</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Run the given steps.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>steps</code></td>
+            <td>
+                  <code><span title="typing.List">List</span>[<span title="ropt.plugins.workflow.base.WorkflowStep">WorkflowStep</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The steps to run</p>
               </div>
             </td>
             <td>
@@ -1748,7 +1945,449 @@ events that produce results.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>True if a result was added, else False</p>
+                <p>Whether a user abort occurred.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.workflow.Workflow.parse_value" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">parse_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Parse a value as a variable, context field or expression.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>value</code></td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The value to evaluate</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The result of the evaluation.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.workflow.Workflow.reset_context" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">reset_context</span><span class="p">(</span><span class="n">obj_id</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Reset the given context object.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>obj_id</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the object.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.workflow.Workflow.has_context" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">has_context</span><span class="p">(</span><span class="n">obj_id</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Check if a variable of field exists.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>obj_id</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>name of the context object</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether the object exists.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.workflow.Workflow.update_context" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">update_context</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Update a context object.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The context</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>value</code></td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The value to use for the update</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.workflow.Workflow.__getitem__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__getitem__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Get the value of a variable.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the variable name</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The value of the variable.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.workflow.Workflow.__setitem__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__setitem__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Set a variable .</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The variable</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>value</code></td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The value to assign</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.workflow.Workflow.__contains__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__contains__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Check if a variable exists.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>name of the variable</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether the variable exists.</p>
               </div>
             </td>
           </tr>

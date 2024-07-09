@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../enums/">
+        <link rel="prev" href="../workflow_plugins/">
       
       
-        <link rel="next" href="../utilities/">
+        <link rel="next" href="../scipy_sampler/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Exceptions - ropt Documentation</title>
+        <title>SciPy Optimizer Plugin - ropt Documentation</title>
       
     
     
@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.exceptions" class="md-skip">
+        <a href="#ropt.plugins.optimizer.scipy.SciPyOptimizer" class="md-skip">
           Skip to content
         </a>
       
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Exceptions
+              SciPy Optimizer Plugin
             
           </span>
         </div>
@@ -740,6 +740,8 @@
                 
   
   
+    
+  
   
   
     
@@ -748,13 +750,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" checked>
         
           
           <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
@@ -768,7 +768,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_4">
             <span class="md-nav__icon md-icon"></span>
             Default Plugins
@@ -779,10 +779,28 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../scipy_optimizer/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    SciPy Optimizer Plugin
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -791,6 +809,33 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.scipy.SciPyOptimizer" class="md-nav__link">
+    <span class="md-ellipsis">
+      SciPyOptimizer
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -913,28 +958,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Exceptions
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../exceptions/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -943,96 +970,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.exceptions" class="md-nav__link">
-    <span class="md-ellipsis">
-      exceptions
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="exceptions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.ConfigError" class="md-nav__link">
-    <span class="md-ellipsis">
-      ConfigError
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.WorkflowError" class="md-nav__link">
-    <span class="md-ellipsis">
-      WorkflowError
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="WorkflowError">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.WorkflowError.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.OptimizationAborted" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptimizationAborted
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptimizationAborted">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.OptimizationAborted.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1091,74 +1028,11 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.exceptions" class="md-nav__link">
+  <a href="#ropt.plugins.optimizer.scipy.SciPyOptimizer" class="md-nav__link">
     <span class="md-ellipsis">
-      exceptions
+      SciPyOptimizer
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="exceptions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.ConfigError" class="md-nav__link">
-    <span class="md-ellipsis">
-      ConfigError
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.WorkflowError" class="md-nav__link">
-    <span class="md-ellipsis">
-      WorkflowError
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="WorkflowError">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.WorkflowError.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.OptimizationAborted" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptimizationAborted
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptimizationAborted">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.OptimizationAborted.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1177,21 +1051,70 @@
                   
 
 
-  <h1>Exceptions</h1>
+  <h1>SciPy Optimizer Plugin</h1>
 
-<div class="doc doc-object doc-module">
+<div class="doc doc-object doc-class">
 
 
 
-<h2 id="ropt.exceptions" class="doc doc-heading">
-            <code>ropt.exceptions</code>
+<h2 id="ropt.plugins.optimizer.scipy.SciPyOptimizer" class="doc doc-heading">
+            <code>ropt.plugins.optimizer.scipy.SciPyOptimizer</code>
 
 
 </h2>
 
+
     <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.optimizer.base.Optimizer" href="../optimizer_plugins/#ropt.plugins.optimizer.base.Optimizer">Optimizer</a></code></p>
 
-      <p>Exceptions raised by <code>ropt</code>.</p>
+
+      <p>Plugin class for optimization via SciPy.</p>
+<p>This class implements several optimizers provided by SciPy in the
+<a href="https://docs.scipy.org/doc/scipy/tutorial/optimize.html"><code>scipy.optimize</code></a>
+package:</p>
+<ul>
+<li>Nelder-Mead</li>
+<li>Powell</li>
+<li>CG</li>
+<li>BFGS</li>
+<li>Newton-CG</li>
+<li>L-BFGS-B</li>
+<li>TNC</li>
+<li>COBYLA</li>
+<li>SLSQP</li>
+<li>differential_evolution</li>
+</ul>
+<p>The optimizer to use is selected by setting the <code>method</code> field in the
+<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.OptimizerConfig"><code>optimizer</code></a> field of
+<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> to the name of the algorithm.
+Most of these methods support the general options set in the
+<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. However, specific
+options that are normally passed as arguments in the SciPy functions can be
+provided via the <code>options</code> dictionary in the configuration object. Consult
+the
+<a href="https://docs.scipy.org/doc/scipy/tutorial/optimize.html"><code>scipy.optimize</code></a>
+manual for details on these options.</p>
+<p>Not all constraints are supported by all optimizers:</p>
+<ul>
+<li>Bound constraints: Nelder-Mead, L-BFGS-B, SLSQP, TNC,
+  differential_evolution</li>
+<li>Linear constraints: SLSQP, differential_evolution</li>
+<li>Nonlinear constraints: COBYLA (only inequality), SLSQP,
+  differential_evolution</li>
+</ul>
+
+
+<details class="info" open>
+  <summary>Info</summary>
+  <ul>
+<li>The Nelder-Mead algorithm only supports bound constraints if SciPy
+  version &gt;= 1.7.</li>
+<li>Some SciPy algorithms that require a Hessian or a Hessian-vector
+  product are not supported. These include dogleg, trust-ncg,
+  trust-exact, and trust-krylov.</li>
+</ul>
+</details>
 
 
 
@@ -1203,230 +1126,6 @@
 
 
 
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.exceptions.ConfigError" class="doc doc-heading">
-            <code>ConfigError</code>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code>Exception</code></p>
-
-
-      <p>Raised when an configuration error occurs.</p>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.exceptions.WorkflowError" class="doc doc-heading">
-            <code>WorkflowError</code>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code>Exception</code></p>
-
-
-      <p>Raised when an error occurs in a workflow.</p>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.exceptions.WorkflowError.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">step_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context_id</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-      <p>Initialize with a custom error message.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>message</code></td>
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Error message</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>step_name</code></td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[str]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional step name to add to the message</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>context_id</code></td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[str]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional context ID to add to the message</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.exceptions.OptimizationAborted" class="doc doc-heading">
-            <code>OptimizationAborted</code>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code>Exception</code></p>
-
-
-      <p>Raised when an optimization is aborted.</p>
-<p>When constructing the execption object an exit code must be passed that
-indicates the reason for aborting (see
-<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.OptimizerExitCode"><code>OptimizerExitCode</code></a>).</p>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.exceptions.OptimizationAborted.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-      <p>Initialize an exception that aborts the optimization.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>exit_code</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.enums.OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The exit code indicating the reason for the abort</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
 
 
 

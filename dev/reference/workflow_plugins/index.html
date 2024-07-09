@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../enums/">
+        <link rel="prev" href="../function_transform_plugins/">
       
       
-        <link rel="next" href="../utilities/">
+        <link rel="next" href="../scipy_optimizer/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Exceptions - ropt Documentation</title>
+        <title>Workflow objects - ropt Documentation</title>
       
     
     
@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.exceptions" class="md-skip">
+        <a href="#ropt.plugins.workflow" class="md-skip">
           Skip to content
         </a>
       
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Exceptions
+              Workflow objects
             
           </span>
         </div>
@@ -567,6 +567,8 @@
                 
   
   
+    
+  
   
   
     
@@ -575,13 +577,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" checked>
         
           
           <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
@@ -595,7 +595,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_3">
             <span class="md-nav__icon md-icon"></span>
             Plugins
@@ -711,10 +711,28 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../workflow_plugins/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Workflow objects
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -723,6 +741,81 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      workflow
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.workflow.DefaultCallbackContext" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultCallbackContext
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.workflow.DefaultCallbackWith" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultCallbackWith
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.workflow.DefaultConfigContext" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultConfigContext
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DefaultConfigContext">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.workflow.DefaultConfigContext.reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -913,28 +1006,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Exceptions
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../exceptions/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -943,96 +1018,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.exceptions" class="md-nav__link">
-    <span class="md-ellipsis">
-      exceptions
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="exceptions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.ConfigError" class="md-nav__link">
-    <span class="md-ellipsis">
-      ConfigError
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.WorkflowError" class="md-nav__link">
-    <span class="md-ellipsis">
-      WorkflowError
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="WorkflowError">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.WorkflowError.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.OptimizationAborted" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptimizationAborted
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptimizationAborted">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.OptimizationAborted.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1091,62 +1076,47 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.exceptions" class="md-nav__link">
+  <a href="#ropt.plugins.workflow" class="md-nav__link">
     <span class="md-ellipsis">
-      exceptions
+      workflow
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="exceptions">
+    <nav class="md-nav" aria-label="workflow">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.ConfigError" class="md-nav__link">
+  <a href="#ropt.plugins.workflow.DefaultCallbackContext" class="md-nav__link">
     <span class="md-ellipsis">
-      ConfigError
+      DefaultCallbackContext
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.WorkflowError" class="md-nav__link">
+  <a href="#ropt.plugins.workflow.DefaultCallbackWith" class="md-nav__link">
     <span class="md-ellipsis">
-      WorkflowError
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="WorkflowError">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.WorkflowError.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
+      DefaultCallbackWith
     </span>
   </a>
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-        
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.OptimizationAborted" class="md-nav__link">
+  <a href="#ropt.plugins.workflow.DefaultConfigContext" class="md-nav__link">
     <span class="md-ellipsis">
-      OptimizationAborted
+      DefaultConfigContext
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="OptimizationAborted">
+    <nav class="md-nav" aria-label="DefaultConfigContext">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.OptimizationAborted.__init__" class="md-nav__link">
+  <a href="#ropt.plugins.workflow.DefaultConfigContext.reset" class="md-nav__link">
     <span class="md-ellipsis">
-      __init__
+      reset
     </span>
   </a>
   
@@ -1177,21 +1147,21 @@
                   
 
 
-  <h1>Exceptions</h1>
+  <h1>Workflow objects</h1>
 
 <div class="doc doc-object doc-module">
 
 
 
-<h2 id="ropt.exceptions" class="doc doc-heading">
-            <code>ropt.exceptions</code>
+<h2 id="ropt.plugins.workflow" class="doc doc-heading">
+            <code>ropt.plugins.workflow</code>
 
 
 </h2>
 
     <div class="doc doc-contents first">
 
-      <p>Exceptions raised by <code>ropt</code>.</p>
+      <p>Plugin functionality for adding workflow objects.</p>
 
 
 
@@ -1208,8 +1178,8 @@
 
 
 
-<h3 id="ropt.exceptions.ConfigError" class="doc doc-heading">
-            <code>ConfigError</code>
+<h3 id="ropt.plugins.workflow.DefaultCallbackContext" class="doc doc-heading">
+            <code>DefaultCallbackContext</code>
 
 
 </h3>
@@ -1217,33 +1187,20 @@
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code>Exception</code></p>
+              Bases: <code><span title="ropt.plugins.workflow.base.ContextObj">ContextObj</span></code></p>
 
 
-      <p>Raised when an configuration error occurs.</p>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.exceptions.WorkflowError" class="doc doc-heading">
-            <code>WorkflowError</code>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code>Exception</code></p>
-
-
-      <p>Raised when an error occurs in a workflow.</p>
+      <p>The default <code>callback</code> context object.</p>
+<p>The <code>callback</code> context object is used to call a user-defined function
+whenever it is updated with new results. For instance, an optimizer step may
+add a <code>callback</code> context object to its <code>update</code> parameter, so that it will
+be updated any time new results are produced.</p>
+<p>When updated, the <code>callback</code> object calls the function defined by its
+<code>function</code> parameter with the new result as it first argument. Optionally,
+additional keyword arguments can be defined via the <code>kwargs</code> parameter,
+which are added to each function call.</p>
+<p>The parameters of the context object are parsed using the
+<a class="autorefs autorefs-internal" href="#ropt.plugins.workflow.DefaultCallbackWith"><code>DefaultCallbackWith</code></a> object.</p>
 
 
 
@@ -1257,80 +1214,6 @@
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.exceptions.WorkflowError.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">step_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context_id</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-      <p>Initialize with a custom error message.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>message</code></td>
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Error message</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>step_name</code></td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[str]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional step name to add to the message</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>context_id</code></td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[str]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional context ID to add to the message</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
 
 
 
@@ -1344,8 +1227,8 @@
 
 
 
-<h3 id="ropt.exceptions.OptimizationAborted" class="doc doc-heading">
-            <code>OptimizationAborted</code>
+<h3 id="ropt.plugins.workflow.DefaultCallbackWith" class="doc doc-heading">
+            <code>DefaultCallbackWith</code>
 
 
 </h3>
@@ -1353,13 +1236,94 @@
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code>Exception</code></p>
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
 
 
-      <p>Raised when an optimization is aborted.</p>
-<p>When constructing the execption object an exit code must be passed that
-indicates the reason for aborting (see
-<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.OptimizerExitCode"><code>OptimizerExitCode</code></a>).</p>
+      <p>Parameters for the <code>callback</code> context object.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.workflow.DefaultCallbackWith.function">function</span></code></td>
+            <td>
+                  <code><span title="typing.Callable">Callable</span>[[<span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]], <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The function to call</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.workflow.DefaultCallbackWith.kwargs">kwargs</span></code></td>
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary of keyword arguments for the call</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.plugins.workflow.DefaultConfigContext" class="doc doc-heading">
+            <code>DefaultConfigContext</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.plugins.workflow.base.ContextObj">ContextObj</span></code></p>
+
+
+      <p>The default <code>config</code> context object.</p>
+<p>The <code>config</code> object is used store and modify configuration objects for
+optimizer and evaluation steps. When initializing the object, the <code>with</code>
+field is parsed as an <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.
+Optimization and evaluation steps can refer to a workflow variable of the
+same name as the <code>config</code> ID to retrieve the parsed configuration object.</p>
+<p>The <code>config</code> object can be updated with a dictionary of values to construct
+a new <code>EnOptConfig</code> object with the updated values. The original value is
+kept with the <code>config</code> object and can be recovered by resetting the <code>config</code>
+object.</p>
 
 
 
@@ -1377,44 +1341,15 @@ indicates the reason for aborting (see
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.exceptions.OptimizationAborted.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span></code>
+<h4 id="ropt.plugins.workflow.DefaultConfigContext.reset" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">reset</span><span class="p">()</span></code>
 
 </h4>
 
 
     <div class="doc doc-contents ">
 
-      <p>Initialize an exception that aborts the optimization.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>exit_code</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.enums.OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The exit code indicating the reason for the abort</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+      <p>Clear the stored values.</p>
 
     </div>
 
