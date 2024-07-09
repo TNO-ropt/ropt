@@ -11,9 +11,11 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 class ContextConfig(BaseModel):
     """Configuration of a single context object.
 
-    Context objects store information that is accessible to and updated by the
-    steps of the workflow. They are referred to by their `id`, which is
-    mandatory.
+    Context objects process information that is provided by the steps of the
+    workflow. They usually store information in workflow variables that are
+    accessible to the steps and after the workflow has finished. In most cases,
+    the context objects store a single result in a variable with a name equal to
+    the `id` of the context object, but additional variables can be defined also.
 
     The `init` string identifies the code that is run to initialize the context
     object. It is used by the plugin manager to load the code.
@@ -21,6 +23,8 @@ class ContextConfig(BaseModel):
     Additional parameters needed by the context objects are configured using the
     `with_` attribute. The contents of the `with_` attribute depend on the type
     of the context object.
+
+    Context objects are referred to by their `id`, which is mandatory.
 
     Note: `with` is an alias for `with_`
         When parsing dictionaries into a `ContextConfig` object the name of the
@@ -99,14 +103,12 @@ class WorkflowConfig(BaseModel):
     `steps` attribute.
 
     The `context` attribute contains the configuration of the objects that
-    create and maintain the context in which the workflow runs. Context objects
-    are initialized before creating and running the workflow steps.
+    create and maintain the environment in which the workflow runs. Context
+    objects are initialized before creating and running the workflow steps.
 
     After initializing the context objects, workflow steps are configured by the
     entries given by the `steps` attribute and are initialized and executed in
-    order. During workflow execution, the context objects may be inspected and
-    updated by the steps. After finishing the workflow, context objects can be
-    inspected to retrieve any stored results.
+    order.
 
     Attributes:
         context: The context objects to initialize

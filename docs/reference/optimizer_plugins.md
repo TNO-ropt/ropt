@@ -1,9 +1,10 @@
 ::: ropt.plugins.optimizer
 
 ::: ropt.plugins.optimizer.base
+    options:
+        members:
+            - Optimizer
+            - OptimizerCallback
+            - OptimizerPlugin
 
 ::: ropt.plugins.optimizer.utils
-
-::: ropt.plugins.optimizer.scipy.SciPyOptimizer
-    options:
-        members: None

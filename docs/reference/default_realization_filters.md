@@ -1,11 +1,3 @@
-::: ropt.plugins.realization_filter
-
-::: ropt.plugins.realization_filter.base
-
-::: ropt.plugins.realization_filter.default
-    options:
-        members: none
-
 ::: ropt.plugins.realization_filter.default.DefaultRealizationFilter
     options:
         members: none

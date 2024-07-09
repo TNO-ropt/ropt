@@ -27,9 +27,7 @@ class RealizationsConfig(EnOptBaseModel):
     the optimizer requests a function value or a gradient, the functions and
     gradients are calculated for each realization and combined into a single
     function or gradient. Usually, this will be a (weighted) sum, but other ways
-    of combining realizations are possible (see [Realization
-    filters](realization_filters.md) and [Function
-    transforms](function_transforms.md) for more details).
+    of combining realizations are possible.
 
     The `weights` field is a `numpy` array, with a length equal to the number of
     realizations. Its values will be normalized to have a sum equal to 1. For

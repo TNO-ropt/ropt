@@ -7,12 +7,13 @@ from functools import lru_cache
 from typing import TYPE_CHECKING, Any, Dict, Final, Literal
 
 from ropt.exceptions import ConfigError
-from ropt.plugins.function_transform.base import FunctionTransformPlugin
-from ropt.plugins.optimization_steps.base import OptimizationStepsPlugin
-from ropt.plugins.optimizer.base import OptimizerPlugin
-from ropt.plugins.realization_filter.base import RealizationFilterPlugin
-from ropt.plugins.sampler.base import SamplerPlugin
-from ropt.plugins.workflow.base import WorkflowPlugin
+
+from .function_transform.base import FunctionTransformPlugin
+from .optimization_steps.base import OptimizationStepsPlugin
+from .optimizer.base import OptimizerPlugin
+from .realization_filter.base import RealizationFilterPlugin
+from .sampler.base import SamplerPlugin
+from .workflow.base import WorkflowPlugin
 
 if TYPE_CHECKING:
     from ropt.plugins.base import Plugin
@@ -21,52 +22,6 @@ if sys.version_info >= (3, 10):
     from importlib.metadata import entry_points
 else:
     from importlib_metadata import entry_points
-
-PluginType = Literal[
-    "optimizer",
-    "sampler",
-    "realization_filter",
-    "function_transform",
-    "optimization_step",
-    "workflow",
-]
-""" Plugin Types Supported by `ropt`
-
-`ropt` supports various types of plugins for different functionalities:
-
-`optimizer`:
-: These plugins implement optimizer plugins providing optimization methods.
-  The default plugin is `scipy`, utilizing the
-  [`scipy.optimize`](https://docs.scipy.org/doc/scipy/reference/optimize.html)
-  module.
-
-`sampler`:
-: These plugins implement sampler plugins generating perturbations for
-  estimating gradients. By default, a plugin based on
-  [`scipy.stats`](https://docs.scipy.org/doc/scipy/reference/stats.html) is
-  installed:
-
-`realization_filter`:
-: These plugins implement filters for selecting a sub-set of realizations used
-  in calculating objective or constraint functions and their gradients. The
-  default plugin provides filters based on ranking and for CVaR optimization.
-
-`function_transform`:
-: These plugins implement the final objective and gradient from sets of
-  objectives or constraints and their gradients for individual realizations. The
-  default built-in plugin supports objectives defined by the mean or standard
-  deviation of these values.
-
-`optimization_step`:
-: Optimization step plugins implement the steps evaluated during the execution
-  plan. The built-in plugin offers a full set of steps for executing complex
-  plans.
-
-`workflow`:
-: Workflow plugins implement the objects that execute an optimization workflow.
-  The built-in plugin offers a full set of workflow objects for executing
-  complex workflows.
-"""
 
 
 _PLUGIN_TYPES: Final = {
@@ -77,6 +32,16 @@ _PLUGIN_TYPES: Final = {
     "realization_filter": RealizationFilterPlugin,
     "workflow": WorkflowPlugin,
 }
+
+PluginType = Literal[
+    "optimizer",
+    "sampler",
+    "realization_filter",
+    "function_transform",
+    "optimization_step",
+    "workflow",
+]
+""" Plugin Types Supported by `ropt`"""
 
 
 class PluginManager:
@@ -97,11 +62,14 @@ class PluginManager:
         [project.entry-points."ropt.plugins.optimizer"]
         my_optimizer = "my_optimizer_pkg.my_plugin:MyOptimizer"
         ```
-
         This will make the `MyOptimizer` class from the `my_optimizer_pkg`
-        package available under the name `my_optimizer`.
+        package available under the name `my_optimizer`. The `MyOptimizer` class
+        will be used to create
+        [`Optimizer`][ropt.plugins.optimizer.base.Optimizer] objects and to
+        faciliate this, it should derive from the
+        [`OptimizerPlugin`][ropt.plugins.optimizer.base.OptimizerPlugin] class.
 
-        Plugins can also be added dynamically using the add_plugins method.
+        Plugins can also be added dynamically using the `add_plugins` method.
         """
         # Built-in plugins, listed for all possible plugin types:
         self._plugins: Dict[PluginType, Dict[str, Plugin]] = {
@@ -120,11 +88,13 @@ class PluginManager:
         """Add a plugin at runtime.
 
         This method adds one or more plugins of a specific type to the plugin
-        manager. The `plugins` argument maps the names of the new plugins to a
-        callable that creates the plugin. The callable can be any function or
-        class that creates a plugin object.
+        manager. The `plugins` argument maps the names of the new plugins to
+        [`Plugin`][ropt.plugins.Plugin] object.
 
         The plugin names are case-insensitive.
+
+        Note: Plugin types
+
 
         Args:
             plugin_type: Type of the plugin.

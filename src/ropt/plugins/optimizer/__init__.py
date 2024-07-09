@@ -13,9 +13,8 @@ To support the implementation of the optimizer classes, the
 [`ropt.plugins.optimizer.utils`][ropt.plugins.optimizer.utils] module provides
 some utilities.
 
-Optimizers can be added via the plugin manager, by default the
-[`SciPyOptimizer`][ropt.plugins.optimizer.scipy.SciPyOptimizer] plugin is
-installed which provides a number of methods from the
+By default the [`SciPyOptimizer`][ropt.plugins.optimizer.scipy.SciPyOptimizer]
+plugin is installed which provides a number of methods from the
 [`scipy.optimize`](https://docs.scipy.org/doc/scipy/tutorial/optimize.html)
 package.
 """

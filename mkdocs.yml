@@ -63,16 +63,23 @@ nav:
           - "Workflow configuration": reference/workflow_config.md
           - "Optimizer configuration": reference/enopt_config.md
       - "Optimization":
+          - "Optimization workflows": reference/workflows.md
           - "Function evaluations": reference/evaluator.md
           - "Optimization results": reference/results.md
           - "Reporting": reference/reporting.md
       - "Plugins":
-          - "Plugin manager": reference/plugins.md
+          - "Plugins": reference/plugin_manager.md
           - "Optimizer plugins": reference/optimizer_plugins.md
           - "Sampler plugins": reference/sampler_plugins.md
-          - "Realization filters": reference/realization_filters.md
-          - "Function transforms": reference/function_transforms.md
-          - "Workflow objects": reference/workflow.md
+          - "Realization filters": reference/realization_filter_plugins.md
+          - "Function transforms": reference/function_transform_plugins.md
+          - "Workflow objects": reference/workflow_plugins.md
+      - "Default Plugins":
+          - "SciPy Optimizer Plugin": reference/scipy_optimizer.md
+          - "SciPy Sampler Plugin": reference/scipy_sampler.md
+          - "Default Realization Filters": reference/default_realization_filters.md
+          - "Default Function Transforms": reference/default_function_transforms.md
+          - "Default Workflow Objects": reference/default_workflow_objects.md
       - "Enumerations": reference/enums.md
       - "Exceptions": reference/exceptions.md
       - "Utilities": reference/utilities.md

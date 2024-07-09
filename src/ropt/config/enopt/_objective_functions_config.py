@@ -60,9 +60,7 @@ class ObjectiveFunctionsConfig(EnOptBaseModel):
     transforms. The `realization_filters` and `function_transforms` fields
     contain indices to the realization filter or function transform objects to
     use. The objects referred to are configured in the parent
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object. Refer to the sections
-    [Realization filters](realization_filters.md) and [Function
-    transforms](function_transforms.md) for more details.
+    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
 
     Attributes:
         names:               Optional names of the objective functions

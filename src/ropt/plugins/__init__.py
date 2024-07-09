@@ -1,28 +1,60 @@
 """The `plugins` module facilitates the integration of `ropt` plugins.
 
 The core functionality of `ropt` can be extended through plugins, which can
-either be built-in, separately installed, or dynamically added at runtime.
+either be builtin, separately installed, or dynamically added at runtime.
+Currently, `ropt` supports the following plugin types to implement specific
+types of functionality:
 
-Various types of plugins provide specific functionalities. Currently, `ropt`
-supports the following plugin types:
+[`optimizer`][ropt.plugins.optimizer]:
+: Plugins that implement specific optimization methods. The builtin
+  [`scipy`][ropt.plugins.optimizer.scipy.SciPyOptimizer] plugin utilizes the
+  [`scipy.optimize`](https://docs.scipy.org/doc/scipy/reference/optimize.html)
+module to implement various optimization algorithms.
 
-1. [`optimizer`][ropt.plugins.optimizer]:
-    Plugins that implement specific optimization methods.
-2. [`sampler`][ropt.plugins.sampler]:
-    Plugins responsible for generating perturbations.
-3. [`realization_filter`][ropt.plugins.realization_filter]:
-    Filters used to determine subsets of realizations.
-4. [`function_transform`][ropt.plugins.function_transform]:
-    Code used to compute objective and constraint values from realizations.
-5. [`workflow`][ropt.plugins.workflow]:
-    Implements workflow context objects and steps.
+[`sampler`][ropt.plugins.sampler]:
+: Plugins responsible for generating perturbations for estimating gradients.
+  The builtin [`scipy`][ropt.plugins.sampler.scipy.SciPySampler] plugin is based
+  on [`scipy.stats`](https://docs.scipy.org/doc/scipy/reference/stats.html),
+  providing various sampling methods.
+
+[`realization_filter`][ropt.plugins.realization_filter]:
+: These plugins implement filters for selecting a sub-set of realizations used
+  in calculating objective or constraint functions and their gradients. The
+  included
+  [`default`][ropt.plugins.realization_filter.default.DefaultRealizationFilter]
+  plugin provides filters based on ranking and for CVaR optimization.
+
+[`function_transform`][ropt.plugins.function_transform]:
+: These plugins calculate the final objective and gradient from sets of
+  objectives or constraints and their gradients for individual realizations. The
+  included
+  [`default`][ropt.plugins.function_transform.default.DefaultFunctionTransform]
+  plugin supports objectives defined by the mean or standard deviation of these
+  values.
+
+[`workflow`][ropt.plugins.workflow]:
+: Workflow plugins implement the objects that execute an optimization workflow.
+  The built-in [`default`][ropt.plugins.workflow.default.DefaultWorkflowPlugin]
+  plugin offers a full set of workflow objects for executing complex workflows.
 
 Plugins are managed by the [`PluginManager`][ropt.plugins.PluginManager] class.
-They can be built-in, installed separately using the standard entry points
+This class is used to retrieve plugin objects that derive from an abstract
+base class defining the required functionality for each plugin type:
+
+1. [`OptimizerPlugin`][ropt.plugins.optimizer.base.OptimizerPlugin]:
+    Abstract base class for optimizer plugins.
+2. [`SamplerPlugin`][ropt.plugins.sampler.base.SamplerPlugin]:
+    Abstract base class for sampler plugins.
+3. [`RealizationFilterPlugin`][ropt.plugins.realization_filter.base.RealizationFilterPlugin]:
+    Abstract base class for realization filter plugins.
+4. [`FunctionTransformPlugin`][ropt.plugins.function_transform.base.FunctionTransformPlugin]:
+    Abstract base class for function transform plugins.
+5. [`WorkflowPlugin`][ropt.plugins.workflow.base.WorkflowPlugin]:
+    Abstract base class for workflow object plugins.
+
+Plugins can be built-in, installed separately using the standard entry points
 mechanism, or added dynamically using the
-[`add_plugins`][ropt.plugins.PluginManager.add_plugins] method. The interface
-that plugin code must adhere to in order to implement the required functionality
-are define by abstract base classes.
+[`add_plugins`][ropt.plugins.PluginManager.add_plugins] method.
 
 The plugin manager object provides the
 [`get_plugin`][ropt.plugins.PluginManager.get_plugin] method, which `ropt` uses
@@ -32,8 +64,10 @@ function) that `ropt` uses to instantiate the plugin when needed.
 """
 
 from ._manager import PluginManager, PluginType
+from .base import Plugin
 
 __all__ = [
-    "PluginType",
+    "Plugin",
     "PluginManager",
+    "PluginType",
 ]
