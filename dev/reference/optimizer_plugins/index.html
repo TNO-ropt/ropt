@@ -691,30 +691,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.optimizer.base.OptimizerCallback" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptimizerCallback
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptimizerCallback">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.optimizer.base.OptimizerCallback.__call__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __call__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plugins.optimizer.base.Optimizer" class="md-nav__link">
     <span class="md-ellipsis">
       Optimizer
@@ -746,6 +722,30 @@
   <a href="#ropt.plugins.optimizer.base.Optimizer.start" class="md-nav__link">
     <span class="md-ellipsis">
       start
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.base.OptimizerCallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      OptimizerCallback
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OptimizerCallback">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.base.OptimizerCallback.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
     </span>
   </a>
   
@@ -1194,30 +1194,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.optimizer.base.OptimizerCallback" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptimizerCallback
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptimizerCallback">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.optimizer.base.OptimizerCallback.__call__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __call__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plugins.optimizer.base.Optimizer" class="md-nav__link">
     <span class="md-ellipsis">
       Optimizer
@@ -1249,6 +1225,30 @@
   <a href="#ropt.plugins.optimizer.base.Optimizer.start" class="md-nav__link">
     <span class="md-ellipsis">
       start
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.base.OptimizerCallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      OptimizerCallback
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OptimizerCallback">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.base.OptimizerCallback.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
     </span>
   </a>
   
@@ -1371,9 +1371,8 @@ from an optimizer step in the optimization workflow.</p>
 <p>To support the implementation of the optimizer classes, the
 <a class="autorefs autorefs-internal" href="#ropt.plugins.optimizer.utils"><code>ropt.plugins.optimizer.utils</code></a> module provides
 some utilities.</p>
-<p>Optimizers can be added via the plugin manager, by default the
-<a class="autorefs autorefs-internal" href="../scipy_optimizer/#ropt.plugins.optimizer.scipy.SciPyOptimizer"><code>SciPyOptimizer</code></a> plugin is
-installed which provides a number of methods from the
+<p>By default the <a class="autorefs autorefs-internal" href="../scipy_optimizer/#ropt.plugins.optimizer.scipy.SciPyOptimizer"><code>SciPyOptimizer</code></a>
+plugin is installed which provides a number of methods from the
 <a href="https://docs.scipy.org/doc/scipy/tutorial/optimize.html"><code>scipy.optimize</code></a>
 package.</p>
 
@@ -1409,11 +1408,7 @@ package.</p>
 
     <div class="doc doc-contents first">
 
-      <p>This module defines the abstract base class for optimization plugins.</p>
-<p>Optimization plugins can be added via the plugin mechanism to implement
-additional optimization methods. Any object that derives from the
-<a class="autorefs autorefs-internal" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> abstract base class may be
-installed as a plugin.</p>
+      <p>This module defines base classes and protocols for optimization plugins.</p>
 
 
 
@@ -1425,6 +1420,226 @@ installed as a plugin.</p>
 
 
 
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.plugins.optimizer.base.Optimizer" class="doc doc-heading">
+            <code>Optimizer</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="abc.ABC">ABC</span></code></p>
+
+
+      <p>Abstract base for optimizer classes.</p>
+<p>Optimizers provided by optimizer plugins should derive from the <code>Optimizer</code>
+abstract base class, which specifies the requirements for the class
+constructor (<code>__init__</code>) and also includes a <code>start</code> method used to initiate
+the optimization process.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.plugins.optimizer.base.Optimizer.allow_nan" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">allow_nan</span><span class="p">:</span> <span class="nb">bool</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Return <code>True</code> if a <code>NaN</code> is a valid function value.</p>
+<p>If the optimizer can handle <code>NaN</code> function values, it may implement this
+method to return <code>True</code>. This enables handling cases where all function
+evaluations in an ensemble fail. By setting the
+<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.RealizationsConfig"><code>realization_min_success</code></a>
+configuration parameter to zero, the ensemble optimization workflow can
+then be allowed to return a <code>NaN</code> value instead of raising an error.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if <code>NaN</code> is allowed.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+    </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plugins.optimizer.base.Optimizer.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">optimizer_callback</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Initialize an optimizer object.</p>
+<p>The <code>config</code> object provides the desired configuration for the
+optimization process and should be used to set up the optimizer
+correctly before starting the optimization. The optimization will be
+initiated using the <code>start</code> method and will repeatedly require function
+and gradient evaluations at given variable vectors. The
+<code>optimizer_callback</code> argument provides the function that should be used
+to calculate the function and gradient values, which can then be
+forwarded to the optimizer.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The optimizer configuration to used</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>optimizer_callback</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.optimizer.base.OptimizerCallback" href="#ropt.plugins.optimizer.base.OptimizerCallback">OptimizerCallback</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The optimizer callback</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plugins.optimizer.base.Optimizer.start" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">start</span><span class="p">(</span><span class="n">initial_values</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Start the optimization.</p>
+<p>This method must be implemented to run the optimization using the
+provided initial values, collecting function and gradient evaluations as
+needed by calling the callback passed via the <code>optimizer_callback</code>
+argument during initialization.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>initial_values</code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Vector of variables to start the optimization with.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-class">
 
@@ -1609,215 +1824,6 @@ optimizers can indicate that this is the case.</p>
 
 
 
-<h3 id="ropt.plugins.optimizer.base.Optimizer" class="doc doc-heading">
-            <code>Optimizer</code>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><span title="abc.ABC">ABC</span></code></p>
-
-
-      <p>Abstract base for optimizer classes.</p>
-<p><code>ropt</code> employs plugins to implement optimizers that are called during an
-optimization workflow. Optimizers should derive from the <code>Optimizer</code>
-abstract base class, which specifies the requirements for the class
-constructor (<code>__init__</code>) and also includes a <code>start</code> method used to initiate
-the optimization process.</p>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h4 id="ropt.plugins.optimizer.base.Optimizer.allow_nan" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">allow_nan</span><span class="p">:</span> <span class="nb">bool</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-      <p>Return <code>True</code> if a <code>NaN</code> is a valid function value.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code>bool</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p><code>True</code> if <code>NaN</code> is allowed.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-    </div>
-
-</div>
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plugins.optimizer.base.Optimizer.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">optimizer_callback</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-      <p>Initialize an optimizer object.</p>
-<p>The <code>config</code> object defines how the optimization run should be
-configured, while the <code>optimizer_callback</code> should be used to evaluate
-functions and gradients that are needed during optimization.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>config</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The optimizer configuration to used</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>optimizer_callback</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.optimizer.base.OptimizerCallback" href="#ropt.plugins.optimizer.base.OptimizerCallback">OptimizerCallback</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The optimizer callback</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plugins.optimizer.base.Optimizer.start" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">start</span><span class="p">(</span><span class="n">initial_values</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-      <p>Start the optimization.</p>
-<p>This method must be implemented to run the optimization, collecting
-functions and gradients as needed by calling the callback passed upon
-initialization.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>initial_values</code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Vector of variables to start the optimization with.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
 <h3 id="ropt.plugins.optimizer.base.OptimizerPlugin" class="doc doc-heading">
             <code>OptimizerPlugin</code>
 
@@ -1831,6 +1837,13 @@ initialization.</p>
 
 
       <p>Abstract base class for optimizer plugins.</p>
+<p>Optimizers are implemented through optimizer plugins that must derive from
+this base class. Plugins can be built-in, installed via a plugin mechanism,
+or loaded dynamically. During an optimization workflow, the required
+optimizer plugin will be located via the
+<a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> and used to create
+<a class="autorefs autorefs-internal" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> objects via its
+<code>create</code> function.</p>
 
 
 
@@ -1861,6 +1874,8 @@ initialization.</p>
     <div class="doc doc-contents ">
 
       <p>Create an optimizer.</p>
+<p>This is a factory function for instantiating optimizer objects
+implemented in the plugin.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

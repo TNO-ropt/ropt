@@ -1279,6 +1279,21 @@ module to implement various optimization algorithms.</dd>
   The built-in <a class="autorefs autorefs-internal" href="../default_workflow_objects/#ropt.plugins.workflow.default.DefaultWorkflowPlugin"><code>default</code></a>
   plugin offers a full set of workflow objects for executing complex workflows.</dd>
 </dl>
+<p>Plugins are managed by the <a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager"><code>PluginManager</code></a> class.
+This class is used to retrieve plugin objects that derive from an abstract
+base class defining the required functionality for each plugin type:</p>
+<ol>
+<li><a class="autorefs autorefs-internal" href="../optimizer_plugins/#ropt.plugins.optimizer.base.OptimizerPlugin"><code>OptimizerPlugin</code></a>:
+    Abstract base class for optimizer plugins.</li>
+<li><a class="autorefs autorefs-internal" href="../sampler_plugins/#ropt.plugins.sampler.base.SamplerPlugin"><code>SamplerPlugin</code></a>:
+    Abstract base class for sampler plugins.</li>
+<li><a class="autorefs autorefs-internal" href="../realization_filter_plugins/#ropt.plugins.realization_filter.base.RealizationFilterPlugin"><code>RealizationFilterPlugin</code></a>:
+    Abstract base class for realization filter plugins.</li>
+<li><a class="autorefs autorefs-internal" href="../function_transform_plugins/#ropt.plugins.function_transform.base.FunctionTransformPlugin"><code>FunctionTransformPlugin</code></a>:
+    Abstract base class for function transform plugins.</li>
+<li><a class="autorefs autorefs-internal" href="../workflow_plugins/#ropt.plugins.workflow.base.WorkflowPlugin"><code>WorkflowPlugin</code></a>:
+    Abstract base class for workflow object plugins.</li>
+</ol>
 <p>Plugins can be built-in, installed separately using the standard entry points
 mechanism, or added dynamically using the
 <a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager.add_plugins"><code>add_plugins</code></a> method.</p>
@@ -1343,12 +1358,16 @@ function) that <code>ropt</code> uses to instantiate the plugin when needed.</p>
 <p>For instance, to install an additional optimizer plugin, implemented in
 an independent package, and assuming installation via a <code>pyproject.toml</code>
 file, add the following:</p>
-<div class="language-toml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">[project.entry-points.</span><span class="s2">&quot;ropt.plugins.optimizer&quot;</span><span class="k">]</span>
+<p><div class="language-toml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">[project.entry-points.</span><span class="s2">&quot;ropt.plugins.optimizer&quot;</span><span class="k">]</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">my_optimizer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my_optimizer_pkg.my_plugin:MyOptimizer&quot;</span>
 </span></code></pre></div>
-<p>This will make the <code>MyOptimizer</code> class from the <code>my_optimizer_pkg</code>
-package available under the name <code>my_optimizer</code>.</p>
-<p>Plugins can also be added dynamically using the add_plugins method.</p>
+This will make the <code>MyOptimizer</code> class from the <code>my_optimizer_pkg</code>
+package available under the name <code>my_optimizer</code>. The <code>MyOptimizer</code> class
+will be used to create
+<a class="autorefs autorefs-internal" href="../optimizer_plugins/#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> objects and to
+faciliate this, it should derive from the
+<a class="autorefs autorefs-internal" href="../optimizer_plugins/#ropt.plugins.optimizer.base.OptimizerPlugin"><code>OptimizerPlugin</code></a> class.</p>
+<p>Plugins can also be added dynamically using the <code>add_plugins</code> method.</p>
 
     </div>
 
@@ -1372,10 +1391,10 @@ package available under the name <code>my_optimizer</code>.</p>
 
       <p>Add a plugin at runtime.</p>
 <p>This method adds one or more plugins of a specific type to the plugin
-manager. The <code>plugins</code> argument maps the names of the new plugins to a
-callable that creates the plugin. The callable can be any function or
-class that creates a plugin object.</p>
+manager. The <code>plugins</code> argument maps the names of the new plugins to
+<a class="autorefs autorefs-internal" href="#ropt.plugins.Plugin"><code>Plugin</code></a> object.</p>
 <p>The plugin names are case-insensitive.</p>
+<p>Note: Plugin types</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
