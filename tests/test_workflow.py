@@ -147,7 +147,7 @@ def test_parse_value(enopt_config: Any, evaluator: Any) -> None:
     assert isinstance(workflow.parse_value("$results"), Results)
 
 
-def test_set(evaluator: Any) -> None:
+def test_setvar(evaluator: Any) -> None:
     workflow_config: Dict[str, Any] = {
         "steps": [
             {
@@ -171,6 +171,10 @@ def test_set(evaluator: Any) -> None:
                     "value": "$y + 1",
                 },
             },
+            {
+                "run": "setvar",
+                "with": "u = 1",
+            },
         ],
     }
     parsed_config = WorkflowConfig.model_validate(workflow_config)
@@ -180,24 +184,44 @@ def test_set(evaluator: Any) -> None:
     assert workflow["x"] == 1
     assert workflow["y"] == 1
     assert workflow["z"] == 2
+    assert workflow["u"] == 1
+
+
+def test_invalid_setvar(evaluator: Any) -> None:
+    workflow_config: Dict[str, Any] = {
+        "steps": [
+            {
+                "run": "setvar",
+                "with": "1",
+            },
+        ],
+    }
+    parsed_config = WorkflowConfig.model_validate(workflow_config)
+    context = OptimizerContext(evaluator=evaluator())
+    with pytest.raises(WorkflowError, match=re.escape("Invalid expression: 1")):
+        Workflow(parsed_config, context)
+
+    workflow_config = {
+        "steps": [
+            {
+                "run": "setvar",
+                "with": "2a = 1",
+            },
+        ],
+    }
+    parsed_config = WorkflowConfig.model_validate(workflow_config)
+    context = OptimizerContext(evaluator=evaluator())
+    with pytest.raises(WorkflowError, match=re.escape("Invalid identifier: 2a")):
+        Workflow(parsed_config, context)
 
 
 def test_invalid_identifier(evaluator: Any) -> None:
     workflow_config: Dict[str, Any] = {
         "steps": [
+            {"run": "setvar", "with": "x=1"},
             {
                 "run": "setvar",
-                "with": {
-                    "var": "x",
-                    "value": "1",
-                },
-            },
-            {
-                "run": "setvar",
-                "with": {
-                    "var": "y",
-                    "value": "x + 1",
-                },
+                "with": "y=x + 1",
             },
         ],
     }
@@ -205,8 +229,7 @@ def test_invalid_identifier(evaluator: Any) -> None:
     context = OptimizerContext(evaluator=evaluator())
     workflow = Workflow(parsed_config, context)
     with pytest.raises(
-        WorkflowError,
-        match=re.escape("Syntax error in workflow expression: x + 1"),
+        WorkflowError, match=re.escape("Syntax error in workflow expression: x + 1")
     ):
         workflow.run()
 
@@ -237,13 +260,7 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 },
                 "if": "${{ 1 > 0 }}",
             },
-            {
-                "run": "setvar",
-                "with": {
-                    "var": "x",
-                    "value": "1",
-                },
-            },
+            {"run": "setvar", "with": "x = 1"},
             {
                 "run": "optimizer",
                 "if": "$x < 0",
@@ -356,16 +373,11 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
             },
             {
                 "run": "setvar",
-                "with": {
-                    "var": "saved_results",
-                    "value": "$optimal",
-                },
+                "with": "saved_results = $optimal",
             },
             {
                 "run": "reset",
-                "with": {
-                    "context": "optimal",
-                },
+                "with": "optimal",
             },
         ],
     }
@@ -412,7 +424,9 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
             {
                 "id": "enopt_config1",
                 "init": "config",
-                "with": enopt_config1,
+                "with": {
+                    "config": enopt_config1,
+                },
             },
             {
                 "id": "enopt_config2",
@@ -433,7 +447,7 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
             {
                 "id": "callback",
                 "init": "callback",
-                "with": {"function": _track_evaluations},
+                "with": _track_evaluations,
             },
         ],
         "steps": [
@@ -828,10 +842,7 @@ def test_restart_optimum_with_reset(
                     "steps": [
                         {
                             "run": "setvar",
-                            "with": {
-                                "var": "initial",
-                                "value": "$optimum",
-                            },
+                            "with": "initial = $optimum",
                         },
                         {
                             "run": "reset",

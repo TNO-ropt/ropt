@@ -37,7 +37,11 @@ class DefaultResetStep(WorkflowStep):
         """
         super().__init__(config, workflow)
 
-        self._with = DefaultResetStepWith.model_validate(config.with_)
+        self._context = (
+            config.with_
+            if isinstance(config.with_, str)
+            else DefaultResetStepWith.model_validate(config.with_).context
+        )
 
     def run(self) -> bool:
         """Run the reset step.
@@ -45,8 +49,8 @@ class DefaultResetStep(WorkflowStep):
         Returns:
             True if a user abort occurred, always `False`.
         """
-        if not self.workflow.has_context(self._with.context):
-            msg = f"Env object `{self._with.context}` does not exist."
+        if not self.workflow.has_context(self._context):
+            msg = f"Env object `{self._context}` does not exist."
             raise WorkflowError(msg, step_name=self.step_config.name)
-        self.workflow.reset_context(self._with.context)
+        self.workflow.reset_context(self._context)
         return False

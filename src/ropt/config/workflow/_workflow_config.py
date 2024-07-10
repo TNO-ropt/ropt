@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections import Counter
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -39,7 +39,7 @@ class ContextConfig(BaseModel):
 
     id: str
     init: str
-    with_: Optional[Any] = Field(default=None, alias="with")
+    with_: Any = Field(default_factory=dict, alias="with")
 
     model_config = ConfigDict(
         extra="forbid",
@@ -86,7 +86,7 @@ class StepConfig(BaseModel):
 
     name: Optional[str] = None
     run: str
-    with_: Dict[str, Any] = Field(default_factory=dict, alias="with")
+    with_: Union[Dict[str, Any], str] = Field(default_factory=dict, alias="with")
     if_: Optional[str] = Field(default=None, alias="if")
 
     model_config = ConfigDict(

@@ -59,7 +59,11 @@ class DefaultEvaluatorStep(WorkflowStep):
         """
         super().__init__(config, workflow)
 
-        self._with = DefaultEvaluatorStepWith.model_validate(config.with_)
+        self._with = (
+            DefaultEvaluatorStepWith.model_validate({"config": config.with_})
+            if isinstance(config.with_, str)
+            else DefaultEvaluatorStepWith.model_validate(config.with_)
+        )
 
     def run(self) -> bool:
         """Run the evaluator step.

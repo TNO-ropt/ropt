@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, Optional
 
 from pydantic import BaseModel, ConfigDict
 
+from ropt.exceptions import WorkflowError
 from ropt.plugins.workflow.base import WorkflowStep
 
 if TYPE_CHECKING:
@@ -41,12 +42,21 @@ class DefaultSetStep(WorkflowStep):
             config:   The configuration of the step
             workflow: The workflow that runs this step
         """
+        self._value: Any
         super().__init__(config, workflow)
-
-        with_ = DefaultSetStepWith.model_validate(config.with_)
-
-        self._var = with_.var.strip()
-        self._value = with_.value
+        if isinstance(config.with_, str):
+            self._var, sep, self._value = config.with_.partition("=")
+            if sep != "=":
+                msg = f"Invalid expression: {config.with_}"
+                raise WorkflowError(msg, step_name=self._step_config.name)
+            self._var = self._var.strip()
+            if not self._var.isidentifier():
+                msg = f"Invalid identifier: {self._var}"
+                raise WorkflowError(msg, step_name=self._step_config.name)
+        else:
+            with_ = DefaultSetStepWith.model_validate(config.with_)
+            self._var = with_.var.strip()
+            self._value = with_.value
 
     def run(self) -> bool:
         """Run the setvar step.

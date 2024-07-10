@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Any, Dict, Union
+
+from pydantic import BaseModel, ConfigDict
 
 from ropt.config.enopt import EnOptConfig
 from ropt.exceptions import WorkflowError
@@ -12,6 +14,21 @@ from ropt.plugins.workflow.base import ContextObj
 if TYPE_CHECKING:
     from ropt.config.workflow import ContextConfig
     from ropt.workflow import Workflow
+
+
+class DefaultConfigWith(BaseModel):
+    """Parameters for the `config` context object.
+
+    Attributes:
+        config: The configuration
+    """
+
+    config: Union[EnOptConfig, Dict[str, Any]]
+
+    model_config = ConfigDict(
+        extra="forbid",
+        validate_default=True,
+    )
 
 
 class DefaultConfigContext(ContextObj):
@@ -31,7 +48,12 @@ class DefaultConfigContext(ContextObj):
 
     def __init__(self, config: ContextConfig, workflow: Workflow) -> None:
         super().__init__(config, workflow)
-        enopt_config = EnOptConfig.model_validate(config.with_)
+        if "config" in config.with_:
+            with_ = DefaultConfigWith.model_validate(config.with_)
+            enopt_config = EnOptConfig.model_validate(with_.config)
+        else:
+            enopt_config = EnOptConfig.model_validate(config.with_)
+
         self._backup = enopt_config
         self.set_variable(enopt_config)
 

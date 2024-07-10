@@ -50,9 +50,13 @@ class DefaultCallbackContext(ContextObj):
 
     def __init__(self, config: ContextConfig, workflow: Workflow) -> None:
         super().__init__(config, workflow)
-        with_ = DefaultCallbackWith.model_validate(config.with_)
-        self._callback = with_.function
-        self._kwargs = with_.kwargs
+        if callable(config.with_):
+            self._callback = config.with_
+            self._kwargs = {}
+        else:
+            with_ = DefaultCallbackWith.model_validate(config.with_)
+            self._callback = with_.function
+            self._kwargs = with_.kwargs
         self.set_variable(None)
 
     def update(self, value: Any) -> None:  # noqa: ANN401

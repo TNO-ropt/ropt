@@ -77,7 +77,11 @@ class DefaultOptimizerStep(OptimizerStep):
         """
         super().__init__(config, workflow)
 
-        self._with = DefaultOptimizerStepWith.model_validate(config.with_)
+        self._with = (
+            DefaultOptimizerStepWith.model_validate({"config": config.with_})
+            if isinstance(config.with_, str)
+            else DefaultOptimizerStepWith.model_validate(config.with_)
+        )
         self._enopt_config: EnOptConfig
 
     def run(self) -> bool:
