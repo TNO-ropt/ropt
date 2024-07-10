@@ -651,6 +651,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.eval" class="md-nav__link">
+    <span class="md-ellipsis">
+      eval
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.workflow.Workflow.reset_context" class="md-nav__link">
     <span class="md-ellipsis">
       reset_context
@@ -1345,6 +1354,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.workflow.Workflow.eval" class="md-nav__link">
+    <span class="md-ellipsis">
+      eval
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.workflow.Workflow.reset_context" class="md-nav__link">
     <span class="md-ellipsis">
       reset_context
@@ -1967,7 +1985,12 @@ after completing the current function evaluation.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Parse a value as a variable, context field or expression.</p>
+      <p>Parse a value as an expression or an interpolated string.</p>
+<p>If the value is a string, and starts with <code>$</code>, it is assumed to be an
+expression and it is evaluated. If it does not start with <code>$</code>, any
+embedded string starting with <code>$</code> sign are evaluated and interpolated
+into the string.</p>
+<p>If the value is not a string, it is passed through unchanged.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2015,6 +2038,86 @@ after completing the current function evaluation.</p>
             <td>
               <div class="doc-md-description">
                 <p>The result of the evaluation.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.workflow.Workflow.eval" class="doc doc-heading">
+            <code class="highlight language-python"><span class="nb">eval</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Evaluate the provided value as an expression.</p>
+<p>The value is evaluated as follows:</p>
+<ul>
+<li>If the value is not a string, return unchanged</li>
+<li>If the value is a string enclosed in a <code>${{ }}</code> pair the contents are
+  evaluated recursively.</li>
+<li>If value is a string that starts with <code>$</code> and is an identifier it is
+  assumed to be a workflow variable and its value is returned. The
+  resulting value can have any type.</li>
+<li>Otherwise the string is evaluated and the result returned. The type of
+  the result is restricted to numerical values, lists and numpy array.</li>
+</ul>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>value</code></td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The expression to evaluate.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The result of the expression.</p>
               </div>
             </td>
           </tr>
