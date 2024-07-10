@@ -167,8 +167,7 @@ def test_setvar(evaluator: Any) -> None:
             {
                 "run": "setvar",
                 "with": {
-                    "var": "z",
-                    "value": "$y + 1",
+                    "expr": "z = $y + 1",
                 },
             },
             {

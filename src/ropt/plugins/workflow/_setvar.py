@@ -14,7 +14,23 @@ if TYPE_CHECKING:
     from ropt.workflow import Workflow
 
 
-class DefaultSetStepWith(BaseModel):
+class DefaultSetStepExprWith(BaseModel):
+    """Parameters used by the default setvar step.
+
+    Attributes:
+        expr: Expression used to set the variable
+    """
+
+    expr: str
+
+    model_config = ConfigDict(
+        extra="forbid",
+        validate_default=True,
+        arbitrary_types_allowed=True,
+    )
+
+
+class DefaultSetStepVarValueWith(BaseModel):
     """Parameters used by the default setvar step.
 
     Attributes:
@@ -23,7 +39,7 @@ class DefaultSetStepWith(BaseModel):
     """
 
     var: str
-    value: Optional[Any] = None
+    value: Any
 
     model_config = ConfigDict(
         extra="forbid",
@@ -42,21 +58,35 @@ class DefaultSetStep(WorkflowStep):
             config:   The configuration of the step
             workflow: The workflow that runs this step
         """
-        self._value: Any
         super().__init__(config, workflow)
+
+        expr: Optional[str] = None
+        var: str
+        value: Any
+
         if isinstance(config.with_, str):
-            self._var, sep, self._value = config.with_.partition("=")
-            if sep != "=":
-                msg = f"Invalid expression: {config.with_}"
-                raise WorkflowError(msg, step_name=self._step_config.name)
-            self._var = self._var.strip()
-            if not self._var.isidentifier():
-                msg = f"Invalid identifier: {self._var}"
-                raise WorkflowError(msg, step_name=self._step_config.name)
+            expr = config.with_
+        elif "expr" in config.with_:
+            expr = DefaultSetStepExprWith.model_validate(config.with_).expr
+        elif "var" in config.with_:
+            with_ = DefaultSetStepVarValueWith.model_validate(config.with_)
+            var = with_.var
+            value = with_.value
         else:
-            with_ = DefaultSetStepWith.model_validate(config.with_)
-            self._var = with_.var.strip()
-            self._value = with_.value
+            msg = "Either `expr` or `var` must be provided"
+            raise RuntimeError(msg)
+
+        if expr is not None:
+            var, sep, value = expr.partition("=")
+            if sep != "=":
+                msg = f"Invalid expression: {expr}"
+                raise WorkflowError(msg, step_name=self._step_config.name)
+
+        self._var = var.strip()
+        if not self._var.isidentifier():
+            msg = f"Invalid identifier: {self._var}"
+            raise WorkflowError(msg, step_name=self._step_config.name)
+        self._value = value
 
     def run(self) -> bool:
         """Run the setvar step.
