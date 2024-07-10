@@ -1,12 +1,11 @@
-"""This module implements the default optimizer step."""
+"""This module implements the default setvar step."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Optional
 
 from pydantic import BaseModel, ConfigDict
 
-from ropt.exceptions import WorkflowError
 from ropt.plugins.workflow.base import WorkflowStep
 
 if TYPE_CHECKING:
@@ -14,22 +13,29 @@ if TYPE_CHECKING:
     from ropt.workflow import Workflow
 
 
-class DefaultResetStepWith(BaseModel):
-    """Parameters used by the default reset step."""
+class DefaultSetStepWith(BaseModel):
+    """Parameters used by the default setvar step.
 
-    context: str
+    Attributes:
+        var:   The variable to set
+        value: The value
+    """
+
+    var: str
+    value: Optional[Any] = None
 
     model_config = ConfigDict(
         extra="forbid",
         validate_default=True,
+        arbitrary_types_allowed=True,
     )
 
 
-class DefaultResetStep(WorkflowStep):
-    """The default reset step."""
+class DefaultSetStep(WorkflowStep):
+    """The default set step."""
 
     def __init__(self, config: StepConfig, workflow: Workflow) -> None:
-        """Initialize a default reset context step.
+        """Initialize a default setvar step.
 
         Args:
             config:   The configuration of the step
@@ -37,16 +43,16 @@ class DefaultResetStep(WorkflowStep):
         """
         super().__init__(config, workflow)
 
-        self._with = DefaultResetStepWith.model_validate(config.with_)
+        with_ = DefaultSetStepWith.model_validate(config.with_)
+
+        self._var = with_.var.strip()
+        self._value = with_.value
 
     def run(self) -> bool:
-        """Run the reset step.
+        """Run the setvar step.
 
         Returns:
             True if a user abort occurred, always `False`.
         """
-        if not self.workflow.has_context(self._with.context):
-            msg = f"Env object `{self._with.context}` does not exist."
-            raise WorkflowError(msg, step_name=self.step_config.name)
-        self.workflow.reset_context(self._with.context)
+        self._workflow[self._var] = self._workflow.eval(self._value)
         return False

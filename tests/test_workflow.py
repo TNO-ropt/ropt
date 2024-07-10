@@ -118,7 +118,7 @@ def test_parse_value(enopt_config: Any, evaluator: Any) -> None:
 
     assert workflow.parse_value("$results") is None
     assert workflow.parse_value("${{ [1, 2] }}") == [1, 2]
-    assert workflow.parse_value("${{ [results, 2] }}") == [None, 2]
+    assert workflow.parse_value("${{ [$results, 2] }}") == [None, 2]
 
     assert workflow.parse_value("a ${{ 1 }} b") == "a 1 b"
     assert workflow.parse_value("a ${{ 1 + 1 }} b") == "a 2 b"
@@ -140,11 +140,75 @@ def test_parse_value(enopt_config: Any, evaluator: Any) -> None:
         WorkflowError,
         match=re.escape("Unknown workflow variable: `y`"),
     ):
-        workflow.parse_value("${{ y + 1 }}")
+        workflow.parse_value("${{ $y + 1 }}")
 
     workflow.run()
 
     assert isinstance(workflow.parse_value("$results"), Results)
+
+
+def test_set(evaluator: Any) -> None:
+    workflow_config: Dict[str, Any] = {
+        "steps": [
+            {
+                "run": "setvar",
+                "with": {
+                    "var": "x",
+                    "value": "${{ 1 }}",
+                },
+            },
+            {
+                "run": "setvar",
+                "with": {
+                    "var": "y",
+                    "value": 1,
+                },
+            },
+            {
+                "run": "setvar",
+                "with": {
+                    "var": "z",
+                    "value": "$y + 1",
+                },
+            },
+        ],
+    }
+    parsed_config = WorkflowConfig.model_validate(workflow_config)
+    context = OptimizerContext(evaluator=evaluator())
+    workflow = Workflow(parsed_config, context)
+    workflow.run()
+    assert workflow["x"] == 1
+    assert workflow["y"] == 1
+    assert workflow["z"] == 2
+
+
+def test_invalid_identifier(evaluator: Any) -> None:
+    workflow_config: Dict[str, Any] = {
+        "steps": [
+            {
+                "run": "setvar",
+                "with": {
+                    "var": "x",
+                    "value": "1",
+                },
+            },
+            {
+                "run": "setvar",
+                "with": {
+                    "var": "y",
+                    "value": "x + 1",
+                },
+            },
+        ],
+    }
+    parsed_config = WorkflowConfig.model_validate(workflow_config)
+    context = OptimizerContext(evaluator=evaluator())
+    workflow = Workflow(parsed_config, context)
+    with pytest.raises(
+        WorkflowError,
+        match=re.escape("Syntax error in workflow expression: x + 1"),
+    ):
+        workflow.run()
 
 
 def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
@@ -174,8 +238,15 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 "if": "${{ 1 > 0 }}",
             },
             {
+                "run": "setvar",
+                "with": {
+                    "var": "x",
+                    "value": "1",
+                },
+            },
+            {
                 "run": "optimizer",
-                "if": "1 < 0",
+                "if": "$x < 0",
                 "with": {
                     "config": "$config",
                     "update": ["optimal2"],
@@ -284,10 +355,16 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 },
             },
             {
+                "run": "setvar",
+                "with": {
+                    "var": "saved_results",
+                    "value": "$optimal",
+                },
+            },
+            {
                 "run": "reset",
                 "with": {
                     "context": "optimal",
-                    "backup_var": "saved_results",
                 },
             },
         ],
@@ -750,10 +827,16 @@ def test_restart_optimum_with_reset(
                     "iterations": 3,
                     "steps": [
                         {
+                            "run": "setvar",
+                            "with": {
+                                "var": "initial",
+                                "value": "$optimum",
+                            },
+                        },
+                        {
                             "run": "reset",
                             "with": {
                                 "context": "optimum",
-                                "backup_var": "initial",
                             },
                         },
                         {
@@ -766,7 +849,7 @@ def test_restart_optimum_with_reset(
                         },
                     ],
                 },
-            }
+            },
         ],
     }
     context = OptimizerContext(evaluator=evaluator(new_functions))

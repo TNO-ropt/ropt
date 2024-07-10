@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+import keyword
 import re
 from itertools import count
 from numbers import Number
@@ -127,7 +128,14 @@ class Workflow:
         return self._workflow_context
 
     def parse_value(self, value: Any) -> Any:  # noqa: ANN401
-        """Parse a value as a variable, context field or expression.
+        """Parse a value as an expression or an interpolated string.
+
+        If the value is a string, and starts with `$`, it is assumed to be an
+        expression and it is evaluated. If it does not start with `$`, any
+        embedded string starting with `$` sign are evaluated and interpolated
+        into the string.
+
+        If the value is not a string, it is passed through unchanged.
 
         Args:
             value: The value to evaluate
@@ -142,20 +150,32 @@ class Workflow:
 
         if isinstance(value, str):
             stripped = value.strip()
-            if stripped.startswith("${{") and stripped.endswith("}}"):
-                return self._eval(stripped[3:-2].strip())
             if stripped.startswith("$"):
-                return self[stripped[1:]]
+                return self.eval(stripped)
             return re.sub(r"\${{(.*?)}}|\$\$|\$([^\W0-9][\w\.]*)", _substitute, value)
         return value
 
-    def _eval(self, expr: str) -> Any:  # noqa: ANN401
+    def _eval_expr(self, expr: str) -> Any:  # noqa: ANN401
+        # Check for identifiers that are not preceded by $:
+        for word in re.findall(r"(?<!\$)\b\w+\b", expr):
+            if word.isidentifier() and not keyword.iskeyword(word):
+                msg = f"Syntax error in workflow expression: {expr}"
+                raise WorkflowError(msg)
+
+        # Remove $ from identifiers, before sending the string to the parser:
+        stripped = expr
+        for word in re.findall(r"(?<=\$)\b\w+\b", expr):
+            if word.isidentifier() and not keyword.iskeyword(word):
+                stripped = stripped.replace(f"${word}", word)
+
+        # Parse the string:
         try:
-            tree = ast.parse(expr, mode="eval")
+            tree = ast.parse(stripped, mode="eval")
         except SyntaxError as exc:
             msg = f"Syntax error in workflow expression: {expr}"
             raise WorkflowError(msg) from exc
 
+        # Replace identifiers with their value and evaluate:
         if _is_valid(tree.body):
             replacer = _ReplaceFields(self)
             tree = ast.fix_missing_locations(replacer.visit(tree))
@@ -172,11 +192,45 @@ class Workflow:
         msg = f"Invalid workflow expression: {expr}"
         raise WorkflowError(msg)
 
+    def eval(self, value: Any) -> Any:  # noqa: ANN401
+        """Evaluate the provided value as an expression.
+
+        The value is evaluated as follows:
+
+        - If the value is not a string, return unchanged
+        - If the value is a string enclosed in a `${{ }}` pair the contents are
+          evaluated recursively.
+        - If value is a string that starts with `$` and is an identifier it is
+          assumed to be a workflow variable and its value is returned. The
+          resulting value can have any type.
+        - Otherwise the string is evaluated and the result returned. The type of
+          the result is restricted to numerical values, lists and numpy array.
+
+        Args:
+            value: The expression to evaluate.
+
+        Returns:
+            The result of the expression.
+        """
+        if not isinstance(value, str):
+            return value
+
+        value = value.strip()
+
+        # Recursively evaluate when enclosed in `${{ }}`:
+        if value.startswith("${{") and value.endswith("}}"):
+            return self.eval(value[3:-2].strip())
+
+        # Identifiers are not evaluated, their value is returned unchanged:
+        if value.startswith("$") and value[1:].isidentifier():
+            return self[value[1:]]
+
+        # Evaluate as an expression:
+        return self._eval_expr(value)
+
     def _check_condition(self, config: StepConfig) -> bool:
         if config.if_ is not None:
-            if config.if_.strip().startswith("$"):
-                return bool(self.parse_value(config.if_))
-            return bool(self._eval(config.if_))
+            return bool(self.eval(config.if_))
         return True
 
     def reset_context(self, obj_id: str) -> None:

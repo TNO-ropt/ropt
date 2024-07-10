@@ -15,6 +15,7 @@ from ._evaluator import DefaultEvaluatorStep
 from ._optimizer import DefaultOptimizerStep
 from ._repeat import DefaultRepeatStep
 from ._reset import DefaultResetStep
+from ._setvar import DefaultSetStep
 from ._update import DefaultUpdateStep
 from .base import WorkflowPlugin
 from .results import DefaultResultsContext
@@ -27,6 +28,7 @@ _CONTEXT_OBJECTS: Final[Dict[str, Type[ContextObj]]] = {
 
 _STEP_OBJECTS: Final[Dict[str, Type[WorkflowStep]]] = {
     "evaluator": DefaultEvaluatorStep,
+    "setvar": DefaultSetStep,
     "optimizer": DefaultOptimizerStep,
     "repeat": DefaultRepeatStep,
     "reset": DefaultResetStep,
