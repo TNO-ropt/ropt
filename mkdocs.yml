@@ -3,7 +3,8 @@ site_name: ropt Documentation
 theme:
   name: material
   features:
-    - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.top
     - navigation.expand
     - content.code.copy
@@ -41,6 +42,9 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.snippets:
 
+extra_css:
+  - stylesheets/extra.css
+
 extra_javascript:
   - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
@@ -49,10 +53,12 @@ extra_javascript:
 extra:
   version:
     provider: mike
+  generator: false
 
 watch:
   - src
 
+repo_url: https://github.com/TNO-ropt/ropt
 nav:
   - "About ropt": index.md
   - Usage:
