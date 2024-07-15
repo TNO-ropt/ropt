@@ -123,6 +123,8 @@ class ScriptOptimizer:
         if all(
             path.exists() for path in (var_path, *objective_paths, *constraint_paths)
         ) and np.allclose(np.load(var_path), variables):
+            msg = f"Batch {batch_id}, realization {realization}, job {job_idx}: SKIPPED"
+            self._logger.info(msg)
             return [
                 ScriptTask(
                     future=None,
