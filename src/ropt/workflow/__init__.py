@@ -1,11 +1,11 @@
 r"""Code to run optimization workflows."""
 
 from ._optimizer import Optimizer
-from ._run import BasicWorkflow
+from ._run import BasicOptimizationWorkflow
 from ._workflow import OptimizerContext, Workflow
 
 __all__ = [
-    "BasicWorkflow",
+    "BasicOptimizationWorkflow",
     "Optimizer",
     "Workflow",
     "OptimizerContext",

@@ -15,7 +15,7 @@ from numpy.typing import NDArray
 
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
 from ropt.results import FunctionResults, Results
-from ropt.workflow import BasicWorkflow
+from ropt.workflow import BasicOptimizationWorkflow
 
 UNCERTAINTY = 0.1
 
@@ -86,7 +86,8 @@ def run_optimization(config: Dict[str, Any]) -> FunctionResults:
     b = rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=realizations)
 
     optimal_result = (
-        BasicWorkflow(CONFIG, partial(rosenbrock, a=a, b=b), callback=report)
+        BasicOptimizationWorkflow(CONFIG, partial(rosenbrock, a=a, b=b))
+        .track_results(report)
         .run()
         .results
     )

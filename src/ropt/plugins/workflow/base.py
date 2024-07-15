@@ -129,6 +129,10 @@ class OptimizerStep(WorkflowStep):
     """Base class for optimizer steps."""
 
     @abstractmethod
+    def start_evaluation(self) -> None:
+        """Called before the optimizer starts an evaluation."""
+
+    @abstractmethod
     def finish_evaluation(self, results: Tuple[Results, ...]) -> None:
         """Called after the optimizer finishes an evaluation.
 

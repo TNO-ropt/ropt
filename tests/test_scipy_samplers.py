@@ -6,7 +6,7 @@ import pytest
 
 from ropt.plugins.sampler.scipy import _SUPPORTED_METHODS
 from ropt.results import GradientResults, Results
-from ropt.workflow import BasicWorkflow
+from ropt.workflow import BasicOptimizationWorkflow
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -36,7 +36,7 @@ def test_scipy_samplers_unconstrained(
     enopt_config: Any, method: str, evaluator: Any
 ) -> None:
     enopt_config["samplers"] = [{"method": method}]
-    variables = BasicWorkflow(enopt_config, evaluator()).run().variables
+    variables = BasicOptimizationWorkflow(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -47,7 +47,7 @@ def test_scipy_indexed_sampler(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["gradient"]["samplers"] = [0, -1, 0]
     enopt_config["variables"]["initial_values"][1] = 0.1
 
-    variables = BasicWorkflow(enopt_config, evaluator()).run().variables
+    variables = BasicOptimizationWorkflow(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert pytest.approx(variables[0]) != 0.0
     assert pytest.approx(variables[1]) == 0.1
@@ -68,9 +68,8 @@ def test_scipy_samplers_shared(enopt_config: Any, method: str, evaluator: Any) -
 
     enopt_config["samplers"][0]["shared"] = False
     variables1 = (
-        BasicWorkflow(
-            enopt_config, evaluator(), callback=partial(_observer, tag="result1")
-        )
+        BasicOptimizationWorkflow(enopt_config, evaluator())
+        .track_results(partial(_observer, tag="result1"))
         .run()
         .variables
     )
@@ -78,9 +77,8 @@ def test_scipy_samplers_shared(enopt_config: Any, method: str, evaluator: Any) -
 
     enopt_config["samplers"][0]["shared"] = True
     variables2 = (
-        BasicWorkflow(
-            enopt_config, evaluator(), callback=partial(_observer, tag="result2")
-        )
+        BasicOptimizationWorkflow(enopt_config, evaluator())
+        .track_results(partial(_observer, tag="result2"))
         .run()
         .variables
     )

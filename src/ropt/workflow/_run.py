@@ -7,6 +7,8 @@ from typing import (
     Any,
     Callable,
     Dict,
+    List,
+    Literal,
     NoReturn,
     Optional,
     Tuple,
@@ -16,6 +18,7 @@ from typing import (
 from ropt.config.workflow import WorkflowConfig
 from ropt.enums import OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
+from ropt.plugins import PluginManager
 
 from ._workflow import OptimizerContext, Workflow
 
@@ -25,77 +28,54 @@ if TYPE_CHECKING:
 
     from ropt.config.enopt import EnOptConfig
     from ropt.evaluator import Evaluator
-    from ropt.plugins import PluginManager
+    from ropt.plugins._manager import PluginType
+    from ropt.plugins.base import Plugin
     from ropt.results import FunctionResults, Results
 
 
-def _basic_run_config(
-    enopt_config: Union[Dict[str, Any], EnOptConfig],
-    callback: Optional[Callable[[Tuple[Results, ...]], None]],
-    constraint_tolerance: float,
-) -> Dict[str, Any]:
-    updates = ["optimal"]
-    if callback is not None:
-        updates.append("callback")
-    config: Dict[str, Any] = {
-        "context": [
-            {
-                "id": "config",
-                "init": "config",
-                "with": enopt_config,
-            },
-            {
-                "id": "optimal",
-                "init": "results",
-                "with": {"constraint_tolerance": constraint_tolerance},
-            },
-        ],
-        "steps": [
-            {
-                "run": "optimizer",
-                "with": {
-                    "config": "$config",
-                    "update": updates,
-                    "exit_code": "exit_code",
-                },
-            },
-        ],
-    }
-    if callback is not None:
-        config["context"].append(
-            {
-                "id": "callback",
-                "init": "callback",
-                "with": {"function": callback},
-            }
-        )
-    return config
-
-
-class BasicWorkflow:
+class BasicOptimizationWorkflow:
     """Runner class for basic workflows."""
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         enopt_config: Union[Dict[str, Any], EnOptConfig],
         evaluator: Evaluator,
         *,
         constraint_tolerance: float = 1e-10,
-        callback: Optional[Callable[[Tuple[Results, ...]], None]] = None,
         seed: Optional[int] = None,
-        plugin_manager: Optional[PluginManager] = None,
     ) -> None:
         self._enopt_config = enopt_config
         self._evaluator = evaluator
-        self._plugin_manager = plugin_manager
+        self._plugin_manager: Optional[PluginManager] = None
         self._context = OptimizerContext(evaluator=self._evaluator, seed=seed)
         self._results: Optional[FunctionResults]
         self._variables: Optional[NDArray[np.float64]]
         self._exit_code: OptimizerExitCode = OptimizerExitCode.UNKNOWN
 
-        self.workflow_config = _basic_run_config(
-            self._enopt_config, callback, constraint_tolerance
-        )
+        self._workflow_config: Dict[str, List[Dict[str, Any]]] = {
+            "context": [
+                {
+                    "id": "config",
+                    "init": "config",
+                    "with": enopt_config,
+                },
+                {
+                    "id": "optimal",
+                    "init": "results",
+                    "with": {"constraint_tolerance": constraint_tolerance},
+                },
+            ],
+            "steps": [
+                {
+                    "run": "optimizer",
+                    "with": {
+                        "config": "$config",
+                        "update": ["optimal"],
+                        "exit_code_var": "exit_code",
+                    },
+                },
+            ],
+        }
 
     @property
     def results(self) -> Optional[FunctionResults]:
@@ -109,8 +89,90 @@ class BasicWorkflow:
     def exit_code(self) -> OptimizerExitCode:
         return self._exit_code
 
-    def run(self) -> BasicWorkflow:
-        config = WorkflowConfig.model_validate(self.workflow_config)
+    def add_plugins(
+        self, plugin_type: PluginType, plugins: Dict[str, Plugin]
+    ) -> BasicOptimizationWorkflow:
+        if self._plugin_manager is None:
+            self._plugin_manager = PluginManager()
+            self._plugin_manager.add_plugins(plugin_type, plugins)
+        return self
+
+    def track_results(
+        self, function: Callable[[Tuple[Results, ...]], None]
+    ) -> BasicOptimizationWorkflow:
+        self._workflow_config["context"].append(
+            {
+                "id": "callback",
+                "init": "callback",
+                "with": {"function": function},
+            }
+        )
+        steps = self._workflow_config["steps"]
+        idx = next(
+            (idx for idx, step in enumerate(steps) if step["run"] == "repeat"), None
+        )
+        if idx is not None:
+            steps = steps[idx]["with"]["steps"]
+        idx = next(idx for idx, step in enumerate(steps) if step["run"] == "optimizer")
+        steps[idx]["with"]["update"].append("callback")
+        return self
+
+    def add_metadata(self, metadata: Dict[str, Any]) -> BasicOptimizationWorkflow:
+        steps = self._workflow_config["steps"]
+        idx = next(
+            (idx for idx, step in enumerate(steps) if step["run"] == "repeat"), None
+        )
+        if idx is not None:
+            steps = steps[idx]["with"]["steps"]
+        idx = next(idx for idx, step in enumerate(steps) if step["run"] == "optimizer")
+        steps[idx]["with"]["metadata"] = metadata
+        return self
+
+    def repeat(
+        self,
+        iterations: int,
+        restart_from: Literal["initial", "last", "optimal", "last_optimal"] = "optimal",
+        counter_var: Optional[str] = None,
+    ) -> BasicOptimizationWorkflow:
+        if any(step["run"] == "repeat" for step in self._workflow_config["steps"]):
+            msg = "The repeat() method can only be called once."
+            raise RuntimeError(msg)
+        steps = self._workflow_config["steps"]
+        idx = next(idx for idx, step in enumerate(steps) if step["run"] == "optimizer")
+        if restart_from in ["last", "last_optimal"]:
+            self._workflow_config["context"].append(
+                {
+                    "id": "repeat_tracker",
+                    "init": "results",
+                    "with": {"type": "last" if restart_from == "last" else "optimal"},
+                }
+            )
+            steps[idx]["with"]["update"].append("repeat_tracker")
+        if restart_from == "last":
+            steps[idx]["with"]["initial_values"] = "$repeat_tracker"
+        elif restart_from == "optimal":
+            steps[idx]["with"]["initial_values"] = "$optimal"
+        elif restart_from == "last_optimal":
+            steps[idx]["with"]["initial_values"] = "$initial"
+            steps = [
+                {"run": "setvar", "with": "initial = $repeat_tracker"},
+                {"run": "reset", "with": {"context": "repeat_tracker"}},
+                *steps,
+            ]
+        self._workflow_config["steps"] = [
+            {
+                "run": "repeat",
+                "with": {
+                    "counter_var": counter_var,
+                    "iterations": iterations,
+                    "steps": steps,
+                },
+            }
+        ]
+        return self
+
+    def run(self) -> BasicOptimizationWorkflow:
+        config = WorkflowConfig.model_validate(self._workflow_config)
         workflow = Workflow(
             config,
             self._context,

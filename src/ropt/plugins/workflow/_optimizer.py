@@ -48,6 +48,7 @@ class DefaultOptimizerStepWith(BaseModel):
         update:          List of the objects that are notified of new results
         initial_values:  The initial values for the optimizer
         metadata:        Metadata to set in the results
+        exit_code_var:   Name of the variable to store the exit code
         nested_workflow: Optional nested workflow configuration
     """
 
@@ -55,7 +56,7 @@ class DefaultOptimizerStepWith(BaseModel):
     update: List[str] = []
     initial_values: Optional[Union[str, Array1D]] = None
     metadata: Dict[str, Union[int, float, bool, str]] = {}
-    exit_code: Optional[str] = None
+    exit_code_var: Optional[str] = None
     nested_workflow: Optional[DefaultNestedWorkflow] = None
 
     model_config = ConfigDict(
@@ -113,10 +114,13 @@ class DefaultOptimizerStep(OptimizerStep):
             plugin_manager=self.workflow.plugin_manager,
         ).start(variables)
 
-        if self._with.exit_code is not None:
-            self.workflow[self._with.exit_code] = exit_code
+        if self._with.exit_code_var is not None:
+            self.workflow[self._with.exit_code_var] = exit_code
 
         return exit_code == OptimizerExitCode.USER_ABORT
+
+    def start_evaluation(self) -> None:
+        """Call before an evaluation is started."""
 
     def finish_evaluation(self, results: Tuple[Results, ...]) -> None:
         """Called after the optimizer finishes an evaluation.

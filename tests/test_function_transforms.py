@@ -6,7 +6,7 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt.exceptions import ConfigError
-from ropt.workflow import BasicWorkflow
+from ropt.workflow import BasicOptimizationWorkflow
 
 
 @pytest.fixture(name="enopt_config")
@@ -47,7 +47,7 @@ def test_stddev_function_transform_merge_error(
             "realizations in the gradient."
         ),
     ):
-        BasicWorkflow(enopt_config, evaluator(test_functions)).run()
+        BasicOptimizationWorkflow(enopt_config, evaluator(test_functions)).run()
 
 
 def test_mean_stddev_function_transform(
@@ -59,7 +59,11 @@ def test_mean_stddev_function_transform(
     enopt_config["objective_functions"]["weights"].extend([0.75, 0.25])
     enopt_config["objective_functions"]["function_transforms"] = [0, 0, 1, 1]
     enopt_config["function_transforms"] = [{"method": "mean"}, {"method": "stddev"}]
-    variables = BasicWorkflow(enopt_config, evaluator(test_functions)).run().variables
+    variables = (
+        BasicOptimizationWorkflow(enopt_config, evaluator(test_functions))
+        .run()
+        .variables
+    )
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -97,6 +101,8 @@ def test_stddev_function_transform(
 
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations
     enopt_config["function_transforms"] = [{"method": "stddev"}]
-    variables = BasicWorkflow(enopt_config, evaluator(functions)).run().variables
+    variables = (
+        BasicOptimizationWorkflow(enopt_config, evaluator(functions)).run().variables
+    )
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)

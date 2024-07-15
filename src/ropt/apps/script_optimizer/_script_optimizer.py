@@ -30,7 +30,6 @@ from ropt.config.workflow import WorkflowConfig
 from ropt.enums import OptimizerExitCode
 from ropt.evaluator import EvaluatorContext
 from ropt.evaluator.parsl import ParslEvaluator, State
-from ropt.events import OptimizationEvent
 from ropt.exceptions import ConfigError
 from ropt.workflow import OptimizerContext, Workflow
 
@@ -268,24 +267,20 @@ class ScriptOptimizer:
         self._update_current_state(batch_id, jobs)
         self._store_states()
 
-    def _log_exit_code(self, event: OptimizationEvent) -> None:
-        exit_code = event.exit_code
-        assert event.config is not None
-        if exit_code == OptimizerExitCode.TOO_FEW_REALIZATIONS:
-            self._logger.warning(
-                "Too few successful realizations: optimization stopped.",
-            )
-        elif exit_code == OptimizerExitCode.MAX_FUNCTIONS_REACHED:
-            self._logger.warning(
-                "Maximum number of functions reached: optimization stopped.",
-            )
-        elif exit_code == OptimizerExitCode.USER_ABORT:
-            self._logger.warning("Optimization aborted by the user.")
-        elif exit_code == OptimizerExitCode.OPTIMIZER_STEP_FINISHED:
-            self._logger.info("Optimization finished normally.")
-
-    def _handle_finished_optimizer(self, event: OptimizationEvent) -> None:
-        self._log_exit_code(event)
+    def _log_exit_code(self, event: Any) -> None:  # noqa: ANN401
+        msg = ""
+        if event.exit_code == OptimizerExitCode.TOO_FEW_REALIZATIONS:
+            msg = "Too few successful realizations: optimization stopped."
+        elif event.exit_code == OptimizerExitCode.MAX_FUNCTIONS_REACHED:
+            msg = "Maximum number of functions reached: optimization stopped."
+        elif event.exit_code == OptimizerExitCode.USER_ABORT:
+            msg = "Optimization workflow aborted by the user."
+        elif event.exit_code == OptimizerExitCode.OPTIMIZER_STEP_FINISHED:
+            msg = "Optimization finished normally."
+        if msg:
+            if event.step_name is not None:
+                msg = f"Step {event.step_name}: {msg}"
+            self._logger.info(msg)
 
     def run(
         self,

@@ -14,7 +14,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.workflow import BasicWorkflow
+from ropt.workflow import BasicOptimizationWorkflow
 
 
 def rosenbrock(
@@ -32,7 +32,7 @@ CONFIG = {                                                            # (4)!
     "gradient": {"perturbation_magnitudes": 1e-6}                     # (5)!
 }
 
-workflow = BasicWorkflow(CONFIG, rosenbrock)                          # (6)!
+workflow = BasicOptimizationWorkflow(CONFIG, rosenbrock)                          # (6)!
 workflow.run()                                                        # (7)!
 optimum = workflow.results                                            # (8)
 

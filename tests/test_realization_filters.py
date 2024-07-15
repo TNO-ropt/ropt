@@ -11,7 +11,7 @@ from ropt.plugins.realization_filter.default import (
     _sort_and_select,
 )
 from ropt.results import FunctionResults, GradientResults, Results
-from ropt.workflow import BasicWorkflow
+from ropt.workflow import BasicOptimizationWorkflow
 
 
 @pytest.fixture(name="enopt_config")
@@ -124,7 +124,9 @@ def test_sort_filter_on_objectives(
 
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations
 
-    variables = BasicWorkflow(enopt_config, evaluator(functions)).run().variables
+    variables = (
+        BasicOptimizationWorkflow(enopt_config, evaluator(functions)).run().variables
+    )
     assert variables is not None
     assert not np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -142,11 +144,11 @@ def test_sort_filter_on_objectives(
 
     result_list: List[Results] = []
     results = (
-        BasicWorkflow(
+        BasicOptimizationWorkflow(
             enopt_config,
             evaluator(functions),
-            callback=partial(_track_results, result_list=result_list),
         )
+        .track_results(partial(_track_results, result_list=result_list))
         .run()
         .results
     )
@@ -201,11 +203,11 @@ def test_sort_filter_on_objectives_with_constraints(
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: List[Results] = []
     results = (
-        BasicWorkflow(
+        BasicOptimizationWorkflow(
             enopt_config,
             evaluator(functions),
-            callback=partial(_track_results, result_list=result_list),
         )
+        .track_results(partial(_track_results, result_list=result_list))
         .run()
         .results
     )
@@ -267,11 +269,11 @@ def test_sort_filter_on_constraints(
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: List[Results] = []
     results = (
-        BasicWorkflow(
+        BasicOptimizationWorkflow(
             enopt_config,
             evaluator(functions),
-            callback=partial(_track_results, result_list=result_list),
         )
+        .track_results(partial(_track_results, result_list=result_list))
         .run()
         .results
     )
@@ -343,7 +345,8 @@ def test_sort_filter_mixed(  # noqa: C901
 
     result_list: List[Results] = []
     results = (
-        BasicWorkflow(enopt_config, evaluator(functions), callback=_add_objective)
+        BasicOptimizationWorkflow(enopt_config, evaluator(functions))
+        .track_results(_add_objective)
         .run()
         .results
     )
@@ -380,7 +383,8 @@ def test_sort_filter_mixed(  # noqa: C901
 
     result_list = []
     results = (
-        BasicWorkflow(enopt_config, evaluator(functions), callback=_add_objective)
+        BasicOptimizationWorkflow(enopt_config, evaluator(functions))
+        .track_results(_add_objective)
         .run()
         .results
     )
@@ -422,7 +426,9 @@ def test_cvar_filter_on_objectives(
 
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations
 
-    variables = BasicWorkflow(enopt_config, evaluator(functions)).run().variables
+    variables = (
+        BasicOptimizationWorkflow(enopt_config, evaluator(functions)).run().variables
+    )
     assert variables is not None
     assert not np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -438,11 +444,11 @@ def test_cvar_filter_on_objectives(
     enopt_config["objective_functions"]["realization_filters"] = [0, 0]
     result_list: List[Results] = []
     results = (
-        BasicWorkflow(
+        BasicOptimizationWorkflow(
             enopt_config,
             evaluator(functions),
-            callback=partial(_track_results, result_list=result_list),
         )
+        .track_results(partial(_track_results, result_list=result_list))
         .run()
         .results
     )
@@ -496,11 +502,11 @@ def test_cvar_filter_on_objectives_with_constraints(
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: List[Results] = []
     results = (
-        BasicWorkflow(
+        BasicOptimizationWorkflow(
             enopt_config,
             evaluator(functions),
-            callback=partial(_track_results, result_list=result_list),
         )
+        .track_results(partial(_track_results, result_list=result_list))
         .run()
         .results
     )
@@ -561,11 +567,11 @@ def test_cvar_filter_on_constraints(
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: List[Results] = []
     results = (
-        BasicWorkflow(
+        BasicOptimizationWorkflow(
             enopt_config,
             evaluator(functions),
-            callback=partial(_track_results, result_list=result_list),
         )
+        .track_results(partial(_track_results, result_list=result_list))
         .run()
         .results
     )
@@ -636,7 +642,8 @@ def test_cvar_filter_mixed(  # noqa: C901
 
     result_list: List[Results] = []
     results = (
-        BasicWorkflow(enopt_config, evaluator(functions), callback=_add_objective)
+        BasicOptimizationWorkflow(enopt_config, evaluator(functions))
+        .track_results(_add_objective)
         .run()
         .results
     )
@@ -672,7 +679,8 @@ def test_cvar_filter_mixed(  # noqa: C901
 
     result_list = []
     results = (
-        BasicWorkflow(enopt_config, evaluator(functions), callback=_add_objective)
+        BasicOptimizationWorkflow(enopt_config, evaluator(functions))
+        .track_results(_add_objective)
         .run()
         .results
     )

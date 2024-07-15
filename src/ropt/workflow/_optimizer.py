@@ -166,9 +166,7 @@ class Optimizer:
         compute_gradients: bool = False,
     ) -> Tuple[Results, ...]:
         assert compute_functions or compute_gradients
-        # TODO: remove when the plan code is removed:
-        if hasattr(self._optimizer_step, "start_evaluation"):
-            self._optimizer_step.start_evaluation()
+        self._optimizer_step.start_evaluation()
         results = self._function_evaluator.calculate(
             variables,
             compute_functions=compute_functions,

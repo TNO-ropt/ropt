@@ -10,7 +10,7 @@ from ropt.config.enopt import EnOptConfig
 from ropt.config.enopt.constants import DEFAULT_SEED
 from ropt.enums import ConstraintType, OptimizerExitCode
 from ropt.results import FunctionResults, GradientResults, Results
-from ropt.workflow import BasicWorkflow
+from ropt.workflow import BasicOptimizationWorkflow
 
 
 @pytest.fixture(name="enopt_config")
@@ -42,7 +42,9 @@ def test_max_functions_exceeded(enopt_config: Any, evaluator: Any) -> None:
 
     max_functions = 2
     enopt_config["optimizer"]["max_functions"] = max_functions
-    optimizer = BasicWorkflow(enopt_config, evaluator(), callback=track_results)
+    optimizer = BasicOptimizationWorkflow(enopt_config, evaluator()).track_results(
+        track_results
+    )
     optimizer.run()
     assert last_evaluation == max_functions
     assert optimizer.exit_code == OptimizerExitCode.MAX_FUNCTIONS_REACHED
@@ -59,7 +61,9 @@ def test_max_functions_not_exceeded(enopt_config: Any, evaluator: Any) -> None:
     max_functions = 100
     enopt_config["optimizer"]["max_functions"] = max_functions
     enopt_config["optimizer"]["split_evaluations"] = True
-    optimizer = BasicWorkflow(enopt_config, evaluator(), callback=track_results)
+    optimizer = BasicOptimizationWorkflow(enopt_config, evaluator()).track_results(
+        track_results
+    )
     optimizer.run()
     assert last_evaluation + 1 < 2 * max_functions
     assert optimizer.exit_code == OptimizerExitCode.OPTIMIZER_STEP_FINISHED
@@ -72,7 +76,9 @@ def test_failed_realizations(enopt_config: Any, evaluator: Any) -> None:
         assert results[0].functions is None
 
     functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
-    optimizer = BasicWorkflow(enopt_config, evaluator(functions), callback=_observer)
+    optimizer = BasicOptimizationWorkflow(
+        enopt_config, evaluator(functions)
+    ).track_results(_observer)
     optimizer.run()
     assert optimizer.exit_code == OptimizerExitCode.TOO_FEW_REALIZATIONS
 
@@ -83,7 +89,7 @@ def test_all_failed_realizations_not_supported(
     enopt_config["realizations"] = {"realization_min_success": 0}
 
     functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
-    optimizer = BasicWorkflow(
+    optimizer = BasicOptimizationWorkflow(
         enopt_config,
         evaluator(functions),
     )
@@ -101,7 +107,9 @@ def test_user_abort(enopt_config: Any, evaluator: Any) -> None:
         if results[0].result_id == 1:
             optimizer.abort_optimization()
 
-    optimizer = BasicWorkflow(enopt_config, evaluator(), callback=_observer)
+    optimizer = BasicOptimizationWorkflow(enopt_config, evaluator()).track_results(
+        _observer
+    )
     optimizer.run()
     assert optimizer.results is not None
     assert last_evaluation == 1
@@ -114,7 +122,7 @@ def test_single_perturbation(enopt_config: Any, evaluator: Any) -> None:
         "merge_realizations": True,
     }
     enopt_config["realizations"] = {"weights": 5 * [1]}
-    variables = BasicWorkflow(enopt_config, evaluator()).run().variables
+    variables = BasicOptimizationWorkflow(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -127,23 +135,23 @@ def test_objective_auto_scale(
 
     enopt_config["objective_functions"]["scales"] = [1.0, init1]
     enopt_config["objective_functions"]["auto_scale"] = False
-    manual_result = BasicWorkflow(enopt_config, evaluator()).run().variables
+    manual_result = BasicOptimizationWorkflow(enopt_config, evaluator()).run().variables
     assert manual_result is not None
 
     enopt_config["objective_functions"]["scales"] = [1.0, 1.0]
     enopt_config["objective_functions"]["auto_scale"] = [False, True]
-    variables = BasicWorkflow(enopt_config, evaluator()).run().variables
+    variables = BasicOptimizationWorkflow(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, manual_result)
 
     enopt_config["objective_functions"]["scales"] = [1.0, 2.0 * init1]
     enopt_config["objective_functions"]["auto_scale"] = False
-    manual_result = BasicWorkflow(enopt_config, evaluator()).run().variables
+    manual_result = BasicOptimizationWorkflow(enopt_config, evaluator()).run().variables
     assert manual_result is not None
 
     enopt_config["objective_functions"]["scales"] = [1.0, 2.0]
     enopt_config["objective_functions"]["auto_scale"] = [False, True]
-    variables = BasicWorkflow(enopt_config, evaluator()).run().variables
+    variables = BasicOptimizationWorkflow(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, manual_result)
 
@@ -174,14 +182,14 @@ def test_constraint_auto_scale(
 
     enopt_config["nonlinear_constraints"]["scales"] = scales
     enopt_config["nonlinear_constraints"]["auto_scale"] = False
-    BasicWorkflow(
-        enopt_config, evaluator(test_functions), callback=check_constraints
+    BasicOptimizationWorkflow(enopt_config, evaluator(test_functions)).track_results(
+        check_constraints
     ).run()
 
     enopt_config["nonlinear_constraints"]["scales"] = 1.0
     enopt_config["nonlinear_constraints"]["auto_scale"] = True
-    BasicWorkflow(
-        enopt_config, evaluator(test_functions), callback=check_constraints
+    BasicOptimizationWorkflow(enopt_config, evaluator(test_functions)).track_results(
+        check_constraints
     ).run()
 
 
@@ -206,7 +214,7 @@ def test_variables_scale(
     if scales is not None:
         enopt_config["variables"]["scales"] = scales
 
-    results = BasicWorkflow(enopt_config, evaluator()).run().results
+    results = BasicOptimizationWorkflow(enopt_config, evaluator()).run().results
     assert results is not None
 
     if offsets is not None:
@@ -261,7 +269,7 @@ def test_variables_scale_linear_constraints(enopt_config: Any, evaluator: Any) -
         enopt_config["linear_constraints"]["rhs_values"],
     )
 
-    results = BasicWorkflow(enopt_config, evaluator()).run().results
+    results = BasicOptimizationWorkflow(enopt_config, evaluator()).run().results
     assert results is not None
     assert results.evaluations.unscaled_variables is not None
     assert np.allclose(
@@ -276,11 +284,11 @@ def test_check_linear_constraints(enopt_config: Any, evaluator: Any) -> None:
         "types": [ConstraintType.EQ, ConstraintType.LE, ConstraintType.GE],
     }
     enopt_config["optimizer"]["max_functions"] = 1
-    results = BasicWorkflow(enopt_config, evaluator()).run().results
+    results = BasicOptimizationWorkflow(enopt_config, evaluator()).run().results
     assert results is not None
 
     enopt_config["linear_constraints"]["rhs_values"] = [1.0, -1.0, 1.0]
-    results = BasicWorkflow(enopt_config, evaluator()).run().results
+    results = BasicOptimizationWorkflow(enopt_config, evaluator()).run().results
     assert results is None
 
 
@@ -302,12 +310,16 @@ def test_check_nonlinear_constraints(
 
     enopt_config["optimizer"]["max_functions"] = 1
 
-    results = BasicWorkflow(enopt_config, evaluator(test_functions)).run().results
+    results = (
+        BasicOptimizationWorkflow(enopt_config, evaluator(test_functions)).run().results
+    )
     assert results is not None
 
     enopt_config["nonlinear_constraints"]["rhs_values"] = [1.0, -1.0, 1.0]
 
-    results = BasicWorkflow(enopt_config, evaluator(test_functions)).run().results
+    results = (
+        BasicOptimizationWorkflow(enopt_config, evaluator(test_functions)).run().results
+    )
     assert results is None
 
 
@@ -326,7 +338,8 @@ def test_optimizer_variables_subset(enopt_config: Any, evaluator: Any) -> None:
                 assert np.all(item.gradients.objectives[:, 1] == 0.0)
 
     variables = (
-        BasicWorkflow(enopt_config, evaluator(), callback=assert_gradient)
+        BasicOptimizationWorkflow(enopt_config, evaluator())
+        .track_results(assert_gradient)
         .run()
         .variables
     )
@@ -349,7 +362,7 @@ def test_optimizer_variables_subset_linear_constraints(
     }
     enopt_config["variables"]["indices"] = [0, 2]
 
-    variables = BasicWorkflow(enopt_config, evaluator()).run().variables
+    variables = BasicOptimizationWorkflow(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.25, 1.0, 0.75], atol=0.02)
 
@@ -365,30 +378,32 @@ def test_parallelize(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["variables"]["initial_values"][0] = 0.2
 
     enopt_config["optimizer"]["parallel"] = False
-    variables = BasicWorkflow(enopt_config, evaluator()).run().variables
+    variables = BasicOptimizationWorkflow(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.15, 0.0, 0.2], atol=3e-2)
 
     enopt_config["optimizer"]["parallel"] = True
-    variables = BasicWorkflow(enopt_config, evaluator()).run().variables
+    variables = BasicOptimizationWorkflow(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.15, 0.0, 0.2], atol=3e-2)
 
 
 def test_rng(enopt_config: Any, evaluator: Any) -> None:
-    variables1 = BasicWorkflow(enopt_config, evaluator()).run().variables
+    variables1 = BasicOptimizationWorkflow(enopt_config, evaluator()).run().variables
     assert variables1 is not None
     assert np.allclose(variables1, [0.0, 0.0, 0.5], atol=0.02)
 
     variables2 = (
-        BasicWorkflow(enopt_config, evaluator(), seed=DEFAULT_SEED).run().variables
+        BasicOptimizationWorkflow(enopt_config, evaluator(), seed=DEFAULT_SEED)
+        .run()
+        .variables
     )
     assert variables2 is not None
     assert np.allclose(variables2, [0.0, 0.0, 0.5], atol=0.02)
     assert np.all(variables1 == variables2)
 
     variables3 = (
-        BasicWorkflow(enopt_config, evaluator(), seed=DEFAULT_SEED + 123)
+        BasicOptimizationWorkflow(enopt_config, evaluator(), seed=DEFAULT_SEED + 123)
         .run()
         .variables
     )

@@ -7,7 +7,7 @@ import pytest
 from ropt.config.enopt import EnOptConfig
 from ropt.report import ResultsTable
 from ropt.results import Results
-from ropt.workflow import BasicWorkflow
+from ropt.workflow import BasicOptimizationWorkflow
 
 # Requires pandas:
 pd = pytest.importorskip("pandas")
@@ -46,10 +46,8 @@ def test_tabular_report_no_results(
 ) -> None:
     config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsTable({}, path=tmp_path / "results.txt")
-    BasicWorkflow(
-        config,
-        evaluator(),
-        callback=partial(_handle_results, reporter=reporter, config=config),
+    BasicOptimizationWorkflow(config, evaluator()).track_results(
+        partial(_handle_results, reporter=reporter, config=config)
     ).run()
     assert not Path(tmp_path / "results.txt").exists()
 
@@ -65,10 +63,8 @@ def test_tabular_report_results(
         },
         path=tmp_path / "results.txt",
     )
-    BasicWorkflow(
-        config,
-        evaluator(),
-        callback=partial(_handle_results, reporter=reporter, config=config),
+    BasicOptimizationWorkflow(config, evaluator()).track_results(
+        partial(_handle_results, reporter=reporter, config=config)
     ).run()
 
     assert Path(tmp_path / "results.txt").exists()
@@ -98,10 +94,8 @@ def test_tabular_report_data_frames_results_formatted_names(
         },
         path=tmp_path / "results.txt",
     )
-    BasicWorkflow(
-        config,
-        evaluator(),
-        callback=partial(_handle_results, reporter=reporter, config=config),
+    BasicOptimizationWorkflow(config, evaluator()).track_results(
+        partial(_handle_results, reporter=reporter, config=config)
     ).run()
 
     assert Path(tmp_path / "results.txt").exists()
@@ -125,10 +119,8 @@ def test_tabular_report_data_frames_gradients(
         tmp_path / "gradients.txt",
         table_type="gradients",
     )
-    BasicWorkflow(
-        config,
-        evaluator(),
-        callback=partial(_handle_results, reporter=reporter, config=config),
+    BasicOptimizationWorkflow(config, evaluator()).track_results(
+        partial(_handle_results, reporter=reporter, config=config)
     ).run()
     assert Path(tmp_path / "gradients.txt").exists()
     gradients = pd.read_fwf(tmp_path / "gradients.txt", header=[0, 1], skiprows=[2])
@@ -158,10 +150,8 @@ def test_tabular_report_data_frames_min_header_len(
         path=tmp_path / "results.txt",
         min_header_len=min_header_len,
     )
-    BasicWorkflow(
-        config,
-        evaluator(),
-        callback=partial(_handle_results, reporter=reporter, config=config),
+    BasicOptimizationWorkflow(config, evaluator()).track_results(
+        partial(_handle_results, reporter=reporter, config=config)
     ).run()
 
     assert Path(tmp_path / "results.txt").exists()

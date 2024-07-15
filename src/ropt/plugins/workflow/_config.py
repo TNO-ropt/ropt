@@ -57,7 +57,7 @@ class DefaultConfigContext(ContextObj):
         self._backup = enopt_config
         self.set_variable(enopt_config)
 
-    def update(self, updates: Dict[str, Any]) -> None:
+    def update(self, updates: Any) -> None:  # noqa: ANN401
         if not isinstance(updates, dict):
             msg = "attempt to update with invalid data."
             raise WorkflowError(msg, context_id=self.context_config.id)

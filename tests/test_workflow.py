@@ -12,7 +12,7 @@ from ropt.config.enopt import EnOptConfig
 from ropt.config.workflow import WorkflowConfig
 from ropt.exceptions import WorkflowError
 from ropt.results import FunctionResults, Results
-from ropt.workflow import BasicWorkflow, OptimizerContext, Workflow
+from ropt.workflow import BasicOptimizationWorkflow, OptimizerContext, Workflow
 
 # ruff: noqa: SLF001
 
@@ -37,7 +37,7 @@ def enopt_config_fixture() -> Dict[str, Any]:
 
 
 def test_run_basic(enopt_config: Any, evaluator: Any) -> None:
-    variables = BasicWorkflow(enopt_config, evaluator()).run().variables
+    variables = BasicOptimizationWorkflow(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -622,6 +622,11 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
 
     assert np.all(variables == workflow["optimum"].evaluations.variables)
 
+    assert np.all(
+        BasicOptimizationWorkflow(enopt_config, evaluator()).repeat(1).run().variables
+        == variables
+    )
+
 
 def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
     completed: List[FunctionResults] = []
@@ -672,6 +677,13 @@ def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
     assert len(completed) == 6
 
     initial = np.array([enopt_config["variables"]["initial_values"]])
+    assert np.all(completed[0].evaluations.variables == initial)
+    assert np.all(completed[3].evaluations.variables == initial)
+
+    completed = []
+    BasicOptimizationWorkflow(enopt_config, evaluator()).track_results(
+        _track_evaluations
+    ).repeat(2, restart_from="initial").run()
     assert np.all(completed[0].evaluations.variables == initial)
     assert np.all(completed[3].evaluations.variables == initial)
 
@@ -731,6 +743,14 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
         completed[3].evaluations.variables == completed[2].evaluations.variables
     )
 
+    completed = []
+    BasicOptimizationWorkflow(enopt_config, evaluator()).repeat(
+        2, restart_from="last"
+    ).track_results(_track_evaluations).run()
+    assert np.all(
+        completed[3].evaluations.variables == completed[2].evaluations.variables
+    )
+
 
 def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
     completed: List[FunctionResults] = []
@@ -782,6 +802,14 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
     workflow = Workflow(WorkflowConfig.model_validate(workflow_config), context)
     workflow.run()
 
+    assert np.all(
+        completed[2].evaluations.variables == completed[4].evaluations.variables
+    )
+
+    completed = []
+    BasicOptimizationWorkflow(enopt_config, evaluator()).track_results(
+        _track_evaluations
+    ).repeat(2, restart_from="optimal").run()
     assert np.all(
         completed[2].evaluations.variables == completed[4].evaluations.variables
     )
@@ -877,11 +905,27 @@ def test_restart_optimum_with_reset(
         == completed[8].evaluations.variables
     )
 
+    completed = []
+    BasicOptimizationWorkflow(enopt_config, evaluator(new_functions)).track_results(
+        _track_evaluations
+    ).repeat(3, restart_from="last_optimal").run()
+
+    # The third evaluation is the optimum, and used to restart the second run:
+    assert np.all(
+        completed[max_functions].evaluations.variables
+        == completed[2].evaluations.variables
+    )
+    # The 8th evaluation is the optimum of the second run, and used for the third:
+    assert np.all(
+        completed[2 * max_functions].evaluations.variables
+        == completed[8].evaluations.variables
+    )
+
 
 def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
     restarts: List[int] = []
 
-    def track_results(results: Tuple[Results, ...]) -> None:
+    def _track_results(results: Tuple[Results, ...]) -> None:
         metadata = results[0].metadata
         restart = metadata.get("restart", -1)
         assert metadata["foo"] == 1
@@ -889,6 +933,13 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
         assert metadata["complex"] == f"string 2 {restart}"
         if not restarts or restart != restarts[-1]:
             restarts.append(restart)
+
+    metadata = {
+        "restart": "$counter",
+        "foo": 1,
+        "bar": "string",
+        "complex": "string ${{ 1 + 1}} $counter",
+    }
 
     workflow_config = {
         "context": [
@@ -900,7 +951,7 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
             {
                 "id": "callback",
                 "init": "callback",
-                "with": {"function": track_results},
+                "with": {"function": _track_results},
             },
         ],
         "steps": [
@@ -915,12 +966,7 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
                             "with": {
                                 "config": "$config",
                                 "update": ["callback"],
-                                "metadata": {
-                                    "restart": "$counter",
-                                    "foo": 1,
-                                    "bar": "string",
-                                    "complex": "string ${{ 1 + 1}} $counter",
-                                },
+                                "metadata": metadata,
                             },
                         },
                     ],
@@ -933,6 +979,14 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
     context = OptimizerContext(evaluator=evaluator())
     workflow = Workflow(parsed_config, context)
     workflow.run()
+    assert restarts == [0, 1]
+
+    restarts = []
+    BasicOptimizationWorkflow(enopt_config, evaluator()).track_results(
+        _track_results
+    ).add_metadata(metadata).repeat(
+        2, restart_from="last_optimal", counter_var="counter"
+    ).run()
     assert restarts == [0, 1]
 
 

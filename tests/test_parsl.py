@@ -13,7 +13,7 @@ from parsl.app.app import python_app
 
 from ropt.evaluator import EvaluatorContext
 from ropt.evaluator.parsl import ParslEvaluator, State, Task
-from ropt.workflow import BasicWorkflow
+from ropt.workflow import BasicOptimizationWorkflow
 
 
 @dataclass
@@ -96,7 +96,7 @@ def test_parsl(enopt_config: Any, test_functions: Any, tmp_path: Any) -> None:
     evaluator = ParslEvaluator(
         function=partial(parsl_function, functions=test_functions)
     )
-    variables = BasicWorkflow(enopt_config, evaluator).run().variables
+    variables = BasicOptimizationWorkflow(enopt_config, evaluator).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -109,7 +109,7 @@ def test_parsl_monitor(
         function=partial(parsl_function, functions=test_functions),
         monitor=parsl_monitor,
     )
-    variables = BasicWorkflow(enopt_config, evaluator).run().variables
+    variables = BasicOptimizationWorkflow(enopt_config, evaluator).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
     captured = capsys.readouterr()
@@ -124,7 +124,7 @@ def test_parsl_exception(
         function=partial(parsl_function, functions=test_functions, fail_index=2),
         monitor=parsl_monitor,
     )
-    variables = BasicWorkflow(enopt_config, evaluator).run().variables
+    variables = BasicOptimizationWorkflow(enopt_config, evaluator).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
     captured = capsys.readouterr()

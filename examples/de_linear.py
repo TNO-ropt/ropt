@@ -12,7 +12,7 @@ from numpy.typing import NDArray
 from ropt.enums import ConstraintType, VariableType
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
 from ropt.results import FunctionResults, Results
-from ropt.workflow import BasicWorkflow
+from ropt.workflow import BasicOptimizationWorkflow
 
 CONFIG: Dict[str, Any] = {
     "variables": {
@@ -66,7 +66,9 @@ def report(results: Tuple[Results, ...]) -> None:
 
 def run_optimization() -> None:
     """Run the optimization."""
-    optimal_result = BasicWorkflow(CONFIG, function, callback=report).run().results
+    optimal_result = (
+        BasicOptimizationWorkflow(CONFIG, function).track_results(report).run().results
+    )
     assert optimal_result is not None
     assert optimal_result.functions is not None
     assert np.all(optimal_result.evaluations.variables == [3, 7])

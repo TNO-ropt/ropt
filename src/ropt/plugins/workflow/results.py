@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, Literal, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -58,7 +58,7 @@ class DefaultResultsContext(ContextObj):
         )
         self.set_variable(None)
 
-    def update(self, value: Tuple[Results, ...]) -> None:
+    def update(self, value: Any) -> None:  # noqa: ANN401
         """Update the result object.
 
         Updates the stored results. If the `constraint_tolerance` value set in
