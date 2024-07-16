@@ -634,6 +634,24 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.workflow.OptimizationEvent" class="md-nav__link">
+    <span class="md-ellipsis">
+      OptimizationEvent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.WorkflowEvent" class="md-nav__link">
+    <span class="md-ellipsis">
+      WorkflowEvent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.workflow.BasicOptimizationWorkflow" class="md-nav__link">
     <span class="md-ellipsis">
       BasicOptimizationWorkflow
@@ -1339,6 +1357,24 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.workflow.OptimizationEvent" class="md-nav__link">
+    <span class="md-ellipsis">
+      OptimizationEvent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.WorkflowEvent" class="md-nav__link">
+    <span class="md-ellipsis">
+      WorkflowEvent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.workflow.BasicOptimizationWorkflow" class="md-nav__link">
     <span class="md-ellipsis">
       BasicOptimizationWorkflow
@@ -1581,6 +1617,151 @@
 
 
 
+<h3 id="ropt.workflow.OptimizationEvent" class="doc doc-heading">
+            <code>OptimizationEvent</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.workflow._event.WorkflowEvent" href="#ropt.workflow.WorkflowEvent">WorkflowEvent</a></code></p>
+
+
+      <p>The <code>OptimizationEvent</code> class stores information for workflow events.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.workflow.OptimizationEvent.event_type">event_type</span></code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The type of the event</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.workflow.WorkflowEvent" class="doc doc-heading">
+            <code>WorkflowEvent</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+      <p>The <code>WorkflowEvent</code> class stores information for workflow events.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.workflow.WorkflowEvent.workflow">workflow</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.workflow.Workflow" href="#ropt.workflow.Workflow">Workflow</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The workflow running the step that emits the event</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.workflow.WorkflowEvent.step_name">step_name</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional name of the step</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
 <h3 id="ropt.workflow.BasicOptimizationWorkflow" class="doc doc-heading">
             <code>BasicOptimizationWorkflow</code>
 
@@ -1623,8 +1804,8 @@
 
       <p>Abort the current optimization run.</p>
 <p>This method can be called from within callbacks to interrupt the ongoing
-optimization plan. The exact point at which the optimization is aborted
-depends on the step in the plan that is executing at that point. For
+optimization workflow. The exact point at which the optimization is
+aborted depends on the step that is executing at that point. For
 example, within a running optimizer, the process will be interrupted
 after completing the current function evaluation.</p>
 
