@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Any, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from ropt.exceptions import WorkflowError
 from ropt.plugins.workflow.base import ContextObj
 from ropt.results import Results
 
@@ -19,8 +18,8 @@ if TYPE_CHECKING:
     from ropt.workflow import Workflow
 
 
-class DefaultResultsWith(BaseModel):
-    """Parameters for the results context object.
+class DefaultTrackResultsWith(BaseModel):
+    """Parameters for the track_results context object.
 
     The `type` parameter determines what result is tracked:
     - "optimal": Track the best result added
@@ -40,11 +39,11 @@ class DefaultResultsWith(BaseModel):
     )
 
 
-class DefaultResultsContext(ContextObj):
+class DefaultTrackResultsContext(ContextObj):
     """The default results context object."""
 
     def __init__(self, config: ContextConfig, workflow: Workflow) -> None:
-        """Initialize a default results context object.
+        """Initialize a default track_results context object.
 
         Args:
             config:   The configuration of the step
@@ -52,9 +51,9 @@ class DefaultResultsContext(ContextObj):
         """
         super().__init__(config, workflow)
         self._with = (
-            DefaultResultsWith()
+            DefaultTrackResultsWith()
             if config.with_ is None
-            else DefaultResultsWith.model_validate(config.with_)
+            else DefaultTrackResultsWith.model_validate(config.with_)
         )
         self.set_variable(None)
 
@@ -69,12 +68,10 @@ class DefaultResultsContext(ContextObj):
         Args:
             value: The value to set.
         """
-        msg = "attempt to update with invalid data."
-        if not isinstance(value, tuple):
-            raise WorkflowError(msg, context_id=self.context_config.id)
-        for item in value:
-            if not isinstance(item, Results):
-                raise WorkflowError(msg, context_id=self.context_config.id)
+        if not isinstance(value, tuple) or not all(
+            isinstance(item, Results) for item in value
+        ):
+            return
 
         results: Optional[FunctionResults] = None
         if self._with.type_ == "optimal":

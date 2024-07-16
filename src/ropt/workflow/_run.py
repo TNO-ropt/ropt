@@ -61,7 +61,7 @@ class BasicOptimizationWorkflow:
                 },
                 {
                     "id": "optimal",
-                    "init": "results",
+                    "init": "track_results",
                     "with": {"constraint_tolerance": constraint_tolerance},
                 },
             ],
@@ -103,7 +103,7 @@ class BasicOptimizationWorkflow:
         self._workflow_config["context"].append(
             {
                 "id": "callback",
-                "init": "callback",
+                "init": "results_callback",
                 "with": {"function": function},
             }
         )
@@ -143,7 +143,7 @@ class BasicOptimizationWorkflow:
             self._workflow_config["context"].append(
                 {
                     "id": "repeat_tracker",
-                    "init": "results",
+                    "init": "track_results",
                     "with": {"type": "last" if restart_from == "last" else "optimal"},
                 }
             )

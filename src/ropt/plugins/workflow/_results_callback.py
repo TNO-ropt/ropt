@@ -7,14 +7,14 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, Tuple
 from pydantic import BaseModel, ConfigDict
 
 from ropt.plugins.workflow.base import ContextObj
-from ropt.results import Results  # noqa: TCH001
+from ropt.results import Results
 
 if TYPE_CHECKING:
     from ropt.config.workflow import ContextConfig
     from ropt.workflow import Workflow
 
 
-class DefaultCallbackWith(BaseModel):
+class DefaultResultsCallbackWith(BaseModel):
     """Parameters for the `callback` context object.
 
     Attributes:
@@ -31,7 +31,7 @@ class DefaultCallbackWith(BaseModel):
     )
 
 
-class DefaultCallbackContext(ContextObj):
+class DefaultResultsCallbackContext(ContextObj):
     """The default `callback` context object.
 
     The `callback` context object is used to call a user-defined function
@@ -54,12 +54,16 @@ class DefaultCallbackContext(ContextObj):
             self._callback = config.with_
             self._kwargs = {}
         else:
-            with_ = DefaultCallbackWith.model_validate(config.with_)
+            with_ = DefaultResultsCallbackWith.model_validate(config.with_)
             self._callback = with_.function
             self._kwargs = with_.kwargs
         self.set_variable(None)
 
     def update(self, value: Any) -> None:  # noqa: ANN401
+        if not isinstance(value, tuple) or not all(
+            isinstance(item, Results) for item in value
+        ):
+            return
         kwargs = {
             key: self.workflow.parse_value(value) for key, value in self._kwargs.items()
         }

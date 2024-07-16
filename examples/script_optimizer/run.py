@@ -76,7 +76,7 @@ def main() -> None:
         workflow={
             "context": [
                 {"id": "enopt_config", "init": "config", "with": ENOPT_CONFIG},
-                {"id": "optimal", "init": "results"},
+                {"id": "optimal", "init": "track_results"},
             ],
             "steps": [
                 {

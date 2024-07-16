@@ -9,21 +9,21 @@ from ropt.config.workflow import ContextConfig, StepConfig  # noqa: TCH001
 from ropt.plugins.workflow.base import ContextObj, WorkflowStep  # noqa: TCH001
 from ropt.workflow import Workflow  # noqa: TCH001
 
-from ._callback import DefaultCallbackContext
 from ._config import DefaultConfigContext
 from ._evaluator import DefaultEvaluatorStep
 from ._optimizer import DefaultOptimizerStep
 from ._repeat import DefaultRepeatStep
 from ._reset import DefaultResetStep
+from ._results_callback import DefaultResultsCallbackContext
 from ._setvar import DefaultSetStep
+from ._track_results import DefaultTrackResultsContext
 from ._update import DefaultUpdateStep
 from .base import WorkflowPlugin
-from .results import DefaultResultsContext
 
 _CONTEXT_OBJECTS: Final[Dict[str, Type[ContextObj]]] = {
-    "callback": DefaultCallbackContext,
+    "results_callback": DefaultResultsCallbackContext,
     "config": DefaultConfigContext,
-    "results": DefaultResultsContext,
+    "track_results": DefaultTrackResultsContext,
 }
 
 _STEP_OBJECTS: Final[Dict[str, Type[WorkflowStep]]] = {
