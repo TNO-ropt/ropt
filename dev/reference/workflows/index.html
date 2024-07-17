@@ -658,6 +658,33 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.workflow.ContextUpdate" class="md-nav__link">
+    <span class="md-ellipsis">
+      ContextUpdate
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.ContextUpdateDict" class="md-nav__link">
+    <span class="md-ellipsis">
+      ContextUpdateDict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.ContextUpdateEvent" class="md-nav__link">
+    <span class="md-ellipsis">
+      ContextUpdateEvent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.workflow.OptimizerContext" class="md-nav__link">
     <span class="md-ellipsis">
       OptimizerContext
@@ -1363,6 +1390,33 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.workflow.ContextUpdate" class="md-nav__link">
+    <span class="md-ellipsis">
+      ContextUpdate
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.ContextUpdateDict" class="md-nav__link">
+    <span class="md-ellipsis">
+      ContextUpdateDict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.workflow.ContextUpdateEvent" class="md-nav__link">
+    <span class="md-ellipsis">
+      ContextUpdateEvent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.workflow.OptimizerContext" class="md-nav__link">
     <span class="md-ellipsis">
       OptimizerContext
@@ -1631,6 +1685,212 @@ after completing the current function evaluation.</p>
     </div>
 
 </div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.workflow.ContextUpdate" class="doc doc-heading">
+            <code>ContextUpdate</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+      <p>Base class for data objects used for updating context objects.</p>
+<p>This class is used as a base for classes that store data produced by
+workflow steps und used to update context objects.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.workflow.ContextUpdate.step_name">step_name</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional name of the step generating the data object</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.workflow.ContextUpdateDict" class="doc doc-heading">
+            <code>ContextUpdateDict</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.workflow._update.ContextUpdate" href="#ropt.workflow.ContextUpdate">ContextUpdate</a></code></p>
+
+
+      <p>Context update data class used to represent dictionary data.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.workflow.ContextUpdateDict.data">data</span></code></td>
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Generic data represented by a dictionary.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.workflow.ContextUpdateEvent" class="doc doc-heading">
+            <code>ContextUpdateEvent</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.workflow._update.ContextUpdate" href="#ropt.workflow.ContextUpdate">ContextUpdate</a></code></p>
+
+
+      <p>Context update data class used for updates after events.</p>
+<p>In steps that run optimizations or evaluations of ensembles, at several
+steps context objects may be updated.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.workflow.ContextUpdateEvent.type">type</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Type of the event</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
 
 
 
