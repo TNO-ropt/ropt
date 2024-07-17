@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, Literal, Optional
+from typing import TYPE_CHECKING, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from ropt.plugins.workflow.base import ContextObj
-from ropt.results import Results
+from ropt.workflow import ContextUpdate, ContextUpdateResults
 
 from ._utils import _get_last_result, _update_optimal_result
 
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from ropt.workflow import Workflow
 
 
-class DefaultTrackResultsWith(BaseModel):
+class DefaultTrackerWith(BaseModel):
     """Parameters for the track_results context object.
 
     The `type` parameter determines what result is tracked:
@@ -39,11 +39,11 @@ class DefaultTrackResultsWith(BaseModel):
     )
 
 
-class DefaultTrackResultsContext(ContextObj):
+class DefaultTrackerContext(ContextObj):
     """The default results context object."""
 
     def __init__(self, config: ContextConfig, workflow: Workflow) -> None:
-        """Initialize a default track_results context object.
+        """Initialize a default tracker context object.
 
         Args:
             config:   The configuration of the step
@@ -51,14 +51,14 @@ class DefaultTrackResultsContext(ContextObj):
         """
         super().__init__(config, workflow)
         self._with = (
-            DefaultTrackResultsWith()
+            DefaultTrackerWith()
             if config.with_ is None
-            else DefaultTrackResultsWith.model_validate(config.with_)
+            else DefaultTrackerWith.model_validate(config.with_)
         )
         self.set_variable(None)
 
-    def update(self, value: Any) -> None:  # noqa: ANN401
-        """Update the result object.
+    def update(self, value: ContextUpdate) -> None:
+        """Update the tracker object.
 
         Updates the stored results. If the `constraint_tolerance` value set in
         the object configuration is `None`, the object value will be updated
@@ -68,21 +68,19 @@ class DefaultTrackResultsContext(ContextObj):
         Args:
             value: The value to set.
         """
-        if not isinstance(value, tuple) or not all(
-            isinstance(item, Results) for item in value
-        ):
-            return
-
-        results: Optional[FunctionResults] = None
-        if self._with.type_ == "optimal":
-            results = _update_optimal_result(
-                self.get_variable(), value, self._with.constraint_tolerance
-            )
-        if self._with.type_ == "last":
-            results = _get_last_result(value, self._with.constraint_tolerance)
-        if results is not None:
-            results = deepcopy(results)
-            self.set_variable(results)
+        if isinstance(value, ContextUpdateResults):
+            results: Optional[FunctionResults] = None
+            if self._with.type_ == "optimal":
+                results = _update_optimal_result(
+                    self.get_variable(), value.results, self._with.constraint_tolerance
+                )
+            if self._with.type_ == "last":
+                results = _get_last_result(
+                    value.results, self._with.constraint_tolerance
+                )
+            if results is not None:
+                results = deepcopy(results)
+                self.set_variable(results)
 
     def reset(self) -> None:
         """Clear the stored values."""

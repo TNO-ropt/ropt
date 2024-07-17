@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, Tuple, cast
+from typing import TYPE_CHECKING, Any, Dict, Optional, cast
 
 import numpy as np
 import pytest
@@ -8,9 +8,12 @@ from numpy.typing import NDArray
 
 from ropt.config.enopt import EnOptConfig
 from ropt.config.enopt.constants import DEFAULT_SEED
-from ropt.enums import ConstraintType, OptimizerExitCode
-from ropt.results import FunctionResults, GradientResults, Results
+from ropt.enums import ConstraintType, EventType, OptimizerExitCode
+from ropt.results import FunctionResults, GradientResults
 from ropt.workflow import BasicOptimizationWorkflow
+
+if TYPE_CHECKING:
+    from ropt.events import OptimizationEvent
 
 
 @pytest.fixture(name="enopt_config")
@@ -35,15 +38,15 @@ def enopt_config_fixture() -> Dict[str, Any]:
 def test_max_functions_exceeded(enopt_config: Any, evaluator: Any) -> None:
     last_evaluation = 100
 
-    def track_results(results: Tuple[Results, ...]) -> None:
+    def track_results(event: OptimizationEvent) -> None:
         nonlocal last_evaluation
-        assert results
-        last_evaluation = results[0].result_id
+        assert event.results
+        last_evaluation = event.results[0].result_id
 
     max_functions = 2
     enopt_config["optimizer"]["max_functions"] = max_functions
-    optimizer = BasicOptimizationWorkflow(enopt_config, evaluator()).track_results(
-        track_results
+    optimizer = BasicOptimizationWorkflow(enopt_config, evaluator()).add_callback(
+        EventType.FINISHED_EVALUATION, track_results
     )
     optimizer.run()
     assert last_evaluation == max_functions
@@ -53,16 +56,16 @@ def test_max_functions_exceeded(enopt_config: Any, evaluator: Any) -> None:
 def test_max_functions_not_exceeded(enopt_config: Any, evaluator: Any) -> None:
     last_evaluation = 100
 
-    def track_results(results: Tuple[Results, ...]) -> None:
+    def track_results(event: OptimizationEvent) -> None:
         nonlocal last_evaluation
-        assert results
-        last_evaluation = results[0].result_id
+        assert event.results
+        last_evaluation = event.results[0].result_id
 
     max_functions = 100
     enopt_config["optimizer"]["max_functions"] = max_functions
     enopt_config["optimizer"]["split_evaluations"] = True
-    optimizer = BasicOptimizationWorkflow(enopt_config, evaluator()).track_results(
-        track_results
+    optimizer = BasicOptimizationWorkflow(enopt_config, evaluator()).add_callback(
+        EventType.FINISHED_EVALUATION, track_results
     )
     optimizer.run()
     assert last_evaluation + 1 < 2 * max_functions
@@ -70,15 +73,15 @@ def test_max_functions_not_exceeded(enopt_config: Any, evaluator: Any) -> None:
 
 
 def test_failed_realizations(enopt_config: Any, evaluator: Any) -> None:
-    def _observer(results: Tuple[Results, ...]) -> None:
-        assert results
-        assert isinstance(results[0], FunctionResults)
-        assert results[0].functions is None
+    def _observer(event: OptimizationEvent) -> None:
+        assert event.results
+        assert isinstance(event.results[0], FunctionResults)
+        assert event.results[0].functions is None
 
     functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
     optimizer = BasicOptimizationWorkflow(
         enopt_config, evaluator(functions)
-    ).track_results(_observer)
+    ).add_callback(EventType.FINISHED_EVALUATION, _observer)
     optimizer.run()
     assert optimizer.exit_code == OptimizerExitCode.TOO_FEW_REALIZATIONS
 
@@ -100,15 +103,15 @@ def test_all_failed_realizations_not_supported(
 def test_user_abort(enopt_config: Any, evaluator: Any) -> None:
     last_evaluation = 100
 
-    def _observer(results: Tuple[Results, ...]) -> None:
+    def _observer(event: OptimizationEvent) -> None:
         nonlocal last_evaluation
-        assert results
-        last_evaluation = results[0].result_id
-        if results[0].result_id == 1:
+        assert event.results
+        last_evaluation = event.results[0].result_id
+        if event.results[0].result_id == 1:
             optimizer.abort_optimization()
 
-    optimizer = BasicOptimizationWorkflow(enopt_config, evaluator()).track_results(
-        _observer
+    optimizer = BasicOptimizationWorkflow(enopt_config, evaluator()).add_callback(
+        EventType.FINISHED_EVALUATION, _observer
     )
     optimizer.run()
     assert optimizer.results is not None
@@ -172,9 +175,9 @@ def test_constraint_auto_scale(
     config = EnOptConfig.model_validate(enopt_config)
     scales = np.fabs(test_functions[-1](config.variables.initial_values, None))
 
-    def check_constraints(results: Tuple[Results, ...]) -> None:
-        assert results
-        for item in results:
+    def check_constraints(event: OptimizationEvent) -> None:
+        assert event.results
+        for item in event.results:
             if isinstance(item, FunctionResults) and item.result_id == 0:
                 assert item.functions is not None
                 assert item.functions.scaled_constraints is not None
@@ -182,14 +185,14 @@ def test_constraint_auto_scale(
 
     enopt_config["nonlinear_constraints"]["scales"] = scales
     enopt_config["nonlinear_constraints"]["auto_scale"] = False
-    BasicOptimizationWorkflow(enopt_config, evaluator(test_functions)).track_results(
-        check_constraints
+    BasicOptimizationWorkflow(enopt_config, evaluator(test_functions)).add_callback(
+        EventType.FINISHED_EVALUATION, check_constraints
     ).run()
 
     enopt_config["nonlinear_constraints"]["scales"] = 1.0
     enopt_config["nonlinear_constraints"]["auto_scale"] = True
-    BasicOptimizationWorkflow(enopt_config, evaluator(test_functions)).track_results(
-        check_constraints
+    BasicOptimizationWorkflow(enopt_config, evaluator(test_functions)).add_callback(
+        EventType.FINISHED_EVALUATION, check_constraints
     ).run()
 
 
@@ -329,9 +332,10 @@ def test_optimizer_variables_subset(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["variables"]["initial_values"] = [0.0, 1.0, 0.1]
     enopt_config["variables"]["indices"] = [0, 2]
 
-    def assert_gradient(results: Tuple[Results, ...]) -> None:
-        assert results
-        for item in results:
+    def assert_gradient(event: OptimizationEvent) -> None:
+        assert event.results
+        assert event.results is not None
+        for item in event.results:
             if isinstance(item, GradientResults):
                 assert item.gradients is not None
                 assert item.gradients.weighted_objective[1] == 0.0
@@ -339,7 +343,7 @@ def test_optimizer_variables_subset(enopt_config: Any, evaluator: Any) -> None:
 
     variables = (
         BasicOptimizationWorkflow(enopt_config, evaluator())
-        .track_results(assert_gradient)
+        .add_callback(EventType.FINISHED_EVALUATION, assert_gradient)
         .run()
         .variables
     )

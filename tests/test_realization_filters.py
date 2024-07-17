@@ -1,11 +1,12 @@
 from functools import partial
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
 import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from ropt.enums import ConstraintType
+from ropt.enums import ConstraintType, EventType
+from ropt.events import OptimizationEvent
 from ropt.plugins.realization_filter.default import (
     _get_cvar_weights_from_percentile,
     _sort_and_select,
@@ -106,9 +107,9 @@ def _constraint_function(variables: NDArray[np.float64], context: Any) -> float:
     return float(result)
 
 
-def _track_results(results: Tuple[Results, ...], result_list: List[Results]) -> None:
-    assert results
-    result_list.extend(results)
+def _track_results(event: OptimizationEvent, result_list: List[Results]) -> None:
+    assert event.results
+    result_list.extend(event.results)
 
 
 @pytest.mark.parametrize("split_evaluations", [True, False])
@@ -148,7 +149,10 @@ def test_sort_filter_on_objectives(
             enopt_config,
             evaluator(functions),
         )
-        .track_results(partial(_track_results, result_list=result_list))
+        .add_callback(
+            EventType.FINISHED_EVALUATION,
+            partial(_track_results, result_list=result_list),
+        )
         .run()
         .results
     )
@@ -207,7 +211,10 @@ def test_sort_filter_on_objectives_with_constraints(
             enopt_config,
             evaluator(functions),
         )
-        .track_results(partial(_track_results, result_list=result_list))
+        .add_callback(
+            EventType.FINISHED_EVALUATION,
+            partial(_track_results, result_list=result_list),
+        )
         .run()
         .results
     )
@@ -273,7 +280,10 @@ def test_sort_filter_on_constraints(
             enopt_config,
             evaluator(functions),
         )
-        .track_results(partial(_track_results, result_list=result_list))
+        .add_callback(
+            EventType.FINISHED_EVALUATION,
+            partial(_track_results, result_list=result_list),
+        )
         .run()
         .results
     )
@@ -322,13 +332,13 @@ def test_sort_filter_mixed(  # noqa: C901
 
     objective_values: List[NDArray[np.float64]] = []
 
-    def _add_objective(results: Tuple[Results, ...]) -> None:
-        if results:
-            for item in results:
+    def _add_objective(event: OptimizationEvent) -> None:
+        if event.results:
+            for item in event.results:
                 if isinstance(item, FunctionResults):
                     assert item.functions is not None
                     objective_values.append(item.functions.weighted_objective)
-        _track_results(results, result_list=result_list)
+        _track_results(event, result_list=result_list)
 
     # Apply the filtering to all objectives, giving the expected result.
     enopt_config["realization_filters"] = [
@@ -346,7 +356,7 @@ def test_sort_filter_mixed(  # noqa: C901
     result_list: List[Results] = []
     results = (
         BasicOptimizationWorkflow(enopt_config, evaluator(functions))
-        .track_results(_add_objective)
+        .add_callback(EventType.FINISHED_EVALUATION, _add_objective)
         .run()
         .results
     )
@@ -384,7 +394,7 @@ def test_sort_filter_mixed(  # noqa: C901
     result_list = []
     results = (
         BasicOptimizationWorkflow(enopt_config, evaluator(functions))
-        .track_results(_add_objective)
+        .add_callback(EventType.FINISHED_EVALUATION, _add_objective)
         .run()
         .results
     )
@@ -448,7 +458,10 @@ def test_cvar_filter_on_objectives(
             enopt_config,
             evaluator(functions),
         )
-        .track_results(partial(_track_results, result_list=result_list))
+        .add_callback(
+            EventType.FINISHED_EVALUATION,
+            partial(_track_results, result_list=result_list),
+        )
         .run()
         .results
     )
@@ -506,7 +519,10 @@ def test_cvar_filter_on_objectives_with_constraints(
             enopt_config,
             evaluator(functions),
         )
-        .track_results(partial(_track_results, result_list=result_list))
+        .add_callback(
+            EventType.FINISHED_EVALUATION,
+            partial(_track_results, result_list=result_list),
+        )
         .run()
         .results
     )
@@ -571,7 +587,10 @@ def test_cvar_filter_on_constraints(
             enopt_config,
             evaluator(functions),
         )
-        .track_results(partial(_track_results, result_list=result_list))
+        .add_callback(
+            EventType.FINISHED_EVALUATION,
+            partial(_track_results, result_list=result_list),
+        )
         .run()
         .results
     )
@@ -620,13 +639,13 @@ def test_cvar_filter_mixed(  # noqa: C901
 
     objective_values: List[NDArray[np.float64]] = []
 
-    def _add_objective(results: Tuple[Results, ...]) -> None:
-        if results is not None:
-            for item in results:
+    def _add_objective(event: OptimizationEvent) -> None:
+        if event.results is not None:
+            for item in event.results:
                 if isinstance(item, FunctionResults):
                     assert item.functions is not None
                     objective_values.append(item.functions.weighted_objective)
-        _track_results(results, result_list=result_list)
+        _track_results(event, result_list=result_list)
 
     # Apply the filtering to all objectives, giving the expected result.
     enopt_config["realization_filters"] = [
@@ -643,7 +662,7 @@ def test_cvar_filter_mixed(  # noqa: C901
     result_list: List[Results] = []
     results = (
         BasicOptimizationWorkflow(enopt_config, evaluator(functions))
-        .track_results(_add_objective)
+        .add_callback(EventType.FINISHED_EVALUATION, _add_objective)
         .run()
         .results
     )
@@ -680,7 +699,7 @@ def test_cvar_filter_mixed(  # noqa: C901
     result_list = []
     results = (
         BasicOptimizationWorkflow(enopt_config, evaluator(functions))
-        .track_results(_add_objective)
+        .add_callback(EventType.FINISHED_EVALUATION, _add_objective)
         .run()
         .results
     )

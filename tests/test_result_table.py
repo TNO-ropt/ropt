@@ -1,12 +1,13 @@
 from functools import partial
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional
 
 import pytest
 
 from ropt.config.enopt import EnOptConfig
+from ropt.enums import EventType
+from ropt.events import OptimizationEvent
 from ropt.report import ResultsTable
-from ropt.results import Results
 from ropt.workflow import BasicOptimizationWorkflow
 
 # Requires pandas:
@@ -36,9 +37,10 @@ def enopt_config_fixture() -> Dict[str, Any]:
 
 
 def _handle_results(
-    results: Tuple[Results, ...], reporter: ResultsTable, config: EnOptConfig
+    event: OptimizationEvent, reporter: ResultsTable, config: EnOptConfig
 ) -> None:
-    reporter.add_results(config, results)
+    assert event.results is not None
+    reporter.add_results(config, event.results)
 
 
 def test_tabular_report_no_results(
@@ -46,8 +48,9 @@ def test_tabular_report_no_results(
 ) -> None:
     config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsTable({}, path=tmp_path / "results.txt")
-    BasicOptimizationWorkflow(config, evaluator()).track_results(
-        partial(_handle_results, reporter=reporter, config=config)
+    BasicOptimizationWorkflow(config, evaluator()).add_callback(
+        EventType.FINISHED_EVALUATION,
+        partial(_handle_results, reporter=reporter, config=config),
     ).run()
     assert not Path(tmp_path / "results.txt").exists()
 
@@ -63,8 +66,9 @@ def test_tabular_report_results(
         },
         path=tmp_path / "results.txt",
     )
-    BasicOptimizationWorkflow(config, evaluator()).track_results(
-        partial(_handle_results, reporter=reporter, config=config)
+    BasicOptimizationWorkflow(config, evaluator()).add_callback(
+        EventType.FINISHED_EVALUATION,
+        partial(_handle_results, reporter=reporter, config=config),
     ).run()
 
     assert Path(tmp_path / "results.txt").exists()
@@ -94,8 +98,9 @@ def test_tabular_report_data_frames_results_formatted_names(
         },
         path=tmp_path / "results.txt",
     )
-    BasicOptimizationWorkflow(config, evaluator()).track_results(
-        partial(_handle_results, reporter=reporter, config=config)
+    BasicOptimizationWorkflow(config, evaluator()).add_callback(
+        EventType.FINISHED_EVALUATION,
+        partial(_handle_results, reporter=reporter, config=config),
     ).run()
 
     assert Path(tmp_path / "results.txt").exists()
@@ -119,8 +124,9 @@ def test_tabular_report_data_frames_gradients(
         tmp_path / "gradients.txt",
         table_type="gradients",
     )
-    BasicOptimizationWorkflow(config, evaluator()).track_results(
-        partial(_handle_results, reporter=reporter, config=config)
+    BasicOptimizationWorkflow(config, evaluator()).add_callback(
+        EventType.FINISHED_EVALUATION,
+        partial(_handle_results, reporter=reporter, config=config),
     ).run()
     assert Path(tmp_path / "gradients.txt").exists()
     gradients = pd.read_fwf(tmp_path / "gradients.txt", header=[0, 1], skiprows=[2])
@@ -150,8 +156,9 @@ def test_tabular_report_data_frames_min_header_len(
         path=tmp_path / "results.txt",
         min_header_len=min_header_len,
     )
-    BasicOptimizationWorkflow(config, evaluator()).track_results(
-        partial(_handle_results, reporter=reporter, config=config)
+    BasicOptimizationWorkflow(config, evaluator()).add_callback(
+        EventType.FINISHED_EVALUATION,
+        partial(_handle_results, reporter=reporter, config=config),
     ).run()
 
     assert Path(tmp_path / "results.txt").exists()

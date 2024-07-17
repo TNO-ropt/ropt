@@ -16,7 +16,7 @@ from typing import (
 )
 
 from ropt.config.workflow import WorkflowConfig
-from ropt.enums import OptimizerExitCode
+from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
 from ropt.plugins import PluginManager
 
@@ -28,9 +28,10 @@ if TYPE_CHECKING:
 
     from ropt.config.enopt import EnOptConfig
     from ropt.evaluator import Evaluator
+    from ropt.events import OptimizationEvent
     from ropt.plugins._manager import PluginType
     from ropt.plugins.base import Plugin
-    from ropt.results import FunctionResults, Results
+    from ropt.results import FunctionResults
 
 
 class BasicOptimizationWorkflow:
@@ -51,6 +52,9 @@ class BasicOptimizationWorkflow:
         self._results: Optional[FunctionResults]
         self._variables: Optional[NDArray[np.float64]]
         self._exit_code: OptimizerExitCode = OptimizerExitCode.UNKNOWN
+        self._observers: List[
+            Tuple[EventType, Callable[[OptimizationEvent], None]]
+        ] = []
 
         self._workflow_config: Dict[str, List[Dict[str, Any]]] = {
             "context": [
@@ -61,7 +65,7 @@ class BasicOptimizationWorkflow:
                 },
                 {
                     "id": "optimal",
-                    "init": "track_results",
+                    "init": "tracker",
                     "with": {"constraint_tolerance": constraint_tolerance},
                 },
             ],
@@ -97,24 +101,10 @@ class BasicOptimizationWorkflow:
             self._plugin_manager.add_plugins(plugin_type, plugins)
         return self
 
-    def track_results(
-        self, function: Callable[[Tuple[Results, ...]], None]
+    def add_callback(
+        self, event_type: EventType, function: Callable[[OptimizationEvent], None]
     ) -> BasicOptimizationWorkflow:
-        self._workflow_config["context"].append(
-            {
-                "id": "callback",
-                "init": "results_callback",
-                "with": {"function": function},
-            }
-        )
-        steps = self._workflow_config["steps"]
-        idx = next(
-            (idx for idx, step in enumerate(steps) if step["run"] == "repeat"), None
-        )
-        if idx is not None:
-            steps = steps[idx]["with"]["steps"]
-        idx = next(idx for idx, step in enumerate(steps) if step["run"] == "optimizer")
-        steps[idx]["with"]["update"].append("callback")
+        self._observers.append((event_type, function))
         return self
 
     def add_metadata(self, metadata: Dict[str, Any]) -> BasicOptimizationWorkflow:
@@ -143,7 +133,7 @@ class BasicOptimizationWorkflow:
             self._workflow_config["context"].append(
                 {
                     "id": "repeat_tracker",
-                    "init": "track_results",
+                    "init": "tracker",
                     "with": {"type": "last" if restart_from == "last" else "optimal"},
                 }
             )
@@ -178,6 +168,8 @@ class BasicOptimizationWorkflow:
             self._context,
             plugin_manager=self._plugin_manager,
         )
+        for event_type, function in self._observers:
+            workflow.optimizer_context.events.add_observer(event_type, function)
         workflow.run()
         self._results = workflow["optimal"]
         self._variables = (

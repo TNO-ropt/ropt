@@ -2,17 +2,21 @@ from __future__ import annotations
 
 import re
 from copy import deepcopy
-from typing import Any, Dict, List, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List
 
 import numpy as np
 import pytest
 from pydantic import ValidationError
 
-from ropt.config.enopt import EnOptConfig
 from ropt.config.workflow import WorkflowConfig
+from ropt.enums import EventType, OptimizerExitCode
+from ropt.events import OptimizationEvent
 from ropt.exceptions import WorkflowError
 from ropt.results import FunctionResults, Results
 from ropt.workflow import BasicOptimizationWorkflow, OptimizerContext, Workflow
+
+if TYPE_CHECKING:
+    from ropt.config.enopt import EnOptConfig
 
 # ruff: noqa: SLF001
 
@@ -47,7 +51,7 @@ def test_invalid_context_ids() -> None:
         "context": [
             {
                 "id": "1optimal",
-                "init": "track_results",
+                "init": "tracker",
             },
         ],
         "steps": [],
@@ -61,11 +65,11 @@ def test_duplicate_context_ids() -> None:
         "context": [
             {
                 "id": "optimal",
-                "init": "track_results",
+                "init": "tracker",
             },
             {
                 "id": "optimal",
-                "init": "track_results",
+                "init": "tracker",
             },
         ],
         "steps": [],
@@ -86,7 +90,7 @@ def test_parse_value(enopt_config: Any, evaluator: Any) -> None:
             },
             {
                 "id": "results",
-                "init": "track_results",
+                "init": "tracker",
             },
         ],
         "steps": [
@@ -243,11 +247,11 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
             },
             {
                 "id": "optimal1",
-                "init": "track_results",
+                "init": "tracker",
             },
             {
                 "id": "optimal2",
-                "init": "track_results",
+                "init": "tracker",
             },
         ],
         "steps": [
@@ -291,15 +295,15 @@ def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
             },
             {
                 "id": "optimal1",
-                "init": "track_results",
+                "init": "tracker",
             },
             {
                 "id": "optimal2",
-                "init": "track_results",
+                "init": "tracker",
             },
             {
                 "id": "optimal3",
-                "init": "track_results",
+                "init": "tracker",
             },
         ],
         "steps": [
@@ -359,7 +363,7 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
             },
             {
                 "id": "optimal",
-                "init": "track_results",
+                "init": "tracker",
             },
         ],
         "steps": [
@@ -394,9 +398,10 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
 def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
     completed_functions = 0
 
-    def _track_evaluations(results: Tuple[Results, ...]) -> None:
+    def _track_evaluations(event: OptimizationEvent) -> None:
         nonlocal completed_functions
-        for item in results:
+        assert event.results is not None
+        for item in event.results:
             if isinstance(item, FunctionResults):
                 completed_functions += 1
 
@@ -434,19 +439,14 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
             },
             {
                 "id": "optimum",
-                "init": "track_results",
+                "init": "tracker",
             },
             {
                 "id": "last",
-                "init": "track_results",
+                "init": "tracker",
                 "with": {
                     "type": "last",
                 },
-            },
-            {
-                "id": "callback",
-                "init": "results_callback",
-                "with": _track_evaluations,
             },
         ],
         "steps": [
@@ -454,14 +454,14 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$enopt_config1",
-                    "update": ["last", "optimum", "callback"],
+                    "update": ["last", "optimum"],
                 },
             },
             {
                 "run": "optimizer",
                 "with": {
                     "config": "$enopt_config2",
-                    "update": ["last", "optimum", "callback"],
+                    "update": ["last", "optimum"],
                     "initial_values": "$last",
                 },
             },
@@ -469,7 +469,7 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$enopt_config1",
-                    "update": ["last", "optimum", "callback"],
+                    "update": ["last", "optimum"],
                     "initial_values": "$last",
                 },
             },
@@ -477,7 +477,7 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$enopt_config2",
-                    "update": ["optimum", "callback"],
+                    "update": ["optimum"],
                     "initial_values": "$last",
                 },
             },
@@ -486,6 +486,9 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
 
     context = OptimizerContext(evaluator=evaluator())
     workflow = Workflow(WorkflowConfig.model_validate(workflow_config), context)
+    workflow.optimizer_context.events.add_observer(
+        EventType.FINISHED_EVALUATION, _track_evaluations
+    )
     workflow.run()
 
     assert completed_functions == 14
@@ -498,9 +501,12 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
 def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
     completed: List[FunctionResults] = []
 
-    def _track_evaluations(results: Tuple[Results, ...]) -> None:
+    def _track_evaluations(event: OptimizationEvent) -> None:
         nonlocal completed
-        completed += [item for item in results if isinstance(item, FunctionResults)]
+        assert event.results is not None
+        completed += [
+            item for item in event.results if isinstance(item, FunctionResults)
+        ]
 
     enopt_config["optimizer"]["speculative"] = True
     enopt_config["optimizer"]["max_functions"] = 2
@@ -522,15 +528,10 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
             },
             {
                 "id": "last",
-                "init": "track_results",
+                "init": "tracker",
                 "with": {
                     "type": "last",
                 },
-            },
-            {
-                "id": "callback",
-                "init": "results_callback",
-                "with": {"function": _track_evaluations},
             },
         ],
         "steps": [
@@ -538,7 +539,7 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$enopt_config",
-                    "update": ["last", "callback"],
+                    "update": ["last"],
                 },
             },
             {
@@ -546,7 +547,6 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
                 "with": {
                     "config": "$enopt_config2",
                     "initial_values": "$last",
-                    "update": ["callback"],
                 },
             },
         ],
@@ -554,6 +554,9 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
 
     context = OptimizerContext(evaluator=evaluator())
     workflow = Workflow(WorkflowConfig.model_validate(workflow_config), context)
+    workflow.optimizer_context.events.add_observer(
+        EventType.FINISHED_EVALUATION, _track_evaluations
+    )
     workflow.run()
 
     assert not np.allclose(
@@ -578,7 +581,7 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
             },
             {
                 "id": "optimum",
-                "init": "track_results",
+                "init": "tracker",
             },
         ],
         "steps": [
@@ -631,9 +634,12 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
 def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
     completed: List[FunctionResults] = []
 
-    def _track_evaluations(results: Tuple[Results, ...]) -> None:
+    def _track_evaluations(event: OptimizationEvent) -> None:
         nonlocal completed
-        completed += [item for item in results if isinstance(item, FunctionResults)]
+        assert event.results is not None
+        completed += [
+            item for item in event.results if isinstance(item, FunctionResults)
+        ]
 
     enopt_config["optimizer"]["speculative"] = True
     enopt_config["optimizer"]["max_functions"] = 3
@@ -644,11 +650,6 @@ def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
                 "id": "enopt_config",
                 "init": "config",
                 "with": enopt_config,
-            },
-            {
-                "id": "callback",
-                "init": "results_callback",
-                "with": {"function": _track_evaluations},
             },
         ],
         "steps": [
@@ -661,7 +662,6 @@ def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
                             "run": "optimizer",
                             "with": {
                                 "config": "$enopt_config",
-                                "update": ["callback"],
                             },
                         },
                     ],
@@ -672,6 +672,9 @@ def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
 
     context = OptimizerContext(evaluator=evaluator())
     workflow = Workflow(WorkflowConfig.model_validate(workflow_config), context)
+    workflow.optimizer_context.events.add_observer(
+        EventType.FINISHED_EVALUATION, _track_evaluations
+    )
     workflow.run()
 
     assert len(completed) == 6
@@ -681,8 +684,8 @@ def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
     assert np.all(completed[3].evaluations.variables == initial)
 
     completed = []
-    BasicOptimizationWorkflow(enopt_config, evaluator()).track_results(
-        _track_evaluations
+    BasicOptimizationWorkflow(enopt_config, evaluator()).add_callback(
+        EventType.FINISHED_EVALUATION, _track_evaluations
     ).repeat(2, restart_from="initial").run()
     assert np.all(completed[0].evaluations.variables == initial)
     assert np.all(completed[3].evaluations.variables == initial)
@@ -691,9 +694,12 @@ def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
 def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
     completed: List[FunctionResults] = []
 
-    def _track_evaluations(results: Tuple[Results, ...]) -> None:
+    def _track_evaluations(event: OptimizationEvent) -> None:
         nonlocal completed
-        completed += [item for item in results if isinstance(item, FunctionResults)]
+        assert event.results is not None
+        completed += [
+            item for item in event.results if isinstance(item, FunctionResults)
+        ]
 
     enopt_config["optimizer"]["speculative"] = True
     enopt_config["optimizer"]["max_functions"] = 3
@@ -707,13 +713,8 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
             },
             {
                 "id": "last",
-                "init": "track_results",
+                "init": "tracker",
                 "with": {"type": "last"},
-            },
-            {
-                "id": "callback",
-                "init": "results_callback",
-                "with": {"function": _track_evaluations},
             },
         ],
         "steps": [
@@ -726,7 +727,7 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
                             "run": "optimizer",
                             "with": {
                                 "config": "$enopt_config",
-                                "update": ["last", "callback"],
+                                "update": ["last"],
                                 "initial_values": "$last",
                             },
                         },
@@ -737,6 +738,9 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
     }
     context = OptimizerContext(evaluator=evaluator())
     workflow = Workflow(WorkflowConfig.model_validate(workflow_config), context)
+    workflow.optimizer_context.events.add_observer(
+        EventType.FINISHED_EVALUATION, _track_evaluations
+    )
     workflow.run()
 
     assert np.all(
@@ -746,7 +750,7 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
     completed = []
     BasicOptimizationWorkflow(enopt_config, evaluator()).repeat(
         2, restart_from="last"
-    ).track_results(_track_evaluations).run()
+    ).add_callback(EventType.FINISHED_EVALUATION, _track_evaluations).run()
     assert np.all(
         completed[3].evaluations.variables == completed[2].evaluations.variables
     )
@@ -755,9 +759,12 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
 def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
     completed: List[FunctionResults] = []
 
-    def _track_evaluations(results: Tuple[Results, ...]) -> None:
+    def _track_evaluations(event: OptimizationEvent) -> None:
         nonlocal completed
-        completed += [item for item in results if isinstance(item, FunctionResults)]
+        assert event.results is not None
+        completed += [
+            item for item in event.results if isinstance(item, FunctionResults)
+        ]
 
     enopt_config["optimizer"]["speculative"] = True
     enopt_config["optimizer"]["max_functions"] = 4
@@ -771,12 +778,7 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
             },
             {
                 "id": "optimum",
-                "init": "track_results",
-            },
-            {
-                "id": "callback",
-                "init": "results_callback",
-                "with": {"function": _track_evaluations},
+                "init": "tracker",
             },
         ],
         "steps": [
@@ -789,7 +791,7 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
                             "run": "optimizer",
                             "with": {
                                 "config": "$enopt_config",
-                                "update": ["optimum", "callback"],
+                                "update": ["optimum"],
                                 "initial_values": "$optimum",
                             },
                         },
@@ -800,6 +802,9 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
     }
     context = OptimizerContext(evaluator=evaluator())
     workflow = Workflow(WorkflowConfig.model_validate(workflow_config), context)
+    workflow.optimizer_context.events.add_observer(
+        EventType.FINISHED_EVALUATION, _track_evaluations
+    )
     workflow.run()
 
     assert np.all(
@@ -807,8 +812,8 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
     )
 
     completed = []
-    BasicOptimizationWorkflow(enopt_config, evaluator()).track_results(
-        _track_evaluations
+    BasicOptimizationWorkflow(enopt_config, evaluator()).add_callback(
+        EventType.FINISHED_EVALUATION, _track_evaluations
     ).repeat(2, restart_from="optimal").run()
     assert np.all(
         completed[2].evaluations.variables == completed[4].evaluations.variables
@@ -821,9 +826,12 @@ def test_restart_optimum_with_reset(
     completed: List[FunctionResults] = []
     max_functions = 5
 
-    def _track_evaluations(results: Tuple[Results, ...]) -> None:
+    def _track_evaluations(event: OptimizationEvent) -> None:
         nonlocal completed
-        completed += [item for item in results if isinstance(item, FunctionResults)]
+        assert event.results is not None
+        completed += [
+            item for item in event.results if isinstance(item, FunctionResults)
+        ]
 
     # Make sure each restart has worse objectives, and that the last evaluation
     # is even worse, so each run has its own optimum that is worse than the
@@ -853,12 +861,7 @@ def test_restart_optimum_with_reset(
             },
             {
                 "id": "optimum",
-                "init": "track_results",
-            },
-            {
-                "id": "callback",
-                "init": "results_callback",
-                "with": {"function": _track_evaluations},
+                "init": "tracker",
             },
         ],
         "steps": [
@@ -881,7 +884,7 @@ def test_restart_optimum_with_reset(
                             "run": "optimizer",
                             "with": {
                                 "config": "$enopt_config",
-                                "update": ["optimum", "callback"],
+                                "update": ["optimum"],
                                 "initial_values": "$initial",
                             },
                         },
@@ -892,6 +895,9 @@ def test_restart_optimum_with_reset(
     }
     context = OptimizerContext(evaluator=evaluator(new_functions))
     workflow = Workflow(WorkflowConfig.model_validate(workflow_config), context)
+    workflow.optimizer_context.events.add_observer(
+        EventType.FINISHED_EVALUATION, _track_evaluations
+    )
     workflow.run()
 
     # The third evaluation is the optimum, and used to restart the second run:
@@ -906,8 +912,8 @@ def test_restart_optimum_with_reset(
     )
 
     completed = []
-    BasicOptimizationWorkflow(enopt_config, evaluator(new_functions)).track_results(
-        _track_evaluations
+    BasicOptimizationWorkflow(enopt_config, evaluator(new_functions)).add_callback(
+        EventType.FINISHED_EVALUATION, _track_evaluations
     ).repeat(3, restart_from="last_optimal").run()
 
     # The third evaluation is the optimum, and used to restart the second run:
@@ -925,8 +931,9 @@ def test_restart_optimum_with_reset(
 def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
     restarts: List[int] = []
 
-    def _track_results(results: Tuple[Results, ...]) -> None:
-        metadata = results[0].metadata
+    def _track_results(event: OptimizationEvent) -> None:
+        assert event.results is not None
+        metadata = event.results[0].metadata
         restart = metadata.get("restart", -1)
         assert metadata["foo"] == 1
         assert metadata["bar"] == "string"
@@ -948,11 +955,6 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 "init": "config",
                 "with": enopt_config,
             },
-            {
-                "id": "callback",
-                "init": "results_callback",
-                "with": {"function": _track_results},
-            },
         ],
         "steps": [
             {
@@ -965,7 +967,6 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
                             "run": "optimizer",
                             "with": {
                                 "config": "$config",
-                                "update": ["callback"],
                                 "metadata": metadata,
                             },
                         },
@@ -978,12 +979,15 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
     parsed_config = WorkflowConfig.model_validate(workflow_config)
     context = OptimizerContext(evaluator=evaluator())
     workflow = Workflow(parsed_config, context)
+    workflow.optimizer_context.events.add_observer(
+        EventType.FINISHED_EVALUATION, _track_results
+    )
     workflow.run()
     assert restarts == [0, 1]
 
     restarts = []
-    BasicOptimizationWorkflow(enopt_config, evaluator()).track_results(
-        _track_results
+    BasicOptimizationWorkflow(enopt_config, evaluator()).add_callback(
+        EventType.FINISHED_EVALUATION, _track_results
     ).add_metadata(metadata).repeat(
         2, restart_from="last_optimal", counter_var="counter"
     ).run()
@@ -1003,7 +1007,7 @@ def test_update_enopt(enopt_config: Any, evaluator: Any) -> None:
             },
             {
                 "id": "optimum",
-                "init": "track_results",
+                "init": "tracker",
             },
         ],
         "steps": [
@@ -1056,7 +1060,7 @@ def test_evaluator_step(enopt_config: Any, evaluator: Any) -> None:
             },
             {
                 "id": "optimum",
-                "init": "track_results",
+                "init": "tracker",
             },
         ],
         "steps": [
@@ -1093,11 +1097,12 @@ def test_evaluator_step(enopt_config: Any, evaluator: Any) -> None:
 def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
     completed: List[float] = []
 
-    def _track_evaluations(results: Tuple[Results, ...]) -> None:
+    def _track_evaluations(event: OptimizationEvent) -> None:
         nonlocal completed
+        assert event.results is not None
         completed += [
             item.functions.weighted_objective.item()
-            for item in results
+            for item in event.results
             if isinstance(item, FunctionResults) and item.functions is not None
         ]
 
@@ -1113,12 +1118,7 @@ def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
             },
             {
                 "id": "optimum",
-                "init": "track_results",
-            },
-            {
-                "id": "callback",
-                "init": "results_callback",
-                "with": {"function": _track_evaluations},
+                "init": "tracker",
             },
         ],
         "steps": [
@@ -1126,7 +1126,7 @@ def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
                 "run": "evaluator",
                 "with": {
                     "config": "$config",
-                    "update": ["optimum", "callback"],
+                    "update": ["optimum"],
                     "values": [[0, 0, 0.1], [0, 0, 0]],
                 },
             },
@@ -1136,6 +1136,9 @@ def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
     parsed_config = WorkflowConfig.model_validate(workflow_config)
     context = OptimizerContext(evaluator=evaluator())
     workflow = Workflow(parsed_config, context)
+    workflow.optimizer_context.events.add_observer(
+        EventType.FINISHED_EVALUATION, _track_evaluations
+    )
     workflow.run()
 
     assert len(completed) == 2
@@ -1147,9 +1150,10 @@ def test_nested_workflow(enopt_config: Any, evaluator: Any) -> None:
 
     completed_functions = 0
 
-    def _track_evaluations(results: Tuple[Results, ...]) -> None:
+    def _track_evaluations(event: OptimizationEvent) -> None:
         nonlocal completed_functions
-        for item in results:
+        assert event.results is not None
+        for item in event.results:
             if isinstance(item, FunctionResults):
                 completed_functions += 1
 
@@ -1170,12 +1174,7 @@ def test_nested_workflow(enopt_config: Any, evaluator: Any) -> None:
             },
             {
                 "id": "nested_optimum",
-                "init": "track_results",
-            },
-            {
-                "id": "callback",
-                "init": "results_callback",
-                "with": {"function": _track_evaluations},
+                "init": "tracker",
             },
         ],
         "steps": [
@@ -1183,7 +1182,7 @@ def test_nested_workflow(enopt_config: Any, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$config",
-                    "update": ["nested_optimum", "callback"],
+                    "update": ["nested_optimum"],
                     "initial_values": "$initial",
                 },
             },
@@ -1199,12 +1198,7 @@ def test_nested_workflow(enopt_config: Any, evaluator: Any) -> None:
             },
             {
                 "id": "optimum",
-                "init": "track_results",
-            },
-            {
-                "id": "callback",
-                "init": "results_callback",
-                "with": {"function": _track_evaluations},
+                "init": "tracker",
             },
         ],
         "steps": [
@@ -1212,7 +1206,7 @@ def test_nested_workflow(enopt_config: Any, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$config",
-                    "update": ["optimum", "callback"],
+                    "update": ["optimum"],
                     "nested_workflow": {
                         "workflow": inner_config,
                         "initial_var": "initial",
@@ -1226,6 +1220,9 @@ def test_nested_workflow(enopt_config: Any, evaluator: Any) -> None:
     parsed_config = WorkflowConfig.model_validate(outer_config)
     context = OptimizerContext(evaluator=evaluator())
     workflow = Workflow(parsed_config, context)
+    workflow.optimizer_context.events.add_observer(
+        EventType.FINISHED_EVALUATION, _track_evaluations
+    )
     workflow.run()
     results = workflow["optimum"]
 
@@ -1234,17 +1231,19 @@ def test_nested_workflow(enopt_config: Any, evaluator: Any) -> None:
     assert completed_functions == 25
 
 
-def test_callback(enopt_config: Any, evaluator: Any) -> None:
+def test_exit_code(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["optimizer"]["speculative"] = True
     enopt_config["optimizer"]["max_functions"] = 4
 
-    counts: List[int] = []
+    is_called = False
 
-    def _store_value(_: Tuple[Results, ...], count: int, config: EnOptConfig) -> int:
-        assert isinstance(config, EnOptConfig)
-        if not counts or count != counts[-1]:
-            counts.append(count)
-        return count
+    def _exit_code(
+        event: OptimizationEvent,
+    ) -> None:
+        nonlocal is_called
+        is_called = True
+        assert isinstance(event, OptimizationEvent)
+        assert event.exit_code == OptimizerExitCode.MAX_FUNCTIONS_REACHED
 
     workflow_config = {
         "context": [
@@ -1253,42 +1252,22 @@ def test_callback(enopt_config: Any, evaluator: Any) -> None:
                 "init": "config",
                 "with": enopt_config,
             },
-            {
-                "id": "callback",
-                "init": "results_callback",
-                "with": {
-                    "function": _store_value,
-                    "kwargs": {
-                        "count": "$counter",
-                        "config": "$enopt_config",
-                    },
-                },
-            },
         ],
         "steps": [
             {
-                "run": "repeat",
+                "run": "optimizer",
                 "with": {
-                    "iterations": 3,
-                    "counter_var": "counter",
-                    "steps": [
-                        {
-                            "run": "optimizer",
-                            "with": {
-                                "config": "$enopt_config",
-                                "update": ["callback"],
-                                "metadata": {
-                                    "restart": "$counter",
-                                },
-                            },
-                        },
-                    ],
+                    "config": "$enopt_config",
+                    "exit_code_var": "exit_code",
                 },
-            }
+            },
         ],
     }
     context = OptimizerContext(evaluator=evaluator())
     workflow = Workflow(WorkflowConfig.model_validate(workflow_config), context)
+    workflow.optimizer_context.events.add_observer(
+        EventType.FINISHED_OPTIMIZER_STEP, _exit_code
+    )
     workflow.run()
-    assert counts == [0, 1, 2]
-    assert workflow["callback"] == 2
+    assert workflow["exit_code"] == OptimizerExitCode.MAX_FUNCTIONS_REACHED
+    assert is_called

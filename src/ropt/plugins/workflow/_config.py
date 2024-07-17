@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING, Any, Dict, Union
 from pydantic import BaseModel, ConfigDict
 
 from ropt.config.enopt import EnOptConfig
-from ropt.exceptions import WorkflowError
 from ropt.plugins.workflow.base import ContextObj
+from ropt.workflow import ContextUpdate, ContextUpdateDict
 
 if TYPE_CHECKING:
     from ropt.config.workflow import ContextConfig
@@ -57,16 +57,14 @@ class DefaultConfigContext(ContextObj):
         self._backup = enopt_config
         self.set_variable(enopt_config)
 
-    def update(self, updates: Any) -> None:  # noqa: ANN401
-        if not isinstance(updates, dict):
-            msg = "attempt to update with invalid data."
-            raise WorkflowError(msg, context_id=self.context_config.id)
-        enopt_config = self.get_variable()
-        assert enopt_config.original_inputs is not None
-        enopt_config = EnOptConfig.model_validate(
-            _update_dict(enopt_config.original_inputs, updates)
-        )
-        self.set_variable(enopt_config)
+    def update(self, updates: ContextUpdate) -> None:
+        if isinstance(updates, ContextUpdateDict):
+            enopt_config = self.get_variable()
+            assert enopt_config.original_inputs is not None
+            enopt_config = EnOptConfig.model_validate(
+                _update_dict(enopt_config.original_inputs, updates.data)
+            )
+            self.set_variable(enopt_config)
 
     def reset(self) -> None:
         """Clear the stored values."""

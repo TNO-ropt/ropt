@@ -10,12 +10,12 @@ from pydantic import BaseModel, ConfigDict
 from ropt.config.enopt import EnOptConfig
 from ropt.config.utils import Array1D  # noqa: TCH001
 from ropt.config.workflow import WorkflowConfig  # noqa: TCH001
-from ropt.enums import OptimizerExitCode
+from ropt.enums import EventType, OptimizerExitCode
 from ropt.evaluator import EnsembleEvaluator
 from ropt.exceptions import WorkflowError
 from ropt.plugins.workflow.base import OptimizerStep
 from ropt.results import FunctionResults
-from ropt.workflow import Optimizer, Workflow
+from ropt.workflow import ContextUpdateResults, Optimizer, Workflow
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -117,6 +117,12 @@ class DefaultOptimizerStep(OptimizerStep):
         if self._with.exit_code_var is not None:
             self.workflow[self._with.exit_code_var] = exit_code
 
+        self.workflow.optimizer_context.events.emit(
+            event_type=EventType.FINISHED_OPTIMIZER_STEP,
+            config=self._enopt_config,
+            exit_code=exit_code,
+        )
+
         return exit_code == OptimizerExitCode.USER_ABORT
 
     def start_evaluation(self) -> None:
@@ -135,7 +141,18 @@ class DefaultOptimizerStep(OptimizerStep):
                 item.metadata[key] = self.workflow.parse_value(expr)
 
         for obj_id in self._with.update:
-            self.workflow.update_context(obj_id, results)
+            self.workflow.update_context(
+                obj_id,
+                ContextUpdateResults(
+                    step_name=self.step_config.name,
+                    results=results,
+                ),
+            )
+        self.workflow.optimizer_context.events.emit(
+            event_type=EventType.FINISHED_EVALUATION,
+            config=self._enopt_config,
+            results=results,
+        )
 
     def run_nested_workflow(
         self, variables: NDArray[np.float64]
@@ -150,9 +167,7 @@ class DefaultOptimizerStep(OptimizerStep):
         """
         if self._with.nested_workflow is None:
             return None, False
-        workflow = Workflow(
-            self._with.nested_workflow.workflow, self.workflow.optimizer_context
-        )
+        workflow = self.workflow.spawn(self._with.nested_workflow.workflow)
         workflow[self._with.nested_workflow.initial_var] = variables
         aborted = workflow.run()
         return workflow[self._with.nested_workflow.results_var], aborted

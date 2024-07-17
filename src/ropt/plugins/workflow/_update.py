@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Dict
 
 from pydantic import BaseModel, ConfigDict
 
 from ropt.exceptions import WorkflowError
 from ropt.plugins.workflow.base import WorkflowStep
+from ropt.workflow import ContextUpdateDict
 
 if TYPE_CHECKING:
     from ropt.config.workflow import StepConfig
@@ -18,7 +19,7 @@ class DefaultUpdateStepWith(BaseModel):
     """Parameters used by the default update step."""
 
     context: str
-    value: Any
+    value: Dict[str, Any]
 
     model_config = ConfigDict(
         extra="forbid",
@@ -49,5 +50,8 @@ class DefaultUpdateStep(WorkflowStep):
         if not self.workflow.has_context(self._with.context):
             msg = f"Env object `{self._with.context}` does not exist."
             raise WorkflowError(msg, step_name=self.step_config.name)
-        self.workflow.update_context(self._with.context, self._with.value)
+        self.workflow.update_context(
+            self._with.context,
+            ContextUpdateDict(step_name=self.step_config.name, data=self._with.value),
+        )
         return False

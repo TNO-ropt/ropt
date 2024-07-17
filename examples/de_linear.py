@@ -4,14 +4,15 @@ This example uses the differential evolution method to solve a discrete
 problem with a linear constraint.
 """
 
-from typing import Any, Dict, Tuple
+from typing import Any, Dict
 
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.enums import ConstraintType, VariableType
+from ropt.enums import ConstraintType, EventType, VariableType
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.results import FunctionResults, Results
+from ropt.events import OptimizationEvent
+from ropt.results import FunctionResults
 from ropt.workflow import BasicOptimizationWorkflow
 
 CONFIG: Dict[str, Any] = {
@@ -51,13 +52,13 @@ def function(variables: NDArray[np.float64], _: EvaluatorContext) -> EvaluatorRe
     return EvaluatorResult(objectives=objectives)
 
 
-def report(results: Tuple[Results, ...]) -> None:
+def report(event: OptimizationEvent) -> None:
     """Report results of an evaluation.
 
     Args:
-        results: Results from an evaluation
+        event: event data
     """
-    for item in results:
+    for item in event.results:
         if isinstance(item, FunctionResults) and item.functions is not None:
             print(f"result: {item.result_id}")
             print(f"  variables: {item.evaluations.variables}")
@@ -67,7 +68,10 @@ def report(results: Tuple[Results, ...]) -> None:
 def run_optimization() -> None:
     """Run the optimization."""
     optimal_result = (
-        BasicOptimizationWorkflow(CONFIG, function).track_results(report).run().results
+        BasicOptimizationWorkflow(CONFIG, function)
+        .add_callback(EventType.FINISHED_EVALUATION, report)
+        .run()
+        .results
     )
     assert optimal_result is not None
     assert optimal_result.functions is not None

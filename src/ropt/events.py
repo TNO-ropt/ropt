@@ -35,3 +35,4 @@ class OptimizationEvent:
     config: EnOptConfig
     results: Optional[Tuple[Results, ...]] = None
     exit_code: Optional[OptimizerExitCode] = None
+    step_name: Optional[str] = None

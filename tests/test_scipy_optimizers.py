@@ -1,11 +1,12 @@
 from pathlib import Path
-from typing import Any, Dict, Tuple, cast
+from typing import Any, Dict, cast
 
 import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from ropt.enums import ConstraintType
+from ropt.enums import ConstraintType, EventType
+from ropt.events import OptimizationEvent
 from ropt.plugins.optimizer.scipy import (
     _CONSTRAINT_REQUIRES_BOUNDS,
     _CONSTRAINT_SUPPORT_BOUNDS,
@@ -15,7 +16,6 @@ from ropt.plugins.optimizer.scipy import (
     _CONSTRAINT_SUPPORT_NONLINEAR_INEQ,
     _SUPPORTED_METHODS,
 )
-from ropt.results import Results
 from ropt.workflow import BasicOptimizationWorkflow
 
 
@@ -437,12 +437,13 @@ def test_scipy_speculative(
     enopt_config["optimizer"]["method"] = "slsqp"
     enopt_config["optimizer"]["speculative"] = speculative
 
-    def _observer(results: Tuple[Results, ...]) -> None:
-        assert len(results) == 2 if speculative else 1
+    def _observer(event: OptimizationEvent) -> None:
+        assert event.results is not None
+        assert len(event.results) == 2 if speculative else 1
 
     variables = (
         BasicOptimizationWorkflow(enopt_config, evaluator())
-        .track_results(_observer)
+        .add_callback(EventType.FINISHED_EVALUATION, _observer)
         .run()
         .variables
     )

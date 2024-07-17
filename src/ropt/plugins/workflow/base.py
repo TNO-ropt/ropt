@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
     from ropt.config.workflow import ContextConfig, StepConfig
     from ropt.results import FunctionResults, Results
-    from ropt.workflow import OptimizerContext, Workflow
+    from ropt.workflow import ContextUpdate, OptimizerContext, Workflow
 
 
 class ContextObj(ABC):
@@ -40,7 +40,7 @@ class ContextObj(ABC):
         self._workflow = workflow
 
     @abstractmethod
-    def update(self, value: Any) -> None:  # noqa: ANN401
+    def update(self, value: ContextUpdate) -> None:
         """Update the value of the object.
 
         Args:

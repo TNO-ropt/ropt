@@ -1,11 +1,13 @@
 from functools import partial
-from typing import TYPE_CHECKING, Any, Dict, Tuple
+from typing import TYPE_CHECKING, Any, Dict
 
 import numpy as np
 import pytest
 
+from ropt.enums import EventType
+from ropt.events import OptimizationEvent
 from ropt.plugins.sampler.scipy import _SUPPORTED_METHODS
-from ropt.results import GradientResults, Results
+from ropt.results import GradientResults
 from ropt.workflow import BasicOptimizationWorkflow
 
 if TYPE_CHECKING:
@@ -61,15 +63,16 @@ def test_scipy_samplers_shared(enopt_config: Any, method: str, evaluator: Any) -
 
     perturbations: Dict[str, NDArray[np.float64]] = {}
 
-    def _observer(results: Tuple[Results, ...], tag: str) -> None:
-        for item in results:
+    def _observer(event: OptimizationEvent, tag: str) -> None:
+        assert event.results is not None
+        for item in event.results:
             if isinstance(item, GradientResults) and tag not in perturbations:
                 perturbations[tag] = item.evaluations.perturbed_variables
 
     enopt_config["samplers"][0]["shared"] = False
     variables1 = (
         BasicOptimizationWorkflow(enopt_config, evaluator())
-        .track_results(partial(_observer, tag="result1"))
+        .add_callback(EventType.FINISHED_EVALUATION, partial(_observer, tag="result1"))
         .run()
         .variables
     )
@@ -78,7 +81,7 @@ def test_scipy_samplers_shared(enopt_config: Any, method: str, evaluator: Any) -
     enopt_config["samplers"][0]["shared"] = True
     variables2 = (
         BasicOptimizationWorkflow(enopt_config, evaluator())
-        .track_results(partial(_observer, tag="result2"))
+        .add_callback(EventType.FINISHED_EVALUATION, partial(_observer, tag="result2"))
         .run()
         .variables
     )

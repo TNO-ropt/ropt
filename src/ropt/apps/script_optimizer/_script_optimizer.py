@@ -27,9 +27,10 @@ from parsl.providers.base import ExecutionProvider
 from tabulate import tabulate
 
 from ropt.config.workflow import WorkflowConfig
-from ropt.enums import OptimizerExitCode
+from ropt.enums import EventType, OptimizerExitCode
 from ropt.evaluator import EvaluatorContext
 from ropt.evaluator.parsl import ParslEvaluator, State
+from ropt.events import OptimizationEvent
 from ropt.exceptions import ConfigError
 from ropt.workflow import OptimizerContext, Workflow
 
@@ -267,7 +268,7 @@ class ScriptOptimizer:
         self._update_current_state(batch_id, jobs)
         self._store_states()
 
-    def _log_exit_code(self, event: Any) -> None:  # noqa: ANN401
+    def _log_exit_code(self, event: OptimizationEvent) -> None:
         msg = ""
         if event.exit_code == OptimizerExitCode.TOO_FEW_REALIZATIONS:
             msg = "Too few successful realizations: optimization stopped."
@@ -312,6 +313,9 @@ class ScriptOptimizer:
             context = OptimizerContext(evaluator=evaluator, seed=self._seed)
             config = WorkflowConfig.model_validate(self._workflow_config)
             workflow = Workflow(config, context)
+            workflow.optimizer_context.events.add_observer(
+                EventType.FINISHED_OPTIMIZER_STEP, self._log_exit_code
+            )
             workflow.run()
         finally:
             os.chdir(cwd)

@@ -16,6 +16,8 @@ from ropt.config.enopt.constants import DEFAULT_SEED
 from ropt.exceptions import WorkflowError
 from ropt.plugins import PluginManager
 
+from ._events import OptimizationEventBroker
+
 if TYPE_CHECKING:
     from ropt.config.workflow import StepConfig, WorkflowConfig
     from ropt.evaluator import Evaluator
@@ -42,6 +44,7 @@ class OptimizerContext:
         self.evaluator = evaluator
         self.rng = default_rng(DEFAULT_SEED) if seed is None else default_rng(seed)
         self.result_id_iter = count()
+        self.events = OptimizationEventBroker()
 
 
 class Workflow:
@@ -50,18 +53,18 @@ class Workflow:
     def __init__(
         self,
         config: WorkflowConfig,
-        context: OptimizerContext,
+        optimizer_context: OptimizerContext,
         plugin_manager: Optional[PluginManager] = None,
     ) -> None:
         """Initialize a workflow object.
 
         Args:
-            config:         Optimizer configuration
-            context:        Context in which the workflow executes
-            plugin_manager: Optional plugin manager
+            config:            Optimizer configuration
+            optimizer_context: Context in which the workflow executes
+            plugin_manager:    Optional plugin manager
         """
         self._workflow_config = config
-        self._workflow_context = context
+        self._optimizer_context = optimizer_context
         self._vars: Dict[str, Any] = {}
 
         self._plugin_manager = (
@@ -125,7 +128,7 @@ class Workflow:
         Returns:
             The optimizer context object used by the workflow.
         """
-        return self._workflow_context
+        return self._optimizer_context
 
     def parse_value(self, value: Any) -> Any:  # noqa: ANN401
         """Parse a value as an expression or an interpolated string.
@@ -154,6 +157,18 @@ class Workflow:
                 return self.eval(stripped)
             return re.sub(r"\${{(.*?)}}|\$\$|\$([^\W0-9][\w\.]*)", _substitute, value)
         return value
+
+    def spawn(self, config: WorkflowConfig) -> Workflow:
+        """Spawn a child workflow.
+
+        Args:
+            config: The configuration of the new workflow.
+        """
+        return Workflow(
+            config,
+            optimizer_context=self._optimizer_context,
+            plugin_manager=self._plugin_manager,
+        )
 
     def _eval_expr(self, expr: str) -> Any:  # noqa: ANN401
         # Check for identifiers that are not preceded by $:

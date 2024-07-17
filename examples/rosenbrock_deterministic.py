@@ -5,13 +5,15 @@ Rosenbrock function. It shows how to write a minimal configuration and how to
 run and monitor the optimization.
 """
 
-from typing import Any, Dict, Tuple
+from typing import Any, Dict
 
 import numpy as np
 from numpy.typing import NDArray
 
+from ropt.enums import EventType
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.results import FunctionResults, Results
+from ropt.events import OptimizationEvent
+from ropt.results import FunctionResults
 from ropt.workflow import BasicOptimizationWorkflow
 
 CONFIG: Dict[str, Any] = {
@@ -43,13 +45,13 @@ def rosenbrock(variables: NDArray[np.float64], _: EvaluatorContext) -> Evaluator
     return EvaluatorResult(objectives=objectives)
 
 
-def report(results: Tuple[Results, ...]) -> None:
+def report(event: OptimizationEvent) -> None:
     """Report results of an evaluation.
 
     Args:
-        results: Results from an evaluation
+        event: event data
     """
-    for item in results:
+    for item in event.results:
         if isinstance(item, FunctionResults) and item.functions is not None:
             print(f"result: {item.result_id}")
             print(f"  variables: {item.evaluations.variables}")
@@ -67,7 +69,7 @@ def run_optimization(config: Dict[str, Any]) -> FunctionResults:
     """
     optimal_result = (
         BasicOptimizationWorkflow(config, rosenbrock)
-        .track_results(report)
+        .add_callback(EventType.FINISHED_EVALUATION, report)
         .run()
         .results
     )

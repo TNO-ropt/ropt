@@ -7,14 +7,16 @@ configuration and how to run and monitor the optimization.
 
 import sys
 from functools import partial
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
+from ropt.enums import EventType
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.results import FunctionResults, Results
+from ropt.events import OptimizationEvent
+from ropt.results import FunctionResults
 from ropt.workflow import BasicOptimizationWorkflow
 
 UNCERTAINTY = 0.1
@@ -57,13 +59,13 @@ def rosenbrock(
     return EvaluatorResult(objectives=objectives)
 
 
-def report(results: Tuple[Results, ...]) -> None:
+def report(event: OptimizationEvent) -> None:
     """Report results of an evaluation.
 
     Args:
-        results: Results from an evaluation
+        event: event data
     """
-    for item in results:
+    for item in event.results:
         if isinstance(item, FunctionResults) and item.functions is not None:
             print(f"result: {item.result_id}")
             print(f"  variables: {item.evaluations.variables}")
@@ -87,7 +89,7 @@ def run_optimization(config: Dict[str, Any]) -> FunctionResults:
 
     optimal_result = (
         BasicOptimizationWorkflow(CONFIG, partial(rosenbrock, a=a, b=b))
-        .track_results(report)
+        .add_callback(EventType.FINISHED_EVALUATION, report)
         .run()
         .results
     )

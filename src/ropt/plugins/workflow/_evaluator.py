@@ -9,11 +9,12 @@ from pydantic import BaseModel, ConfigDict
 
 from ropt.config.enopt import EnOptConfig
 from ropt.config.utils import Array2D  # noqa: TCH001
-from ropt.enums import OptimizerExitCode
+from ropt.enums import EventType, OptimizerExitCode
 from ropt.evaluator import EnsembleEvaluator
 from ropt.exceptions import OptimizationAborted, WorkflowError
 from ropt.plugins.workflow.base import WorkflowStep
 from ropt.results import FunctionResults
+from ropt.workflow import ContextUpdateResults
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -102,7 +103,18 @@ class DefaultEvaluatorStep(WorkflowStep):
                 item.metadata[key] = self.workflow.parse_value(expr)
 
         for obj_id in self._with.update:
-            self.workflow.update_context(obj_id, results)
+            self.workflow.update_context(
+                obj_id,
+                ContextUpdateResults(
+                    step_name=self.step_config.name,
+                    results=results,
+                ),
+            )
+        self.workflow.optimizer_context.events.emit(
+            event_type=EventType.FINISHED_EVALUATION,
+            config=self._enopt_config,
+            results=results,
+        )
 
         assert results
         assert isinstance(results[0], FunctionResults)

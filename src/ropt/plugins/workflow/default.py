@@ -14,16 +14,14 @@ from ._evaluator import DefaultEvaluatorStep
 from ._optimizer import DefaultOptimizerStep
 from ._repeat import DefaultRepeatStep
 from ._reset import DefaultResetStep
-from ._results_callback import DefaultResultsCallbackContext
 from ._setvar import DefaultSetStep
-from ._track_results import DefaultTrackResultsContext
+from ._tracker import DefaultTrackerContext
 from ._update import DefaultUpdateStep
 from .base import WorkflowPlugin
 
 _CONTEXT_OBJECTS: Final[Dict[str, Type[ContextObj]]] = {
-    "results_callback": DefaultResultsCallbackContext,
     "config": DefaultConfigContext,
-    "track_results": DefaultTrackResultsContext,
+    "tracker": DefaultTrackerContext,
 }
 
 _STEP_OBJECTS: Final[Dict[str, Type[WorkflowStep]]] = {
