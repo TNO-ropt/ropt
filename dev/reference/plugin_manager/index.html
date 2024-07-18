@@ -228,7 +228,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../workflow_config/" class="md-tabs__link">
+        <a href="../plan_config/" class="md-tabs__link">
           
   
   Reference
@@ -492,11 +492,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_config/" class="md-nav__link">
+      <a href="../plan_config/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Workflow configuration
+    Optimization Plan configuration
   </span>
   
 
@@ -582,11 +582,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflows/" class="md-nav__link">
+      <a href="../plans/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Optimization workflows
+    Optimization Plans
   </span>
   
 
@@ -954,11 +954,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_plugins/" class="md-nav__link">
+      <a href="../plan_plugins/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Workflow objects
+    Optimization Plan objects
   </span>
   
 
@@ -1107,11 +1107,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../default_workflow_objects/" class="md-nav__link">
+      <a href="../default_plan_objects/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Default Workflow Objects
+    Default Optimization Plan Objects
   </span>
   
 
@@ -1383,10 +1383,11 @@ module to implement various optimization algorithms.</dd>
   <a class="autorefs autorefs-internal" href="../default_function_transforms/#ropt.plugins.function_transform.default.DefaultFunctionTransform"><code>default</code></a>
   plugin supports objectives defined by the mean or standard deviation of these
   values.</dd>
-<dt><a class="autorefs autorefs-internal" href="../workflow_plugins/#ropt.plugins.workflow"><code>workflow</code></a>:</dt>
-<dd>Workflow plugins implement the objects that execute an optimization workflow.
-  The built-in <a class="autorefs autorefs-internal" href="../default_workflow_objects/#ropt.plugins.workflow.default.DefaultWorkflowPlugin"><code>default</code></a>
-  plugin offers a full set of workflow objects for executing complex workflows.</dd>
+<dt><a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan"><code>plan</code></a>:</dt>
+<dd>Plan plugins implement the objects that execute an optimization plan.
+  The built-in <a class="autorefs autorefs-internal" href="../default_plan_objects/#ropt.plugins.plan.default.DefaultPlanPlugin"><code>default</code></a> plugin
+  offers a full set of optimization plan objects for executing complex
+  optimization plans.</dd>
 </dl>
 <p>Plugins are managed by the <a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager"><code>PluginManager</code></a> class.
 This class is used to retrieve plugin objects that derive from an abstract
@@ -1400,8 +1401,8 @@ base class defining the required functionality for each plugin type:</p>
     Abstract base class for realization filter plugins.</li>
 <li><a class="autorefs autorefs-internal" href="../function_transform_plugins/#ropt.plugins.function_transform.base.FunctionTransformPlugin"><code>FunctionTransformPlugin</code></a>:
     Abstract base class for function transform plugins.</li>
-<li><a class="autorefs autorefs-internal" href="../workflow_plugins/#ropt.plugins.workflow.base.WorkflowPlugin"><code>WorkflowPlugin</code></a>:
-    Abstract base class for workflow object plugins.</li>
+<li><a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.PlanPlugin"><code>PlanPlugin</code></a>:
+    Abstract base class for optimization plan object plugins.</li>
 </ol>
 <p>Plugins can be built-in, installed separately using the standard entry points
 mechanism, or added dynamically using the
@@ -1701,7 +1702,7 @@ manager. The <code>plugins</code> argument maps the names of the new plugins to
 
 
 <h3 id="ropt.plugins.PluginType" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">PluginType</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">,</span> <span class="s1">&#39;sampler&#39;</span><span class="p">,</span> <span class="s1">&#39;realization_filter&#39;</span><span class="p">,</span> <span class="s1">&#39;function_transform&#39;</span><span class="p">,</span> <span class="s1">&#39;optimization_step&#39;</span><span class="p">,</span> <span class="s1">&#39;workflow&#39;</span><span class="p">]</span></code>
+            <code class="highlight language-python"><span class="n">PluginType</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">,</span> <span class="s1">&#39;sampler&#39;</span><span class="p">,</span> <span class="s1">&#39;realization_filter&#39;</span><span class="p">,</span> <span class="s1">&#39;function_transform&#39;</span><span class="p">,</span> <span class="s1">&#39;plan&#39;</span><span class="p">]</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>

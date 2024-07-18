@@ -228,7 +228,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../workflow_config/" class="md-tabs__link">
+        <a href="../plan_config/" class="md-tabs__link">
           
   
   Reference
@@ -492,11 +492,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_config/" class="md-nav__link">
+      <a href="../plan_config/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Workflow configuration
+    Optimization Plan configuration
   </span>
   
 
@@ -582,11 +582,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflows/" class="md-nav__link">
+      <a href="../plans/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Optimization workflows
+    Optimization Plans
   </span>
   
 
@@ -819,11 +819,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_plugins/" class="md-nav__link">
+      <a href="../plan_plugins/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Workflow objects
+    Optimization Plan objects
   </span>
   
 
@@ -972,11 +972,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../default_workflow_objects/" class="md-nav__link">
+      <a href="../default_plan_objects/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Default Workflow Objects
+    Default Optimization Plan Objects
   </span>
   
 
@@ -1083,17 +1083,17 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.WorkflowError" class="md-nav__link">
+  <a href="#ropt.exceptions.PlanError" class="md-nav__link">
     <span class="md-ellipsis">
-      WorkflowError
+      PlanError
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="WorkflowError">
+    <nav class="md-nav" aria-label="PlanError">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.WorkflowError.__init__" class="md-nav__link">
+  <a href="#ropt.exceptions.PlanError.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -1216,17 +1216,17 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.WorkflowError" class="md-nav__link">
+  <a href="#ropt.exceptions.PlanError" class="md-nav__link">
     <span class="md-ellipsis">
-      WorkflowError
+      PlanError
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="WorkflowError">
+    <nav class="md-nav" aria-label="PlanError">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.WorkflowError.__init__" class="md-nav__link">
+  <a href="#ropt.exceptions.PlanError.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -1340,8 +1340,8 @@
 
 
 
-<h3 id="ropt.exceptions.WorkflowError" class="doc doc-heading">
-            <code>WorkflowError</code>
+<h3 id="ropt.exceptions.PlanError" class="doc doc-heading">
+            <code>PlanError</code>
 
 
 </h3>
@@ -1352,7 +1352,7 @@
               Bases: <code>Exception</code></p>
 
 
-      <p>Raised when an error occurs in a workflow.</p>
+      <p>Raised when an error occurs in an optimization plan.</p>
 
 
 
@@ -1370,7 +1370,7 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.exceptions.WorkflowError.__init__" class="doc doc-heading">
+<h4 id="ropt.exceptions.PlanError.__init__" class="doc doc-heading">
             <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">step_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context_id</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
@@ -1466,7 +1466,7 @@
 
 
       <p>Raised when an optimization is aborted.</p>
-<p>When constructing the execption object an exit code must be passed that
+<p>When constructing the exception object an exit code must be passed that
 indicates the reason for aborting (see
 <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.OptimizerExitCode"><code>OptimizerExitCode</code></a>).</p>
 

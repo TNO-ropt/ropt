@@ -20,7 +20,7 @@
     
     
       
-        <title>Optimization workflows - ropt Documentation</title>
+        <title>Optimization Plans - ropt Documentation</title>
       
     
     
@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.workflow" class="md-skip">
+        <a href="#ropt.plan" class="md-skip">
           Skip to content
         </a>
       
@@ -106,7 +106,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Optimization workflows
+              Optimization Plans
             
           </span>
         </div>
@@ -228,7 +228,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../workflow_config/" class="md-tabs__link">
+        <a href="../plan_config/" class="md-tabs__link">
           
   
   Reference
@@ -492,11 +492,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_config/" class="md-nav__link">
+      <a href="../plan_config/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Workflow configuration
+    Optimization Plan configuration
   </span>
   
 
@@ -593,7 +593,7 @@
           
   
   <span class="md-ellipsis">
-    Optimization workflows
+    Optimization Plans
   </span>
   
 
@@ -604,7 +604,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization workflows
+    Optimization Plans
   </span>
   
 
@@ -624,27 +624,201 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.workflow" class="md-nav__link">
+  <a href="#ropt.plan" class="md-nav__link">
     <span class="md-ellipsis">
-      workflow
+      plan
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="workflow">
+    <nav class="md-nav" aria-label="plan">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.BasicOptimizationWorkflow" class="md-nav__link">
+  <a href="#ropt.plan.OptimizerContext" class="md-nav__link">
     <span class="md-ellipsis">
-      BasicOptimizationWorkflow
+      OptimizerContext
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="BasicOptimizationWorkflow">
+    <nav class="md-nav" aria-label="OptimizerContext">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.BasicOptimizationWorkflow.abort_optimization" class="md-nav__link">
+  <a href="#ropt.plan.OptimizerContext.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      Plan
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Plan">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.plugin_manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      plugin_manager
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.optimizer_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      optimizer_context
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      run
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.create_steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      create_steps
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.run_steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      run_steps
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.parse_value" class="md-nav__link">
+    <span class="md-ellipsis">
+      parse_value
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.spawn" class="md-nav__link">
+    <span class="md-ellipsis">
+      spawn
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.eval" class="md-nav__link">
+    <span class="md-ellipsis">
+      eval
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.reset_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset_context
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.has_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      has_context
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.update_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_context
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.__getitem__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __getitem__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.__setitem__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __setitem__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.__contains__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __contains__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.BasicOptimizationPlan" class="md-nav__link">
+    <span class="md-ellipsis">
+      BasicOptimizationPlan
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BasicOptimizationPlan">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.BasicOptimizationPlan.abort_optimization" class="md-nav__link">
     <span class="md-ellipsis">
       abort_optimization
     </span>
@@ -658,7 +832,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.ContextUpdate" class="md-nav__link">
+  <a href="#ropt.plan.ContextUpdate" class="md-nav__link">
     <span class="md-ellipsis">
       ContextUpdate
     </span>
@@ -667,7 +841,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.ContextUpdateDict" class="md-nav__link">
+  <a href="#ropt.plan.ContextUpdateDict" class="md-nav__link">
     <span class="md-ellipsis">
       ContextUpdateDict
     </span>
@@ -676,176 +850,11 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.ContextUpdateEvent" class="md-nav__link">
+  <a href="#ropt.plan.ContextUpdateResults" class="md-nav__link">
     <span class="md-ellipsis">
-      ContextUpdateEvent
+      ContextUpdateResults
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.OptimizerContext" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptimizerContext
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptimizerContext">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.OptimizerContext.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow" class="md-nav__link">
-    <span class="md-ellipsis">
-      Workflow
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Workflow">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.plugin_manager" class="md-nav__link">
-    <span class="md-ellipsis">
-      plugin_manager
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.optimizer_context" class="md-nav__link">
-    <span class="md-ellipsis">
-      optimizer_context
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.run" class="md-nav__link">
-    <span class="md-ellipsis">
-      run
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.create_steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      create_steps
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.run_steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      run_steps
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.parse_value" class="md-nav__link">
-    <span class="md-ellipsis">
-      parse_value
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.eval" class="md-nav__link">
-    <span class="md-ellipsis">
-      eval
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.reset_context" class="md-nav__link">
-    <span class="md-ellipsis">
-      reset_context
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.has_context" class="md-nav__link">
-    <span class="md-ellipsis">
-      has_context
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.update_context" class="md-nav__link">
-    <span class="md-ellipsis">
-      update_context
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.__getitem__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __getitem__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.__setitem__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __setitem__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.__contains__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __contains__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1086,11 +1095,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../workflow_plugins/" class="md-nav__link">
+      <a href="../plan_plugins/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Workflow objects
+    Optimization Plan objects
   </span>
   
 
@@ -1239,11 +1248,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../default_workflow_objects/" class="md-nav__link">
+      <a href="../default_plan_objects/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Default Workflow Objects
+    Default Optimization Plan Objects
   </span>
   
 
@@ -1356,27 +1365,201 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.workflow" class="md-nav__link">
+  <a href="#ropt.plan" class="md-nav__link">
     <span class="md-ellipsis">
-      workflow
+      plan
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="workflow">
+    <nav class="md-nav" aria-label="plan">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.BasicOptimizationWorkflow" class="md-nav__link">
+  <a href="#ropt.plan.OptimizerContext" class="md-nav__link">
     <span class="md-ellipsis">
-      BasicOptimizationWorkflow
+      OptimizerContext
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="BasicOptimizationWorkflow">
+    <nav class="md-nav" aria-label="OptimizerContext">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.BasicOptimizationWorkflow.abort_optimization" class="md-nav__link">
+  <a href="#ropt.plan.OptimizerContext.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      Plan
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Plan">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.plugin_manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      plugin_manager
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.optimizer_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      optimizer_context
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      run
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.create_steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      create_steps
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.run_steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      run_steps
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.parse_value" class="md-nav__link">
+    <span class="md-ellipsis">
+      parse_value
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.spawn" class="md-nav__link">
+    <span class="md-ellipsis">
+      spawn
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.eval" class="md-nav__link">
+    <span class="md-ellipsis">
+      eval
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.reset_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset_context
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.has_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      has_context
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.update_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_context
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.__getitem__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __getitem__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.__setitem__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __setitem__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.__contains__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __contains__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.BasicOptimizationPlan" class="md-nav__link">
+    <span class="md-ellipsis">
+      BasicOptimizationPlan
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BasicOptimizationPlan">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.BasicOptimizationPlan.abort_optimization" class="md-nav__link">
     <span class="md-ellipsis">
       abort_optimization
     </span>
@@ -1390,7 +1573,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.ContextUpdate" class="md-nav__link">
+  <a href="#ropt.plan.ContextUpdate" class="md-nav__link">
     <span class="md-ellipsis">
       ContextUpdate
     </span>
@@ -1399,7 +1582,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.ContextUpdateDict" class="md-nav__link">
+  <a href="#ropt.plan.ContextUpdateDict" class="md-nav__link">
     <span class="md-ellipsis">
       ContextUpdateDict
     </span>
@@ -1408,176 +1591,11 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.ContextUpdateEvent" class="md-nav__link">
+  <a href="#ropt.plan.ContextUpdateResults" class="md-nav__link">
     <span class="md-ellipsis">
-      ContextUpdateEvent
+      ContextUpdateResults
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.OptimizerContext" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptimizerContext
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptimizerContext">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.OptimizerContext.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow" class="md-nav__link">
-    <span class="md-ellipsis">
-      Workflow
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Workflow">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.plugin_manager" class="md-nav__link">
-    <span class="md-ellipsis">
-      plugin_manager
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.optimizer_context" class="md-nav__link">
-    <span class="md-ellipsis">
-      optimizer_context
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.run" class="md-nav__link">
-    <span class="md-ellipsis">
-      run
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.create_steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      create_steps
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.run_steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      run_steps
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.parse_value" class="md-nav__link">
-    <span class="md-ellipsis">
-      parse_value
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.eval" class="md-nav__link">
-    <span class="md-ellipsis">
-      eval
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.reset_context" class="md-nav__link">
-    <span class="md-ellipsis">
-      reset_context
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.has_context" class="md-nav__link">
-    <span class="md-ellipsis">
-      has_context
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.update_context" class="md-nav__link">
-    <span class="md-ellipsis">
-      update_context
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.__getitem__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __getitem__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.__setitem__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __setitem__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.Workflow.__contains__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __contains__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1604,21 +1622,21 @@
   
 
 
-  <h1>Optimization workflows</h1>
+  <h1>Optimization Plans</h1>
 
 <div class="doc doc-object doc-module">
 
 
 
-<h2 id="ropt.workflow" class="doc doc-heading">
-            <code>ropt.workflow</code>
+<h2 id="ropt.plan" class="doc doc-heading">
+            <code>ropt.plan</code>
 
 
 </h2>
 
     <div class="doc doc-contents first">
 
-      <p>Code to run optimization workflows.</p>
+      <p>Code to run optimization plans.</p>
 
 
 
@@ -1635,276 +1653,7 @@
 
 
 
-<h3 id="ropt.workflow.BasicOptimizationWorkflow" class="doc doc-heading">
-            <code>BasicOptimizationWorkflow</code>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-
-      <p>Runner class for basic workflows.</p>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.workflow.BasicOptimizationWorkflow.abort_optimization" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">abort_optimization</span><span class="p">()</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
-  </span>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-      <p>Abort the current optimization run.</p>
-<p>This method can be called from within callbacks to interrupt the ongoing
-optimization plan. The exact point at which the optimization is aborted
-depends on the step in the plan that is executing at that point. For
-example, within a running optimizer, the process will be interrupted
-after completing the current function evaluation.</p>
-
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.workflow.ContextUpdate" class="doc doc-heading">
-            <code>ContextUpdate</code>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
-  </span>
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-
-      <p>Base class for data objects used for updating context objects.</p>
-<p>This class is used as a base for classes that store data produced by
-workflow steps und used to update context objects.</p>
-
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.workflow.ContextUpdate.step_name">step_name</span></code></td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[str]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional name of the step generating the data object</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.workflow.ContextUpdateDict" class="doc doc-heading">
-            <code>ContextUpdateDict</code>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
-  </span>
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.workflow._update.ContextUpdate" href="#ropt.workflow.ContextUpdate">ContextUpdate</a></code></p>
-
-
-      <p>Context update data class used to represent dictionary data.</p>
-
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.workflow.ContextUpdateDict.data">data</span></code></td>
-            <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Generic data represented by a dictionary.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.workflow.ContextUpdateEvent" class="doc doc-heading">
-            <code>ContextUpdateEvent</code>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
-  </span>
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.workflow._update.ContextUpdate" href="#ropt.workflow.ContextUpdate">ContextUpdate</a></code></p>
-
-
-      <p>Context update data class used for updates after events.</p>
-<p>In steps that run optimizations or evaluations of ensembles, at several
-steps context objects may be updated.</p>
-
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.workflow.ContextUpdateEvent.type">type</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Type of the event</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.workflow.OptimizerContext" class="doc doc-heading">
+<h3 id="ropt.plan.OptimizerContext" class="doc doc-heading">
             <code>OptimizerContext</code>
 
 
@@ -1914,7 +1663,7 @@ steps context objects may be updated.</p>
     <div class="doc doc-contents ">
 
 
-      <p>Store the context in which a workflow runs.</p>
+      <p>Store the context in which an optimizer runs.</p>
 
 
 
@@ -1932,7 +1681,7 @@ steps context objects may be updated.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.workflow.OptimizerContext.__init__" class="doc doc-heading">
+<h4 id="ropt.plan.OptimizerContext.__init__" class="doc doc-heading">
             <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">evaluator</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
@@ -1940,7 +1689,7 @@ steps context objects may be updated.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Initialize the workflow context.</p>
+      <p>Initialize the optimiation context.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2001,8 +1750,8 @@ steps context objects may be updated.</p>
 
 
 
-<h3 id="ropt.workflow.Workflow" class="doc doc-heading">
-            <code>Workflow</code>
+<h3 id="ropt.plan.Plan" class="doc doc-heading">
+            <code>Plan</code>
 
 
 </h3>
@@ -2011,7 +1760,7 @@ steps context objects may be updated.</p>
     <div class="doc doc-contents ">
 
 
-      <p>The workflow object.</p>
+      <p>The plan object.</p>
 
 
 
@@ -2028,7 +1777,7 @@ steps context objects may be updated.</p>
 
 
 
-<h4 id="ropt.workflow.Workflow.plugin_manager" class="doc doc-heading">
+<h4 id="ropt.plan.Plan.plugin_manager" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">plugin_manager</span><span class="p">:</span> <span class="n">PluginManager</span></code>
 
   <span class="doc doc-labels">
@@ -2040,7 +1789,7 @@ steps context objects may be updated.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Return the plugin manager used by the workflow.</p>
+      <p>Return the plugin manager used by the plan.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2072,7 +1821,7 @@ steps context objects may be updated.</p>
 
 
 
-<h4 id="ropt.workflow.Workflow.optimizer_context" class="doc doc-heading">
+<h4 id="ropt.plan.Plan.optimizer_context" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">optimizer_context</span><span class="p">:</span> <span class="n">OptimizerContext</span></code>
 
   <span class="doc doc-labels">
@@ -2084,7 +1833,7 @@ steps context objects may be updated.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Return the optimizer context of the workflow.</p>
+      <p>Return the optimizer context of the plan.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2098,11 +1847,11 @@ steps context objects may be updated.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.workflow._workflow.OptimizerContext" href="#ropt.workflow.OptimizerContext">OptimizerContext</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plan._plan.OptimizerContext" href="#ropt.plan.OptimizerContext">OptimizerContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The optimizer context object used by the workflow.</p>
+                <p>The optimizer context object used by the plan.</p>
               </div>
             </td>
           </tr>
@@ -2117,15 +1866,15 @@ steps context objects may be updated.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.workflow.Workflow.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<h4 id="ropt.plan.Plan.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">optimizer_context</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
 
     <div class="doc doc-contents ">
 
-      <p>Initialize a workflow object.</p>
+      <p>Initialize a plan object.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2142,7 +1891,7 @@ steps context objects may be updated.</p>
           <tr class="doc-section-item">
             <td><code>config</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.workflow.WorkflowConfig" href="../workflow_config/#ropt.config.workflow.WorkflowConfig">WorkflowConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.plan.PlanConfig" href="../plan_config/#ropt.config.plan.PlanConfig">PlanConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2154,13 +1903,13 @@ steps context objects may be updated.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>context</code></td>
+            <td><code>optimizer_context</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.workflow._workflow.OptimizerContext" href="#ropt.workflow.OptimizerContext">OptimizerContext</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plan._plan.OptimizerContext" href="#ropt.plan.OptimizerContext">OptimizerContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Context in which the workflow executes</p>
+                <p>Context in which the plan executes</p>
               </div>
             </td>
             <td>
@@ -2191,7 +1940,7 @@ steps context objects may be updated.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.workflow.Workflow.run" class="doc doc-heading">
+<h4 id="ropt.plan.Plan.run" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">run</span><span class="p">()</span></code>
 
 </h4>
@@ -2199,7 +1948,7 @@ steps context objects may be updated.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Run the workflow.</p>
+      <p>Run the plan.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2231,7 +1980,7 @@ steps context objects may be updated.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.workflow.Workflow.create_steps" class="doc doc-heading">
+<h4 id="ropt.plan.Plan.create_steps" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">create_steps</span><span class="p">(</span><span class="n">step_configs</span><span class="p">)</span></code>
 
 </h4>
@@ -2256,7 +2005,7 @@ steps context objects may be updated.</p>
           <tr class="doc-section-item">
             <td><code>step_configs</code></td>
             <td>
-                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.config.workflow.StepConfig" href="../workflow_config/#ropt.config.workflow.StepConfig">StepConfig</a>]</code>
+                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.config.plan.StepConfig" href="../plan_config/#ropt.config.plan.StepConfig">StepConfig</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2277,7 +2026,7 @@ steps context objects may be updated.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.workflow.Workflow.run_steps" class="doc doc-heading">
+<h4 id="ropt.plan.Plan.run_steps" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">run_steps</span><span class="p">(</span><span class="n">steps</span><span class="p">)</span></code>
 
 </h4>
@@ -2302,7 +2051,7 @@ steps context objects may be updated.</p>
           <tr class="doc-section-item">
             <td><code>steps</code></td>
             <td>
-                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.workflow.base.WorkflowStep" href="../workflow_plugins/#ropt.plugins.workflow.base.WorkflowStep">WorkflowStep</a>]</code>
+                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2346,7 +2095,7 @@ steps context objects may be updated.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.workflow.Workflow.parse_value" class="doc doc-heading">
+<h4 id="ropt.plan.Plan.parse_value" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">parse_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></code>
 
 </h4>
@@ -2420,7 +2169,53 @@ into the string.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.workflow.Workflow.eval" class="doc doc-heading">
+<h4 id="ropt.plan.Plan.spawn" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">spawn</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Spawn a child plan.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.plan.PlanConfig" href="../plan_config/#ropt.config.plan.PlanConfig">PlanConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration of the new plan.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plan.Plan.eval" class="doc doc-heading">
             <code class="highlight language-python"><span class="nb">eval</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></code>
 
 </h4>
@@ -2435,7 +2230,7 @@ into the string.</p>
 <li>If the value is a string enclosed in a <code>${{ }}</code> pair the contents are
   evaluated recursively.</li>
 <li>If value is a string that starts with <code>$</code> and is an identifier it is
-  assumed to be a workflow variable and its value is returned. The
+  assumed to be a plan variable and its value is returned. The
   resulting value can have any type.</li>
 <li>Otherwise the string is evaluated and the result returned. The type of
   the result is restricted to numerical values, lists and numpy array.</li>
@@ -2500,7 +2295,7 @@ into the string.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.workflow.Workflow.reset_context" class="doc doc-heading">
+<h4 id="ropt.plan.Plan.reset_context" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">reset_context</span><span class="p">(</span><span class="n">obj_id</span><span class="p">)</span></code>
 
 </h4>
@@ -2546,7 +2341,7 @@ into the string.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.workflow.Workflow.has_context" class="doc doc-heading">
+<h4 id="ropt.plan.Plan.has_context" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">has_context</span><span class="p">(</span><span class="n">obj_id</span><span class="p">)</span></code>
 
 </h4>
@@ -2615,7 +2410,7 @@ into the string.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.workflow.Workflow.update_context" class="doc doc-heading">
+<h4 id="ropt.plan.Plan.update_context" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">update_context</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></code>
 
 </h4>
@@ -2675,7 +2470,7 @@ into the string.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.workflow.Workflow.__getitem__" class="doc doc-heading">
+<h4 id="ropt.plan.Plan.__getitem__" class="doc doc-heading">
             <code class="highlight language-python"><span class="fm">__getitem__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></code>
 
 </h4>
@@ -2744,7 +2539,7 @@ into the string.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.workflow.Workflow.__setitem__" class="doc doc-heading">
+<h4 id="ropt.plan.Plan.__setitem__" class="doc doc-heading">
             <code class="highlight language-python"><span class="fm">__setitem__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></code>
 
 </h4>
@@ -2804,7 +2599,7 @@ into the string.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.workflow.Workflow.__contains__" class="doc doc-heading">
+<h4 id="ropt.plan.Plan.__contains__" class="doc doc-heading">
             <code class="highlight language-python"><span class="fm">__contains__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></code>
 
 </h4>
@@ -2869,6 +2664,273 @@ into the string.</p>
     </div>
 
 </div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.plan.BasicOptimizationPlan" class="doc doc-heading">
+            <code>BasicOptimizationPlan</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+      <p>Runner class for basic optimization plans.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plan.BasicOptimizationPlan.abort_optimization" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">abort_optimization</span><span class="p">()</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Abort the current optimization run.</p>
+<p>This method can be called from within callbacks to interrupt the ongoing
+optimization plan. The exact point at which the optimization is aborted
+depends on the step that is executing at that point. For example, within
+a running optimizer, the process will be interrupted after completing
+the current function evaluation.</p>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.plan.ContextUpdate" class="doc doc-heading">
+            <code>ContextUpdate</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+      <p>Base class for data objects used for updating context objects.</p>
+<p>This class is used as a base for classes that store data produced by
+optimization plan steps und used to update context objects.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plan.ContextUpdate.step_name">step_name</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional name of the step generating the data object</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.plan.ContextUpdateDict" class="doc doc-heading">
+            <code>ContextUpdateDict</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plan._update.ContextUpdate" href="#ropt.plan.ContextUpdate">ContextUpdate</a></code></p>
+
+
+      <p>Context update data class used to represent dictionary data.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plan.ContextUpdateDict.data">data</span></code></td>
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Generic data represented by a dictionary.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.plan.ContextUpdateResults" class="doc doc-heading">
+            <code>ContextUpdateResults</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plan._update.ContextUpdate" href="#ropt.plan.ContextUpdate">ContextUpdate</a></code></p>
+
+
+      <p>Context update data class used for updating with new results.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plan.ContextUpdateResults.results">results</span></code></td>
+            <td>
+                  <code><span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The new results</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
 
 
 
