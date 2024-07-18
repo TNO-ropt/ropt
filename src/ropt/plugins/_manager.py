@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING, Any, Dict, Final, Literal
 from ropt.exceptions import ConfigError
 
 from .function_transform.base import FunctionTransformPlugin
-from .optimization_steps.base import OptimizationStepsPlugin
 from .optimizer.base import OptimizerPlugin
 from .realization_filter.base import RealizationFilterPlugin
 from .sampler.base import SamplerPlugin
@@ -27,7 +26,6 @@ else:
 _PLUGIN_TYPES: Final = {
     "function_transform": FunctionTransformPlugin,
     "optimizer": OptimizerPlugin,
-    "optimization_step": OptimizationStepsPlugin,
     "sampler": SamplerPlugin,
     "realization_filter": RealizationFilterPlugin,
     "workflow": WorkflowPlugin,
@@ -38,7 +36,6 @@ PluginType = Literal[
     "sampler",
     "realization_filter",
     "function_transform",
-    "optimization_step",
     "workflow",
 ]
 """ Plugin Types Supported by `ropt`"""
@@ -77,7 +74,6 @@ class PluginManager:
             "sampler": {},
             "realization_filter": {},
             "function_transform": {},
-            "optimization_step": {},
             "workflow": {},
         }
 

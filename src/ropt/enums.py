@@ -91,11 +91,11 @@ class PerturbationType(IntEnum):
 class EventType(IntEnum):
     """Enumerates the events emitted during optimization.
 
-    The optimizer emits events during the execution of the optimization plan,
-    and callbacks can be connected to these events . When triggered by an event,
-    the callbacks receive an `OptimizationEvent` object. This object contains at
-    least the type of the event (a value of this enumeration) and the current
-    configuration of the step in the plan that is executing. Additionally,
+    The optimizer emits events during the execution of the optimization
+    workflow, and callbacks can be connected to these events . When triggered by
+    an event, the callbacks receive an `OptimizationEvent` object. This object
+    contains at least the type of the event (a value of this enumeration) and
+    the current configuration of the step that is executing. Additionally,
     depending on the event type, a tuple of result objects or an exit code may
     be present. Refer to the documentation of the individual event types for
     details.

@@ -47,9 +47,6 @@ default = "ropt.plugins.realization_filter.default:DefaultRealizationFilterPlugi
 [project.entry-points."ropt.plugins.function_transform"]
 default = "ropt.plugins.function_transform.default:DefaultFunctionTransformPlugin"
 
-[project.entry-points."ropt.plugins.optimization_step"]
-default = "ropt.plugins.optimization_steps.default:DefaultOptimizationStepsPlugin"
-
 [project.entry-points."ropt.plugins.workflow"]
 default = "ropt.plugins.workflow.default:DefaultWorkflowPlugin"
 

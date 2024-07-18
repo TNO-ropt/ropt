@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Optional, Tuple
 
 import numpy as np
 
 from ropt.enums import ConstraintType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
-from ropt.optimization import OptimizerStep as PlanOptimizerStep
-from ropt.plugins.workflow.base import OptimizerStep
 from ropt.results import (
     BoundConstraints,
     FunctionResults,
@@ -22,6 +20,7 @@ if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
     from ropt.evaluator import EnsembleEvaluator
     from ropt.plugins import PluginManager
+    from ropt.plugins.workflow.base import OptimizerStep
     from ropt.results import Functions, Gradients, Results
 
 
@@ -29,7 +28,7 @@ class Optimizer:
     def __init__(
         self,
         *,
-        optimizer_step: Union[PlanOptimizerStep, OptimizerStep],
+        optimizer_step: OptimizerStep,
         enopt_config: EnOptConfig,
         ensemble_evaluator: EnsembleEvaluator,
         plugin_manager: PluginManager,
@@ -78,22 +77,12 @@ class Optimizer:
 
         # Run any nested steps, when this improves the objective, this may
         # change the fixed variables and the current optimal result:
-        if isinstance(self._optimizer_step, PlanOptimizerStep):
-            nested_results, aborted = self._optimizer_step.run_nested_plan(variables)
-            if nested_results is not None:
-                if aborted:
-                    raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
-                variables = nested_results.evaluations.variables.copy()
-                self._fixed_variables = variables.copy()
-        if isinstance(self._optimizer_step, OptimizerStep):
-            nested_results, aborted = self._optimizer_step.run_nested_workflow(
-                variables
-            )
-            if nested_results is not None:
-                if aborted:
-                    raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
-                variables = nested_results.evaluations.variables.copy()
-                self._fixed_variables = variables.copy()
+        nested_results, aborted = self._optimizer_step.run_nested_workflow(variables)
+        if nested_results is not None:
+            if aborted:
+                raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
+            variables = nested_results.evaluations.variables.copy()
+            self._fixed_variables = variables.copy()
 
         results = self._run_evaluations(
             variables,

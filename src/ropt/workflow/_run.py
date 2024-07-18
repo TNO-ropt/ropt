@@ -183,8 +183,8 @@ class BasicOptimizationWorkflow:
         """Abort the current optimization run.
 
         This method can be called from within callbacks to interrupt the ongoing
-        optimization plan. The exact point at which the optimization is aborted
-        depends on the step in the plan that is executing at that point. For
+        optimization workflow. The exact point at which the optimization is
+        aborted depends on the step that is executing at that point. For
         example, within a running optimizer, the process will be interrupted
         after completing the current function evaluation.
         """
