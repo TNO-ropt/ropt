@@ -240,7 +240,7 @@ class ConcurrentEvaluator(ABC):
 
         return active
 
-    def _update_cache(  # noqa: PLR0913
+    def _update_cache(
         self,
         variables: NDArray[np.float64],
         context: EvaluatorContext,
@@ -302,7 +302,7 @@ class _Cache:
         # Generate unique ID's:
         self._counter = count()
 
-    def add_simulation_results(  # noqa: PLR0913
+    def add_simulation_results(
         self,
         job_idx: int,
         real_id: int,

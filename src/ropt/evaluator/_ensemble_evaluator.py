@@ -44,7 +44,7 @@ if TYPE_CHECKING:
 
 
 class EnsembleEvaluator:
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         config: EnOptConfig,
         evaluator: Evaluator,
@@ -380,7 +380,7 @@ class EnsembleEvaluator:
 
         return function_results, gradient_results
 
-    def _compute_functions(  # noqa: PLR0913
+    def _compute_functions(
         self,
         objectives: NDArray[np.float64],
         constraints: Optional[NDArray[np.float64]],
