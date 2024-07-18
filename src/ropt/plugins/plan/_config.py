@@ -8,12 +8,12 @@ from typing import TYPE_CHECKING, Any, Dict, Union
 from pydantic import BaseModel, ConfigDict
 
 from ropt.config.enopt import EnOptConfig
-from ropt.plugins.workflow.base import ContextObj
-from ropt.workflow import ContextUpdate, ContextUpdateDict
+from ropt.plan import ContextUpdate, ContextUpdateDict
+from ropt.plugins.plan.base import ContextObj
 
 if TYPE_CHECKING:
-    from ropt.config.workflow import ContextConfig
-    from ropt.workflow import Workflow
+    from ropt.config.plan import ContextConfig
+    from ropt.plan import Plan
 
 
 class DefaultConfigWith(BaseModel):
@@ -37,8 +37,9 @@ class DefaultConfigContext(ContextObj):
     The `config` object is used store and modify configuration objects for
     optimizer and evaluation steps. When initializing the object, the `with`
     field is parsed as an [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
-    Optimization and evaluation steps can refer to a workflow variable of the
-    same name as the `config` ID to retrieve the parsed configuration object.
+    Optimization and evaluation steps can refer to an optimization plan variable
+    of the same name as the `config` ID to retrieve the parsed configuration
+    object.
 
     The `config` object can be updated with a dictionary of values to construct
     a new `EnOptConfig` object with the updated values. The original value is
@@ -46,8 +47,8 @@ class DefaultConfigContext(ContextObj):
     object.
     """
 
-    def __init__(self, config: ContextConfig, workflow: Workflow) -> None:
-        super().__init__(config, workflow)
+    def __init__(self, config: ContextConfig, plan: Plan) -> None:
+        super().__init__(config, plan)
         if "config" in config.with_:
             with_ = DefaultConfigWith.model_validate(config.with_)
             enopt_config = EnOptConfig.model_validate(with_.config)

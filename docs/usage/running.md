@@ -14,7 +14,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.workflow import BasicOptimizationWorkflow
+from ropt.plan import BasicOptimizationPlan
 
 
 def rosenbrock(
@@ -32,9 +32,9 @@ CONFIG = {                                                            # (4)!
     "gradient": {"perturbation_magnitudes": 1e-6}                     # (5)!
 }
 
-workflow = BasicOptimizationWorkflow(CONFIG, rosenbrock)                          # (6)!
-workflow.run()                                                        # (7)!
-optimum = workflow.results                                            # (8)
+plan = BasicOptimizationPlan(CONFIG, rosenbrock)                      # (6)!
+plan.run()                                                            # (7)!
+optimum = plan.results                                                # (8)
 
 print(
     optimum.evaluations.variables,
@@ -55,7 +55,7 @@ print(
 4. Create an optimizer configuration with default values except for initial
    values and perturbation magnitudes.
 5. Set perturbation magnitudes to a small value for accurate gradient estimation.
-6. Make a basic workflow that runs a single optimization.
+6. Make a basic plan that runs a single optimization.
 7. Run the optimization.
 8. Get the results.
 

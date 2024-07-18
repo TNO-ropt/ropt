@@ -7,15 +7,15 @@ from typing import TYPE_CHECKING, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from ropt.plugins.workflow.base import ContextObj
-from ropt.workflow import ContextUpdate, ContextUpdateResults
+from ropt.plan import ContextUpdate, ContextUpdateResults
+from ropt.plugins.plan.base import ContextObj
 
 from ._utils import _get_last_result, _update_optimal_result
 
 if TYPE_CHECKING:
-    from ropt.config.workflow import ContextConfig
+    from ropt.config.plan import ContextConfig
+    from ropt.plan import Plan
     from ropt.results import FunctionResults
-    from ropt.workflow import Workflow
 
 
 class DefaultTrackerWith(BaseModel):
@@ -42,14 +42,14 @@ class DefaultTrackerWith(BaseModel):
 class DefaultTrackerContext(ContextObj):
     """The default results context object."""
 
-    def __init__(self, config: ContextConfig, workflow: Workflow) -> None:
+    def __init__(self, config: ContextConfig, plan: Plan) -> None:
         """Initialize a default tracker context object.
 
         Args:
-            config:   The configuration of the step
-            workflow: The workflow
+            config: The configuration of the step
+            plan:   The plan that runs this step
         """
-        super().__init__(config, workflow)
+        super().__init__(config, plan)
         self._with = (
             DefaultTrackerWith()
             if config.with_ is None

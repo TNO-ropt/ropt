@@ -26,13 +26,13 @@ from parsl.app.app import bash_app
 from parsl.providers.base import ExecutionProvider
 from tabulate import tabulate
 
-from ropt.config.workflow import WorkflowConfig
+from ropt.config.plan import PlanConfig
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.evaluator import EvaluatorContext
 from ropt.evaluator.parsl import ParslEvaluator, State
 from ropt.events import OptimizationEvent
 from ropt.exceptions import ConfigError
-from ropt.workflow import OptimizerContext, Workflow
+from ropt.plan import OptimizerContext, Plan
 
 from ._config import ScriptEvaluatorConfig, ScriptOptimizerConfig
 from ._task import ScriptTask
@@ -54,12 +54,12 @@ def run_script(
 
 
 class ScriptOptimizer:
-    """Optimizer class for running script bases optimization workflows."""
+    """Optimizer class for running script-based optimization plans."""
 
     def __init__(
         self,
         config: Union[Dict[str, Any], ScriptOptimizerConfig],
-        workflow: Dict[str, Any],
+        plan: Dict[str, Any],
         tasks: Dict[str, str],
         *,
         seed: Optional[int] = None,
@@ -72,17 +72,17 @@ class ScriptOptimizer:
         using the `work_dir` parameter of the `run()` method.
 
         Args:
-            config:   Script optimizer configuration
-            workflow: The optimization workflow to run
-            tasks:    A dictionary mapping task names to strings containing bash code
-            seed:     Optional seed used by the optimization code
+            config: Script optimizer configuration
+            plan:   The optimization plan to run
+            tasks:  A dictionary mapping task names to strings containing bash code
+            seed:   Optional seed used by the optimization code
         """
         self._config = (
             config
             if isinstance(config, ScriptOptimizerConfig)
             else ScriptOptimizerConfig.model_validate(config)
         )
-        self._workflow_config = workflow
+        self._plan_config = plan
         self._tasks = tasks
         self._seed = seed
         self._status: Dict[int, Any] = {}
@@ -275,7 +275,7 @@ class ScriptOptimizer:
         elif event.exit_code == OptimizerExitCode.MAX_FUNCTIONS_REACHED:
             msg = "Maximum number of functions reached: optimization stopped."
         elif event.exit_code == OptimizerExitCode.USER_ABORT:
-            msg = "Optimization workflow aborted by the user."
+            msg = "Optimization plan aborted by the user."
         elif event.exit_code == OptimizerExitCode.OPTIMIZER_STEP_FINISHED:
             msg = "Optimization finished normally."
         if msg:
@@ -287,7 +287,7 @@ class ScriptOptimizer:
         self,
         provider: Optional[ExecutionProvider] = None,
         evaluator_config: Optional[Union[Dict[str, Any], ScriptEvaluatorConfig]] = None,
-    ) -> Workflow:
+    ) -> Plan:
         """Run the optimization."""
         cwd = Path.cwd()
         Path.mkdir(self._config.work_dir, parents=True, exist_ok=True)
@@ -311,13 +311,13 @@ class ScriptOptimizer:
                 max_submit=evaluator_config.max_submit,
             )
             context = OptimizerContext(evaluator=evaluator, seed=self._seed)
-            config = WorkflowConfig.model_validate(self._workflow_config)
-            workflow = Workflow(config, context)
-            workflow.optimizer_context.events.add_observer(
+            config = PlanConfig.model_validate(self._plan_config)
+            plan = Plan(config, context)
+            plan.optimizer_context.events.add_observer(
                 EventType.FINISHED_OPTIMIZER_STEP, self._log_exit_code
             )
-            workflow.run()
+            plan.run()
         finally:
             os.chdir(cwd)
 
-        return workflow
+        return plan

@@ -1,7 +1,7 @@
-::: ropt.config.workflow
+::: ropt.config.plan
     options:
         members:
-            - WorkflowConfig
+            - PlanConfig
             - ContextConfig
             - StepConfig
         group_by_category: false

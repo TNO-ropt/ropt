@@ -6,13 +6,13 @@ from typing import TYPE_CHECKING, Any, Dict
 
 from pydantic import BaseModel, ConfigDict
 
-from ropt.exceptions import WorkflowError
-from ropt.plugins.workflow.base import WorkflowStep
-from ropt.workflow import ContextUpdateDict
+from ropt.exceptions import PlanError
+from ropt.plan import ContextUpdateDict
+from ropt.plugins.plan.base import PlanStep
 
 if TYPE_CHECKING:
-    from ropt.config.workflow import StepConfig
-    from ropt.workflow import Workflow
+    from ropt.config.plan import StepConfig
+    from ropt.plan import Plan
 
 
 class DefaultUpdateStepWith(BaseModel):
@@ -27,17 +27,17 @@ class DefaultUpdateStepWith(BaseModel):
     )
 
 
-class DefaultUpdateStep(WorkflowStep):
+class DefaultUpdateStep(PlanStep):
     """The default update context step."""
 
-    def __init__(self, config: StepConfig, workflow: Workflow) -> None:
+    def __init__(self, config: StepConfig, plan: Plan) -> None:
         """Initialize a default update step.
 
         Args:
-            config:   The configuration of the step
-            workflow: The workflow that runs this step
+            config: The configuration of the step
+            plan:   The plan that runs this step
         """
-        super().__init__(config, workflow)
+        super().__init__(config, plan)
 
         self._with = DefaultUpdateStepWith.model_validate(config.with_)
 
@@ -47,10 +47,10 @@ class DefaultUpdateStep(WorkflowStep):
         Returns:
             True if a user abort occurred, always `False`.
         """
-        if not self.workflow.has_context(self._with.context):
+        if not self.plan.has_context(self._with.context):
             msg = f"Env object `{self._with.context}` does not exist."
-            raise WorkflowError(msg, step_name=self.step_config.name)
-        self.workflow.update_context(
+            raise PlanError(msg, step_name=self.step_config.name)
+        self.plan.update_context(
             self._with.context,
             ContextUpdateDict(step_name=self.step_config.name, data=self._with.value),
         )

@@ -70,9 +70,9 @@ class ConcurrentEvaluator(ABC):
 
     The class implements an optional caching mechanism to prevent repeated
     evaluation of functions. When enabled, all evaluation results are cached in
-    memory and reused when requested. This is in particular useful in workflows
-    with multiple or nested optimizations where often restarts occur from points
-    that already have been evaluated before.
+    memory and reused when requested. This is in particular useful in
+    optimization plans with multiple or nested optimizations where often
+    restarts occur from points that already have been evaluated before.
     """
 
     def __init__(

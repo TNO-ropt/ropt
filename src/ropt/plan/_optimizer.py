@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
     from ropt.evaluator import EnsembleEvaluator
     from ropt.plugins import PluginManager
-    from ropt.plugins.workflow.base import OptimizerStep
+    from ropt.plugins.plan.base import OptimizerStep
     from ropt.results import Functions, Gradients, Results
 
 
@@ -77,7 +77,7 @@ class Optimizer:
 
         # Run any nested steps, when this improves the objective, this may
         # change the fixed variables and the current optimal result:
-        nested_results, aborted = self._optimizer_step.run_nested_workflow(variables)
+        nested_results, aborted = self._optimizer_step.run_nested_plan(variables)
         if nested_results is not None:
             if aborted:
                 raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)

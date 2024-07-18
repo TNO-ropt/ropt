@@ -14,7 +14,7 @@ class ContextUpdate:
     """Base class for data objects used for updating context objects.
 
     This class is used as a base for classes that store data produced by
-    workflow steps und used to update context objects.
+    optimization plan steps und used to update context objects.
 
     Attributes:
         step_name: Optional name of the step generating the data object

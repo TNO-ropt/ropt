@@ -126,8 +126,8 @@ class Optimizer(ABC):
         method to return `True`. This enables handling cases where all function
         evaluations in an ensemble fail. By setting the
         [`realization_min_success`][ropt.config.enopt.RealizationsConfig]
-        configuration parameter to zero, the ensemble optimization workflow can
-        then be allowed to return a `NaN` value instead of raising an error.
+        configuration parameter to zero, the ensemble optimization plan can then
+        be allowed to return a `NaN` value instead of raising an error.
 
         Returns:
             `True` if `NaN` is allowed.
@@ -139,8 +139,8 @@ class OptimizerPlugin(Plugin):
 
     Optimizers are implemented through optimizer plugins that must derive from
     this base class. Plugins can be built-in, installed via a plugin mechanism,
-    or loaded dynamically. During an optimization workflow, the required
-    optimizer plugin will be located via the
+    or loaded dynamically. During execution of an optimization plan, the
+    required optimizer plugin will be located via the
     [`PluginManager`][ropt.plugins.PluginManager] and used to create
     [`Optimizer`][ropt.plugins.optimizer.base.Optimizer] objects via its
     `create` function.

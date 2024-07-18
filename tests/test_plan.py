@@ -8,12 +8,12 @@ import numpy as np
 import pytest
 from pydantic import ValidationError
 
-from ropt.config.workflow import WorkflowConfig
+from ropt.config.plan import PlanConfig
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.events import OptimizationEvent
-from ropt.exceptions import WorkflowError
+from ropt.exceptions import PlanError
+from ropt.plan import BasicOptimizationPlan, OptimizerContext, Plan
 from ropt.results import FunctionResults, Results
-from ropt.workflow import BasicOptimizationWorkflow, OptimizerContext, Workflow
 
 if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
@@ -41,13 +41,13 @@ def enopt_config_fixture() -> Dict[str, Any]:
 
 
 def test_run_basic(enopt_config: Any, evaluator: Any) -> None:
-    variables = BasicOptimizationWorkflow(enopt_config, evaluator()).run().variables
+    variables = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 def test_invalid_context_ids() -> None:
-    workflow_config: Dict[str, Any] = {
+    plan_config: Dict[str, Any] = {
         "context": [
             {
                 "id": "1optimal",
@@ -57,11 +57,11 @@ def test_invalid_context_ids() -> None:
         "steps": [],
     }
     with pytest.raises(ValidationError, match=".*Invalid ID: 1optimal.*"):
-        WorkflowConfig.model_validate(workflow_config)
+        PlanConfig.model_validate(plan_config)
 
 
 def test_duplicate_context_ids() -> None:
-    workflow_config: Dict[str, Any] = {
+    plan_config: Dict[str, Any] = {
         "context": [
             {
                 "id": "optimal",
@@ -77,11 +77,11 @@ def test_duplicate_context_ids() -> None:
     with pytest.raises(
         ValidationError, match=".*Duplicate Context ID\\(s\\): optimal.*"
     ):
-        WorkflowConfig.model_validate(workflow_config)
+        PlanConfig.model_validate(plan_config)
 
 
 def test_parse_value(enopt_config: Any, evaluator: Any) -> None:
-    workflow_config: Dict[str, Any] = {
+    plan_config: Dict[str, Any] = {
         "context": [
             {
                 "id": "config",
@@ -103,56 +103,56 @@ def test_parse_value(enopt_config: Any, evaluator: Any) -> None:
             },
         ],
     }
-    parsed_config = WorkflowConfig.model_validate(workflow_config)
+    parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(parsed_config, context)
-    assert workflow.parse_value("${{ 1 }}") == 1
-    assert workflow.parse_value("${{ -1 }}") == -1
-    assert not workflow.parse_value("${{ not 1 }}")
-    assert not workflow.parse_value("${{ True and False }}")
-    assert workflow.parse_value("${{ True or False }}")
-    assert workflow.parse_value("${{ 1 + 1 }}") == 2
-    assert workflow.parse_value("${{ 2**3 }}") == 8
-    assert workflow.parse_value("${{ 3 % 2 }}") == 1
-    assert workflow.parse_value("${{ 3 // 2 }}") == 1
-    assert workflow.parse_value("${{ 2.5 + (2 + 3) / 2 }}") == 5
-    assert workflow.parse_value("${{ 1 < 2 }}")
-    assert workflow.parse_value("${{ 1 < 2 < 3 }}")
-    assert not workflow.parse_value("${{ 1 < 2 > 3 }}")
+    plan = Plan(parsed_config, context)
+    assert plan.parse_value("${{ 1 }}") == 1
+    assert plan.parse_value("${{ -1 }}") == -1
+    assert not plan.parse_value("${{ not 1 }}")
+    assert not plan.parse_value("${{ True and False }}")
+    assert plan.parse_value("${{ True or False }}")
+    assert plan.parse_value("${{ 1 + 1 }}") == 2
+    assert plan.parse_value("${{ 2**3 }}") == 8
+    assert plan.parse_value("${{ 3 % 2 }}") == 1
+    assert plan.parse_value("${{ 3 // 2 }}") == 1
+    assert plan.parse_value("${{ 2.5 + (2 + 3) / 2 }}") == 5
+    assert plan.parse_value("${{ 1 < 2 }}")
+    assert plan.parse_value("${{ 1 < 2 < 3 }}")
+    assert not plan.parse_value("${{ 1 < 2 > 3 }}")
 
-    assert workflow.parse_value("$results") is None
-    assert workflow.parse_value("${{ [1, 2] }}") == [1, 2]
-    assert workflow.parse_value("${{ [$results, 2] }}") == [None, 2]
+    assert plan.parse_value("$results") is None
+    assert plan.parse_value("${{ [1, 2] }}") == [1, 2]
+    assert plan.parse_value("${{ [$results, 2] }}") == [None, 2]
 
-    assert workflow.parse_value("a ${{ 1 }} b") == "a 1 b"
-    assert workflow.parse_value("a ${{ 1 + 1 }} b") == "a 2 b"
-    assert workflow.parse_value("a ${{ 1 + 1 }} b $results") == "a 2 b None"
-    assert workflow.parse_value("a ${{ 1 + 1 }} b $$results") == "a 2 b $results"
-
-    with pytest.raises(
-        WorkflowError,
-        match=re.escape("Syntax error in workflow expression: 1 + 1 ${{ x"),
-    ):
-        workflow.parse_value("a $results ${{ 1 + 1 ${{ x }} }} b")
+    assert plan.parse_value("a ${{ 1 }} b") == "a 1 b"
+    assert plan.parse_value("a ${{ 1 + 1 }} b") == "a 2 b"
+    assert plan.parse_value("a ${{ 1 + 1 }} b $results") == "a 2 b None"
+    assert plan.parse_value("a ${{ 1 + 1 }} b $$results") == "a 2 b $results"
 
     with pytest.raises(
-        WorkflowError, match=re.escape("Syntax error in workflow expression: 1 + * 1")
+        PlanError,
+        match=re.escape("Syntax error in expression: 1 + 1 ${{ x"),
     ):
-        workflow.parse_value("${{ 1 + * 1 }}")
+        plan.parse_value("a $results ${{ 1 + 1 ${{ x }} }} b")
 
     with pytest.raises(
-        WorkflowError,
-        match=re.escape("Unknown workflow variable: `y`"),
+        PlanError, match=re.escape("Syntax error in expression: 1 + * 1")
     ):
-        workflow.parse_value("${{ $y + 1 }}")
+        plan.parse_value("${{ 1 + * 1 }}")
 
-    workflow.run()
+    with pytest.raises(
+        PlanError,
+        match=re.escape("Unknown plan variable: `y`"),
+    ):
+        plan.parse_value("${{ $y + 1 }}")
 
-    assert isinstance(workflow.parse_value("$results"), Results)
+    plan.run()
+
+    assert isinstance(plan.parse_value("$results"), Results)
 
 
 def test_setvar(evaluator: Any) -> None:
-    workflow_config: Dict[str, Any] = {
+    plan_config: Dict[str, Any] = {
         "steps": [
             {
                 "run": "setvar",
@@ -180,18 +180,18 @@ def test_setvar(evaluator: Any) -> None:
             },
         ],
     }
-    parsed_config = WorkflowConfig.model_validate(workflow_config)
+    parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(parsed_config, context)
-    workflow.run()
-    assert workflow["x"] == 1
-    assert workflow["y"] == 1
-    assert workflow["z"] == 2
-    assert workflow["u"] == 1
+    plan = Plan(parsed_config, context)
+    plan.run()
+    assert plan["x"] == 1
+    assert plan["y"] == 1
+    assert plan["z"] == 2
+    assert plan["u"] == 1
 
 
 def test_invalid_setvar(evaluator: Any) -> None:
-    workflow_config: Dict[str, Any] = {
+    plan_config: Dict[str, Any] = {
         "steps": [
             {
                 "run": "setvar",
@@ -199,12 +199,12 @@ def test_invalid_setvar(evaluator: Any) -> None:
             },
         ],
     }
-    parsed_config = WorkflowConfig.model_validate(workflow_config)
+    parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
-    with pytest.raises(WorkflowError, match=re.escape("Invalid expression: 1")):
-        Workflow(parsed_config, context)
+    with pytest.raises(PlanError, match=re.escape("Invalid expression: 1")):
+        Plan(parsed_config, context)
 
-    workflow_config = {
+    plan_config = {
         "steps": [
             {
                 "run": "setvar",
@@ -212,14 +212,14 @@ def test_invalid_setvar(evaluator: Any) -> None:
             },
         ],
     }
-    parsed_config = WorkflowConfig.model_validate(workflow_config)
+    parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
-    with pytest.raises(WorkflowError, match=re.escape("Invalid identifier: 2a")):
-        Workflow(parsed_config, context)
+    with pytest.raises(PlanError, match=re.escape("Invalid identifier: 2a")):
+        Plan(parsed_config, context)
 
 
 def test_invalid_identifier(evaluator: Any) -> None:
-    workflow_config: Dict[str, Any] = {
+    plan_config: Dict[str, Any] = {
         "steps": [
             {"run": "setvar", "with": "x=1"},
             {
@@ -228,17 +228,15 @@ def test_invalid_identifier(evaluator: Any) -> None:
             },
         ],
     }
-    parsed_config = WorkflowConfig.model_validate(workflow_config)
+    parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(parsed_config, context)
-    with pytest.raises(
-        WorkflowError, match=re.escape("Syntax error in workflow expression: x + 1")
-    ):
-        workflow.run()
+    plan = Plan(parsed_config, context)
+    with pytest.raises(PlanError, match=re.escape("Syntax error in expression: x + 1")):
+        plan.run()
 
 
 def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
-    workflow_config = {
+    plan_config = {
         "context": [
             {
                 "id": "config",
@@ -274,19 +272,19 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
             },
         ],
     }
-    parsed_config = WorkflowConfig.model_validate(workflow_config)
+    parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(parsed_config, context)
-    workflow.run()
-    result1 = workflow["optimal1"]
-    result2 = workflow["optimal2"]
+    plan = Plan(parsed_config, context)
+    plan.run()
+    result1 = plan["optimal1"]
+    result2 = plan["optimal2"]
     assert result1 is not None
     assert np.allclose(result1.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
     assert result2 is None
 
 
 def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
-    workflow_config = {
+    plan_config = {
         "context": [
             {
                 "id": "config",
@@ -332,20 +330,20 @@ def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
             },
         ],
     }
-    parsed_config = WorkflowConfig.model_validate(workflow_config)
+    parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(parsed_config, context)
-    workflow.run()
+    plan = Plan(parsed_config, context)
+    plan.run()
 
-    result1 = workflow["optimal1"]
+    result1 = plan["optimal1"]
     assert result1 is not None
     assert np.allclose(result1.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
 
-    result2 = workflow["optimal2"]
+    result2 = plan["optimal2"]
     assert result2 is not None
     assert np.allclose(result2.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
 
-    result3 = workflow["optimal2"]
+    result3 = plan["optimal2"]
     assert result3 is not None
     assert np.allclose(result3.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -354,7 +352,7 @@ def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
 
 
 def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
-    workflow_config = {
+    plan_config = {
         "context": [
             {
                 "id": "config",
@@ -384,13 +382,13 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
             },
         ],
     }
-    parsed_config = WorkflowConfig.model_validate(workflow_config)
+    parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(parsed_config, context)
-    workflow.run()
+    plan = Plan(parsed_config, context)
+    plan.run()
 
-    assert workflow["optimal"] is None
-    saved_results = workflow["saved_results"]
+    assert plan["optimal"] is None
+    saved_results = plan["saved_results"]
     assert saved_results is not None
     assert np.allclose(saved_results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -423,7 +421,7 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
     enopt_config2["variables"]["indices"] = [1]
     enopt_config2["optimizer"] = opt_config2
 
-    workflow_config = {
+    plan_config = {
         "context": [
             {
                 "id": "enopt_config1",
@@ -485,16 +483,16 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
     }
 
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(WorkflowConfig.model_validate(workflow_config), context)
-    workflow.optimizer_context.events.add_observer(
+    plan = Plan(PlanConfig.model_validate(plan_config), context)
+    plan.optimizer_context.events.add_observer(
         EventType.FINISHED_EVALUATION, _track_evaluations
     )
-    workflow.run()
+    plan.run()
 
     assert completed_functions == 14
-    assert workflow["optimum"] is not None
+    assert plan["optimum"] is not None
     assert np.allclose(
-        workflow["optimum"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+        plan["optimum"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
 
 
@@ -514,7 +512,7 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
     enopt_config2 = deepcopy(enopt_config)
     enopt_config2["optimizer"]["max_functions"] = 3
 
-    workflow_config = {
+    plan_config = {
         "context": [
             {
                 "id": "enopt_config",
@@ -553,11 +551,11 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
     }
 
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(WorkflowConfig.model_validate(workflow_config), context)
-    workflow.optimizer_context.events.add_observer(
+    plan = Plan(PlanConfig.model_validate(plan_config), context)
+    plan.optimizer_context.events.add_observer(
         EventType.FINISHED_EVALUATION, _track_evaluations
     )
-    workflow.run()
+    plan.run()
 
     assert not np.allclose(
         completed[1].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
@@ -572,7 +570,7 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["optimizer"]["speculative"] = True
     enopt_config["optimizer"]["max_functions"] = 4
 
-    workflow_config = {
+    plan_config = {
         "context": [
             {
                 "id": "enopt_config",
@@ -595,13 +593,13 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
         ],
     }
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(WorkflowConfig.model_validate(workflow_config), context)
-    workflow.run()
-    assert workflow["optimum"] is not None
-    variables = workflow["optimum"].evaluations.variables.copy()
+    plan = Plan(PlanConfig.model_validate(plan_config), context)
+    plan.run()
+    assert plan["optimum"] is not None
+    variables = plan["optimum"].evaluations.variables.copy()
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
-    workflow_config["steps"] = [
+    plan_config["steps"] = [
         {
             "run": "repeat",
             "with": {
@@ -619,14 +617,14 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
         }
     ]
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(WorkflowConfig.model_validate(workflow_config), context)
-    workflow.run()
-    assert workflow["optimum"] is not None
+    plan = Plan(PlanConfig.model_validate(plan_config), context)
+    plan.run()
+    assert plan["optimum"] is not None
 
-    assert np.all(variables == workflow["optimum"].evaluations.variables)
+    assert np.all(variables == plan["optimum"].evaluations.variables)
 
     assert np.all(
-        BasicOptimizationWorkflow(enopt_config, evaluator()).repeat(1).run().variables
+        BasicOptimizationPlan(enopt_config, evaluator()).repeat(1).run().variables
         == variables
     )
 
@@ -644,7 +642,7 @@ def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["optimizer"]["speculative"] = True
     enopt_config["optimizer"]["max_functions"] = 3
 
-    workflow_config = {
+    plan_config = {
         "context": [
             {
                 "id": "enopt_config",
@@ -671,11 +669,11 @@ def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
     }
 
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(WorkflowConfig.model_validate(workflow_config), context)
-    workflow.optimizer_context.events.add_observer(
+    plan = Plan(PlanConfig.model_validate(plan_config), context)
+    plan.optimizer_context.events.add_observer(
         EventType.FINISHED_EVALUATION, _track_evaluations
     )
-    workflow.run()
+    plan.run()
 
     assert len(completed) == 6
 
@@ -684,7 +682,7 @@ def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
     assert np.all(completed[3].evaluations.variables == initial)
 
     completed = []
-    BasicOptimizationWorkflow(enopt_config, evaluator()).add_callback(
+    BasicOptimizationPlan(enopt_config, evaluator()).add_callback(
         EventType.FINISHED_EVALUATION, _track_evaluations
     ).repeat(2, restart_from="initial").run()
     assert np.all(completed[0].evaluations.variables == initial)
@@ -704,7 +702,7 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["optimizer"]["speculative"] = True
     enopt_config["optimizer"]["max_functions"] = 3
 
-    workflow_config = {
+    plan_config = {
         "context": [
             {
                 "id": "enopt_config",
@@ -737,18 +735,18 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
         ],
     }
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(WorkflowConfig.model_validate(workflow_config), context)
-    workflow.optimizer_context.events.add_observer(
+    plan = Plan(PlanConfig.model_validate(plan_config), context)
+    plan.optimizer_context.events.add_observer(
         EventType.FINISHED_EVALUATION, _track_evaluations
     )
-    workflow.run()
+    plan.run()
 
     assert np.all(
         completed[3].evaluations.variables == completed[2].evaluations.variables
     )
 
     completed = []
-    BasicOptimizationWorkflow(enopt_config, evaluator()).repeat(
+    BasicOptimizationPlan(enopt_config, evaluator()).repeat(
         2, restart_from="last"
     ).add_callback(EventType.FINISHED_EVALUATION, _track_evaluations).run()
     assert np.all(
@@ -769,7 +767,7 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["optimizer"]["speculative"] = True
     enopt_config["optimizer"]["max_functions"] = 4
 
-    workflow_config = {
+    plan_config = {
         "context": [
             {
                 "id": "enopt_config",
@@ -801,18 +799,18 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
         ],
     }
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(WorkflowConfig.model_validate(workflow_config), context)
-    workflow.optimizer_context.events.add_observer(
+    plan = Plan(PlanConfig.model_validate(plan_config), context)
+    plan.optimizer_context.events.add_observer(
         EventType.FINISHED_EVALUATION, _track_evaluations
     )
-    workflow.run()
+    plan.run()
 
     assert np.all(
         completed[2].evaluations.variables == completed[4].evaluations.variables
     )
 
     completed = []
-    BasicOptimizationWorkflow(enopt_config, evaluator()).add_callback(
+    BasicOptimizationPlan(enopt_config, evaluator()).add_callback(
         EventType.FINISHED_EVALUATION, _track_evaluations
     ).repeat(2, restart_from="optimal").run()
     assert np.all(
@@ -852,7 +850,7 @@ def test_restart_optimum_with_reset(
     enopt_config["optimizer"]["speculative"] = True
     enopt_config["optimizer"]["max_functions"] = max_functions
 
-    workflow_config = {
+    plan_config = {
         "context": [
             {
                 "id": "enopt_config",
@@ -894,11 +892,11 @@ def test_restart_optimum_with_reset(
         ],
     }
     context = OptimizerContext(evaluator=evaluator(new_functions))
-    workflow = Workflow(WorkflowConfig.model_validate(workflow_config), context)
-    workflow.optimizer_context.events.add_observer(
+    plan = Plan(PlanConfig.model_validate(plan_config), context)
+    plan.optimizer_context.events.add_observer(
         EventType.FINISHED_EVALUATION, _track_evaluations
     )
-    workflow.run()
+    plan.run()
 
     # The third evaluation is the optimum, and used to restart the second run:
     assert np.all(
@@ -912,7 +910,7 @@ def test_restart_optimum_with_reset(
     )
 
     completed = []
-    BasicOptimizationWorkflow(enopt_config, evaluator(new_functions)).add_callback(
+    BasicOptimizationPlan(enopt_config, evaluator(new_functions)).add_callback(
         EventType.FINISHED_EVALUATION, _track_evaluations
     ).repeat(3, restart_from="last_optimal").run()
 
@@ -948,7 +946,7 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
         "complex": "string ${{ 1 + 1}} $counter",
     }
 
-    workflow_config = {
+    plan_config = {
         "context": [
             {
                 "id": "config",
@@ -976,17 +974,17 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
         ],
     }
 
-    parsed_config = WorkflowConfig.model_validate(workflow_config)
+    parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(parsed_config, context)
-    workflow.optimizer_context.events.add_observer(
+    plan = Plan(parsed_config, context)
+    plan.optimizer_context.events.add_observer(
         EventType.FINISHED_EVALUATION, _track_results
     )
-    workflow.run()
+    plan.run()
     assert restarts == [0, 1]
 
     restarts = []
-    BasicOptimizationWorkflow(enopt_config, evaluator()).add_callback(
+    BasicOptimizationPlan(enopt_config, evaluator()).add_callback(
         EventType.FINISHED_EVALUATION, _track_results
     ).add_metadata(metadata).repeat(
         2, restart_from="last_optimal", counter_var="counter"
@@ -998,7 +996,7 @@ def test_update_enopt(enopt_config: Any, evaluator: Any) -> None:
     weights = enopt_config["objective_functions"]["weights"]
     enopt_config["objective_functions"]["weights"] = [1, 1]
 
-    workflow_config = {
+    plan_config = {
         "context": [
             {
                 "id": "config",
@@ -1021,17 +1019,17 @@ def test_update_enopt(enopt_config: Any, evaluator: Any) -> None:
         ],
     }
 
-    parsed_config = WorkflowConfig.model_validate(workflow_config)
+    parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(parsed_config, context)
-    workflow.run()
+    plan = Plan(parsed_config, context)
+    plan.run()
 
-    assert workflow["optimum"] is not None
+    assert plan["optimum"] is not None
     assert not np.allclose(
-        workflow["optimum"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+        plan["optimum"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
 
-    workflow_config["steps"] = [
+    plan_config["steps"] = [
         {
             "run": "update",
             "with": {
@@ -1039,19 +1037,19 @@ def test_update_enopt(enopt_config: Any, evaluator: Any) -> None:
                 "value": {"objective_functions": {"weights": weights}},
             },
         },
-    ] + workflow_config["steps"]
-    parsed_config = WorkflowConfig.model_validate(workflow_config)
+    ] + plan_config["steps"]
+    parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(parsed_config, context)
-    workflow.run()
-    assert workflow["optimum"] is not None
+    plan = Plan(parsed_config, context)
+    plan.run()
+    assert plan["optimum"] is not None
     assert np.allclose(
-        workflow["optimum"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+        plan["optimum"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
 
 
 def test_evaluator_step(enopt_config: Any, evaluator: Any) -> None:
-    workflow_config = {
+    plan_config = {
         "context": [
             {
                 "id": "config",
@@ -1074,24 +1072,24 @@ def test_evaluator_step(enopt_config: Any, evaluator: Any) -> None:
         ],
     }
 
-    parsed_config = WorkflowConfig.model_validate(workflow_config)
+    parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(parsed_config, context)
-    workflow.run()
+    plan = Plan(parsed_config, context)
+    plan.run()
 
-    assert workflow["optimum"] is not None
-    assert workflow["optimum"].functions is not None
-    assert np.allclose(workflow["optimum"].functions.weighted_objective, 1.66)
+    assert plan["optimum"] is not None
+    assert plan["optimum"].functions is not None
+    assert np.allclose(plan["optimum"].functions.weighted_objective, 1.66)
 
-    workflow_config["steps"][0]["with"]["values"] = [0, 0, 0]
-    parsed_config = WorkflowConfig.model_validate(workflow_config)
+    plan_config["steps"][0]["with"]["values"] = [0, 0, 0]
+    parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(parsed_config, context)
-    workflow.run()
+    plan = Plan(parsed_config, context)
+    plan.run()
 
-    assert workflow["optimum"] is not None
-    assert workflow["optimum"].functions is not None
-    assert np.allclose(workflow["optimum"].functions.weighted_objective, 1.75)
+    assert plan["optimum"] is not None
+    assert plan["optimum"].functions is not None
+    assert np.allclose(plan["optimum"].functions.weighted_objective, 1.75)
 
 
 def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
@@ -1109,7 +1107,7 @@ def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["optimizer"]["speculative"] = True
     enopt_config["optimizer"]["max_functions"] = 4
 
-    workflow_config = {
+    plan_config = {
         "context": [
             {
                 "id": "config",
@@ -1133,19 +1131,19 @@ def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
         ],
     }
 
-    parsed_config = WorkflowConfig.model_validate(workflow_config)
+    parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(parsed_config, context)
-    workflow.optimizer_context.events.add_observer(
+    plan = Plan(parsed_config, context)
+    plan.optimizer_context.events.add_observer(
         EventType.FINISHED_EVALUATION, _track_evaluations
     )
-    workflow.run()
+    plan.run()
 
     assert len(completed) == 2
     assert np.allclose(completed, [1.66, 1.75])
 
 
-def test_nested_workflow(enopt_config: Any, evaluator: Any) -> None:
+def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["variables"]["initial_values"] = [0.0, 0.2, 0.1]
 
     completed_functions = 0
@@ -1207,8 +1205,8 @@ def test_nested_workflow(enopt_config: Any, evaluator: Any) -> None:
                 "with": {
                     "config": "$config",
                     "update": ["optimum"],
-                    "nested_workflow": {
-                        "workflow": inner_config,
+                    "nested_plan": {
+                        "plan": inner_config,
                         "initial_var": "initial",
                         "results_var": "nested_optimum",
                     },
@@ -1217,14 +1215,14 @@ def test_nested_workflow(enopt_config: Any, evaluator: Any) -> None:
         ],
     }
 
-    parsed_config = WorkflowConfig.model_validate(outer_config)
+    parsed_config = PlanConfig.model_validate(outer_config)
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(parsed_config, context)
-    workflow.optimizer_context.events.add_observer(
+    plan = Plan(parsed_config, context)
+    plan.optimizer_context.events.add_observer(
         EventType.FINISHED_EVALUATION, _track_evaluations
     )
-    workflow.run()
-    results = workflow["optimum"]
+    plan.run()
+    results = plan["optimum"]
 
     assert results is not None
     assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
@@ -1245,7 +1243,7 @@ def test_exit_code(enopt_config: Any, evaluator: Any) -> None:
         assert isinstance(event, OptimizationEvent)
         assert event.exit_code == OptimizerExitCode.MAX_FUNCTIONS_REACHED
 
-    workflow_config = {
+    plan_config = {
         "context": [
             {
                 "id": "enopt_config",
@@ -1264,10 +1262,10 @@ def test_exit_code(enopt_config: Any, evaluator: Any) -> None:
         ],
     }
     context = OptimizerContext(evaluator=evaluator())
-    workflow = Workflow(WorkflowConfig.model_validate(workflow_config), context)
-    workflow.optimizer_context.events.add_observer(
+    plan = Plan(PlanConfig.model_validate(plan_config), context)
+    plan.optimizer_context.events.add_observer(
         EventType.FINISHED_OPTIMIZER_STEP, _exit_code
     )
-    workflow.run()
-    assert workflow["exit_code"] == OptimizerExitCode.MAX_FUNCTIONS_REACHED
+    plan.run()
+    assert plan["exit_code"] == OptimizerExitCode.MAX_FUNCTIONS_REACHED
     assert is_called

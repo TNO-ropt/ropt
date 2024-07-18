@@ -12,8 +12,8 @@ from numpy.typing import NDArray
 from ropt.enums import ConstraintType, EventType, VariableType
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
 from ropt.events import OptimizationEvent
+from ropt.plan import BasicOptimizationPlan
 from ropt.results import FunctionResults
-from ropt.workflow import BasicOptimizationWorkflow
 
 CONFIG: Dict[str, Any] = {
     "variables": {
@@ -68,7 +68,7 @@ def report(event: OptimizationEvent) -> None:
 def run_optimization() -> None:
     """Run the optimization."""
     optimal_result = (
-        BasicOptimizationWorkflow(CONFIG, function)
+        BasicOptimizationPlan(CONFIG, function)
         .add_callback(EventType.FINISHED_EVALUATION, report)
         .run()
         .results

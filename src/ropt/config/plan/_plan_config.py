@@ -1,4 +1,4 @@
-"""The optimization workflow configuration class."""
+"""The optimization plan configuration class."""
 
 from __future__ import annotations
 
@@ -12,10 +12,10 @@ class ContextConfig(BaseModel):
     """Configuration of a single context object.
 
     Context objects process information that is provided by the steps of the
-    workflow. They usually store information in workflow variables that are
-    accessible to the steps and after the workflow has finished. In most cases,
-    the context objects store a single result in a variable with a name equal to
-    the `id` of the context object, but additional variables can be defined also.
+    optimization plan. They usually store information in plan variables that are
+    accessible to the steps and after the plan has finished. In most cases, the
+    context objects store a single result in a variable with a name equal to the
+    `id` of the context object, but additional variables can be defined also.
 
     The `init` string identifies the code that is run to initialize the context
     object. It is used by the plugin manager to load the code.
@@ -55,11 +55,11 @@ class ContextConfig(BaseModel):
 
 
 class StepConfig(BaseModel):
-    """Configuration of a single step in the workflow.
+    """Configuration of a single step.
 
-    A step is a single action within a workflow. The `run` string identifies the
-    code that executes te step. It is used by the plugin manager to load the
-    code.
+    A step is a single action within an optimization plan. The `run` string
+    identifies the code that executes te step. It is used by the plugin manager
+    to load the code.
 
     A step may be named using the optional `name` field, which will only be used
     for informational purposes, such as in error messages or in generated reports.
@@ -95,24 +95,24 @@ class StepConfig(BaseModel):
     )
 
 
-class WorkflowConfig(BaseModel):
-    """Configuration for a workflow.
+class PlanConfig(BaseModel):
+    """Configuration for a optimization plan.
 
-    A workflow consists of two sections: a context section defined using the
-    `context` attribute, and a section that defines the tasks to perform by the
-    `steps` attribute.
+    An optimization plan consists of two sections: a context section defined
+    using the `context` attribute, and a section that defines the tasks to
+    perform by the `steps` attribute.
 
     The `context` attribute contains the configuration of the objects that
-    create and maintain the environment in which the workflow runs. Context
-    objects are initialized before creating and running the workflow steps.
+    create and maintain the environment in which the plan runs. Context objects
+    are initialized before creating and running the steps.
 
-    After initializing the context objects, workflow steps are configured by the
+    After initializing the context objects, the steps are configured by the
     entries given by the `steps` attribute and are initialized and executed in
     order.
 
     Attributes:
         context: The context objects to initialize
-        steps:   The steps that are executed by the workflow
+        steps:   The steps that are executed by the plan
     """
 
     context: List[ContextConfig] = []
@@ -124,7 +124,7 @@ class WorkflowConfig(BaseModel):
     )
 
     @model_validator(mode="after")
-    def _after_validator(self) -> WorkflowConfig:
+    def _after_validator(self) -> PlanConfig:
         duplicates = [
             id_
             for id_, count in Counter([item.id for item in self.context]).items()

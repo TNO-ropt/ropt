@@ -32,10 +32,11 @@ module to implement various optimization algorithms.
   plugin supports objectives defined by the mean or standard deviation of these
   values.
 
-[`workflow`][ropt.plugins.workflow]:
-: Workflow plugins implement the objects that execute an optimization workflow.
-  The built-in [`default`][ropt.plugins.workflow.default.DefaultWorkflowPlugin]
-  plugin offers a full set of workflow objects for executing complex workflows.
+[`plan`][ropt.plugins.plan]:
+: Plan plugins implement the objects that execute an optimization plan.
+  The built-in [`default`][ropt.plugins.plan.default.DefaultPlanPlugin] plugin
+  offers a full set of optimization plan objects for executing complex
+  optimization plans.
 
 Plugins are managed by the [`PluginManager`][ropt.plugins.PluginManager] class.
 This class is used to retrieve plugin objects that derive from an abstract
@@ -49,8 +50,8 @@ base class defining the required functionality for each plugin type:
     Abstract base class for realization filter plugins.
 4. [`FunctionTransformPlugin`][ropt.plugins.function_transform.base.FunctionTransformPlugin]:
     Abstract base class for function transform plugins.
-5. [`WorkflowPlugin`][ropt.plugins.workflow.base.WorkflowPlugin]:
-    Abstract base class for workflow object plugins.
+5. [`PlanPlugin`][ropt.plugins.plan.base.PlanPlugin]:
+    Abstract base class for optimization plan object plugins.
 
 Plugins can be built-in, installed separately using the standard entry points
 mechanism, or added dynamically using the

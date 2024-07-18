@@ -1,10 +1,10 @@
-"""This module defines the base classes for workflow objects.
+"""This module defines the base classes for optimization plan objects.
 
-Workflow objects can be added via the plugin mechanism to implement additional
-workflow functionality. This is done by creating a plugin class that derives
-from the [`WorkflowPlugin`][ropt.plugins.workflow.base.WorkflowPlugin] class. It
-needs to define a [`create`][ropt.plugins.workflow.base.WorkflowPlugin].create
-method that generates the workflow objects.
+Optimization plan objects can be added via the plugin mechanism to implement
+additional functionality. This is done by creating a plugin class that derives
+from the [`PlanPlugin`][ropt.plugins.plan.base.PlanPlugin] class. It
+needs to define a [`create`][ropt.plugins.plan.base.PlanPlugin].create
+method that generates the plan objects.
 """
 
 from __future__ import annotations
@@ -18,26 +18,26 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
-    from ropt.config.workflow import ContextConfig, StepConfig
+    from ropt.config.plan import ContextConfig, StepConfig
+    from ropt.plan import ContextUpdate, OptimizerContext, Plan
     from ropt.results import FunctionResults, Results
-    from ropt.workflow import ContextUpdate, OptimizerContext, Workflow
 
 
 class ContextObj(ABC):
-    """Base class for workflow context objects."""
+    """Base class for context objects."""
 
-    def __init__(self, config: ContextConfig, workflow: Workflow) -> None:
+    def __init__(self, config: ContextConfig, plan: Plan) -> None:
         """Initialize the context object.
 
-        The `config` and `workflow` arguments are accessible as `context_config`
-        and `workflow` properties.
+        The `config` and `plan` arguments are accessible as `context_config`
+        and `plan` properties.
 
         Args:
-            config:   The configuration of the context object
-            workflow: The parent workflow that contains the object
+            config: The configuration of the context object
+            plan:   The parent plan that contains the object
         """
         self._context_config = config
-        self._workflow = workflow
+        self._plan = plan
 
     @abstractmethod
     def update(self, value: ContextUpdate) -> None:
@@ -60,13 +60,13 @@ class ContextObj(ABC):
         return self._context_config
 
     @property
-    def workflow(self) -> Workflow:
-        """Return the workflow object.
+    def plan(self) -> Plan:
+        """Return the plan object.
 
         Returns:
-            The workflow object.
+            The plan object.
         """
-        return self._workflow
+        return self._plan
 
     def get_variable(self) -> Any:  # noqa: ANN401
         """Get a variable with the name equal to the context object ID.
@@ -74,7 +74,7 @@ class ContextObj(ABC):
         Returns:
             The value of the variable.
         """
-        return self._workflow[self._context_config.id]
+        return self._plan[self._context_config.id]
 
     def set_variable(self, value: Any) -> None:  # noqa: ANN401
         """Set a variable with the name equal to the context object ID.
@@ -82,21 +82,21 @@ class ContextObj(ABC):
         Args:
             value: The value
         """
-        self._workflow[self._context_config.id] = value
+        self._plan[self._context_config.id] = value
 
 
-class WorkflowStep(ABC):
-    """Base class for workflow steps."""
+class PlanStep(ABC):
+    """Base class for plan steps."""
 
-    def __init__(self, config: StepConfig, workflow: Workflow) -> None:
-        """Initialize the workflow object.
+    def __init__(self, config: StepConfig, plan: Plan) -> None:
+        """Initialize the plan object.
 
         Args:
-            config:   The configuration of the workflow object
-            workflow: The parent workflow
+            config: The configuration of the plan object
+            plan:   The parent plan
         """
         self._step_config = config
-        self._workflow = workflow
+        self._plan = plan
 
     @property
     def step_config(self) -> StepConfig:
@@ -108,13 +108,13 @@ class WorkflowStep(ABC):
         return self._step_config
 
     @property
-    def workflow(self) -> Workflow:
-        """Return the workflow object.
+    def plan(self) -> Plan:
+        """Return the plan object.
 
         Returns:
-            The workflow object.
+            The plan object.
         """
-        return self._workflow
+        return self._plan
 
     @abstractmethod
     def run(self) -> bool:
@@ -125,7 +125,7 @@ class WorkflowStep(ABC):
         """
 
 
-class OptimizerStep(WorkflowStep):
+class OptimizerStep(PlanStep):
     """Base class for optimizer steps."""
 
     @abstractmethod
@@ -141,29 +141,29 @@ class OptimizerStep(WorkflowStep):
         """
 
     @abstractmethod
-    def run_nested_workflow(
+    def run_nested_plan(
         self, variables: NDArray[np.float64]
     ) -> Tuple[Optional[FunctionResults], bool]:
-        """Run a  nested workflow.
+        """Run a  nested plan.
 
         Args:
-            variables: variables to set in the nested workflow.
+            variables: variables to set in the nested plan.
 
         Returns:
-            The variables generated by the nested workflow.
+            The variables generated by the nested plan.
         """
 
 
-class WorkflowPlugin(Plugin):
-    """The abstract base class for workflow plugins."""
+class PlanPlugin(Plugin):
+    """The abstract base class for plan plugins."""
 
     @abstractmethod
     def create(
         self, config: Union[ContextConfig, StepConfig], context: OptimizerContext
-    ) -> Union[ContextObj, WorkflowStep]:
-        """Create the workflow object.
+    ) -> Union[ContextObj, PlanStep]:
+        """Create the plan object.
 
         Args:
-            config:  The configuration of the workflow object
-            context: The context in which the workflow operates
+            config:  The configuration of the plan object
+            context: The context in which the plan operates
         """

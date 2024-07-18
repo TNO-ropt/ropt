@@ -1,20 +1,20 @@
-r"""Code to run optimization workflows."""
+r"""Code to run optimization plans."""
 
 from ._optimizer import Optimizer
-from ._run import BasicOptimizationWorkflow
+from ._plan import OptimizerContext, Plan
+from ._run import BasicOptimizationPlan
 from ._update import (
     ContextUpdate,
     ContextUpdateDict,
     ContextUpdateResults,
 )
-from ._workflow import OptimizerContext, Workflow
 
 __all__ = [
-    "BasicOptimizationWorkflow",
+    "BasicOptimizationPlan",
+    "ContextUpdate",
     "ContextUpdateDict",
     "ContextUpdateResults",
     "Optimizer",
     "OptimizerContext",
-    "Workflow",
-    "ContextUpdate",
+    "Plan",
 ]

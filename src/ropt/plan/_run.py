@@ -1,4 +1,4 @@
-"""This module defines workflow object."""
+"""This module defines a basic optimization object."""
 
 from __future__ import annotations
 
@@ -15,12 +15,12 @@ from typing import (
     Union,
 )
 
-from ropt.config.workflow import WorkflowConfig
+from ropt.config.plan import PlanConfig
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
 from ropt.plugins import PluginManager
 
-from ._workflow import OptimizerContext, Workflow
+from ._plan import OptimizerContext, Plan
 
 if TYPE_CHECKING:
     import numpy as np
@@ -34,8 +34,8 @@ if TYPE_CHECKING:
     from ropt.results import FunctionResults
 
 
-class BasicOptimizationWorkflow:
-    """Runner class for basic workflows."""
+class BasicOptimizationPlan:
+    """Runner class for basic optimization plans."""
 
     def __init__(
         self,
@@ -56,7 +56,7 @@ class BasicOptimizationWorkflow:
             Tuple[EventType, Callable[[OptimizationEvent], None]]
         ] = []
 
-        self._workflow_config: Dict[str, List[Dict[str, Any]]] = {
+        self._plan_config: Dict[str, List[Dict[str, Any]]] = {
             "context": [
                 {
                     "id": "config",
@@ -95,7 +95,7 @@ class BasicOptimizationWorkflow:
 
     def add_plugins(
         self, plugin_type: PluginType, plugins: Dict[str, Plugin]
-    ) -> BasicOptimizationWorkflow:
+    ) -> BasicOptimizationPlan:
         if self._plugin_manager is None:
             self._plugin_manager = PluginManager()
             self._plugin_manager.add_plugins(plugin_type, plugins)
@@ -103,12 +103,12 @@ class BasicOptimizationWorkflow:
 
     def add_callback(
         self, event_type: EventType, function: Callable[[OptimizationEvent], None]
-    ) -> BasicOptimizationWorkflow:
+    ) -> BasicOptimizationPlan:
         self._observers.append((event_type, function))
         return self
 
-    def add_metadata(self, metadata: Dict[str, Any]) -> BasicOptimizationWorkflow:
-        steps = self._workflow_config["steps"]
+    def add_metadata(self, metadata: Dict[str, Any]) -> BasicOptimizationPlan:
+        steps = self._plan_config["steps"]
         idx = next(
             (idx for idx, step in enumerate(steps) if step["run"] == "repeat"), None
         )
@@ -123,14 +123,14 @@ class BasicOptimizationWorkflow:
         iterations: int,
         restart_from: Literal["initial", "last", "optimal", "last_optimal"] = "optimal",
         counter_var: Optional[str] = None,
-    ) -> BasicOptimizationWorkflow:
-        if any(step["run"] == "repeat" for step in self._workflow_config["steps"]):
+    ) -> BasicOptimizationPlan:
+        if any(step["run"] == "repeat" for step in self._plan_config["steps"]):
             msg = "The repeat() method can only be called once."
             raise RuntimeError(msg)
-        steps = self._workflow_config["steps"]
+        steps = self._plan_config["steps"]
         idx = next(idx for idx, step in enumerate(steps) if step["run"] == "optimizer")
         if restart_from in ["last", "last_optimal"]:
-            self._workflow_config["context"].append(
+            self._plan_config["context"].append(
                 {
                     "id": "repeat_tracker",
                     "init": "tracker",
@@ -149,7 +149,7 @@ class BasicOptimizationWorkflow:
                 {"run": "reset", "with": {"context": "repeat_tracker"}},
                 *steps,
             ]
-        self._workflow_config["steps"] = [
+        self._plan_config["steps"] = [
             {
                 "run": "repeat",
                 "with": {
@@ -161,21 +161,21 @@ class BasicOptimizationWorkflow:
         ]
         return self
 
-    def run(self) -> BasicOptimizationWorkflow:
-        config = WorkflowConfig.model_validate(self._workflow_config)
-        workflow = Workflow(
+    def run(self) -> BasicOptimizationPlan:
+        config = PlanConfig.model_validate(self._plan_config)
+        plan = Plan(
             config,
             self._context,
             plugin_manager=self._plugin_manager,
         )
         for event_type, function in self._observers:
-            workflow.optimizer_context.events.add_observer(event_type, function)
-        workflow.run()
-        self._results = workflow["optimal"]
+            plan.optimizer_context.events.add_observer(event_type, function)
+        plan.run()
+        self._results = plan["optimal"]
         self._variables = (
             None if self._results is None else self._results.evaluations.variables
         )
-        self._exit_code = workflow["exit_code"]
+        self._exit_code = plan["exit_code"]
         return self
 
     @staticmethod
@@ -183,9 +183,9 @@ class BasicOptimizationWorkflow:
         """Abort the current optimization run.
 
         This method can be called from within callbacks to interrupt the ongoing
-        optimization workflow. The exact point at which the optimization is
-        aborted depends on the step that is executing at that point. For
-        example, within a running optimizer, the process will be interrupted
-        after completing the current function evaluation.
+        optimization plan. The exact point at which the optimization is aborted
+        depends on the step that is executing at that point. For example, within
+        a running optimizer, the process will be interrupted after completing
+        the current function evaluation.
         """
         raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)

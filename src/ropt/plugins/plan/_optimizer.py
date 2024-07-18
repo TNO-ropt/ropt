@@ -8,32 +8,32 @@ import numpy as np
 from pydantic import BaseModel, ConfigDict
 
 from ropt.config.enopt import EnOptConfig
+from ropt.config.plan import PlanConfig  # noqa: TCH001
 from ropt.config.utils import Array1D  # noqa: TCH001
-from ropt.config.workflow import WorkflowConfig  # noqa: TCH001
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.evaluator import EnsembleEvaluator
-from ropt.exceptions import WorkflowError
-from ropt.plugins.workflow.base import OptimizerStep
+from ropt.exceptions import PlanError
+from ropt.plan import ContextUpdateResults, Optimizer, Plan
+from ropt.plugins.plan.base import OptimizerStep
 from ropt.results import FunctionResults
-from ropt.workflow import ContextUpdateResults, Optimizer, Workflow
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt.config.workflow import StepConfig
+    from ropt.config.plan import StepConfig
     from ropt.results import Results
 
 
-class DefaultNestedWorkflow(BaseModel):
+class DefaultNestedPlan(BaseModel):
     """Parameters used by the nested optimizer step.
 
     Attributes:
-        workflow:    Optional nested workflow to run during optimization
-        initial_var: Name of the variable providing initial_values to the nested workflow
-        results_var: The name of the variable in the workflow containing the result
+        plan:        Optional nested plan to run during optimization
+        initial_var: Name of the variable providing initial_values to the nested plan
+        results_var: The name of the variable in the plan containing the result
     """
 
-    workflow: WorkflowConfig
+    plan: PlanConfig
     initial_var: str
     results_var: str
 
@@ -44,12 +44,12 @@ class DefaultOptimizerStepWith(BaseModel):
     Optionally the initial variables to be used can be set from a context object.
 
     Attributes:
-        config:          ID of the context object that contains the optimizer configuration
-        update:          List of the objects that are notified of new results
-        initial_values:  The initial values for the optimizer
-        metadata:        Metadata to set in the results
-        exit_code_var:   Name of the variable to store the exit code
-        nested_workflow: Optional nested workflow configuration
+        config:         ID of the context object that contains the optimizer configuration
+        update:         List of the objects that are notified of new results
+        initial_values: The initial values for the optimizer
+        metadata:       Metadata to set in the results
+        exit_code_var:  Name of the variable to store the exit code
+        nested_plan:    Optional nested plan configuration
     """
 
     config: str
@@ -57,7 +57,7 @@ class DefaultOptimizerStepWith(BaseModel):
     initial_values: Optional[Union[str, Array1D]] = None
     metadata: Dict[str, Union[int, float, bool, str]] = {}
     exit_code_var: Optional[str] = None
-    nested_workflow: Optional[DefaultNestedWorkflow] = None
+    nested_plan: Optional[DefaultNestedPlan] = None
 
     model_config = ConfigDict(
         extra="forbid",
@@ -69,14 +69,14 @@ class DefaultOptimizerStepWith(BaseModel):
 class DefaultOptimizerStep(OptimizerStep):
     """The default optimizer step."""
 
-    def __init__(self, config: StepConfig, workflow: Workflow) -> None:
+    def __init__(self, config: StepConfig, plan: Plan) -> None:
         """Initialize a default optimizer step.
 
         Args:
-            config:   The configuration of the step
-            workflow: The workflow that runs this step
+            config: The configuration of the step
+            plan:   The plan that runs this step
         """
-        super().__init__(config, workflow)
+        super().__init__(config, plan)
 
         self._with = (
             DefaultOptimizerStepWith.model_validate({"config": config.with_})
@@ -91,19 +91,19 @@ class DefaultOptimizerStep(OptimizerStep):
         Returns:
             Whether a user abort occurred.
         """
-        config = self.workflow.parse_value(self._with.config)
+        config = self.plan.parse_value(self._with.config)
         if not isinstance(config, (dict, EnOptConfig)):
             msg = "No valid EnOpt configuration provided"
-            raise WorkflowError(msg, step_name=self.step_config.name)
+            raise PlanError(msg, step_name=self.step_config.name)
         self._enopt_config = EnOptConfig.model_validate(config)
 
-        assert self.workflow.optimizer_context.rng is not None
+        assert self.plan.optimizer_context.rng is not None
         ensemble_evaluator = EnsembleEvaluator(
             self._enopt_config,
-            self.workflow.optimizer_context.evaluator,
-            self.workflow.optimizer_context.result_id_iter,
-            self.workflow.optimizer_context.rng,
-            self.workflow.plugin_manager,
+            self.plan.optimizer_context.evaluator,
+            self.plan.optimizer_context.result_id_iter,
+            self.plan.optimizer_context.rng,
+            self.plan.plugin_manager,
         )
 
         variables = self._get_variables()
@@ -111,13 +111,13 @@ class DefaultOptimizerStep(OptimizerStep):
             enopt_config=self._enopt_config,
             optimizer_step=self,
             ensemble_evaluator=ensemble_evaluator,
-            plugin_manager=self.workflow.plugin_manager,
+            plugin_manager=self.plan.plugin_manager,
         ).start(variables)
 
         if self._with.exit_code_var is not None:
-            self.workflow[self._with.exit_code_var] = exit_code
+            self.plan[self._with.exit_code_var] = exit_code
 
-        self.workflow.optimizer_context.events.emit(
+        self.plan.optimizer_context.events.emit(
             event_type=EventType.FINISHED_OPTIMIZER_STEP,
             config=self._enopt_config,
             exit_code=exit_code,
@@ -138,48 +138,48 @@ class DefaultOptimizerStep(OptimizerStep):
             if self.step_config.name is not None:
                 item.metadata["step_name"] = self.step_config.name
             for key, expr in self._with.metadata.items():
-                item.metadata[key] = self.workflow.parse_value(expr)
+                item.metadata[key] = self.plan.parse_value(expr)
 
         for obj_id in self._with.update:
-            self.workflow.update_context(
+            self.plan.update_context(
                 obj_id,
                 ContextUpdateResults(
                     step_name=self.step_config.name,
                     results=results,
                 ),
             )
-        self.workflow.optimizer_context.events.emit(
+        self.plan.optimizer_context.events.emit(
             event_type=EventType.FINISHED_EVALUATION,
             config=self._enopt_config,
             results=results,
         )
 
-    def run_nested_workflow(
+    def run_nested_plan(
         self, variables: NDArray[np.float64]
     ) -> Tuple[Optional[FunctionResults], bool]:
-        """Run a  nested workflow.
+        """Run a  nested plan.
 
         Args:
-            variables: variables to set in the nested workflow.
+            variables: variables to set in the nested plan.
 
         Returns:
-            The variables generated by the nested workflow.
+            The variables generated by the nested plan.
         """
-        if self._with.nested_workflow is None:
+        if self._with.nested_plan is None:
             return None, False
-        workflow = self.workflow.spawn(self._with.nested_workflow.workflow)
-        workflow[self._with.nested_workflow.initial_var] = variables
-        aborted = workflow.run()
-        return workflow[self._with.nested_workflow.results_var], aborted
+        plan = self.plan.spawn(self._with.nested_plan.plan)
+        plan[self._with.nested_plan.initial_var] = variables
+        aborted = plan.run()
+        return plan[self._with.nested_plan.results_var], aborted
 
     def _get_variables(self) -> NDArray[np.float64]:
         if self._with.initial_values is not None:
-            parsed_variables = self.workflow.parse_value(self._with.initial_values)
+            parsed_variables = self.plan.parse_value(self._with.initial_values)
             if isinstance(parsed_variables, FunctionResults):
                 return parsed_variables.evaluations.variables
             if isinstance(parsed_variables, np.ndarray):
                 return parsed_variables
             if parsed_variables is not None:
                 msg = f"`{self._with.initial_values} does not contain variables."
-                raise WorkflowError(msg, step_name=self.step_config.name)
+                raise PlanError(msg, step_name=self.step_config.name)
         return self._enopt_config.variables.initial_values

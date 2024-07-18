@@ -25,11 +25,10 @@ class Sampler(ABC):
     """Abstract base class for sampler classes.
 
     `ropt` employs plugins to implement samplers that are called during an
-    optimization workflow to generate perturbed variable vectors. Samplers
-    should derive from the `Sampler` base class, which specifies the
-    requirements for the class constructor (`__init__`) and also includes a
-    `generate_samples` method used to generate samples used to create perturbed
-    values.
+    optimization plan to generate perturbed variable vectors. Samplers should
+    derive from the `Sampler` base class, which specifies the requirements for
+    the class constructor (`__init__`) and also includes a `generate_samples`
+    method used to generate samples used to create perturbed values.
     """
 
     @abstractmethod

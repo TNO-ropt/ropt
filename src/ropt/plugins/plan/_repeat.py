@@ -6,11 +6,11 @@ from typing import TYPE_CHECKING, List, Optional
 
 from pydantic import BaseModel, ConfigDict
 
-from ropt.config.workflow import StepConfig  # noqa: TCH001
-from ropt.plugins.workflow.base import WorkflowStep
+from ropt.config.plan import StepConfig  # noqa: TCH001
+from ropt.plugins.plan.base import PlanStep
 
 if TYPE_CHECKING:
-    from ropt.workflow import Workflow
+    from ropt.plan import Plan
 
 
 class DefaultRepeatStepWith(BaseModel):
@@ -32,21 +32,21 @@ class DefaultRepeatStepWith(BaseModel):
     )
 
 
-class DefaultRepeatStep(WorkflowStep):
+class DefaultRepeatStep(PlanStep):
     """The default optimizer step."""
 
-    def __init__(self, config: StepConfig, workflow: Workflow) -> None:
+    def __init__(self, config: StepConfig, plan: Plan) -> None:
         """Initialize a default optimizer step.
 
         Args:
-            config:   The configuration of the step
-            workflow: The workflow that runs this step
+            config: The configuration of the step
+            plan:   The plan that runs this step
         """
-        super().__init__(config, workflow)
+        super().__init__(config, plan)
 
         with_ = DefaultRepeatStepWith.model_validate(config.with_)
         self._num = with_.iterations
-        self._steps = self.workflow.create_steps(with_.steps)
+        self._steps = self.plan.create_steps(with_.steps)
         self._counter_var = with_.counter_var
 
     def run(self) -> bool:
@@ -57,7 +57,7 @@ class DefaultRepeatStep(WorkflowStep):
         """
         for idx in range(self._num):
             if self._counter_var is not None:
-                self.workflow[self._counter_var] = idx
-            if self.workflow.run_steps(self._steps):
+                self.plan[self._counter_var] = idx
+            if self.plan.run_steps(self._steps):
                 return True
         return False

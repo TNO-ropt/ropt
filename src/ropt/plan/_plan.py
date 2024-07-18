@@ -1,4 +1,4 @@
-"""This module defines workflow object."""
+"""This module defines the optimization plan object."""
 
 from __future__ import annotations
 
@@ -13,15 +13,15 @@ import numpy as np
 from numpy.random import default_rng
 
 from ropt.config.enopt.constants import DEFAULT_SEED
-from ropt.exceptions import WorkflowError
+from ropt.exceptions import PlanError
 from ropt.plugins import PluginManager
 
 from ._events import OptimizationEventBroker
 
 if TYPE_CHECKING:
-    from ropt.config.workflow import StepConfig, WorkflowConfig
+    from ropt.config.plan import PlanConfig, StepConfig
     from ropt.evaluator import Evaluator
-    from ropt.plugins.workflow.base import WorkflowStep
+    from ropt.plugins.plan.base import PlanStep
 
 _VALID_TYPES: Final = (int, float, bool)
 _VALID_RESULTS: Final = (list, np.ndarray, *_VALID_TYPES)
@@ -32,10 +32,10 @@ _CMP_OPS: Final = (ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE)
 
 
 class OptimizerContext:
-    """Store the context in which a workflow runs."""
+    """Store the context in which an optimizer runs."""
 
     def __init__(self, evaluator: Evaluator, seed: Optional[int] = None) -> None:
-        """Initialize the workflow context.
+        """Initialize the optimiation context.
 
         Args:
             evaluator:      The callable for running function evaluations
@@ -47,23 +47,23 @@ class OptimizerContext:
         self.events = OptimizationEventBroker()
 
 
-class Workflow:
-    """The workflow object."""
+class Plan:
+    """The plan object."""
 
     def __init__(
         self,
-        config: WorkflowConfig,
+        config: PlanConfig,
         optimizer_context: OptimizerContext,
         plugin_manager: Optional[PluginManager] = None,
     ) -> None:
-        """Initialize a workflow object.
+        """Initialize a plan object.
 
         Args:
             config:            Optimizer configuration
-            optimizer_context: Context in which the workflow executes
+            optimizer_context: Context in which the plan executes
             plugin_manager:    Optional plugin manager
         """
-        self._workflow_config = config
+        self._plan_config = config
         self._optimizer_context = optimizer_context
         self._vars: Dict[str, Any] = {}
 
@@ -72,34 +72,34 @@ class Workflow:
         )
         self._context = {
             config.id: self._plugin_manager.get_plugin(
-                "workflow", method=config.init
+                "plan", method=config.init
             ).create(config, self)
             for config in config.context
         }
         self._steps = self.create_steps(config.steps)
 
     def run(self) -> bool:
-        """Run the workflow.
+        """Run the plan.
 
         Returns:
             Whether a user abort occurred.
         """
         return self.run_steps(self._steps)
 
-    def create_steps(self, step_configs: List[StepConfig]) -> List[WorkflowStep]:
+    def create_steps(self, step_configs: List[StepConfig]) -> List[PlanStep]:
         """Create step objects from step configs.
 
         Args:
             step_configs: The configurations of the steps.
         """
         return [
-            self._plugin_manager.get_plugin("workflow", method=step_config.run).create(
+            self._plugin_manager.get_plugin("plan", method=step_config.run).create(
                 step_config, self
             )
             for step_config in step_configs
         ]
 
-    def run_steps(self, steps: List[WorkflowStep]) -> bool:
+    def run_steps(self, steps: List[PlanStep]) -> bool:
         """Run the given steps.
 
         Args:
@@ -114,7 +114,7 @@ class Workflow:
 
     @property
     def plugin_manager(self) -> PluginManager:
-        """Return the plugin manager used by the workflow.
+        """Return the plugin manager used by the plan.
 
         Returns:
             The plugin manager.
@@ -123,10 +123,10 @@ class Workflow:
 
     @property
     def optimizer_context(self) -> OptimizerContext:
-        """Return the optimizer context of the workflow.
+        """Return the optimizer context of the plan.
 
         Returns:
-            The optimizer context object used by the workflow.
+            The optimizer context object used by the plan.
         """
         return self._optimizer_context
 
@@ -158,13 +158,13 @@ class Workflow:
             return re.sub(r"\${{(.*?)}}|\$\$|\$([^\W0-9][\w\.]*)", _substitute, value)
         return value
 
-    def spawn(self, config: WorkflowConfig) -> Workflow:
-        """Spawn a child workflow.
+    def spawn(self, config: PlanConfig) -> Plan:
+        """Spawn a child plan.
 
         Args:
-            config: The configuration of the new workflow.
+            config: The configuration of the new plan.
         """
-        return Workflow(
+        return Plan(
             config,
             optimizer_context=self._optimizer_context,
             plugin_manager=self._plugin_manager,
@@ -174,8 +174,8 @@ class Workflow:
         # Check for identifiers that are not preceded by $:
         for word in re.findall(r"(?<!\$)\b\w+\b", expr):
             if word.isidentifier() and not keyword.iskeyword(word):
-                msg = f"Syntax error in workflow expression: {expr}"
-                raise WorkflowError(msg)
+                msg = f"Syntax error in expression: {expr}"
+                raise PlanError(msg)
 
         # Remove $ from identifiers, before sending the string to the parser:
         stripped = expr
@@ -187,8 +187,8 @@ class Workflow:
         try:
             tree = ast.parse(stripped, mode="eval")
         except SyntaxError as exc:
-            msg = f"Syntax error in workflow expression: {expr}"
-            raise WorkflowError(msg) from exc
+            msg = f"Syntax error in expression: {expr}"
+            raise PlanError(msg) from exc
 
         # Replace identifiers with their value and evaluate:
         if _is_valid(tree.body):
@@ -199,13 +199,13 @@ class Workflow:
                     compile(tree, "", mode="eval"), {"__builtins__": {}}, replacer.vars
                 )
             except TypeError as exc:
-                msg = f"Type error in workflow expression: {expr}"
-                raise WorkflowError(msg) from exc
+                msg = f"Type error in expression: {expr}"
+                raise PlanError(msg) from exc
             assert result is None or isinstance(result, _VALID_RESULTS)
             return result
 
-        msg = f"Invalid workflow expression: {expr}"
-        raise WorkflowError(msg)
+        msg = f"Invalid expression: {expr}"
+        raise PlanError(msg)
 
     def eval(self, value: Any) -> Any:  # noqa: ANN401
         """Evaluate the provided value as an expression.
@@ -216,7 +216,7 @@ class Workflow:
         - If the value is a string enclosed in a `${{ }}` pair the contents are
           evaluated recursively.
         - If value is a string that starts with `$` and is an identifier it is
-          assumed to be a workflow variable and its value is returned. The
+          assumed to be a plan variable and its value is returned. The
           resulting value can have any type.
         - Otherwise the string is evaluated and the result returned. The type of
           the result is restricted to numerical values, lists and numpy array.
@@ -277,7 +277,7 @@ class Workflow:
         """
         if name not in self._context:
             msg = f"not a valid context: `{name}`"
-            raise WorkflowError(msg)
+            raise PlanError(msg)
         self._context[name].update(value)
 
     def __getitem__(self, name: str) -> Any:  # noqa: ANN401
@@ -291,8 +291,8 @@ class Workflow:
         """
         if name in self._vars:
             return self._vars[name]
-        msg = f"Unknown workflow variable: `{name}`"
-        raise WorkflowError(msg)
+        msg = f"Unknown plan variable: `{name}`"
+        raise PlanError(msg)
 
     def __setitem__(self, name: str, value: Any) -> None:  # noqa: ANN401
         """Set a variable .
@@ -303,7 +303,7 @@ class Workflow:
         """
         if not name.isidentifier():
             msg = f"Not a valid variable name: `{name}`"
-            raise WorkflowError(msg)
+            raise PlanError(msg)
         self._vars[name] = value
 
     def __contains__(self, name: str) -> bool:
@@ -344,14 +344,14 @@ def _is_valid(node: ast.AST) -> bool:  # noqa: PLR0911
 
 
 class _ReplaceFields(ast.NodeTransformer):
-    def __init__(self, workflow: Workflow) -> None:
-        self._workflow = workflow
+    def __init__(self, plan: Plan) -> None:
+        self._plan = plan
         self.vars: Dict[str, Any] = {}
 
     def visit_Name(self, node: ast.Name) -> ast.AST:  # noqa: N802
-        value = self._workflow[node.id]
+        value = self._plan[node.id]
         if value is None or isinstance(value, (Number, np.ndarray)):
             self.vars[node.id] = value
             return node
         msg = f"Error in expression: the type of `{node.id}` is not supported"
-        raise WorkflowError(msg)
+        raise PlanError(msg)

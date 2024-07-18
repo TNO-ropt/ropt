@@ -6,12 +6,12 @@ from typing import TYPE_CHECKING, Any, Optional
 
 from pydantic import BaseModel, ConfigDict
 
-from ropt.exceptions import WorkflowError
-from ropt.plugins.workflow.base import WorkflowStep
+from ropt.exceptions import PlanError
+from ropt.plugins.plan.base import PlanStep
 
 if TYPE_CHECKING:
-    from ropt.config.workflow import StepConfig
-    from ropt.workflow import Workflow
+    from ropt.config.plan import StepConfig
+    from ropt.plan import Plan
 
 
 class DefaultSetStepExprWith(BaseModel):
@@ -48,17 +48,17 @@ class DefaultSetStepVarValueWith(BaseModel):
     )
 
 
-class DefaultSetStep(WorkflowStep):
+class DefaultSetStep(PlanStep):
     """The default set step."""
 
-    def __init__(self, config: StepConfig, workflow: Workflow) -> None:
+    def __init__(self, config: StepConfig, plan: Plan) -> None:
         """Initialize a default setvar step.
 
         Args:
-            config:   The configuration of the step
-            workflow: The workflow that runs this step
+            config: The configuration of the step
+            plan:   The plan that runs this step
         """
-        super().__init__(config, workflow)
+        super().__init__(config, plan)
 
         expr: Optional[str] = None
         var: str
@@ -80,12 +80,12 @@ class DefaultSetStep(WorkflowStep):
             var, sep, value = expr.partition("=")
             if sep != "=":
                 msg = f"Invalid expression: {expr}"
-                raise WorkflowError(msg, step_name=self._step_config.name)
+                raise PlanError(msg, step_name=self._step_config.name)
 
         self._var = var.strip()
         if not self._var.isidentifier():
             msg = f"Invalid identifier: {self._var}"
-            raise WorkflowError(msg, step_name=self._step_config.name)
+            raise PlanError(msg, step_name=self._step_config.name)
         self._value = value
 
     def run(self) -> bool:
@@ -94,5 +94,5 @@ class DefaultSetStep(WorkflowStep):
         Returns:
             True if a user abort occurred, always `False`.
         """
-        self._workflow[self._var] = self._workflow.eval(self._value)
+        self._plan[self._var] = self._plan.eval(self._value)
         return False

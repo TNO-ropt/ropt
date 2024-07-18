@@ -1,1 +1,1 @@
-"""Simple applications to run optimization workflows."""
+"""Simple applications to run optimization plans."""

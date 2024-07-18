@@ -10,9 +10,9 @@ from ropt.exceptions import ConfigError
 
 from .function_transform.base import FunctionTransformPlugin
 from .optimizer.base import OptimizerPlugin
+from .plan.base import PlanPlugin
 from .realization_filter.base import RealizationFilterPlugin
 from .sampler.base import SamplerPlugin
-from .workflow.base import WorkflowPlugin
 
 if TYPE_CHECKING:
     from ropt.plugins.base import Plugin
@@ -28,7 +28,7 @@ _PLUGIN_TYPES: Final = {
     "optimizer": OptimizerPlugin,
     "sampler": SamplerPlugin,
     "realization_filter": RealizationFilterPlugin,
-    "workflow": WorkflowPlugin,
+    "plan": PlanPlugin,
 }
 
 PluginType = Literal[
@@ -36,7 +36,7 @@ PluginType = Literal[
     "sampler",
     "realization_filter",
     "function_transform",
-    "workflow",
+    "plan",
 ]
 """ Plugin Types Supported by `ropt`"""
 
@@ -74,7 +74,7 @@ class PluginManager:
             "sampler": {},
             "realization_filter": {},
             "function_transform": {},
-            "workflow": {},
+            "plan": {},
         }
 
         for plugin_type in self._plugins:

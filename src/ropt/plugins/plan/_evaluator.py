@@ -11,16 +11,16 @@ from ropt.config.enopt import EnOptConfig
 from ropt.config.utils import Array2D  # noqa: TCH001
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.evaluator import EnsembleEvaluator
-from ropt.exceptions import OptimizationAborted, WorkflowError
-from ropt.plugins.workflow.base import WorkflowStep
+from ropt.exceptions import OptimizationAborted, PlanError
+from ropt.plan import ContextUpdateResults
+from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
-from ropt.workflow import ContextUpdateResults
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt.config.workflow import StepConfig
-    from ropt.workflow import Workflow
+    from ropt.config.plan import StepConfig
+    from ropt.plan import Plan
 
 
 class DefaultEvaluatorStepWith(BaseModel):
@@ -48,17 +48,17 @@ class DefaultEvaluatorStepWith(BaseModel):
     )
 
 
-class DefaultEvaluatorStep(WorkflowStep):
+class DefaultEvaluatorStep(PlanStep):
     """The default evaluator step."""
 
-    def __init__(self, config: StepConfig, workflow: Workflow) -> None:
+    def __init__(self, config: StepConfig, plan: Plan) -> None:
         """Initialize a default evaluator step.
 
         Args:
             config:   The configuration of the step
-            workflow: The workflow that runs this step
+            plan:   The optimization plan that runs this step
         """
-        super().__init__(config, workflow)
+        super().__init__(config, plan)
 
         self._with = (
             DefaultEvaluatorStepWith.model_validate({"config": config.with_})
@@ -72,19 +72,19 @@ class DefaultEvaluatorStep(WorkflowStep):
         Returns:
             Whether a user abort occurred.
         """
-        config = self.workflow.parse_value(self._with.config)
+        config = self.plan.parse_value(self._with.config)
         if not isinstance(config, (dict, EnOptConfig)):
             msg = "No valid EnOpt configuration provided"
-            raise WorkflowError(msg, step_name=self.step_config.name)
+            raise PlanError(msg, step_name=self.step_config.name)
         self._enopt_config = EnOptConfig.model_validate(config)
 
-        assert self.workflow.optimizer_context.rng is not None
+        assert self.plan.optimizer_context.rng is not None
         ensemble_evaluator = EnsembleEvaluator(
             self._enopt_config,
-            self.workflow.optimizer_context.evaluator,
-            self.workflow.optimizer_context.result_id_iter,
-            self.workflow.optimizer_context.rng,
-            self.workflow.plugin_manager,
+            self.plan.optimizer_context.evaluator,
+            self.plan.optimizer_context.result_id_iter,
+            self.plan.optimizer_context.rng,
+            self.plan.plugin_manager,
         )
 
         variables = self._get_variables()
@@ -100,17 +100,17 @@ class DefaultEvaluatorStep(WorkflowStep):
             if self.step_config.name is not None:
                 item.metadata["step_name"] = self.step_config.name
             for key, expr in self._with.metadata.items():
-                item.metadata[key] = self.workflow.parse_value(expr)
+                item.metadata[key] = self.plan.parse_value(expr)
 
         for obj_id in self._with.update:
-            self.workflow.update_context(
+            self.plan.update_context(
                 obj_id,
                 ContextUpdateResults(
                     step_name=self.step_config.name,
                     results=results,
                 ),
             )
-        self.workflow.optimizer_context.events.emit(
+        self.plan.optimizer_context.events.emit(
             event_type=EventType.FINISHED_EVALUATION,
             config=self._enopt_config,
             results=results,
@@ -125,12 +125,12 @@ class DefaultEvaluatorStep(WorkflowStep):
 
     def _get_variables(self) -> NDArray[np.float64]:
         if self._with.values is not None:  # noqa: PD011
-            parsed_variables = self.workflow.parse_value(self._with.values)
+            parsed_variables = self.plan.parse_value(self._with.values)
             if isinstance(parsed_variables, FunctionResults):
                 return parsed_variables.evaluations.variables
             if isinstance(parsed_variables, np.ndarray):
                 return parsed_variables
             if parsed_variables is not None:
                 msg = f"`{self._with.values} does not contain variables."  # noqa: PD011
-                raise WorkflowError(msg, step_name=self.step_config.name)
+                raise PlanError(msg, step_name=self.step_config.name)
         return self._enopt_config.variables.initial_values

@@ -9,8 +9,8 @@ class ConfigError(Exception):
     """Raised when an configuration error occurs."""
 
 
-class WorkflowError(Exception):
-    """Raised when an error occurs in a workflow."""
+class PlanError(Exception):
+    """Raised when an error occurs in an optimization plan."""
 
     def __init__(
         self,
@@ -38,7 +38,7 @@ class WorkflowError(Exception):
 class OptimizationAborted(Exception):  # noqa: N818
     """Raised when an optimization is aborted.
 
-    When constructing the execption object an exit code must be passed that
+    When constructing the exception object an exit code must be passed that
     indicates the reason for aborting (see
     [`OptimizerExitCode`][ropt.enums.OptimizerExitCode]).
     """

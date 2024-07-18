@@ -7,7 +7,7 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt.evaluator import ConcurrentEvaluator, ConcurrentTask, EvaluatorContext
-from ropt.workflow import BasicOptimizationWorkflow
+from ropt.plan import BasicOptimizationPlan
 
 
 @pytest.fixture(name="enopt_config")
@@ -96,7 +96,7 @@ class ConcurrentTestEvaluator(ConcurrentEvaluator):
 
 def test_concurrent(enopt_config: Any, test_functions: Any) -> None:
     evaluator = ConcurrentTestEvaluator(test_functions)
-    variables = BasicOptimizationWorkflow(enopt_config, evaluator).run().variables
+    variables = BasicOptimizationPlan(enopt_config, evaluator).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -105,7 +105,7 @@ def test_concurrent_exception(
     enopt_config: Any, test_functions: Any, capsys: Any
 ) -> None:
     evaluator = ConcurrentTestEvaluator(test_functions, fail_index=2)
-    variables = BasicOptimizationWorkflow(enopt_config, evaluator).run().variables
+    variables = BasicOptimizationPlan(enopt_config, evaluator).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
     captured = capsys.readouterr()
@@ -115,13 +115,13 @@ def test_concurrent_exception(
 def test_concurrent_cache(enopt_config: Any, test_functions: Any) -> None:
     evaluator = ConcurrentTestEvaluator(test_functions)
 
-    variables1 = BasicOptimizationWorkflow(enopt_config, evaluator).run().variables
+    variables1 = BasicOptimizationPlan(enopt_config, evaluator).run().variables
     assert variables1 is not None
     assert np.allclose(variables1, [0.0, 0.0, 0.5], atol=0.02)
 
     # Disable the functions, now the evaluator fully relies on its cache:
     evaluator.disable_functions()
 
-    variables2 = BasicOptimizationWorkflow(enopt_config, evaluator).run().variables
+    variables2 = BasicOptimizationPlan(enopt_config, evaluator).run().variables
     assert variables2 is not None
     assert np.all(variables1 == variables2)

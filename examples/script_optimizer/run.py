@@ -73,7 +73,7 @@ def main() -> None:
         config={
             "work_dir": "work",
         },
-        workflow={
+        plan={
             "context": [
                 {"id": "enopt_config", "init": "config", "with": ENOPT_CONFIG},
                 {"id": "optimal", "init": "tracker"},

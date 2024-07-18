@@ -6,8 +6,8 @@ import pytest
 from ropt.config.enopt import EnOptConfig
 from ropt.enums import EventType
 from ropt.events import OptimizationEvent
+from ropt.plan import BasicOptimizationPlan
 from ropt.report import ResultsDataFrame
-from ropt.workflow import BasicOptimizationWorkflow
 
 # Requires pandas:
 pd = pytest.importorskip("pandas")
@@ -45,7 +45,7 @@ def _handle_results(
 def test_dataframe_results_no_results(enopt_config: Any, evaluator: Any) -> None:
     config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsDataFrame(set())
-    BasicOptimizationWorkflow(config, evaluator()).add_callback(
+    BasicOptimizationPlan(config, evaluator()).add_callback(
         EventType.FINISHED_EVALUATION,
         partial(_handle_results, reporter=reporter, config=config),
     ).run()
@@ -60,7 +60,7 @@ def test_dataframe_results_function_results(enopt_config: Any, evaluator: Any) -
             "evaluations.variables",
         },
     )
-    BasicOptimizationWorkflow(config, evaluator()).add_callback(
+    BasicOptimizationPlan(config, evaluator()).add_callback(
         EventType.FINISHED_EVALUATION,
         partial(_handle_results, reporter=reporter, config=config),
     ).run()
@@ -82,7 +82,7 @@ def test_dataframe_results_function_results_formatted_names(
             "evaluations.variables",
         },
     )
-    BasicOptimizationWorkflow(config, evaluator()).add_callback(
+    BasicOptimizationPlan(config, evaluator()).add_callback(
         EventType.FINISHED_EVALUATION,
         partial(_handle_results, reporter=reporter, config=config),
     ).run()
@@ -103,7 +103,7 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
         },
         table_type="gradients",
     )
-    BasicOptimizationWorkflow(config, evaluator()).add_callback(
+    BasicOptimizationPlan(config, evaluator()).add_callback(
         EventType.FINISHED_EVALUATION,
         partial(_handle_results, reporter=reporter, config=config),
     ).run()
@@ -131,7 +131,7 @@ def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
             item.metadata["foo"] = {"bar": 1}
         reporter.add_results(EnOptConfig.model_validate(enopt_config), event.results)
 
-    BasicOptimizationWorkflow(enopt_config, evaluator()).add_callback(
+    BasicOptimizationPlan(enopt_config, evaluator()).add_callback(
         EventType.FINISHED_EVALUATION, handler
     ).run()
 
@@ -154,9 +154,9 @@ def test_dataframe_results_metadata_step_id(enopt_config: Any, evaluator: Any) -
         assert event.results is not None
         reporter.add_results(EnOptConfig.model_validate(enopt_config), event.results)
 
-    runner = BasicOptimizationWorkflow(enopt_config, evaluator()).add_callback(
+    runner = BasicOptimizationPlan(enopt_config, evaluator()).add_callback(
         EventType.FINISHED_EVALUATION, handler
     )
-    runner._workflow_config["steps"][0]["name"] = "opt"  # noqa: SLF001
+    runner._plan_config["steps"][0]["name"] = "opt"  # noqa: SLF001
     runner.run()
     assert reporter.frame["metadata.step_name"].to_list() == ["opt"] * 3

@@ -1,13 +1,13 @@
-"""This module implements the default workflow plugin."""
+"""This module implements the default optimization plan plugin."""
 
 from __future__ import annotations
 
 from functools import singledispatchmethod
 from typing import Dict, Final, Type, Union
 
-from ropt.config.workflow import ContextConfig, StepConfig  # noqa: TCH001
-from ropt.plugins.workflow.base import ContextObj, WorkflowStep  # noqa: TCH001
-from ropt.workflow import Workflow  # noqa: TCH001
+from ropt.config.plan import ContextConfig, StepConfig  # noqa: TCH001
+from ropt.plan import Plan  # noqa: TCH001
+from ropt.plugins.plan.base import ContextObj, PlanStep  # noqa: TCH001
 
 from ._config import DefaultConfigContext
 from ._evaluator import DefaultEvaluatorStep
@@ -17,14 +17,14 @@ from ._reset import DefaultResetStep
 from ._setvar import DefaultSetStep
 from ._tracker import DefaultTrackerContext
 from ._update import DefaultUpdateStep
-from .base import WorkflowPlugin
+from .base import PlanPlugin
 
 _CONTEXT_OBJECTS: Final[Dict[str, Type[ContextObj]]] = {
     "config": DefaultConfigContext,
     "tracker": DefaultTrackerContext,
 }
 
-_STEP_OBJECTS: Final[Dict[str, Type[WorkflowStep]]] = {
+_STEP_OBJECTS: Final[Dict[str, Type[PlanStep]]] = {
     "evaluator": DefaultEvaluatorStep,
     "setvar": DefaultSetStep,
     "optimizer": DefaultOptimizerStep,
@@ -34,40 +34,40 @@ _STEP_OBJECTS: Final[Dict[str, Type[WorkflowStep]]] = {
 }
 
 
-class DefaultWorkflowPlugin(WorkflowPlugin):
-    """Default workflow plugin class."""
+class DefaultPlanPlugin(PlanPlugin):
+    """Default plan plugin class."""
 
     @singledispatchmethod
     def create(  # type: ignore
         self,
         config: Union[ContextConfig, StepConfig],  # noqa: ARG002
-        workflow: Workflow,  # noqa: ARG002
-    ) -> Union[ContextObj, WorkflowStep]:
-        """Initialize the workflow plugin.
+        plan: Plan,  # noqa: ARG002
+    ) -> Union[ContextObj, PlanStep]:
+        """Initialize the plan plugin.
 
-        See the [ropt.plugins.workflow.base.WorkflowPlugin][] abstract base class.
+        See the [ropt.plugins.plan.base.PlanPlugin][] abstract base class.
 
         # noqa
         """
-        msg = "Workflow config type not implemented."
+        msg = "Plan config type not implemented."
         raise NotImplementedError(msg)
 
     @create.register
-    def _create_context(self, config: ContextConfig, workflow: Workflow) -> ContextObj:
+    def _create_context(self, config: ContextConfig, plan: Plan) -> ContextObj:
         _, _, name = config.init.lower().rpartition("/")
         obj = _CONTEXT_OBJECTS.get(name)
         if obj is not None:
-            return obj(config, workflow)
+            return obj(config, plan)
 
         msg = f"Unknown context object type: {config.init}"
         raise TypeError(msg)
 
     @create.register
-    def _create_step(self, config: StepConfig, workflow: Workflow) -> WorkflowStep:
+    def _create_step(self, config: StepConfig, plan: Plan) -> PlanStep:
         _, _, step_name = config.run.lower().rpartition("/")
         step_obj = _STEP_OBJECTS.get(step_name)
         if step_obj is not None:
-            return step_obj(config, workflow)
+            return step_obj(config, plan)
 
         msg = f"Unknown step type: {config.run}"
         raise TypeError(msg)
