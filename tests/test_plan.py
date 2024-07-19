@@ -1135,7 +1135,7 @@ def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(parsed_config, context)
     plan.optimizer_context.events.add_observer(
-        EventType.FINISHED_EVALUATION, _track_evaluations
+        EventType.FINISHED_EVALUATOR_STEP, _track_evaluations
     )
     plan.run()
 

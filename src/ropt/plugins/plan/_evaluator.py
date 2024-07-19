@@ -78,6 +78,12 @@ class DefaultEvaluatorStep(PlanStep):
             raise PlanError(msg, step_name=self.step_config.name)
         self._enopt_config = EnOptConfig.model_validate(config)
 
+        self.plan.optimizer_context.events.emit(
+            event_type=EventType.START_EVALUATOR_STEP,
+            config=self._enopt_config,
+            step_name=self.step_config.name,
+        )
+
         assert self.plan.optimizer_context.rng is not None
         ensemble_evaluator = EnsembleEvaluator(
             self._enopt_config,
@@ -89,12 +95,18 @@ class DefaultEvaluatorStep(PlanStep):
 
         variables = self._get_variables()
         exit_code = OptimizerExitCode.EVALUATION_STEP_FINISHED
+
         try:
             results = ensemble_evaluator.calculate(
                 variables, compute_functions=True, compute_gradients=False
             )
         except OptimizationAborted as exc:
             exit_code = exc.exit_code
+
+        assert results
+        assert isinstance(results[0], FunctionResults)
+        if results[0].functions is None:
+            exit_code = OptimizerExitCode.TOO_FEW_REALIZATIONS
 
         for item in results:
             if self.step_config.name is not None:
@@ -110,16 +122,14 @@ class DefaultEvaluatorStep(PlanStep):
                     results=results,
                 ),
             )
+
         self.plan.optimizer_context.events.emit(
-            event_type=EventType.FINISHED_EVALUATION,
+            event_type=EventType.FINISHED_EVALUATOR_STEP,
             config=self._enopt_config,
             results=results,
+            exit_code=exit_code,
+            step_name=self.step_config.name,
         )
-
-        assert results
-        assert isinstance(results[0], FunctionResults)
-        if results[0].functions is None:
-            exit_code = OptimizerExitCode.TOO_FEW_REALIZATIONS
 
         return exit_code == OptimizerExitCode.USER_ABORT
 

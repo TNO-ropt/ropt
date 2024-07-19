@@ -97,6 +97,12 @@ class DefaultOptimizerStep(OptimizerStep):
             raise PlanError(msg, step_name=self.step_config.name)
         self._enopt_config = EnOptConfig.model_validate(config)
 
+        self.plan.optimizer_context.events.emit(
+            event_type=EventType.START_OPTIMIZER_STEP,
+            config=self._enopt_config,
+            step_name=self.step_config.name,
+        )
+
         assert self.plan.optimizer_context.rng is not None
         ensemble_evaluator = EnsembleEvaluator(
             self._enopt_config,
@@ -121,12 +127,18 @@ class DefaultOptimizerStep(OptimizerStep):
             event_type=EventType.FINISHED_OPTIMIZER_STEP,
             config=self._enopt_config,
             exit_code=exit_code,
+            step_name=self.step_config.name,
         )
 
         return exit_code == OptimizerExitCode.USER_ABORT
 
     def start_evaluation(self) -> None:
         """Call before an evaluation is started."""
+        self.plan.optimizer_context.events.emit(
+            event_type=EventType.START_EVALUATION,
+            config=self._enopt_config,
+            step_name=self.step_config.name,
+        )
 
     def finish_evaluation(self, results: Tuple[Results, ...]) -> None:
         """Called after the optimizer finishes an evaluation.
@@ -152,6 +164,7 @@ class DefaultOptimizerStep(OptimizerStep):
             event_type=EventType.FINISHED_EVALUATION,
             config=self._enopt_config,
             results=results,
+            step_name=self.step_config.name,
         )
 
     def run_nested_plan(
