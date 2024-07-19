@@ -65,6 +65,7 @@ def report(event: OptimizationEvent) -> None:
     Args:
         event: event data
     """
+    assert event.results is not None
     for item in event.results:
         if isinstance(item, FunctionResults) and item.functions is not None:
             print(f"result: {item.result_id}")
@@ -89,7 +90,7 @@ def run_optimization(config: Dict[str, Any]) -> FunctionResults:
 
     optimal_result = (
         BasicOptimizationPlan(CONFIG, partial(rosenbrock, a=a, b=b))
-        .add_callback(EventType.FINISHED_EVALUATION, report)
+        .add_observer(EventType.FINISHED_EVALUATION, report)
         .run()
         .results
     )

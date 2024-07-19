@@ -72,7 +72,7 @@ def test_scipy_samplers_shared(enopt_config: Any, method: str, evaluator: Any) -
     enopt_config["samplers"][0]["shared"] = False
     variables1 = (
         BasicOptimizationPlan(enopt_config, evaluator())
-        .add_callback(EventType.FINISHED_EVALUATION, partial(_observer, tag="result1"))
+        .add_observer(EventType.FINISHED_EVALUATION, partial(_observer, tag="result1"))
         .run()
         .variables
     )
@@ -81,7 +81,7 @@ def test_scipy_samplers_shared(enopt_config: Any, method: str, evaluator: Any) -
     enopt_config["samplers"][0]["shared"] = True
     variables2 = (
         BasicOptimizationPlan(enopt_config, evaluator())
-        .add_callback(EventType.FINISHED_EVALUATION, partial(_observer, tag="result2"))
+        .add_observer(EventType.FINISHED_EVALUATION, partial(_observer, tag="result2"))
         .run()
         .variables
     )

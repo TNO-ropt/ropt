@@ -149,7 +149,7 @@ def test_sort_filter_on_objectives(
             enopt_config,
             evaluator(functions),
         )
-        .add_callback(
+        .add_observer(
             EventType.FINISHED_EVALUATION,
             partial(_track_results, result_list=result_list),
         )
@@ -211,7 +211,7 @@ def test_sort_filter_on_objectives_with_constraints(
             enopt_config,
             evaluator(functions),
         )
-        .add_callback(
+        .add_observer(
             EventType.FINISHED_EVALUATION,
             partial(_track_results, result_list=result_list),
         )
@@ -280,7 +280,7 @@ def test_sort_filter_on_constraints(
             enopt_config,
             evaluator(functions),
         )
-        .add_callback(
+        .add_observer(
             EventType.FINISHED_EVALUATION,
             partial(_track_results, result_list=result_list),
         )
@@ -356,7 +356,7 @@ def test_sort_filter_mixed(  # noqa: C901
     result_list: List[Results] = []
     results = (
         BasicOptimizationPlan(enopt_config, evaluator(functions))
-        .add_callback(EventType.FINISHED_EVALUATION, _add_objective)
+        .add_observer(EventType.FINISHED_EVALUATION, _add_objective)
         .run()
         .results
     )
@@ -394,7 +394,7 @@ def test_sort_filter_mixed(  # noqa: C901
     result_list = []
     results = (
         BasicOptimizationPlan(enopt_config, evaluator(functions))
-        .add_callback(EventType.FINISHED_EVALUATION, _add_objective)
+        .add_observer(EventType.FINISHED_EVALUATION, _add_objective)
         .run()
         .results
     )
@@ -458,7 +458,7 @@ def test_cvar_filter_on_objectives(
             enopt_config,
             evaluator(functions),
         )
-        .add_callback(
+        .add_observer(
             EventType.FINISHED_EVALUATION,
             partial(_track_results, result_list=result_list),
         )
@@ -519,7 +519,7 @@ def test_cvar_filter_on_objectives_with_constraints(
             enopt_config,
             evaluator(functions),
         )
-        .add_callback(
+        .add_observer(
             EventType.FINISHED_EVALUATION,
             partial(_track_results, result_list=result_list),
         )
@@ -587,7 +587,7 @@ def test_cvar_filter_on_constraints(
             enopt_config,
             evaluator(functions),
         )
-        .add_callback(
+        .add_observer(
             EventType.FINISHED_EVALUATION,
             partial(_track_results, result_list=result_list),
         )
@@ -662,7 +662,7 @@ def test_cvar_filter_mixed(  # noqa: C901
     result_list: List[Results] = []
     results = (
         BasicOptimizationPlan(enopt_config, evaluator(functions))
-        .add_callback(EventType.FINISHED_EVALUATION, _add_objective)
+        .add_observer(EventType.FINISHED_EVALUATION, _add_objective)
         .run()
         .results
     )
@@ -699,7 +699,7 @@ def test_cvar_filter_mixed(  # noqa: C901
     result_list = []
     results = (
         BasicOptimizationPlan(enopt_config, evaluator(functions))
-        .add_callback(EventType.FINISHED_EVALUATION, _add_objective)
+        .add_observer(EventType.FINISHED_EVALUATION, _add_objective)
         .run()
         .results
     )

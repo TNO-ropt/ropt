@@ -101,7 +101,7 @@ class BasicOptimizationPlan:
             self._plugin_manager.add_plugins(plugin_type, plugins)
         return self
 
-    def add_callback(
+    def add_observer(
         self, event_type: EventType, function: Callable[[OptimizationEvent], None]
     ) -> BasicOptimizationPlan:
         self._observers.append((event_type, function))

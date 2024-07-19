@@ -435,7 +435,7 @@ def test_scipy_speculative(
 
     variables = (
         BasicOptimizationPlan(enopt_config, evaluator())
-        .add_callback(EventType.FINISHED_EVALUATION, _observer)
+        .add_observer(EventType.FINISHED_EVALUATION, _observer)
         .run()
         .variables
     )

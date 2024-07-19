@@ -682,7 +682,7 @@ def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
     assert np.all(completed[3].evaluations.variables == initial)
 
     completed = []
-    BasicOptimizationPlan(enopt_config, evaluator()).add_callback(
+    BasicOptimizationPlan(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, _track_evaluations
     ).repeat(2, restart_from="initial").run()
     assert np.all(completed[0].evaluations.variables == initial)
@@ -748,7 +748,7 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
     completed = []
     BasicOptimizationPlan(enopt_config, evaluator()).repeat(
         2, restart_from="last"
-    ).add_callback(EventType.FINISHED_EVALUATION, _track_evaluations).run()
+    ).add_observer(EventType.FINISHED_EVALUATION, _track_evaluations).run()
     assert np.all(
         completed[3].evaluations.variables == completed[2].evaluations.variables
     )
@@ -810,7 +810,7 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
     )
 
     completed = []
-    BasicOptimizationPlan(enopt_config, evaluator()).add_callback(
+    BasicOptimizationPlan(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, _track_evaluations
     ).repeat(2, restart_from="optimal").run()
     assert np.all(
@@ -910,7 +910,7 @@ def test_restart_optimum_with_reset(
     )
 
     completed = []
-    BasicOptimizationPlan(enopt_config, evaluator(new_functions)).add_callback(
+    BasicOptimizationPlan(enopt_config, evaluator(new_functions)).add_observer(
         EventType.FINISHED_EVALUATION, _track_evaluations
     ).repeat(3, restart_from="last_optimal").run()
 
@@ -984,7 +984,7 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
     assert restarts == [0, 1]
 
     restarts = []
-    BasicOptimizationPlan(enopt_config, evaluator()).add_callback(
+    BasicOptimizationPlan(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, _track_results
     ).add_metadata(metadata).repeat(
         2, restart_from="last_optimal", counter_var="counter"

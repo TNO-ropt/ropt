@@ -45,7 +45,7 @@ def test_max_functions_exceeded(enopt_config: Any, evaluator: Any) -> None:
 
     max_functions = 2
     enopt_config["optimizer"]["max_functions"] = max_functions
-    optimizer = BasicOptimizationPlan(enopt_config, evaluator()).add_callback(
+    optimizer = BasicOptimizationPlan(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, track_results
     )
     optimizer.run()
@@ -64,7 +64,7 @@ def test_max_functions_not_exceeded(enopt_config: Any, evaluator: Any) -> None:
     max_functions = 100
     enopt_config["optimizer"]["max_functions"] = max_functions
     enopt_config["optimizer"]["split_evaluations"] = True
-    optimizer = BasicOptimizationPlan(enopt_config, evaluator()).add_callback(
+    optimizer = BasicOptimizationPlan(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, track_results
     )
     optimizer.run()
@@ -79,7 +79,7 @@ def test_failed_realizations(enopt_config: Any, evaluator: Any) -> None:
         assert event.results[0].functions is None
 
     functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
-    optimizer = BasicOptimizationPlan(enopt_config, evaluator(functions)).add_callback(
+    optimizer = BasicOptimizationPlan(enopt_config, evaluator(functions)).add_observer(
         EventType.FINISHED_EVALUATION, _observer
     )
     optimizer.run()
@@ -110,7 +110,7 @@ def test_user_abort(enopt_config: Any, evaluator: Any) -> None:
         if event.results[0].result_id == 1:
             optimizer.abort_optimization()
 
-    optimizer = BasicOptimizationPlan(enopt_config, evaluator()).add_callback(
+    optimizer = BasicOptimizationPlan(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, _observer
     )
     optimizer.run()
@@ -185,13 +185,13 @@ def test_constraint_auto_scale(
 
     enopt_config["nonlinear_constraints"]["scales"] = scales
     enopt_config["nonlinear_constraints"]["auto_scale"] = False
-    BasicOptimizationPlan(enopt_config, evaluator(test_functions)).add_callback(
+    BasicOptimizationPlan(enopt_config, evaluator(test_functions)).add_observer(
         EventType.FINISHED_EVALUATION, check_constraints
     ).run()
 
     enopt_config["nonlinear_constraints"]["scales"] = 1.0
     enopt_config["nonlinear_constraints"]["auto_scale"] = True
-    BasicOptimizationPlan(enopt_config, evaluator(test_functions)).add_callback(
+    BasicOptimizationPlan(enopt_config, evaluator(test_functions)).add_observer(
         EventType.FINISHED_EVALUATION, check_constraints
     ).run()
 
@@ -343,7 +343,7 @@ def test_optimizer_variables_subset(enopt_config: Any, evaluator: Any) -> None:
 
     variables = (
         BasicOptimizationPlan(enopt_config, evaluator())
-        .add_callback(EventType.FINISHED_EVALUATION, assert_gradient)
+        .add_observer(EventType.FINISHED_EVALUATION, assert_gradient)
         .run()
         .variables
     )
