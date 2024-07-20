@@ -13,7 +13,7 @@ from ropt.plan import BasicOptimizationPlan
 from ropt.results import FunctionResults, GradientResults
 
 if TYPE_CHECKING:
-    from ropt.events import OptimizationEvent
+    from ropt.events import Event
 
 
 @pytest.fixture(name="enopt_config")
@@ -38,7 +38,7 @@ def enopt_config_fixture() -> Dict[str, Any]:
 def test_max_functions_exceeded(enopt_config: Any, evaluator: Any) -> None:
     last_evaluation = 100
 
-    def track_results(event: OptimizationEvent) -> None:
+    def track_results(event: Event) -> None:
         nonlocal last_evaluation
         assert event.results
         last_evaluation = event.results[0].result_id
@@ -56,7 +56,7 @@ def test_max_functions_exceeded(enopt_config: Any, evaluator: Any) -> None:
 def test_max_functions_not_exceeded(enopt_config: Any, evaluator: Any) -> None:
     last_evaluation = 100
 
-    def track_results(event: OptimizationEvent) -> None:
+    def track_results(event: Event) -> None:
         nonlocal last_evaluation
         assert event.results
         last_evaluation = event.results[0].result_id
@@ -73,7 +73,7 @@ def test_max_functions_not_exceeded(enopt_config: Any, evaluator: Any) -> None:
 
 
 def test_failed_realizations(enopt_config: Any, evaluator: Any) -> None:
-    def _observer(event: OptimizationEvent) -> None:
+    def _observer(event: Event) -> None:
         assert event.results
         assert isinstance(event.results[0], FunctionResults)
         assert event.results[0].functions is None
@@ -103,7 +103,7 @@ def test_all_failed_realizations_not_supported(
 def test_user_abort(enopt_config: Any, evaluator: Any) -> None:
     last_evaluation = 100
 
-    def _observer(event: OptimizationEvent) -> None:
+    def _observer(event: Event) -> None:
         nonlocal last_evaluation
         assert event.results
         last_evaluation = event.results[0].result_id
@@ -175,7 +175,7 @@ def test_constraint_auto_scale(
     config = EnOptConfig.model_validate(enopt_config)
     scales = np.fabs(test_functions[-1](config.variables.initial_values, None))
 
-    def check_constraints(event: OptimizationEvent) -> None:
+    def check_constraints(event: Event) -> None:
         assert event.results
         for item in event.results:
             if isinstance(item, FunctionResults) and item.result_id == 0:
@@ -332,7 +332,7 @@ def test_optimizer_variables_subset(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["variables"]["initial_values"] = [0.0, 1.0, 0.1]
     enopt_config["variables"]["indices"] = [0, 2]
 
-    def assert_gradient(event: OptimizationEvent) -> None:
+    def assert_gradient(event: Event) -> None:
         assert event.results
         assert event.results is not None
         for item in event.results:

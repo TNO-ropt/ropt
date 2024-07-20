@@ -15,7 +15,7 @@ from numpy.typing import NDArray
 
 from ropt.enums import EventType
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.events import OptimizationEvent
+from ropt.events import Event
 from ropt.plan import BasicOptimizationPlan
 from ropt.results import FunctionResults
 
@@ -59,7 +59,7 @@ def rosenbrock(
     return EvaluatorResult(objectives=objectives)
 
 
-def report(event: OptimizationEvent) -> None:
+def report(event: Event) -> None:
     """Report results of an evaluation.
 
     Args:

@@ -13,7 +13,7 @@ import numpy as np
 from numpy.random import default_rng
 
 from ropt.config.enopt.constants import DEFAULT_SEED
-from ropt.events import OptimizationEventBroker
+from ropt.events import EventBroker
 from ropt.exceptions import PlanError
 from ropt.plugins import PluginManager
 
@@ -43,7 +43,7 @@ class OptimizerContext:
         self.evaluator = evaluator
         self.rng = default_rng(DEFAULT_SEED) if seed is None else default_rng(seed)
         self.result_id_iter = count()
-        self.events = OptimizationEventBroker()
+        self.events = EventBroker()
 
 
 class Plan:

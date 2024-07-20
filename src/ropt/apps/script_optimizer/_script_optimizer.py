@@ -30,7 +30,7 @@ from ropt.config.plan import PlanConfig
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.evaluator import EvaluatorContext
 from ropt.evaluator.parsl import ParslEvaluator, State
-from ropt.events import OptimizationEvent
+from ropt.events import Event
 from ropt.exceptions import ConfigError
 from ropt.plan import OptimizerContext, Plan
 
@@ -268,7 +268,7 @@ class ScriptOptimizer:
         self._update_current_state(batch_id, jobs)
         self._store_states()
 
-    def _log_exit_code(self, event: OptimizationEvent) -> None:
+    def _log_exit_code(self, event: Event) -> None:
         msg = ""
         if event.exit_code == OptimizerExitCode.TOO_FEW_REALIZATIONS:
             msg = "Too few successful realizations: optimization stopped."

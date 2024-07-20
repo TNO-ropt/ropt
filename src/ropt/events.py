@@ -13,13 +13,12 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class OptimizationEvent:
-    """The `OptimizationEvent` class stores optimization event data.
+class Event:
+    """The `Event` class stores optimization event data.
 
-    While running an optimization, callbacks can be connected to react to events
-    triggered during the execution of the optimization plan. These callbacks
-    accept a single `OptimizationEvent` object containing information about the
-    event.
+    While running an optimization plan, callbacks can be connected to react to
+    events triggered during execution. These callbacks accept a single `Event`
+    object containing information about the event.
 
     The actual data contained in the object depends on the nature of the event.
     Refer to the documentation of the [`EventType`][ropt.enums.EventType]
@@ -39,19 +38,19 @@ class OptimizationEvent:
     step_name: Optional[str] = None
 
 
-class OptimizationEventBroker:
-    """A class for handling optimization events."""
+class EventBroker:
+    """A class for handling events."""
 
     def __init__(self) -> None:
-        """Initialize the optimization event broker."""
-        self._subscribers: Dict[
-            EventType, List[Callable[[OptimizationEvent], None]]
-        ] = {event: [] for event in EventType}
+        """Initialize the event broker."""
+        self._subscribers: Dict[EventType, List[Callable[[Event], None]]] = {
+            event: [] for event in EventType
+        }
 
     def add_observer(
         self,
         event: EventType,
-        callback: Callable[[OptimizationEvent], None],
+        callback: Callable[[Event], None],
     ) -> None:
         """Add an observer function.
 
@@ -62,17 +61,17 @@ class OptimizationEventBroker:
         self._subscribers[event].append(callback)
 
     def emit(self, event_type: EventType, /, **kwargs: Any) -> None:  # noqa: ANN401
-        """Emit an optimization event.
+        """Emit an event.
 
         The keyword arguments are used to construct an
-        [`OptimizationEvent`][ropt.events.OptimizationEvent] object of the type
-        given by `event_type`. All stored callbacks that react to this event
-        type are then called with that event object as their arugment.
+        [`Event`][ropt.events.Event] object of the type given by `event_type`.
+        All stored callbacks that react to this event type are then called with
+        that event object as their argument.
 
         Args:
             event_type: The type of event to emit
             kwargs:     Keyword arguments used to create an optimization event
         """
-        event = OptimizationEvent(event_type=event_type, **kwargs)
+        event = Event(event_type=event_type, **kwargs)
         for callback in self._subscribers[event_type]:
             callback(event)

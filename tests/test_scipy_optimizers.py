@@ -6,7 +6,7 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt.enums import ConstraintType, EventType
-from ropt.events import OptimizationEvent
+from ropt.events import Event
 from ropt.plan import BasicOptimizationPlan
 from ropt.plugins.optimizer.scipy import (
     _CONSTRAINT_REQUIRES_BOUNDS,
@@ -429,7 +429,7 @@ def test_scipy_speculative(
     enopt_config["optimizer"]["method"] = "slsqp"
     enopt_config["optimizer"]["speculative"] = speculative
 
-    def _observer(event: OptimizationEvent) -> None:
+    def _observer(event: Event) -> None:
         assert event.results is not None
         assert len(event.results) == 2 if speculative else 1
 

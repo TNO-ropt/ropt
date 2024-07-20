@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 
     from ropt.config.enopt import EnOptConfig
     from ropt.evaluator import Evaluator
-    from ropt.events import OptimizationEvent
+    from ropt.events import Event
     from ropt.plugins._manager import PluginType
     from ropt.plugins.base import Plugin
     from ropt.results import FunctionResults
@@ -52,9 +52,7 @@ class BasicOptimizationPlan:
         self._results: Optional[FunctionResults]
         self._variables: Optional[NDArray[np.float64]]
         self._exit_code: OptimizerExitCode = OptimizerExitCode.UNKNOWN
-        self._observers: List[
-            Tuple[EventType, Callable[[OptimizationEvent], None]]
-        ] = []
+        self._observers: List[Tuple[EventType, Callable[[Event], None]]] = []
 
         self._plan_config: Dict[str, List[Dict[str, Any]]] = {
             "context": [
@@ -102,7 +100,7 @@ class BasicOptimizationPlan:
         return self
 
     def add_observer(
-        self, event_type: EventType, function: Callable[[OptimizationEvent], None]
+        self, event_type: EventType, function: Callable[[Event], None]
     ) -> BasicOptimizationPlan:
         self._observers.append((event_type, function))
         return self

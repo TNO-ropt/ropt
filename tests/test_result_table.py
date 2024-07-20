@@ -6,7 +6,7 @@ import pytest
 
 from ropt.config.enopt import EnOptConfig
 from ropt.enums import EventType
-from ropt.events import OptimizationEvent
+from ropt.events import Event
 from ropt.plan import BasicOptimizationPlan
 from ropt.report import ResultsTable
 
@@ -36,9 +36,7 @@ def enopt_config_fixture() -> Dict[str, Any]:
     }
 
 
-def _handle_results(
-    event: OptimizationEvent, reporter: ResultsTable, config: EnOptConfig
-) -> None:
+def _handle_results(event: Event, reporter: ResultsTable, config: EnOptConfig) -> None:
     assert event.results is not None
     reporter.add_results(config, event.results)
 

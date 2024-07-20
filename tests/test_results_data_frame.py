@@ -5,7 +5,7 @@ import pytest
 
 from ropt.config.enopt import EnOptConfig
 from ropt.enums import EventType
-from ropt.events import OptimizationEvent
+from ropt.events import Event
 from ropt.plan import BasicOptimizationPlan
 from ropt.report import ResultsDataFrame
 
@@ -36,7 +36,7 @@ def enopt_config_fixture() -> Dict[str, Any]:
 
 
 def _handle_results(
-    event: OptimizationEvent, reporter: ResultsDataFrame, config: EnOptConfig
+    event: Event, reporter: ResultsDataFrame, config: EnOptConfig
 ) -> None:
     assert event.results is not None
     reporter.add_results(config, event.results)
@@ -124,7 +124,7 @@ def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
         },
     )
 
-    def handler(event: OptimizationEvent) -> None:
+    def handler(event: Event) -> None:
         assert event.results is not None
         assert event.results is not None
         for item in event.results:
@@ -150,7 +150,7 @@ def test_dataframe_results_metadata_step_id(enopt_config: Any, evaluator: Any) -
         },
     )
 
-    def handler(event: OptimizationEvent) -> None:
+    def handler(event: Event) -> None:
         assert event.results is not None
         reporter.add_results(EnOptConfig.model_validate(enopt_config), event.results)
 

@@ -10,7 +10,7 @@ from pydantic import ValidationError
 
 from ropt.config.plan import PlanConfig
 from ropt.enums import EventType, OptimizerExitCode
-from ropt.events import OptimizationEvent
+from ropt.events import Event
 from ropt.exceptions import PlanError
 from ropt.plan import BasicOptimizationPlan, OptimizerContext, Plan
 from ropt.results import FunctionResults, Results
@@ -396,7 +396,7 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
 def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
     completed_functions = 0
 
-    def _track_evaluations(event: OptimizationEvent) -> None:
+    def _track_evaluations(event: Event) -> None:
         nonlocal completed_functions
         assert event.results is not None
         for item in event.results:
@@ -499,7 +499,7 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
 def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
     completed: List[FunctionResults] = []
 
-    def _track_evaluations(event: OptimizationEvent) -> None:
+    def _track_evaluations(event: Event) -> None:
         nonlocal completed
         assert event.results is not None
         completed += [
@@ -632,7 +632,7 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
 def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
     completed: List[FunctionResults] = []
 
-    def _track_evaluations(event: OptimizationEvent) -> None:
+    def _track_evaluations(event: Event) -> None:
         nonlocal completed
         assert event.results is not None
         completed += [
@@ -692,7 +692,7 @@ def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
 def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
     completed: List[FunctionResults] = []
 
-    def _track_evaluations(event: OptimizationEvent) -> None:
+    def _track_evaluations(event: Event) -> None:
         nonlocal completed
         assert event.results is not None
         completed += [
@@ -757,7 +757,7 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
 def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
     completed: List[FunctionResults] = []
 
-    def _track_evaluations(event: OptimizationEvent) -> None:
+    def _track_evaluations(event: Event) -> None:
         nonlocal completed
         assert event.results is not None
         completed += [
@@ -824,7 +824,7 @@ def test_restart_optimum_with_reset(
     completed: List[FunctionResults] = []
     max_functions = 5
 
-    def _track_evaluations(event: OptimizationEvent) -> None:
+    def _track_evaluations(event: Event) -> None:
         nonlocal completed
         assert event.results is not None
         completed += [
@@ -929,7 +929,7 @@ def test_restart_optimum_with_reset(
 def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
     restarts: List[int] = []
 
-    def _track_results(event: OptimizationEvent) -> None:
+    def _track_results(event: Event) -> None:
         assert event.results is not None
         metadata = event.results[0].metadata
         restart = metadata.get("restart", -1)
@@ -1095,7 +1095,7 @@ def test_evaluator_step(enopt_config: Any, evaluator: Any) -> None:
 def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
     completed: List[float] = []
 
-    def _track_evaluations(event: OptimizationEvent) -> None:
+    def _track_evaluations(event: Event) -> None:
         nonlocal completed
         assert event.results is not None
         completed += [
@@ -1148,7 +1148,7 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
 
     completed_functions = 0
 
-    def _track_evaluations(event: OptimizationEvent) -> None:
+    def _track_evaluations(event: Event) -> None:
         nonlocal completed_functions
         assert event.results is not None
         for item in event.results:
@@ -1236,11 +1236,11 @@ def test_exit_code(enopt_config: Any, evaluator: Any) -> None:
     is_called = False
 
     def _exit_code(
-        event: OptimizationEvent,
+        event: Event,
     ) -> None:
         nonlocal is_called
         is_called = True
-        assert isinstance(event, OptimizationEvent)
+        assert isinstance(event, Event)
         assert event.exit_code == OptimizerExitCode.MAX_FUNCTIONS_REACHED
 
     plan_config = {

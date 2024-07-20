@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from ropt.enums import EventType
-from ropt.events import OptimizationEvent
+from ropt.events import Event
 from ropt.plan import BasicOptimizationPlan
 from ropt.plugins.sampler.scipy import _SUPPORTED_METHODS
 from ropt.results import GradientResults
@@ -63,7 +63,7 @@ def test_scipy_samplers_shared(enopt_config: Any, method: str, evaluator: Any) -
 
     perturbations: Dict[str, NDArray[np.float64]] = {}
 
-    def _observer(event: OptimizationEvent, tag: str) -> None:
+    def _observer(event: Event, tag: str) -> None:
         assert event.results is not None
         for item in event.results:
             if isinstance(item, GradientResults) and tag not in perturbations:

@@ -6,7 +6,7 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt.enums import ConstraintType, EventType
-from ropt.events import OptimizationEvent
+from ropt.events import Event
 from ropt.plan import BasicOptimizationPlan
 from ropt.plugins.realization_filter.default import (
     _get_cvar_weights_from_percentile,
@@ -107,7 +107,7 @@ def _constraint_function(variables: NDArray[np.float64], context: Any) -> float:
     return float(result)
 
 
-def _track_results(event: OptimizationEvent, result_list: List[Results]) -> None:
+def _track_results(event: Event, result_list: List[Results]) -> None:
     assert event.results
     result_list.extend(event.results)
 
@@ -332,7 +332,7 @@ def test_sort_filter_mixed(  # noqa: C901
 
     objective_values: List[NDArray[np.float64]] = []
 
-    def _add_objective(event: OptimizationEvent) -> None:
+    def _add_objective(event: Event) -> None:
         if event.results:
             for item in event.results:
                 if isinstance(item, FunctionResults):
@@ -639,7 +639,7 @@ def test_cvar_filter_mixed(  # noqa: C901
 
     objective_values: List[NDArray[np.float64]] = []
 
-    def _add_objective(event: OptimizationEvent) -> None:
+    def _add_objective(event: Event) -> None:
         if event.results is not None:
             for item in event.results:
                 if isinstance(item, FunctionResults):
