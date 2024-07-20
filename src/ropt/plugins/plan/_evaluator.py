@@ -9,8 +9,8 @@ from pydantic import BaseModel, ConfigDict
 
 from ropt.config.enopt import EnOptConfig
 from ropt.config.utils import Array2D  # noqa: TCH001
+from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
-from ropt.evaluator import EnsembleEvaluator
 from ropt.exceptions import OptimizationAborted, PlanError
 from ropt.plan import ContextUpdateResults
 from ropt.plugins.plan.base import PlanStep
@@ -79,7 +79,7 @@ class DefaultEvaluatorStep(PlanStep):
         self._enopt_config = EnOptConfig.model_validate(config)
 
         self.plan.optimizer_context.events.emit(
-            event_type=EventType.START_EVALUATOR_STEP,
+            EventType.START_EVALUATOR_STEP,
             config=self._enopt_config,
             step_name=self.step_config.name,
         )
@@ -124,7 +124,7 @@ class DefaultEvaluatorStep(PlanStep):
             )
 
         self.plan.optimizer_context.events.emit(
-            event_type=EventType.FINISHED_EVALUATOR_STEP,
+            EventType.FINISHED_EVALUATOR_STEP,
             config=self._enopt_config,
             results=results,
             exit_code=exit_code,

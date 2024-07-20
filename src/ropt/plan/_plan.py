@@ -13,10 +13,9 @@ import numpy as np
 from numpy.random import default_rng
 
 from ropt.config.enopt.constants import DEFAULT_SEED
+from ropt.events import OptimizationEventBroker
 from ropt.exceptions import PlanError
 from ropt.plugins import PluginManager
-
-from ._events import OptimizationEventBroker
 
 if TYPE_CHECKING:
     from ropt.config.plan import PlanConfig, StepConfig

@@ -10,11 +10,11 @@ from pydantic import BaseModel, ConfigDict
 from ropt.config.enopt import EnOptConfig
 from ropt.config.plan import PlanConfig  # noqa: TCH001
 from ropt.config.utils import Array1D  # noqa: TCH001
+from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
-from ropt.evaluator import EnsembleEvaluator
 from ropt.exceptions import PlanError
-from ropt.plan import ContextUpdateResults, Optimizer, Plan
-from ropt.plugins.plan.base import OptimizerStep
+from ropt.plan import ContextUpdateResults, EnsembleOptimizer, Plan
+from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
 
 if TYPE_CHECKING:
@@ -66,7 +66,7 @@ class DefaultOptimizerStepWith(BaseModel):
     )
 
 
-class DefaultOptimizerStep(OptimizerStep):
+class DefaultOptimizerStep(PlanStep):
     """The default optimizer step."""
 
     def __init__(self, config: StepConfig, plan: Plan) -> None:
@@ -98,7 +98,7 @@ class DefaultOptimizerStep(OptimizerStep):
         self._enopt_config = EnOptConfig.model_validate(config)
 
         self.plan.optimizer_context.events.emit(
-            event_type=EventType.START_OPTIMIZER_STEP,
+            EventType.START_OPTIMIZER_STEP,
             config=self._enopt_config,
             step_name=self.step_config.name,
         )
@@ -113,18 +113,19 @@ class DefaultOptimizerStep(OptimizerStep):
         )
 
         variables = self._get_variables()
-        exit_code = Optimizer(
+        exit_code = EnsembleOptimizer(
             enopt_config=self._enopt_config,
-            optimizer_step=self,
             ensemble_evaluator=ensemble_evaluator,
             plugin_manager=self.plan.plugin_manager,
+            nested_optimizer=self._run_nested_plan,
+            signal_evaluation=self._signal_evaluation,
         ).start(variables)
 
         if self._with.exit_code_var is not None:
             self.plan[self._with.exit_code_var] = exit_code
 
         self.plan.optimizer_context.events.emit(
-            event_type=EventType.FINISHED_OPTIMIZER_STEP,
+            EventType.FINISHED_OPTIMIZER_STEP,
             config=self._enopt_config,
             exit_code=exit_code,
             step_name=self.step_config.name,
@@ -132,42 +133,45 @@ class DefaultOptimizerStep(OptimizerStep):
 
         return exit_code == OptimizerExitCode.USER_ABORT
 
-    def start_evaluation(self) -> None:
-        """Call before an evaluation is started."""
-        self.plan.optimizer_context.events.emit(
-            event_type=EventType.START_EVALUATION,
-            config=self._enopt_config,
-            step_name=self.step_config.name,
-        )
+    def _signal_evaluation(self, results: Optional[Tuple[Results, ...]] = None) -> None:
+        """Called before and after the optimizer finishes an evaluation.
 
-    def finish_evaluation(self, results: Tuple[Results, ...]) -> None:
-        """Called after the optimizer finishes an evaluation.
+        Before the evaluation starts, this method is called with the `results`
+        argument set to `None`. When an evaluation is has finished, it is called
+        with `results` set to the results of the evaluation.
 
         Args:
             results: The results produced by the evaluation.
         """
-        for item in results:
-            if self.step_config.name is not None:
-                item.metadata["step_name"] = self.step_config.name
-            for key, expr in self._with.metadata.items():
-                item.metadata[key] = self.plan.parse_value(expr)
-
-        for obj_id in self._with.update:
-            self.plan.update_context(
-                obj_id,
-                ContextUpdateResults(
-                    step_name=self.step_config.name,
-                    results=results,
-                ),
+        if results is None:
+            self.plan.optimizer_context.events.emit(
+                EventType.START_EVALUATION,
+                config=self._enopt_config,
+                step_name=self.step_config.name,
             )
-        self.plan.optimizer_context.events.emit(
-            event_type=EventType.FINISHED_EVALUATION,
-            config=self._enopt_config,
-            results=results,
-            step_name=self.step_config.name,
-        )
+        else:
+            for item in results:
+                if self.step_config.name is not None:
+                    item.metadata["step_name"] = self.step_config.name
+                for key, expr in self._with.metadata.items():
+                    item.metadata[key] = self.plan.parse_value(expr)
 
-    def run_nested_plan(
+            for obj_id in self._with.update:
+                self.plan.update_context(
+                    obj_id,
+                    ContextUpdateResults(
+                        step_name=self.step_config.name,
+                        results=results,
+                    ),
+                )
+            self.plan.optimizer_context.events.emit(
+                EventType.FINISHED_EVALUATION,
+                config=self._enopt_config,
+                results=results,
+                step_name=self.step_config.name,
+            )
+
+    def _run_nested_plan(
         self, variables: NDArray[np.float64]
     ) -> Tuple[Optional[FunctionResults], bool]:
         """Run a  nested plan.

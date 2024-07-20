@@ -6,8 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.config.enopt import EnOptConfig
-
-from ._evaluator import Evaluator, EvaluatorContext
+from ropt.evaluator import Evaluator, EvaluatorContext
 
 
 @dataclass

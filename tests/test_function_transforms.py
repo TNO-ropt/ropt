@@ -93,8 +93,8 @@ def test_stddev_function_transform(
     split_evaluations: bool,
 ) -> None:
     functions = [
-        partial(_compute_distance_squared_stddev, target=[0.5, 0.5, 0.5]),
-        partial(_compute_distance_squared_stddev, target=[-1.5, -1.5, 0.5]),
+        partial(_compute_distance_squared_stddev, target=np.array([0.5, 0.5, 0.5])),
+        partial(_compute_distance_squared_stddev, target=np.array([-1.5, -1.5, 0.5])),
     ]
 
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations

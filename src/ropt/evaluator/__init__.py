@@ -36,13 +36,11 @@ Tip: Reusing Objective and Non-linear Constraint Values
 """
 
 from ._concurrent import ConcurrentEvaluator, ConcurrentTask
-from ._ensemble_evaluator import EnsembleEvaluator
 from ._evaluator import Evaluator, EvaluatorContext, EvaluatorResult
 
 __all__ = [
     "ConcurrentEvaluator",
     "ConcurrentTask",
-    "EnsembleEvaluator",
     "Evaluator",
     "EvaluatorContext",
     "EvaluatorResult",

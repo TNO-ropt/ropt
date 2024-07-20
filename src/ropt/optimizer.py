@@ -1,6 +1,8 @@
+"""Ensemble optimizer class."""
+
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Tuple
+from typing import TYPE_CHECKING, Optional, Protocol, Tuple
 
 import numpy as np
 
@@ -18,25 +20,94 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config.enopt import EnOptConfig
-    from ropt.evaluator import EnsembleEvaluator
+    from ropt.ensemble_evaluator import EnsembleEvaluator
     from ropt.plugins import PluginManager
-    from ropt.plugins.plan.base import OptimizerStep
     from ropt.results import Functions, Gradients, Results
 
 
-class Optimizer:
+class SignalEvaluationCallback(Protocol):
+    """Protocol for the callback that is used to signal that an evaluation is occurring."""
+
+    def __call__(self, results: Optional[Tuple[Results, ...]] = None, /) -> None:
+        """Callback protocal.
+
+        When a function with this signature is provided to an ensemble
+        optimizer, it is called before and after the optimizer finishes an
+        evaluation.Before the evaluation starts, this method is called with the
+        `results` argument set to `None`. When an evaluation is has finished, it
+        is called with `results` set to the results of the evaluation.
+
+        Args:
+            results: The results produced by the evaluation.
+        """
+
+
+class NestedOptimizerCallback(Protocol):
+    """Run a nested optimization."""
+
+    def __call__(
+        self, variables: NDArray[np.float64], /
+    ) -> Tuple[Optional[FunctionResults], bool]:
+        """Callback protocol.
+
+        When a function with this signature is provided to an ensemble
+        optimizer, it is called at each function evaluation to run a nested
+        optimization. It accepts the current variables as its arguments and
+        returns a tuple consisting of the result (or `None` if no result is
+        available), and a boolean value that indicates if the optimization was
+        aborted by a user signal.
+
+        Args:
+            variables: The variables to start the nested optimization with
+
+        Returns:
+            The nested optimization results and whether the user aborted the optimization.
+        """
+
+
+class EnsembleOptimizer:
+    """Optimizer class for running ensemble optimizations."""
+
     def __init__(
         self,
         *,
-        optimizer_step: OptimizerStep,
         enopt_config: EnOptConfig,
         ensemble_evaluator: EnsembleEvaluator,
         plugin_manager: PluginManager,
+        signal_evaluation: Optional[SignalEvaluationCallback] = None,
+        nested_optimizer: Optional[NestedOptimizerCallback] = None,
     ) -> None:
+        """Initialize the ensemble optimizer class.
+
+        This class requires at least three argument thats together define a single optimization run:
+
+        1. An [`EnOptConfig`][ropt.config.enopt.EnOptConfig] that contains all
+           configuration settings for the optimization.
+        2. An [`EnsembleEvaluator`][ropt.evaluator.EnsembleEvaluator] object
+           that is responsible for evaluating functions and gradients.
+        3. A [`PluginManager`][ropt.plugins.PluginManager] object that provides
+           access to optimizer plugins.
+
+        In addition, two optional callbacks can be provided:
+
+        1. A [`SignalEvaluationCallback`][ropt.optimizer.SignalEvaluationCallback]
+           callback that is called before and after each function evaluation.
+        2. A [`NestedOptimizerCallback`][ropt.optimizer.NestedOptimizerCallback]
+           callback that is called at each function evaluation to run a nested
+           optimization.
+
+        Args:
+            enopt_config:       The ensemble optimization configuration
+            ensemble_evaluator: The evaluator object
+            plugin_manager:     Plugin manager
+            signal_evaluation:  Optional callback to signal evaluations
+            nested_optimizer:   Optional nested optimization call
+        """
         self._enopt_config = enopt_config
-        self._optimizer_step = optimizer_step
         self._function_evaluator = ensemble_evaluator
         self._plugin_manager = plugin_manager
+        self._signal_evaluation = signal_evaluation
+        self._nested_optimizer = nested_optimizer
 
         # This stores the values of the fixed variable
         self._fixed_variables: NDArray[np.float64]
@@ -48,6 +119,14 @@ class Optimizer:
         self._allow_nan = False
 
     def start(self, variables: NDArray[np.float64]) -> OptimizerExitCode:
+        """Start the optimization.
+
+        Args:
+            variables: The initial variables for the optimization.
+
+        Returns:
+            _description_
+        """
         self._fixed_variables = variables.copy()
 
         optimizer = self._plugin_manager.get_plugin(
@@ -77,12 +156,13 @@ class Optimizer:
 
         # Run any nested steps, when this improves the objective, this may
         # change the fixed variables and the current optimal result:
-        nested_results, aborted = self._optimizer_step.run_nested_plan(variables)
-        if nested_results is not None:
-            if aborted:
-                raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
-            variables = nested_results.evaluations.variables.copy()
-            self._fixed_variables = variables.copy()
+        if self._nested_optimizer is not None:
+            nested_results, aborted = self._nested_optimizer(variables)
+            if nested_results is not None:
+                if aborted:
+                    raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
+                variables = nested_results.evaluations.variables.copy()
+                self._fixed_variables = variables.copy()
 
         results = self._run_evaluations(
             variables,
@@ -155,14 +235,16 @@ class Optimizer:
         compute_gradients: bool = False,
     ) -> Tuple[Results, ...]:
         assert compute_functions or compute_gradients
-        self._optimizer_step.start_evaluation()
+        if self._signal_evaluation:
+            self._signal_evaluation()
         results = self._function_evaluator.calculate(
             variables,
             compute_functions=compute_functions,
             compute_gradients=compute_gradients,
         )
         results = self._augment_results(results)
-        self._optimizer_step.finish_evaluation(results)
+        if self._signal_evaluation:
+            self._signal_evaluation(results)
 
         # If the configuration allows for zero successful realizations, there
         # will always be results. However, they may all be equal to `np.nan`. If

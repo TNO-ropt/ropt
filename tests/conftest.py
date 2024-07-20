@@ -91,8 +91,8 @@ def _compute_distance_squared(
 @pytest.fixture(name="test_functions", scope="session")
 def fixture_test_functions() -> Tuple[_Function, _Function]:
     return (
-        partial(_compute_distance_squared, target=[0.5, 0.5, 0.5]),
-        partial(_compute_distance_squared, target=[-1.5, -1.5, 0.5]),
+        partial(_compute_distance_squared, target=np.array([0.5, 0.5, 0.5])),
+        partial(_compute_distance_squared, target=np.array([-1.5, -1.5, 0.5])),
     )
 
 

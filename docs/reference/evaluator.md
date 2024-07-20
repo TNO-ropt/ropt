@@ -1,7 +1,3 @@
-::: ropt.evaluator
-    options:
-        members: none
-
 ## Evaluator callbacks
 
 ::: ropt.evaluator.Evaluator

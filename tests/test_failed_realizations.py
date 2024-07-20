@@ -1,6 +1,6 @@
 import numpy as np
 
-from ropt.evaluator._utils import _get_failed_realizations
+from ropt.ensemble_evaluator._utils import _get_failed_realizations
 
 
 def test_failed_realizations01() -> None:

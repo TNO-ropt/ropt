@@ -119,8 +119,8 @@ def test_sort_filter_on_objectives(
     split_evaluations: bool,
 ) -> None:
     functions = [
-        partial(_objective_function, target=[0.5, 0.5, 0.5]),
-        partial(_objective_function, target=[-1.5, -1.5, 0.5]),
+        partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
+        partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
     ]
 
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations
@@ -182,8 +182,8 @@ def test_sort_filter_on_objectives_with_constraints(
     split_evaluations: bool,
 ) -> None:
     functions = [
-        partial(_objective_function, target=[0.5, 0.5, 0.5]),
-        partial(_objective_function, target=[-1.5, -1.5, 0.5]),
+        partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
+        partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
         partial(_constraint_function),
     ]
 
@@ -251,8 +251,8 @@ def test_sort_filter_on_constraints(
     split_evaluations: bool,
 ) -> None:
     functions = [
-        partial(_objective_function, target=[0.5, 0.5, 0.5]),
-        partial(_objective_function, target=[-1.5, -1.5, 0.5]),
+        partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
+        partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
         partial(_constraint_function),
     ]
 
@@ -320,10 +320,10 @@ def test_sort_filter_mixed(  # noqa: C901
     split_evaluations: bool,
 ) -> None:
     functions = [
-        partial(_objective_function, target=[0.5, 0.5, 0.5]),
-        partial(_objective_function, target=[-1.5, -1.5, 0.5]),
-        partial(_objective_function, target=[0.5, 0.5, 0.5]),
-        partial(_objective_function, target=[-1.5, -1.5, 0.5]),
+        partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
+        partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
+        partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
+        partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
     ]
 
     enopt_config["objective_functions"]["weights"] = [0.75, 0.25, 0.75, 0.25]
@@ -430,8 +430,8 @@ def test_cvar_filter_on_objectives(
     split_evaluations: bool,
 ) -> None:
     functions = [
-        partial(_objective_function, target=[0.5, 0.5, 0.5]),
-        partial(_objective_function, target=[-1.5, -1.5, 0.5]),
+        partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
+        partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
     ]
 
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations
@@ -491,8 +491,8 @@ def test_cvar_filter_on_objectives_with_constraints(
     split_evaluations: bool,
 ) -> None:
     functions = [
-        partial(_objective_function, target=[0.5, 0.5, 0.5]),
-        partial(_objective_function, target=[-1.5, -1.5, 0.5]),
+        partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
+        partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
         partial(_constraint_function),
     ]
 
@@ -559,8 +559,8 @@ def test_cvar_filter_on_constraints(
     split_evaluations: bool,
 ) -> None:
     functions = [
-        partial(_objective_function, target=[0.5, 0.5, 0.5]),
-        partial(_objective_function, target=[-1.5, -1.5, 0.5]),
+        partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
+        partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
         partial(_constraint_function),
     ]
 
@@ -627,10 +627,10 @@ def test_cvar_filter_mixed(  # noqa: C901
     split_evaluations: bool,
 ) -> None:
     functions = [
-        partial(_objective_function, target=[0.5, 0.5, 0.5]),
-        partial(_objective_function, target=[-1.5, -1.5, 0.5]),
-        partial(_objective_function, target=[0.5, 0.5, 0.5]),
-        partial(_objective_function, target=[-1.5, -1.5, 0.5]),
+        partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
+        partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
+        partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
+        partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
     ]
 
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations

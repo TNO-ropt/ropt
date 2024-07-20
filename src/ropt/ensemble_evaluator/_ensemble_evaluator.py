@@ -35,12 +35,11 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config.enopt import EnOptConfig
+    from ropt.evaluator import Evaluator
     from ropt.plugins import PluginManager
     from ropt.plugins.function_transform.base import FunctionTransform
     from ropt.plugins.realization_filter.base import RealizationFilter
     from ropt.plugins.sampler.base import Sampler
-
-    from ._evaluator import Evaluator
 
 
 class EnsembleEvaluator:
