@@ -1009,48 +1009,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.OptimizerStep" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptimizerStep
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptimizerStep">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.OptimizerStep.start_evaluation" class="md-nav__link">
-    <span class="md-ellipsis">
-      start_evaluation
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.OptimizerStep.finish_evaluation" class="md-nav__link">
-    <span class="md-ellipsis">
-      finish_evaluation
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.OptimizerStep.run_nested_plan" class="md-nav__link">
-    <span class="md-ellipsis">
-      run_nested_plan
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plugins.plan.base.PlanPlugin" class="md-nav__link">
     <span class="md-ellipsis">
       PlanPlugin
@@ -1492,48 +1450,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.OptimizerStep" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptimizerStep
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptimizerStep">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.OptimizerStep.start_evaluation" class="md-nav__link">
-    <span class="md-ellipsis">
-      start_evaluation
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.OptimizerStep.finish_evaluation" class="md-nav__link">
-    <span class="md-ellipsis">
-      finish_evaluation
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.OptimizerStep.run_nested_plan" class="md-nav__link">
-    <span class="md-ellipsis">
-      run_nested_plan
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plugins.plan.base.PlanPlugin" class="md-nav__link">
     <span class="md-ellipsis">
       PlanPlugin
@@ -1859,7 +1775,7 @@ and <code>plan</code> properties.</p>
           <tr class="doc-section-item">
             <td><code>value</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plan.ContextUpdate" href="../plans/#ropt.plan.ContextUpdate">ContextUpdate</a></code>
+                  <code><span title="ropt.plan.ContextUpdate">ContextUpdate</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2223,189 +2139,6 @@ and <code>plan</code> properties.</p>
 
 
 
-<h3 id="ropt.plugins.plan.base.OptimizerStep" class="doc doc-heading">
-            <code>OptimizerStep</code>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.PlanStep" href="#ropt.plugins.plan.base.PlanStep">PlanStep</a></code></p>
-
-
-      <p>Base class for optimizer steps.</p>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plugins.plan.base.OptimizerStep.start_evaluation" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">start_evaluation</span><span class="p">()</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-      <p>Called before the optimizer starts an evaluation.</p>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plugins.plan.base.OptimizerStep.finish_evaluation" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">finish_evaluation</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-      <p>Called after the optimizer finishes an evaluation.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>results</code></td>
-            <td>
-                  <code><span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The results produced by the evaluation.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plugins.plan.base.OptimizerStep.run_nested_plan" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">run_nested_plan</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-      <p>Run a  nested plan.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>variables</code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>variables to set in the nested plan.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="typing.Tuple">Tuple</span>[<span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.results.FunctionResults" href="../results/#ropt.results.FunctionResults">FunctionResults</a>], bool]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The variables generated by the nested plan.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
 <h3 id="ropt.plugins.plan.base.PlanPlugin" class="doc doc-heading">
             <code>PlanPlugin</code>
 
@@ -2479,7 +2212,7 @@ and <code>plan</code> properties.</p>
           <tr class="doc-section-item">
             <td><code>context</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plan.OptimizerContext" href="../plans/#ropt.plan.OptimizerContext">OptimizerContext</a></code>
+                  <code><span title="ropt.plan.OptimizerContext">OptimizerContext</span></code>
             </td>
             <td>
               <div class="doc-md-description">
