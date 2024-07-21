@@ -3,7 +3,7 @@ r"""Code to run optimization plans."""
 from ropt.optimizer import EnsembleOptimizer
 
 from ._plan import OptimizerContext, Plan
-from ._run import BasicOptimizationPlan
+from ._run import OptimizationPlanRunner
 from ._update import (
     ContextUpdate,
     ContextUpdateDict,
@@ -11,7 +11,7 @@ from ._update import (
 )
 
 __all__ = [
-    "BasicOptimizationPlan",
+    "OptimizationPlanRunner",
     "ContextUpdate",
     "ContextUpdateDict",
     "ContextUpdateResults",

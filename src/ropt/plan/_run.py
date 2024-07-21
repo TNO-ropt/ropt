@@ -34,8 +34,8 @@ if TYPE_CHECKING:
     from ropt.results import FunctionResults
 
 
-class BasicOptimizationPlan:
-    """Runner class for basic optimization plans."""
+class OptimizationPlanRunner:
+    """A class for running optimization plans."""
 
     def __init__(
         self,
@@ -93,7 +93,7 @@ class BasicOptimizationPlan:
 
     def add_plugins(
         self, plugin_type: PluginType, plugins: Dict[str, Plugin]
-    ) -> BasicOptimizationPlan:
+    ) -> OptimizationPlanRunner:
         if self._plugin_manager is None:
             self._plugin_manager = PluginManager()
             self._plugin_manager.add_plugins(plugin_type, plugins)
@@ -101,11 +101,11 @@ class BasicOptimizationPlan:
 
     def add_observer(
         self, event_type: EventType, function: Callable[[Event], None]
-    ) -> BasicOptimizationPlan:
+    ) -> OptimizationPlanRunner:
         self._observers.append((event_type, function))
         return self
 
-    def add_metadata(self, metadata: Dict[str, Any]) -> BasicOptimizationPlan:
+    def add_metadata(self, metadata: Dict[str, Any]) -> OptimizationPlanRunner:
         steps = self._plan_config["steps"]
         idx = next(
             (idx for idx, step in enumerate(steps) if step["run"] == "repeat"), None
@@ -121,7 +121,7 @@ class BasicOptimizationPlan:
         iterations: int,
         restart_from: Literal["initial", "last", "optimal", "last_optimal"] = "optimal",
         counter_var: Optional[str] = None,
-    ) -> BasicOptimizationPlan:
+    ) -> OptimizationPlanRunner:
         if any(step["run"] == "repeat" for step in self._plan_config["steps"]):
             msg = "The repeat() method can only be called once."
             raise RuntimeError(msg)
@@ -159,7 +159,7 @@ class BasicOptimizationPlan:
         ]
         return self
 
-    def run(self) -> BasicOptimizationPlan:
+    def run(self) -> OptimizationPlanRunner:
         config = PlanConfig.model_validate(self._plan_config)
         plan = Plan(
             config,

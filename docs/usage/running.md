@@ -14,7 +14,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.plan import BasicOptimizationPlan
+from ropt.plan import OptimizationPlanRunner
 
 
 def rosenbrock(
@@ -32,7 +32,7 @@ CONFIG = {                                                            # (4)!
     "gradient": {"perturbation_magnitudes": 1e-6}                     # (5)!
 }
 
-plan = BasicOptimizationPlan(CONFIG, rosenbrock)                      # (6)!
+plan = OptimizationPlanRunner(CONFIG, rosenbrock)                      # (6)!
 plan.run()                                                            # (7)!
 optimum = plan.results                                                # (8)
 

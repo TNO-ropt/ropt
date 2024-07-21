@@ -12,7 +12,7 @@ from ropt.config.plan import PlanConfig
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.events import Event
 from ropt.exceptions import PlanError
-from ropt.plan import BasicOptimizationPlan, OptimizerContext, Plan
+from ropt.plan import OptimizationPlanRunner, OptimizerContext, Plan
 from ropt.results import FunctionResults, Results
 
 if TYPE_CHECKING:
@@ -41,7 +41,7 @@ def enopt_config_fixture() -> Dict[str, Any]:
 
 
 def test_run_basic(enopt_config: Any, evaluator: Any) -> None:
-    variables = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -624,7 +624,7 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
     assert np.all(variables == plan["optimum"].evaluations.variables)
 
     assert np.all(
-        BasicOptimizationPlan(enopt_config, evaluator()).repeat(1).run().variables
+        OptimizationPlanRunner(enopt_config, evaluator()).repeat(1).run().variables
         == variables
     )
 
@@ -682,7 +682,7 @@ def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
     assert np.all(completed[3].evaluations.variables == initial)
 
     completed = []
-    BasicOptimizationPlan(enopt_config, evaluator()).add_observer(
+    OptimizationPlanRunner(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, _track_evaluations
     ).repeat(2, restart_from="initial").run()
     assert np.all(completed[0].evaluations.variables == initial)
@@ -746,7 +746,7 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
     )
 
     completed = []
-    BasicOptimizationPlan(enopt_config, evaluator()).repeat(
+    OptimizationPlanRunner(enopt_config, evaluator()).repeat(
         2, restart_from="last"
     ).add_observer(EventType.FINISHED_EVALUATION, _track_evaluations).run()
     assert np.all(
@@ -810,7 +810,7 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
     )
 
     completed = []
-    BasicOptimizationPlan(enopt_config, evaluator()).add_observer(
+    OptimizationPlanRunner(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, _track_evaluations
     ).repeat(2, restart_from="optimal").run()
     assert np.all(
@@ -910,7 +910,7 @@ def test_restart_optimum_with_reset(
     )
 
     completed = []
-    BasicOptimizationPlan(enopt_config, evaluator(new_functions)).add_observer(
+    OptimizationPlanRunner(enopt_config, evaluator(new_functions)).add_observer(
         EventType.FINISHED_EVALUATION, _track_evaluations
     ).repeat(3, restart_from="last_optimal").run()
 
@@ -984,7 +984,7 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
     assert restarts == [0, 1]
 
     restarts = []
-    BasicOptimizationPlan(enopt_config, evaluator()).add_observer(
+    OptimizationPlanRunner(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, _track_results
     ).add_metadata(metadata).repeat(
         2, restart_from="last_optimal", counter_var="counter"

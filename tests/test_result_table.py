@@ -7,7 +7,7 @@ import pytest
 from ropt.config.enopt import EnOptConfig
 from ropt.enums import EventType
 from ropt.events import Event
-from ropt.plan import BasicOptimizationPlan
+from ropt.plan import OptimizationPlanRunner
 from ropt.report import ResultsTable
 
 # Requires pandas:
@@ -46,7 +46,7 @@ def test_tabular_report_no_results(
 ) -> None:
     config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsTable({}, path=tmp_path / "results.txt")
-    BasicOptimizationPlan(config, evaluator()).add_observer(
+    OptimizationPlanRunner(config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION,
         partial(_handle_results, reporter=reporter, config=config),
     ).run()
@@ -64,7 +64,7 @@ def test_tabular_report_results(
         },
         path=tmp_path / "results.txt",
     )
-    BasicOptimizationPlan(config, evaluator()).add_observer(
+    OptimizationPlanRunner(config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION,
         partial(_handle_results, reporter=reporter, config=config),
     ).run()
@@ -96,7 +96,7 @@ def test_tabular_report_data_frames_results_formatted_names(
         },
         path=tmp_path / "results.txt",
     )
-    BasicOptimizationPlan(config, evaluator()).add_observer(
+    OptimizationPlanRunner(config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION,
         partial(_handle_results, reporter=reporter, config=config),
     ).run()
@@ -122,7 +122,7 @@ def test_tabular_report_data_frames_gradients(
         tmp_path / "gradients.txt",
         table_type="gradients",
     )
-    BasicOptimizationPlan(config, evaluator()).add_observer(
+    OptimizationPlanRunner(config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION,
         partial(_handle_results, reporter=reporter, config=config),
     ).run()
@@ -154,7 +154,7 @@ def test_tabular_report_data_frames_min_header_len(
         path=tmp_path / "results.txt",
         min_header_len=min_header_len,
     )
-    BasicOptimizationPlan(config, evaluator()).add_observer(
+    OptimizationPlanRunner(config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION,
         partial(_handle_results, reporter=reporter, config=config),
     ).run()

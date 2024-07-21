@@ -9,7 +9,7 @@ from numpy.typing import NDArray
 from ropt.config.enopt import EnOptConfig
 from ropt.config.enopt.constants import DEFAULT_SEED
 from ropt.enums import ConstraintType, EventType, OptimizerExitCode
-from ropt.plan import BasicOptimizationPlan
+from ropt.plan import OptimizationPlanRunner
 from ropt.results import FunctionResults, GradientResults
 
 if TYPE_CHECKING:
@@ -45,7 +45,7 @@ def test_max_functions_exceeded(enopt_config: Any, evaluator: Any) -> None:
 
     max_functions = 2
     enopt_config["optimizer"]["max_functions"] = max_functions
-    optimizer = BasicOptimizationPlan(enopt_config, evaluator()).add_observer(
+    optimizer = OptimizationPlanRunner(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, track_results
     )
     optimizer.run()
@@ -64,7 +64,7 @@ def test_max_functions_not_exceeded(enopt_config: Any, evaluator: Any) -> None:
     max_functions = 100
     enopt_config["optimizer"]["max_functions"] = max_functions
     enopt_config["optimizer"]["split_evaluations"] = True
-    optimizer = BasicOptimizationPlan(enopt_config, evaluator()).add_observer(
+    optimizer = OptimizationPlanRunner(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, track_results
     )
     optimizer.run()
@@ -79,7 +79,7 @@ def test_failed_realizations(enopt_config: Any, evaluator: Any) -> None:
         assert event.results[0].functions is None
 
     functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
-    optimizer = BasicOptimizationPlan(enopt_config, evaluator(functions)).add_observer(
+    optimizer = OptimizationPlanRunner(enopt_config, evaluator(functions)).add_observer(
         EventType.FINISHED_EVALUATION, _observer
     )
     optimizer.run()
@@ -92,7 +92,7 @@ def test_all_failed_realizations_not_supported(
     enopt_config["realizations"] = {"realization_min_success": 0}
 
     functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
-    optimizer = BasicOptimizationPlan(
+    optimizer = OptimizationPlanRunner(
         enopt_config,
         evaluator(functions),
     )
@@ -110,7 +110,7 @@ def test_user_abort(enopt_config: Any, evaluator: Any) -> None:
         if event.results[0].result_id == 1:
             optimizer.abort_optimization()
 
-    optimizer = BasicOptimizationPlan(enopt_config, evaluator()).add_observer(
+    optimizer = OptimizationPlanRunner(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, _observer
     )
     optimizer.run()
@@ -125,7 +125,7 @@ def test_single_perturbation(enopt_config: Any, evaluator: Any) -> None:
         "merge_realizations": True,
     }
     enopt_config["realizations"] = {"weights": 5 * [1]}
-    variables = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -138,23 +138,23 @@ def test_objective_auto_scale(
 
     enopt_config["objective_functions"]["scales"] = [1.0, init1]
     enopt_config["objective_functions"]["auto_scale"] = False
-    manual_result = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    manual_result = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     assert manual_result is not None
 
     enopt_config["objective_functions"]["scales"] = [1.0, 1.0]
     enopt_config["objective_functions"]["auto_scale"] = [False, True]
-    variables = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, manual_result)
 
     enopt_config["objective_functions"]["scales"] = [1.0, 2.0 * init1]
     enopt_config["objective_functions"]["auto_scale"] = False
-    manual_result = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    manual_result = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     assert manual_result is not None
 
     enopt_config["objective_functions"]["scales"] = [1.0, 2.0]
     enopt_config["objective_functions"]["auto_scale"] = [False, True]
-    variables = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, manual_result)
 
@@ -185,13 +185,13 @@ def test_constraint_auto_scale(
 
     enopt_config["nonlinear_constraints"]["scales"] = scales
     enopt_config["nonlinear_constraints"]["auto_scale"] = False
-    BasicOptimizationPlan(enopt_config, evaluator(test_functions)).add_observer(
+    OptimizationPlanRunner(enopt_config, evaluator(test_functions)).add_observer(
         EventType.FINISHED_EVALUATION, check_constraints
     ).run()
 
     enopt_config["nonlinear_constraints"]["scales"] = 1.0
     enopt_config["nonlinear_constraints"]["auto_scale"] = True
-    BasicOptimizationPlan(enopt_config, evaluator(test_functions)).add_observer(
+    OptimizationPlanRunner(enopt_config, evaluator(test_functions)).add_observer(
         EventType.FINISHED_EVALUATION, check_constraints
     ).run()
 
@@ -217,7 +217,7 @@ def test_variables_scale(
     if scales is not None:
         enopt_config["variables"]["scales"] = scales
 
-    results = BasicOptimizationPlan(enopt_config, evaluator()).run().results
+    results = OptimizationPlanRunner(enopt_config, evaluator()).run().results
     assert results is not None
 
     if offsets is not None:
@@ -272,7 +272,7 @@ def test_variables_scale_linear_constraints(enopt_config: Any, evaluator: Any) -
         enopt_config["linear_constraints"]["rhs_values"],
     )
 
-    results = BasicOptimizationPlan(enopt_config, evaluator()).run().results
+    results = OptimizationPlanRunner(enopt_config, evaluator()).run().results
     assert results is not None
     assert results.evaluations.unscaled_variables is not None
     assert np.allclose(
@@ -287,11 +287,11 @@ def test_check_linear_constraints(enopt_config: Any, evaluator: Any) -> None:
         "types": [ConstraintType.EQ, ConstraintType.LE, ConstraintType.GE],
     }
     enopt_config["optimizer"]["max_functions"] = 1
-    results = BasicOptimizationPlan(enopt_config, evaluator()).run().results
+    results = OptimizationPlanRunner(enopt_config, evaluator()).run().results
     assert results is not None
 
     enopt_config["linear_constraints"]["rhs_values"] = [1.0, -1.0, 1.0]
-    results = BasicOptimizationPlan(enopt_config, evaluator()).run().results
+    results = OptimizationPlanRunner(enopt_config, evaluator()).run().results
     assert results is None
 
 
@@ -314,14 +314,14 @@ def test_check_nonlinear_constraints(
     enopt_config["optimizer"]["max_functions"] = 1
 
     results = (
-        BasicOptimizationPlan(enopt_config, evaluator(test_functions)).run().results
+        OptimizationPlanRunner(enopt_config, evaluator(test_functions)).run().results
     )
     assert results is not None
 
     enopt_config["nonlinear_constraints"]["rhs_values"] = [1.0, -1.0, 1.0]
 
     results = (
-        BasicOptimizationPlan(enopt_config, evaluator(test_functions)).run().results
+        OptimizationPlanRunner(enopt_config, evaluator(test_functions)).run().results
     )
     assert results is None
 
@@ -342,7 +342,7 @@ def test_optimizer_variables_subset(enopt_config: Any, evaluator: Any) -> None:
                 assert np.all(item.gradients.objectives[:, 1] == 0.0)
 
     variables = (
-        BasicOptimizationPlan(enopt_config, evaluator())
+        OptimizationPlanRunner(enopt_config, evaluator())
         .add_observer(EventType.FINISHED_EVALUATION, assert_gradient)
         .run()
         .variables
@@ -366,7 +366,7 @@ def test_optimizer_variables_subset_linear_constraints(
     }
     enopt_config["variables"]["indices"] = [0, 2]
 
-    variables = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.25, 1.0, 0.75], atol=0.02)
 
@@ -382,23 +382,23 @@ def test_parallelize(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["variables"]["initial_values"][0] = 0.2
 
     enopt_config["optimizer"]["parallel"] = False
-    variables = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.15, 0.0, 0.2], atol=3e-2)
 
     enopt_config["optimizer"]["parallel"] = True
-    variables = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.15, 0.0, 0.2], atol=3e-2)
 
 
 def test_rng(enopt_config: Any, evaluator: Any) -> None:
-    variables1 = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    variables1 = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     assert variables1 is not None
     assert np.allclose(variables1, [0.0, 0.0, 0.5], atol=0.02)
 
     variables2 = (
-        BasicOptimizationPlan(enopt_config, evaluator(), seed=DEFAULT_SEED)
+        OptimizationPlanRunner(enopt_config, evaluator(), seed=DEFAULT_SEED)
         .run()
         .variables
     )
@@ -407,7 +407,7 @@ def test_rng(enopt_config: Any, evaluator: Any) -> None:
     assert np.all(variables1 == variables2)
 
     variables3 = (
-        BasicOptimizationPlan(enopt_config, evaluator(), seed=DEFAULT_SEED + 123)
+        OptimizationPlanRunner(enopt_config, evaluator(), seed=DEFAULT_SEED + 123)
         .run()
         .variables
     )

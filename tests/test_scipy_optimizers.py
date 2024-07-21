@@ -7,7 +7,7 @@ from numpy.typing import NDArray
 
 from ropt.enums import ConstraintType, EventType
 from ropt.events import Event
-from ropt.plan import BasicOptimizationPlan
+from ropt.plan import OptimizationPlanRunner
 from ropt.plugins.optimizer.scipy import (
     _CONSTRAINT_REQUIRES_BOUNDS,
     _CONSTRAINT_SUPPORT_BOUNDS,
@@ -44,7 +44,7 @@ def enopt_config_fixture() -> Dict[str, Any]:
 def test_scipy_unconstrained(enopt_config: Any, method: str, evaluator: Any) -> None:
     enopt_config["optimizer"]["method"] = method
 
-    variables = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     assert variables is not None
     # Some methods are supported, but not reliable in this test.
     if method != "newton-cg":
@@ -60,7 +60,7 @@ def test_scipy_unsupported_constraints_bounds(
     enopt_config["optimizer"]["method"] = method
     enopt_config["variables"]["lower_bounds"] = [0.1, -np.inf, -np.inf]
     with pytest.raises(NotImplementedError, match="does not support bound constraints"):
-        BasicOptimizationPlan(enopt_config, evaluator()).run()
+        OptimizationPlanRunner(enopt_config, evaluator()).run()
 
 
 @pytest.mark.parametrize("method", sorted(_CONSTRAINT_REQUIRES_BOUNDS))
@@ -69,7 +69,7 @@ def test_scipy_required_constraints_bounds(
 ) -> None:
     enopt_config["optimizer"]["method"] = method
     with pytest.raises(NotImplementedError, match="requires bound constraints"):
-        BasicOptimizationPlan(enopt_config, evaluator()).run()
+        OptimizationPlanRunner(enopt_config, evaluator()).run()
 
 
 @pytest.mark.parametrize(
@@ -88,7 +88,7 @@ def test_scipy_unsupported_constraints_linear_eq(
     with pytest.raises(
         NotImplementedError, match="does not support linear equality constraints"
     ):
-        BasicOptimizationPlan(enopt_config, evaluator()).run()
+        OptimizationPlanRunner(enopt_config, evaluator()).run()
 
 
 @pytest.mark.parametrize(
@@ -111,7 +111,7 @@ def test_scipy_unsupported_constraints_linear_ineq(
     with pytest.raises(
         NotImplementedError, match="does not support linear inequality constraints"
     ):
-        BasicOptimizationPlan(enopt_config, evaluator()).run()
+        OptimizationPlanRunner(enopt_config, evaluator()).run()
 
 
 @pytest.mark.parametrize(
@@ -130,7 +130,7 @@ def test_scipy_unsupported_constraints_nonlinear_eq(
     with pytest.raises(
         NotImplementedError, match="does not support non-linear equality constraints"
     ):
-        BasicOptimizationPlan(enopt_config, evaluator()).run()
+        OptimizationPlanRunner(enopt_config, evaluator()).run()
 
 
 @pytest.mark.parametrize(
@@ -152,7 +152,7 @@ def test_scipy_unsupported_constraints_nonlinear_ineq(
     with pytest.raises(
         NotImplementedError, match="does not support non-linear inequality constraints"
     ):
-        BasicOptimizationPlan(enopt_config, evaluator()).run()
+        OptimizationPlanRunner(enopt_config, evaluator()).run()
 
 
 @pytest.mark.parametrize("method", sorted(_CONSTRAINT_SUPPORT_BOUNDS))
@@ -166,7 +166,7 @@ def test_scipy_bound_constraints(
 
     if method == "differential_evolution":
         enopt_config["optimizer"]["options"] = {"seed": 123}
-    variables = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     assert variables is not None
     if method != "differential_evolution":
         assert np.allclose(variables, [0.15, 0.0, 0.2], atol=0.02)
@@ -181,7 +181,7 @@ def test_scipy_bound_constraints_differential_evolution(
     enopt_config["variables"]["initial_values"][0] = 0.2
     enopt_config["optimizer"]["options"] = {"seed": 123}
     enopt_config["realizations"] = {"realization_min_success": 0}
-    variables1 = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    variables1 = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     assert variables1 is not None
     assert np.allclose(variables1, [0.15, 0.0, 0.2], atol=0.025)
 
@@ -196,7 +196,7 @@ def test_scipy_bound_constraints_differential_evolution(
         return test_functions[0](x, c)
 
     variables2 = (
-        BasicOptimizationPlan(enopt_config, evaluator((_add_nan, test_functions[1])))
+        OptimizationPlanRunner(enopt_config, evaluator((_add_nan, test_functions[1])))
         .run()
         .variables
     )
@@ -219,7 +219,7 @@ def test_scipy_eq_linear_constraints(
         "types": [ConstraintType.EQ, ConstraintType.EQ],
     }
 
-    variables = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     if method != "differential_evolution":
         assert variables is not None
         assert np.allclose(variables, [0.25, 0.0, 0.75], atol=0.02)
@@ -239,7 +239,7 @@ def test_scipy_ge_linear_constraints(
         "types": [ConstraintType.GE],
     }
 
-    variables = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     if method != "differential_evolution":
         assert variables is not None
         assert np.allclose(variables, [-0.05, 0.0, 0.45], atol=0.02)
@@ -259,7 +259,7 @@ def test_scipy_le_linear_constraints(
         "types": [ConstraintType.LE],
     }
 
-    variables = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     if method != "differential_evolution":
         assert variables is not None
         assert np.allclose(variables, [-0.05, 0.0, 0.45], atol=0.02)
@@ -279,7 +279,7 @@ def test_scipy_le_ge_linear_constraints(
         "types": [ConstraintType.LE, ConstraintType.GE],
     }
 
-    variables = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     if method != "differential_evolution":
         assert variables is not None
         assert np.allclose(variables, [-0.05, 0.0, 0.45], atol=0.02)
@@ -306,7 +306,7 @@ def test_scipy_eq_nonlinear_constraints(
     )
 
     variables = (
-        BasicOptimizationPlan(enopt_config, evaluator(test_functions)).run().variables
+        OptimizationPlanRunner(enopt_config, evaluator(test_functions)).run().variables
     )
     if method != "differential_evolution":
         assert variables is not None
@@ -340,7 +340,7 @@ def test_scipy_ineq_nonlinear_constraints(
     )
 
     variables = (
-        BasicOptimizationPlan(enopt_config, evaluator(test_functions)).run().variables
+        OptimizationPlanRunner(enopt_config, evaluator(test_functions)).run().variables
     )
     if method != "differential_evolution":
         assert variables is not None
@@ -380,7 +380,7 @@ def test_scipy_le_ge_nonlinear_constraints(
     )
 
     variables = (
-        BasicOptimizationPlan(enopt_config, evaluator(test_functions)).run().variables
+        OptimizationPlanRunner(enopt_config, evaluator(test_functions)).run().variables
     )
     if method != "differential_evolution":
         assert variables is not None
@@ -391,7 +391,7 @@ def test_scipy_options(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["optimizer"]["method"] = "Nelder-Mead"
     enopt_config["optimizer"]["options"] = {"maxfev": 10}
 
-    variables = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert pytest.approx(variables[2], abs=0.025) != 0.5
 
@@ -405,7 +405,7 @@ def test_scipy_split_evaluations(
     enopt_config["optimizer"]["method"] = method
     enopt_config["optimizer"]["split_evaluations"] = True
 
-    variables = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     assert variables is not None
     # Some methods are supported, but not reliable in this test.
     if method != "newton-cg":
@@ -415,7 +415,7 @@ def test_scipy_split_evaluations(
     enopt_config["optimizer"]["speculative"] = True
     enopt_config["optimizer"]["split_evaluations"] = True
 
-    variables = BasicOptimizationPlan(enopt_config, evaluator()).run().variables
+    variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     assert variables is not None
     # Some methods are supported, but not reliable in this test.
     if method != "newton-cg":
@@ -434,7 +434,7 @@ def test_scipy_speculative(
         assert len(event.results) == 2 if speculative else 1
 
     variables = (
-        BasicOptimizationPlan(enopt_config, evaluator())
+        OptimizationPlanRunner(enopt_config, evaluator())
         .add_observer(EventType.FINISHED_EVALUATION, _observer)
         .run()
         .variables
@@ -450,11 +450,11 @@ def test_scipy_output_dir(tmp_path: Path, enopt_config: Any, evaluator: Any) -> 
     enopt_config["optimizer"]["method"] = "slsqp"
     enopt_config["optimizer"]["max_functions"] = 1
 
-    BasicOptimizationPlan(enopt_config, evaluator()).run()
+    OptimizationPlanRunner(enopt_config, evaluator()).run()
     assert (output_dir / "optimizer_output.txt").exists()
 
-    BasicOptimizationPlan(enopt_config, evaluator()).run()
+    OptimizationPlanRunner(enopt_config, evaluator()).run()
     assert (output_dir / "optimizer_output-001.txt").exists()
 
-    BasicOptimizationPlan(enopt_config, evaluator()).run()
+    OptimizationPlanRunner(enopt_config, evaluator()).run()
     assert (output_dir / "optimizer_output-002.txt").exists()
