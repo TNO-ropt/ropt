@@ -89,15 +89,24 @@ class ResultsDataFrame:
         """
         added = False
         for item in results:
-            if self._table_type == "functions" and isinstance(item, FunctionResults):
+            if (
+                self._table_type == "functions"
+                and isinstance(item, FunctionResults)
+                and item.functions is not None
+            ):
                 frame = _get_function_results(config, item, self._fields)
-            elif self._table_type == "gradients" and isinstance(item, GradientResults):
+            elif (
+                self._table_type == "gradients"
+                and isinstance(item, GradientResults)
+                and item.gradients is not None
+            ):
                 frame = _add_gradient_results(config, item, self._fields)
             else:
                 continue
-            frame = _add_metadata(frame, item, self._fields)
-            self._frame = pd.concat([self._frame, frame])
-            added = True
+            if not frame.empty:
+                frame = _add_metadata(frame, item, self._fields)
+                self._frame = pd.concat([self._frame, frame])
+                added = True
         return added
 
     @property
