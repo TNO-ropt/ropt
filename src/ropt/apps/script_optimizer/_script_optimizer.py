@@ -300,23 +300,25 @@ class ScriptOptimizer:
 
         try:
             self._set_logger()
-            evaluator = ParslEvaluator(
+            with ParslEvaluator(
                 self._function,
-                monitor=self._monitor,
-                provider=provider,
-                max_threads=evaluator_config.max_threads,
-                worker_restart=evaluator_config.worker_restart,
-                htex_kwargs=evaluator_config.htex_kwargs,
                 polling=evaluator_config.polling,
                 max_submit=evaluator_config.max_submit,
-            )
-            context = OptimizerContext(evaluator=evaluator, seed=self._seed)
-            config = PlanConfig.model_validate(self._plan_config)
-            plan = Plan(config, context)
-            plan.optimizer_context.events.add_observer(
-                EventType.FINISHED_OPTIMIZER_STEP, self._log_exit_code
-            )
-            plan.run()
+                max_threads=evaluator_config.max_threads,
+            ).with_htex(
+                provider=provider,
+                htex_kwargs=evaluator_config.htex_kwargs,
+                worker_restart=evaluator_config.worker_restart,
+            ).with_monitor(
+                self._monitor,
+            ) as evaluator:
+                context = OptimizerContext(evaluator=evaluator, seed=self._seed)
+                config = PlanConfig.model_validate(self._plan_config)
+                plan = Plan(config, context)
+                plan.optimizer_context.events.add_observer(
+                    EventType.FINISHED_OPTIMIZER_STEP, self._log_exit_code
+                )
+                plan.run()
         finally:
             os.chdir(cwd)
 

@@ -93,10 +93,22 @@ def parsl_monitor(batch_id: int, jobs: Dict[int, List[ParslTestTask]]) -> None:
 
 def test_parsl(enopt_config: Any, test_functions: Any, tmp_path: Any) -> None:
     os.chdir(tmp_path)
-    evaluator = ParslEvaluator(
+    with ParslEvaluator(
         function=partial(parsl_function, functions=test_functions)
-    )
-    variables = OptimizationPlanRunner(enopt_config, evaluator).run().variables
+    ) as evaluator:
+        variables = OptimizationPlanRunner(enopt_config, evaluator).run().variables
+    assert variables is not None
+    assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
+
+
+def test_parsl_dummy_htex(
+    enopt_config: Any, test_functions: Any, tmp_path: Any
+) -> None:
+    os.chdir(tmp_path)
+    with ParslEvaluator(
+        function=partial(parsl_function, functions=test_functions)
+    ).with_htex(provider=None) as evaluator:
+        variables = OptimizationPlanRunner(enopt_config, evaluator).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -105,11 +117,12 @@ def test_parsl_monitor(
     enopt_config: Any, test_functions: Any, tmp_path: Any, capsys: Any
 ) -> None:
     os.chdir(tmp_path)
-    evaluator = ParslEvaluator(
-        function=partial(parsl_function, functions=test_functions),
-        monitor=parsl_monitor,
-    )
-    variables = OptimizationPlanRunner(enopt_config, evaluator).run().variables
+    with ParslEvaluator(
+        function=partial(parsl_function, functions=test_functions)
+    ).with_monitor(
+        parsl_monitor,
+    ) as evaluator:
+        variables = OptimizationPlanRunner(enopt_config, evaluator).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
     captured = capsys.readouterr()
@@ -122,10 +135,21 @@ def test_parsl_exception(
     os.chdir(tmp_path)
     evaluator = ParslEvaluator(
         function=partial(parsl_function, functions=test_functions, fail_index=2),
-        monitor=parsl_monitor,
+    ).with_monitor(
+        parsl_monitor,
     )
-    variables = OptimizationPlanRunner(enopt_config, evaluator).run().variables
+    with evaluator:
+        variables = OptimizationPlanRunner(enopt_config, evaluator).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
     captured = capsys.readouterr()
     assert "error in job 2" in captured.out
+
+
+def test_parsl_no_with(enopt_config: Any, test_functions: Any, tmp_path: Any) -> None:
+    os.chdir(tmp_path)
+    evaluator = ParslEvaluator(
+        function=partial(parsl_function, functions=test_functions, fail_index=2),
+    )
+    with pytest.raises(RuntimeError):
+        OptimizationPlanRunner(enopt_config, evaluator).run()

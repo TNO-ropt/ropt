@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -32,6 +33,11 @@ if TYPE_CHECKING:
     from ropt.plugins._manager import PluginType
     from ropt.plugins.base import Plugin
     from ropt.results import FunctionResults
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 
 class OptimizationPlanRunner:
@@ -91,9 +97,7 @@ class OptimizationPlanRunner:
     def exit_code(self) -> OptimizerExitCode:
         return self._exit_code
 
-    def add_plugins(
-        self, plugin_type: PluginType, plugins: Dict[str, Plugin]
-    ) -> OptimizationPlanRunner:
+    def add_plugins(self, plugin_type: PluginType, plugins: Dict[str, Plugin]) -> Self:
         if self._plugin_manager is None:
             self._plugin_manager = PluginManager()
             self._plugin_manager.add_plugins(plugin_type, plugins)
@@ -101,11 +105,11 @@ class OptimizationPlanRunner:
 
     def add_observer(
         self, event_type: EventType, function: Callable[[Event], None]
-    ) -> OptimizationPlanRunner:
+    ) -> Self:
         self._observers.append((event_type, function))
         return self
 
-    def add_metadata(self, metadata: Dict[str, Any]) -> OptimizationPlanRunner:
+    def add_metadata(self, metadata: Dict[str, Any]) -> Self:
         steps = self._plan_config["steps"]
         idx = next(
             (idx for idx, step in enumerate(steps) if step["run"] == "repeat"), None
@@ -121,7 +125,7 @@ class OptimizationPlanRunner:
         iterations: int,
         restart_from: Literal["initial", "last", "optimal", "last_optimal"] = "optimal",
         counter_var: Optional[str] = None,
-    ) -> OptimizationPlanRunner:
+    ) -> Self:
         if any(step["run"] == "repeat" for step in self._plan_config["steps"]):
             msg = "The repeat() method can only be called once."
             raise RuntimeError(msg)
@@ -159,7 +163,7 @@ class OptimizationPlanRunner:
         ]
         return self
 
-    def run(self) -> OptimizationPlanRunner:
+    def run(self) -> Self:
         config = PlanConfig.model_validate(self._plan_config)
         plan = Plan(
             config,
