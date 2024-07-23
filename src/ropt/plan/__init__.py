@@ -2,7 +2,7 @@ r"""Code to run optimization plans."""
 
 from ropt.optimizer import EnsembleOptimizer
 
-from ._plan import OptimizerContext, Plan
+from ._plan import MetaDataType, OptimizerContext, Plan
 from ._run import OptimizationPlanRunner
 from ._update import (
     ContextUpdate,
@@ -17,5 +17,6 @@ __all__ = [
     "ContextUpdateResults",
     "EnsembleOptimizer",
     "OptimizerContext",
+    "MetaDataType",
     "Plan",
 ]

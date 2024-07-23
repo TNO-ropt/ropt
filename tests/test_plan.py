@@ -1143,6 +1143,48 @@ def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
     assert np.allclose(completed, [1.66, 1.75])
 
 
+def test_exit_code(enopt_config: Any, evaluator: Any) -> None:
+    enopt_config["optimizer"]["speculative"] = True
+    enopt_config["optimizer"]["max_functions"] = 4
+
+    is_called = False
+
+    def _exit_code(
+        event: Event,
+    ) -> None:
+        nonlocal is_called
+        is_called = True
+        assert isinstance(event, Event)
+        assert event.exit_code == OptimizerExitCode.MAX_FUNCTIONS_REACHED
+
+    plan_config = {
+        "context": [
+            {
+                "id": "enopt_config",
+                "init": "config",
+                "with": enopt_config,
+            },
+        ],
+        "steps": [
+            {
+                "run": "optimizer",
+                "with": {
+                    "config": "$enopt_config",
+                    "exit_code_var": "exit_code",
+                },
+            },
+        ],
+    }
+    context = OptimizerContext(evaluator=evaluator())
+    plan = Plan(PlanConfig.model_validate(plan_config), context)
+    plan.optimizer_context.events.add_observer(
+        EventType.FINISHED_OPTIMIZER_STEP, _exit_code
+    )
+    plan.run()
+    assert plan["exit_code"] == OptimizerExitCode.MAX_FUNCTIONS_REACHED
+    assert is_called
+
+
 def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["variables"]["initial_values"] = [0.0, 0.2, 0.1]
 
@@ -1229,43 +1271,76 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
     assert completed_functions == 25
 
 
-def test_exit_code(enopt_config: Any, evaluator: Any) -> None:
+def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
+    enopt_config["variables"]["initial_values"] = [0.0, 0.2, 0.1]
+
+    def _track_evaluations(event: Event) -> None:
+        assert event.results is not None
+        for item in event.results:
+            if isinstance(item, FunctionResults):
+                assert item.metadata.get("outer") == 1
+                if event.step_name == "inner":
+                    assert item.metadata.get("inner") == "inner_meta_data"
+
+    enopt_config["optimizer"]["tolerance"] = 1e-10
     enopt_config["optimizer"]["speculative"] = True
     enopt_config["optimizer"]["max_functions"] = 4
+    enopt_config["variables"]["indices"] = [0, 2]
+    nested_config = deepcopy(enopt_config)
+    nested_config["variables"]["indices"] = [1]
+    enopt_config["optimizer"]["max_functions"] = 5
 
-    is_called = False
-
-    def _exit_code(
-        event: Event,
-    ) -> None:
-        nonlocal is_called
-        is_called = True
-        assert isinstance(event, Event)
-        assert event.exit_code == OptimizerExitCode.MAX_FUNCTIONS_REACHED
-
-    plan_config = {
+    inner_config = {
         "context": [
-            {
-                "id": "enopt_config",
-                "init": "config",
-                "with": enopt_config,
-            },
+            {"id": "config", "init": "config", "with": nested_config},
+            {"id": "nested_optimum", "init": "tracker"},
         ],
         "steps": [
             {
+                "name": "inner",
                 "run": "optimizer",
                 "with": {
-                    "config": "$enopt_config",
-                    "exit_code_var": "exit_code",
+                    "config": "$config",
+                    "update": ["nested_optimum"],
+                    "initial_values": "$initial",
+                    "metadata": {"inner": "inner_meta_data"},
                 },
             },
         ],
     }
+
+    outer_config = {
+        "context": [
+            {"id": "config", "init": "config", "with": enopt_config},
+            {"id": "optimum", "init": "tracker"},
+        ],
+        "steps": [
+            {"run": "setvar", "with": "x = 1"},
+            {
+                "name": "outer",
+                "run": "optimizer",
+                "with": {
+                    "config": "$config",
+                    "update": ["optimum"],
+                    "nested_plan": {
+                        "plan": inner_config,
+                        "initial_var": "initial",
+                        "results_var": "nested_optimum",
+                    },
+                    "metadata": {"outer": "$x"},
+                },
+            },
+        ],
+    }
+
+    parsed_config = PlanConfig.model_validate(outer_config)
     context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(PlanConfig.model_validate(plan_config), context)
+    plan = Plan(parsed_config, context)
     plan.optimizer_context.events.add_observer(
-        EventType.FINISHED_OPTIMIZER_STEP, _exit_code
+        EventType.FINISHED_EVALUATION, _track_evaluations
     )
     plan.run()
-    assert plan["exit_code"] == OptimizerExitCode.MAX_FUNCTIONS_REACHED
-    assert is_called
+    results = plan["optimum"]
+
+    assert results is not None
+    assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)

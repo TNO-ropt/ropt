@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, List, Optional, Tuple, Union
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict
@@ -13,7 +13,7 @@ from ropt.config.utils import Array1D  # noqa: TCH001
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import PlanError
-from ropt.plan import ContextUpdateResults, EnsembleOptimizer, Plan
+from ropt.plan import ContextUpdateResults, EnsembleOptimizer, MetaDataType, Plan
 from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
 
@@ -55,7 +55,7 @@ class DefaultOptimizerStepWith(BaseModel):
     config: str
     update: List[str] = []
     initial_values: Optional[Union[str, Array1D]] = None
-    metadata: Dict[str, Union[int, float, bool, str]] = {}
+    metadata: MetaDataType = {}
     exit_code_var: Optional[str] = None
     nested_plan: Optional[DefaultNestedPlan] = None
 
@@ -150,11 +150,9 @@ class DefaultOptimizerStep(PlanStep):
                 step_name=self.step_config.name,
             )
         else:
+            metadata = self._get_metadata(add_step_name=True)
             for item in results:
-                if self.step_config.name is not None:
-                    item.metadata["step_name"] = self.step_config.name
-                for key, expr in self._with.metadata.items():
-                    item.metadata[key] = self.plan.parse_value(expr)
+                item.metadata = metadata
 
             for obj_id in self._with.update:
                 self.plan.update_context(
@@ -184,7 +182,8 @@ class DefaultOptimizerStep(PlanStep):
         """
         if self._with.nested_plan is None:
             return None, False
-        plan = self.plan.spawn(self._with.nested_plan.plan)
+        metadata = self._get_metadata(add_step_name=False)
+        plan = self.plan.spawn(self._with.nested_plan.plan, metadata)
         plan[self._with.nested_plan.initial_var] = variables
         aborted = plan.run()
         return plan[self._with.nested_plan.results_var], aborted
@@ -200,3 +199,13 @@ class DefaultOptimizerStep(PlanStep):
                 msg = f"`{self._with.initial_values} does not contain variables."
                 raise PlanError(msg, step_name=self.step_config.name)
         return self._enopt_config.variables.initial_values
+
+    def _get_metadata(self, *, add_step_name: bool) -> MetaDataType:
+        metadata = self.plan.metadata
+        if metadata is None:
+            metadata = {}
+        if add_step_name and self.step_config.name is not None:
+            metadata["step_name"] = self.step_config.name
+        for key, expr in self._with.metadata.items():
+            metadata[key] = self.plan.parse_value(expr)
+        return metadata
