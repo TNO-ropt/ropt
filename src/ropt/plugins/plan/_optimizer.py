@@ -47,7 +47,6 @@ class DefaultOptimizerStepWith(BaseModel):
         config:         ID of the context object that contains the optimizer configuration
         update:         List of the objects that are notified of new results
         initial_values: The initial values for the optimizer
-        metadata:       Metadata to set in the results
         exit_code_var:  Name of the variable to store the exit code
         nested_plan:    Optional nested plan configuration
     """
@@ -55,7 +54,6 @@ class DefaultOptimizerStepWith(BaseModel):
     config: str
     update: List[str] = []
     initial_values: Optional[Union[str, Array1D]] = None
-    metadata: MetaDataType = {}
     exit_code_var: Optional[str] = None
     nested_plan: Optional[DefaultNestedPlan] = None
 
@@ -182,8 +180,7 @@ class DefaultOptimizerStep(PlanStep):
         """
         if self._with.nested_plan is None:
             return None, False
-        metadata = self._get_metadata(add_step_name=False)
-        plan = self.plan.spawn(self._with.nested_plan.plan, metadata)
+        plan = self.plan.spawn(self._with.nested_plan.plan)
         plan[self._with.nested_plan.initial_var] = variables
         aborted = plan.run()
         return plan[self._with.nested_plan.results_var], aborted
@@ -201,11 +198,7 @@ class DefaultOptimizerStep(PlanStep):
         return self._enopt_config.variables.initial_values
 
     def _get_metadata(self, *, add_step_name: bool) -> MetaDataType:
-        metadata = self.plan.metadata
-        if metadata is None:
-            metadata = {}
+        metadata = self.plan.optimizer_context.metadata
         if add_step_name and self.step_config.name is not None:
             metadata["step_name"] = self.step_config.name
-        for key, expr in self._with.metadata.items():
-            metadata[key] = self.plan.parse_value(expr)
         return metadata

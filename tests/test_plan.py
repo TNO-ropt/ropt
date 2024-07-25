@@ -961,12 +961,10 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
                     "iterations": 2,
                     "counter_var": "counter",
                     "steps": [
+                        {"run": "metadata", "with": metadata},
                         {
                             "run": "optimizer",
-                            "with": {
-                                "config": "$config",
-                                "metadata": metadata,
-                            },
+                            "with": {"config": "$config"},
                         },
                     ],
                 },
@@ -1296,6 +1294,7 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
             {"id": "nested_optimum", "init": "tracker"},
         ],
         "steps": [
+            {"run": "metadata", "with": {"inner": "inner_meta_data"}},
             {
                 "name": "inner",
                 "run": "optimizer",
@@ -1303,7 +1302,6 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
                     "config": "$config",
                     "update": ["nested_optimum"],
                     "initial_values": "$initial",
-                    "metadata": {"inner": "inner_meta_data"},
                 },
             },
         ],
@@ -1316,6 +1314,7 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
         ],
         "steps": [
             {"run": "setvar", "with": "x = 1"},
+            {"run": "metadata", "with": {"outer": "$x"}},
             {
                 "name": "outer",
                 "run": "optimizer",
@@ -1327,7 +1326,6 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
                         "initial_var": "initial",
                         "results_var": "nested_optimum",
                     },
-                    "metadata": {"outer": "$x"},
                 },
             },
         ],

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, List, Optional, Union
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict
@@ -33,13 +33,11 @@ class DefaultEvaluatorStepWith(BaseModel):
         config:   ID of the context object that contains the optimizer configuration
         update:   List of the objects that are notified of new results
         values:   Values to evaluate at
-        metadata: Metadata to set in the results
     """
 
     config: str
     update: List[str] = []
     values: Optional[Union[str, Array2D]] = None
-    metadata: Dict[str, str] = {}
 
     model_config = ConfigDict(
         extra="forbid",
@@ -108,13 +106,9 @@ class DefaultEvaluatorStep(PlanStep):
         if results[0].functions is None:
             exit_code = OptimizerExitCode.TOO_FEW_REALIZATIONS
 
-        metadata = self.plan.metadata
-        if metadata is None:
-            metadata = {}
+        metadata = self.plan.optimizer_context.metadata
         if self.step_config.name is not None:
             metadata["step_name"] = self.step_config.name
-        for key, expr in self._with.metadata.items():
-            metadata[key] = self.plan.parse_value(expr)
         for item in results:
             item.metadata = metadata
 

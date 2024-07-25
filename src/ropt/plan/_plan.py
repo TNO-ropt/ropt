@@ -47,6 +47,7 @@ class OptimizerContext:
         self.rng = default_rng(DEFAULT_SEED) if seed is None else default_rng(seed)
         self.result_id_iter = count()
         self.events = EventBroker()
+        self.metadata: MetaDataType = {}
 
 
 class Plan:
@@ -57,7 +58,6 @@ class Plan:
         config: PlanConfig,
         optimizer_context: OptimizerContext,
         plugin_manager: Optional[PluginManager] = None,
-        metadata: Optional[MetaDataType] = None,
     ) -> None:
         """Initialize a plan object.
 
@@ -65,12 +65,10 @@ class Plan:
             config:            Optimizer configuration
             optimizer_context: Context in which the plan executes
             plugin_manager:    Optional plugin manager
-            metadata:          Metadata to add to all results
         """
         self._plan_config = config
         self._optimizer_context = optimizer_context
         self._vars: Dict[str, Any] = {}
-        self._metadata = metadata
 
         self._plugin_manager = (
             PluginManager() if plugin_manager is None else plugin_manager
@@ -135,15 +133,6 @@ class Plan:
         """
         return self._optimizer_context
 
-    @property
-    def metadata(self) -> Optional[MetaDataType]:
-        """Return the metadata stored by the plan.
-
-        Returns:
-            The plan metadata.
-        """
-        return self._metadata
-
     def parse_value(self, value: Any) -> Any:  # noqa: ANN401
         """Parse a value as an expression or an interpolated string.
 
@@ -172,20 +161,16 @@ class Plan:
             return re.sub(r"\${{(.*?)}}|\$\$|\$([^\W0-9][\w\.]*)", _substitute, value)
         return value
 
-    def spawn(self, config: PlanConfig, metadata: Optional[MetaDataType]) -> Plan:
+    def spawn(self, config: PlanConfig) -> Plan:
         """Spawn a child plan.
 
         Args:
             config:  The configuration of the new plan.
-            metadata: Metadata to set in the new plan.
         """
-        if metadata is not None:
-            metadata = {key: self.parse_value(expr) for key, expr in metadata.items()}
         return Plan(
             config,
             optimizer_context=self._optimizer_context,
             plugin_manager=self._plugin_manager,
-            metadata=metadata,
         )
 
     def _eval_expr(self, expr: str) -> Any:  # noqa: ANN401

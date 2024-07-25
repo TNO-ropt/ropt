@@ -59,6 +59,7 @@ class OptimizationPlanRunner:
         self._variables: Optional[NDArray[np.float64]]
         self._exit_code: OptimizerExitCode = OptimizerExitCode.UNKNOWN
         self._observers: List[Tuple[EventType, Callable[[Event], None]]] = []
+        self._metadata: Dict[str, Any] = {}
 
         self._plan_config: Dict[str, List[Dict[str, Any]]] = {
             "context": [
@@ -110,14 +111,18 @@ class OptimizationPlanRunner:
         return self
 
     def add_metadata(self, metadata: Dict[str, Any]) -> Self:
+        for key, value in metadata.items():
+            if value is None:
+                del self._metadata[key]
+            else:
+                self._metadata[key] = value
         steps = self._plan_config["steps"]
         idx = next(
             (idx for idx, step in enumerate(steps) if step["run"] == "repeat"), None
         )
         if idx is not None:
             steps = steps[idx]["with"]["steps"]
-        idx = next(idx for idx, step in enumerate(steps) if step["run"] == "optimizer")
-        steps[idx]["with"]["metadata"] = metadata
+        steps.insert(0, {"run": "metadata", "with": {"metadata": self._metadata}})
         return self
 
     def repeat(
@@ -129,7 +134,25 @@ class OptimizationPlanRunner:
         if any(step["run"] == "repeat" for step in self._plan_config["steps"]):
             msg = "The repeat() method can only be called once."
             raise RuntimeError(msg)
-        steps = self._plan_config["steps"]
+        self._plan_config["steps"] = [
+            {
+                "run": "repeat",
+                "with": {
+                    "counter_var": counter_var,
+                    "iterations": iterations,
+                    "steps": self._add_repeat_tracker(
+                        self._plan_config["steps"], restart_from
+                    ),
+                },
+            }
+        ]
+        return self
+
+    def _add_repeat_tracker(
+        self,
+        steps: List[Dict[str, Any]],
+        restart_from: Literal["initial", "last", "optimal", "last_optimal"] = "optimal",
+    ) -> List[Dict[str, Any]]:
         idx = next(idx for idx, step in enumerate(steps) if step["run"] == "optimizer")
         if restart_from in ["last", "last_optimal"]:
             self._plan_config["context"].append(
@@ -151,17 +174,7 @@ class OptimizationPlanRunner:
                 {"run": "reset", "with": {"context": "repeat_tracker"}},
                 *steps,
             ]
-        self._plan_config["steps"] = [
-            {
-                "run": "repeat",
-                "with": {
-                    "counter_var": counter_var,
-                    "iterations": iterations,
-                    "steps": steps,
-                },
-            }
-        ]
-        return self
+        return steps
 
     def run(self) -> Self:
         config = PlanConfig.model_validate(self._plan_config)
