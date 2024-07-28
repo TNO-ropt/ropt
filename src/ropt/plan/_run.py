@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+from dataclasses import dataclass
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -39,6 +40,23 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import Self
 
+_RepeatTypes = Literal["initial", "last", "optimal", "last_optimal"]
+
+
+@dataclass
+class _Repeat:
+    iterations: int
+    restart_from: _RepeatTypes
+    counter_var: Optional[str]
+    metadata_var: Optional[str]
+
+
+@dataclass
+class _Results:
+    results: Optional[FunctionResults]
+    variables: Optional[NDArray[np.float64]]
+    exit_code: OptimizerExitCode = OptimizerExitCode.UNKNOWN
+
 
 class OptimizationPlanRunner:
     """A class for running optimization plans."""
@@ -51,17 +69,12 @@ class OptimizationPlanRunner:
         constraint_tolerance: float = 1e-10,
         seed: Optional[int] = None,
     ) -> None:
-        self._enopt_config = enopt_config
-        self._evaluator = evaluator
         self._plugin_manager: Optional[PluginManager] = None
-        self._context = OptimizerContext(evaluator=self._evaluator, seed=seed)
-        self._results: Optional[FunctionResults]
-        self._variables: Optional[NDArray[np.float64]]
-        self._exit_code: OptimizerExitCode = OptimizerExitCode.UNKNOWN
+        self._optimizer_context = OptimizerContext(evaluator=evaluator, seed=seed)
         self._observers: List[Tuple[EventType, Callable[[Event], None]]] = []
         self._metadata: Dict[str, Any] = {}
-
-        self._plan_config: Dict[str, List[Dict[str, Any]]] = {
+        self._repeat: Optional[_Repeat] = None
+        self._plan_config: Dict[str, Any] = {
             "context": [
                 {
                     "id": "config",
@@ -82,26 +95,27 @@ class OptimizationPlanRunner:
                         "update": ["optimal"],
                         "exit_code_var": "exit_code",
                     },
-                },
+                }
             ],
         }
+        self._results: _Results
 
     @property
     def results(self) -> Optional[FunctionResults]:
-        return self._results
+        return self._results.results
 
     @property
     def variables(self) -> Optional[NDArray[np.float64]]:
-        return self._variables
+        return self._results.variables
 
     @property
     def exit_code(self) -> OptimizerExitCode:
-        return self._exit_code
+        return self._results.exit_code
 
     def add_plugins(self, plugin_type: PluginType, plugins: Dict[str, Plugin]) -> Self:
         if self._plugin_manager is None:
             self._plugin_manager = PluginManager()
-            self._plugin_manager.add_plugins(plugin_type, plugins)
+        self._plugin_manager.add_plugins(plugin_type, plugins)
         return self
 
     def add_observer(
@@ -116,81 +130,81 @@ class OptimizationPlanRunner:
                 del self._metadata[key]
             else:
                 self._metadata[key] = value
-        steps = self._plan_config["steps"]
-        idx = next(
-            (idx for idx, step in enumerate(steps) if step["run"] == "repeat"), None
-        )
-        if idx is not None:
-            steps = steps[idx]["with"]["steps"]
-        steps.insert(0, {"run": "metadata", "with": {"metadata": self._metadata}})
         return self
 
     def repeat(
         self,
         iterations: int,
-        restart_from: Literal["initial", "last", "optimal", "last_optimal"] = "optimal",
+        restart_from: _RepeatTypes = "optimal",
         counter_var: Optional[str] = None,
+        metadata_var: Optional[str] = None,
     ) -> Self:
-        if any(step["run"] == "repeat" for step in self._plan_config["steps"]):
+        if self._repeat is not None:
             msg = "The repeat() method can only be called once."
             raise RuntimeError(msg)
-        self._plan_config["steps"] = [
-            {
-                "run": "repeat",
-                "with": {
-                    "counter_var": counter_var,
-                    "iterations": iterations,
-                    "steps": self._add_repeat_tracker(
-                        self._plan_config["steps"], restart_from
-                    ),
-                },
-            }
-        ]
+        self._repeat = _Repeat(
+            iterations=iterations,
+            restart_from=restart_from,
+            counter_var=counter_var,
+            metadata_var=metadata_var,
+        )
         return self
 
-    def _add_repeat_tracker(
-        self,
-        steps: List[Dict[str, Any]],
-        restart_from: Literal["initial", "last", "optimal", "last_optimal"] = "optimal",
-    ) -> List[Dict[str, Any]]:
-        idx = next(idx for idx, step in enumerate(steps) if step["run"] == "optimizer")
-        if restart_from in ["last", "last_optimal"]:
-            self._plan_config["context"].append(
-                {
-                    "id": "repeat_tracker",
-                    "init": "tracker",
-                    "with": {"type": "last" if restart_from == "last" else "optimal"},
-                }
+    def _build_plan_config(self) -> Dict[str, Any]:
+        context = self._plan_config["context"]
+        steps = self._plan_config["steps"]
+        metadata = self._metadata
+
+        if self._repeat is not None:
+            counter_var = self._repeat.counter_var
+            if self._repeat.metadata_var is not None:
+                if counter_var is None:
+                    counter_var = "__repeat_counter__"
+                metadata[self._repeat.metadata_var] = f"${counter_var}"
+            context, steps = _add_repeat_tracker(
+                context, steps, self._repeat.restart_from
             )
-            steps[idx]["with"]["update"].append("repeat_tracker")
-        if restart_from == "last":
-            steps[idx]["with"]["initial_values"] = "$repeat_tracker"
-        elif restart_from == "optimal":
-            steps[idx]["with"]["initial_values"] = "$optimal"
-        elif restart_from == "last_optimal":
-            steps[idx]["with"]["initial_values"] = "$initial"
+
+        if metadata:
             steps = [
-                {"run": "setvar", "with": "initial = $repeat_tracker"},
-                {"run": "reset", "with": {"context": "repeat_tracker"}},
+                {
+                    "run": "metadata",
+                    "with": {
+                        "metadata": self._metadata,
+                    },
+                },
                 *steps,
             ]
-        return steps
+
+        if self._repeat is not None:
+            steps = [
+                {
+                    "run": "repeat",
+                    "with": {
+                        "iterations": self._repeat.iterations,
+                        "counter_var": counter_var,
+                        "steps": steps,
+                    },
+                }
+            ]
+
+        return {"context": context, "steps": steps}
 
     def run(self) -> Self:
-        config = PlanConfig.model_validate(self._plan_config)
         plan = Plan(
-            config,
-            self._context,
+            PlanConfig.model_validate(self._build_plan_config()),
+            self._optimizer_context,
             plugin_manager=self._plugin_manager,
         )
         for event_type, function in self._observers:
             plan.optimizer_context.events.add_observer(event_type, function)
         plan.run()
-        self._results = plan["optimal"]
-        self._variables = (
-            None if self._results is None else self._results.evaluations.variables
+        results = plan["optimal"]
+        self._results = _Results(
+            results=results,
+            variables=None if results is None else results.evaluations.variables,
+            exit_code=plan["exit_code"],
         )
-        self._exit_code = plan["exit_code"]
         return self
 
     @staticmethod
@@ -204,3 +218,32 @@ class OptimizationPlanRunner:
         the current function evaluation.
         """
         raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
+
+
+def _add_repeat_tracker(
+    context: List[Dict[str, Any]],
+    steps: List[Dict[str, Any]],
+    restart_from: Literal["initial", "last", "optimal", "last_optimal"] = "optimal",
+) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    idx = next(idx for idx, step in enumerate(steps) if step["run"] == "optimizer")
+    if restart_from in ["last", "last_optimal"]:
+        context.append(
+            {
+                "id": "repeat_tracker",
+                "init": "tracker",
+                "with": {"type": "last" if restart_from == "last" else "optimal"},
+            }
+        )
+        steps[idx]["with"]["update"].append("repeat_tracker")
+    if restart_from == "last":
+        steps[idx]["with"]["initial_values"] = "$repeat_tracker"
+    elif restart_from == "optimal":
+        steps[idx]["with"]["initial_values"] = "$optimal"
+    elif restart_from == "last_optimal":
+        steps[idx]["with"]["initial_values"] = "$initial"
+        steps = [
+            {"run": "setvar", "with": "initial = $repeat_tracker"},
+            {"run": "reset", "with": {"context": "repeat_tracker"}},
+            *steps,
+        ]
+    return context, steps

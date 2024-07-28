@@ -935,7 +935,8 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
         restart = metadata.get("restart", -1)
         assert metadata["foo"] == 1
         assert metadata["bar"] == "string"
-        assert metadata["complex"] == f"string 2 {restart}"
+        if "complex" in metadata:
+            assert metadata["complex"] == f"string 2 {restart}"
         if not restarts or restart != restarts[-1]:
             restarts.append(restart)
 
@@ -982,10 +983,16 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
     assert restarts == [0, 1]
 
     restarts = []
+
+    metadata = {
+        "foo": 1,
+        "bar": "string",
+    }
+
     OptimizationPlanRunner(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, _track_results
     ).add_metadata(metadata).repeat(
-        2, restart_from="last_optimal", counter_var="counter"
+        2, restart_from="last_optimal", metadata_var="restart"
     ).run()
     assert restarts == [0, 1]
 
