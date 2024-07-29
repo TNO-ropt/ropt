@@ -35,11 +35,9 @@ def enopt_config_fixture() -> Dict[str, Any]:
     }
 
 
-def _handle_results(
-    event: Event, reporter: ResultsDataFrame, config: EnOptConfig
-) -> None:
+def _handle_results(event: Event, reporter: ResultsDataFrame) -> None:
     assert event.results is not None
-    reporter.add_results(config, event.results)
+    reporter.add_results(event.config, event.results)
 
 
 def test_dataframe_results_no_results(enopt_config: Any, evaluator: Any) -> None:
@@ -47,7 +45,7 @@ def test_dataframe_results_no_results(enopt_config: Any, evaluator: Any) -> None
     reporter = ResultsDataFrame(set())
     OptimizationPlanRunner(config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION,
-        partial(_handle_results, reporter=reporter, config=config),
+        partial(_handle_results, reporter=reporter),
     ).run()
     assert reporter.frame.empty
 
@@ -62,7 +60,7 @@ def test_dataframe_results_function_results(enopt_config: Any, evaluator: Any) -
     )
     OptimizationPlanRunner(config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION,
-        partial(_handle_results, reporter=reporter, config=config),
+        partial(_handle_results, reporter=reporter),
     ).run()
 
     assert len(reporter.frame) == 3
@@ -84,7 +82,7 @@ def test_dataframe_results_function_results_formatted_names(
     )
     OptimizationPlanRunner(config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION,
-        partial(_handle_results, reporter=reporter, config=config),
+        partial(_handle_results, reporter=reporter),
     ).run()
 
     assert len(reporter.frame) == 3
@@ -105,7 +103,7 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
     )
     OptimizationPlanRunner(config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION,
-        partial(_handle_results, reporter=reporter, config=config),
+        partial(_handle_results, reporter=reporter),
     ).run()
 
     assert len(reporter.frame) == 3

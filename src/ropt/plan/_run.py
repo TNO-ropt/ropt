@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sys
 from dataclasses import dataclass
+from pathlib import Path  # noqa: TCH003
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -16,6 +17,7 @@ from typing import (
     Tuple,
     Union,
 )
+from uuid import uuid4
 
 from ropt.config.plan import PlanConfig
 from ropt.enums import EventType, OptimizerExitCode
@@ -77,22 +79,23 @@ class OptimizationPlanRunner:
         self._plan_config: Dict[str, Any] = {
             "context": [
                 {
-                    "id": "config",
+                    "id": "__config__",
                     "init": "config",
                     "with": enopt_config,
                 },
                 {
-                    "id": "optimal",
+                    "id": "__optimum_tracker__",
                     "init": "tracker",
                     "with": {"constraint_tolerance": constraint_tolerance},
                 },
             ],
             "steps": [
                 {
+                    "name": "__optimizer_step__",
                     "run": "optimizer",
                     "with": {
-                        "config": "$config",
-                        "update": ["optimal"],
+                        "config": "$__config__",
+                        "update": ["__optimum_tracker__"],
                         "exit_code_var": "exit_code",
                     },
                 }
@@ -130,6 +133,31 @@ class OptimizationPlanRunner:
                 del self._metadata[key]
             else:
                 self._metadata[key] = value
+        return self
+
+    def add_table(
+        self,
+        columns: Dict[str, str],
+        path: Path,
+        table_type: Literal["functions", "gradients"] = "functions",
+        min_header_len: Optional[int] = None,
+        *,
+        maximize: bool = False,
+    ) -> Self:
+        self._plan_config["context"].append(
+            {
+                "id": f"__{uuid4().hex}__",
+                "init": "table",
+                "with": {
+                    "columns": columns,
+                    "path": path,
+                    "table_type": table_type,
+                    "min_header_len": min_header_len,
+                    "maximize": maximize,
+                    "steps": ["__optimizer_step__"],
+                },
+            }
+        )
         return self
 
     def repeat(
@@ -199,7 +227,7 @@ class OptimizationPlanRunner:
         for event_type, function in self._observers:
             plan.optimizer_context.events.add_observer(event_type, function)
         plan.run()
-        results = plan["optimal"]
+        results = plan["__optimum_tracker__"]
         self._results = _Results(
             results=results,
             variables=None if results is None else results.evaluations.variables,
@@ -229,21 +257,21 @@ def _add_repeat_tracker(
     if restart_from in ["last", "last_optimal"]:
         context.append(
             {
-                "id": "repeat_tracker",
+                "id": "__repeat_tracker__",
                 "init": "tracker",
                 "with": {"type": "last" if restart_from == "last" else "optimal"},
             }
         )
-        steps[idx]["with"]["update"].append("repeat_tracker")
+        steps[idx]["with"]["update"].append("__repeat_tracker__")
     if restart_from == "last":
-        steps[idx]["with"]["initial_values"] = "$repeat_tracker"
+        steps[idx]["with"]["initial_values"] = "$__repeat_tracker__"
     elif restart_from == "optimal":
-        steps[idx]["with"]["initial_values"] = "$optimal"
+        steps[idx]["with"]["initial_values"] = "$__optimum_tracker__"
     elif restart_from == "last_optimal":
-        steps[idx]["with"]["initial_values"] = "$initial"
+        steps[idx]["with"]["initial_values"] = "$__initial_var__"
         steps = [
-            {"run": "setvar", "with": "initial = $repeat_tracker"},
-            {"run": "reset", "with": {"context": "repeat_tracker"}},
+            {"run": "setvar", "with": "__initial_var__ = $__repeat_tracker__"},
+            {"run": "reset", "with": {"context": "__repeat_tracker__"}},
             *steps,
         ]
     return context, steps

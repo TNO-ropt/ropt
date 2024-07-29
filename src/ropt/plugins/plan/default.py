@@ -16,12 +16,14 @@ from ._optimizer import DefaultOptimizerStep
 from ._repeat import DefaultRepeatStep
 from ._reset import DefaultResetStep
 from ._setvar import DefaultSetStep
+from ._table import DefaultTableContext
 from ._tracker import DefaultTrackerContext
 from ._update import DefaultUpdateStep
 from .base import PlanPlugin
 
 _CONTEXT_OBJECTS: Final[Dict[str, Type[ContextObj]]] = {
     "config": DefaultConfigContext,
+    "table": DefaultTableContext,
     "tracker": DefaultTrackerContext,
 }
 

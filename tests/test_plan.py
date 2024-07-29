@@ -16,6 +16,8 @@ from ropt.plan import OptimizationPlanRunner, OptimizerContext, Plan
 from ropt.results import FunctionResults, Results
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from ropt.config.enopt import EnOptConfig
 
 # ruff: noqa: SLF001
@@ -41,6 +43,32 @@ def enopt_config_fixture() -> Dict[str, Any]:
 
 
 def test_run_basic(enopt_config: Any, evaluator: Any) -> None:
+    plan_config = {
+        "context": [
+            {
+                "id": "enopt_config",
+                "init": "config",
+                "with": enopt_config,
+            },
+            {
+                "id": "results",
+                "init": "tracker",
+            },
+        ],
+        "steps": [
+            {
+                "run": "optimizer",
+                "with": {"config": "$enopt_config", "update": ["results"]},
+            },
+        ],
+    }
+    context = OptimizerContext(evaluator=evaluator())
+    plan = Plan(PlanConfig.model_validate(plan_config), context)
+    plan.run()
+    variables = plan["results"].evaluations.variables
+    assert variables is not None
+    assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
+
     variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
@@ -1349,3 +1377,48 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
 
     assert results is not None
     assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+
+
+def test_table(enopt_config: Any, evaluator: Any, tmp_path: Path) -> None:
+    path = tmp_path / "results.txt"
+    plan_config = {
+        "context": [
+            {
+                "id": "enopt_config",
+                "init": "config",
+                "with": enopt_config,
+            },
+            {
+                "id": "table",
+                "init": "table",
+                "with": {
+                    "columns": {
+                        "result_id": "eval-ID",
+                        "evaluations.variables": "Variables",
+                    },
+                    "path": path,
+                    "steps": ["opt"],
+                },
+            },
+        ],
+        "steps": [
+            {
+                "name": "opt",
+                "run": "optimizer",
+                "with": {"config": "$enopt_config"},
+            },
+        ],
+    }
+    context = OptimizerContext(evaluator=evaluator())
+    plan = Plan(PlanConfig.model_validate(plan_config), context)
+    plan.run()
+    assert path.exists()
+
+    path.unlink()
+    assert not path.exists()
+
+    OptimizationPlanRunner(enopt_config, evaluator()).add_table(
+        columns={"result_id": "eval-ID", "evaluations.variables": "Variables"},
+        path=path,
+    ).run()
+    assert path.exists()

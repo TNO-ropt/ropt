@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 
 class DefaultTrackerWith(BaseModel):
-    """Parameters for the track_results context object.
+    """Parameters for the tracker context object.
 
     The `type` parameter determines what result is tracked:
     - "optimal": Track the best result added
@@ -40,7 +40,7 @@ class DefaultTrackerWith(BaseModel):
 
 
 class DefaultTrackerContext(ContextObj):
-    """The default results context object."""
+    """The default tracker context object."""
 
     def __init__(self, config: ContextConfig, plan: Plan) -> None:
         """Initialize a default tracker context object.
