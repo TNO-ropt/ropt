@@ -28,6 +28,12 @@ dependencies = [
     "typing-extensions; python_version<'3.9'",
 ]
 
+[project.urls]
+"Homepage" = "https://github.com/TNO-ropt/ropt"
+"Repository" = "https://github.com/TNO-ropt/ropt"
+"Bug Tracker" = "https://github.com/TNO-ropt/ropt/issues"
+"Documentation" = "https://tno-ropt.github.io/ropt"
+
 [project.optional-dependencies]
 test = ["ruff", "mypy", "pytest", "pandas-stubs", "types-tabulate"]
 docs = ["mkdocs", "mkdocstrings[python]", "mkdocs-material", "mike"]
