@@ -3,7 +3,7 @@
 To demonstrate basic optimization with `ropt`, consider the Rosenbrock function,
 a standard test problem:
 
-$$ f(x,y) = (a - x)^2 + b (y = x^2)^2, $$
+$$ f(x,y) = (a - x)^2 + b (y - x^2)^2, $$
 
 which has a global minimum of $f(x, y) = 0$ at $(x, y) = (a, a^2)$ .
 
@@ -29,22 +29,17 @@ def rosenbrock(
 
 CONFIG = {                                                            # (4)!
     "variables": {"initial_values": [0.5, 2.0]},
-    "gradient": {"perturbation_magnitudes": 1e-6}                     # (5)!
+    "gradient": {"perturbation_magnitudes": 1e-5}                     # (5)!
 }
 
-plan = OptimizationPlanRunner(CONFIG, rosenbrock)                      # (6)!
-plan.run()                                                            # (7)!
-optimum = plan.results                                                # (8)
+optimum = OptimizationPlanRunner(CONFIG, rosenbrock).run().results    # (6)!
 
-print(
-    optimum.evaluations.variables,
-    optimum.functions.weighted_objective,
-)
+print(ptimum.evaluations.variables, optimum.functions.weighted_objective)
 ```
 
-1. The variables to optimize ($x, y$) are passes as a single `numpy` array. It
-   may receive multiple variable vectors to evaluate, hence the input is a
-   matrix where the variable vectors are the rows of the matrix.
+1. The variables to optimize ($x, y$) are passes as a single `numpy` array. The
+   function may receive multiple variable vectors to evaluate, hence the input
+   is a matrix where the variable vectors are the rows of the matrix.
 2. Additional information is passes via an
    [`EvaluatorContext`][ropt.evaluator.EvaluatorContext] object. It is not
    needed in this case.
@@ -54,14 +49,14 @@ print(
    be evaluated.
 4. Create an optimizer configuration with default values except for initial
    values and perturbation magnitudes.
-5. Set perturbation magnitudes to a small value for accurate gradient estimation.
-6. Make a basic plan that runs a single optimization.
-7. Run the optimization.
-8. Get the results.
+5. Set perturbation magnitudes to a small value for accurate gradient
+   estimation.
+6. Make an [`OptimizationPlanRunner`][ropt.plan.OptimizationPlanRunner]
+   plan, run it, and retrieve the results.
 
 Running this will print the estimated optimal variables and the corresponding
 function value:
 
 ```python
-[0.99959301 0.99917614] 1.7574715576837572e-07
+[1.00117794 1.0023715 ] 1.4078103983185034e-06
 ```

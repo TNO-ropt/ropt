@@ -11,22 +11,22 @@ from ropt.config.enopt import EnOptConfig
 def scale_variables(
     config: EnOptConfig, variables: NDArray[np.float64], axis: int
 ) -> Optional[NDArray[np.float64]]:
-    """Scale Back Variables.
+    """Scale variables.
 
     Given an ensemble optimizer configuration object and a vector of variables,
-    this function applies an offset and scale to their values.
+    this function applies an offset and scale to the vector values.
 
     As the `variables` input may be a multi-dimensional array, the index of the
     axis that designates the variables should be provided through the `axis`
     argument.
 
     Args:
-        config:    The ensemble optimizer configuration object.
-        variables: The scaled variables.
-        axis:      The variables axis.
+        config:    The ensemble optimizer configuration object
+        variables: The scaled variables
+        axis:      The variables axis
 
     Returns:
-        The unscaled variables, or `None` if no scaling is applied.
+        The scaled variables, or `None` if no scaling is applied.
     """
     if config.variables.offsets is None and config.variables.scales is None:
         return None
@@ -60,7 +60,7 @@ def scale_back_variables(
         config:          The ensemble optimizer configuration object
         variables:       The scaled variables
         axis:            The variables axis
-        correct_offsets: If True also correct for offsets.
+        correct_offsets: If True also correct for offsets
 
     Returns:
         The unscaled variables, or `None` if no scaling is applied.
@@ -81,7 +81,7 @@ def scale_objectives(
     scales: Optional[NDArray[np.float64]],
     axis: int,
 ) -> Optional[NDArray[np.float64]]:
-    """Scale Objective Functions.
+    """Scale objective function values.
 
     Given an ensemble optimizer configuration object, this function scales the
     provided objective values. It divides them by the scale values given in the
@@ -93,10 +93,10 @@ def scale_objectives(
     argument.
 
     Args:
-        config:     The ensemble optimizer configuration object.
-        objectives: Objective functions.
-        scales:     Optional additional scales.
-        axis:       The objectives axis.
+        config:     The ensemble optimizer configuration object
+        objectives: Objective functions
+        scales:     Optional additional scales
+        axis:       The objectives axis
 
     Returns:
         The scaled objectives or `None` if no scaling was applied.
@@ -116,7 +116,7 @@ def scale_constraints(
     scales: Optional[NDArray[np.float64]],
     axis: int,
 ) -> Optional[NDArray[np.float64]]:
-    """Scale constraint functions.
+    """Scale constraint function values.
 
     Given an ensemble optimizer configuration object, this function scales the
     provided constraint values. It divides them by the scale values given in the
@@ -130,7 +130,7 @@ def scale_constraints(
     Args:
         config:      The ensemble optimizer configuration object
         constraints: Constraint functions
-        scales:      Optional additional scales.
+        scales:      Optional additional scales
         axis:        The constraints axis
 
     Returns:

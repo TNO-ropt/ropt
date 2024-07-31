@@ -1,3 +1,8 @@
+## Ensemble evaluator
+::: ropt.ensemble_evaluator.EnsembleEvaluator
+    options:
+        heading_level: 3
+
 ## Evaluator callbacks
 
 ::: ropt.evaluator.Evaluator
@@ -10,7 +15,7 @@
     options:
         heading_level: 3
 
-## Optional implementations
+## Optional evaluator implementations
 
 ::: ropt.evaluator.ConcurrentEvaluator
     options:

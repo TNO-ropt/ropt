@@ -29,6 +29,7 @@ class Event:
         config:     The current configuration object of the executing plan
         results:    Optional results passed with the event
         exit_code:  An optional exit code
+        step_name:  Optional name of the step emitting the event
     """
 
     event_type: EventType
@@ -64,7 +65,7 @@ class EventBroker:
         """Emit an event.
 
         The keyword arguments are used to construct an
-        [`Event`][ropt.events.Event] object of the type given by `event_type`.
+        [`Event`][ropt.optimization.Event] object of the type given by `event_type`.
         All stored callbacks that react to this event type are then called with
         that event object as their argument.
 

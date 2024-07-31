@@ -1,4 +1,4 @@
-"""Exceptions raised by `ropt`."""
+"""Exceptions raised within the `ropt` library."""
 
 from typing import Optional
 

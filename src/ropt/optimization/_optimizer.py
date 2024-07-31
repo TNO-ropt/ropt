@@ -83,7 +83,7 @@ class EnsembleOptimizer:
 
         1. An [`EnOptConfig`][ropt.config.enopt.EnOptConfig] that contains all
            configuration settings for the optimization.
-        2. An [`EnsembleEvaluator`][ropt.evaluator.EnsembleEvaluator] object
+        2. An [`EnsembleEvaluator`][ropt.ensemble_evaluator.EnsembleEvaluator] object
            that is responsible for evaluating functions and gradients.
         3. A [`PluginManager`][ropt.plugins.PluginManager] object that provides
            access to optimizer plugins.

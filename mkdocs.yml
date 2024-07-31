@@ -60,7 +60,7 @@ watch:
 
 repo_url: https://github.com/TNO-ropt/ropt
 nav:
-  - "About ropt": index.md
+  - "About": index.md
   - Usage:
       - "Introduction": usage/robust_optimization.md
       - "Running Optimizations": usage/running.md
@@ -70,22 +70,23 @@ nav:
           - "Optimizer configuration": reference/enopt_config.md
       - "Optimization":
           - "Optimization Plans": reference/plans.md
+          - "Optimization": reference/optimization.md
           - "Function evaluations": reference/evaluator.md
           - "Optimization results": reference/results.md
           - "Reporting": reference/reporting.md
       - "Plugins":
           - "Plugins": reference/plugin_manager.md
+          - "Plan objects": reference/plan_plugins.md
           - "Optimizer plugins": reference/optimizer_plugins.md
           - "Sampler plugins": reference/sampler_plugins.md
           - "Realization filters": reference/realization_filter_plugins.md
           - "Function transforms": reference/function_transform_plugins.md
-          - "Optimization Plan objects": reference/plan_plugins.md
       - "Default Plugins":
           - "SciPy Optimizer Plugin": reference/scipy_optimizer.md
           - "SciPy Sampler Plugin": reference/scipy_sampler.md
           - "Default Realization Filters": reference/default_realization_filters.md
           - "Default Function Transforms": reference/default_function_transforms.md
-          - "Default Optimization Plan Objects": reference/default_plan_objects.md
+          - "Default Plan Objects": reference/default_plan_objects.md
       - "Enumerations": reference/enums.md
       - "Exceptions": reference/exceptions.md
       - "Utilities": reference/utilities.md

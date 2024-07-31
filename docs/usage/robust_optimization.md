@@ -30,7 +30,7 @@ where $w_i$ represents the weights assigned to the different realizations. In
 more complex settings, the realizations may also be combined in different ways,
 and the set of realizations may be modified during optimization. For instance,
 risk-aware objectives may be constructed by minimizing the standard deviation of
-the functions or by selecting the worst-performing realizations at each
+the functions or by selecting some of the worst-performing realizations at each
 iteration.
 
 In practice, the optimization task often becomes complex due to additional

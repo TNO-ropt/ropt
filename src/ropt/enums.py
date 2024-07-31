@@ -1,10 +1,16 @@
-"""Enumerations used by `ropt`."""
+"""Enumerations used within the `ropt` library."""
 
 from enum import Enum, IntEnum
 
 
 class VariableType(IntEnum):
-    """Enumerates the variable types."""
+    """Enumerates the variable types.
+
+    The variable types are configured in the
+    [`variables`][ropt.config.enopt.VariablesConfig] section of the optimizer
+    configuration. The optimization backends may make us of this information to
+    modify their behavior accordingly.
+    """
 
     REAL = 1
     "Continuous variables represented by real values."
@@ -14,7 +20,12 @@ class VariableType(IntEnum):
 
 
 class ConstraintType(IntEnum):
-    """Enumerates the types of linear or non-linear constraints."""
+    r"""Enumerates the types of linear or non-linear constraints.
+
+    Both linear and non-linear constraints may be less or equal ($\le$), greater
+    or equal ($\ge$), or equal ($=$). Internally, $\le$ or $\ge$ constraints may
+    be converted to an opposite constraint, depending on the optimizer backend.
+    """
 
     LE = 1
     r"Less or equal constraint ($\le$)."
@@ -76,7 +87,7 @@ class PerturbationType(IntEnum):
     RELATIVE = 2
     r"""Multiply the perturbation value $p_i$ by the range defined by the bounds
     of the variables $c_i$: $\hat{p}_i = (c_{i,\text{max}} - c_{i,\text{min}})
-    \cdot p_i$. The bounds will generally be defined in the configuration for
+    \times p_i$. The bounds will generally be defined in the configuration for
     the variables (see [`VariablesConfig`][ropt.config.enopt.VariablesConfig]).
     """
 
@@ -93,10 +104,11 @@ class EventType(IntEnum):
 
     During the execution of the optimization plan, events may be emitted and
     callbacks can be connected to these events . When triggered by an event, the
-    callbacks receive an `Event` object. This object contains at least the type
-    of the event (a value of this enumeration) and the current configuration of
-    the step that is executing. Additionally, depending on the event type, a
-    tuple of result objects or an exit code may be present. Refer to the
+    callbacks receive an [`Event`][ropt.optimization.Event] object. This object
+    contains at least the type of the event (a value of this enumeration) and
+    the current configuration of the step that is executing. If the step has a
+    name it is also added to the event. Additionally, depending on the event
+    type, a tuple of result objects, an exit code  may be present. Refer to the
     documentation of the individual event types for details.
     """
 
@@ -115,7 +127,7 @@ class EventType(IntEnum):
     FINISHED_OPTIMIZER_STEP = 4
     """Emitted immediately after an optimizer step finishes.
 
-    Results and an exit code may be passed to callback reacting to this event.
+    Results and an exit code may be passed via the event object.
     """
 
     START_EVALUATOR_STEP = 5
@@ -124,7 +136,7 @@ class EventType(IntEnum):
     FINISHED_EVALUATOR_STEP = 6
     """Emitted immediately after an evaluation step finishes.
 
-    Results and an exit code may be passed to callback reacting to this event.
+    Results and an exit code may be passed via the event object.
     """
 
 
@@ -151,7 +163,18 @@ class OptimizerExitCode(IntEnum):
 
 
 class ResultAxisName(Enum):
-    """Enumerates the possible axis names in a Results data object."""
+    """Enumerates the possible axis names in a Results data object.
+
+    Result objects (see [`Results`][ropt.results.Results]) contain
+    multidimensional arrays where the axes represent particular quantities, for
+    instance variables, function objects, or realization numbers. The result
+    objects contain metadata that identify the axes by values of this
+    enumeration. These can be retrieved by the
+    [`get_axis_names`][ropt.results.ResultField.get_axis_names] method of the
+    attributes of a results object. They are used internally when exporting data
+    to determine the type of the array axes, for instance to retrieve the names
+    of the variables from the configuration.
+    """
 
     VARIABLE = "variable"
     """The axis index corresponds to the index of the variable."""
