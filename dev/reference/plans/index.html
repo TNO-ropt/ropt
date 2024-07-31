@@ -186,7 +186,7 @@
   
     
   
-  About ropt
+  About
 
       </a>
     </li>
@@ -304,7 +304,7 @@
         
   
   <span class="md-ellipsis">
-    About ropt
+    About
   </span>
   
 
@@ -783,6 +783,30 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner" class="md-nav__link">
+    <span class="md-ellipsis">
+      OptimizationPlanRunner
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OptimizationPlanRunner">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.abort_optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      abort_optimization
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -936,6 +960,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../plan_plugins/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Plan objects
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../optimizer_plugins/" class="md-nav__link">
         
   
@@ -1004,27 +1049,6 @@
   
   <span class="md-ellipsis">
     Function transforms
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../plan_plugins/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Optimization Plan objects
   </span>
   
 
@@ -1177,7 +1201,7 @@
         
   
   <span class="md-ellipsis">
-    Default Optimization Plan Objects
+    Default Plan Objects
   </span>
   
 
@@ -1439,6 +1463,30 @@
   <a href="#ropt.plan.Plan.__contains__" class="md-nav__link">
     <span class="md-ellipsis">
       __contains__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner" class="md-nav__link">
+    <span class="md-ellipsis">
+      OptimizationPlanRunner
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OptimizationPlanRunner">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.abort_optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      abort_optimization
     </span>
   </a>
   
@@ -2413,6 +2461,69 @@ into the string.</p>
           </tr>
       </tbody>
     </table>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.plan.OptimizationPlanRunner" class="doc doc-heading">
+            <code>OptimizationPlanRunner</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+      <p>A class for running optimization plans.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plan.OptimizationPlanRunner.abort_optimization" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">abort_optimization</span><span class="p">()</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Abort the current optimization run.</p>
+<p>This method can be called from within callbacks to interrupt the ongoing
+optimization plan. The exact point at which the optimization is aborted
+depends on the step that is executing at that point. For example, within
+a running optimizer, the process will be interrupted after completing
+the current function evaluation.</p>
 
     </div>
 

@@ -186,7 +186,7 @@
   
     
   
-  About ropt
+  About
 
       </a>
     </li>
@@ -302,7 +302,7 @@
         
   
   <span class="md-ellipsis">
-    About ropt
+    About
   </span>
   
 
@@ -743,6 +743,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../../reference/plan_plugins/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Plan objects
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../reference/optimizer_plugins/" class="md-nav__link">
         
   
@@ -811,27 +832,6 @@
   
   <span class="md-ellipsis">
     Function transforms
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../reference/plan_plugins/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Optimization Plan objects
   </span>
   
 
@@ -984,7 +984,7 @@
         
   
   <span class="md-ellipsis">
-    Default Optimization Plan Objects
+    Default Plan Objects
   </span>
   
 
@@ -1111,7 +1111,7 @@
 <h1 id="running-a-basic-optimization-script">Running a basic optimization script</h1>
 <p>To demonstrate basic optimization with <code>ropt</code>, consider the Rosenbrock function,
 a standard test problem:</p>
-<div class="arithmatex">\[ f(x,y) = (a - x)^2 + b (y = x^2)^2, \]</div>
+<div class="arithmatex">\[ f(x,y) = (a - x)^2 + b (y - x^2)^2, \]</div>
 <p>which has a global minimum of <span class="arithmatex">\(f(x, y) = 0\)</span> at <span class="arithmatex">\((x, y) = (a, a^2)\)</span> .</p>
 <p>Here's an example optimizing the Rosenbrock function for <span class="arithmatex">\(a = 1\)</span> and <span class="arithmatex">\(b = 100\)</span>:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -1133,22 +1133,17 @@ a standard test problem:</p>
 </span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>
 </span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>                                                            <span class="c1"># (4)!</span>
 </span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;initial_values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">]},</span>
-</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>    <span class="s2">&quot;gradient&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;perturbation_magnitudes&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">}</span>                     <span class="c1"># (5)!</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>    <span class="s2">&quot;gradient&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;perturbation_magnitudes&quot;</span><span class="p">:</span> <span class="mf">1e-5</span><span class="p">}</span>                     <span class="c1"># (5)!</span>
 </span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="p">}</span>
 </span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>
-</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="n">plan</span> <span class="o">=</span> <span class="n">OptimizationPlanRunner</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">)</span>                      <span class="c1"># (6)!</span>
-</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="n">plan</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>                                                            <span class="c1"># (7)!</span>
-</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="n">optimum</span> <span class="o">=</span> <span class="n">plan</span><span class="o">.</span><span class="n">results</span>                                                <span class="c1"># (8)</span>
-</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>
-</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="nb">print</span><span class="p">(</span>
-</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>    <span class="n">optimum</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span>
-</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>    <span class="n">optimum</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">weighted_objective</span><span class="p">,</span>
-</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="p">)</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="n">optimum</span> <span class="o">=</span> <span class="n">OptimizationPlanRunner</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span><span class="o">.</span><span class="n">results</span>    <span class="c1"># (6)!</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="nb">print</span><span class="p">(</span><span class="n">ptimum</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span> <span class="n">optimum</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">weighted_objective</span><span class="p">)</span>
 </span></code></pre></div>
 <ol>
-<li>The variables to optimize (<span class="arithmatex">\(x, y\)</span>) are passes as a single <code>numpy</code> array. It
-   may receive multiple variable vectors to evaluate, hence the input is a
-   matrix where the variable vectors are the rows of the matrix.</li>
+<li>The variables to optimize (<span class="arithmatex">\(x, y\)</span>) are passes as a single <code>numpy</code> array. The
+   function may receive multiple variable vectors to evaluate, hence the input
+   is a matrix where the variable vectors are the rows of the matrix.</li>
 <li>Additional information is passes via an
    <a class="autorefs autorefs-internal" href="../../reference/evaluator/#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a> object. It is not
    needed in this case.</li>
@@ -1158,14 +1153,14 @@ a standard test problem:</p>
    be evaluated.</li>
 <li>Create an optimizer configuration with default values except for initial
    values and perturbation magnitudes.</li>
-<li>Set perturbation magnitudes to a small value for accurate gradient estimation.</li>
-<li>Make a basic plan that runs a single optimization.</li>
-<li>Run the optimization.</li>
-<li>Get the results.</li>
+<li>Set perturbation magnitudes to a small value for accurate gradient
+   estimation.</li>
+<li>Make an <a class="autorefs autorefs-internal" href="../../reference/plans/#ropt.plan.OptimizationPlanRunner"><code>OptimizationPlanRunner</code></a>
+   plan, run it, and retrieve the results.</li>
 </ol>
 <p>Running this will print the estimated optimal variables and the corresponding
 function value:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">[</span><span class="mf">0.99959301</span> <span class="mf">0.99917614</span><span class="p">]</span> <span class="mf">1.7574715576837572e-07</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">[</span><span class="mf">1.00117794</span> <span class="mf">1.0023715</span> <span class="p">]</span> <span class="mf">1.4078103983185034e-06</span>
 </span></code></pre></div>
 
 
