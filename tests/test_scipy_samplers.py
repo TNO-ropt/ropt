@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from ropt.enums import EventType
-from ropt.events import Event
+from ropt.optimization import Event
 from ropt.plan import OptimizationPlanRunner
 from ropt.plugins.sampler.scipy import _SUPPORTED_METHODS
 from ropt.results import GradientResults

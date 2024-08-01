@@ -6,7 +6,7 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt.enums import ConstraintType, EventType
-from ropt.events import Event
+from ropt.optimization import Event
 from ropt.plan import OptimizationPlanRunner
 from ropt.plugins.realization_filter.default import (
     _get_cvar_weights_from_percentile,

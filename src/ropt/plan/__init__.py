@@ -1,6 +1,6 @@
 r"""Code to run optimization plans."""
 
-from ropt.optimizer import EnsembleOptimizer
+from ropt.optimization import EnsembleOptimizer
 
 from ._plan import MetaDataType, OptimizerContext, Plan
 from ._run import OptimizationPlanRunner

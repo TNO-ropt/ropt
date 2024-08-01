@@ -15,7 +15,7 @@ from numpy.typing import NDArray
 
 from ropt.enums import EventType
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.events import Event
+from ropt.optimization import Event
 from ropt.plan import OptimizationPlanRunner
 from ropt.results import FunctionResults
 

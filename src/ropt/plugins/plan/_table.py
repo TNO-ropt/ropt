@@ -14,7 +14,7 @@ from ropt.results import convert_to_maximize
 
 if TYPE_CHECKING:
     from ropt.config.plan import ContextConfig
-    from ropt.events import Event
+    from ropt.optimization import Event
     from ropt.plan import ContextUpdate, Plan
 
 

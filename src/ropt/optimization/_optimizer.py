@@ -90,9 +90,9 @@ class EnsembleOptimizer:
 
         In addition, two optional callbacks can be provided:
 
-        1. A [`SignalEvaluationCallback`][ropt.optimizer.SignalEvaluationCallback]
+        1. A [`SignalEvaluationCallback`][ropt.optimization.SignalEvaluationCallback]
            callback that is called before and after each function evaluation.
-        2. A [`NestedOptimizerCallback`][ropt.optimizer.NestedOptimizerCallback]
+        2. A [`NestedOptimizerCallback`][ropt.optimization.NestedOptimizerCallback]
            callback that is called at each function evaluation to run a nested
            optimization.
 

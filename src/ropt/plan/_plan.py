@@ -13,8 +13,8 @@ import numpy as np
 from numpy.random import default_rng
 
 from ropt.config.enopt.constants import DEFAULT_SEED
-from ropt.events import EventBroker
 from ropt.exceptions import PlanError
+from ropt.optimization import EventBroker
 from ropt.plugins import PluginManager
 
 if TYPE_CHECKING:

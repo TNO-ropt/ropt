@@ -10,8 +10,8 @@ from pydantic import ValidationError
 
 from ropt.config.plan import PlanConfig
 from ropt.enums import EventType, OptimizerExitCode
-from ropt.events import Event
 from ropt.exceptions import PlanError
+from ropt.optimization import Event
 from ropt.plan import OptimizationPlanRunner, OptimizerContext, Plan
 from ropt.results import FunctionResults, Results
 
