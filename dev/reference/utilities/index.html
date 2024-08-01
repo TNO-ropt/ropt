@@ -601,6 +601,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../optimization/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Optimization
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../evaluator/" class="md-nav__link">
         
   
@@ -1446,9 +1467,9 @@
 
     <div class="doc doc-contents ">
 
-      <p>Scale Back Variables.</p>
+      <p>Scale variables.</p>
 <p>Given an ensemble optimizer configuration object and a vector of variables,
-this function applies an offset and scale to their values.</p>
+this function applies an offset and scale to the vector values.</p>
 <p>As the <code>variables</code> input may be a multi-dimensional array, the index of the
 axis that designates the variables should be provided through the <code>axis</code>
 argument.</p>
@@ -1472,7 +1493,7 @@ argument.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The ensemble optimizer configuration object.</p>
+                <p>The ensemble optimizer configuration object</p>
               </div>
             </td>
             <td>
@@ -1486,7 +1507,7 @@ argument.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The scaled variables.</p>
+                <p>The scaled variables</p>
               </div>
             </td>
             <td>
@@ -1500,7 +1521,7 @@ argument.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The variables axis.</p>
+                <p>The variables axis</p>
               </div>
             </td>
             <td>
@@ -1526,7 +1547,7 @@ argument.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The unscaled variables, or <code>None</code> if no scaling is applied.</p>
+                <p>The scaled variables, or <code>None</code> if no scaling is applied.</p>
               </div>
             </td>
           </tr>
@@ -1618,7 +1639,7 @@ argument.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If True also correct for offsets.</p>
+                <p>If True also correct for offsets</p>
               </div>
             </td>
             <td>
@@ -1666,7 +1687,7 @@ argument.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Scale Objective Functions.</p>
+      <p>Scale objective function values.</p>
 <p>Given an ensemble optimizer configuration object, this function scales the
 provided objective values. It divides them by the scale values given in the
 configuration object (if not <code>None</code>), and optionally also by the values
@@ -1694,7 +1715,7 @@ argument.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The ensemble optimizer configuration object.</p>
+                <p>The ensemble optimizer configuration object</p>
               </div>
             </td>
             <td>
@@ -1708,7 +1729,7 @@ argument.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Objective functions.</p>
+                <p>Objective functions</p>
               </div>
             </td>
             <td>
@@ -1722,7 +1743,7 @@ argument.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional additional scales.</p>
+                <p>Optional additional scales</p>
               </div>
             </td>
             <td>
@@ -1736,7 +1757,7 @@ argument.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The objectives axis.</p>
+                <p>The objectives axis</p>
               </div>
             </td>
             <td>
@@ -1784,7 +1805,7 @@ argument.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Scale constraint functions.</p>
+      <p>Scale constraint function values.</p>
 <p>Given an ensemble optimizer configuration object, this function scales the
 provided constraint values. It divides them by the scale values given in the
 configuration object (if not <code>None</code>), and optionally also by the values
@@ -1840,7 +1861,7 @@ argument.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional additional scales.</p>
+                <p>Optional additional scales</p>
               </div>
             </td>
             <td>

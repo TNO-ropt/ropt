@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../optimizer_plugins/">
+        <link rel="prev" href="../plans/">
       
       
-        <link rel="next" href="../realization_filter_plugins/">
+        <link rel="next" href="../evaluator/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Sampler plugins - ropt Documentation</title>
+        <title>Optimization - ropt Documentation</title>
       
     
     
@@ -66,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.plugins.sampler" class="md-skip">
+        <a href="#ropt.optimization" class="md-skip">
           Skip to content
         </a>
       
@@ -106,7 +106,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Sampler plugins
+              Optimization
             
           </span>
         </div>
@@ -539,8 +539,10 @@
                 
   
   
+    
   
   
+  
     
     
     
@@ -548,13 +550,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
         
           
           <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
@@ -568,7 +568,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_2">
             <span class="md-nav__icon md-icon"></span>
             Optimization
@@ -600,10 +600,28 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../optimization/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Optimization
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -612,6 +630,171 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      optimization
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="optimization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.EnsembleOptimizer" class="md-nav__link">
+    <span class="md-ellipsis">
+      EnsembleOptimizer
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EnsembleOptimizer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.EnsembleOptimizer.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.EnsembleOptimizer.start" class="md-nav__link">
+    <span class="md-ellipsis">
+      start
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.Event" class="md-nav__link">
+    <span class="md-ellipsis">
+      Event
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.EventBroker" class="md-nav__link">
+    <span class="md-ellipsis">
+      EventBroker
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EventBroker">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.EventBroker.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.EventBroker.add_observer" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_observer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.EventBroker.emit" class="md-nav__link">
+    <span class="md-ellipsis">
+      emit
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.SignalEvaluationCallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      SignalEvaluationCallback
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SignalEvaluationCallback">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.SignalEvaluationCallback.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.NestedOptimizerCallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      NestedOptimizerCallback
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="NestedOptimizerCallback">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.NestedOptimizerCallback.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -692,8 +875,6 @@
                 
   
   
-    
-  
   
   
     
@@ -703,11 +884,13 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
         
           
           <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
@@ -721,7 +904,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_3">
             <span class="md-nav__icon md-icon"></span>
             Plugins
@@ -795,28 +978,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Sampler plugins
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../sampler_plugins/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -825,105 +990,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler" class="md-nav__link">
-    <span class="md-ellipsis">
-      sampler
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.base" class="md-nav__link">
-    <span class="md-ellipsis">
-      base
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="base">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.base.Sampler" class="md-nav__link">
-    <span class="md-ellipsis">
-      Sampler
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Sampler">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.base.Sampler.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.base.Sampler.generate_samples" class="md-nav__link">
-    <span class="md-ellipsis">
-      generate_samples
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.base.SamplerPlugin" class="md-nav__link">
-    <span class="md-ellipsis">
-      SamplerPlugin
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="SamplerPlugin">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.base.SamplerPlugin.create" class="md-nav__link">
-    <span class="md-ellipsis">
-      create
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1227,36 +1293,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler" class="md-nav__link">
+  <a href="#ropt.optimization" class="md-nav__link">
     <span class="md-ellipsis">
-      sampler
+      optimization
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.base" class="md-nav__link">
-    <span class="md-ellipsis">
-      base
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="base">
+    <nav class="md-nav" aria-label="optimization">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.base.Sampler" class="md-nav__link">
+  <a href="#ropt.optimization.EnsembleOptimizer" class="md-nav__link">
     <span class="md-ellipsis">
-      Sampler
+      EnsembleOptimizer
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Sampler">
+    <nav class="md-nav" aria-label="EnsembleOptimizer">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.base.Sampler.__init__" class="md-nav__link">
+  <a href="#ropt.optimization.EnsembleOptimizer.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -1265,9 +1322,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.base.Sampler.generate_samples" class="md-nav__link">
+  <a href="#ropt.optimization.EnsembleOptimizer.start" class="md-nav__link">
     <span class="md-ellipsis">
-      generate_samples
+      start
     </span>
   </a>
   
@@ -1279,19 +1336,94 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.base.SamplerPlugin" class="md-nav__link">
+  <a href="#ropt.optimization.Event" class="md-nav__link">
     <span class="md-ellipsis">
-      SamplerPlugin
+      Event
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="SamplerPlugin">
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.EventBroker" class="md-nav__link">
+    <span class="md-ellipsis">
+      EventBroker
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EventBroker">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.base.SamplerPlugin.create" class="md-nav__link">
+  <a href="#ropt.optimization.EventBroker.__init__" class="md-nav__link">
     <span class="md-ellipsis">
-      create
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.EventBroker.add_observer" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_observer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.EventBroker.emit" class="md-nav__link">
+    <span class="md-ellipsis">
+      emit
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.SignalEvaluationCallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      SignalEvaluationCallback
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SignalEvaluationCallback">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.SignalEvaluationCallback.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.NestedOptimizerCallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      NestedOptimizerCallback
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="NestedOptimizerCallback">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.NestedOptimizerCallback.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
     </span>
   </a>
   
@@ -1325,68 +1457,21 @@
   
 
 
-  <h1>Sampler plugins</h1>
+  <h1>Optimization</h1>
 
 <div class="doc doc-object doc-module">
 
 
 
-<h2 id="ropt.plugins.sampler" class="doc doc-heading">
-            <code>ropt.plugins.sampler</code>
+<h2 id="ropt.optimization" class="doc doc-heading">
+            <code>ropt.optimization</code>
 
 
 </h2>
 
     <div class="doc doc-contents first">
 
-      <p>Plugin functionality for adding sampler plugins.</p>
-<p>Sampler plugins are managed by a <a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>
-object, which returns classes or factory functions to create objects that
-implement one or more sampling methods to produce perturbations. These objects
-must adhere to the <a class="autorefs autorefs-internal" href="#ropt.plugins.sampler.base.Sampler"><code>Sampler</code></a> abstract base
-class.</p>
-<p>Samplers can be added via the plugin manager, by default the
-<a class="autorefs autorefs-internal" href="../scipy_sampler/#ropt.plugins.sampler.scipy.SciPySampler"><code>SciPySampler</code></a> plugin is installed
-which provides a number of methods from the
-<a href="https://docs.scipy.org/doc/scipy/reference/stats.html"><code>scipy.stats</code></a> package.</p>
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-module">
-
-
-
-<h2 id="ropt.plugins.sampler.base" class="doc doc-heading">
-            <code>ropt.plugins.sampler.base</code>
-
-
-</h2>
-
-    <div class="doc doc-contents first">
-
-      <p>This module defines the abstract base class for samplers.</p>
-<p>Samplers can be added via the plugin mechanism to implement additional ways to
-generate perturbed variables. Any object that follows the
-<a class="autorefs autorefs-internal" href="#ropt.plugins.sampler.base.Sampler"><code>Sampler</code></a> abstract base class may be
-installed as a plugin.</p>
+      <p>The optimizer and event classes.</p>
 
 
 
@@ -1403,24 +1488,17 @@ installed as a plugin.</p>
 
 
 
-<h3 id="ropt.plugins.sampler.base.Sampler" class="doc doc-heading">
-            <code>Sampler</code>
+<h3 id="ropt.optimization.EnsembleOptimizer" class="doc doc-heading">
+            <code>EnsembleOptimizer</code>
 
 
 </h3>
 
 
     <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
 
-      <p>Abstract base class for sampler classes.</p>
-<p><code>ropt</code> employs plugins to implement samplers that are called during an
-optimization plan to generate perturbed variable vectors. Samplers should
-derive from the <code>Sampler</code> base class, which specifies the requirements for
-the class constructor (<code>__init__</code>) and also includes a <code>generate_samples</code>
-method used to generate samples used to create perturbed values.</p>
+      <p>Optimizer class for running ensemble optimizations.</p>
 
 
 
@@ -1438,27 +1516,32 @@ method used to generate samples used to create perturbed values.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.sampler.base.Sampler.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">sampler_index</span><span class="p">,</span> <span class="n">variable_indices</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
+<h4 id="ropt.optimization.EnsembleOptimizer.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">enopt_config</span><span class="p">,</span> <span class="n">ensemble_evaluator</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="p">,</span> <span class="n">signal_evaluation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nested_optimizer</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
 
     <div class="doc doc-contents ">
 
-      <p>Initialize the sampler object.</p>
-<p>The <code>samplers</code> field in the
-<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>enopt_config</code></a> configuration used by
-the optimization is a tuple of sampler configurations (see
-<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.SamplerConfig"><code>SamplerConfig</code></a>). The <code>sampler_index</code>
-field is used to identify the configuration to use to initialize this
-sampler.</p>
-<p>The sampler may be used for a subset of the variables. The <code>variable_indices</code>
-array lists the indices of the variables that are handled by this sampler.</p>
+      <p>Initialize the ensemble optimizer class.</p>
+<p>This class requires at least three argument thats together define a single optimization run:</p>
+<ol>
+<li>An <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> that contains all
+   configuration settings for the optimization.</li>
+<li>An <a class="autorefs autorefs-internal" href="../evaluator/#ropt.ensemble_evaluator.EnsembleEvaluator"><code>EnsembleEvaluator</code></a> object
+   that is responsible for evaluating functions and gradients.</li>
+<li>A <a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> object that provides
+   access to optimizer plugins.</li>
+</ol>
+<p>In addition, two optional callbacks can be provided:</p>
+<ol>
+<li>A <a class="autorefs autorefs-internal" href="#ropt.optimization.SignalEvaluationCallback"><code>SignalEvaluationCallback</code></a>
+   callback that is called before and after each function evaluation.</li>
+<li>A <a class="autorefs autorefs-internal" href="#ropt.optimization.NestedOptimizerCallback"><code>NestedOptimizerCallback</code></a>
+   callback that is called at each function evaluation to run a nested
+   optimization.</li>
+</ol>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1479,7 +1562,7 @@ array lists the indices of the variables that are handled by this sampler.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The configuration of the optimizer.</p>
+                <p>The ensemble optimization configuration</p>
               </div>
             </td>
             <td>
@@ -1487,13 +1570,13 @@ array lists the indices of the variables that are handled by this sampler.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>sampler_index</code></td>
+            <td><code>ensemble_evaluator</code></td>
             <td>
-                  <code>int</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.ensemble_evaluator.EnsembleEvaluator" href="../evaluator/#ropt.ensemble_evaluator.EnsembleEvaluator">EnsembleEvaluator</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The index of the sampler to use.</p>
+                <p>The evaluator object</p>
               </div>
             </td>
             <td>
@@ -1501,13 +1584,13 @@ array lists the indices of the variables that are handled by this sampler.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>variable_indices</code></td>
+            <td><code>plugin_manager</code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>]]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The indices of the variables to sample.</p>
+                <p>Plugin manager</p>
               </div>
             </td>
             <td>
@@ -1515,17 +1598,31 @@ array lists the indices of the variables that are handled by this sampler.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>rng</code></td>
+            <td><code>signal_evaluation</code></td>
             <td>
-                  <code><span title="numpy.random.Generator">Generator</span></code>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.optimization._optimizer.SignalEvaluationCallback" href="#ropt.optimization.SignalEvaluationCallback">SignalEvaluationCallback</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A random generator object for use by stochastic samplers.</p>
+                <p>Optional callback to signal evaluations</p>
               </div>
             </td>
             <td>
-                <em>required</em>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>nested_optimizer</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.optimization._optimizer.NestedOptimizerCallback" href="#ropt.optimization.NestedOptimizerCallback">NestedOptimizerCallback</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional nested optimization call</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -1538,43 +1635,45 @@ array lists the indices of the variables that are handled by this sampler.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.sampler.base.Sampler.generate_samples" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">generate_samples</span><span class="p">()</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
+<h4 id="ropt.optimization.EnsembleOptimizer.start" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">start</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span></code>
 
 </h4>
 
 
     <div class="doc doc-contents ">
 
-      <p>Return an array containing sampled values.</p>
-<p>The result should be a three-dimensional array of perturbation values.
-The variable values are stored along the last axis, for each realization
-and perturbation. The first axis indexes the realization, and the second
-axis indexes the perturbation.</p>
-<p>If the <code>shared</code> flag is set in the
-<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.SamplerConfig"><code>SamplerConfig</code></a> configuration, the
-first dimension should have a length equal to one, since all
-realizations will use the same set of perturbations.</p>
-<p>The sampler may handle only a subset of the variables, as specified by
-the <code>variable_indices</code> argument of the constructor. In this case, only
-the corresponding values along the variables axis (the last axis) should
-be set, while other values should be zero.</p>
+      <p>Start the optimization.</p>
 
 
-<details class="note" open>
-  <summary>Sample scaling</summary>
-  <p>Samples will be multiplied by the values given by the
-<code>perturbation_magnitudes</code> field in the
-<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.GradientConfig"><code>gradients</code></a> section of the
-optimizer configuration. It makes therefore sense to generate
-samples that have an order of magnitude around one. For instance, by
-generating them on a <code>[-1, 1]</code> range, or with a unit standard
-deviation.</p>
-</details>
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>variables</code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The initial variables for the optimization.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
 
     <p><span class="doc-section-title">Returns:</span></p>
     <table>
@@ -1587,11 +1686,11 @@ deviation.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.enums.OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The sampled values.</p>
+                <p><em>description</em></p>
               </div>
             </td>
           </tr>
@@ -1614,19 +1713,133 @@ deviation.</p>
 
 
 
-<h3 id="ropt.plugins.sampler.base.SamplerPlugin" class="doc doc-heading">
-            <code>SamplerPlugin</code>
+<h3 id="ropt.optimization.Event" class="doc doc-heading">
+            <code>Event</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+      <p>The <code>Event</code> class stores optimization event data.</p>
+<p>While running an optimization plan, callbacks can be connected to react to
+events triggered during execution. These callbacks accept a single <code>Event</code>
+object containing information about the event.</p>
+<p>The actual data contained in the object depends on the nature of the event.
+Refer to the documentation of the <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType"><code>EventType</code></a>
+enumeration for more details.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.optimization.Event.event_type">event_type</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The type of the event</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.optimization.Event.config">config</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The current configuration object of the executing plan</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.optimization.Event.results">results</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional results passed with the event</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.optimization.Event.exit_code">exit_code</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.enums.OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An optional exit code</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.optimization.Event.step_name">step_name</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional name of the step emitting the event</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.optimization.EventBroker" class="doc doc-heading">
+            <code>EventBroker</code>
 
 
 </h3>
 
 
     <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.base.Plugin" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
 
 
-      <p>Abtract base class for sampler plugins.</p>
+      <p>A class for handling events.</p>
 
 
 
@@ -1644,19 +1857,32 @@ deviation.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.sampler.base.SamplerPlugin.create" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">sampler_index</span><span class="p">,</span> <span class="n">variable_indices</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
+<h4 id="ropt.optimization.EventBroker.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">()</span></code>
 
 </h4>
 
 
     <div class="doc doc-contents ">
 
-      <p>Create a sampler.</p>
+      <p>Initialize the event broker.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.optimization.EventBroker.add_observer" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">add_observer</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Add an observer function.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1671,13 +1897,13 @@ deviation.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>enopt_config</code></td>
+            <td><code>event</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The configuration of the optimizer.</p>
+                <p>The type of events to react to</p>
               </div>
             </td>
             <td>
@@ -1685,13 +1911,63 @@ deviation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>sampler_index</code></td>
+            <td><code>callback</code></td>
             <td>
-                  <code>int</code>
+                  <code><span title="typing.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="ropt.optimization._events.Event" href="#ropt.optimization.Event">Event</a>], None]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The index of the sampler to use.</p>
+                <p>The function to call if the event is received</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.optimization.EventBroker.emit" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">emit</span><span class="p">(</span><span class="n">event_type</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Emit an event.</p>
+<p>The keyword arguments are used to construct an
+<a class="autorefs autorefs-internal" href="#ropt.optimization.Event"><code>Event</code></a> object of the type given by <code>event_type</code>.
+All stored callbacks that react to this event type are then called with
+that event object as their argument.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>event_type</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The type of event to emit</p>
               </div>
             </td>
             <td>
@@ -1699,31 +1975,221 @@ deviation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>variable_indices</code></td>
+            <td><code>kwargs</code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>]]</code>
+                  <code><span title="typing.Any">Any</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The indices of the variables to sample.</p>
+                <p>Keyword arguments used to create an optimization event</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.optimization.SignalEvaluationCallback" class="doc doc-heading">
+            <code>SignalEvaluationCallback</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
+
+
+      <p>Protocol for the callback that is used to signal that an evaluation is occurring.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.optimization.SignalEvaluationCallback.__call__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">results</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Callback protocal.</p>
+<p>When a function with this signature is provided to an ensemble
+optimizer, it is called before and after the optimizer finishes an
+evaluation.Before the evaluation starts, this method is called with the
+<code>results</code> argument set to <code>None</code>. When an evaluation is has finished, it
+is called with <code>results</code> set to the results of the evaluation.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>results</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The results produced by the evaluation.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.optimization.NestedOptimizerCallback" class="doc doc-heading">
+            <code>NestedOptimizerCallback</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
+
+
+      <p>Run a nested optimization.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.optimization.NestedOptimizerCallback.__call__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+      <p>Callback protocol.</p>
+<p>When a function with this signature is provided to an ensemble
+optimizer, it is called at each function evaluation to run a nested
+optimization. It accepts the current variables as its arguments and
+returns a tuple consisting of the result (or <code>None</code> if no result is
+available), and a boolean value that indicates if the optimization was
+aborted by a user signal.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>variables</code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The variables to start the nested optimization with</p>
               </div>
             </td>
             <td>
                 <em>required</em>
             </td>
           </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
           <tr class="doc-section-item">
-            <td><code>rng</code></td>
             <td>
-                  <code><span title="numpy.random.Generator">Generator</span></code>
+                  <code><span title="typing.Tuple">Tuple</span>[<span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.results.FunctionResults" href="../results/#ropt.results.FunctionResults">FunctionResults</a>], bool]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A random generator object for use by stochastic samplers.</p>
+                <p>The nested optimization results and whether the user aborted the optimization.</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
       </tbody>
