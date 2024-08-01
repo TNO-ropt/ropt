@@ -5,12 +5,16 @@ from __future__ import annotations
 from pathlib import Path  # noqa: TCH003
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import NonNegativeFloat, PositiveInt, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    NonNegativeFloat,
+    PositiveInt,
+    model_validator,
+)
 
-from ._enopt_base_model import EnOptBaseModel
 
-
-class OptimizerConfig(EnOptBaseModel):
+class OptimizerConfig(BaseModel):
     """The configuration class for optimizers used in the optimization.
 
     This class defines the configuration for optimizers, configured by the
@@ -71,6 +75,13 @@ class OptimizerConfig(EnOptBaseModel):
     parallel: bool = False
     output_dir: Optional[Path] = None
     options: Optional[Union[Dict[str, Any], List[str]]] = None
+
+    model_config = ConfigDict(
+        extra="forbid",
+        str_min_length=1,
+        str_strip_whitespace=True,
+        validate_default=True,
+    )
 
     @model_validator(mode="after")
     def _method(self) -> OptimizerConfig:

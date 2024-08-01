@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
-from ._enopt_base_model import EnOptBaseModel
+from pydantic import BaseModel, ConfigDict
 
 
-class FunctionTransformConfig(EnOptBaseModel):
+class FunctionTransformConfig(BaseModel):
     """Configuration class for function transforms.
 
     This class defines the configuration for function transforms, which are
@@ -32,4 +32,11 @@ class FunctionTransformConfig(EnOptBaseModel):
     """
 
     method: str = "default/default"
-    options: Dict[str, Any] = {}  # noqa: RUF012
+    options: Dict[str, Any] = {}
+
+    model_config = ConfigDict(
+        extra="forbid",
+        str_min_length=1,
+        str_strip_whitespace=True,
+        validate_default=True,
+    )

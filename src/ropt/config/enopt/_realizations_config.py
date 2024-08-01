@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Optional
 
 import numpy as np
-from pydantic import NonNegativeInt, model_validator
+from pydantic import BaseModel, ConfigDict, NonNegativeInt, model_validator
 
 from ropt.config.utils import (
     Array1D,
@@ -14,10 +14,8 @@ from ropt.config.utils import (
     normalize,
 )
 
-from ._enopt_base_model import EnOptBaseModel
 
-
-class RealizationsConfig(EnOptBaseModel):
+class RealizationsConfig(BaseModel):
     """The configuration class for realizations.
 
     This class defines realizations configured by the `realizations` field in an
@@ -66,6 +64,12 @@ class RealizationsConfig(EnOptBaseModel):
     names: Optional[UniqueNames] = None
     weights: Array1D = np.array(1.0)
     realization_min_success: Optional[NonNegativeInt] = None
+
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        extra="forbid",
+        validate_default=True,
+    )
 
     @model_validator(mode="after")
     def _broadcast_normalize_and_check(self) -> RealizationsConfig:

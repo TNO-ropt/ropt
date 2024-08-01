@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from pydantic import model_validator
+from pydantic import BaseModel, ConfigDict, model_validator
 
 from ropt.config.utils import (
     Array1D,
@@ -13,10 +13,8 @@ from ropt.config.utils import (
 )
 from ropt.enums import ConstraintType
 
-from ._enopt_base_model import EnOptBaseModel
 
-
-class LinearConstraintsConfig(EnOptBaseModel):
+class LinearConstraintsConfig(BaseModel):
     r"""The configuration class for linear constraints.
 
     This class defines linear constraints configured by the `linear_constraints`
@@ -73,6 +71,12 @@ class LinearConstraintsConfig(EnOptBaseModel):
     coefficients: Array2D
     rhs_values: Array1D
     types: ArrayEnum
+
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        extra="forbid",
+        validate_default=True,
+    )
 
     @model_validator(mode="after")
     def _broadcast_and_check(self) -> LinearConstraintsConfig:

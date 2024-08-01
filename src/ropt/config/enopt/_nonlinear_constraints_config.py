@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Optional
 
 import numpy as np
-from pydantic import model_validator
+from pydantic import BaseModel, ConfigDict, model_validator
 
 from ropt.config.utils import (
     Array1D,
@@ -19,10 +19,8 @@ from ropt.config.utils import (
 )
 from ropt.enums import ConstraintType
 
-from ._enopt_base_model import EnOptBaseModel
 
-
-class NonlinearConstraintsConfig(EnOptBaseModel):
+class NonlinearConstraintsConfig(BaseModel):
     r"""The configuration class for non-linear constraints.
 
     This class defines non-linear constraints configured by the
@@ -86,6 +84,12 @@ class NonlinearConstraintsConfig(EnOptBaseModel):
     types: ArrayEnum
     realization_filters: Optional[Array1DInt] = None
     function_transforms: Optional[Array1DInt] = None
+
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        extra="forbid",
+        validate_default=True,
+    )
 
     @model_validator(mode="after")
     def _broadcast_and_check(

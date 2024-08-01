@@ -6,7 +6,7 @@ from itertools import zip_longest
 from typing import Optional, Tuple, Union
 
 import numpy as np
-from pydantic import Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from ropt.config.utils import (
     Array1D,
@@ -20,10 +20,8 @@ from ropt.config.utils import (
 )
 from ropt.enums import VariableType
 
-from ._enopt_base_model import EnOptBaseModel
 
-
-class VariablesConfig(EnOptBaseModel):
+class VariablesConfig(BaseModel):
     r"""The configuration class for variables.
 
     This configuration class, configured by the `variables` field in an
@@ -96,6 +94,12 @@ class VariablesConfig(EnOptBaseModel):
     scales: Optional[Array1D] = None
     indices: Optional[ArrayIndices] = None
     delimiters: str = Field(":", min_length=0)
+
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        extra="forbid",
+        validate_default=True,
+    )
 
     @model_validator(mode="after")
     def _broadcast_and_scale(self) -> "VariablesConfig":

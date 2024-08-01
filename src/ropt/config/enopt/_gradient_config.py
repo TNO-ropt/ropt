@@ -5,12 +5,11 @@ from __future__ import annotations
 from typing import Optional
 
 import numpy as np
-from pydantic import PositiveInt, model_validator
+from pydantic import BaseModel, ConfigDict, PositiveInt, model_validator
 
 from ropt.config.utils import Array1D, Array1DInt, ArrayEnum, check_enum_values
 from ropt.enums import BoundaryType, PerturbationType
 
-from ._enopt_base_model import EnOptBaseModel
 from .constants import (
     DEFAULT_NUMBER_OF_PERTURBATIONS,
     DEFAULT_PERTURBATION_BOUNDARY_TYPE,
@@ -19,7 +18,7 @@ from .constants import (
 )
 
 
-class GradientConfig(EnOptBaseModel):
+class GradientConfig(BaseModel):
     """The configuration class for gradient calculations.
 
     This class defines the configuration for gradient calculations, configured
@@ -102,6 +101,12 @@ class GradientConfig(EnOptBaseModel):
     boundary_types: ArrayEnum = np.array(DEFAULT_PERTURBATION_BOUNDARY_TYPE)
     samplers: Optional[Array1DInt] = None
     merge_realizations: bool = False
+
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        extra="forbid",
+        validate_default=True,
+    )
 
     @model_validator(mode="after")
     def _check_perturbation_min_success(self) -> GradientConfig:

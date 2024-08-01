@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Optional
 
 import numpy as np
-from pydantic import model_validator
+from pydantic import BaseModel, ConfigDict, model_validator
 
 from ropt.config.utils import (
     Array1D,
@@ -17,10 +17,8 @@ from ropt.config.utils import (
     normalize,
 )
 
-from ._enopt_base_model import EnOptBaseModel
 
-
-class ObjectiveFunctionsConfig(EnOptBaseModel):
+class ObjectiveFunctionsConfig(BaseModel):
     """The configuration class for objective functions.
 
     This configuration class defines objective functions configured by the
@@ -77,6 +75,12 @@ class ObjectiveFunctionsConfig(EnOptBaseModel):
     auto_scale: Array1DBool = np.array(False)  # noqa: FBT003
     realization_filters: Optional[Array1DInt] = None
     function_transforms: Optional[Array1DInt] = None
+
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        extra="forbid",
+        validate_default=True,
+    )
 
     @model_validator(mode="after")
     def _broadcast_and_normalize(self) -> ObjectiveFunctionsConfig:

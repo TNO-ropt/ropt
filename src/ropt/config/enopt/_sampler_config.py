@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
-from ._enopt_base_model import EnOptBaseModel
+from pydantic import BaseModel, ConfigDict
 
 
-class SamplerConfig(EnOptBaseModel):
+class SamplerConfig(BaseModel):
     """The sampler configuration class.
 
     This class defines the configuration for samplers, which are configured by
@@ -41,5 +41,12 @@ class SamplerConfig(EnOptBaseModel):
     """
 
     method: str = "scipy/default"
-    options: Dict[str, Any] = {}  # noqa: RUF012
+    options: Dict[str, Any] = {}
     shared: bool = False
+
+    model_config = ConfigDict(
+        extra="forbid",
+        str_min_length=1,
+        str_strip_whitespace=True,
+        validate_default=True,
+    )

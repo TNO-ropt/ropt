@@ -23,14 +23,7 @@ from ._sampler_config import SamplerConfig
 from ._variables_config import VariablesConfig  # noqa: TCH001
 
 
-class _EnOptBaseModel(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        validate_default=True,
-    )
-
-
-class EnOptConfig(_EnOptBaseModel):
+class EnOptConfig(BaseModel):
     """The primary configuration class for a single optimization step.
 
     The fields of the `EnOptConfig` class are nested configuration classes that
@@ -95,6 +88,11 @@ class EnOptConfig(_EnOptBaseModel):
     )
     samplers: Tuple[SamplerConfig, ...] = (SamplerConfig(),)
     original_inputs: Optional[Dict[str, Any]] = None
+
+    model_config = ConfigDict(
+        extra="forbid",
+        validate_default=True,
+    )
 
     @model_validator(mode="after")
     def _linear_constraints(self) -> EnOptConfig:
