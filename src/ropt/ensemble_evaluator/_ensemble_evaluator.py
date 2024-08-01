@@ -43,6 +43,8 @@ if TYPE_CHECKING:
 
 
 class EnsembleEvaluator:
+    """A class for constructing functions and gradients from an ensemble of functions."""
+
     def __init__(
         self,
         config: EnOptConfig,

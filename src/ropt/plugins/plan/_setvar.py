@@ -74,7 +74,7 @@ class DefaultSetStep(PlanStep):
             value = with_.value
         else:
             msg = "Either `expr` or `var` must be provided"
-            raise RuntimeError(msg)
+            raise ValueError(msg)
 
         if expr is not None:
             var, sep, value = expr.partition("=")

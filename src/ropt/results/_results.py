@@ -130,7 +130,7 @@ class Results(ABC):
         result_field = getattr(self, field_name, None)
         if result_field is None:
             msg = f"Invalid result field: {field_name}"
-            raise ValueError(msg)
+            raise AttributeError(msg)
 
         return _to_dataframe(
             config,
@@ -191,7 +191,7 @@ class Results(ABC):
         result_field = getattr(self, field_name, None)
         if result_field is None:
             msg = f"Invalid result field: {field_name}"
-            raise ValueError(msg)
+            raise AttributeError(msg)
 
         return _to_dataset(
             config,

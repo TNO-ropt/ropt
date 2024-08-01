@@ -55,7 +55,7 @@ def _to_data_array(
         data = getattr(result_field, field)
     except AttributeError as exc:
         msg = f"Not a field name: {field}"
-        raise ValueError(msg) from exc
+        raise AttributeError(msg) from exc
     if data is None:
         return None
     axes = result_field.get_axis_names(field)
