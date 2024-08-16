@@ -10,6 +10,9 @@ import numpy as np
 from numpy.random import default_rng
 
 from ropt.apps.script_optimizer import ScriptOptimizer
+from ropt.enums import EventType
+from ropt.optimization import Event
+from ropt.results import FunctionResults
 
 # Number of realizations:
 REALIZATIONS = 3
@@ -57,6 +60,20 @@ with Path("coefficients.json").open("w", encoding="utf-8") as file_obj:
     json.dump(coefficients, file_obj, sort_keys=True, indent=4)
 
 
+def report(event: Event) -> None:
+    """Report results of an evaluation.
+
+    Args:
+        event: event data
+    """
+    assert event.results is not None
+    for item in event.results:
+        if isinstance(item, FunctionResults) and item.functions is not None:
+            print(f"result: {item.result_id}")
+            print(f"  variables: {item.evaluations.variables}")
+            print(f"  objective: {item.functions.weighted_objective}\n")
+
+
 # Running locally:
 provider = None
 
@@ -69,24 +86,28 @@ provider = None
 
 def main() -> None:
     """Run the example and check the result."""
-    optimal_result = ScriptOptimizer(
-        config={
-            "work_dir": "work",
-        },
-        plan={
-            "context": [
-                {"id": "enopt_config", "init": "config", "with": ENOPT_CONFIG},
-                {"id": "optimal", "init": "tracker"},
-            ],
-            "steps": [
-                {
-                    "run": "optimizer",
-                    "with": {"config": "$enopt_config", "update": ["optimal"]},
-                },
-            ],
-        },
-        tasks=tasks,
-    ).run(provider)["optimal"]
+    optimal_result = (
+        ScriptOptimizer(
+            config={
+                "work_dir": "work",
+            },
+            plan={
+                "context": [
+                    {"id": "enopt_config", "init": "config", "with": ENOPT_CONFIG},
+                    {"id": "optimal", "init": "tracker"},
+                ],
+                "steps": [
+                    {
+                        "run": "optimizer",
+                        "with": {"config": "$enopt_config", "update": ["optimal"]},
+                    },
+                ],
+            },
+            tasks=tasks,
+        )
+        .add_observer(EventType.FINISHED_EVALUATION, report)
+        .run(provider)["optimal"]
+    )
     if optimal_result is not None and optimal_result.functions is not None:
         print(f"BEST RESULT: {optimal_result.result_id}")
         print(f"  variables: {optimal_result.evaluations.variables}")

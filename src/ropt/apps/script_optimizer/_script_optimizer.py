@@ -3,6 +3,7 @@
 import json
 import logging
 import os
+import sys
 from collections import defaultdict
 from pathlib import Path
 from shutil import rmtree
@@ -11,11 +12,13 @@ from traceback import format_exception
 from typing import (
     TYPE_CHECKING,
     Any,
+    Callable,
     DefaultDict,
     Dict,
     List,
     Optional,
     TextIO,
+    Tuple,
     Union,
     no_type_check,
 )
@@ -40,6 +43,11 @@ from ._utils import _format_list, _get_function_files, _make_dict
 
 if TYPE_CHECKING:
     from ropt.results import FunctionResults
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 
 @no_type_check
@@ -87,6 +95,7 @@ class ScriptOptimizer:
         self._seed = seed
         self._status: Dict[int, Any] = {}
         self._optimal_result: Optional[FunctionResults] = None
+        self._observers: List[Tuple[EventType, Callable[[Event], None]]] = []
 
     def _set_logger(self) -> None:
         self._logger = logging.getLogger("ScriptBasedOptimizer")
@@ -283,6 +292,12 @@ class ScriptOptimizer:
                 msg = f"Step {event.step_name}: {msg}"
             self._logger.info(msg)
 
+    def add_observer(
+        self, event_type: EventType, function: Callable[[Event], None]
+    ) -> Self:
+        self._observers.append((event_type, function))
+        return self
+
     def run(
         self,
         provider: Optional[ExecutionProvider] = None,
@@ -315,9 +330,11 @@ class ScriptOptimizer:
                 context = OptimizerContext(evaluator=evaluator, seed=self._seed)
                 config = PlanConfig.model_validate(self._plan_config)
                 plan = Plan(config, context)
-                plan.optimizer_context.events.add_observer(
-                    EventType.FINISHED_OPTIMIZER_STEP, self._log_exit_code
-                )
+                for event_type, function in (
+                    (EventType.FINISHED_OPTIMIZER_STEP, self._log_exit_code),
+                    *self._observers,
+                ):
+                    plan.optimizer_context.events.add_observer(event_type, function)
                 plan.run()
         finally:
             os.chdir(cwd)
