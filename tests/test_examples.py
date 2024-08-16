@@ -50,7 +50,7 @@ def test_differential_evolution_nonlinear(tmp_path: Path) -> None:
     module.main()
 
 
-@pytest.mark.slow()
+@pytest.mark.slow
 @pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
 def test_script_optimizer(tmp_path: Path) -> None:
     os.chdir(tmp_path)
