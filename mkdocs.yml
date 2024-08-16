@@ -9,6 +9,21 @@ theme:
     - navigation.expand
     - content.code.copy
     - content.code.annotate
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      primary: indigo
+      accent: blue
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      primary: teal
+      accent: lime
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
 
 plugins:
   - search
