@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import filecmp
 import re
 from copy import deepcopy
 from typing import TYPE_CHECKING, Any, Dict, List
@@ -13,6 +14,7 @@ from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import PlanError
 from ropt.optimization import Event
 from ropt.plan import OptimizationPlanRunner, OptimizerContext, Plan
+from ropt.report import ResultsTable
 from ropt.results import FunctionResults, Results
 
 if TYPE_CHECKING:
@@ -1380,25 +1382,22 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
 
 
 def test_table(enopt_config: Any, evaluator: Any, tmp_path: Path) -> None:
-    path = tmp_path / "results.txt"
+    enopt_config["optimizer"]["max_functions"] = 5
+
+    path1 = tmp_path / "results1.txt"
+    table = ResultsTable(
+        columns={
+            "result_id": "eval-ID",
+            "evaluations.variables": "Variables",
+        },
+        path=path1,
+    )
     plan_config = {
         "context": [
             {
                 "id": "enopt_config",
                 "init": "config",
                 "with": enopt_config,
-            },
-            {
-                "id": "table",
-                "init": "table",
-                "with": {
-                    "columns": {
-                        "result_id": "eval-ID",
-                        "evaluations.variables": "Variables",
-                    },
-                    "path": path,
-                    "steps": ["opt"],
-                },
             },
         ],
         "steps": [
@@ -1409,16 +1408,27 @@ def test_table(enopt_config: Any, evaluator: Any, tmp_path: Path) -> None:
             },
         ],
     }
+
+    def handle_results(event: Event) -> None:
+        assert event.results is not None
+        table.add_results(event.config, event.results)
+
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(PlanConfig.model_validate(plan_config), context)
+    plan.optimizer_context.events.add_observer(
+        EventType.FINISHED_EVALUATION, handle_results
+    )
     plan.run()
-    assert path.exists()
 
-    path.unlink()
-    assert not path.exists()
+    assert path1.exists()
+    with path1.open() as fp:
+        assert len(fp.readlines()) == 8
 
+    path2 = tmp_path / "results2.txt"
     OptimizationPlanRunner(enopt_config, evaluator()).add_table(
         columns={"result_id": "eval-ID", "evaluations.variables": "Variables"},
-        path=path,
+        path=path2,
     ).run()
-    assert path.exists()
+    assert path2.exists()
+
+    assert filecmp.cmp(path1, path2)

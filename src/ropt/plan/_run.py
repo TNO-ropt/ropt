@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sys
 from dataclasses import dataclass
+from functools import partial
 from pathlib import Path  # noqa: TCH003
 from typing import (
     TYPE_CHECKING,
@@ -17,12 +18,13 @@ from typing import (
     Tuple,
     Union,
 )
-from uuid import uuid4
 
 from ropt.config.plan import PlanConfig
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
 from ropt.plugins import PluginManager
+from ropt.report import ResultsTable
+from ropt.results import convert_to_maximize
 
 from ._plan import OptimizerContext, Plan
 
@@ -135,6 +137,19 @@ class OptimizationPlanRunner:
                 self._metadata[key] = value
         return self
 
+    def _handle_results(
+        self, event: Event, table: ResultsTable, *, maximize: bool
+    ) -> None:
+        assert event.results is not None
+        table.add_results(
+            event.config,
+            (
+                (convert_to_maximize(item) for item in event.results)
+                if maximize
+                else event.results
+            ),
+        )
+
     def add_table(
         self,
         columns: Dict[str, str],
@@ -144,19 +159,17 @@ class OptimizationPlanRunner:
         *,
         maximize: bool = False,
     ) -> Self:
-        self._plan_config["context"].append(
-            {
-                "id": f"__{uuid4().hex}__",
-                "init": "table",
-                "with": {
-                    "columns": columns,
-                    "path": path,
-                    "table_type": table_type,
-                    "min_header_len": min_header_len,
-                    "maximize": maximize,
-                    "steps": ["__optimizer_step__"],
-                },
-            }
+        table = ResultsTable(
+            columns=columns,
+            path=path,
+            table_type=table_type,
+            min_header_len=min_header_len,
+        )
+        self._observers.append(
+            (
+                EventType.FINISHED_EVALUATION,
+                partial(self._handle_results, table=table, maximize=maximize),
+            ),
         )
         return self
 

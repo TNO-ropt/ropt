@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict, Literal, Optional, Tuple
+from typing import TYPE_CHECKING, Dict, Iterable, Literal, Optional
 
 from ._data_frame import ResultsDataFrame
 from ._utils import _HAVE_PANDAS, _HAVE_TABULATE, _extract_columns, _write_table
@@ -85,7 +85,7 @@ class ResultsTable(ResultsDataFrame):
         self._path = path
         self._min_header_len = min_header_len
 
-    def add_results(self, config: EnOptConfig, results: Tuple[Results, ...]) -> bool:
+    def add_results(self, config: EnOptConfig, results: Iterable[Results]) -> bool:
         """Add results to the table.
 
         This method can be called directly from any observers connected to

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import TYPE_CHECKING, Literal, Set, Tuple
+from typing import TYPE_CHECKING, Iterable, Literal, Set
 
 from ropt.enums import ResultAxisName
 from ropt.results import FunctionResults, GradientResults
@@ -74,7 +74,7 @@ class ResultsDataFrame:
         self._table_type = table_type
         self._frame = pd.DataFrame()
 
-    def add_results(self, config: EnOptConfig, results: Tuple[Results, ...]) -> bool:
+    def add_results(self, config: EnOptConfig, results: Iterable[Results]) -> bool:
         """Add results to the table.
 
         This method can be called directly from any observers connected to
