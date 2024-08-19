@@ -110,20 +110,15 @@ class PluginManager:
             plugin_type: The type of the plugin to retrieve.
             method:      The name of the method the plugin should provide.
         """
-        plugin_name, sep, method_name = method.rpartition("/")
-
-        if sep == "/":
-            assert method_name != ""
-            plugin = self._plugins[plugin_type].get(plugin_name.lower())
-            if plugin is None:
-                msg = f"Plugin not found: {method}"
-                raise ConfigError(msg)
-            return plugin
-
-        for plugin in self._plugins[plugin_type].values():
-            if plugin.is_supported(method_name):
+        split_method = method.split("/", maxsplit=1)
+        if len(split_method) > 1:
+            plugin = self._plugins[plugin_type].get(split_method[0].lower())
+            if plugin and plugin.is_supported(split_method[1]):
                 return plugin
-
+        else:
+            for plugin in self._plugins[plugin_type].values():
+                if plugin.is_supported(split_method[0]):
+                    return plugin
         msg = f"Method not found: {method}"
         raise ConfigError(msg)
 
@@ -134,7 +129,8 @@ class PluginManager:
             plugin_type: The type of the plugin to retrieve.
             method:      The name of the method the plugin should provide.
         """
-        _, _, method_name = method.rpartition("/")
+        split_method = method.split("/", maxsplit=1)
+        method_name = split_method[1] if len(split_method) > 1 else split_method[0]
         try:
             plugin = self.get_plugin(plugin_type, method)
         except ConfigError:
