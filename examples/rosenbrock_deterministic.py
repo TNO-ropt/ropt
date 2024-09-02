@@ -1,8 +1,8 @@
-"""Example of optimization of the Rosenbrock test function.
+"""Example of optimization of a multi-dimensional Rosenbrock test function.
 
 This example demonstrates optimization of the unmodified (deterministic)
-Rosenbrock function. It shows how to write a minimal configuration and how to
-run and monitor the optimization.
+multi-dimensional Rosenbrock function. It shows how to write a minimal
+configuration and how to run and monitor the optimization.
 """
 
 from typing import Any, Dict
@@ -16,9 +16,11 @@ from ropt.optimization import Event
 from ropt.plan import OptimizationPlanRunner
 from ropt.results import FunctionResults
 
+DIM = 5
+
 CONFIG: Dict[str, Any] = {
     "variables": {
-        "initial_values": [0.5, 2.0],
+        "initial_values": 2 * np.arange(DIM) / DIM + 0.5,
     },
     "gradient": {
         "perturbation_magnitudes": 1e-6,
@@ -27,21 +29,23 @@ CONFIG: Dict[str, Any] = {
 
 
 def rosenbrock(variables: NDArray[np.float64], _: EvaluatorContext) -> EvaluatorResult:
-    """Function evaluator for the rosenbrock function.
+    """Function evaluator for the 4D rosenbrock function.
 
     This function returns a tuple containing the calculated objectives and
     `None`, the latter because no constraints are calculated.
 
     Args:
         variables: The variables to evaluate
+        dimension: The number of variables
 
     Returns:
         The calculated objective, and `None`
     """
     objectives = np.zeros((variables.shape[0], 1), dtype=np.float64)
-    for idx in range(variables.shape[0]):
-        x, y = variables[idx, :]
-        objectives[idx, 0] = (1.0 - x) ** 2 + 100 * (y - x * x) ** 2
+    for v_idx in range(variables.shape[0]):
+        for d_idx in range(DIM - 1):
+            x, y = variables[v_idx, d_idx : d_idx + 2]
+            objectives[v_idx, 0] += (1.0 - x) ** 2 + 100 * (y - x * x) ** 2
     return EvaluatorResult(objectives=objectives)
 
 
@@ -89,8 +93,8 @@ def main() -> None:
     optimal_result = run_optimization(CONFIG)
     assert optimal_result is not None
     assert optimal_result.functions is not None
-    assert np.allclose(optimal_result.functions.weighted_objective, 0, atol=1e-5)
-    assert np.allclose(optimal_result.evaluations.variables, 1, atol=1e-3)
+    assert np.allclose(optimal_result.functions.weighted_objective, 0, atol=1e-4)
+    assert np.allclose(optimal_result.evaluations.variables, 1, atol=1e-2)
 
 
 if __name__ == "__main__":
