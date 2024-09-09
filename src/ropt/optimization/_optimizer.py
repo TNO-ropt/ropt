@@ -213,7 +213,7 @@ class EnsembleOptimizer:
         if indices is not None:
             if variables.ndim > 1:
                 tmp_variables = np.repeat(
-                    variables[np.newaxis, :], variables.shape[0], axis=0
+                    self._fixed_variables[np.newaxis, :], variables.shape[0], axis=0
                 )
                 tmp_variables[:, indices] = variables
             else:
