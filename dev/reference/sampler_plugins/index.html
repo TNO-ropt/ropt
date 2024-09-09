@@ -1375,7 +1375,7 @@
 
     <div class="doc doc-contents first">
 
-      <p>Plugin functionality for adding sampler plugins.</p>
+        <p>Plugin functionality for adding sampler plugins.</p>
 <p>Sampler plugins are managed by a <a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>
 object, which returns classes or factory functions to create objects that
 implement one or more sampling methods to produce perturbations. These objects
@@ -1418,7 +1418,7 @@ which provides a number of methods from the
 
     <div class="doc doc-contents first">
 
-      <p>This module defines the abstract base class for samplers.</p>
+        <p>This module defines the abstract base class for samplers.</p>
 <p>Samplers can be added via the plugin mechanism to implement additional ways to
 generate perturbed variables. Any object that follows the
 <a class="autorefs autorefs-internal" href="#ropt.plugins.sampler.base.Sampler"><code>Sampler</code></a> abstract base class may be
@@ -1451,7 +1451,7 @@ installed as a plugin.</p>
               Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
 
-      <p>Abstract base class for sampler classes.</p>
+        <p>Abstract base class for sampler classes.</p>
 <p><code>ropt</code> employs plugins to implement samplers that are called during an
 optimization plan to generate perturbed variable vectors. Samplers should
 derive from the <code>Sampler</code> base class, which specifies the requirements for
@@ -1486,7 +1486,7 @@ method used to generate samples used to create perturbed values.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Initialize the sampler object.</p>
+        <p>Initialize the sampler object.</p>
 <p>The <code>samplers</code> field in the
 <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>enopt_config</code></a> configuration used by
 the optimization is a tuple of sampler configurations (see
@@ -1586,7 +1586,7 @@ array lists the indices of the variables that are handled by this sampler.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Return an array containing sampled values.</p>
+        <p>Return an array containing sampled values.</p>
 <p>The result should be a three-dimensional array of perturbation values.
 The variable values are stored along the last axis, for each realization
 and perturbation. The first axis indexes the realization, and the second
@@ -1662,7 +1662,7 @@ deviation.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.base.Plugin" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
 
 
-      <p>Abtract base class for sampler plugins.</p>
+        <p>Abtract base class for sampler plugins.</p>
 
 
 
@@ -1692,7 +1692,7 @@ deviation.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Create a sampler.</p>
+        <p>Create a sampler.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

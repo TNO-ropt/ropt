@@ -1591,7 +1591,7 @@
 
     <div class="doc doc-contents first">
 
-      <p>The <code>ropt.config.enopt</code> module contains optimization configuration classes.</p>
+        <p>The <code>ropt.config.enopt</code> module contains optimization configuration classes.</p>
 
 
 
@@ -1617,7 +1617,7 @@
     <div class="doc doc-contents ">
 
 
-      <p>The primary configuration class for a single optimization step.</p>
+        <p>The primary configuration class for a single optimization step.</p>
 <p>The fields of the <code>EnOptConfig</code> class are nested configuration classes that
 specify specific aspects of a single optimization run.</p>
 <p>Upon initialization and validation of an <code>EnOptConfig</code> object, the contents
@@ -1821,7 +1821,7 @@ used for all variables.</p>
     <div class="doc doc-contents ">
 
 
-      <p>The configuration class for variables.</p>
+        <p>The configuration class for variables.</p>
 <p>This configuration class, configured by the <code>variables</code> field in an
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object defines essential
 aspects of the variables: the initial values and the bounds. These are given
@@ -1849,7 +1849,7 @@ obtained using the
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.VariablesConfig.get_formatted_names"><code>get_formatted_names</code></a>
 method. The <code>delimiters</code> attribute is used by this method to convert the
 special case of names consisting of tuples of strings.</p>
-</details>      <p>The optional <code>types</code> field can be used to assign types to each variable,
+</details>        <p>The optional <code>types</code> field can be used to assign types to each variable,
 according to the <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.VariableType"><code>VariableType</code></a> enumeration. The
 values can be used to configure the optimizer accordingly. If not provided,
 all variables are assumed to be continuous and of real data type
@@ -1867,7 +1867,7 @@ o_i) / s_i\)</span>.</p>
 <code>linear_constraints</code> field will also be transformed using any offsets
 and scales passed via the <code>VariablesConfig</code> object. See:
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.LinearConstraintsConfig"><code>LinearConstraintsConfig</code></a>.</p>
-</details>      <p>The optional <code>indices</code> field contains the indices of the variables
+</details>        <p>The optional <code>indices</code> field contains the indices of the variables
 considered to be free to change. During optimization, only these variables
 should change while others remain fixed.</p>
 
@@ -2006,7 +2006,7 @@ should change while others remain fixed.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Return string representations of the variable names.</p>
+        <p>Return string representations of the variable names.</p>
 <p>This method converts the variable names to a tuple of strings. Each name
 is converted using its string representation unless the name is a tuple.
 In that case, the tuple items are converted to strings and joined using
@@ -2071,7 +2071,7 @@ delimiter.</p>
     <div class="doc doc-contents ">
 
 
-      <p>The configuration class for objective functions.</p>
+        <p>The configuration class for objective functions.</p>
 <p>This configuration class defines objective functions configured by the
 <code>objective_functions</code> field in an
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
@@ -2103,7 +2103,7 @@ functions.</p>
 applied. Thus, if <code>scales</code> is not supplied, auto-scaling will scale the
 objectives such that their initial values will be equal to one. Setting
 <code>scales</code> also allows for scaling to different initial values.</p>
-</details>      <p>The objective functions may be subject to realization filters and function
+</details>        <p>The objective functions may be subject to realization filters and function
 transforms. The <code>realization_filters</code> and <code>function_transforms</code> fields
 contain indices to the realization filter or function transform objects to
 use. The objects referred to are configured in the parent
@@ -2223,7 +2223,7 @@ use. The objects referred to are configured in the parent
     <div class="doc doc-contents ">
 
 
-      <p>The configuration class for linear constraints.</p>
+        <p>The configuration class for linear constraints.</p>
 <p>This class defines linear constraints configured by the <code>linear_constraints</code>
 field in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 <p>Linear constraints can be described by a set of linear equations on the
@@ -2346,7 +2346,7 @@ difference between the equations and right-hand side to a tolerance.</p>
     <div class="doc doc-contents ">
 
 
-      <p>The configuration class for non-linear constraints.</p>
+        <p>The configuration class for non-linear constraints.</p>
 <p>This class defines non-linear constraints configured by the
 <code>nonlinear_constraints</code> field in an
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
@@ -2376,7 +2376,7 @@ to have a size equal to the number of constraint functions.</p>
 applied. If <code>scales</code> is not supplied, auto-scaling will scale the
 constraints such that their initial values will be equal to one. Setting
 <code>scales</code> additionally allows for scaling to different initial values.</p>
-</details>      <p>The <code>types</code> field determines the type of each constraint: equality (<span class="arithmatex">\(=\)</span>) or
+</details>        <p>The <code>types</code> field determines the type of each constraint: equality (<span class="arithmatex">\(=\)</span>) or
 inequality (<span class="arithmatex">\(\le\)</span> or <span class="arithmatex">\(\ge\)</span>), and is broadcasted to a length equal to the
 number of constraints. The <code>types</code> field is defined as an integer array, but
 its values are limited to those of the
@@ -2513,7 +2513,7 @@ objects to use. These objects are configured in the parent
     <div class="doc doc-contents ">
 
 
-      <p>The configuration class for realizations.</p>
+        <p>The configuration class for realizations.</p>
 <p>This class defines realizations configured by the <code>realizations</code> field in an
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 <p>To optimize an ensemble of functions, a set of realizations is defined. When
@@ -2630,7 +2630,7 @@ and will behave as if the value is set to one.</p>
     <div class="doc doc-contents ">
 
 
-      <p>The configuration class for optimizers used in the optimization.</p>
+        <p>The configuration class for optimizers used in the optimization.</p>
 <p>This class defines the configuration for optimizers, configured by the
 <code>optimizer</code> field in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>
 object.</p>
@@ -2815,7 +2815,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
     <div class="doc doc-contents ">
 
 
-      <p>The configuration class for gradient calculations.</p>
+        <p>The configuration class for gradient calculations.</p>
 <p>This class defines the configuration for gradient calculations, configured
 by the <code>gradients</code> field in an
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
@@ -2997,7 +2997,7 @@ gradient.</p>
     <div class="doc doc-contents ">
 
 
-      <p>Configuration class for function transforms.</p>
+        <p>Configuration class for function transforms.</p>
 <p>This class defines the configuration for function transforms, which are
 configured by the <code>function_transforms</code> field in an
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. That field contains a
@@ -3082,7 +3082,7 @@ interpretation of these options depends on the chosen method.</p>
     <div class="doc doc-contents ">
 
 
-      <p>The configuration class for realization filters.</p>
+        <p>The configuration class for realization filters.</p>
 <p>This class defines the configuration for realization filters, which are
 configured by the <code>realization_filters</code> field in an
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. This field contains a
@@ -3170,7 +3170,7 @@ method.</p>
     <div class="doc doc-contents ">
 
 
-      <p>The sampler configuration class.</p>
+        <p>The sampler configuration class.</p>
 <p>This class defines the configuration for samplers, which are configured by
 the <code>samplers</code> field in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>
 object. That field contains a tuple of configuration objects that define
@@ -3275,7 +3275,7 @@ directed to use the same set of perturbed values for each realization.</p>
 
     <div class="doc doc-contents first">
 
-      <p>Default values used by the configuration classes.</p>
+        <p>Default values used by the configuration classes.</p>
 
 
 
@@ -3303,7 +3303,7 @@ directed to use the same set of perturbed values for each realization.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Default random generator seed.</p>
+        <p>Default random generator seed.</p>
     </div>
 
 </div>
@@ -3324,7 +3324,7 @@ directed to use the same set of perturbed values for each realization.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Default number of perturbations.</p>
+        <p>Default number of perturbations.</p>
     </div>
 
 </div>
@@ -3345,7 +3345,7 @@ directed to use the same set of perturbed values for each realization.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Default perturbation magnitude.</p>
+        <p>Default perturbation magnitude.</p>
     </div>
 
 </div>
@@ -3366,7 +3366,7 @@ directed to use the same set of perturbed values for each realization.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Default perturbation boundary handling type.</p>
+        <p>Default perturbation boundary handling type.</p>
 <p>See also: <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>.</p>
     </div>
 
@@ -3388,7 +3388,7 @@ directed to use the same set of perturbed values for each realization.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Default perturbation type.</p>
+        <p>Default perturbation type.</p>
 <p>See also: <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>.</p>
     </div>
 

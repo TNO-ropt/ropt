@@ -1507,7 +1507,7 @@
 
     <div class="doc doc-contents first">
 
-      <p>The optimizer and event classes.</p>
+        <p>The optimizer and event classes.</p>
 
 
 
@@ -1534,7 +1534,7 @@
     <div class="doc doc-contents ">
 
 
-      <p>Optimizer class for running ensemble optimizations.</p>
+        <p>Optimizer class for running ensemble optimizations.</p>
 
 
 
@@ -1560,7 +1560,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Initialize the ensemble optimizer class.</p>
+        <p>Initialize the ensemble optimizer class.</p>
 <p>This class requires at least three argument thats together define a single optimization run:</p>
 <ol>
 <li>An <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> that contains all
@@ -1679,7 +1679,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>Start the optimization.</p>
+        <p>Start the optimization.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1763,7 +1763,7 @@
     <div class="doc doc-contents ">
 
 
-      <p>The <code>Event</code> class stores optimization event data.</p>
+        <p>The <code>Event</code> class stores optimization event data.</p>
 <p>While running an optimization plan, callbacks can be connected to react to
 events triggered during execution. These callbacks accept a single <code>Event</code>
 object containing information about the event.</p>
@@ -1875,7 +1875,7 @@ enumeration for more details.</p>
     <div class="doc doc-contents ">
 
 
-      <p>A class for handling events.</p>
+        <p>A class for handling events.</p>
 
 
 
@@ -1901,7 +1901,7 @@ enumeration for more details.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Initialize the event broker.</p>
+        <p>Initialize the event broker.</p>
 
     </div>
 
@@ -1918,7 +1918,7 @@ enumeration for more details.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Add an observer function.</p>
+        <p>Add an observer function.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1978,7 +1978,7 @@ enumeration for more details.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Emit an event.</p>
+        <p>Emit an event.</p>
 <p>The keyword arguments are used to construct an
 <a class="autorefs autorefs-internal" href="#ropt.optimization.Event"><code>Event</code></a> object of the type given by <code>event_type</code>.
 All stored callbacks that react to this event type are then called with
@@ -2055,7 +2055,7 @@ that event object as their argument.</p>
               Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
 
 
-      <p>Protocol for the callback that is used to signal that an evaluation is occurring.</p>
+        <p>Protocol for the callback that is used to signal that an evaluation is occurring.</p>
 
 
 
@@ -2081,7 +2081,7 @@ that event object as their argument.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Callback protocal.</p>
+        <p>Callback protocal.</p>
 <p>When a function with this signature is provided to an ensemble
 optimizer, it is called before and after the optimizer finishes an
 evaluation.Before the evaluation starts, this method is called with the
@@ -2145,7 +2145,7 @@ is called with <code>results</code> set to the results of the evaluation.</p>
               Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
 
 
-      <p>Run a nested optimization.</p>
+        <p>Run a nested optimization.</p>
 
 
 
@@ -2171,7 +2171,7 @@ is called with <code>results</code> set to the results of the evaluation.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Callback protocol.</p>
+        <p>Callback protocol.</p>
 <p>When a function with this signature is provided to an ensemble
 optimizer, it is called at each function evaluation to run a nested
 optimization. It accepts the current variables as its arguments and

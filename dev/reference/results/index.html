@@ -1633,7 +1633,7 @@
 
     <div class="doc doc-contents first">
 
-      <p>Data classes for storing intermediate optimization results.</p>
+        <p>Data classes for storing intermediate optimization results.</p>
 <p>During the optimization process, functions and gradients are calculated and need
 to be reported. To streamline this process, after new results become available,
 these are passed to callbacks as a tuple of <a class="autorefs autorefs-internal" href="#ropt.results.Results"><code>Results</code></a>
@@ -1719,7 +1719,7 @@ frame and optionally unstack such multi-dimensional data into multiple columns.<
               Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
 
-      <p>The <code>Results</code> class serves as an abstract base class for storing results.</p>
+        <p>The <code>Results</code> class serves as an abstract base class for storing results.</p>
 <p>This class contains the following generic information:</p>
 <ol>
 <li>The result ID, a unique integer value that is incremented as the
@@ -1824,7 +1824,7 @@ classes:</p>
 
     <div class="doc doc-contents ">
 
-      <p>Export a field to a pandas dataframe.</p>
+        <p>Export a field to a pandas dataframe.</p>
 <p>The function exports the values of a single field to a pandas data
 frame. The field to export is selected by the <code>field_name</code> argument. In
 general such a field is another object with multiple sub-fields. By
@@ -1996,7 +1996,7 @@ and/or batch ID.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Export a field to an xarray dataset.</p>
+        <p>Export a field to an xarray dataset.</p>
 <p>The function exports the values of a single field to an xarray dataset.
 The field to export is selected by the <code>field_name</code> argument. In
 general, such a field is another object with multiple sub-fields. By
@@ -2159,7 +2159,7 @@ also added under the <code>metadata</code> key.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Write the results to a netCDF4 file.</p>
+        <p>Write the results to a netCDF4 file.</p>
 <p>The fields of the result are converted to xarray datasets and each
 stored as a group in a netCDF4 file, using the name of the field as the
 group name. In addition, a special <code>__metadata__</code> group is added that
@@ -2284,7 +2284,7 @@ are installed.</p>
     <div class="doc doc-contents first">
 
 
-      <p>Base class for <code>Results</code> fields.</p>
+        <p>Base class for <code>Results</code> fields.</p>
 
 
 
@@ -2314,7 +2314,7 @@ are installed.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Return the axis names of a field in the given field class or object.</p>
+        <p>Return the axis names of a field in the given field class or object.</p>
 <p>When used with the class or an instance of that class for one of the
 fields of a <code>Results</code> object, retrieve the names of the axes of the
 stored <code>numpy</code> array from the metadata and return them.</p>
@@ -2426,7 +2426,7 @@ stored <code>numpy</code> array from the metadata and return them.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.results._results.Results" href="#ropt.results.Results">Results</a></code></p>
 
 
-      <p>The <code>FunctionResults</code> class stores function related results.</p>
+        <p>The <code>FunctionResults</code> class stores function related results.</p>
 <p>This class contains  the following additional information:</p>
 <ol>
 <li>The results of the function evaluations.</li>
@@ -2563,7 +2563,7 @@ stored <code>numpy</code> array from the metadata and return them.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Read results from a netCDF4 file.</p>
+        <p>Read results from a netCDF4 file.</p>
 <p>Use of this method requires that the <code>xarray</code> and <code>netCDF4</code> modules are
 installed.</p>
 <p>The filename is assumed to have an ".nc" extension, which will be added
@@ -2681,7 +2681,7 @@ if not present.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.results._result_field.ResultField" href="#ropt.results.ResultField">ResultField</a></code></p>
 
 
-      <p>This class contains the results of evaluations for function calculation.</p>
+        <p>This class contains the results of evaluations for function calculation.</p>
 <p>This class stores the variables with the calculated objective and constraint
 functions. It contains the following information:</p>
 <ol>
@@ -2851,7 +2851,7 @@ functions. It contains the following information:</p>
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.results._result_field.ResultField" href="#ropt.results.ResultField">ResultField</a></code></p>
 
 
-      <p>This class stores information on the realizations.</p>
+        <p>This class stores information on the realizations.</p>
 <p>The <code>failed_realizations</code> field is a boolean array that indicates for
 each realization whether the evaluation was successful or not.</p>
 <p>Depending on the type of objective or constraint calculation, the weights
@@ -2958,7 +2958,7 @@ the function or constraint. The second axis index denotes the realization.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.results._result_field.ResultField" href="#ropt.results.ResultField">ResultField</a></code></p>
 
 
-      <p>Store the calculated objective and constraint functions.</p>
+        <p>Store the calculated objective and constraint functions.</p>
 <p>The objective and constraint functions used by the optimizer are calculated
 from their values evaluated for all realizations, for instance by averaging.
 There may be multiple objectives and constraints. Multiple objectives are
@@ -3094,7 +3094,7 @@ versions of the objective or constraint values are stored.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.results._result_field.ResultField" href="#ropt.results.ResultField">ResultField</a></code></p>
 
 
-      <p>This class stores bound constraint values and violations.</p>
+        <p>This class stores bound constraint values and violations.</p>
 <p>The following information is stored:</p>
 <ol>
 <li>Differences between the current variable and the lower or upper bounds.</li>
@@ -3271,7 +3271,7 @@ versions of the objective or constraint values are stored.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.results._result_field.ResultField" href="#ropt.results.ResultField">ResultField</a></code></p>
 
 
-      <p>This class stores constraint values and violations.</p>
+        <p>This class stores constraint values and violations.</p>
 <p>The following information is stored:</p>
 <ol>
 <li>Differences between the linear constraints and their right-hand-side
@@ -3364,7 +3364,7 @@ versions of the objective or constraint values are stored.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.results._result_field.ResultField" href="#ropt.results.ResultField">ResultField</a></code></p>
 
 
-      <p>This class stores constraint values and violations.</p>
+        <p>This class stores constraint values and violations.</p>
 <p>The following information is stored:</p>
 <ol>
 <li>Differences between the non-linear constraints and their right-hand-side
@@ -3486,7 +3486,7 @@ versions of the objective or constraint values are stored.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.results._results.Results" href="#ropt.results.Results">Results</a></code></p>
 
 
-      <p>The <code>GradientResults</code> class stores gradient related results.</p>
+        <p>The <code>GradientResults</code> class stores gradient related results.</p>
 <p>This contains  the following additional information:</p>
 <ol>
 <li>The results of the function evaluations for perturbed variables.</li>
@@ -3580,7 +3580,7 @@ versions of the objective or constraint values are stored.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Read results from a netCDF4 file.</p>
+        <p>Read results from a netCDF4 file.</p>
 <p>Use of this method requires that the <code>xarray</code> and <code>netCDF4</code> modules are
 installed.</p>
 <p>The filename is assumed to have an ".nc" extension, which will be added
@@ -3698,7 +3698,7 @@ if not present.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.results._result_field.ResultField" href="#ropt.results.ResultField">ResultField</a></code></p>
 
 
-      <p>This class contains the results of evaluations for gradient calculation.</p>
+        <p>This class contains the results of evaluations for gradient calculation.</p>
 <p>This class stores the variables with the calculated objective and
 constraints gradients. It contains the following information:</p>
 <ol>
@@ -3902,7 +3902,7 @@ constraints gradients. It contains the following information:</p>
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.results._result_field.ResultField" href="#ropt.results.ResultField">ResultField</a></code></p>
 
 
-      <p>This class stores the calculated objective and constraint gradients.</p>
+        <p>This class stores the calculated objective and constraint gradients.</p>
 <p>The objective and constraint gradients used by the optimizer are calculated
 from their values evaluated for all realizations, for instance by averaging.
 There may be multiple objectives and constraints. Multiple objectives are
@@ -3999,7 +3999,7 @@ handled by the optimizer.</p>
 
     <div class="doc doc-contents first">
 
-      <p>Convert results to maximization results.</p>
+        <p>Convert results to maximization results.</p>
 <p>The optimization process always assumes that the objective functions must be
 minimized. To perform a maximization, the negative of the objective
 functions can be passed instead. However, the result objects will then

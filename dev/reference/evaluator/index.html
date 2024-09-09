@@ -1590,7 +1590,7 @@
     <div class="doc doc-contents first">
 
 
-      <p>A class for constructing functions and gradients from an ensemble of functions.</p>
+        <p>A class for constructing functions and gradients from an ensemble of functions.</p>
 
 
 
@@ -1630,7 +1630,7 @@
               Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
 
 
-      <p>Protocol for evaluator objects or callables.</p>
+        <p>Protocol for evaluator objects or callables.</p>
 <p>The optimizers require a callback that follows this protocol.</p>
 
 
@@ -1657,7 +1657,7 @@
 
     <div class="doc doc-contents ">
 
-      <p>The function evaluator callback signature.</p>
+        <p>The function evaluator callback signature.</p>
 <p>The first argument of the function should be a matrix where each column is a
 variable vector. Depending on the information passed by the second argument, all
 objective and constraint functions for all vectors or for a subset are to be
@@ -1761,7 +1761,7 @@ object, providing supplementary information to the evaluation function.</p>
     <div class="doc doc-contents first">
 
 
-      <p>Capture additional details for the function evaluator.</p>
+        <p>Capture additional details for the function evaluator.</p>
 <p>Function evaluator callbacks (see <a class="autorefs autorefs-internal" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a>)
 mainly require variable vectors to evaluate objective and constraint
 functions. However, depending on their implementation, evaluators may
@@ -1873,7 +1873,7 @@ indicating the realizations requiring evaluation.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Return the set of active variable vectors.</p>
+        <p>Return the set of active variable vectors.</p>
 <p>This property is useful for determining the realizations for which the
 objective and constraint functions need to be calculated. The index of
 each entry corresponds to the realization number and indicates whether
@@ -1933,7 +1933,7 @@ the functions should be calculated.</p>
     <div class="doc doc-contents first">
 
 
-      <p>Store the results of a function evaluation.</p>
+        <p>Store the results of a function evaluation.</p>
 <p>The objectives and constraint values are stored as a matrix, where the
 columns correspond to the index of the objective or constraint, and the rows
 correspond to the index of the variable vector for which they were
@@ -2045,7 +2045,7 @@ input vectors.</p>
               Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
 
-      <p>Abstract base class for implementing a concurrent evaluator.</p>
+        <p>Abstract base class for implementing a concurrent evaluator.</p>
 <p>This abstract base class provides the framework for implementing an
 evaluator that uses a concurrent executor.</p>
 <p>The <code>launch</code> method must be implemented to start an evaluation for one
@@ -2084,7 +2084,7 @@ restarts occur from points that already have been evaluated before.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Initialize a concurrent evaluator object.</p>
+        <p>Initialize a concurrent evaluator object.</p>
 <p>Some general properties of the evaluator are fixed at initialization time:</p>
 <ul>
 <li>The cache may be enabled or disabled using the <code>enable_cache</code> parameter.</li>
@@ -2173,7 +2173,7 @@ restarts occur from points that already have been evaluated before.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Launch an evaluation return a future for each job.</p>
+        <p>Launch an evaluation return a future for each job.</p>
 <p>This method must implement the process of launching a a single function
 evaluation for a variable vector passed via the <code>variables</code> parameter. A
 unique batch ID is passed via the <code>batch_id</code>, which can be optionally
@@ -2298,7 +2298,7 @@ that contain results should be returned.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Monitor the states of the running evaluations.</p>
+        <p>Monitor the states of the running evaluations.</p>
 <p>This method is called regularly in the polling loop that checks the
 futures until all results are collected. If the status of the
 evaluations should be monitored, this method should be overridden.</p>
@@ -2337,7 +2337,7 @@ setting the <code>polling</code> attribute upon object initialization.</p>
               Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
 
-      <p>Abstract data class for tasks in a concurrent evaluator.</p>
+        <p>Abstract data class for tasks in a concurrent evaluator.</p>
 <p>These task objects should contain the future that represents the task and
 return the results of the evaluation.</p>
 <p>It should implement two methods to retrieve the objective function values
@@ -2371,7 +2371,7 @@ and optionally the constraint values.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Return the objectives calculated by the task.</p>
+        <p>Return the objectives calculated by the task.</p>
 <p>This method will only be called after the future is done, and if no
 exception was raised during the execution of the task.</p>
 
@@ -2419,7 +2419,7 @@ also employ tasks that do not return results.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Return the constraints calculated by the task, if available.</p>
+        <p>Return the constraints calculated by the task, if available.</p>
 <p>This method will only be called after the future is done, and if no
 exception was raised during the execution of the task.</p>
 <p>This has a default implementation that returns <code>None</code>, which is only

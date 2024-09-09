@@ -1975,7 +1975,7 @@
 
     <div class="doc doc-contents first">
 
-      <p>Enumerations used within the <code>ropt</code> library.</p>
+        <p>Enumerations used within the <code>ropt</code> library.</p>
 
 
 
@@ -2004,7 +2004,7 @@
               Bases: <code><span title="enum.IntEnum">IntEnum</span></code></p>
 
 
-      <p>Enumerates the variable types.</p>
+        <p>Enumerates the variable types.</p>
 <p>The variable types are configured in the
 <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.VariablesConfig"><code>variables</code></a> section of the optimizer
 configuration. The optimization backends may make us of this information to
@@ -2038,7 +2038,7 @@ modify their behavior accordingly.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Continuous variables represented by real values.</p>
+        <p>Continuous variables represented by real values.</p>
     </div>
 
 </div>
@@ -2060,7 +2060,7 @@ modify their behavior accordingly.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Discrete variables represented by integer values.</p>
+        <p>Discrete variables represented by integer values.</p>
     </div>
 
 </div>
@@ -2091,7 +2091,7 @@ modify their behavior accordingly.</p>
               Bases: <code><span title="enum.IntEnum">IntEnum</span></code></p>
 
 
-      <p>Enumerates the types of linear or non-linear constraints.</p>
+        <p>Enumerates the types of linear or non-linear constraints.</p>
 <p>Both linear and non-linear constraints may be less or equal (<span class="arithmatex">\(\le\)</span>), greater
 or equal (<span class="arithmatex">\(\ge\)</span>), or equal (<span class="arithmatex">\(=\)</span>). Internally, <span class="arithmatex">\(\le\)</span> or <span class="arithmatex">\(\ge\)</span> constraints may
 be converted to an opposite constraint, depending on the optimizer backend.</p>
@@ -2124,7 +2124,7 @@ be converted to an opposite constraint, depending on the optimizer backend.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Less or equal constraint (<span class="arithmatex">\(\le\)</span>).</p>
+        <p>Less or equal constraint (<span class="arithmatex">\(\le\)</span>).</p>
     </div>
 
 </div>
@@ -2146,7 +2146,7 @@ be converted to an opposite constraint, depending on the optimizer backend.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Greater or equal constraint (<span class="arithmatex">\(\ge\)</span>).</p>
+        <p>Greater or equal constraint (<span class="arithmatex">\(\ge\)</span>).</p>
     </div>
 
 </div>
@@ -2168,7 +2168,7 @@ be converted to an opposite constraint, depending on the optimizer backend.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Equality constraint (<span class="arithmatex">\(=\)</span>).</p>
+        <p>Equality constraint (<span class="arithmatex">\(=\)</span>).</p>
     </div>
 
 </div>
@@ -2199,7 +2199,7 @@ be converted to an opposite constraint, depending on the optimizer backend.</p>
               Bases: <code><span title="enum.IntEnum">IntEnum</span></code></p>
 
 
-      <p>Enumerates the ways boundaries should be treated.</p>
+        <p>Enumerates the ways boundaries should be treated.</p>
 <p>When variables are perturbed their values may violate boundary constraints.
 This enumeration lists the ways these values can be modified to fix this.</p>
 
@@ -2231,7 +2231,7 @@ This enumeration lists the ways these values can be modified to fix this.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Do not modify the value.</p>
+        <p>Do not modify the value.</p>
     </div>
 
 </div>
@@ -2253,7 +2253,7 @@ This enumeration lists the ways these values can be modified to fix this.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Truncate the value <span class="arithmatex">\(v_i\)</span> at the lower or upper boundary (<span class="arithmatex">\(l_i\)</span>, <span class="arithmatex">\(u_i\)</span>):</p>
+        <p>Truncate the value <span class="arithmatex">\(v_i\)</span> at the lower or upper boundary (<span class="arithmatex">\(l_i\)</span>, <span class="arithmatex">\(u_i\)</span>):</p>
 <div class="arithmatex">\[
 \hat{v_i} = \begin{cases}
     l_i &amp; \text{if $v_i &lt; l_i$}, \\
@@ -2282,7 +2282,7 @@ This enumeration lists the ways these values can be modified to fix this.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Mirror the value <span class="arithmatex">\(v_i\)</span> at the lower or upper boundary (<span class="arithmatex">\(l_i\)</span>, <span class="arithmatex">\(u_i\)</span>):</p>
+        <p>Mirror the value <span class="arithmatex">\(v_i\)</span> at the lower or upper boundary (<span class="arithmatex">\(l_i\)</span>, <span class="arithmatex">\(u_i\)</span>):</p>
 <div class="arithmatex">\[
 \hat{v_i} = \begin{cases}
     2l_i - v_i &amp; \text{if $v_i &lt; l_i$}, \\
@@ -2320,7 +2320,7 @@ This enumeration lists the ways these values can be modified to fix this.</p>
               Bases: <code><span title="enum.IntEnum">IntEnum</span></code></p>
 
 
-      <p>Enumerates the types of perturbations that can be applied.</p>
+        <p>Enumerates the types of perturbations that can be applied.</p>
 <p>When applying a perturbation to a variable, generally, some value is
 generated, which is then applied to the unperturbed values (usually by
 addition). This enumeration lists the ways how this perturbation value can
@@ -2354,7 +2354,7 @@ be modified before being added to the unperturbed variable.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Use the perturbation value as is.</p>
+        <p>Use the perturbation value as is.</p>
     </div>
 
 </div>
@@ -2376,7 +2376,7 @@ be modified before being added to the unperturbed variable.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Multiply the perturbation value <span class="arithmatex">\(p_i\)</span> by the range defined by the bounds
+        <p>Multiply the perturbation value <span class="arithmatex">\(p_i\)</span> by the range defined by the bounds
 of the variables <span class="arithmatex">\(c_i\)</span>: <span class="arithmatex">\(\hat{p}_i = (c_{i,\text{max}} - c_{i,\text{min}})
 \times p_i\)</span>. The bounds will generally be defined in the configuration for
 the variables (see <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.VariablesConfig"><code>VariablesConfig</code></a>).</p>
@@ -2401,7 +2401,7 @@ the variables (see <a class="autorefs autorefs-internal" href="../enopt_config/#
 
     <div class="doc doc-contents ">
 
-      <p>Scale each perturbation <span class="arithmatex">\(p_i\)</span> according to the scales (<span class="arithmatex">\(s_i\)</span>) for each
+        <p>Scale each perturbation <span class="arithmatex">\(p_i\)</span> according to the scales (<span class="arithmatex">\(s_i\)</span>) for each
 variable: <span class="arithmatex">\(\hat{p}_i = p_i/s_i\)</span>. The scales <span class="arithmatex">\(s_i\)</span> will generally be defined
 in the configuration of the variables (see
 <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.VariablesConfig"><code>VariablesConfig</code></a>).</p>
@@ -2435,7 +2435,7 @@ in the configuration of the variables (see
               Bases: <code><span title="enum.IntEnum">IntEnum</span></code></p>
 
 
-      <p>Enumerates the events handled by the event broker.</p>
+        <p>Enumerates the events handled by the event broker.</p>
 <p>During the execution of the optimization plan, events may be emitted and
 callbacks can be connected to these events . When triggered by an event, the
 callbacks receive an <a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.Event"><code>Event</code></a> object. This object
@@ -2473,7 +2473,7 @@ documentation of the individual event types for details.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Emitted before evaluating new functions.</p>
+        <p>Emitted before evaluating new functions.</p>
     </div>
 
 </div>
@@ -2495,7 +2495,7 @@ documentation of the individual event types for details.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Emitted after finishing the evaluation.</p>
+        <p>Emitted after finishing the evaluation.</p>
 <p>Results may be passed to callback reacting to this event.</p>
     </div>
 
@@ -2518,7 +2518,7 @@ documentation of the individual event types for details.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Emitted just before starting an optimizer step.</p>
+        <p>Emitted just before starting an optimizer step.</p>
     </div>
 
 </div>
@@ -2540,7 +2540,7 @@ documentation of the individual event types for details.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Emitted immediately after an optimizer step finishes.</p>
+        <p>Emitted immediately after an optimizer step finishes.</p>
 <p>Results and an exit code may be passed via the event object.</p>
     </div>
 
@@ -2563,7 +2563,7 @@ documentation of the individual event types for details.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Emitted just before starting an evaluation step.</p>
+        <p>Emitted just before starting an evaluation step.</p>
     </div>
 
 </div>
@@ -2585,7 +2585,7 @@ documentation of the individual event types for details.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Emitted immediately after an evaluation step finishes.</p>
+        <p>Emitted immediately after an evaluation step finishes.</p>
 <p>Results and an exit code may be passed via the event object.</p>
     </div>
 
@@ -2617,7 +2617,7 @@ documentation of the individual event types for details.</p>
               Bases: <code><span title="enum.IntEnum">IntEnum</span></code></p>
 
 
-      <p>Enumerates the reasons for terminating an optimization.</p>
+        <p>Enumerates the reasons for terminating an optimization.</p>
 
 
 
@@ -2647,7 +2647,7 @@ documentation of the individual event types for details.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Unknown cause of termination.</p>
+        <p>Unknown cause of termination.</p>
     </div>
 
 </div>
@@ -2669,7 +2669,7 @@ documentation of the individual event types for details.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Returned when too few realizations are evaluated successfully.</p>
+        <p>Returned when too few realizations are evaluated successfully.</p>
     </div>
 
 </div>
@@ -2691,7 +2691,7 @@ documentation of the individual event types for details.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Returned when the maximum number of function evaluations is reached.</p>
+        <p>Returned when the maximum number of function evaluations is reached.</p>
     </div>
 
 </div>
@@ -2713,7 +2713,7 @@ documentation of the individual event types for details.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Returned when the optimization is aborted by the user.</p>
+        <p>Returned when the optimization is aborted by the user.</p>
     </div>
 
 </div>
@@ -2735,7 +2735,7 @@ documentation of the individual event types for details.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Returned when an optimization step terminates normally.</p>
+        <p>Returned when an optimization step terminates normally.</p>
     </div>
 
 </div>
@@ -2757,7 +2757,7 @@ documentation of the individual event types for details.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Returned when an evaluation step terminates normally.</p>
+        <p>Returned when an evaluation step terminates normally.</p>
     </div>
 
 </div>
@@ -2788,7 +2788,7 @@ documentation of the individual event types for details.</p>
               Bases: <code><span title="enum.Enum">Enum</span></code></p>
 
 
-      <p>Enumerates the possible axis names in a Results data object.</p>
+        <p>Enumerates the possible axis names in a Results data object.</p>
 <p>Result objects (see <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a>) contain
 multidimensional arrays where the axes represent particular quantities, for
 instance variables, function objects, or realization numbers. The result
@@ -2827,7 +2827,7 @@ of the variables from the configuration.</p>
 
     <div class="doc doc-contents ">
 
-      <p>The axis index corresponds to the index of the variable.</p>
+        <p>The axis index corresponds to the index of the variable.</p>
     </div>
 
 </div>
@@ -2849,7 +2849,7 @@ of the variables from the configuration.</p>
 
     <div class="doc doc-contents ">
 
-      <p>The axis index corresponds to the index of the objective function.</p>
+        <p>The axis index corresponds to the index of the objective function.</p>
     </div>
 
 </div>
@@ -2871,7 +2871,7 @@ of the variables from the configuration.</p>
 
     <div class="doc doc-contents ">
 
-      <p>The axis index corresponds to the index of the linear constraint.</p>
+        <p>The axis index corresponds to the index of the linear constraint.</p>
     </div>
 
 </div>
@@ -2893,7 +2893,7 @@ of the variables from the configuration.</p>
 
     <div class="doc doc-contents ">
 
-      <p>The axis index corresponds to the index of the constraint function.</p>
+        <p>The axis index corresponds to the index of the constraint function.</p>
     </div>
 
 </div>
@@ -2915,7 +2915,7 @@ of the variables from the configuration.</p>
 
     <div class="doc doc-contents ">
 
-      <p>The axis index corresponds to the index of the realization.</p>
+        <p>The axis index corresponds to the index of the realization.</p>
     </div>
 
 </div>
@@ -2937,7 +2937,7 @@ of the variables from the configuration.</p>
 
     <div class="doc doc-contents ">
 
-      <p>The axis index corresponds to the index of the perturbation.</p>
+        <p>The axis index corresponds to the index of the perturbation.</p>
     </div>
 
 </div>

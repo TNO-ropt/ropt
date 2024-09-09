@@ -1525,7 +1525,7 @@
 
     <div class="doc doc-contents first">
 
-      <p>Plugin functionality for adding optimization plugins.</p>
+        <p>Plugin functionality for adding optimization plugins.</p>
 <p>Optimization plugins are managed by a
 <a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> object, which returns classes or
 factory functions to create objects that implement one or more optimization
@@ -1574,7 +1574,7 @@ package.</p>
 
     <div class="doc doc-contents first">
 
-      <p>This module defines base classes and protocols for optimization plugins.</p>
+        <p>This module defines base classes and protocols for optimization plugins.</p>
 
 
 
@@ -1603,7 +1603,7 @@ package.</p>
               Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
 
-      <p>Abstract base for optimizer classes.</p>
+        <p>Abstract base for optimizer classes.</p>
 <p>Optimizers provided by optimizer plugins should derive from the <code>Optimizer</code>
 abstract base class, which specifies the requirements for the class
 constructor (<code>__init__</code>) and also includes a <code>start</code> method used to initiate
@@ -1637,7 +1637,7 @@ the optimization process.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Return <code>True</code> if a <code>NaN</code> is a valid function value.</p>
+        <p>Return <code>True</code> if a <code>NaN</code> is a valid function value.</p>
 <p>If the optimizer can handle <code>NaN</code> function values, it may implement this
 method to return <code>True</code>. This enables handling cases where all function
 evaluations in an ensemble fail. By setting the
@@ -1688,7 +1688,7 @@ be allowed to return a <code>NaN</code> value instead of raising an error.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Initialize an optimizer object.</p>
+        <p>Initialize an optimizer object.</p>
 <p>The <code>config</code> object provides the desired configuration for the
 optimization process and should be used to set up the optimizer
 correctly before starting the optimization. The optimization will be
@@ -1760,7 +1760,7 @@ forwarded to the optimizer.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Start the optimization.</p>
+        <p>Start the optimization.</p>
 <p>This method must be implemented to run the optimization using the
 provided initial values, collecting function and gradient evaluations as
 needed by calling the callback passed via the <code>optimizer_callback</code>
@@ -1823,7 +1823,7 @@ argument during initialization.</p>
               Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
 
 
-      <p>Protocol for the optimizer callback.</p>
+        <p>Protocol for the optimizer callback.</p>
 <p>Optimization plugins implement optimizer classes derived from the
 <a class="autorefs autorefs-internal" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> abstract base class.
 Objects of these classes are initialized with a callback function that
@@ -1854,7 +1854,7 @@ request the function and gradient evaluations that the optimizer needs.</p>
 
     <div class="doc doc-contents ">
 
-      <p>The signature of the optimizer callback.</p>
+        <p>The signature of the optimizer callback.</p>
 <p>The optimizer callback expects a vector or matrix with variables to
 evaluate. Discrete optimizers may request function evaluations for
 multiple variable vectors, passed as the rows of a matrix.
@@ -2002,7 +2002,7 @@ optimizers can indicate that this is the case.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.base.Plugin" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
 
 
-      <p>Abstract base class for optimizer plugins.</p>
+        <p>Abstract base class for optimizer plugins.</p>
 <p>Optimizers are implemented through optimizer plugins that must derive from
 this base class. Plugins can be built-in, installed via a plugin mechanism,
 or loaded dynamically. During execution of an optimization plan, the
@@ -2039,7 +2039,7 @@ required optimizer plugin will be located via the
 
     <div class="doc doc-contents ">
 
-      <p>Create an optimizer.</p>
+        <p>Create an optimizer.</p>
 <p>This is a factory function for instantiating optimizer objects
 implemented in the plugin.</p>
 
@@ -2119,7 +2119,7 @@ implemented in the plugin.</p>
 
     <div class="doc doc-contents first">
 
-      <p>Utility functions for use by optimizer plugins.</p>
+        <p>Utility functions for use by optimizer plugins.</p>
 <p>This module provides utility functions to validate supported constraints, filter
 linear constraints, and to retrieve the list of supported optimizers.</p>
 
@@ -2146,7 +2146,7 @@ linear constraints, and to retrieve the list of supported optimizers.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Filter unnecessary constraints from a linear constraint configuration.</p>
+        <p>Filter unnecessary constraints from a linear constraint configuration.</p>
 <p>In the case that the optimizer only optimizes a sub-set of the variables,
 linear constraints that are only formed from the unused variables are
 superfluous. This utility function removes those constraints from a  linear
@@ -2233,7 +2233,7 @@ configuration constraint.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Check if the requested optimization features are supported or required.</p>
+        <p>Check if the requested optimization features are supported or required.</p>
 <p>The keys of the supported_constraints and required_constraints dicts specify
 the type of the constraint as shown in the example below. The values are
 sets of method names that support or require the type of constraint
@@ -2333,7 +2333,7 @@ specified by the key.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Create an output path name.</p>
+        <p>Create an output path name.</p>
 <p>If the path already exists, an index is appended to it.</p>
 
 

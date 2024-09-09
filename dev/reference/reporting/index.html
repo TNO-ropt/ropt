@@ -1393,7 +1393,7 @@
 
     <div class="doc doc-contents first">
 
-      <p>Classes for reporting optimization results.</p>
+        <p>Classes for reporting optimization results.</p>
 <p>The classes in this module are designed to gather multiple results generated
 during the execution of an optimization plan. Currently, the results can
 be reported as a <a href="https://pandas.pydata.org/"><code>pandas</code></a> DataFrame using the
@@ -1425,7 +1425,7 @@ a tabular format using the <a class="autorefs autorefs-internal" href="#ropt.rep
     <div class="doc doc-contents ">
 
 
-      <p>Generate a results report in a <code>pandas</code> DataFrame.</p>
+        <p>Generate a results report in a <code>pandas</code> DataFrame.</p>
 <p>The class is intended to be used for gathering results from
 <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a> objects and storing them as a
 <a href="https://pandas.pydata.org/"><code>pandas</code></a> DataFrame.</p>
@@ -1462,7 +1462,7 @@ to <code>add_results</code>. The updated table can be retrieved at any time via 
 
     <div class="doc doc-contents ">
 
-      <p>Return the function results generated so far.</p>
+        <p>Return the function results generated so far.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -1503,7 +1503,7 @@ to <code>add_results</code>. The updated table can be retrieved at any time via 
 
     <div class="doc doc-contents ">
 
-      <p>Initialize a ResultsDataFrame object.</p>
+        <p>Initialize a ResultsDataFrame object.</p>
 <p>The set of fields used is determined by the <code>results_fields</code> argument
 passed when initializing the object. These can be any of the fields
 defined in a <a class="autorefs autorefs-internal" href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> or a
@@ -1582,7 +1582,7 @@ gradient results (<code>gradients</code>).</p>
 
     <div class="doc doc-contents ">
 
-      <p>Add results to the table.</p>
+        <p>Add results to the table.</p>
 <p>This method can be called directly from any observers connected to
 events that produce results.</p>
 
@@ -1680,7 +1680,7 @@ events that produce results.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.report._data_frame.ResultsDataFrame" href="#ropt.report.ResultsDataFrame">ResultsDataFrame</a></code></p>
 
 
-      <p>Generate files containing tables of optimization results.</p>
+        <p>Generate files containing tables of optimization results.</p>
 <p>This class derives from the
 <a class="autorefs autorefs-internal" href="#ropt.report.ResultsDataFrame"><code>ResultsDataFrame</code></a> class and writes the
 generated data frame in a tabular format to a text file.</p>
@@ -1709,7 +1709,7 @@ generated data frame in a tabular format to a text file.</p>
 
     <div class="doc doc-contents ">
 
-      <p>Initialize a results table.</p>
+        <p>Initialize a results table.</p>
 <p>The <code>columns</code> parameter specifies which results are to be exported. The
 keys of the <code>columns</code> dictionary correspond to the <code>fields</code> parameter of
 the <a class="autorefs autorefs-internal" href="#ropt.report.ResultsDataFrame"><code>ResultsDataFrame</code></a> parent class. The
@@ -1851,7 +1851,7 @@ min_header_len, empty lines will be added. For example:</p>
 
     <div class="doc doc-contents ">
 
-      <p>Add results to the table.</p>
+        <p>Add results to the table.</p>
 <p>This method can be called directly from any observers connected to
 events that produce results.</p>
 
