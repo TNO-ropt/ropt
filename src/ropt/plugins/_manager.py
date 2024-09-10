@@ -63,7 +63,7 @@ class PluginManager:
         package available under the name `my_optimizer`. The `MyOptimizer` class
         will be used to create
         [`Optimizer`][ropt.plugins.optimizer.base.Optimizer] objects and to
-        faciliate this, it should derive from the
+        facilitate this, it should derive from the
         [`OptimizerPlugin`][ropt.plugins.optimizer.base.OptimizerPlugin] class.
 
         Plugins can also be added dynamically using the `add_plugins` method.
@@ -115,7 +115,7 @@ class PluginManager:
             plugin = self._plugins[plugin_type].get(split_method[0].lower())
             if plugin and plugin.is_supported(split_method[1]):
                 return plugin
-        else:
+        elif split_method[0] != "default":
             for plugin in self._plugins[plugin_type].values():
                 if plugin.is_supported(split_method[0]):
                     return plugin
@@ -129,13 +129,11 @@ class PluginManager:
             plugin_type: The type of the plugin to retrieve.
             method:      The name of the method the plugin should provide.
         """
-        split_method = method.split("/", maxsplit=1)
-        method_name = split_method[1] if len(split_method) > 1 else split_method[0]
         try:
-            plugin = self.get_plugin(plugin_type, method)
+            self.get_plugin(plugin_type, method)
         except ConfigError:
             return False
-        return bool(plugin.is_supported(method_name))
+        return True
 
 
 @lru_cache  # Without the cache, repeated calls are very slow
