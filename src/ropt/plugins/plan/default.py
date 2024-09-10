@@ -74,7 +74,7 @@ class DefaultPlanPlugin(PlanPlugin):
         msg = f"Unknown step type: {config.run}"
         raise TypeError(msg)
 
-    def is_supported(self, method: str) -> bool:
+    def is_supported(self, method: str, *, explicit: bool) -> bool:  # noqa: ARG002
         """Check if a method is supported.
 
         See the [ropt.plugins.base.Plugin][] abstract base class.
