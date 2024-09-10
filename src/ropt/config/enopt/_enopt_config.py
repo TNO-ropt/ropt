@@ -199,7 +199,7 @@ class EnOptConfig(BaseModel):
         msg = "EnOptConfig objects must be constructed from dicts"
         raise ValueError(msg)
 
-    @model_validator(mode="wrap")  # type: ignore
+    @model_validator(mode="wrap")  # type: ignore[arg-type]
     def _pass_enopt_config_unchanged(self, handler: Any) -> Any:  # noqa: ANN401
         if isinstance(self, EnOptConfig):
             return self

@@ -40,7 +40,7 @@ class DefaultPlanPlugin(PlanPlugin):
     """Default plan plugin class."""
 
     @singledispatchmethod
-    def create(  # type: ignore
+    def create(  # type: ignore[override]
         self,
         config: Union[ContextConfig, StepConfig],  # noqa: ARG002
         plan: Plan,  # noqa: ARG002

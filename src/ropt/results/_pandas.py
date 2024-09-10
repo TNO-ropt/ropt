@@ -33,7 +33,7 @@ def _to_dataframe(  # noqa: PLR0913
             for axis in unstack:
                 if axis.value in frame.index.names:
                     frame = cast(pd.DataFrame, frame.unstack(axis.value))  # noqa: PD010
-            frame.columns = frame.columns.to_flat_index()  # type:ignore
+            frame.columns = frame.columns.to_flat_index()  # type:ignore[no-untyped-call]
             if joined_frame.empty:
                 joined_frame = frame
             else:

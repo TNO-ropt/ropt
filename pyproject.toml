@@ -78,46 +78,43 @@ filterwarnings = [
     'ignore:datetime.datetime.utcfromtimestamp\(\) is deprecated.*:DeprecationWarning',  # 3.12
 ]
 
-[tool.ruff.lint]
-select = ["ALL"]
-ignore = [
-    "AIR",
-    "COM812",
-    "COM819",
-    "D206",
-    "E501",
-    "DJ",
-    "FA",
-    "ISC001",
-    "PGH",
-    "UP",
-    "ANN101",
-    "ANN102",
-    "FIX002",
-    "S101",
-    "TD002",
-    "TD003",
-    "Q",
-    "W191",
-]
-
 [tool.ruff.format]
 exclude = ["src/ropt/version.py", "build"]
 
-[tool.ruff.lint.pydocstyle]
-convention = "google"
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "AIR",    # airflow-variable-name-task-id-mismatch
+    "COM812", # missing-trailing-comma
+    "E501",   # line-too-lone
+    "ISC001", # single-line-implicit-string-concatenation   
+    "DJ",     # flake8-django
+    "FA",     # flake8-future-annotations
+    "UP",     # pyupgrade 
+    "S101",   # assert
+]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["E402", "D", "ANN401", "FBT", "PLR2004", "PLR0913"]
-"examples/*" = ["INP001", "T201"]
+"tests/*" = [
+    "E402",    # module-import-not-at-top-of-file
+    "D",       # pydocstyle
+    "ANN401",  # anytype
+    "FBT",     # flake8-boolean-trap
+    "PLR2004", # magic-value-comparison
+    "PLR0913", # too-many-arguments
+]
+"examples/*" = [
+    "INP001", # implicit-namespace-package
+    "T201",   # print
+]
 
-[tool.ruff.lint.isort]
-known-first-party = ["ropt"]
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [tool.mypy]
 strict = true
 plugins = ["numpy.typing.mypy_plugin", "pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["scipy.*", "dakota"]
+module = ["scipy.*"]
 ignore_missing_imports = true

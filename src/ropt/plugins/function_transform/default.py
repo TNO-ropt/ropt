@@ -98,7 +98,7 @@ class DefaultFunctionTransform(FunctionTransform):
         functions: NDArray[np.float64], weights: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         functions = np.nan_to_num(functions)
-        return np.dot(functions, weights)  # type: ignore
+        return np.dot(functions, weights)  # type: ignore[no-any-return]
 
     def _calculate_gradient_mean(
         self,
@@ -108,7 +108,7 @@ class DefaultFunctionTransform(FunctionTransform):
     ) -> NDArray[np.float64]:
         if self._enopt_config.gradient.merge_realizations:
             return gradient
-        return np.dot(gradient, weights)  # type: ignore
+        return np.dot(gradient, weights)  # type: ignore[no-any-return]
 
     def _calculate_function_stddev(
         self, functions: NDArray[np.float64], weights: NDArray[np.float64]
@@ -130,7 +130,7 @@ class DefaultFunctionTransform(FunctionTransform):
         functions = np.nan_to_num(functions)
         norm, mean, stddev = self._mean_stddev(functions, weights)
         mean_gradient = np.dot(gradient, weights)
-        return (  # type: ignore
+        return (  # type: ignore[no-any-return]
             np.zeros(mean_gradient.shape, dtype=np.float64)
             if np.allclose(np.abs(stddev), 0.0)
             else (
