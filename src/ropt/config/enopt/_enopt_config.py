@@ -191,11 +191,9 @@ class EnOptConfig(BaseModel):
     @classmethod
     def _add_original_data(cls, data: Any) -> Any:  # noqa: ANN401
         if isinstance(data, dict):
-            data = deepcopy(data)
-            if "original_inputs" in data:
-                del data["original_inputs"]
-            data["original_inputs"] = data
-            return data
+            newdata = deepcopy(data)
+            newdata["original_inputs"] = deepcopy(data)
+            return newdata
         msg = "EnOptConfig objects must be constructed from dicts"
         raise ValueError(msg)
 
