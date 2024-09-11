@@ -1847,7 +1847,7 @@ request the function and gradient evaluations that the optimizer needs.</p>
 
 
 <h4 id="ropt.plugins.optimizer.base.OptimizerCallback.__call__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">return_functions</span><span class="p">,</span> <span class="n">return_gradients</span><span class="p">,</span> <span class="n">allow_nan</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">return_functions</span><span class="p">,</span> <span class="n">return_gradients</span><span class="p">)</span></code>
 
 </h4>
 
@@ -1874,11 +1874,6 @@ are returned as a matrix. The first row contains the gradient of the
 objective function, while the remaining rows contain the gradients of
 the non-linear constraints. Gradient-based methods currently support
 only a single evaluation, hence there is also only a single result.</p>
-<p>In most cases, the optimizer cannot handle failed function evaluations,
-which are indicated by <code>NaN</code> values. Some optimizers, in particular
-those that use multiple function evaluations do determine a next step
-are robust in this regard. By returning <code>allow_nan=True</code>, these
-optimizers can indicate that this is the case.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1932,20 +1927,6 @@ optimizers can indicate that this is the case.</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>allow_nan</code></td>
-            <td>
-                  <code>bool</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If <code>True</code>, accept <code>NaN</code> values</p>
-              </div>
-            </td>
-            <td>
-                  <code>False</code>
             </td>
           </tr>
       </tbody>
