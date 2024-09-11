@@ -31,7 +31,6 @@ class OptimizerCallback(Protocol):
         *,
         return_functions: bool,
         return_gradients: bool,
-        allow_nan: bool = False,
     ) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
         """The signature of the optimizer callback.
 
@@ -58,17 +57,10 @@ class OptimizerCallback(Protocol):
         the non-linear constraints. Gradient-based methods currently support
         only a single evaluation, hence there is also only a single result.
 
-        In most cases, the optimizer cannot handle failed function evaluations,
-        which are indicated by `NaN` values. Some optimizers, in particular
-        those that use multiple function evaluations do determine a next step
-        are robust in this regard. By returning `allow_nan=True`, these
-        optimizers can indicate that this is the case.
-
         Args:
             variables:        The variable vector or matrix to evaluate
             return_functions: If `True`, evaluate and return functions
             return_gradients: If `True`, evaluate and return gradients
-            allow_nan:        If `True`, accept `NaN` values
 
         Returns:
             A tuple with function and gradient values.
