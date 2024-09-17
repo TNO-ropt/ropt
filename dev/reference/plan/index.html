@@ -12,7 +12,7 @@
         <link rel="prev" href="../enopt_config/">
       
       
-        <link rel="next" href="../optimization/">
+        <link rel="next" href="../plan_runner/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Optimization Plans - ropt Documentation</title>
+        <title>Optimization plans - ropt Documentation</title>
       
     
     
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Optimization Plans
+              Optimization plans
             
           </span>
         </div>
@@ -629,7 +629,7 @@
           
   
   <span class="md-ellipsis">
-    Optimization Plans
+    Optimization plans
   </span>
   
 
@@ -640,7 +640,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization Plans
+    Optimization plans
   </span>
   
 
@@ -843,30 +843,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plan.OptimizationPlanRunner" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptimizationPlanRunner
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptimizationPlanRunner">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.OptimizationPlanRunner.abort_optimization" class="md-nav__link">
-    <span class="md-ellipsis">
-      abort_optimization
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -876,6 +852,27 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan_runner/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Optimization plan runner
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -1578,30 +1575,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plan.OptimizationPlanRunner" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptimizationPlanRunner
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptimizationPlanRunner">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.OptimizationPlanRunner.abort_optimization" class="md-nav__link">
-    <span class="md-ellipsis">
-      abort_optimization
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1625,7 +1598,7 @@
   
 
 
-  <h1>Optimization Plans</h1>
+  <h1>Optimization plans</h1>
 
 <div class="doc doc-object doc-module">
 
@@ -1672,7 +1645,7 @@ all steps, such as a callable for function evaluations or a random number
 generator. For this purpose, an <a class="autorefs autorefs-internal" href="#ropt.plan.OptimizerContext">OptimizerContext</a>
 object is supplied when creating the plan, which maintains this shared state.</p>
 <p>Initializing and executing a plan object for simple optimization cases can be
-cumbersome. The <a class="autorefs autorefs-internal" href="#ropt.plan.OptimizationPlanRunner"><code>OptimizationPlanRunner</code></a>
+cumbersome. The <a class="autorefs autorefs-internal" href="../plan_runner/#ropt.plan.OptimizationPlanRunner"><code>OptimizationPlanRunner</code></a>
 provides a convenient way to build and execute such plans with ease.</p>
 
 
@@ -2761,69 +2734,6 @@ all steps in an optimization plan. This currently includes the following:</p>
           </tr>
       </tbody>
     </table>
-
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.plan.OptimizationPlanRunner" class="doc doc-heading">
-            <code>OptimizationPlanRunner</code>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-
-        <p>A class for running optimization plans.</p>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plan.OptimizationPlanRunner.abort_optimization" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">abort_optimization</span><span class="p">()</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
-  </span>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Abort the current optimization run.</p>
-<p>This method can be called from within callbacks to interrupt the ongoing
-optimization plan. The exact point at which the optimization is aborted
-depends on the step that is executing at that point. For example, within
-a running optimizer, the process will be interrupted after completing
-the current function evaluation.</p>
 
     </div>
 
