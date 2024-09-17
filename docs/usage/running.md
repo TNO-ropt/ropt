@@ -34,7 +34,7 @@ CONFIG = {                                                            # (4)!
 
 optimum = OptimizationPlanRunner(CONFIG, rosenbrock).run().results    # (6)!
 
-print(ptimum.evaluations.variables, optimum.functions.weighted_objective)
+print(optimum.evaluations.variables, optimum.functions.weighted_objective)
 ```
 
 1. The variables to optimize ($x, y$) are passes as a single `numpy` array. The
@@ -60,3 +60,8 @@ function value:
 ```python
 [1.00117794 1.0023715 ] 1.4078103983185034e-06
 ```
+
+This example uses the [OptimizationPlanRunner][ropt.plan.OptimizationPlanRunner]
+class which provides a simplified interface for running optimizations. More
+complex optimization workflows can be implemented using the [plan][ropt.plan]
+functionality.

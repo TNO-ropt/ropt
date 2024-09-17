@@ -84,7 +84,8 @@ nav:
           - "Optimization Plan configuration": reference/plan_config.md
           - "Optimizer configuration": reference/enopt_config.md
       - "Optimization":
-          - "Optimization Plans": reference/plans.md
+          - "Optimization plans": reference/plan.md
+          - "Optimization plan runner": reference/plan_runner.md
           - "Optimization": reference/optimization.md
           - "Function evaluations": reference/evaluator.md
           - "Optimization results": reference/results.md

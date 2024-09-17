@@ -34,10 +34,23 @@ MetaDataType = Dict[str, Union[int, float, bool, str]]
 
 
 class OptimizerContext:
-    """Store the context in which an optimizer runs."""
+    """Context class for shared state across a plan.
+
+    An optimizer context object holds the information and state shared across
+    all steps in an optimization plan. This currently includes the following:
+
+    - An [`Evaluator`][ropt.evaluator.Evaluator] callable for evaluating
+      functions.
+    - A seed for a random number generator used in stochastic gradient
+      estimation.
+    - An iterator that generates unique result IDs.
+    - An event broker for connecting user-provided callbacks to optimization
+      events.
+    - A metadata dictionary that can be shared between steps.
+    """
 
     def __init__(self, evaluator: Evaluator, seed: Optional[int] = None) -> None:
-        """Initialize the optimiation context.
+        """Initialize the optimization context.
 
         Args:
             evaluator:      The callable for running function evaluations
@@ -51,7 +64,7 @@ class OptimizerContext:
 
 
 class Plan:
-    """The plan object."""
+    """The plan class for executing optimization workflows."""
 
     def __init__(
         self,
@@ -61,10 +74,16 @@ class Plan:
     ) -> None:
         """Initialize a plan object.
 
+        The plan requires a `PlanConfig` object and an `OptimizationContext`
+        object. The `plugin_manager` argument is optional and allows you to
+        specify plugins for the context and step objects that the plan may use.
+        If not provided, only plugins installed via Python's standard entry
+        points mechanism will be used.
+
         Args:
-            config:            Optimizer configuration
-            optimizer_context: Context in which the plan executes
-            plugin_manager:    Optional plugin manager
+            config:            The optimizer configuration
+            optimizer_context: The context in which the plan executes
+            plugin_manager:    An optional plugin manager
         """
         self._plan_config = config
         self._optimizer_context = optimizer_context
@@ -82,18 +101,25 @@ class Plan:
         self._steps = self.create_steps(config.steps)
 
     def run(self) -> bool:
-        """Run the plan.
+        """Run the Plan.
+
+        This method executes the steps of the plan. If a user abort event
+        occurs, the method will return `True`.
 
         Returns:
-            Whether a user abort occurred.
+            `True` if a user abort occurred; otherwise, `False`.
         """
         return self.run_steps(self._steps)
 
     def create_steps(self, step_configs: List[StepConfig]) -> List[PlanStep]:
         """Create step objects from step configs.
 
+        Given a list of step configuration objects, this method returns a list
+        of step objects, each configured according to its corresponding
+        configuration.
+
         Args:
-            step_configs: The configurations of the steps.
+            step_configs: A list of step configuration objects.
         """
         return [
             self._plugin_manager.get_plugin("plan", method=step_config.run).create(
@@ -103,13 +129,16 @@ class Plan:
         ]
 
     def run_steps(self, steps: List[PlanStep]) -> bool:
-        """Run the given steps.
+        """Execute a list of steps.
+
+        This method executes a list of plan steps and returns `True` if the
+        execution is aborted by the user.
 
         Args:
-            steps: The steps to run
+            steps: A list of steps to execute.
 
         Returns:
-            Whether a user abort occurred.
+            `True` if the execution was aborted by the user; otherwise, `False`.
         """
         return any(
             task.run() for task in steps if self._check_condition(task.step_config)
@@ -133,15 +162,40 @@ class Plan:
         """
         return self._optimizer_context
 
+    def spawn(self, config: PlanConfig) -> Plan:
+        """Spawn a new plan from the current plan.
+
+        This method creates a new plan that shares the same optimization context
+        and plugin manager as the current plan. However, it does not inherit
+        other properties, such as variables.
+
+        Args:
+            config: The configuration of the new plan
+        """
+        return Plan(
+            config,
+            optimizer_context=self._optimizer_context,
+            plugin_manager=self._plugin_manager,
+        )
+
     def parse_value(self, value: Any) -> Any:  # noqa: ANN401
         """Parse a value as an expression or an interpolated string.
 
-        If the value is a string, and starts with `$`, it is assumed to be an
-        expression and it is evaluated. If it does not start with `$`, any
-        embedded string starting with `$` sign are evaluated and interpolated
-        into the string.
+        If the value is not a string, it is returned unchanged. If it is a
+        string, it is first stripped of leading and trailing whitespace and then
+        parsed according to the following rules:
 
-        If the value is not a string, it is passed through unchanged.
+        - If the string starts with a `$`, it is evaluated using the
+          [`eval`][ropt.plan.Plan.eval] method of the plan object. This will
+          replace strings of the form `$identifier` with the corresponding plan
+          value and evaluate strings of the form `${{ expr }}` as a mathematical
+          expression, optionally containing variables in the form `$identifier`.
+        - If the string does not start with a `$`, it is returned after
+          interpolating any substrings delimited by `${{` and `}}` by passing
+          them to the [`eval`][ropt.plan.Plan.eval] method.
+
+        Note:
+            The string `$$` is not interpolated but replaced with a single `$`.
 
         Args:
             value: The value to evaluate
@@ -152,7 +206,7 @@ class Plan:
 
         def _substitute(matched: re.Match[str]) -> str:
             value = matched.string[matched.start() : matched.end()]
-            return "$" if value == "$$" else str(self.parse_value(value))
+            return "$" if value == "$$" else str(self.eval(value))
 
         if isinstance(value, str):
             stripped = value.strip()
@@ -160,18 +214,6 @@ class Plan:
                 return self.eval(stripped)
             return re.sub(r"\${{(.*?)}}|\$\$|\$([^\W0-9][\w\.]*)", _substitute, value)
         return value
-
-    def spawn(self, config: PlanConfig) -> Plan:
-        """Spawn a child plan.
-
-        Args:
-            config:  The configuration of the new plan.
-        """
-        return Plan(
-            config,
-            optimizer_context=self._optimizer_context,
-            plugin_manager=self._plugin_manager,
-        )
 
     def _eval_expr(self, expr: str) -> Any:  # noqa: ANN401
         # Check for identifiers that are not preceded by $:
@@ -213,16 +255,24 @@ class Plan:
     def eval(self, value: Any) -> Any:  # noqa: ANN401
         """Evaluate the provided value as an expression.
 
-        The value is evaluated as follows:
+        If the value is a string, it is returned unchanged. Otherwise, it is
+        evaluated as follows:
 
-        - If the value is not a string, return unchanged
-        - If the value is a string enclosed in a `${{ }}` pair the contents are
-          evaluated recursively.
-        - If value is a string that starts with `$` and is an identifier it is
-          assumed to be a plan variable and its value is returned. The
-          resulting value can have any type.
-        - Otherwise the string is evaluated and the result returned. The type of
-          the result is restricted to numerical values, lists and numpy array.
+        - If the value is a string that starts with `$`, it is assumed to denote
+          a plan variable, and its value is returned.
+        - If the value is enclosed in `${{` and `}}` delimiters, these
+          delimiters are removed. The string is then evaluated as a mathematical
+          expression, with variables of the form `$identifier` replaced by their
+          corresponding plan variable values.
+        - Arbitrary strings that do not start with `$` are treated as if they
+          are enclosed in `${{` and `}}` delimiters and evaluated in the same
+          way.
+
+        Note:
+            The result of a mathematical expression is restricted to numerical
+            values, lists, and numpy arrays. However, plan variables can contain
+            values of any type, so expressions of the form `$identifier` may
+            evaluate to a result of any type.
 
         Args:
             value: The expression to evaluate.
@@ -254,40 +304,54 @@ class Plan:
     def reset_context(self, obj_id: str) -> None:
         """Reset the given context object.
 
+        This method calls the `reset` method of the context object identified by
+        `obj_id`. The effect of this operation depends on the specific
+        implementation of the context object.
+
         Args:
-            obj_id: The ID of the object.
+            obj_id: The ID of the context object to reset.
         """
         if obj_id in self._context:
             self._context[obj_id].reset()
 
     def has_context(self, obj_id: str) -> bool:
-        """Check if a variable of field exists.
+        """Check if a context object exists.
+
+        Returns `True` if the plan contains a context object with the given ID;
+        otherwise, returns `False`.
 
         Args:
-            obj_id: name of the context object
+            obj_id: The ID of the context object to check.
 
         Returns:
-            Whether the object exists.
+            `True` if the object exists; otherwise, `False`.
         """
         return obj_id in self._context
 
-    def update_context(self, name: str, value: Any) -> None:  # noqa: ANN401
+    def update_context(self, obj_id: str, value: Any) -> None:  # noqa: ANN401
         """Update a context object.
 
+        This method calls the `update` method of the context object identified
+        by `obj_id` with the given value. The effect of this operation depends
+        on the specific implementation of the context object.
+
         Args:
-            name:  The context
-            value: The value to use for the update
+            obj_id: The context object ID
+            value:  The value to use for the update
         """
-        if name not in self._context:
-            msg = f"not a valid context: `{name}`"
+        if obj_id not in self._context:
+            msg = f"not a valid context: `{obj_id}`"
             raise PlanError(msg)
-        self._context[name].update(value)
+        self._context[obj_id].update(value)
 
     def __getitem__(self, name: str) -> Any:  # noqa: ANN401
-        """Get the value of a variable.
+        """Get the value of a plan variable.
+
+        This method implements the `[]` operator on the plan object to retrieve
+        the value of a plan variable.
 
         Args:
-            name: the variable name
+            name: The name of the variable.
 
         Returns:
             The value of the variable.
@@ -298,11 +362,14 @@ class Plan:
         raise PlanError(msg)
 
     def __setitem__(self, name: str, value: Any) -> None:  # noqa: ANN401
-        """Set a variable .
+        """Set a plan variable to the given value.
+
+        This method implements the `[]` operator on the plan object to set the
+        value of a plan variable.
 
         Args:
-            name:  The variable
-            value: The value to assign
+            name:  The name of the variable.
+            value: The value to assign.
         """
         if not name.isidentifier():
             msg = f"Not a valid variable name: `{name}`"
@@ -312,11 +379,14 @@ class Plan:
     def __contains__(self, name: str) -> bool:
         """Check if a variable exists.
 
+        This method implements the `in` operator on the plan object to determine
+        if a plan variable exists.
+
         Args:
-            name: name of the variable
+            name: The name of the variable.
 
         Returns:
-            Whether the variable exists.
+            `True` if the variable exists; otherwise, `False`.
         """
         return name in self._vars
 

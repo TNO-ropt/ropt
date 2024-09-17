@@ -51,7 +51,6 @@ _RepeatTypes = Literal["initial", "last", "optimal", "last_optimal"]
 class _Repeat:
     iterations: int
     restart_from: _RepeatTypes
-    counter_var: Optional[str]
     metadata_var: Optional[str]
 
 
@@ -63,7 +62,22 @@ class _Results:
 
 
 class OptimizationPlanRunner:
-    """A class for running optimization plans."""
+    """A class for running optimization plans.
+
+    `OptimizationPlanRunner` objects are designed for use cases where the
+    optimization workflow is relatively simple, such as a single optimization
+    run possibly with a few restarts. Using this object can be more convenient
+    than defining and running an optimization plan directly in such cases.
+
+    This class provides the following features:
+
+    - Start a single optimization.
+    - Repeat the same optimization multiple times, with various options for
+      restarting from different points.
+    - Add observer functions connected to various optimization events.
+    - Attach metadata to each result generated during the optimization.
+    - Generate tables summarizing the optimization results.
+    """
 
     def __init__(
         self,
@@ -73,6 +87,18 @@ class OptimizationPlanRunner:
         constraint_tolerance: float = 1e-10,
         seed: Optional[int] = None,
     ) -> None:
+        """Initialize an `OptimizationPlanRunner` object.
+
+        An optimization configuration and an evaluation object must be provided,
+        as they define the optimization to perform.
+
+        Args:
+            enopt_config:         The configuration for the optimization.
+            evaluator:            The evaluator object used to evaluate functions.
+            constraint_tolerance: The tolerance level used to detect constraint violations.
+            seed:                 The seed for the random number generator used
+                                  for stochastic gradient estimation.
+        """
         self._plugin_manager: Optional[PluginManager] = None
         self._optimizer_context = OptimizerContext(evaluator=evaluator, seed=seed)
         self._observers: List[Tuple[EventType, Callable[[Event], None]]] = []
@@ -107,17 +133,44 @@ class OptimizationPlanRunner:
 
     @property
     def results(self) -> Optional[FunctionResults]:
+        """Return the optimal result.
+
+        Returns:
+            The optimal result found during optimization.
+        """
         return self._results.results
 
     @property
     def variables(self) -> Optional[NDArray[np.float64]]:
+        """Return the optimal variables.
+
+        Returns:
+            The variables corresponding to the optimal result.
+        """
         return self._results.variables
 
     @property
     def exit_code(self) -> OptimizerExitCode:
+        """Return the exit code.
+
+        Returns:
+            The exit code of the optimization run.
+        """
         return self._results.exit_code
 
     def add_plugins(self, plugin_type: PluginType, plugins: Dict[str, Plugin]) -> Self:
+        """Add plugins.
+
+        By default, plugins are installed via Python's entry point mechanism.
+        This method allows you to install additional plugins.
+
+        Args:
+            plugin_type: The type of plugin to install.
+            plugins:     A dictionary mapping plugin names to plugin objects.
+
+        Returns:
+            The `OptimizationPlanRunner` instance, allowing for method chaining.
+        """
         if self._plugin_manager is None:
             self._plugin_manager = PluginManager()
         self._plugin_manager.add_plugins(plugin_type, plugins)
@@ -126,10 +179,34 @@ class OptimizationPlanRunner:
     def add_observer(
         self, event_type: EventType, function: Callable[[Event], None]
     ) -> Self:
+        """Add an observer.
+
+        Observers are callables that are triggered when an optimization event
+        occurs. This method adds an observer that responds to a specified event
+        type.
+
+        Args:
+            event_type: The type of event to observe.
+            function:   The callable to invoke when the event is emitted.
+
+        Returns:
+            The `OptimizationPlanRunner` instance, allowing for method chaining.
+        """
         self._observers.append((event_type, function))
         return self
 
     def add_metadata(self, metadata: Dict[str, Any]) -> Self:
+        """Add metadata.
+
+        Add a dictionary of metadata that will be attached to each result object
+        generated during optimization.
+
+        Args:
+            metadata: The dictionary containing metadata to add to each result.
+
+        Returns:
+            The `OptimizationPlanRunner` instance, allowing for method chaining.
+        """
         for key, value in metadata.items():
             if value is None:
                 del self._metadata[key]
@@ -159,6 +236,24 @@ class OptimizationPlanRunner:
         *,
         maximize: bool = False,
     ) -> Self:
+        """Add a table of results.
+
+        This method instructs the runner to generate a table summarizing the
+        results of the optimization. This is implemented via a
+        [`ResultsTable`][ropt.report.ResultsTable] object. Refer to its
+        documentation for more details.
+
+        Args:
+            columns:        A mapping of column names for the results table.
+            path:           The location where the results file will be saved.
+            table_type:     The type of table to generate.
+            min_header_len: The minimum number of header lines to generate.
+            maximize:       If `True`, interpret the results as a maximization
+                            problem rather than the default minimization.
+
+        Returns:
+            The `OptimizationPlanRunner` instance, allowing for method chaining.
+        """
         table = ResultsTable(
             columns=columns,
             path=path,
@@ -177,16 +272,38 @@ class OptimizationPlanRunner:
         self,
         iterations: int,
         restart_from: _RepeatTypes = "optimal",
-        counter_var: Optional[str] = None,
         metadata_var: Optional[str] = None,
     ) -> Self:
+        """Repeat the optimization.
+
+        Run the optimization multiple times with various options for the
+        starting points. On the first run, the optimization starts from the
+        initial variables defined in its configuration. For subsequent runs, the
+        initial variables are selected based on the `restart_from` option:
+
+        - `"initial"`: Use the initial values from the configuration.
+        - `"last"`: Use the variables from the previous run.
+        - `"optimal"`: Use the variables from the optimal result found so far.
+        - `"last_optimal"`: Use the variables from the optimal result of the last run.
+
+        If `metadata_var` is defined, a field will be added to the metadata
+        stored with each result, recording the sequence number of the
+        optimization run.
+
+        Args:
+            iterations:      The number of times to run the optimization.
+            restart_from:    The method for selecting initial variables. Defaults to `"optimal"`.
+            metadata_var:    Optional field name in the metadata to record the repeat index.
+
+        Returns:
+            The `OptimizationPlanRunner` instance, allowing for method chaining.
+        """
         if self._repeat is not None:
             msg = "The repeat() method can only be called once."
             raise RuntimeError(msg)
         self._repeat = _Repeat(
             iterations=iterations,
             restart_from=restart_from,
-            counter_var=counter_var,
             metadata_var=metadata_var,
         )
         return self
@@ -197,11 +314,8 @@ class OptimizationPlanRunner:
         metadata = self._metadata
 
         if self._repeat is not None:
-            counter_var = self._repeat.counter_var
             if self._repeat.metadata_var is not None:
-                if counter_var is None:
-                    counter_var = "__repeat_counter__"
-                metadata[self._repeat.metadata_var] = f"${counter_var}"
+                metadata[self._repeat.metadata_var] = "$__repeat_counter__"
             context, steps = _add_repeat_tracker(
                 context, steps, self._repeat.restart_from
             )
@@ -223,7 +337,7 @@ class OptimizationPlanRunner:
                     "run": "repeat",
                     "with": {
                         "iterations": self._repeat.iterations,
-                        "counter_var": counter_var,
+                        "counter_var": "__repeat_counter__",
                         "steps": steps,
                     },
                 }
@@ -232,6 +346,11 @@ class OptimizationPlanRunner:
         return {"context": context, "steps": steps}
 
     def run(self) -> Self:
+        """Run the optimization.
+
+        Returns:
+            The `OptimizationPlanRunner` instance, allowing for method chaining.
+        """
         plan = Plan(
             PlanConfig.model_validate(self._build_plan_config()),
             self._optimizer_context,
