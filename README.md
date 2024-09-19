@@ -41,27 +41,34 @@ pip install ropt[pandas,xarray,parsl]
 
 ## Development
 The `ropt` source distribution can be found on
-[GitHub](https://github.com/tno-ropt/ropt). To install from source, enter the
-distribution directory and execute:
+[GitHub](https://github.com/tno-ropt/ropt). It uses a standard `pyproject.toml`
+file, which contains build information and configuration settings for various
+tools. A development environment can be set up with compatible tools of your
+choice.
+
+The [uv](https://docs.astral.sh/uv/) package manager offers an easy way to
+install `ropt` in its own virtual environment:
 
 ```bash
-pip install .
+uv sync               # or:
+uv sync --all-extras  # To add all optional dependencies
 ```
 
-Documentation is written using [`MkDocs`](https://www.mkdocs.org/) and
-[`mkdocstrings`](https://mkdocstrings.github.io/). To view it, install the
-necessary dependencies and start the `MkDocs` built-in server within the `ropt`
-distribution directory:
+The `ropt` package uses [ruff](https://docs.astral.sh/ruff/) (for formatting and
+linting), [mypy](https://www.mypy-lang.org/) (for static typing), and
+[pytest](https://docs.pytest.org/en/stable/) (for running the test suite).
+
+The documentation is written using [MkDocs](https://www.mkdocs.org/) and
+[mkdocstrings](https://mkdocstrings.github.io/). To view the documentation
+locally, start the built-in server within the `ropt` distribution directory:
 
 ```bash
-pip install .[docs]
 mkdocs serve
 ```
 
-## Running the tests
-To run the test suite, install the necessary dependencies and execute `pytest`:
+All development and documentation tools are declared in `pyproject.toml` as `uv`
+development dependencies and can be installed using the `--dev` flag:
 
 ```bash
-pip install .[test]
-pytest
+uv sync --dev
 ```

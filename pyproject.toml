@@ -35,8 +35,6 @@ dependencies = [
 "Documentation" = "https://tno-ropt.github.io/ropt"
 
 [project.optional-dependencies]
-test = ["ruff", "mypy", "pytest", "pandas-stubs", "types-tabulate"]
-docs = ["mkdocs", "mkdocstrings[python]", "mkdocs-material", "mike"]
 pandas = ["pandas", "tabulate"]
 xarray = ["xarray", "netcdf4"]
 parsl = ["parsl"]
@@ -62,7 +60,6 @@ ropt_plugin_optimizer = "ropt.plugins.optimizer.external:ropt_plugin_optimizer"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["ropt"]
 
 [tool.setuptools.package-data]
 ropt = ["py.typed"]
@@ -122,3 +119,16 @@ plugins = ["numpy.typing.mypy_plugin", "pydantic.mypy"]
 [[tool.mypy.overrides]]
 module = ["scipy.*"]
 ignore_missing_imports = true
+
+[tool.uv]
+dev-dependencies = [
+    "mike>=2.1.3",
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.5.35",
+    "mkdocstrings[python]>=0.26.1",
+    "mypy>=1.11.2",
+    "pandas-stubs>=2.0.2.230605",
+    "pytest>=8.3.3",
+    "ruff>=0.6.5",
+    "types-tabulate>=0.9.0.20240106",
+]
