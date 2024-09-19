@@ -12,15 +12,15 @@
         <link rel="prev" href="../enopt_config/">
       
       
-        <link rel="next" href="../optimization/">
+        <link rel="next" href="../plan_runner/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.34">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.35">
     
     
       
-        <title>Optimization Plans - ropt Documentation</title>
+        <title>Optimization plans - ropt Documentation</title>
       
     
     
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Optimization Plans
+              Optimization plans
             
           </span>
         </div>
@@ -629,7 +629,7 @@
           
   
   <span class="md-ellipsis">
-    Optimization Plans
+    Optimization plans
   </span>
   
 
@@ -640,7 +640,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization Plans
+    Optimization plans
   </span>
   
 
@@ -734,18 +734,18 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.parse_value" class="md-nav__link">
+  <a href="#ropt.plan.Plan.spawn" class="md-nav__link">
     <span class="md-ellipsis">
-      parse_value
+      spawn
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.spawn" class="md-nav__link">
+  <a href="#ropt.plan.Plan.parse_value" class="md-nav__link">
     <span class="md-ellipsis">
-      spawn
+      parse_value
     </span>
   </a>
   
@@ -820,19 +820,19 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.OptimizationPlanRunner" class="md-nav__link">
+  <a href="#ropt.plan.OptimizerContext" class="md-nav__link">
     <span class="md-ellipsis">
-      OptimizationPlanRunner
+      OptimizerContext
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="OptimizationPlanRunner">
+    <nav class="md-nav" aria-label="OptimizerContext">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.OptimizationPlanRunner.abort_optimization" class="md-nav__link">
+  <a href="#ropt.plan.OptimizerContext.__init__" class="md-nav__link">
     <span class="md-ellipsis">
-      abort_optimization
+      __init__
     </span>
   </a>
   
@@ -852,6 +852,27 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan_runner/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Optimization plan runner
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -1445,18 +1466,18 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.parse_value" class="md-nav__link">
+  <a href="#ropt.plan.Plan.spawn" class="md-nav__link">
     <span class="md-ellipsis">
-      parse_value
+      spawn
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.spawn" class="md-nav__link">
+  <a href="#ropt.plan.Plan.parse_value" class="md-nav__link">
     <span class="md-ellipsis">
-      spawn
+      parse_value
     </span>
   </a>
   
@@ -1531,19 +1552,19 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.OptimizationPlanRunner" class="md-nav__link">
+  <a href="#ropt.plan.OptimizerContext" class="md-nav__link">
     <span class="md-ellipsis">
-      OptimizationPlanRunner
+      OptimizerContext
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="OptimizationPlanRunner">
+    <nav class="md-nav" aria-label="OptimizerContext">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.OptimizationPlanRunner.abort_optimization" class="md-nav__link">
+  <a href="#ropt.plan.OptimizerContext.__init__" class="md-nav__link">
     <span class="md-ellipsis">
-      abort_optimization
+      __init__
     </span>
   </a>
   
@@ -1577,7 +1598,7 @@
   
 
 
-  <h1>Optimization Plans</h1>
+  <h1>Optimization plans</h1>
 
 <div class="doc doc-object doc-module">
 
@@ -1592,6 +1613,40 @@
     <div class="doc doc-contents first">
 
         <p>Code to run optimization plans.</p>
+<p>Optimization plans consist of a series of steps that define an optimization
+workflow. This can be as simple as a single optimization run or involve
+multiple, potentially nested optimizations.</p>
+<p>These plans are configured using <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanConfig">PlanConfig</a>
+objects and executed by a <a class="autorefs autorefs-internal" href="#ropt.plan.Plan">Plan</a> object. A plan is composed of
+<a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.ContextObj">ContextObj</a> objects, which process and store
+data generated during execution, and <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a>
+objects that define the individual steps executed by the plan. Both context and
+step objects are implemented through a <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan">plugin</a> mechanism.
+The ropt library also offers several
+<a class="autorefs autorefs-internal" href="../default_plan_objects/#ropt.plugins.plan.default.DefaultPlanPlugin">default</a> plan objects to support
+various optimization workflows.</p>
+<p>A plan can store data identified by a name, known as plan variables. These
+variables can be accessed using the <code>[]</code> operator, and their existence can be
+checked with the <code>in</code> operator. Context objects often store values this way,
+typically using their own <code>id</code> field from the configuration as the variable
+name. Step objects can also store values but usually require an explicit
+variable name to be set in their configuration.</p>
+<p>Context and step objects are configured using their corresponding configuration
+objects, <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.ContextConfig"><code>ContextConfig</code></a> and
+<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.StepConfig"><code>StepConfig</code></a>, respectively. These are Pydantic
+classes initialized via dictionaries of configuration values. These can be
+strings that are interpolated with the variables stored in the plan. Plan
+variables, prefixed with the <code>$</code> sign, will be substituted with their
+corresponding values. Any part of a string enclosed by <code>${{</code> and <code>}}</code> will be
+parsed as a mathematical expression, with variables replaced by their
+corresponding values in the plan.</p>
+<p>To execute optimization plans, additional shared state may be required across
+all steps, such as a callable for function evaluations or a random number
+generator. For this purpose, an <a class="autorefs autorefs-internal" href="#ropt.plan.OptimizerContext">OptimizerContext</a>
+object is supplied when creating the plan, which maintains this shared state.</p>
+<p>Initializing and executing a plan object for simple optimization cases can be
+cumbersome. The <a class="autorefs autorefs-internal" href="../plan_runner/#ropt.plan.OptimizationPlanRunner"><code>OptimizationPlanRunner</code></a>
+provides a convenient way to build and execute such plans with ease.</p>
 
 
 
@@ -1618,7 +1673,7 @@
     <div class="doc doc-contents ">
 
 
-        <p>The plan object.</p>
+        <p>The plan class for executing optimization workflows.</p>
 
 
 
@@ -1705,7 +1760,7 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="ropt.plan._plan.OptimizerContext">OptimizerContext</span></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plan._plan.OptimizerContext" href="#ropt.plan.OptimizerContext">OptimizerContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1733,6 +1788,11 @@
     <div class="doc doc-contents ">
 
         <p>Initialize a plan object.</p>
+<p>The plan requires a <code>PlanConfig</code> object and an <code>OptimizationContext</code>
+object. The <code>plugin_manager</code> argument is optional and allows you to
+specify plugins for the context and step objects that the plan may use.
+If not provided, only plugins installed via Python's standard entry
+points mechanism will be used.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1753,7 +1813,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optimizer configuration</p>
+                <p>The optimizer configuration</p>
               </div>
             </td>
             <td>
@@ -1763,11 +1823,11 @@
           <tr class="doc-section-item">
             <td><code>optimizer_context</code></td>
             <td>
-                  <code><span title="ropt.plan._plan.OptimizerContext">OptimizerContext</span></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plan._plan.OptimizerContext" href="#ropt.plan.OptimizerContext">OptimizerContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Context in which the plan executes</p>
+                <p>The context in which the plan executes</p>
               </div>
             </td>
             <td>
@@ -1781,7 +1841,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional plugin manager</p>
+                <p>An optional plugin manager</p>
               </div>
             </td>
             <td>
@@ -1806,7 +1866,9 @@
 
     <div class="doc doc-contents ">
 
-        <p>Run the plan.</p>
+        <p>Run the Plan.</p>
+<p>This method executes the steps of the plan. If a user abort event
+occurs, the method will return <code>True</code>.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -1824,7 +1886,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether a user abort occurred.</p>
+                <p><code>True</code> if a user abort occurred; otherwise, <code>False</code>.</p>
               </div>
             </td>
           </tr>
@@ -1847,6 +1909,9 @@
     <div class="doc doc-contents ">
 
         <p>Create step objects from step configs.</p>
+<p>Given a list of step configuration objects, this method returns a list
+of step objects, each configured according to its corresponding
+configuration.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1867,7 +1932,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The configurations of the steps.</p>
+                <p>A list of step configuration objects.</p>
               </div>
             </td>
             <td>
@@ -1892,7 +1957,9 @@
 
     <div class="doc doc-contents ">
 
-        <p>Run the given steps.</p>
+        <p>Execute a list of steps.</p>
+<p>This method executes a list of plan steps and returns <code>True</code> if the
+execution is aborted by the user.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1913,7 +1980,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The steps to run</p>
+                <p>A list of steps to execute.</p>
               </div>
             </td>
             <td>
@@ -1939,8 +2006,57 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether a user abort occurred.</p>
+                <p><code>True</code> if the execution was aborted by the user; otherwise, <code>False</code>.</p>
               </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plan.Plan.spawn" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">spawn</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Spawn a new plan from the current plan.</p>
+<p>This method creates a new plan that shares the same optimization context
+and plugin manager as the current plan. However, it does not inherit
+other properties, such as variables.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.plan.PlanConfig" href="../plan_config/#ropt.config.plan.PlanConfig">PlanConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration of the new plan</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
             </td>
           </tr>
       </tbody>
@@ -1962,12 +2078,25 @@
     <div class="doc doc-contents ">
 
         <p>Parse a value as an expression or an interpolated string.</p>
-<p>If the value is a string, and starts with <code>$</code>, it is assumed to be an
-expression and it is evaluated. If it does not start with <code>$</code>, any
-embedded string starting with <code>$</code> sign are evaluated and interpolated
-into the string.</p>
-<p>If the value is not a string, it is passed through unchanged.</p>
+<p>If the value is not a string, it is returned unchanged. If it is a
+string, it is first stripped of leading and trailing whitespace and then
+parsed according to the following rules:</p>
+<ul>
+<li>If the string starts with a <code>$</code>, it is evaluated using the
+  <a class="autorefs autorefs-internal" href="#ropt.plan.Plan.eval"><code>eval</code></a> method of the plan object. This will
+  replace strings of the form <code>$identifier</code> with the corresponding plan
+  value and evaluate strings of the form <code>${{ expr }}</code> as a mathematical
+  expression, optionally containing variables in the form <code>$identifier</code>.</li>
+<li>If the string does not start with a <code>$</code>, it is returned after
+  interpolating any substrings delimited by <code>${{</code> and <code>}}</code> by passing
+  them to the <a class="autorefs autorefs-internal" href="#ropt.plan.Plan.eval"><code>eval</code></a> method.</li>
+</ul>
 
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>The string <code>$$</code> is not interpolated but replaced with a single <code>$</code>.</p>
+</details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>
@@ -2027,52 +2156,6 @@ into the string.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.spawn" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">spawn</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Spawn a child plan.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>config</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.plan.PlanConfig" href="../plan_config/#ropt.config.plan.PlanConfig">PlanConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The configuration of the new plan.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
 <h4 id="ropt.plan.Plan.eval" class="doc doc-heading">
             <code class="highlight language-python"><span class="nb">eval</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></code>
 
@@ -2082,18 +2165,28 @@ into the string.</p>
     <div class="doc doc-contents ">
 
         <p>Evaluate the provided value as an expression.</p>
-<p>The value is evaluated as follows:</p>
+<p>If the value is a string, it is returned unchanged. Otherwise, it is
+evaluated as follows:</p>
 <ul>
-<li>If the value is not a string, return unchanged</li>
-<li>If the value is a string enclosed in a <code>${{ }}</code> pair the contents are
-  evaluated recursively.</li>
-<li>If value is a string that starts with <code>$</code> and is an identifier it is
-  assumed to be a plan variable and its value is returned. The
-  resulting value can have any type.</li>
-<li>Otherwise the string is evaluated and the result returned. The type of
-  the result is restricted to numerical values, lists and numpy array.</li>
+<li>If the value is a string that starts with <code>$</code>, it is assumed to denote
+  a plan variable, and its value is returned.</li>
+<li>If the value is enclosed in <code>${{</code> and <code>}}</code> delimiters, these
+  delimiters are removed. The string is then evaluated as a mathematical
+  expression, with variables of the form <code>$identifier</code> replaced by their
+  corresponding plan variable values.</li>
+<li>Arbitrary strings that do not start with <code>$</code> are treated as if they
+  are enclosed in <code>${{</code> and <code>}}</code> delimiters and evaluated in the same
+  way.</li>
 </ul>
 
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>The result of a mathematical expression is restricted to numerical
+values, lists, and numpy arrays. However, plan variables can contain
+values of any type, so expressions of the form <code>$identifier</code> may
+evaluate to a result of any type.</p>
+</details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>
@@ -2162,6 +2255,9 @@ into the string.</p>
     <div class="doc doc-contents ">
 
         <p>Reset the given context object.</p>
+<p>This method calls the <code>reset</code> method of the context object identified by
+<code>obj_id</code>. The effect of this operation depends on the specific
+implementation of the context object.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2182,7 +2278,7 @@ into the string.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The ID of the object.</p>
+                <p>The ID of the context object to reset.</p>
               </div>
             </td>
             <td>
@@ -2207,7 +2303,9 @@ into the string.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Check if a variable of field exists.</p>
+        <p>Check if a context object exists.</p>
+<p>Returns <code>True</code> if the plan contains a context object with the given ID;
+otherwise, returns <code>False</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2228,7 +2326,7 @@ into the string.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>name of the context object</p>
+                <p>The ID of the context object to check.</p>
               </div>
             </td>
             <td>
@@ -2254,7 +2352,7 @@ into the string.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether the object exists.</p>
+                <p><code>True</code> if the object exists; otherwise, <code>False</code>.</p>
               </div>
             </td>
           </tr>
@@ -2269,7 +2367,7 @@ into the string.</p>
 
 
 <h4 id="ropt.plan.Plan.update_context" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">update_context</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">update_context</span><span class="p">(</span><span class="n">obj_id</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></code>
 
 </h4>
 
@@ -2277,6 +2375,9 @@ into the string.</p>
     <div class="doc doc-contents ">
 
         <p>Update a context object.</p>
+<p>This method calls the <code>update</code> method of the context object identified
+by <code>obj_id</code> with the given value. The effect of this operation depends
+on the specific implementation of the context object.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2291,13 +2392,13 @@ into the string.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>name</code></td>
+            <td><code>obj_id</code></td>
             <td>
                   <code>str</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The context</p>
+                <p>The context object ID</p>
               </div>
             </td>
             <td>
@@ -2336,7 +2437,9 @@ into the string.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Get the value of a variable.</p>
+        <p>Get the value of a plan variable.</p>
+<p>This method implements the <code>[]</code> operator on the plan object to retrieve
+the value of a plan variable.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2357,7 +2460,7 @@ into the string.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>the variable name</p>
+                <p>The name of the variable.</p>
               </div>
             </td>
             <td>
@@ -2405,7 +2508,9 @@ into the string.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Set a variable .</p>
+        <p>Set a plan variable to the given value.</p>
+<p>This method implements the <code>[]</code> operator on the plan object to set the
+value of a plan variable.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2426,7 +2531,7 @@ into the string.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The variable</p>
+                <p>The name of the variable.</p>
               </div>
             </td>
             <td>
@@ -2440,7 +2545,7 @@ into the string.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The value to assign</p>
+                <p>The value to assign.</p>
               </div>
             </td>
             <td>
@@ -2466,6 +2571,8 @@ into the string.</p>
     <div class="doc doc-contents ">
 
         <p>Check if a variable exists.</p>
+<p>This method implements the <code>in</code> operator on the plan object to determine
+if a plan variable exists.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2486,7 +2593,7 @@ into the string.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>name of the variable</p>
+                <p>The name of the variable.</p>
               </div>
             </td>
             <td>
@@ -2512,7 +2619,7 @@ into the string.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether the variable exists.</p>
+                <p><code>True</code> if the variable exists; otherwise, <code>False</code>.</p>
               </div>
             </td>
           </tr>
@@ -2535,8 +2642,8 @@ into the string.</p>
 
 
 
-<h3 id="ropt.plan.OptimizationPlanRunner" class="doc doc-heading">
-            <code>OptimizationPlanRunner</code>
+<h3 id="ropt.plan.OptimizerContext" class="doc doc-heading">
+            <code>OptimizerContext</code>
 
 
 </h3>
@@ -2545,7 +2652,19 @@ into the string.</p>
     <div class="doc doc-contents ">
 
 
-        <p>A class for running optimization plans.</p>
+        <p>Context class for shared state across a plan.</p>
+<p>An optimizer context object holds the information and state shared across
+all steps in an optimization plan. This currently includes the following:</p>
+<ul>
+<li>An <a class="autorefs autorefs-internal" href="../evaluator/#ropt.evaluator.Evaluator"><code>Evaluator</code></a> callable for evaluating
+  functions.</li>
+<li>A seed for a random number generator used in stochastic gradient
+  estimation.</li>
+<li>An iterator that generates unique result IDs.</li>
+<li>An event broker for connecting user-provided callbacks to optimization
+  events.</li>
+<li>A metadata dictionary that can be shared between steps.</li>
+</ul>
 
 
 
@@ -2563,24 +2682,58 @@ into the string.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.OptimizationPlanRunner.abort_optimization" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">abort_optimization</span><span class="p">()</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
-  </span>
+<h4 id="ropt.plan.OptimizerContext.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">evaluator</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
 
     <div class="doc doc-contents ">
 
-        <p>Abort the current optimization run.</p>
-<p>This method can be called from within callbacks to interrupt the ongoing
-optimization plan. The exact point at which the optimization is aborted
-depends on the step that is executing at that point. For example, within
-a running optimizer, the process will be interrupted after completing
-the current function evaluation.</p>
+        <p>Initialize the optimization context.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>evaluator</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.evaluator.Evaluator" href="../evaluator/#ropt.evaluator.Evaluator">Evaluator</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The callable for running function evaluations</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>seed</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[int]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional seed for the random number generator</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
     </div>
 
@@ -2649,7 +2802,7 @@ the current function evaluation.</p>
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.56dfad97.min.js"></script>

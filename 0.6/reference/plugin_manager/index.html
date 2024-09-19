@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.34">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.35">
     
     
       
@@ -618,11 +618,32 @@
   
   
     <li class="md-nav__item">
-      <a href="../plans/" class="md-nav__link">
+      <a href="../plan/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Optimization Plans
+    Optimization plans
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan_runner/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Optimization plan runner
   </span>
   
 
@@ -1532,7 +1553,7 @@ This will make the <code>MyOptimizer</code> class from the <code>my_optimizer_pk
 package available under the name <code>my_optimizer</code>. The <code>MyOptimizer</code> class
 will be used to create
 <a class="autorefs autorefs-internal" href="../optimizer_plugins/#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> objects and to
-faciliate this, it should derive from the
+facilitate this, it should derive from the
 <a class="autorefs autorefs-internal" href="../optimizer_plugins/#ropt.plugins.optimizer.base.OptimizerPlugin"><code>OptimizerPlugin</code></a> class.</p>
 <p>Plugins can also be added dynamically using the <code>add_plugins</code> method.</p>
 
@@ -1815,7 +1836,7 @@ manager. The <code>plugins</code> argument maps the names of the new plugins to
 
 
 <h4 id="ropt.plugins.Plugin.is_supported" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">is_supported</span><span class="p">(</span><span class="n">method</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">is_supported</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">explicit</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -1827,6 +1848,12 @@ manager. The <code>plugins</code> argument maps the names of the new plugins to
     <div class="doc doc-contents ">
 
         <p>Check wether a given method is supported.</p>
+<p>If the <code>explicit</code> flag is set, then the method was explicitly requested
+for this plugin. If not, the caller does not know which plugin contains
+the requested method and is checking whether this plugin supports a
+method with this name. This can be used to return <code>False</code> if the plugin
+only wants to be specified explicitly using its name. In other cases,
+this argument can be ignored.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1854,31 +1881,24 @@ manager. The <code>plugins</code> argument maps the names of the new plugins to
                 <em>required</em>
             </td>
           </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
           <tr class="doc-section-item">
+            <td><code>explicit</code></td>
             <td>
                   <code>bool</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>True if the method is supported.</p>
+                <p>Whether the plugin was requested explicitly</p>
               </div>
+            </td>
+            <td>
+                <em>required</em>
             </td>
           </tr>
       </tbody>
     </table>
+        <p>Returns:
+    True if the method is supported.</p>
 
     </div>
 
@@ -1948,7 +1968,7 @@ manager. The <code>plugins</code> argument maps the names of the new plugins to
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.56dfad97.min.js"></script>

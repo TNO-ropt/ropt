@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../enums/">
+        <link rel="prev" href="../plan/">
       
       
-        <link rel="next" href="../utilities/">
+        <link rel="next" href="../optimization/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Exceptions - ropt Documentation</title>
+        <title>Optimization plan runner - ropt Documentation</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.exceptions" class="md-skip">
+        <a href="#ropt.plan.OptimizationPlanRunner" class="md-skip">
           Skip to content
         </a>
       
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Exceptions
+              Optimization plan runner
             
           </span>
         </div>
@@ -575,8 +575,10 @@
                 
   
   
+    
   
   
+  
     
     
     
@@ -584,13 +586,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
         
           
           <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
@@ -604,7 +604,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_2">
             <span class="md-nav__icon md-icon"></span>
             Optimization
@@ -636,10 +636,28 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../plan_runner/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Optimization plan runner
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -648,6 +666,138 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner" class="md-nav__link">
+    <span class="md-ellipsis">
+      OptimizationPlanRunner
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OptimizationPlanRunner">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.results" class="md-nav__link">
+    <span class="md-ellipsis">
+      results
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      variables
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.exit_code" class="md-nav__link">
+    <span class="md-ellipsis">
+      exit_code
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.add_plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_plugins
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.add_observer" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_observer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.add_metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_metadata
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.add_table" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_table
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.repeat" class="md-nav__link">
+    <span class="md-ellipsis">
+      repeat
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      run
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.abort_optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      abort_optimization
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1097,28 +1247,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Exceptions
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../exceptions/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1127,96 +1259,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.exceptions" class="md-nav__link">
-    <span class="md-ellipsis">
-      exceptions
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="exceptions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.ConfigError" class="md-nav__link">
-    <span class="md-ellipsis">
-      ConfigError
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.PlanError" class="md-nav__link">
-    <span class="md-ellipsis">
-      PlanError
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="PlanError">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.PlanError.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.OptimizationAborted" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptimizationAborted
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptimizationAborted">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.OptimizationAborted.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1275,36 +1317,44 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.exceptions" class="md-nav__link">
+  <a href="#ropt.plan.OptimizationPlanRunner" class="md-nav__link">
     <span class="md-ellipsis">
-      exceptions
+      OptimizationPlanRunner
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="exceptions">
+    <nav class="md-nav" aria-label="OptimizationPlanRunner">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.ConfigError" class="md-nav__link">
+  <a href="#ropt.plan.OptimizationPlanRunner.results" class="md-nav__link">
     <span class="md-ellipsis">
-      ConfigError
+      results
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.PlanError" class="md-nav__link">
+  <a href="#ropt.plan.OptimizationPlanRunner.variables" class="md-nav__link">
     <span class="md-ellipsis">
-      PlanError
+      variables
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="PlanError">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.PlanError.__init__" class="md-nav__link">
+  <a href="#ropt.plan.OptimizationPlanRunner.exit_code" class="md-nav__link">
+    <span class="md-ellipsis">
+      exit_code
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -1312,32 +1362,66 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-        
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.OptimizationAborted" class="md-nav__link">
+  <a href="#ropt.plan.OptimizationPlanRunner.add_plugins" class="md-nav__link">
     <span class="md-ellipsis">
-      OptimizationAborted
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptimizationAborted">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.exceptions.OptimizationAborted.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
+      add_plugins
     </span>
   </a>
   
 </li>
         
-      </ul>
-    </nav>
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.add_observer" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_observer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.add_metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_metadata
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.add_table" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_table
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.repeat" class="md-nav__link">
+    <span class="md-ellipsis">
+      repeat
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      run
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizationPlanRunner.abort_optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      abort_optimization
+    </span>
+  </a>
   
 </li>
         
@@ -1364,73 +1448,36 @@
   
 
 
-  <h1>Exceptions</h1>
+  <h1>Optimization plan runner</h1>
 
-<div class="doc doc-object doc-module">
+<div class="doc doc-object doc-class">
 
 
 
-<h2 id="ropt.exceptions" class="doc doc-heading">
-            <code>ropt.exceptions</code>
+<h2 id="ropt.plan.OptimizationPlanRunner" class="doc doc-heading">
+            <code>ropt.plan.OptimizationPlanRunner</code>
 
 
 </h2>
 
+
     <div class="doc doc-contents first">
 
-        <p>Exceptions raised within the <code>ropt</code> library.</p>
 
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.exceptions.ConfigError" class="doc doc-heading">
-            <code>ConfigError</code>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code>Exception</code></p>
-
-
-        <p>Raised when an configuration error occurs.</p>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.exceptions.PlanError" class="doc doc-heading">
-            <code>PlanError</code>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code>Exception</code></p>
-
-
-        <p>Raised when an error occurs in an optimization plan.</p>
+        <p>A class for running optimization plans.</p>
+<p><code>OptimizationPlanRunner</code> objects are designed for use cases where the
+optimization workflow is relatively simple, such as a single optimization
+run possibly with a few restarts. Using this object can be more convenient
+than defining and running an optimization plan directly in such cases.</p>
+<p>This class provides the following features:</p>
+<ul>
+<li>Start a single optimization.</li>
+<li>Repeat the same optimization multiple times, with various options for
+  restarting from different points.</li>
+<li>Add observer functions connected to various optimization events.</li>
+<li>Attach metadata to each result generated during the optimization.</li>
+<li>Generate tables summarizing the optimization results.</li>
+</ul>
 
 
 
@@ -1443,161 +1490,222 @@
 
 
 
+<div class="doc doc-object doc-attribute">
 
 
-<div class="doc doc-object doc-function">
 
+<h3 id="ropt.plan.OptimizationPlanRunner.results" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">results</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">]</span></code>
 
-<h4 id="ropt.exceptions.PlanError.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">step_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context_id</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
 
-</h4>
+</h3>
 
 
     <div class="doc doc-contents ">
 
-        <p>Initialize with a custom error message.</p>
+        <p>Return the optimal result.</p>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
+    <p><span class="doc-section-title">Returns:</span></p>
     <table>
       <thead>
         <tr>
-          <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>message</code></td>
             <td>
-                  <code>str</code>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.results.FunctionResults" href="../results/#ropt.results.FunctionResults">FunctionResults</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Error message</p>
+                <p>The optimal result found during optimization.</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>step_name</code></td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[str]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional step name to add to the message</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>context_id</code></td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[str]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional context ID to add to the message</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
       </tbody>
     </table>
-
     </div>
 
 </div>
 
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
+<div class="doc doc-object doc-attribute">
 
 
 
-<h3 id="ropt.exceptions.OptimizationAborted" class="doc doc-heading">
-            <code>OptimizationAborted</code>
+<h3 id="ropt.plan.OptimizationPlanRunner.variables" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">variables</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span></code>
 
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
 
 </h3>
 
 
     <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code>Exception</code></p>
+
+        <p>Return the optimal variables.</p>
 
 
-        <p>Raised when an optimization is aborted.</p>
-<p>When constructing the exception object an exit code must be passed that
-indicates the reason for aborting (see
-<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.OptimizerExitCode"><code>OptimizerExitCode</code></a>).</p>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.exceptions.OptimizationAborted.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Initialize an exception that aborts the optimization.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
+    <p><span class="doc-section-title">Returns:</span></p>
     <table>
       <thead>
         <tr>
-          <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>exit_code</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The variables corresponding to the optimal result.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.plan.OptimizationPlanRunner.exit_code" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">exit_code</span><span class="p">:</span> <span class="n">OptimizerExitCode</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the exit code.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.enums.OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The exit code indicating the reason for the abort</p>
+                <p>The exit code of the optimization run.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+    </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plan.OptimizationPlanRunner.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">evaluator</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">constraint_tolerance</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize an <code>OptimizationPlanRunner</code> object.</p>
+<p>An optimization configuration and an evaluation object must be provided,
+as they define the optimization to perform.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>enopt_config</code></td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>], <a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration for the optimization.</p>
               </div>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>evaluator</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.evaluator.Evaluator" href="../evaluator/#ropt.evaluator.Evaluator">Evaluator</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The evaluator object used to evaluate functions.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>constraint_tolerance</code></td>
+            <td>
+                  <code>float</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The tolerance level used to detect constraint violations.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1e-10</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>seed</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[int]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The seed for the random number generator used
+                  for stochastic gradient estimation.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -1607,14 +1715,553 @@ indicates the reason for aborting (see
 
 </div>
 
+<div class="doc doc-object doc-function">
 
 
-  </div>
+<h3 id="ropt.plan.OptimizationPlanRunner.add_plugins" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">add_plugins</span><span class="p">(</span><span class="n">plugin_type</span><span class="p">,</span> <span class="n">plugins</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Add plugins.</p>
+<p>By default, plugins are installed via Python's entry point mechanism.
+This method allows you to install additional plugins.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>plugin_type</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plugins._manager.PluginType" href="../plugin_manager/#ropt.plugins.PluginType">PluginType</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The type of plugin to install.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>plugins</code></td>
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[str, <a class="autorefs autorefs-internal" title="ropt.plugins.base.Plugin" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary mapping plugin names to plugin objects.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing_extensions.Self">Self</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The <code>OptimizationPlanRunner</code> instance, allowing for method chaining.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
     </div>
 
 </div>
 
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plan.OptimizationPlanRunner.add_observer" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">add_observer</span><span class="p">(</span><span class="n">event_type</span><span class="p">,</span> <span class="n">function</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Add an observer.</p>
+<p>Observers are callables that are triggered when an optimization event
+occurs. This method adds an observer that responds to a specified event
+type.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>event_type</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The type of event to observe.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>function</code></td>
+            <td>
+                  <code><span title="typing.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="ropt.optimization.Event" href="../optimization/#ropt.optimization.Event">Event</a>], None]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The callable to invoke when the event is emitted.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing_extensions.Self">Self</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The <code>OptimizationPlanRunner</code> instance, allowing for method chaining.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plan.OptimizationPlanRunner.add_metadata" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">add_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Add metadata.</p>
+<p>Add a dictionary of metadata that will be attached to each result object
+generated during optimization.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>metadata</code></td>
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The dictionary containing metadata to add to each result.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing_extensions.Self">Self</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The <code>OptimizationPlanRunner</code> instance, allowing for method chaining.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plan.OptimizationPlanRunner.add_table" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">add_table</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;functions&#39;</span><span class="p">,</span> <span class="n">min_header_len</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">maximize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Add a table of results.</p>
+<p>This method instructs the runner to generate a table summarizing the
+results of the optimization. This is implemented via a
+<a class="autorefs autorefs-internal" href="../reporting/#ropt.report.ResultsTable"><code>ResultsTable</code></a> object. Refer to its
+documentation for more details.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>columns</code></td>
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[str, str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A mapping of column names for the results table.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>path</code></td>
+            <td>
+                  <code><span title="pathlib.Path">Path</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The location where the results file will be saved.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>table_type</code></td>
+            <td>
+                  <code><span title="typing.Literal">Literal</span>[&#39;functions&#39;, &#39;gradients&#39;]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The type of table to generate.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;functions&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>min_header_len</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[int]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The minimum number of header lines to generate.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>maximize</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>True</code>, interpret the results as a maximization
+            problem rather than the default minimization.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing_extensions.Self">Self</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The <code>OptimizationPlanRunner</code> instance, allowing for method chaining.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plan.OptimizationPlanRunner.repeat" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">repeat</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">restart_from</span><span class="o">=</span><span class="s1">&#39;optimal&#39;</span><span class="p">,</span> <span class="n">metadata_var</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Repeat the optimization.</p>
+<p>Run the optimization multiple times with various options for the
+starting points. On the first run, the optimization starts from the
+initial variables defined in its configuration. For subsequent runs, the
+initial variables are selected based on the <code>restart_from</code> option:</p>
+<ul>
+<li><code>"initial"</code>: Use the initial values from the configuration.</li>
+<li><code>"last"</code>: Use the variables from the previous run.</li>
+<li><code>"optimal"</code>: Use the variables from the optimal result found so far.</li>
+<li><code>"last_optimal"</code>: Use the variables from the optimal result of the last run.</li>
+</ul>
+<p>If <code>metadata_var</code> is defined, a field will be added to the metadata
+stored with each result, recording the sequence number of the
+optimization run.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>iterations</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The number of times to run the optimization.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>restart_from</code></td>
+            <td>
+                  <code><span title="ropt.plan._run._RepeatTypes">_RepeatTypes</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The method for selecting initial variables. Defaults to <code>"optimal"</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;optimal&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>metadata_var</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional field name in the metadata to record the repeat index.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing_extensions.Self">Self</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The <code>OptimizationPlanRunner</code> instance, allowing for method chaining.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plan.OptimizationPlanRunner.run" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">run</span><span class="p">()</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Run the optimization.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing_extensions.Self">Self</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The <code>OptimizationPlanRunner</code> instance, allowing for method chaining.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plan.OptimizationPlanRunner.abort_optimization" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">abort_optimization</span><span class="p">()</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Abort the current optimization run.</p>
+<p>This method can be called from within callbacks to interrupt the ongoing
+optimization plan. The exact point at which the optimization is aborted
+depends on the step that is executing at that point. For example, within
+a running optimizer, the process will be interrupted after completing
+the current function evaluation.</p>
+
+    </div>
+
+</div>
 
 
 
