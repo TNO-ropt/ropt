@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.35">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.36">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.35f28582.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.06209087.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -1319,7 +1319,9 @@
     <div class="doc doc-contents first">
 
         <p>Configuration classes for optimization plans.</p>
-<p>Optimization plans are defined an run by <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> objects.</p>
+<p>Optimization plans are configured via
+<a class="autorefs autorefs-internal" href="#ropt.config.plan.PlanConfig"><code>PlanConfig</code></a> objects and run by
+<a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> objects and.</p>
 
 
 
@@ -1345,10 +1347,10 @@
     <div class="doc doc-contents ">
 
 
-        <p>Configuration for a optimization plan.</p>
-<p>An optimization plan consists of two sections: a context section defined
-using the <code>context</code> attribute, and a section that defines the tasks to
-perform by the <code>steps</code> attribute.</p>
+        <p>Configuration class for optimization plans.</p>
+<p>An optimization plan configuration consists of two sections: a context
+section defined using the <code>context</code> attribute, and a section that defines
+the tasks to perform by the <code>steps</code> attribute.</p>
 <p>The <code>context</code> attribute contains the configuration of the objects that
 create and maintain the environment in which the plan runs. Context objects
 are initialized before creating and running the steps.</p>
@@ -1427,11 +1429,12 @@ order.</p>
 
 
         <p>Configuration of a single context object.</p>
-<p>Context objects process information that is provided by the steps of the
-optimization plan. They usually store information in plan variables that are
-accessible to the steps and after the plan has finished. In most cases, the
-context objects store a single result in a variable with a name equal to the
-<code>id</code> of the context object, but additional variables can be defined also.</p>
+<p>Context objects process and store information that is provided by the steps
+of the optimization plan. They usually store information in plan variables
+that are accessible to the steps and to the user via the plan object. In
+most cases, the context objects store a single result in a variable with a
+name equal to the <code>id</code> of the context object, but additional variables can
+be defined also.</p>
 <p>The <code>init</code> string identifies the code that is run to initialize the context
 object. It is used by the plugin manager to load the code.</p>
 <p>Additional parameters needed by the context objects are configured using the
@@ -1442,7 +1445,7 @@ of the context object.</p>
 
 <details class="note" open>
   <summary><code>with</code> is an alias for <code>with_</code></summary>
-  <p>When parsing dictionaries into a <code>ContextConfig</code> object the name of the
+  <p>When parsing dictionaries into a <code>ContextConfig</code> object, the name of the
 <code>with_</code> attribute should be replaced by by <code>with</code>, i.e. without the <code>_</code>
 suffix.</p>
 </details>
@@ -1543,9 +1546,17 @@ step will only be executed if the result is <code>True</code>.</p>
 
 <details class="note" open>
   <summary><code>with</code> and <code>if</code> aliases</summary>
-  <p>When parsing dictionaries into a <code>StepConfig</code> object the name of the
+  <p>When parsing dictionaries into a <code>StepConfig</code> object, the name of the
 <code>with_</code> attribute should be replaced by by <code>with</code>, and the name of the
 <code>if_</code> attribute by <code>if</code>, i.e. without the <code>_</code> suffix</p>
+</details>
+
+<details class="info" open>
+  <summary>Conditional evaluation</summary>
+  <p>Conditions defined via the <code>if_</code> attribute are evaluated by passing them
+to the <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan.eval"><code>eval</code></a> method of the plan object that is
+executing the steps. Consult the documentation of the method for more
+details on the expressions that can be evaluated.</p>
 </details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
