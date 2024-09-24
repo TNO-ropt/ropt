@@ -11,11 +11,12 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 class ContextConfig(BaseModel):
     """Configuration of a single context object.
 
-    Context objects process information that is provided by the steps of the
-    optimization plan. They usually store information in plan variables that are
-    accessible to the steps and after the plan has finished. In most cases, the
-    context objects store a single result in a variable with a name equal to the
-    `id` of the context object, but additional variables can be defined also.
+    Context objects process and store information that is provided by the steps
+    of the optimization plan. They usually store information in plan variables
+    that are accessible to the steps and to the user via the plan object. In
+    most cases, the context objects store a single result in a variable with a
+    name equal to the `id` of the context object, but additional variables can
+    be defined also.
 
     The `init` string identifies the code that is run to initialize the context
     object. It is used by the plugin manager to load the code.
@@ -27,7 +28,7 @@ class ContextConfig(BaseModel):
     Context objects are referred to by their `id`, which is mandatory.
 
     Note: `with` is an alias for `with_`
-        When parsing dictionaries into a `ContextConfig` object the name of the
+        When parsing dictionaries into a `ContextConfig` object, the name of the
         `with_` attribute should be replaced by by `with`, i.e. without the `_`
         suffix.
 
@@ -73,9 +74,15 @@ class StepConfig(BaseModel):
     step will only be executed if the result is `True`.
 
     Note: `with` and `if` aliases
-        When parsing dictionaries into a `StepConfig` object the name of the
+        When parsing dictionaries into a `StepConfig` object, the name of the
         `with_` attribute should be replaced by by `with`, and the name of the
         `if_` attribute by `if`, i.e. without the `_` suffix
+
+    Info: Conditional evaluation
+        Conditions defined via the `if_` attribute are evaluated by passing them
+        to the [`eval`][ropt.plan.Plan.eval] method of the plan object that is
+        executing the steps. Consult the documentation of the method for more
+        details on the expressions that can be evaluated.
 
     Attributes:
         name:  An optional name used to refer to the step
@@ -96,11 +103,11 @@ class StepConfig(BaseModel):
 
 
 class PlanConfig(BaseModel):
-    """Configuration for a optimization plan.
+    """Configuration class for optimization plans.
 
-    An optimization plan consists of two sections: a context section defined
-    using the `context` attribute, and a section that defines the tasks to
-    perform by the `steps` attribute.
+    An optimization plan configuration consists of two sections: a context
+    section defined using the `context` attribute, and a section that defines
+    the tasks to perform by the `steps` attribute.
 
     The `context` attribute contains the configuration of the objects that
     create and maintain the environment in which the plan runs. Context objects

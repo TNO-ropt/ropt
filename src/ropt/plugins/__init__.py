@@ -62,6 +62,19 @@ The plugin manager object provides the
 to retrieve the necessary plugin based on its type and name. Given the plugin's
 type and name, this method returns a callable (either a class or a factory
 function) that `ropt` uses to instantiate the plugin when needed.
+
+Info: Plugin and method names
+  Plugins are registered by name by plugin manager objects. Plugins may
+  implement multiple methods, each of which should also be identified by a name.
+  [`PluginManager.get_plugin`][ropt.plugins.PluginManager.get_plugin] and
+  [`PluginManager.is_supported`][ropt.plugins.PluginManager.is_supported] accept
+  method names and will search through the available plugins to find the correct
+  plugin code. To refer to a method _method-name_ of a given plugin
+  _plugin-name_, a string in the form "_plugin-name/method-name_" can be used
+  instead. In this case, the plugin manager will not search through all plugins
+  for the requested method but will only inquire with the plugin _plugin-name_.
+  By convention, using "default" for the method name in such a string will
+  select the default method of the plugin.
 """
 
 from ._manager import PluginManager, PluginType

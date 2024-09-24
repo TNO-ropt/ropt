@@ -97,7 +97,7 @@ class DefaultOptimizerStep(PlanStep):
 
         self.plan.optimizer_context.events.emit(
             EventType.START_OPTIMIZER_STEP,
-            config=self._enopt_config,
+            self._enopt_config,
             step_name=self.step_config.name,
         )
 
@@ -124,7 +124,7 @@ class DefaultOptimizerStep(PlanStep):
 
         self.plan.optimizer_context.events.emit(
             EventType.FINISHED_OPTIMIZER_STEP,
-            config=self._enopt_config,
+            self._enopt_config,
             exit_code=exit_code,
             step_name=self.step_config.name,
         )
@@ -144,7 +144,7 @@ class DefaultOptimizerStep(PlanStep):
         if results is None:
             self.plan.optimizer_context.events.emit(
                 EventType.START_EVALUATION,
-                config=self._enopt_config,
+                self._enopt_config,
                 step_name=self.step_config.name,
             )
         else:
@@ -162,7 +162,7 @@ class DefaultOptimizerStep(PlanStep):
                 )
             self.plan.optimizer_context.events.emit(
                 EventType.FINISHED_EVALUATION,
-                config=self._enopt_config,
+                self._enopt_config,
                 results=results,
                 step_name=self.step_config.name,
             )

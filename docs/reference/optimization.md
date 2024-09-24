@@ -2,8 +2,8 @@
     options:
         members:
             - EnsembleOptimizer
-            - Event
-            - EventBroker
             - SignalEvaluationCallback
             - NestedOptimizerCallback
+            - EventBroker
+            - Event
 

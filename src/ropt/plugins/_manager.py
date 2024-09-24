@@ -89,9 +89,6 @@ class PluginManager:
 
         The plugin names are case-insensitive.
 
-        Note: Plugin types
-
-
         Args:
             plugin_type: Type of the plugin.
             plugins:     Dictionary of plugins.
@@ -105,6 +102,12 @@ class PluginManager:
 
     def get_plugin(self, plugin_type: PluginType, method: str) -> Any:  # noqa: ANN401
         """Retrieve a plugin by type and method name.
+
+        If the given method name does not contain a slash (/), the plugin
+        manager will search through all plugins and return the first plugin that
+        supports the requested method. If the method name is of the form
+        "_plugin-name/method-name_", the method _method-name_ will be retrieved
+        from the given plugin _plugin-name_.
 
         Args:
             plugin_type: The type of the plugin to retrieve.
@@ -124,6 +127,12 @@ class PluginManager:
 
     def is_supported(self, plugin_type: PluginType, method: str) -> bool:
         """Check if a method is supported.
+
+        If the given method name does not contain a slash (/), the plugin
+        manager will search through all plugins and return `True` if a plugin is
+        found that supports the requested method. If the method name is of the
+        form "_plugin-name/method-name_", `True` will be returned if the method
+        _method-name_ is supported by the given plugin _plugin-name_.
 
         Args:
             plugin_type: The type of the plugin to retrieve.

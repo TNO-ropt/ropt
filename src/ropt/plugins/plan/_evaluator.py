@@ -78,7 +78,7 @@ class DefaultEvaluatorStep(PlanStep):
 
         self.plan.optimizer_context.events.emit(
             EventType.START_EVALUATOR_STEP,
-            config=self._enopt_config,
+            self._enopt_config,
             step_name=self.step_config.name,
         )
 
@@ -123,7 +123,7 @@ class DefaultEvaluatorStep(PlanStep):
 
         self.plan.optimizer_context.events.emit(
             EventType.FINISHED_EVALUATOR_STEP,
-            config=self._enopt_config,
+            self._enopt_config,
             results=results,
             exit_code=exit_code,
             step_name=self.step_config.name,

@@ -40,7 +40,11 @@ class Event:
 
 
 class EventBroker:
-    """A class for handling events."""
+    """A class for handling events.
+
+    An `EventBroker` object is responsible for registering callback objects and
+    calling them in response to events that occur during optimization.
+    """
 
     def __init__(self) -> None:
         """Initialize the event broker."""
@@ -55,24 +59,39 @@ class EventBroker:
     ) -> None:
         """Add an observer function.
 
+        Observer functions will be called during optimization if an event of the
+        given type occurs. The callable must accept an argument of the
+        [`Event`][ropt.optimization.Event] class that contains information about
+        the event that occurred.
+
         Args:
             event:    The type of events to react to
             callback: The function to call if the event is received
         """
         self._subscribers[event].append(callback)
 
-    def emit(self, event_type: EventType, /, **kwargs: Any) -> None:  # noqa: ANN401
-        """Emit an event.
+    def emit(
+        self,
+        event_type: EventType,
+        config: EnOptConfig,
+        /,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> None:
+        """Emit an event of the given type with given data.
 
-        The keyword arguments are used to construct an
-        [`Event`][ropt.optimization.Event] object of the type given by `event_type`.
-        All stored callbacks that react to this event type are then called with
-        that event object as their argument.
+        When called, an [`Event`][ropt.optimization.Event] object is constructed
+        using the given `event_type` and `config` for its mandatory fields. When
+        given, the additional keyword arguments are also passed to the
+        [`Event`][ropt.optimization.Event] constructor to set the optional
+        fields. All callbacks for the given event type, that were added by the
+        `add_observer` method are then called using the newly constructed event
+        object as their argument.
 
         Args:
             event_type: The type of event to emit
+            config:     Optimization configuration used by the emitting object
             kwargs:     Keyword arguments used to create an optimization event
         """
-        event = Event(event_type=event_type, **kwargs)
+        event = Event(event_type, config, **kwargs)
         for callback in self._subscribers[event_type]:
             callback(event)

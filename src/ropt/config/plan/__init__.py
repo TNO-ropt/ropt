@@ -1,6 +1,8 @@
 """Configuration classes for optimization plans.
 
-Optimization plans are defined an run by [`Plan`][ropt.plan.Plan] objects.
+Optimization plans are configured via
+[`PlanConfig`][ropt.config.plan.PlanConfig] objects and run by
+[`Plan`][ropt.plan.Plan] objects and.
 """
 
 from ._plan_config import ContextConfig, PlanConfig, StepConfig

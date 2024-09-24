@@ -29,7 +29,7 @@ class SignalEvaluationCallback(Protocol):
     """Protocol for the callback that is used to signal that an evaluation is occurring."""
 
     def __call__(self, results: Optional[Tuple[Results, ...]] = None, /) -> None:
-        """Callback protocal.
+        """Callback protocol for signaling that evaluations are occurring.
 
         When a function with this signature is provided to an ensemble
         optimizer, it is called before and after the optimizer finishes an
@@ -48,7 +48,7 @@ class NestedOptimizerCallback(Protocol):
     def __call__(
         self, variables: NDArray[np.float64], /
     ) -> Tuple[Optional[FunctionResults], bool]:
-        """Callback protocol.
+        """Callback protocol for running a nested optimization.
 
         When a function with this signature is provided to an ensemble
         optimizer, it is called at each function evaluation to run a nested
@@ -70,7 +70,6 @@ class EnsembleOptimizer:
 
     def __init__(
         self,
-        *,
         enopt_config: EnOptConfig,
         ensemble_evaluator: EnsembleEvaluator,
         plugin_manager: PluginManager,
@@ -79,12 +78,13 @@ class EnsembleOptimizer:
     ) -> None:
         """Initialize the ensemble optimizer class.
 
-        This class requires at least three argument thats together define a single optimization run:
+        This class requires at least three argument that together define a
+        single optimization run:
 
         1. An [`EnOptConfig`][ropt.config.enopt.EnOptConfig] that contains all
            configuration settings for the optimization.
         2. An [`EnsembleEvaluator`][ropt.ensemble_evaluator.EnsembleEvaluator] object
-           that is responsible for evaluating functions and gradients.
+           that is responsible for evaluating functions.
         3. A [`PluginManager`][ropt.plugins.PluginManager] object that provides
            access to optimizer plugins.
 
@@ -125,7 +125,7 @@ class EnsembleOptimizer:
             variables: The initial variables for the optimization.
 
         Returns:
-            _description_
+            An exit code indicating the reason for termination.
         """
         self._fixed_variables = variables.copy()
 

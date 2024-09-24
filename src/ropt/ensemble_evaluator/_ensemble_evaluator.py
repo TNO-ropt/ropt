@@ -43,7 +43,14 @@ if TYPE_CHECKING:
 
 
 class EnsembleEvaluator:
-    """A class for constructing functions and gradients from an ensemble of functions."""
+    """A class for constructing functions and gradients from an ensemble of functions.
+
+    This class implements the calculation of functions and gradients from an
+    ensemble of functions, according to the settings defined in an
+    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] configuration object, given
+    an [`Evaluator`][ropt.evaluator.Evaluator] callable that is used to evaluate
+    the individual functions.
+    """
 
     def __init__(
         self,
@@ -53,6 +60,15 @@ class EnsembleEvaluator:
         rng: Generator,
         plugin_manager: PluginManager,
     ) -> None:
+        """Initialize the ensemble evaluator.
+
+        Args:
+            config:         The configuration object
+            evaluator:      The callable for evaluation individual functions
+            result_id_iter: An iterator that generates ID's for generated results
+            rng:            A random number generator used for stochastic gradient estimation
+            plugin_manager: A plugin manager to load required plugins
+        """
         self._config = config
         self._evaluator = evaluator
         self._result_id_iter = result_id_iter
@@ -65,6 +81,11 @@ class EnsembleEvaluator:
 
     @property
     def constraint_auto_scales(self) -> Optional[NDArray[np.float64]]:
+        """Return optional auto-calculated scales for constraints.
+
+        Returns:
+            The calculate scales, or `None`.
+        """
         return self._constraint_auto_scales
 
     def calculate(
@@ -74,6 +95,21 @@ class EnsembleEvaluator:
         compute_functions: bool,
         compute_gradients: bool,
     ) -> Tuple[Results, ...]:
+        """Evaluate the given variable vectors.
+
+        The `variables` argument may be a single vector of variables, or a set
+        of variable vectors represented as row-vectors in a matrix. The
+        `compute_functions` and `compute_gradient` flags determine with results
+        are returned: functions, gradients, or both.
+
+        Args:
+            variables:         The variable vectors to evaluate
+            compute_functions: Whether to calculate functions
+            compute_gradients: Whether to calculate gradients
+
+        Returns:
+            The results, representing single function or gradient evaluations.
+        """
         assert compute_functions or compute_gradients
 
         # Only functions:
