@@ -1492,6 +1492,21 @@ type and name, this method returns a callable (either a class or a factory
 function) that <code>ropt</code> uses to instantiate the plugin when needed.</p>
 
 
+<details class="info" open>
+  <summary>Plugin and method names</summary>
+  <p>Plugins are registered by name by plugin manager objects. Plugins may
+implement multiple methods, each of which should also be identified by a name.
+<a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager.get_plugin"><code>PluginManager.get_plugin</code></a> and
+<a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager.is_supported"><code>PluginManager.is_supported</code></a> accept
+method names and will search through the available plugins to find the correct
+plugin code. To refer to a method <em>method-name</em> of a given plugin
+<em>plugin-name</em>, a string in the form "<em>plugin-name/method-name</em>" can be used
+instead. In this case, the plugin manager will not search through all plugins
+for the requested method but will only inquire with the plugin <em>plugin-name</em>.
+By convention, using "default" for the method name in such a string will
+select the default method of the plugin.</p>
+</details>
+
 
   <div class="doc doc-children">
 
@@ -1582,7 +1597,6 @@ facilitate this, it should derive from the
 manager. The <code>plugins</code> argument maps the names of the new plugins to
 <a class="autorefs autorefs-internal" href="#ropt.plugins.Plugin"><code>Plugin</code></a> object.</p>
 <p>The plugin names are case-insensitive.</p>
-<p>Note: Plugin types</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1648,6 +1662,11 @@ manager. The <code>plugins</code> argument maps the names of the new plugins to
     <div class="doc doc-contents ">
 
         <p>Retrieve a plugin by type and method name.</p>
+<p>If the given method name does not contain a slash (/), the plugin
+manager will search through all plugins and return the first plugin that
+supports the requested method. If the method name is of the form
+"<em>plugin-name/method-name</em>", the method <em>method-name</em> will be retrieved
+from the given plugin <em>plugin-name</em>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1713,6 +1732,11 @@ manager. The <code>plugins</code> argument maps the names of the new plugins to
     <div class="doc doc-contents ">
 
         <p>Check if a method is supported.</p>
+<p>If the given method name does not contain a slash (/), the plugin
+manager will search through all plugins and return <code>True</code> if a plugin is
+found that supports the requested method. If the method name is of the
+form "<em>plugin-name/method-name</em>", <code>True</code> will be returned if the method
+<em>method-name</em> is supported by the given plugin <em>plugin-name</em>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
