@@ -44,15 +44,6 @@ if sys.version_info >= (3, 11):
 else:
     from typing_extensions import Self
 
-_RepeatTypes = Literal["initial", "last", "optimal", "last_optimal"]
-
-
-@dataclass
-class _Repeat:
-    iterations: int
-    restart_from: _RepeatTypes
-    metadata_var: Optional[str]
-
 
 @dataclass
 class _Results:
@@ -65,15 +56,13 @@ class OptimizationPlanRunner:
     """A class for running optimization plans.
 
     `OptimizationPlanRunner` objects are designed for use cases where the
-    optimization workflow is relatively simple, such as a single optimization
-    run possibly with a few restarts. Using this object can be more convenient
-    than defining and running an optimization plan directly in such cases.
+    optimization workflow comprises a single optimization run. Using this object
+    can be more convenient than defining and running an optimization plan
+    directly in such cases.
 
     This class provides the following features:
 
     - Start a single optimization.
-    - Repeat the same optimization multiple times, with various options for
-      restarting from different points.
     - Add observer functions connected to various optimization events.
     - Attach metadata to each result generated during the optimization.
     - Generate tables summarizing the optimization results.
@@ -103,32 +92,29 @@ class OptimizationPlanRunner:
         self._optimizer_context = OptimizerContext(evaluator=evaluator, seed=seed)
         self._observers: List[Tuple[EventType, Callable[[Event], None]]] = []
         self._metadata: Dict[str, Any] = {}
-        self._repeat: Optional[_Repeat] = None
-        self._plan_config: Dict[str, Any] = {
-            "context": [
-                {
-                    "id": "__config__",
-                    "init": "config",
-                    "with": enopt_config,
+        self._context: List[Dict[str, Any]] = [
+            {
+                "id": "__config__",
+                "init": "config",
+                "with": enopt_config,
+            },
+            {
+                "id": "__optimum_tracker__",
+                "init": "tracker",
+                "with": {"constraint_tolerance": constraint_tolerance},
+            },
+        ]
+        self._steps: List[Dict[str, Any]] = [
+            {
+                "name": "__optimizer_step__",
+                "run": "optimizer",
+                "with": {
+                    "config": "$__config__",
+                    "update": ["__optimum_tracker__"],
+                    "exit_code_var": "exit_code",
                 },
-                {
-                    "id": "__optimum_tracker__",
-                    "init": "tracker",
-                    "with": {"constraint_tolerance": constraint_tolerance},
-                },
-            ],
-            "steps": [
-                {
-                    "name": "__optimizer_step__",
-                    "run": "optimizer",
-                    "with": {
-                        "config": "$__config__",
-                        "update": ["__optimum_tracker__"],
-                        "exit_code_var": "exit_code",
-                    },
-                }
-            ],
-        }
+            }
+        ]
         self._results: _Results
 
     @property
@@ -268,59 +254,10 @@ class OptimizationPlanRunner:
         )
         return self
 
-    def repeat(
-        self,
-        iterations: int,
-        restart_from: _RepeatTypes = "optimal",
-        metadata_var: Optional[str] = None,
-    ) -> Self:
-        """Repeat the optimization.
-
-        Run the optimization multiple times with various options for the
-        starting points. On the first run, the optimization starts from the
-        initial variables defined in its configuration. For subsequent runs, the
-        initial variables are selected based on the `restart_from` option:
-
-        - `"initial"`: Use the initial values from the configuration.
-        - `"last"`: Use the variables from the previous run.
-        - `"optimal"`: Use the variables from the optimal result found so far.
-        - `"last_optimal"`: Use the variables from the optimal result of the last run.
-
-        If `metadata_var` is defined, a field will be added to the metadata
-        stored with each result, recording the sequence number of the
-        optimization run.
-
-        Args:
-            iterations:      The number of times to run the optimization.
-            restart_from:    The method for selecting initial variables. Defaults to `"optimal"`.
-            metadata_var:    Optional field name in the metadata to record the repeat index.
-
-        Returns:
-            The `OptimizationPlanRunner` instance, allowing for method chaining.
-        """
-        if self._repeat is not None:
-            msg = "The repeat() method can only be called once."
-            raise RuntimeError(msg)
-        self._repeat = _Repeat(
-            iterations=iterations,
-            restart_from=restart_from,
-            metadata_var=metadata_var,
-        )
-        return self
-
     def _build_plan_config(self) -> Dict[str, Any]:
-        context = self._plan_config["context"]
-        steps = self._plan_config["steps"]
-        metadata = self._metadata
+        steps = self._steps
 
-        if self._repeat is not None:
-            if self._repeat.metadata_var is not None:
-                metadata[self._repeat.metadata_var] = "$__repeat_counter__"
-            context, steps = _add_repeat_tracker(
-                context, steps, self._repeat.restart_from
-            )
-
-        if metadata:
+        if self._metadata:
             steps = [
                 {
                     "run": "metadata",
@@ -331,19 +268,7 @@ class OptimizationPlanRunner:
                 *steps,
             ]
 
-        if self._repeat is not None:
-            steps = [
-                {
-                    "run": "repeat",
-                    "with": {
-                        "iterations": self._repeat.iterations,
-                        "counter_var": "__repeat_counter__",
-                        "steps": steps,
-                    },
-                }
-            ]
-
-        return {"context": context, "steps": steps}
+        return {"context": self._context, "steps": steps}
 
     def run(self) -> Self:
         """Run the optimization.
@@ -378,32 +303,3 @@ class OptimizationPlanRunner:
         the current function evaluation.
         """
         raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
-
-
-def _add_repeat_tracker(
-    context: List[Dict[str, Any]],
-    steps: List[Dict[str, Any]],
-    restart_from: Literal["initial", "last", "optimal", "last_optimal"] = "optimal",
-) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
-    idx = next(idx for idx, step in enumerate(steps) if step["run"] == "optimizer")
-    if restart_from in ["last", "last_optimal"]:
-        context.append(
-            {
-                "id": "__repeat_tracker__",
-                "init": "tracker",
-                "with": {"type": "last" if restart_from == "last" else "optimal"},
-            }
-        )
-        steps[idx]["with"]["update"].append("__repeat_tracker__")
-    if restart_from == "last":
-        steps[idx]["with"]["initial_values"] = "$__repeat_tracker__"
-    elif restart_from == "optimal":
-        steps[idx]["with"]["initial_values"] = "$__optimum_tracker__"
-    elif restart_from == "last_optimal":
-        steps[idx]["with"]["initial_values"] = "$__initial_var__"
-        steps = [
-            {"run": "setvar", "with": "__initial_var__ = $__repeat_tracker__"},
-            {"run": "reset", "with": {"context": "__repeat_tracker__"}},
-            *steps,
-        ]
-    return context, steps

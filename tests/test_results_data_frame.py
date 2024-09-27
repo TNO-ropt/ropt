@@ -155,6 +155,6 @@ def test_dataframe_results_metadata_step_id(enopt_config: Any, evaluator: Any) -
     runner = OptimizationPlanRunner(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, handler
     )
-    runner._plan_config["steps"][0]["name"] = "opt"  # noqa: SLF001
+    runner._steps[0]["name"] = "opt"  # noqa: SLF001
     runner.run()
     assert reporter.frame["metadata.step_name"].to_list() == ["opt"] * 3
