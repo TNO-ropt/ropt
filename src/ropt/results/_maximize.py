@@ -56,9 +56,17 @@ def _(results: GradientResults) -> GradientResults:
     results.evaluations.perturbed_objectives.setflags(write=True)
     results.evaluations.perturbed_objectives *= -1.0
     results.evaluations.perturbed_objectives.setflags(write=False)
+    if results.evaluations.scaled_perturbed_objectives is not None:
+        results.evaluations.scaled_perturbed_objectives.setflags(write=True)
+        results.evaluations.scaled_perturbed_objectives *= -1.0
+        results.evaluations.scaled_perturbed_objectives.setflags(write=False)
     if results.gradients is not None:
         results.gradients.weighted_objective *= -1.0
         results.gradients.objectives.setflags(write=True)
         results.gradients.objectives *= -1.0
         results.gradients.objectives.setflags(write=False)
+        if results.gradients.scaled_objectives is not None:
+            results.gradients.scaled_objectives.setflags(write=True)
+            results.gradients.scaled_objectives *= -1.0
+            results.gradients.scaled_objectives.setflags(write=False)
     return results

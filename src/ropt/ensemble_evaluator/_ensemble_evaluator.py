@@ -485,11 +485,11 @@ class EnsembleEvaluator:
 
         return Functions.create(
             config=self._config,
-            objective_auto_scales=self._objective_auto_scales,
-            constraint_auto_scales=self._constraint_auto_scales,
             weighted_objective=weighted_objective,
             objectives=objectives,
             constraints=constraints,
+            objective_auto_scales=self._objective_auto_scales,
+            constraint_auto_scales=self._constraint_auto_scales,
         )
 
     def _compute_gradients(  # noqa: PLR0913
@@ -547,7 +547,8 @@ class EnsembleEvaluator:
             self._get_objective_scales(self._objective_auto_scales),
         )
 
-        return Gradients(
+        return Gradients.create(
+            config=self._config,
             weighted_objective=self._expand_gradients(
                 weighted_objective_gradient, variable_indices
             ),
@@ -557,6 +558,8 @@ class EnsembleEvaluator:
                 if constraint_gradients is None
                 else self._expand_gradients(constraint_gradients, variable_indices)
             ),
+            objective_auto_scales=self._objective_auto_scales,
+            constraint_auto_scales=self._constraint_auto_scales,
         )
 
     def _expand_gradients(
