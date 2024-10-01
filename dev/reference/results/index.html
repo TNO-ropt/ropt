@@ -3930,6 +3930,8 @@ There may be multiple objectives and constraints. Multiple objectives are
 handled by the optimizer using a weighted sum of the individual gradients,
 stored in the <code>weighted_objective</code> field. Multiple constraints are directly
 handled by the optimizer.</p>
+<p>If scaling of objectives and/or constraint functions is enabled, also scaled
+versions of the objective or constraint gradients are stored.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3979,6 +3981,34 @@ handled by the optimizer.</p>
             <td>
               <div class="doc-md-description">
                 <p>The value of each constraint gradient</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>scaled_objectives</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional scaled objective gradients.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>scaled_constraints</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional scaled constraint gradients.</p>
               </div>
             </td>
             <td>
