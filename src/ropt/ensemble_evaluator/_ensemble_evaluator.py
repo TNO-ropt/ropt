@@ -165,6 +165,24 @@ class EnsembleEvaluator:
     def _calculate_one_set_of_functions(
         self, f_eval_results: _FunctionEvaluatorResults, variables: NDArray[np.float64]
     ) -> FunctionResults:
+        # Autoscaling is done by finding the weighted mean of the realizations:
+        if self._objective_auto_scales is None:
+            self._objective_auto_scales = _compute_auto_scales(
+                f_eval_results.objectives,
+                self._config.objective_functions.auto_scale,
+                self._config.realizations.weights,
+            )
+        if (
+            f_eval_results.constraints is not None
+            and self._constraint_auto_scales is None
+        ):
+            assert self._config.nonlinear_constraints is not None
+            self._constraint_auto_scales = _compute_auto_scales(
+                f_eval_results.constraints,
+                self._config.nonlinear_constraints.auto_scale,
+                self._config.realizations.weights,
+            )
+
         (
             objective_weights,
             constraint_weights,
@@ -458,16 +476,6 @@ class EnsembleEvaluator:
                 )
             else:
                 constraints = None
-
-            if self._objective_auto_scales is None:
-                self._objective_auto_scales = _compute_auto_scales(
-                    objectives, self._config.objective_functions.auto_scale
-                )
-            if constraints is not None and self._constraint_auto_scales is None:
-                assert self._config.nonlinear_constraints is not None
-                self._constraint_auto_scales = _compute_auto_scales(
-                    constraints, self._config.nonlinear_constraints.auto_scale
-                )
 
             weighted_objective = _calculate_weighted_function(
                 objectives,

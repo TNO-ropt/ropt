@@ -178,15 +178,6 @@ class DefaultRealizationFilter(RealizationFilter):
 
         _, _, self._method = self._filter_config.method.lower().rpartition("/")
         options = self._filter_config.options
-        if enopt_config.objective_functions.weights.size > 1 and np.any(
-            enopt_config.objective_functions.auto_scale
-        ):
-            msg = (
-                f"{self._method} does not support auto-scaling for "
-                "multi-objective optimization"
-            )
-            raise ConfigError(msg)
-
         if self._method == "sort-objective":
             self._filter_options = SortObjectiveOptions.model_validate(options)
             self._check_range(self._filter_options)
