@@ -5,12 +5,15 @@ from typing import TYPE_CHECKING, Iterator, List, Optional, Tuple
 import numpy as np
 
 from ropt.results import (
+    BoundConstraints,
     FunctionEvaluations,
     FunctionResults,
     Functions,
     GradientEvaluations,
     GradientResults,
     Gradients,
+    LinearConstraints,
+    NonlinearConstraints,
     Realizations,
     Results,
 )
@@ -235,6 +238,11 @@ class EnsembleEvaluator:
                 constraint_weights=constraint_weights,
             ),
             functions=functions,
+            bound_constraints=BoundConstraints.create(self._config, evaluations),
+            linear_constraints=LinearConstraints.create(self._config, evaluations),
+            nonlinear_constraints=NonlinearConstraints.create(
+                self._config, functions, self.constraint_auto_scales
+            ),
         )
 
     def _calculate_gradients(

@@ -9,11 +9,8 @@ import numpy as np
 from ropt.enums import ConstraintType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
 from ropt.results import (
-    BoundConstraints,
     FunctionResults,
     GradientResults,
-    LinearConstraints,
-    NonlinearConstraints,
 )
 
 if TYPE_CHECKING:
@@ -246,7 +243,6 @@ class EnsembleOptimizer:
             compute_functions=compute_functions,
             compute_gradients=compute_gradients,
         )
-        results = self._augment_results(results)
         if self._signal_evaluation:
             self._signal_evaluation(results)
 
@@ -270,22 +266,6 @@ class EnsembleOptimizer:
                     exit_code=OptimizerExitCode.TOO_FEW_REALIZATIONS
                 )
 
-        return results
-
-    def _augment_results(self, results: Tuple[Results, ...]) -> Tuple[Results, ...]:
-        for result in results:
-            if isinstance(result, FunctionResults):
-                result.bound_constraints = BoundConstraints.create(
-                    self._enopt_config, result.evaluations
-                )
-                result.linear_constraints = LinearConstraints.create(
-                    self._enopt_config, result.evaluations
-                )
-                result.nonlinear_constraints = NonlinearConstraints.create(
-                    self._enopt_config,
-                    result.functions,
-                    self._function_evaluator.constraint_auto_scales,
-                )
         return results
 
     @staticmethod
