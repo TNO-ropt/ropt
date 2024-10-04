@@ -33,9 +33,11 @@ class GradientEvaluations(ResultField):
        constraint values arranged along the third axis. The second axis index
        indicates the perturbation number, whereas the first axis index
        represents the realization number.
-    4. Scaled versions of the objective and constraint values if scaling was
+    4. Scaled versions of the variables and perturbed variables if scaling
+       was enabled.
+    5. Scaled versions of the objective and constraint values if scaling was
        enabled.
-    5. Optional evaluation IDs that may have been passed from the evaluator,
+    6. Optional evaluation IDs that may have been passed from the evaluator,
        identifying each calculated realization and perturbation.
 
     Args:
@@ -45,8 +47,8 @@ class GradientEvaluations(ResultField):
                                       perturbation.
         perturbed_constraints:        The constraint functions for each realization and
                                       perturbation.
-        unscaled_variables:           Optional variables after scaling back.
-        unscaled_perturbed_variables: Optional variables after scaling back.
+        scaled_variables:             Optional variables after scaling back.
+        scaled_perturbed_variables:   Optional variables after scaling back.
         scaled_perturbed_objectives:  Optional scaled objectives.
         scaled_perturbed_constraints: Optional scaled constraints.
         perturbed_evaluation_ids:     Optional id of each evaluated realization.
@@ -85,13 +87,13 @@ class GradientEvaluations(ResultField):
             ),
         },
     )
-    unscaled_variables: Optional[NDArray[np.float64]] = field(
+    scaled_variables: Optional[NDArray[np.float64]] = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.VARIABLE,),
         },
     )
-    unscaled_perturbed_variables: Optional[NDArray[np.float64]] = field(
+    scaled_perturbed_variables: Optional[NDArray[np.float64]] = field(
         default=None,
         metadata={
             "__axes__": (
@@ -140,9 +142,9 @@ class GradientEvaluations(ResultField):
         self.perturbed_variables = _immutable_copy(self.perturbed_variables)
         self.perturbed_objectives = _immutable_copy(self.perturbed_objectives)
         self.perturbed_constraints = _immutable_copy(self.perturbed_constraints)
-        self.unscaled_variables = _immutable_copy(self.unscaled_variables)
-        self.unscaled_perturbed_variables = _immutable_copy(
-            self.unscaled_perturbed_variables
+        self.scaled_variables = _immutable_copy(self.scaled_variables)
+        self.scaled_perturbed_variables = _immutable_copy(
+            self.scaled_perturbed_variables
         )
         self.scaled_perturbed_objectives = _immutable_copy(
             self.scaled_perturbed_objectives
@@ -198,12 +200,18 @@ class GradientEvaluations(ResultField):
             axis=-1,
         )
         return GradientEvaluations(
-            variables=variables,
-            perturbed_variables=perturbed_variables,
+            variables=variables if unscaled_variables is None else unscaled_variables,
+            perturbed_variables=(
+                perturbed_variables
+                if unscaled_perturbed_variables is None
+                else unscaled_perturbed_variables
+            ),
             perturbed_objectives=perturbed_objectives,
             perturbed_constraints=perturbed_constraints,
-            unscaled_variables=unscaled_variables,
-            unscaled_perturbed_variables=unscaled_perturbed_variables,
+            scaled_variables=None if unscaled_variables is None else variables,
+            scaled_perturbed_variables=(
+                None if unscaled_perturbed_variables is None else perturbed_variables
+            ),
             scaled_perturbed_objectives=scaled_perturbed_objectives,
             scaled_perturbed_constraints=scaled_perturbed_constraints,
             perturbed_evaluation_ids=perturbed_evaluation_ids,

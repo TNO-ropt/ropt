@@ -15,6 +15,7 @@ from ropt.exceptions import OptimizationAborted, PlanError
 from ropt.plan import ContextUpdateResults
 from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
+from ropt.utils.scaling import scale_variables
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -91,7 +92,7 @@ class DefaultEvaluatorStep(PlanStep):
             self.plan.plugin_manager,
         )
 
-        variables = self._get_variables()
+        variables = self._get_variables(self._enopt_config)
         exit_code = OptimizerExitCode.EVALUATION_STEP_FINISHED
 
         try:
@@ -131,13 +132,20 @@ class DefaultEvaluatorStep(PlanStep):
 
         return exit_code == OptimizerExitCode.USER_ABORT
 
-    def _get_variables(self) -> NDArray[np.float64]:
+    def _get_variables(self, config: EnOptConfig) -> NDArray[np.float64]:
         if self._with.values is not None:  # noqa: PD011
             parsed_variables = self.plan.parse_value(self._with.values)
             if isinstance(parsed_variables, FunctionResults):
-                return parsed_variables.evaluations.variables
+                return (
+                    parsed_variables.evaluations.variables
+                    if parsed_variables.evaluations.scaled_variables is None
+                    else parsed_variables.evaluations.scaled_variables
+                )
             if isinstance(parsed_variables, np.ndarray):
-                return parsed_variables
+                scaled_variables = scale_variables(config, parsed_variables, axis=-1)
+                return (
+                    parsed_variables if scaled_variables is None else scaled_variables
+                )
             if parsed_variables is not None:
                 msg = f"`{self._with.values} does not contain variables."  # noqa: PD011
                 raise PlanError(msg, step_name=self.step_config.name)

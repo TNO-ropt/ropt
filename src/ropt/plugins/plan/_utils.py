@@ -23,21 +23,33 @@ def _get_new_optimal_result(
     return None
 
 
-def _check_constraints(
-    results: FunctionResults, constraint_tolerance: Optional[float]
+def _check_bound_constraints(
+    results: FunctionResults, constraint_tolerance: float
 ) -> bool:
-    if constraint_tolerance is None:
-        return True
     if results.bound_constraints is not None:
-        for violations in (
-            results.bound_constraints.lower_violations,
-            results.bound_constraints.upper_violations,
-        ):
+        lower_violations = results.bound_constraints.scaled_lower_violations
+        if lower_violations is None:
+            lower_violations = results.bound_constraints.lower_violations
+        upper_violations = results.bound_constraints.scaled_upper_violations
+        if upper_violations is None:
+            upper_violations = results.bound_constraints.upper_violations
+        for violations in (lower_violations, upper_violations):
             if (
                 violations is not None
                 and np.any(violations > constraint_tolerance).item()
             ):
                 return False
+    return True
+
+
+def _check_constraints(
+    results: FunctionResults, constraint_tolerance: Optional[float]
+) -> bool:
+    if constraint_tolerance is None:
+        return True
+
+    if not _check_bound_constraints(results, constraint_tolerance):
+        return False
 
     if results.linear_constraints is not None and (
         results.linear_constraints.violations is not None

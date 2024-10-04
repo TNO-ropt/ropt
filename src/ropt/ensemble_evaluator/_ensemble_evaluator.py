@@ -122,7 +122,11 @@ class EnsembleEvaluator:
             and not compute_functions
             and self._cache_for_gradient is not None
             and np.allclose(
-                self._cache_for_gradient.evaluations.variables,
+                (
+                    self._cache_for_gradient.evaluations.variables
+                    if self._cache_for_gradient.evaluations.scaled_variables is None
+                    else self._cache_for_gradient.evaluations.scaled_variables
+                ),
                 variables,
                 rtol=0.0,
                 atol=1e-15,

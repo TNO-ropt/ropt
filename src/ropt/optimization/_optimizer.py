@@ -161,7 +161,11 @@ class EnsembleOptimizer:
             if nested_results is not None:
                 if aborted:
                     raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
-                variables = nested_results.evaluations.variables.copy()
+                variables = (
+                    nested_results.evaluations.variables
+                    if nested_results.evaluations.scaled_variables is None
+                    else nested_results.evaluations.scaled_variables
+                ).copy()
                 self._fixed_variables = variables.copy()
 
         results = self._run_evaluations(

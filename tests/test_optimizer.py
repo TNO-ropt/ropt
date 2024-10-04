@@ -232,19 +232,15 @@ def test_variables_scale(
     assert np.allclose(config.variables.initial_values, initial_values)
     assert np.allclose(config.variables.lower_bounds, lower_bounds)
     assert np.allclose(config.variables.upper_bounds, upper_bounds)
-    result = results.evaluations.variables
+    result = results.evaluations.scaled_variables
+    if result is None:
+        result = results.evaluations.variables
     if scales is not None:
         result = result * scales
     if offsets is not None:
         result = result + offsets
     assert np.allclose(result, [0.0, 0.0, 0.5], atol=0.05)
-    variables = (
-        results.evaluations.variables
-        if offsets is None and scales is None
-        else results.evaluations.unscaled_variables
-    )
-    assert variables is not None
-    assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.05)
+    assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.05)
 
 
 def test_variables_scale_linear_constraints(enopt_config: Any, evaluator: Any) -> None:
@@ -274,10 +270,8 @@ def test_variables_scale_linear_constraints(enopt_config: Any, evaluator: Any) -
 
     results = OptimizationPlanRunner(enopt_config, evaluator()).run().results
     assert results is not None
-    assert results.evaluations.unscaled_variables is not None
-    assert np.allclose(
-        results.evaluations.unscaled_variables, [0.25, 0.0, 0.75], atol=0.02
-    )
+    assert results.evaluations.variables is not None
+    assert np.allclose(results.evaluations.variables, [0.25, 0.0, 0.75], atol=0.02)
 
 
 def test_check_linear_constraints(enopt_config: Any, evaluator: Any) -> None:

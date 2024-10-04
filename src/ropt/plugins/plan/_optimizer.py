@@ -16,6 +16,7 @@ from ropt.exceptions import PlanError
 from ropt.plan import ContextUpdateResults, EnsembleOptimizer, MetaDataType, Plan
 from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
+from ropt.utils.scaling import scale_variables
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -110,7 +111,7 @@ class DefaultOptimizerStep(PlanStep):
             self.plan.plugin_manager,
         )
 
-        variables = self._get_variables()
+        variables = self._get_variables(self._enopt_config)
         exit_code = EnsembleOptimizer(
             enopt_config=self._enopt_config,
             ensemble_evaluator=ensemble_evaluator,
@@ -185,13 +186,20 @@ class DefaultOptimizerStep(PlanStep):
         aborted = plan.run()
         return plan[self._with.nested_plan.results_var], aborted
 
-    def _get_variables(self) -> NDArray[np.float64]:
+    def _get_variables(self, config: EnOptConfig) -> NDArray[np.float64]:
         if self._with.initial_values is not None:
             parsed_variables = self.plan.parse_value(self._with.initial_values)
             if isinstance(parsed_variables, FunctionResults):
-                return parsed_variables.evaluations.variables
+                return (
+                    parsed_variables.evaluations.variables
+                    if parsed_variables.evaluations.scaled_variables is None
+                    else parsed_variables.evaluations.scaled_variables
+                )
             if isinstance(parsed_variables, np.ndarray):
-                return parsed_variables
+                scaled_variables = scale_variables(config, parsed_variables, axis=-1)
+                return (
+                    parsed_variables if scaled_variables is None else scaled_variables
+                )
             if parsed_variables is not None:
                 msg = f"`{self._with.initial_values} does not contain variables."
                 raise PlanError(msg, step_name=self.step_config.name)

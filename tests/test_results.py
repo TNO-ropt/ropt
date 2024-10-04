@@ -107,10 +107,10 @@ def test_scaling_evaluations_functions(
     )
     function_result = replace(function_result, evaluations=evaluations)
     assert config.variables.scales is not None
-    assert function_result.evaluations.unscaled_variables is not None
+    assert function_result.evaluations.scaled_variables is not None
     assert np.allclose(
-        function_result.evaluations.unscaled_variables,
-        function_result.evaluations.variables * config.variables.scales,
+        function_result.evaluations.variables,
+        function_result.evaluations.scaled_variables * config.variables.scales,
     )
     assert function_result.evaluations.scaled_objectives is not None
     assert np.allclose(

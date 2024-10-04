@@ -79,7 +79,13 @@ class LinearConstraints(ResultField):
         kwargs = {}
         if config.linear_constraints is not None:
             kwargs["values"] = _get_linear_constraint_values(
-                config, evaluations.variables, axis=-1
+                config,
+                (
+                    evaluations.variables
+                    if evaluations.scaled_variables is None
+                    else evaluations.scaled_variables
+                ),
+                axis=-1,
             )
             kwargs["violations"] = _get_linear_constraint_violations(
                 config, kwargs["values"]

@@ -28,7 +28,7 @@ class FunctionEvaluations(ResultField):
        two-dimensional array, with the objective or constraint values arranged
        along the second axis. The first axis index indicates the realization
        number.
-    3. Unscaled versions of the variables if variable scaling was enabled.
+    3. Scaled versions of the variables if variable scaling was enabled.
     4. Scaled versions of the objective and constraint values if scaling was
        enabled.
     5. Optional evaluation IDs that may have been passed from the evaluator,
@@ -38,7 +38,7 @@ class FunctionEvaluations(ResultField):
         variables:          The unperturbed variable vector.
         objectives:         The objective functions for each realization.
         constraints:        The constraint functions for each realization.
-        unscaled_variables: Optional variables after scaling back.
+        scaled_variables:   Optional variables after scaling.
         scaled_objectives:  Optional scaled objectives.
         scaled_constraints: Optional scaled constraints.
         evaluation_ids:     Optional id of each evaluated realization.
@@ -66,7 +66,7 @@ class FunctionEvaluations(ResultField):
             ),
         },
     )
-    unscaled_variables: Optional[NDArray[np.float64]] = field(
+    scaled_variables: Optional[NDArray[np.float64]] = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.VARIABLE,),
@@ -105,7 +105,7 @@ class FunctionEvaluations(ResultField):
         self.variables = _immutable_copy(self.variables)
         self.objectives = _immutable_copy(self.objectives)
         self.constraints = _immutable_copy(self.constraints)
-        self.unscaled_variables = _immutable_copy(self.unscaled_variables)
+        self.scaled_variables = _immutable_copy(self.scaled_variables)
         self.scaled_objectives = _immutable_copy(self.scaled_objectives)
         self.scaled_constraints = _immutable_copy(self.scaled_constraints)
         self.evaluation_ids = _immutable_copy(self.evaluation_ids)
@@ -151,10 +151,10 @@ class FunctionEvaluations(ResultField):
             axis=-1,
         )
         return FunctionEvaluations(
-            variables=variables,
+            variables=variables if unscaled_variables is None else unscaled_variables,
             objectives=objectives,
             constraints=constraints,
-            unscaled_variables=unscaled_variables,
+            scaled_variables=None if unscaled_variables is None else variables,
             scaled_objectives=scaled_objectives,
             scaled_constraints=scaled_constraints,
             evaluation_ids=evaluation_ids,

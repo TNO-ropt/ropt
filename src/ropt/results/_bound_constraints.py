@@ -34,17 +34,17 @@ class BoundConstraints(ResultField):
     1. Differences between the current variable and the lower or upper bounds.
     2. Violations of constraints, defined as the absolute value of the
        difference if the constraint is violated, or else zero.
-    3. If variable scaling is configured, unscaled versions of all values.
+    3. If variable scaling is configured, scaled versions of all values.
 
     Args:
-        lower_values:              Lower bound differences
-        lower_violations:          Lower bound violations
-        upper_values:              Upper bound differences
-        upper_violations:          Upper bound violations
-        unscaled_lower_values:     Optional unscaled lower bound differences
-        unscaled_lower_violations: Optional unscaled lower bound violations
-        unscaled_upper_values:     Optional unscaled upper bound differences
-        unscaled_upper_violations: Optional unscaled upper bound violations
+        lower_values:            Lower bound differences
+        lower_violations:        Lower bound violations
+        upper_values:            Upper bound differences
+        upper_violations:        Upper bound violations
+        scaled_lower_values:     Optional scaled lower bound differences
+        scaled_lower_violations: Optional scaled lower bound violations
+        scaled_upper_values:     Optional scaled upper bound differences
+        scaled_upper_violations: Optional scaled upper bound violations
     """
 
     lower_values: Optional[NDArray[np.float64]] = field(
@@ -71,25 +71,25 @@ class BoundConstraints(ResultField):
             "__axes__": (ResultAxisName.VARIABLE,),
         },
     )
-    unscaled_lower_values: Optional[NDArray[np.float64]] = field(
+    scaled_lower_values: Optional[NDArray[np.float64]] = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.VARIABLE,),
         },
     )
-    unscaled_lower_violations: Optional[NDArray[np.float64]] = field(
+    scaled_lower_violations: Optional[NDArray[np.float64]] = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.VARIABLE,),
         },
     )
-    unscaled_upper_values: Optional[NDArray[np.float64]] = field(
+    scaled_upper_values: Optional[NDArray[np.float64]] = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.VARIABLE,),
         },
     )
-    unscaled_upper_violations: Optional[NDArray[np.float64]] = field(
+    scaled_upper_violations: Optional[NDArray[np.float64]] = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.VARIABLE,),
@@ -105,10 +105,10 @@ class BoundConstraints(ResultField):
         self.lower_violations = _immutable_copy(self.lower_violations)
         self.upper_values = _immutable_copy(self.upper_values)
         self.upper_violations = _immutable_copy(self.upper_violations)
-        self.unscaled_lower_values = _immutable_copy(self.unscaled_lower_values)
-        self.unscaled_lower_violations = _immutable_copy(self.unscaled_lower_violations)
-        self.unscaled_upper_values = _immutable_copy(self.unscaled_upper_values)
-        self.unscaled_upper_violations = _immutable_copy(self.unscaled_upper_violations)
+        self.scaled_lower_values = _immutable_copy(self.scaled_lower_values)
+        self.scaled_lower_violations = _immutable_copy(self.scaled_lower_violations)
+        self.scaled_upper_values = _immutable_copy(self.scaled_upper_values)
+        self.scaled_upper_violations = _immutable_copy(self.scaled_upper_violations)
 
     @classmethod
     def create(
@@ -116,9 +116,9 @@ class BoundConstraints(ResultField):
     ) -> Optional[BoundConstraints]:
         """Add constraint information.
 
-        This factory function creates a `BoundConstraints` object with the correct
-        information on bound constraints, based on the
-        given evaluations.
+        This factory function creates a `BoundConstraints` object with the
+        correct information on bound constraints, based on the given
+        evaluations.
 
         Args:
             config:      The ensemble optimizer configuration object
@@ -147,28 +147,68 @@ class BoundConstraints(ResultField):
         kwargs = {}
         if np.any(np.isfinite(config.variables.lower_bounds)):
             lower_values = _get_lower_bound_constraint_values(
-                config, evaluations.variables, axis=-1
+                config,
+                (
+                    evaluations.variables
+                    if evaluations.scaled_variables is None
+                    else evaluations.scaled_variables
+                ),
+                axis=-1,
             )
             lower_violations = _get_lower_bound_violations(lower_values)
+            unscaled_lower_values = _get_unscaled(lower_values)
+            unscaled_lower_violations = _get_unscaled(lower_violations)
             kwargs.update(
                 {
-                    "lower_values": lower_values,
-                    "lower_violations": lower_violations,
-                    "unscaled_lower_values": _get_unscaled(lower_values),
-                    "unscaled_lower_violations": _get_unscaled(lower_violations),
+                    "lower_values": (
+                        lower_values
+                        if unscaled_lower_values is None
+                        else unscaled_lower_values
+                    ),
+                    "lower_violations": (
+                        lower_violations
+                        if unscaled_lower_violations is None
+                        else unscaled_lower_violations
+                    ),
+                    "scaled_lower_values": (
+                        None if unscaled_lower_values is None else lower_values
+                    ),
+                    "scaled_lower_violations": (
+                        None if unscaled_lower_violations is None else lower_violations
+                    ),
                 },
             )
         if np.any(np.isfinite(config.variables.upper_bounds)):
             upper_values = _get_upper_bound_constraint_values(
-                config, evaluations.variables, axis=-1
+                config,
+                (
+                    evaluations.variables
+                    if evaluations.scaled_variables is None
+                    else evaluations.scaled_variables
+                ),
+                axis=-1,
             )
             upper_violations = _get_upper_bound_violations(upper_values)
+            unscaled_upper_values = _get_unscaled(upper_values)
+            unscaled_upper_violations = _get_unscaled(upper_violations)
             kwargs.update(
                 {
-                    "upper_values": upper_values,
-                    "upper_violations": upper_violations,
-                    "unscaled_upper_values": _get_unscaled(upper_values),
-                    "unscaled_upper_violations": _get_unscaled(upper_violations),
+                    "upper_values": (
+                        upper_values
+                        if unscaled_upper_values is None
+                        else unscaled_upper_values
+                    ),
+                    "upper_violations": (
+                        upper_violations
+                        if unscaled_upper_violations is None
+                        else unscaled_upper_violations
+                    ),
+                    "scaled_upper_values": (
+                        None if unscaled_upper_values is None else upper_values
+                    ),
+                    "scaled_upper_violations": (
+                        None if unscaled_upper_violations is None else upper_violations
+                    ),
                 },
             )
         return BoundConstraints(**kwargs) if kwargs else None
