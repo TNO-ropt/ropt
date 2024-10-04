@@ -2711,7 +2711,7 @@ functions. It contains the following information:</p>
    two-dimensional array, with the objective or constraint values arranged
    along the second axis. The first axis index indicates the realization
    number.</li>
-<li>Unscaled versions of the variables if variable scaling was enabled.</li>
+<li>Scaled versions of the variables if variable scaling was enabled.</li>
 <li>Scaled versions of the objective and constraint values if scaling was
    enabled.</li>
 <li>Optional evaluation IDs that may have been passed from the evaluator,
@@ -2773,13 +2773,13 @@ functions. It contains the following information:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>unscaled_variables</code></td>
+            <td><code>scaled_variables</code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional variables after scaling back.</p>
+                <p>Optional variables after scaling.</p>
               </div>
             </td>
             <td>
@@ -3121,7 +3121,7 @@ versions of the objective or constraint values are stored.</p>
 <li>Differences between the current variable and the lower or upper bounds.</li>
 <li>Violations of constraints, defined as the absolute value of the
    difference if the constraint is violated, or else zero.</li>
-<li>If variable scaling is configured, unscaled versions of all values.</li>
+<li>If variable scaling is configured, scaled versions of all values.</li>
 </ol>
 
 
@@ -3193,13 +3193,13 @@ versions of the objective or constraint values are stored.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>unscaled_lower_values</code></td>
+            <td><code>scaled_lower_values</code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional unscaled lower bound differences</p>
+                <p>Optional scaled lower bound differences</p>
               </div>
             </td>
             <td>
@@ -3207,13 +3207,13 @@ versions of the objective or constraint values are stored.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>unscaled_lower_violations</code></td>
+            <td><code>scaled_lower_violations</code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional unscaled lower bound violations</p>
+                <p>Optional scaled lower bound violations</p>
               </div>
             </td>
             <td>
@@ -3221,13 +3221,13 @@ versions of the objective or constraint values are stored.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>unscaled_upper_values</code></td>
+            <td><code>scaled_upper_values</code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional unscaled upper bound differences</p>
+                <p>Optional scaled upper bound differences</p>
               </div>
             </td>
             <td>
@@ -3235,13 +3235,13 @@ versions of the objective or constraint values are stored.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>unscaled_upper_violations</code></td>
+            <td><code>scaled_upper_violations</code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional unscaled upper bound violations</p>
+                <p>Optional scaled upper bound violations</p>
               </div>
             </td>
             <td>
@@ -3733,6 +3733,8 @@ constraints gradients. It contains the following information:</p>
    constraint values arranged along the third axis. The second axis index
    indicates the perturbation number, whereas the first axis index
    represents the realization number.</li>
+<li>Scaled versions of the variables and perturbed variables if scaling
+   was enabled.</li>
 <li>Scaled versions of the objective and constraint values if scaling was
    enabled.</li>
 <li>Optional evaluation IDs that may have been passed from the evaluator,
@@ -3810,7 +3812,7 @@ constraints gradients. It contains the following information:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>unscaled_variables</code></td>
+            <td><code>scaled_variables</code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
@@ -3824,7 +3826,7 @@ constraints gradients. It contains the following information:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>unscaled_perturbed_variables</code></td>
+            <td><code>scaled_perturbed_variables</code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
