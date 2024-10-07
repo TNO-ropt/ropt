@@ -113,6 +113,14 @@ class PlanConfig(BaseModel):
     create and maintain the environment in which the plan runs. Context objects
     are initialized before creating and running the steps.
 
+    When running a plan, arguments can be passed. The `inputs` attributes
+    denotes a list of input variables, that will be initialized with the passed
+    values.
+
+    After the plan has finished, a tuple of outputs can be returned. The
+    `outputs` attribute contains the names of the variables that will used to
+    generate the output tuple.
+
     After initializing the context objects, the steps are configured by the
     entries given by the `steps` attribute and are initialized and executed in
     order.
@@ -120,10 +128,14 @@ class PlanConfig(BaseModel):
     Attributes:
         context: The context objects to initialize
         steps:   The steps that are executed by the plan
+        inputs:  The names of input variables
+        outputs: The names of output variables
     """
 
     context: List[ContextConfig] = []
     steps: List[StepConfig]
+    inputs: List[str] = []
+    outputs: List[str] = []
 
     model_config = ConfigDict(
         extra="forbid",

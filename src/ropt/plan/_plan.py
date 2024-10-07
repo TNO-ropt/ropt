@@ -7,7 +7,7 @@ import keyword
 import re
 from itertools import count
 from numbers import Number
-from typing import TYPE_CHECKING, Any, Dict, Final, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, Final, List, Optional, Tuple, Union
 
 import numpy as np
 from numpy.random import default_rng
@@ -101,13 +101,25 @@ class Plan:
         self._steps = self.create_steps(config.steps)
         self._aborted = False
 
-    def run(self) -> None:
+    def run(self, *args: Any) -> Tuple[Any, ...]:  # noqa: ANN401
         """Run the Plan.
 
         This method executes the steps of the plan. If a user abort event
         occurs, the method will return `True`.
         """
+        len_args = len(args)
+        len_inputs = len(self._plan_config.inputs)
+        if len_args != len_inputs:
+            msg = f"The number of inputs is incorrect: expected {len_inputs}, passed {len_args}"
+            raise PlanError(msg)
+        for name, arg in zip(self._plan_config.inputs, args):
+            self[name] = arg
         self.run_steps(self._steps)
+        missing = [name for name in self._plan_config.outputs if name not in self]
+        if missing:
+            msg = f"Missing outputs: {missing}"
+            raise PlanError(msg)
+        return tuple(self[name] for name in self._plan_config.outputs)
 
     def abort(self) -> None:
         """Abort the plan."""

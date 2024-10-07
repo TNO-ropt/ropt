@@ -1204,6 +1204,8 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
                 },
             },
         ],
+        "inputs": ["initial"],
+        "outputs": ["nested_optimum"],
     }
 
     outer_config = {
@@ -1224,11 +1226,7 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
                 "with": {
                     "config": "$config",
                     "update": ["optimum"],
-                    "nested_plan": {
-                        "plan": inner_config,
-                        "initial_var": "initial",
-                        "results_var": "nested_optimum",
-                    },
+                    "nested_plan": inner_config,
                 },
             },
         ],
@@ -1284,6 +1282,8 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
                 },
             },
         ],
+        "inputs": ["initial"],
+        "outputs": ["nested_optimum"],
     }
 
     outer_config = {
@@ -1300,11 +1300,7 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
                 "with": {
                     "config": "$config",
                     "update": ["optimum"],
-                    "nested_plan": {
-                        "plan": inner_config,
-                        "initial_var": "initial",
-                        "results_var": "nested_optimum",
-                    },
+                    "nested_plan": inner_config,
                 },
             },
         ],

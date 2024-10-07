@@ -25,20 +25,6 @@ if TYPE_CHECKING:
     from ropt.results import Results
 
 
-class DefaultNestedPlan(BaseModel):
-    """Parameters used by the nested optimizer step.
-
-    Attributes:
-        plan:        Optional nested plan to run during optimization
-        initial_var: Name of the variable providing initial_values to the nested plan
-        results_var: The name of the variable in the plan containing the result
-    """
-
-    plan: PlanConfig
-    initial_var: str
-    results_var: str
-
-
 class DefaultOptimizerStepWith(BaseModel):
     """Parameters used by the default optimizer step.
 
@@ -56,7 +42,7 @@ class DefaultOptimizerStepWith(BaseModel):
     update: List[str] = []
     initial_values: Optional[Union[str, Array1D]] = None
     exit_code_var: Optional[str] = None
-    nested_plan: Optional[DefaultNestedPlan] = None
+    nested_plan: Optional[PlanConfig] = None
 
     model_config = ConfigDict(
         extra="forbid",
@@ -182,12 +168,13 @@ class DefaultOptimizerStep(PlanStep):
         """
         if self._with.nested_plan is None:
             return None, False
-        plan = self.plan.spawn(self._with.nested_plan.plan)
-        plan[self._with.nested_plan.initial_var] = variables
-        plan.run()
+        plan = self.plan.spawn(self._with.nested_plan)
+        results = plan.run(variables)
+        assert len(results) == 1
+        assert results[0] is None or isinstance(results[0], FunctionResults)
         if plan.aborted:
             self.plan.abort()
-        return plan[self._with.nested_plan.results_var], plan.aborted
+        return results[0], plan.aborted
 
     def _get_variables(self, config: EnOptConfig) -> NDArray[np.float64]:
         if self._with.initial_values is not None:
