@@ -1354,6 +1354,12 @@ the tasks to perform by the <code>steps</code> attribute.</p>
 <p>The <code>context</code> attribute contains the configuration of the objects that
 create and maintain the environment in which the plan runs. Context objects
 are initialized before creating and running the steps.</p>
+<p>When running a plan, arguments can be passed. The <code>inputs</code> attributes
+denotes a list of input variables, that will be initialized with the passed
+values.</p>
+<p>After the plan has finished, a tuple of outputs can be returned. The
+<code>outputs</code> attribute contains the names of the variables that will used to
+generate the output tuple.</p>
 <p>After initializing the context objects, the steps are configured by the
 entries given by the <code>steps</code> attribute and are initialized and executed in
 order.</p>
@@ -1388,6 +1394,28 @@ order.</p>
             <td>
               <div class="doc-md-description">
                 <p>The steps that are executed by the plan</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.plan.PlanConfig.inputs">inputs</span></code></td>
+            <td>
+                  <code><span title="typing.List">List</span>[str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The names of input variables</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.plan.PlanConfig.outputs">outputs</span></code></td>
+            <td>
+                  <code><span title="typing.List">List</span>[str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The names of output variables</p>
               </div>
             </td>
           </tr>

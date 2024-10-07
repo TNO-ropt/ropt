@@ -680,6 +680,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.aborted" class="md-nav__link">
+    <span class="md-ellipsis">
+      aborted
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.plugin_manager" class="md-nav__link">
     <span class="md-ellipsis">
       plugin_manager
@@ -710,6 +719,15 @@
   <a href="#ropt.plan.Plan.run" class="md-nav__link">
     <span class="md-ellipsis">
       run
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.abort" class="md-nav__link">
+    <span class="md-ellipsis">
+      abort
     </span>
   </a>
   
@@ -1412,6 +1430,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.aborted" class="md-nav__link">
+    <span class="md-ellipsis">
+      aborted
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.plugin_manager" class="md-nav__link">
     <span class="md-ellipsis">
       plugin_manager
@@ -1442,6 +1469,15 @@
   <a href="#ropt.plan.Plan.run" class="md-nav__link">
     <span class="md-ellipsis">
       run
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.abort" class="md-nav__link">
+    <span class="md-ellipsis">
+      abort
     </span>
   </a>
   
@@ -1690,6 +1726,50 @@ provides a convenient way to build and execute such plans with ease.</p>
 
 
 
+<h4 id="ropt.plan.Plan.aborted" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">aborted</span><span class="p">:</span> <span class="nb">bool</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Whether the plan was aborted by the user.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the user aborted the plan.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
 <h4 id="ropt.plan.Plan.plugin_manager" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">plugin_manager</span><span class="p">:</span> <span class="n">PluginManager</span></code>
 
@@ -1859,7 +1939,7 @@ points mechanism will be used.</p>
 
 
 <h4 id="ropt.plan.Plan.run" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">run</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></code>
 
 </h4>
 
@@ -1870,28 +1950,22 @@ points mechanism will be used.</p>
 <p>This method executes the steps of the plan. If a user abort event
 occurs, the method will return <code>True</code>.</p>
 
+    </div>
 
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code>bool</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p><code>True</code> if a user abort occurred; otherwise, <code>False</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plan.Plan.abort" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">abort</span><span class="p">()</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Abort the plan.</p>
 
     </div>
 
@@ -2002,7 +2076,7 @@ execution is aborted by the user.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code>bool</code>
+                  <code>None</code>
             </td>
             <td>
               <div class="doc-md-description">
