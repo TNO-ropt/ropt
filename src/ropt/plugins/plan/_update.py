@@ -41,12 +41,8 @@ class DefaultUpdateStep(PlanStep):
 
         self._with = DefaultUpdateStepWith.model_validate(config.with_)
 
-    def run(self) -> bool:
-        """Run the update step.
-
-        Returns:
-            True if a user abort occurred, always `False`.
-        """
+    def run(self) -> None:
+        """Run the update step."""
         if not self.plan.has_context(self._with.context):
             msg = f"Env object `{self._with.context}` does not exist."
             raise PlanError(msg, step_name=self.step_config.name)
@@ -54,4 +50,3 @@ class DefaultUpdateStep(PlanStep):
             self._with.context,
             ContextUpdateDict(step_name=self.step_config.name, data=self._with.value),
         )
-        return False

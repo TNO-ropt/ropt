@@ -43,14 +43,9 @@ class DefaultResetStep(PlanStep):
             else DefaultResetStepWith.model_validate(config.with_).context
         )
 
-    def run(self) -> bool:
-        """Run the reset step.
-
-        Returns:
-            True if a user abort occurred, always `False`.
-        """
+    def run(self) -> None:
+        """Run the reset step."""
         if not self.plan.has_context(self._context):
             msg = f"Env object `{self._context}` does not exist."
             raise PlanError(msg, step_name=self.step_config.name)
         self.plan.reset_context(self._context)
-        return False

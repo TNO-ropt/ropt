@@ -99,17 +99,28 @@ class Plan:
             for config in config.context
         }
         self._steps = self.create_steps(config.steps)
+        self._aborted = False
 
-    def run(self) -> bool:
+    def run(self) -> None:
         """Run the Plan.
 
         This method executes the steps of the plan. If a user abort event
         occurs, the method will return `True`.
+        """
+        self.run_steps(self._steps)
+
+    def abort(self) -> None:
+        """Abort the plan."""
+        self._aborted = True
+
+    @property
+    def aborted(self) -> bool:
+        """Whether the plan was aborted by the user.
 
         Returns:
-            `True` if a user abort occurred; otherwise, `False`.
+            `True` if the user aborted the plan.
         """
-        return self.run_steps(self._steps)
+        return self._aborted
 
     def create_steps(self, step_configs: List[StepConfig]) -> List[PlanStep]:
         """Create step objects from step configs.
@@ -128,7 +139,7 @@ class Plan:
             for step_config in step_configs
         ]
 
-    def run_steps(self, steps: List[PlanStep]) -> bool:
+    def run_steps(self, steps: List[PlanStep]) -> None:
         """Execute a list of steps.
 
         This method executes a list of plan steps and returns `True` if the
@@ -140,9 +151,11 @@ class Plan:
         Returns:
             `True` if the execution was aborted by the user; otherwise, `False`.
         """
-        return any(
-            task.run() for task in steps if self._check_condition(task.step_config)
-        )
+        for task in steps:
+            if self._check_condition(task.step_config):
+                task.run()
+            if self._aborted:
+                break
 
     @property
     def plugin_manager(self) -> PluginManager:

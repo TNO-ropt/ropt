@@ -113,12 +113,8 @@ class PlanStep(ABC):
         return self._plan
 
     @abstractmethod
-    def run(self) -> bool:
-        """Run the step object.
-
-        Returns:
-            `True` if a user abort occurred.
-        """
+    def run(self) -> None:
+        """Run the step object."""
 
 
 class PlanPlugin(Plugin):

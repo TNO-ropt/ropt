@@ -88,11 +88,6 @@ class DefaultSetStep(PlanStep):
             raise PlanError(msg, step_name=self._step_config.name)
         self._value = value
 
-    def run(self) -> bool:
-        """Run the setvar step.
-
-        Returns:
-            True if a user abort occurred, always `False`.
-        """
+    def run(self) -> None:
+        """Run the setvar step."""
         self._plan[self._var] = self._plan.eval(self._value)
-        return False

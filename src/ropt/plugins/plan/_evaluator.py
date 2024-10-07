@@ -65,12 +65,8 @@ class DefaultEvaluatorStep(PlanStep):
             else DefaultEvaluatorStepWith.model_validate(config.with_)
         )
 
-    def run(self) -> bool:
-        """Run the evaluator step.
-
-        Returns:
-            Whether a user abort occurred.
-        """
+    def run(self) -> None:
+        """Run the evaluator step."""
         config = self.plan.parse_value(self._with.config)
         if not isinstance(config, (dict, EnOptConfig)):
             msg = "No valid EnOpt configuration provided"
@@ -130,7 +126,8 @@ class DefaultEvaluatorStep(PlanStep):
             step_name=self.step_config.name,
         )
 
-        return exit_code == OptimizerExitCode.USER_ABORT
+        if exit_code == OptimizerExitCode.USER_ABORT:
+            self.plan.abort()
 
     def _get_variables(self, config: EnOptConfig) -> NDArray[np.float64]:
         if self._with.values is not None:  # noqa: PD011

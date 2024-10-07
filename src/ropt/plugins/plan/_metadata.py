@@ -45,16 +45,11 @@ class DefaultMetadataStep(PlanStep):
             config.with_ if "metadata" in config.with_ else {"metadata": config.with_}
         )
 
-    def run(self) -> bool:
-        """Run the metadata step.
-
-        Returns:
-            True if a user abort occurred, always `False`.
-        """
+    def run(self) -> None:
+        """Run the metadata step."""
         metadata = self._plan.optimizer_context.metadata
         for key, expr in self._with.metadata.items():
             if expr is None:
                 del metadata[key]
             else:
                 metadata[key] = self.plan.parse_value(expr)
-        return False

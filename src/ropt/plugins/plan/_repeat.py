@@ -49,15 +49,11 @@ class DefaultRepeatStep(PlanStep):
         self._steps = self.plan.create_steps(with_.steps)
         self._counter_var = with_.counter_var
 
-    def run(self) -> bool:
-        """Run the steps repeatedly.
-
-        Returns:
-            True if a user abort occurred.
-        """
+    def run(self) -> None:
+        """Run the steps repeatedly."""
         for idx in range(self._num):
             if self._counter_var is not None:
                 self.plan[self._counter_var] = idx
-            if self.plan.run_steps(self._steps):
-                return True
-        return False
+            self.plan.run_steps(self._steps)
+            if self.plan.aborted:
+                break

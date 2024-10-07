@@ -84,7 +84,7 @@ class DefaultOptimizerStep(PlanStep):
         )
         self._enopt_config: EnOptConfig
 
-    def run(self) -> bool:
+    def run(self) -> None:
         """Run the optimizer step.
 
         Returns:
@@ -130,7 +130,8 @@ class DefaultOptimizerStep(PlanStep):
             step_name=self.step_config.name,
         )
 
-        return exit_code == OptimizerExitCode.USER_ABORT
+        if exit_code == OptimizerExitCode.USER_ABORT:
+            self.plan.abort()
 
     def _signal_evaluation(self, results: Optional[Tuple[Results, ...]] = None) -> None:
         """Called before and after the optimizer finishes an evaluation.
@@ -183,8 +184,10 @@ class DefaultOptimizerStep(PlanStep):
             return None, False
         plan = self.plan.spawn(self._with.nested_plan.plan)
         plan[self._with.nested_plan.initial_var] = variables
-        aborted = plan.run()
-        return plan[self._with.nested_plan.results_var], aborted
+        plan.run()
+        if plan.aborted:
+            self.plan.abort()
+        return plan[self._with.nested_plan.results_var], plan.aborted
 
     def _get_variables(self, config: EnOptConfig) -> NDArray[np.float64]:
         if self._with.initial_values is not None:
