@@ -57,12 +57,8 @@ class DefaultTrackerContext(ContextObj):
             else DefaultTrackerWith.model_validate(config.with_)
         )
         self.plan[self.context_config.id] = None
-        self.plan.optimizer_context.events.add_observer(
-            EventType.FINISHED_EVALUATION, self._track_results
-        )
-        self.plan.optimizer_context.events.add_observer(
-            EventType.FINISHED_EVALUATOR_STEP, self._track_results
-        )
+        self.plan.add_observer(EventType.FINISHED_EVALUATION, self._track_results)
+        self.plan.add_observer(EventType.FINISHED_EVALUATOR_STEP, self._track_results)
 
     def _track_results(self, event: Event) -> None:
         if self._with.filter and not (event.tags & self._with.filter):

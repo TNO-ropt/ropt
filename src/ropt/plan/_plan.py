@@ -7,17 +7,19 @@ import keyword
 import re
 from itertools import count
 from numbers import Number
-from typing import TYPE_CHECKING, Any, Dict, Final, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Dict, Final, List, Optional, Tuple
 
 import numpy as np
 from numpy.random import default_rng
 
 from ropt.config.enopt.constants import DEFAULT_SEED
+from ropt.enums import EventType
 from ropt.exceptions import PlanError
-from ropt.optimization import EventBroker
+from ropt.optimization import Event, EventBroker
 from ropt.plugins import PluginManager
 
 if TYPE_CHECKING:
+    from ropt.config.enopt import EnOptConfig
     from ropt.config.plan import PlanConfig, StepConfig
     from ropt.evaluator import Evaluator
     from ropt.plugins.plan.base import PlanStep
@@ -41,8 +43,6 @@ class OptimizerContext:
     - A seed for a random number generator used in stochastic gradient
       estimation.
     - An iterator that generates unique result IDs.
-    - An event broker for connecting user-provided callbacks to optimization
-      events.
     """
 
     def __init__(self, evaluator: Evaluator, seed: Optional[int] = None) -> None:
@@ -55,7 +55,6 @@ class OptimizerContext:
         self.evaluator = evaluator
         self.rng = default_rng(DEFAULT_SEED) if seed is None else default_rng(seed)
         self.result_id_iter = count()
-        self.events = EventBroker()
 
 
 class Plan:
@@ -82,6 +81,7 @@ class Plan:
         """
         self._plan_config = config
         self._optimizer_context = optimizer_context
+        self._event_broker = EventBroker()
         self._vars: Dict[str, Any] = {}
 
         self._plugin_manager = (
@@ -191,14 +191,27 @@ class Plan:
         and plugin manager as the current plan. However, it does not inherit
         other properties, such as variables.
 
+        In addition, any signals that are emitted by the spawned plan are
+        forwarded to the observers that are connected to this plan. In other
+        words, signals emitted by the spawn plan 'bubble' up to the current
+        plan.
+
         Args:
             config: The configuration of the new plan
         """
-        return Plan(
+        plan = Plan(
             config,
             optimizer_context=self._optimizer_context,
             plugin_manager=self._plugin_manager,
         )
+
+        def _forward_event(event: Event) -> None:
+            self._event_broker.re_emit(event)
+
+        for event_type in EventType:
+            plan.add_observer(event_type, _forward_event)
+
+        return plan
 
     def parse_value(self, value: Any) -> Any:  # noqa: ANN401
         """Parse a value as an expression or an interpolated string.
@@ -317,6 +330,48 @@ class Plan:
 
         # Evaluate as an expression:
         return self._eval_expr(value)
+
+    def add_observer(
+        self,
+        event: EventType,
+        callback: Callable[[Event], None],
+    ) -> None:
+        """Add an observer function.
+
+        Observer functions will be called during optimization if an event of the
+        given type occurs. The callable must accept an argument of the
+        [`Event`][ropt.optimization.Event] class that contains information about
+        the event that occurred.
+
+        Args:
+            event:    The type of events to react to
+            callback: The function to call if the event is received
+        """
+        self._event_broker.add_observer(event, callback)
+
+    def emit_event(
+        self,
+        event_type: EventType,
+        config: EnOptConfig,
+        /,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> None:
+        """Emit an event of the given type with given data.
+
+        When called, an [`Event`][ropt.optimization.Event] object is constructed
+        using the given `event_type` and `config` for its mandatory fields. When
+        given, the additional keyword arguments are also passed to the
+        [`Event`][ropt.optimization.Event] constructor to set the optional
+        fields. All callbacks for the given event type, that were added by the
+        `add_observer` method are then called using the newly constructed event
+        object as their argument.
+
+        Args:
+            event_type: The type of event to emit
+            config:     Optimization configuration used by the emitting object
+            kwargs:     Keyword arguments used to create an optimization event
+        """
+        self._event_broker.emit(event_type, config, **kwargs)
 
     def _check_condition(self, config: StepConfig) -> bool:
         if config.if_ is not None:

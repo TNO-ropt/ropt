@@ -96,3 +96,12 @@ class EventBroker:
         event = Event(event_type, config, **kwargs)
         for callback in self._subscribers[event_type]:
             callback(event)
+
+    def re_emit(self, event: Event) -> None:
+        """Given an event object, call the appropriate callbacks.
+
+        Args:
+            event: The event object to re-emit
+        """
+        for callback in self._subscribers[event.event_type]:
+            callback(event)

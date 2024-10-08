@@ -493,9 +493,7 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
 
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(PlanConfig.model_validate(plan_config), context)
-    plan.optimizer_context.events.add_observer(
-        EventType.FINISHED_EVALUATION, _track_evaluations
-    )
+    plan.add_observer(EventType.FINISHED_EVALUATION, _track_evaluations)
     plan.run()
 
     assert completed_functions == 14
@@ -553,9 +551,7 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
 
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(PlanConfig.model_validate(plan_config), context)
-    plan.optimizer_context.events.add_observer(
-        EventType.FINISHED_EVALUATION, _track_evaluations
-    )
+    plan.add_observer(EventType.FINISHED_EVALUATION, _track_evaluations)
     plan.run()
 
     assert not np.allclose(
@@ -658,9 +654,7 @@ def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
 
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(PlanConfig.model_validate(plan_config), context)
-    plan.optimizer_context.events.add_observer(
-        EventType.FINISHED_EVALUATION, _track_evaluations
-    )
+    plan.add_observer(EventType.FINISHED_EVALUATION, _track_evaluations)
     plan.run()
 
     assert len(completed) == 6
@@ -714,9 +708,7 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
     }
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(PlanConfig.model_validate(plan_config), context)
-    plan.optimizer_context.events.add_observer(
-        EventType.FINISHED_EVALUATION, _track_evaluations
-    )
+    plan.add_observer(EventType.FINISHED_EVALUATION, _track_evaluations)
     plan.run()
 
     assert np.all(
@@ -767,9 +759,7 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
     }
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(PlanConfig.model_validate(plan_config), context)
-    plan.optimizer_context.events.add_observer(
-        EventType.FINISHED_EVALUATION, _track_evaluations
-    )
+    plan.add_observer(EventType.FINISHED_EVALUATION, _track_evaluations)
     plan.run()
 
     assert np.all(
@@ -847,9 +837,7 @@ def test_restart_optimum_with_reset(
     }
     context = OptimizerContext(evaluator=evaluator(new_functions))
     plan = Plan(PlanConfig.model_validate(plan_config), context)
-    plan.optimizer_context.events.add_observer(
-        EventType.FINISHED_EVALUATION, _track_evaluations
-    )
+    plan.add_observer(EventType.FINISHED_EVALUATION, _track_evaluations)
     plan.run()
 
     # The third evaluation is the optimum, and used to restart the second run:
@@ -910,9 +898,7 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
     parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(parsed_config, context)
-    plan.optimizer_context.events.add_observer(
-        EventType.FINISHED_EVALUATION, _track_results
-    )
+    plan.add_observer(EventType.FINISHED_EVALUATION, _track_results)
     plan.run()
     assert restarts == [0, 1]
 
@@ -997,9 +983,7 @@ def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
     parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(parsed_config, context)
-    plan.optimizer_context.events.add_observer(
-        EventType.FINISHED_EVALUATOR_STEP, _track_evaluations
-    )
+    plan.add_observer(EventType.FINISHED_EVALUATOR_STEP, _track_evaluations)
     plan.run()
 
     assert len(completed) == 2
@@ -1036,9 +1020,7 @@ def test_exit_code(enopt_config: Any, evaluator: Any) -> None:
     }
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(PlanConfig.model_validate(plan_config), context)
-    plan.optimizer_context.events.add_observer(
-        EventType.FINISHED_OPTIMIZER_STEP, _exit_code
-    )
+    plan.add_observer(EventType.FINISHED_OPTIMIZER_STEP, _exit_code)
     plan.run()
     assert plan["exit_code"] == OptimizerExitCode.MAX_FUNCTIONS_REACHED
     assert is_called
@@ -1064,8 +1046,6 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
     nested_config["variables"]["indices"] = [1]
     enopt_config["optimizer"]["max_functions"] = 5
 
-    # TO-DO: In the future, the inner tracker will only see events from the
-    # nested plan, so the "filter" option will not be needed anymore.
     inner_config = {
         "variables": {
             "config": nested_config,
@@ -1074,7 +1054,6 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
             {
                 "id": "nested_optimum",
                 "init": "tracker",
-                "with": {"filter": ["nested_optimum"]},
             },
         ],
         "steps": [
@@ -1115,9 +1094,7 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
     parsed_config = PlanConfig.model_validate(outer_config)
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(parsed_config, context)
-    plan.optimizer_context.events.add_observer(
-        EventType.FINISHED_EVALUATION, _track_evaluations
-    )
+    plan.add_observer(EventType.FINISHED_EVALUATION, _track_evaluations)
     plan.run()
     results = plan["optimum"]
 
@@ -1156,9 +1133,7 @@ def test_table(enopt_config: Any, evaluator: Any, tmp_path: Path) -> None:
 
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(PlanConfig.model_validate(plan_config), context)
-    plan.optimizer_context.events.add_observer(
-        EventType.FINISHED_EVALUATION, handle_results
-    )
+    plan.add_observer(EventType.FINISHED_EVALUATION, handle_results)
     plan.run()
 
     assert path1.exists()

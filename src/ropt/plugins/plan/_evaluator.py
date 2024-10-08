@@ -71,7 +71,7 @@ class DefaultEvaluatorStep(PlanStep):
             raise PlanError(msg, step_name=self.step_config.name)
         self._enopt_config = EnOptConfig.model_validate(config)
 
-        self.plan.optimizer_context.events.emit(
+        self.plan.emit_event(
             EventType.START_EVALUATOR_STEP,
             self._enopt_config,
             tags=self._with.tags,
@@ -102,7 +102,7 @@ class DefaultEvaluatorStep(PlanStep):
         if results[0].functions is None:
             exit_code = OptimizerExitCode.TOO_FEW_REALIZATIONS
 
-        self.plan.optimizer_context.events.emit(
+        self.plan.emit_event(
             EventType.FINISHED_EVALUATOR_STEP,
             self._enopt_config,
             results=results,

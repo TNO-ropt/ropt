@@ -85,7 +85,7 @@ class DefaultOptimizerStep(PlanStep):
             raise PlanError(msg, step_name=self.step_config.name)
         self._enopt_config = EnOptConfig.model_validate(config)
 
-        self.plan.optimizer_context.events.emit(
+        self.plan.emit_event(
             EventType.START_OPTIMIZER_STEP,
             self._enopt_config,
             tags=self._with.tags,
@@ -113,7 +113,7 @@ class DefaultOptimizerStep(PlanStep):
         if self._with.exit_code_var is not None:
             self.plan[self._with.exit_code_var] = exit_code
 
-        self.plan.optimizer_context.events.emit(
+        self.plan.emit_event(
             EventType.FINISHED_OPTIMIZER_STEP,
             self._enopt_config,
             tags=self._with.tags,
@@ -135,7 +135,7 @@ class DefaultOptimizerStep(PlanStep):
             results: The results produced by the evaluation.
         """
         if results is None:
-            self.plan.optimizer_context.events.emit(
+            self.plan.emit_event(
                 EventType.START_EVALUATION,
                 self._enopt_config,
                 tags=self._with.tags,
@@ -146,7 +146,7 @@ class DefaultOptimizerStep(PlanStep):
             for item in results:
                 item.metadata = metadata
 
-            self.plan.optimizer_context.events.emit(
+            self.plan.emit_event(
                 EventType.FINISHED_EVALUATION,
                 self._enopt_config,
                 results=results,
