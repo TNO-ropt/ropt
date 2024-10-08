@@ -829,6 +829,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.EventBroker.re_emit" class="md-nav__link">
+    <span class="md-ellipsis">
+      re_emit
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1472,6 +1481,15 @@
   <a href="#ropt.optimization.EventBroker.emit" class="md-nav__link">
     <span class="md-ellipsis">
       emit
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.EventBroker.re_emit" class="md-nav__link">
+    <span class="md-ellipsis">
+      re_emit
     </span>
   </a>
   
@@ -2160,6 +2178,52 @@ object as their argument.</p>
             </td>
             <td>
                   <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.optimization.EventBroker.re_emit" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">re_emit</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Given an event object, call the appropriate callbacks.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>event</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.optimization._events.Event" href="#ropt.optimization.Event">Event</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The event object to re-emit</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
             </td>
           </tr>
       </tbody>

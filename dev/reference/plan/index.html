@@ -779,27 +779,18 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.reset_context" class="md-nav__link">
+  <a href="#ropt.plan.Plan.add_observer" class="md-nav__link">
     <span class="md-ellipsis">
-      reset_context
+      add_observer
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.has_context" class="md-nav__link">
+  <a href="#ropt.plan.Plan.emit_event" class="md-nav__link">
     <span class="md-ellipsis">
-      has_context
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.update_context" class="md-nav__link">
-    <span class="md-ellipsis">
-      update_context
+      emit_event
     </span>
   </a>
   
@@ -1529,27 +1520,18 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.reset_context" class="md-nav__link">
+  <a href="#ropt.plan.Plan.add_observer" class="md-nav__link">
     <span class="md-ellipsis">
-      reset_context
+      add_observer
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.has_context" class="md-nav__link">
+  <a href="#ropt.plan.Plan.emit_event" class="md-nav__link">
     <span class="md-ellipsis">
-      has_context
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.update_context" class="md-nav__link">
-    <span class="md-ellipsis">
-      update_context
+      emit_event
     </span>
   </a>
   
@@ -2106,6 +2088,10 @@ execution is aborted by the user.</p>
 <p>This method creates a new plan that shares the same optimization context
 and plugin manager as the current plan. However, it does not inherit
 other properties, such as variables.</p>
+<p>In addition, any signals that are emitted by the spawned plan are
+forwarded to the observers that are connected to this plan. In other
+words, signals emitted by the spawn plan 'bubble' up to the current
+plan.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2320,18 +2306,19 @@ evaluate to a result of any type.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.reset_context" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">reset_context</span><span class="p">(</span><span class="n">obj_id</span><span class="p">)</span></code>
+<h4 id="ropt.plan.Plan.add_observer" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">add_observer</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span></code>
 
 </h4>
 
 
     <div class="doc doc-contents ">
 
-        <p>Reset the given context object.</p>
-<p>This method calls the <code>reset</code> method of the context object identified by
-<code>obj_id</code>. The effect of this operation depends on the specific
-implementation of the context object.</p>
+        <p>Add an observer function.</p>
+<p>Observer functions will be called during optimization if an event of the
+given type occurs. The callable must accept an argument of the
+<a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.Event"><code>Event</code></a> class that contains information about
+the event that occurred.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2346,13 +2333,27 @@ implementation of the context object.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>obj_id</code></td>
+            <td><code>event</code></td>
             <td>
-                  <code>str</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The ID of the context object to reset.</p>
+                <p>The type of events to react to</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>callback</code></td>
+            <td>
+                  <code><span title="typing.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="ropt.optimization.Event" href="../optimization/#ropt.optimization.Event">Event</a>], None]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The function to call if the event is received</p>
               </div>
             </td>
             <td>
@@ -2369,17 +2370,22 @@ implementation of the context object.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.has_context" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">has_context</span><span class="p">(</span><span class="n">obj_id</span><span class="p">)</span></code>
+<h4 id="ropt.plan.Plan.emit_event" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">emit_event</span><span class="p">(</span><span class="n">event_type</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 </h4>
 
 
     <div class="doc doc-contents ">
 
-        <p>Check if a context object exists.</p>
-<p>Returns <code>True</code> if the plan contains a context object with the given ID;
-otherwise, returns <code>False</code>.</p>
+        <p>Emit an event of the given type with given data.</p>
+<p>When called, an <a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.Event"><code>Event</code></a> object is constructed
+using the given <code>event_type</code> and <code>config</code> for its mandatory fields. When
+given, the additional keyword arguments are also passed to the
+<a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.Event"><code>Event</code></a> constructor to set the optional
+fields. All callbacks for the given event type, that were added by the
+<code>add_observer</code> method are then called using the newly constructed event
+object as their argument.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2394,85 +2400,13 @@ otherwise, returns <code>False</code>.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>obj_id</code></td>
+            <td><code>event_type</code></td>
             <td>
-                  <code>str</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The ID of the context object to check.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code>bool</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p><code>True</code> if the object exists; otherwise, <code>False</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plan.Plan.update_context" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">update_context</span><span class="p">(</span><span class="n">obj_id</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Update a context object.</p>
-<p>This method calls the <code>update</code> method of the context object identified
-by <code>obj_id</code> with the given value. The effect of this operation depends
-on the specific implementation of the context object.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>obj_id</code></td>
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The context object ID</p>
+                <p>The type of event to emit</p>
               </div>
             </td>
             <td>
@@ -2480,17 +2414,31 @@ on the specific implementation of the context object.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>value</code></td>
+            <td><code>config</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optimization configuration used by the emitting object</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>kwargs</code></td>
             <td>
                   <code><span title="typing.Any">Any</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The value to use for the update</p>
+                <p>Keyword arguments used to create an optimization event</p>
               </div>
             </td>
             <td>
-                <em>required</em>
+                  <code>{}</code>
             </td>
           </tr>
       </tbody>
@@ -2735,9 +2683,6 @@ all steps in an optimization plan. This currently includes the following:</p>
 <li>A seed for a random number generator used in stochastic gradient
   estimation.</li>
 <li>An iterator that generates unique result IDs.</li>
-<li>An event broker for connecting user-provided callbacks to optimization
-  events.</li>
-<li>A metadata dictionary that can be shared between steps.</li>
 </ul>
 
 

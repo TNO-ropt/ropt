@@ -1360,6 +1360,9 @@ values.</p>
 <p>After the plan has finished, a tuple of outputs can be returned. The
 <code>outputs</code> attribute contains the names of the variables that will used to
 generate the output tuple.</p>
+<p>Variables can be created on the fly by the steps, or by the context objects,
+but can also be predefined by the <code>variables</code> attribute, giving their name
+and value.</p>
 <p>After initializing the context objects, the steps are configured by the
 entries given by the <code>steps</code> attribute and are initialized and executed in
 order.</p>
@@ -1416,6 +1419,17 @@ order.</p>
             <td>
               <div class="doc-md-description">
                 <p>The names of output variables</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.plan.PlanConfig.variables">variables</span></code></td>
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Names and values of preset variables.</p>
               </div>
             </td>
           </tr>
@@ -1489,9 +1503,9 @@ suffix.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.plan.ContextConfig.id">id</span></code></td>
+            <td><code><span title="ropt.config.plan.ContextConfig.name">name</span></code></td>
             <td>
-                  <code>str</code>
+                  <code><span title="typing.Optional">Optional</span>[str]</code>
             </td>
             <td>
               <div class="doc-md-description">
