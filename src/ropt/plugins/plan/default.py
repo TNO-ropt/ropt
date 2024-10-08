@@ -12,7 +12,6 @@ from ropt.plugins.plan.base import ContextObj, PlanStep  # noqa: TCH001
 from ._evaluator import DefaultEvaluatorStep
 from ._optimizer import DefaultOptimizerStep
 from ._repeat import DefaultRepeatStep
-from ._reset import DefaultResetStep
 from ._setvar import DefaultSetStep
 from ._tracker import DefaultTrackerContext
 from .base import PlanPlugin
@@ -25,7 +24,6 @@ _STEP_OBJECTS: Final[Dict[str, Type[PlanStep]]] = {
     "evaluator": DefaultEvaluatorStep,
     "optimizer": DefaultOptimizerStep,
     "repeat": DefaultRepeatStep,
-    "reset": DefaultResetStep,
     "setvar": DefaultSetStep,
 }
 

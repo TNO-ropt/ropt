@@ -35,9 +35,6 @@ class ContextObj:
         self._context_config = config
         self._plan = plan
 
-    def reset(self) -> None:
-        """Resets the object to its initial state."""
-
     @property
     def context_config(self) -> ContextConfig:
         """Return the context object configuration.

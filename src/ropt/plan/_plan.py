@@ -323,19 +323,6 @@ class Plan:
             return bool(self.eval(config.if_))
         return True
 
-    def reset_context(self, obj_id: str) -> None:
-        """Reset the given context object.
-
-        This method calls the `reset` method of the context object identified by
-        `obj_id`. The effect of this operation depends on the specific
-        implementation of the context object.
-
-        Args:
-            obj_id: The ID of the context object to reset.
-        """
-        if obj_id in self._context:
-            self._context[obj_id].reset()
-
     def has_context(self, obj_id: str) -> bool:
         """Check if a context object exists.
 

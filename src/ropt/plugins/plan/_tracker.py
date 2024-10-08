@@ -79,7 +79,3 @@ class DefaultTrackerContext(ContextObj):
                 )
             if results is not None:
                 self.set_variable(deepcopy(results))
-
-    def reset(self) -> None:
-        """Clear the stored values."""
-        self.set_variable(None)

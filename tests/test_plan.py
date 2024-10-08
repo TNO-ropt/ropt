@@ -400,8 +400,8 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 "with": "saved_results = $optimal",
             },
             {
-                "run": "reset",
-                "with": "optimal",
+                "run": "setvar",
+                "with": "optimal = None",
             },
         ],
     }
@@ -830,10 +830,8 @@ def test_restart_optimum_with_reset(
                             "with": "initial = $optimum",
                         },
                         {
-                            "run": "reset",
-                            "with": {
-                                "context": "optimum",
-                            },
+                            "run": "setvar",
+                            "with": "optimum = None",
                         },
                         {
                             "run": "optimizer",
