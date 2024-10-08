@@ -94,11 +94,6 @@ class OptimizationPlanRunner:
         self._metadata: Dict[str, Any] = {}
         self._context: List[Dict[str, Any]] = [
             {
-                "id": "__config__",
-                "init": "config",
-                "with": enopt_config,
-            },
-            {
                 "id": "__optimum_tracker__",
                 "init": "tracker",
                 "with": {"constraint_tolerance": constraint_tolerance},
@@ -114,6 +109,7 @@ class OptimizationPlanRunner:
                 },
             }
         ]
+        self._variables = {"__config__": enopt_config}
         self._results: _Results
 
     @property
@@ -267,7 +263,11 @@ class OptimizationPlanRunner:
                 *steps,
             ]
 
-        return {"context": self._context, "steps": steps}
+        return {
+            "context": self._context,
+            "steps": steps,
+            "variables": self._variables,
+        }
 
     def run(self) -> Self:
         """Run the optimization.

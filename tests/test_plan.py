@@ -46,12 +46,10 @@ def enopt_config_fixture() -> Dict[str, Any]:
 
 def test_run_basic(enopt_config: Any, evaluator: Any) -> None:
     plan_config = {
+        "variables": {
+            "enopt_config": enopt_config,
+        },
         "context": [
-            {
-                "id": "enopt_config",
-                "init": "config",
-                "with": enopt_config,
-            },
             {
                 "id": "results",
                 "init": "tracker",
@@ -112,12 +110,10 @@ def test_duplicate_context_ids() -> None:
 
 def test_parse_value(enopt_config: Any, evaluator: Any) -> None:
     plan_config: Dict[str, Any] = {
+        "variables": {
+            "config": enopt_config,
+        },
         "context": [
-            {
-                "id": "config",
-                "init": "config",
-                "with": enopt_config,
-            },
             {
                 "id": "results",
                 "init": "tracker",
@@ -266,12 +262,10 @@ def test_invalid_identifier(evaluator: Any) -> None:
 
 def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
     plan_config = {
+        "variables": {
+            "config": enopt_config,
+        },
         "context": [
-            {
-                "id": "config",
-                "init": "config",
-                "with": enopt_config,
-            },
             {
                 "id": "optimal1",
                 "init": "tracker",
@@ -316,12 +310,10 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
 
 def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
     plan_config = {
+        "variables": {
+            "config": enopt_config,
+        },
         "context": [
-            {
-                "id": "config",
-                "init": "config",
-                "with": enopt_config,
-            },
             {
                 "id": "optimal1",
                 "init": "tracker",
@@ -387,12 +379,10 @@ def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
 
 def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
     plan_config = {
+        "variables": {
+            "config": enopt_config,
+        },
         "context": [
-            {
-                "id": "config",
-                "init": "config",
-                "with": enopt_config,
-            },
             {
                 "id": "optimal",
                 "init": "tracker",
@@ -455,19 +445,11 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
     enopt_config2["optimizer"] = opt_config2
 
     plan_config = {
+        "variables": {
+            "enopt_config1": enopt_config1,
+            "enopt_config2": enopt_config2,
+        },
         "context": [
-            {
-                "id": "enopt_config1",
-                "init": "config",
-                "with": {
-                    "config": enopt_config1,
-                },
-            },
-            {
-                "id": "enopt_config2",
-                "init": "config",
-                "with": enopt_config2,
-            },
             {
                 "id": "optimum",
                 "init": "tracker",
@@ -540,17 +522,11 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
     enopt_config2["optimizer"]["max_functions"] = 3
 
     plan_config = {
+        "variables": {
+            "enopt_config": enopt_config,
+            "enopt_config2": enopt_config2,
+        },
         "context": [
-            {
-                "id": "enopt_config",
-                "init": "config",
-                "with": enopt_config,
-            },
-            {
-                "id": "enopt_config2",
-                "init": "config",
-                "with": enopt_config2,
-            },
             {
                 "id": "last",
                 "init": "tracker",
@@ -596,12 +572,10 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["optimizer"]["max_functions"] = 4
 
     plan_config = {
+        "variables": {
+            "enopt_config": enopt_config,
+        },
         "context": [
-            {
-                "id": "enopt_config",
-                "init": "config",
-                "with": enopt_config,
-            },
             {
                 "id": "optimum",
                 "init": "tracker",
@@ -661,13 +635,9 @@ def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["optimizer"]["max_functions"] = 3
 
     plan_config = {
-        "context": [
-            {
-                "id": "enopt_config",
-                "init": "config",
-                "with": enopt_config,
-            },
-        ],
+        "variables": {
+            "enopt_config": enopt_config,
+        },
         "steps": [
             {
                 "run": "repeat",
@@ -714,12 +684,10 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["optimizer"]["max_functions"] = 3
 
     plan_config = {
+        "variables": {
+            "enopt_config": enopt_config,
+        },
         "context": [
-            {
-                "id": "enopt_config",
-                "init": "config",
-                "with": enopt_config,
-            },
             {
                 "id": "last",
                 "init": "tracker",
@@ -770,12 +738,10 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["optimizer"]["max_functions"] = 4
 
     plan_config = {
+        "variables": {
+            "enopt_config": enopt_config,
+        },
         "context": [
-            {
-                "id": "enopt_config",
-                "init": "config",
-                "with": enopt_config,
-            },
             {
                 "id": "optimum",
                 "init": "tracker",
@@ -844,12 +810,10 @@ def test_restart_optimum_with_reset(
     enopt_config["optimizer"]["max_functions"] = max_functions
 
     plan_config = {
+        "variables": {
+            "enopt_config": enopt_config,
+        },
         "context": [
-            {
-                "id": "enopt_config",
-                "init": "config",
-                "with": enopt_config,
-            },
             {
                 "id": "optimum",
                 "init": "tracker",
@@ -924,13 +888,9 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
     }
 
     plan_config = {
-        "context": [
-            {
-                "id": "config",
-                "init": "config",
-                "with": enopt_config,
-            },
-        ],
+        "variables": {
+            "config": enopt_config,
+        },
         "steps": [
             {
                 "run": "repeat",
@@ -959,69 +919,12 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
     assert restarts == [0, 1]
 
 
-def test_update_enopt(enopt_config: Any, evaluator: Any) -> None:
-    weights = enopt_config["objective_functions"]["weights"]
-    enopt_config["objective_functions"]["weights"] = [1, 1]
-
-    plan_config = {
-        "context": [
-            {
-                "id": "config",
-                "init": "config",
-                "with": enopt_config,
-            },
-            {
-                "id": "optimum",
-                "init": "tracker",
-            },
-        ],
-        "steps": [
-            {
-                "run": "optimizer",
-                "with": {
-                    "config": "$config",
-                },
-            },
-        ],
-    }
-
-    parsed_config = PlanConfig.model_validate(plan_config)
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(parsed_config, context)
-    plan.run()
-
-    assert plan["optimum"] is not None
-    assert not np.allclose(
-        plan["optimum"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
-    )
-
-    plan_config["steps"] = [
-        {
-            "run": "update",
-            "with": {
-                "context": "config",
-                "value": {"objective_functions": {"weights": weights}},
-            },
-        },
-    ] + plan_config["steps"]
-    parsed_config = PlanConfig.model_validate(plan_config)
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(parsed_config, context)
-    plan.run()
-    assert plan["optimum"] is not None
-    assert np.allclose(
-        plan["optimum"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
-    )
-
-
 def test_evaluator_step(enopt_config: Any, evaluator: Any) -> None:
-    plan_config = {
+    plan_config: Dict[str, Any] = {
+        "variables": {
+            "config": enopt_config,
+        },
         "context": [
-            {
-                "id": "config",
-                "init": "config",
-                "with": enopt_config,
-            },
             {
                 "id": "optimum",
                 "init": "tracker",
@@ -1073,12 +976,10 @@ def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["optimizer"]["max_functions"] = 4
 
     plan_config = {
+        "variables": {
+            "config": enopt_config,
+        },
         "context": [
-            {
-                "id": "config",
-                "init": "config",
-                "with": enopt_config,
-            },
             {
                 "id": "optimum",
                 "init": "tracker",
@@ -1122,13 +1023,9 @@ def test_exit_code(enopt_config: Any, evaluator: Any) -> None:
         assert event.exit_code == OptimizerExitCode.MAX_FUNCTIONS_REACHED
 
     plan_config = {
-        "context": [
-            {
-                "id": "enopt_config",
-                "init": "config",
-                "with": enopt_config,
-            },
-        ],
+        "variables": {
+            "enopt_config": enopt_config,
+        },
         "steps": [
             {
                 "run": "optimizer",
@@ -1172,12 +1069,10 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
     # TO-DO: In the future, the inner tracker will only see events from the
     # nested plan, so the "filter" option will not be needed anymore.
     inner_config = {
+        "variables": {
+            "config": nested_config,
+        },
         "context": [
-            {
-                "id": "config",
-                "init": "config",
-                "with": nested_config,
-            },
             {
                 "id": "nested_optimum",
                 "init": "tracker",
@@ -1199,12 +1094,10 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
     }
 
     outer_config = {
+        "variables": {
+            "config": enopt_config,
+        },
         "context": [
-            {
-                "id": "config",
-                "init": "config",
-                "with": enopt_config,
-            },
             {
                 "id": "optimum",
                 "init": "tracker",
@@ -1255,12 +1148,10 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["optimizer"]["max_functions"] = 5
 
     inner_config = {
+        "variables": {
+            "config": nested_config,
+        },
         "context": [
-            {
-                "id": "config",
-                "init": "config",
-                "with": nested_config,
-            },
             {
                 "id": "nested_optimum",
                 "init": "tracker",
@@ -1284,12 +1175,10 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
     }
 
     outer_config = {
+        "variables": {
+            "config": enopt_config,
+        },
         "context": [
-            {
-                "id": "config",
-                "init": "config",
-                "with": enopt_config,
-            },
             {
                 "id": "optimum",
                 "init": "tracker",
@@ -1334,13 +1223,9 @@ def test_table(enopt_config: Any, evaluator: Any, tmp_path: Path) -> None:
         path=path1,
     )
     plan_config = {
-        "context": [
-            {
-                "id": "enopt_config",
-                "init": "config",
-                "with": enopt_config,
-            },
-        ],
+        "variables": {
+            "enopt_config": enopt_config,
+        },
         "steps": [
             {
                 "name": "opt",

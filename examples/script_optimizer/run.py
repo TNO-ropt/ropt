@@ -92,8 +92,8 @@ def main() -> None:
                 "work_dir": "work",
             },
             plan={
+                "variables": {"enopt_config": ENOPT_CONFIG},
                 "context": [
-                    {"id": "enopt_config", "init": "config", "with": ENOPT_CONFIG},
                     {"id": "optimal", "init": "tracker"},
                 ],
                 "steps": [

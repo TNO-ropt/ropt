@@ -107,6 +107,8 @@ class Plan:
         This method executes the steps of the plan. If a user abort event
         occurs, the method will return `True`.
         """
+        for var, value in self._plan_config.variables.items():
+            self[var] = value
         len_args = len(args)
         len_inputs = len(self._plan_config.inputs)
         if len_args != len_inputs:

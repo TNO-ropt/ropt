@@ -1,4 +1,4 @@
-"""This module implements the default setvar step."""
+"""This module implements the default metadata step."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 class DefaultMetadataStepWith(BaseModel):
-    """Parameters used by the default setvar step.
+    """Parameters used by the default metadata step.
 
     Attributes:
         metadata: Data to set into the metadata

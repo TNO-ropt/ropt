@@ -121,21 +121,27 @@ class PlanConfig(BaseModel):
     `outputs` attribute contains the names of the variables that will used to
     generate the output tuple.
 
+    Variables can be created on the fly by the steps, or by the context objects,
+    but can also be predefined by the `variables` attribute, giving their name
+    and value.
+
     After initializing the context objects, the steps are configured by the
     entries given by the `steps` attribute and are initialized and executed in
     order.
 
     Attributes:
-        context: The context objects to initialize
-        steps:   The steps that are executed by the plan
-        inputs:  The names of input variables
-        outputs: The names of output variables
+        context:   The context objects to initialize
+        steps:     The steps that are executed by the plan
+        inputs:    The names of input variables
+        outputs:   The names of output variables
+        variables: Names and values of preset variables.
     """
 
     context: List[ContextConfig] = []
     steps: List[StepConfig]
     inputs: List[str] = []
     outputs: List[str] = []
+    variables: Dict[str, Any] = {}
 
     model_config = ConfigDict(
         extra="forbid",

@@ -9,7 +9,6 @@ from ropt.config.plan import ContextConfig, StepConfig  # noqa: TCH001
 from ropt.plan import Plan  # noqa: TCH001
 from ropt.plugins.plan.base import ContextObj, PlanStep  # noqa: TCH001
 
-from ._config import DefaultConfigContext
 from ._evaluator import DefaultEvaluatorStep
 from ._metadata import DefaultMetadataStep
 from ._optimizer import DefaultOptimizerStep
@@ -17,11 +16,9 @@ from ._repeat import DefaultRepeatStep
 from ._reset import DefaultResetStep
 from ._setvar import DefaultSetStep
 from ._tracker import DefaultTrackerContext
-from ._update import DefaultUpdateStep
 from .base import PlanPlugin
 
 _CONTEXT_OBJECTS: Final[Dict[str, Type[ContextObj]]] = {
-    "config": DefaultConfigContext,
     "tracker": DefaultTrackerContext,
 }
 
@@ -32,7 +29,6 @@ _STEP_OBJECTS: Final[Dict[str, Type[PlanStep]]] = {
     "repeat": DefaultRepeatStep,
     "reset": DefaultResetStep,
     "setvar": DefaultSetStep,
-    "update": DefaultUpdateStep,
 }
 
 
