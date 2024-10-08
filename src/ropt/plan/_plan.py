@@ -350,22 +350,6 @@ class Plan:
         """
         return obj_id in self._context
 
-    def update_context(self, obj_id: str, value: Any) -> None:  # noqa: ANN401
-        """Update a context object.
-
-        This method calls the `update` method of the context object identified
-        by `obj_id` with the given value. The effect of this operation depends
-        on the specific implementation of the context object.
-
-        Args:
-            obj_id: The context object ID
-            value:  The value to use for the update
-        """
-        if obj_id not in self._context:
-            msg = f"not a valid context: `{obj_id}`"
-            raise PlanError(msg)
-        self._context[obj_id].update(value)
-
     def __getitem__(self, name: str) -> Any:  # noqa: ANN401
         """Get the value of a plan variable.
 

@@ -16,7 +16,7 @@ from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
     from ropt.config.plan import ContextConfig, StepConfig
-    from ropt.plan import ContextUpdate, OptimizerContext, Plan
+    from ropt.plan import OptimizerContext, Plan
 
 
 class ContextObj:
@@ -34,13 +34,6 @@ class ContextObj:
         """
         self._context_config = config
         self._plan = plan
-
-    def update(self, value: ContextUpdate) -> None:
-        """Update the value of the object.
-
-        Args:
-            value: The value used for the update.
-        """
 
     def reset(self) -> None:
         """Resets the object to its initial state."""

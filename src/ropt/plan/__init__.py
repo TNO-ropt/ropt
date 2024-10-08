@@ -45,12 +45,9 @@ from ropt.optimization import EnsembleOptimizer
 
 from ._plan import OptimizerContext, Plan
 from ._run import OptimizationPlanRunner
-from ._update import ContextUpdate, ContextUpdateDict
 
 __all__ = [
     "OptimizationPlanRunner",
-    "ContextUpdate",
-    "ContextUpdateDict",
     "EnsembleOptimizer",
     "OptimizerContext",
     "Plan",
