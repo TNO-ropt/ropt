@@ -10,7 +10,7 @@ method that generates the plan objects.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Union
 
 from ropt.plugins.base import Plugin
 
@@ -52,22 +52,6 @@ class ContextObj:
             The plan object.
         """
         return self._plan
-
-    def get_variable(self) -> Any:  # noqa: ANN401
-        """Get a variable with the name equal to the context object ID.
-
-        Returns:
-            The value of the variable.
-        """
-        return self._plan[self._context_config.id]
-
-    def set_variable(self, value: Any) -> None:  # noqa: ANN401
-        """Set a variable with the name equal to the context object ID.
-
-        Args:
-            value: The value
-        """
-        self._plan[self._context_config.id] = value
 
 
 class PlanStep(ABC):

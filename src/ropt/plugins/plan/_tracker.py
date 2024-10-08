@@ -56,7 +56,7 @@ class DefaultTrackerContext(ContextObj):
             if config.with_ is None
             else DefaultTrackerWith.model_validate(config.with_)
         )
-        self.set_variable(None)
+        self.plan[self.context_config.id] = None
         self.plan.optimizer_context.events.add_observer(
             EventType.FINISHED_EVALUATION, self._track_results
         )
@@ -71,11 +71,13 @@ class DefaultTrackerContext(ContextObj):
             results = None
             if self._with.type_ == "optimal":
                 results = _update_optimal_result(
-                    self.get_variable(), event.results, self._with.constraint_tolerance
+                    self.plan[self.context_config.id],
+                    event.results,
+                    self._with.constraint_tolerance,
                 )
             elif self._with.type_ == "last":
                 results = _get_last_result(
                     event.results, self._with.constraint_tolerance
                 )
             if results is not None:
-                self.set_variable(deepcopy(results))
+                self.plan[self.context_config.id] = deepcopy(results)
