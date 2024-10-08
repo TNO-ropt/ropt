@@ -323,20 +323,6 @@ class Plan:
             return bool(self.eval(config.if_))
         return True
 
-    def has_context(self, obj_id: str) -> bool:
-        """Check if a context object exists.
-
-        Returns `True` if the plan contains a context object with the given ID;
-        otherwise, returns `False`.
-
-        Args:
-            obj_id: The ID of the context object to check.
-
-        Returns:
-            `True` if the object exists; otherwise, `False`.
-        """
-        return obj_id in self._context
-
     def __getitem__(self, name: str) -> Any:  # noqa: ANN401
         """Get the value of a plan variable.
 
