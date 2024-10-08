@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple
-
-if TYPE_CHECKING:
-    from ropt.results import Results
+from dataclasses import dataclass
+from typing import Any, Dict, Optional
 
 
 @dataclass
@@ -32,14 +29,3 @@ class ContextUpdateDict(ContextUpdate):
     """
 
     data: Dict[str, Any]
-
-
-@dataclass
-class ContextUpdateResults(ContextUpdate):
-    """Context update data class used for updating with new results.
-
-    Attributes:
-        results: The new results
-    """
-
-    results: Tuple[Results, ...] = field(default_factory=tuple)

@@ -3,19 +3,19 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, Literal, Optional
+from typing import TYPE_CHECKING, Literal, Optional, Set
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from ropt.plan import ContextUpdate, ContextUpdateResults
+from ropt.enums import EventType
 from ropt.plugins.plan.base import ContextObj
 
 from ._utils import _get_last_result, _update_optimal_result
 
 if TYPE_CHECKING:
     from ropt.config.plan import ContextConfig
+    from ropt.optimization import Event
     from ropt.plan import Plan
-    from ropt.results import FunctionResults
 
 
 class DefaultTrackerWith(BaseModel):
@@ -32,6 +32,7 @@ class DefaultTrackerWith(BaseModel):
 
     type_: Literal["optimal", "last"] = Field(default="optimal", alias="type")
     constraint_tolerance: Optional[float] = 1e-10
+    filter: Set[str] = set()
 
     model_config = ConfigDict(
         extra="forbid",
@@ -56,31 +57,28 @@ class DefaultTrackerContext(ContextObj):
             else DefaultTrackerWith.model_validate(config.with_)
         )
         self.set_variable(None)
+        self.plan.optimizer_context.events.add_observer(
+            EventType.FINISHED_EVALUATION, self._track_results
+        )
+        self.plan.optimizer_context.events.add_observer(
+            EventType.FINISHED_EVALUATOR_STEP, self._track_results
+        )
 
-    def update(self, value: ContextUpdate) -> None:
-        """Update the tracker object.
-
-        Updates the stored results. If the `constraint_tolerance` value set in
-        the object configuration is `None`, the object value will be updated
-        according to the `type`. If `constraint_tolerance` is not `None`, it
-        will only be updated if the results do not violate any constraints.
-
-        Args:
-            value: The value to set.
-        """
-        if isinstance(value, ContextUpdateResults):
-            results: Optional[FunctionResults] = None
+    def _track_results(self, event: Event) -> None:
+        if self._with.filter and not (event.tags & self._with.filter):
+            return
+        if event.results is not None:
+            results = None
             if self._with.type_ == "optimal":
                 results = _update_optimal_result(
-                    self.get_variable(), value.results, self._with.constraint_tolerance
+                    self.get_variable(), event.results, self._with.constraint_tolerance
                 )
-            if self._with.type_ == "last":
+            elif self._with.type_ == "last":
                 results = _get_last_result(
-                    value.results, self._with.constraint_tolerance
+                    event.results, self._with.constraint_tolerance
                 )
             if results is not None:
-                results = deepcopy(results)
-                self.set_variable(results)
+                self.set_variable(deepcopy(results))
 
     def reset(self) -> None:
         """Clear the stored values."""

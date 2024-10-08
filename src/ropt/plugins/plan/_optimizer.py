@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Optional, Set, Tuple, Union
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict
@@ -13,7 +13,7 @@ from ropt.config.utils import Array1D  # noqa: TCH001
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import PlanError
-from ropt.plan import ContextUpdateResults, EnsembleOptimizer, MetaDataType, Plan
+from ropt.plan import EnsembleOptimizer, MetaDataType, Plan
 from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
 from ropt.utils.scaling import scale_variables
@@ -32,14 +32,13 @@ class DefaultOptimizerStepWith(BaseModel):
 
     Attributes:
         config:         ID of the context object that contains the optimizer configuration
-        update:         List of the objects that are notified of new results
         initial_values: The initial values for the optimizer
         exit_code_var:  Name of the variable to store the exit code
         nested_plan:    Optional nested plan configuration
     """
 
     config: str
-    update: List[str] = []
+    tags: Set[str] = set()
     initial_values: Optional[Union[str, Array1D]] = None
     exit_code_var: Optional[str] = None
     nested_plan: Optional[PlanConfig] = None
@@ -85,6 +84,7 @@ class DefaultOptimizerStep(PlanStep):
         self.plan.optimizer_context.events.emit(
             EventType.START_OPTIMIZER_STEP,
             self._enopt_config,
+            tags=self._with.tags,
             step_name=self.step_config.name,
         )
 
@@ -112,6 +112,7 @@ class DefaultOptimizerStep(PlanStep):
         self.plan.optimizer_context.events.emit(
             EventType.FINISHED_OPTIMIZER_STEP,
             self._enopt_config,
+            tags=self._with.tags,
             exit_code=exit_code,
             step_name=self.step_config.name,
         )
@@ -133,6 +134,7 @@ class DefaultOptimizerStep(PlanStep):
             self.plan.optimizer_context.events.emit(
                 EventType.START_EVALUATION,
                 self._enopt_config,
+                tags=self._with.tags,
                 step_name=self.step_config.name,
             )
         else:
@@ -140,18 +142,11 @@ class DefaultOptimizerStep(PlanStep):
             for item in results:
                 item.metadata = metadata
 
-            for obj_id in self._with.update:
-                self.plan.update_context(
-                    obj_id,
-                    ContextUpdateResults(
-                        step_name=self.step_config.name,
-                        results=results,
-                    ),
-                )
             self.plan.optimizer_context.events.emit(
                 EventType.FINISHED_EVALUATION,
                 self._enopt_config,
                 results=results,
+                tags=self._with.tags,
                 step_name=self.step_config.name,
             )
 

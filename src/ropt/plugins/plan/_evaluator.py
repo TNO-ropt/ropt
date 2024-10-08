@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional, Union
+from typing import TYPE_CHECKING, Optional, Set, Union
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict
@@ -12,7 +12,6 @@ from ropt.config.utils import Array2D  # noqa: TCH001
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted, PlanError
-from ropt.plan import ContextUpdateResults
 from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
 from ropt.utils.scaling import scale_variables
@@ -32,12 +31,11 @@ class DefaultEvaluatorStepWith(BaseModel):
 
     Attributes:
         config:   ID of the context object that contains the optimizer configuration
-        update:   List of the objects that are notified of new results
         values:   Values to evaluate at
     """
 
     config: str
-    update: List[str] = []
+    tags: Set[str] = set()
     values: Optional[Union[str, Array2D]] = None
 
     model_config = ConfigDict(
@@ -76,6 +74,7 @@ class DefaultEvaluatorStep(PlanStep):
         self.plan.optimizer_context.events.emit(
             EventType.START_EVALUATOR_STEP,
             self._enopt_config,
+            tags=self._with.tags,
             step_name=self.step_config.name,
         )
 
@@ -109,19 +108,11 @@ class DefaultEvaluatorStep(PlanStep):
         for item in results:
             item.metadata = metadata
 
-        for obj_id in self._with.update:
-            self.plan.update_context(
-                obj_id,
-                ContextUpdateResults(
-                    step_name=self.step_config.name,
-                    results=results,
-                ),
-            )
-
         self.plan.optimizer_context.events.emit(
             EventType.FINISHED_EVALUATOR_STEP,
             self._enopt_config,
             results=results,
+            tags=self._with.tags,
             exit_code=exit_code,
             step_name=self.step_config.name,
         )

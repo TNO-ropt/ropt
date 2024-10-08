@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from ropt.plan import ContextUpdate, OptimizerContext, Plan
 
 
-class ContextObj(ABC):
+class ContextObj:
     """Base class for context objects."""
 
     def __init__(self, config: ContextConfig, plan: Plan) -> None:
@@ -35,7 +35,6 @@ class ContextObj(ABC):
         self._context_config = config
         self._plan = plan
 
-    @abstractmethod
     def update(self, value: ContextUpdate) -> None:
         """Update the value of the object.
 
@@ -43,7 +42,7 @@ class ContextObj(ABC):
             value: The value used for the update.
         """
 
-    def reset(self) -> None:  # noqa: B027
+    def reset(self) -> None:
         """Resets the object to its initial state."""
 
     @property

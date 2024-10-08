@@ -110,7 +110,6 @@ class OptimizationPlanRunner:
                 "run": "optimizer",
                 "with": {
                     "config": "$__config__",
-                    "update": ["__optimum_tracker__"],
                     "exit_code_var": "exit_code",
                 },
             }

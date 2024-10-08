@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Set, Tuple
 
 from ropt.enums import EventType, OptimizerExitCode
 
@@ -36,6 +36,7 @@ class Event:
     config: EnOptConfig
     results: Optional[Tuple[Results, ...]] = None
     exit_code: Optional[OptimizerExitCode] = None
+    tags: Set[str] = field(default_factory=set)
     step_name: Optional[str] = None
 
 
