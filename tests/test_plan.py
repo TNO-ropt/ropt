@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Any, Dict, List
 
 import numpy as np
 import pytest
-from pydantic import ValidationError
 
 from ropt.config.plan import PlanConfig
 from ropt.enums import EventType, OptimizerExitCode
@@ -51,8 +50,8 @@ def test_run_basic(enopt_config: Any, evaluator: Any) -> None:
         },
         "context": [
             {
-                "id": "results",
                 "init": "tracker",
+                "with": {"var": "results"},
             },
         ],
         "steps": [
@@ -74,50 +73,13 @@ def test_run_basic(enopt_config: Any, evaluator: Any) -> None:
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
-def test_invalid_context_ids() -> None:
-    plan_config: Dict[str, Any] = {
-        "context": [
-            {
-                "id": "1optimal",
-                "init": "tracker",
-            },
-        ],
-        "steps": [],
-    }
-    with pytest.raises(ValidationError, match=".*Invalid ID: 1optimal.*"):
-        PlanConfig.model_validate(plan_config)
-
-
-def test_duplicate_context_ids() -> None:
-    plan_config: Dict[str, Any] = {
-        "context": [
-            {
-                "id": "optimal",
-                "init": "tracker",
-            },
-            {
-                "id": "optimal",
-                "init": "tracker",
-            },
-        ],
-        "steps": [],
-    }
-    with pytest.raises(
-        ValidationError, match=".*Duplicate Context ID\\(s\\): optimal.*"
-    ):
-        PlanConfig.model_validate(plan_config)
-
-
 def test_parse_value(enopt_config: Any, evaluator: Any) -> None:
     plan_config: Dict[str, Any] = {
         "variables": {
             "config": enopt_config,
         },
         "context": [
-            {
-                "id": "results",
-                "init": "tracker",
-            },
+            {"init": "tracker", "with": {"var": "results"}},
         ],
         "steps": [
             {
@@ -267,14 +229,12 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
         },
         "context": [
             {
-                "id": "optimal1",
                 "init": "tracker",
-                "with": {"filter": ["optimal1"]},
+                "with": {"var": "optimal1", "filter": ["optimal1"]},
             },
             {
-                "id": "optimal2",
                 "init": "tracker",
-                "with": {"filter": ["optimal2"]},
+                "with": {"var": "optimal2", "filter": ["optimal2"]},
             },
         ],
         "steps": [
@@ -315,19 +275,16 @@ def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
         },
         "context": [
             {
-                "id": "optimal1",
                 "init": "tracker",
-                "with": {"filter": ["optimal1"]},
+                "with": {"var": "optimal1", "filter": ["optimal1"]},
             },
             {
-                "id": "optimal2",
                 "init": "tracker",
-                "with": {"filter": ["optimal2"]},
+                "with": {"var": "optimal2", "filter": ["optimal2"]},
             },
             {
-                "id": "optimal3",
                 "init": "tracker",
-                "with": {"filter": ["optimal3"]},
+                "with": {"var": "optimal3", "filter": ["optimal3"]},
             },
         ],
         "steps": [
@@ -383,10 +340,7 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
             "config": enopt_config,
         },
         "context": [
-            {
-                "id": "optimal",
-                "init": "tracker",
-            },
+            {"init": "tracker", "with": {"var": "optimal"}},
         ],
         "steps": [
             {
@@ -450,14 +404,10 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
             "enopt_config2": enopt_config2,
         },
         "context": [
+            {"init": "tracker", "with": {"var": "optimum"}},
             {
-                "id": "optimum",
                 "init": "tracker",
-            },
-            {
-                "id": "last",
-                "init": "tracker",
-                "with": {"type": "last"},
+                "with": {"var": "last", "type": "last"},
             },
         ],
         "steps": [
@@ -526,9 +476,8 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
         },
         "context": [
             {
-                "id": "last",
                 "init": "tracker",
-                "with": {"type": "last", "filter": ["last"]},
+                "with": {"var": "last", "type": "last", "filter": ["last"]},
             },
         ],
         "steps": [
@@ -572,10 +521,7 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
             "enopt_config": enopt_config,
         },
         "context": [
-            {
-                "id": "optimum",
-                "init": "tracker",
-            },
+            {"init": "tracker", "with": {"var": "optimum"}},
         ],
         "steps": [
             {
@@ -683,9 +629,8 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
         },
         "context": [
             {
-                "id": "last",
                 "init": "tracker",
-                "with": {"type": "last"},
+                "with": {"var": "last", "type": "last"},
             },
         ],
         "steps": [
@@ -734,10 +679,7 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
             "enopt_config": enopt_config,
         },
         "context": [
-            {
-                "id": "optimum",
-                "init": "tracker",
-            },
+            {"init": "tracker", "with": {"var": "optimum"}},
         ],
         "steps": [
             {
@@ -804,10 +746,7 @@ def test_restart_optimum_with_reset(
             "enopt_config": enopt_config,
         },
         "context": [
-            {
-                "id": "optimum",
-                "init": "tracker",
-            },
+            {"init": "tracker", "with": {"var": "optimum"}},
         ],
         "steps": [
             {
@@ -909,10 +848,7 @@ def test_evaluator_step(enopt_config: Any, evaluator: Any) -> None:
             "config": enopt_config,
         },
         "context": [
-            {
-                "id": "optimum",
-                "init": "tracker",
-            },
+            {"init": "tracker", "with": {"var": "optimum"}},
         ],
         "steps": [
             {
@@ -964,10 +900,7 @@ def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
             "config": enopt_config,
         },
         "context": [
-            {
-                "id": "optimum",
-                "init": "tracker",
-            },
+            {"init": "tracker", "with": {"var": "optimum"}},
         ],
         "steps": [
             {
@@ -1051,10 +984,7 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
             "config": nested_config,
         },
         "context": [
-            {
-                "id": "nested_optimum",
-                "init": "tracker",
-            },
+            {"init": "tracker", "with": {"var": "nested_optimum"}},
         ],
         "steps": [
             {
@@ -1075,10 +1005,7 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
             "config": enopt_config,
         },
         "context": [
-            {
-                "id": "optimum",
-                "init": "tracker",
-            },
+            {"init": "tracker", "with": {"var": "optimum"}},
         ],
         "steps": [
             {

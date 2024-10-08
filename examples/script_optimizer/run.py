@@ -94,7 +94,7 @@ def main() -> None:
             plan={
                 "variables": {"enopt_config": ENOPT_CONFIG},
                 "context": [
-                    {"id": "optimal", "init": "tracker"},
+                    {"init": "tracker", "with": {"var": "optimal"}},
                 ],
                 "steps": [
                     {

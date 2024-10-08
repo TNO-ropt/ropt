@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from collections import Counter
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ContextConfig(BaseModel):
@@ -33,12 +32,12 @@ class ContextConfig(BaseModel):
         suffix.
 
     Attributes:
-        id:    An identifier used to refer to the context object
+        name:  An identifier used to refer to the context object
         init:  Identifies the code that initializes the object
         with_: Additional parameters passed to the object
     """
 
-    id: str
+    name: Optional[str] = None
     init: str
     with_: Any = Field(default_factory=dict, alias="with")
 
@@ -46,13 +45,6 @@ class ContextConfig(BaseModel):
         extra="forbid",
         validate_default=True,
     )
-
-    @model_validator(mode="after")
-    def _after_validator(self) -> ContextConfig:
-        if not self.id.isidentifier():
-            msg = f"Invalid ID: {self.id}"
-            raise ValueError(msg)
-        return self
 
 
 class StepConfig(BaseModel):
@@ -147,14 +139,3 @@ class PlanConfig(BaseModel):
         extra="forbid",
         validate_default=True,
     )
-
-    @model_validator(mode="after")
-    def _after_validator(self) -> PlanConfig:
-        duplicates = [
-            id_
-            for id_, count in Counter([item.id for item in self.context]).items()
-            if count > 1
-        ]
-        if duplicates:
-            raise ValueError("Duplicate Context ID(s): " + ", ".join(duplicates))
-        return self

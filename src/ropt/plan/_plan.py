@@ -87,12 +87,12 @@ class Plan:
         self._plugin_manager = (
             PluginManager() if plugin_manager is None else plugin_manager
         )
-        self._context = {
-            config.id: self._plugin_manager.get_plugin(
-                "plan", method=config.init
-            ).create(config, self)
+        self._context = [
+            self._plugin_manager.get_plugin("plan", method=config.init).create(
+                config, self
+            )
             for config in config.context
-        }
+        ]
         self._steps = self.create_steps(config.steps)
         self._aborted = False
 

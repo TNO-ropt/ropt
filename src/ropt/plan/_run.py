@@ -94,9 +94,11 @@ class OptimizationPlanRunner:
         self._metadata: Dict[str, Any] = {}
         self._context: List[Dict[str, Any]] = [
             {
-                "id": "__optimum_tracker__",
                 "init": "tracker",
-                "with": {"constraint_tolerance": constraint_tolerance},
+                "with": {
+                    "var": "__optimum_tracker__",
+                    "constraint_tolerance": constraint_tolerance,
+                },
             },
         ]
         self._steps: List[Dict[str, Any]] = [

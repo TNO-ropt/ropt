@@ -26,10 +26,13 @@ class DefaultTrackerWith(BaseModel):
     - "last": Track the last result added
 
     Attributes:
+        var:                  The name of the variable to store the tracked result
         type:                 The type of result to store
         constraint_tolerance: Optional constraint tolerance
+        filter:               Optional tags of the sources to track
     """
 
+    var: str
     type_: Literal["optimal", "last"] = Field(default="optimal", alias="type")
     constraint_tolerance: Optional[float] = 1e-10
     filter: Set[str] = set()
@@ -51,12 +54,8 @@ class DefaultTrackerContext(ContextObj):
             plan:   The plan that runs this step
         """
         super().__init__(config, plan)
-        self._with = (
-            DefaultTrackerWith()
-            if config.with_ is None
-            else DefaultTrackerWith.model_validate(config.with_)
-        )
-        self.plan[self.context_config.id] = None
+        self._with = DefaultTrackerWith.model_validate(config.with_)
+        self.plan[self._with.var] = None
         self.plan.add_observer(EventType.FINISHED_EVALUATION, self._track_results)
         self.plan.add_observer(EventType.FINISHED_EVALUATOR_STEP, self._track_results)
 
@@ -67,7 +66,7 @@ class DefaultTrackerContext(ContextObj):
             results = None
             if self._with.type_ == "optimal":
                 results = _update_optimal_result(
-                    self.plan[self.context_config.id],
+                    self.plan[self._with.var],
                     event.results,
                     self._with.constraint_tolerance,
                 )
@@ -76,4 +75,4 @@ class DefaultTrackerContext(ContextObj):
                     event.results, self._with.constraint_tolerance
                 )
             if results is not None:
-                self.plan[self.context_config.id] = deepcopy(results)
+                self.plan[self._with.var] = deepcopy(results)

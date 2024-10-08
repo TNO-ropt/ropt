@@ -30,8 +30,8 @@ class DefaultEvaluatorStepWith(BaseModel):
     object.
 
     Attributes:
-        config:   ID of the context object that contains the optimizer configuration
-        values:   Values to evaluate at
+        config: The optimizer configuration
+        values: Values to evaluate at
     """
 
     config: str
@@ -68,7 +68,7 @@ class DefaultEvaluatorStep(PlanStep):
         config = self.plan.parse_value(self._with.config)
         if not isinstance(config, (dict, EnOptConfig)):
             msg = "No valid EnOpt configuration provided"
-            raise PlanError(msg, step_name=self.step_config.name)
+            raise PlanError(msg, name=self.step_config.name)
         self._enopt_config = EnOptConfig.model_validate(config)
 
         self.plan.emit_event(
@@ -130,5 +130,5 @@ class DefaultEvaluatorStep(PlanStep):
                 )
             if parsed_variables is not None:
                 msg = f"`{self._with.values} does not contain variables."  # noqa: PD011
-                raise PlanError(msg, step_name=self.step_config.name)
+                raise PlanError(msg, name=self.step_config.name)
         return self._enopt_config.variables.initial_values

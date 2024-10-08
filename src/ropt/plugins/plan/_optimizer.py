@@ -33,7 +33,7 @@ class DefaultOptimizerStepWith(BaseModel):
     Optionally the initial variables to be used can be set from a context object.
 
     Attributes:
-        config:         ID of the context object that contains the optimizer configuration
+        config:         The optimizer configuration
         initial_values: The initial values for the optimizer
         exit_code_var:  Name of the variable to store the exit code
         nested_plan:    Optional nested plan configuration
@@ -82,7 +82,7 @@ class DefaultOptimizerStep(PlanStep):
         config = self.plan.parse_value(self._with.config)
         if not isinstance(config, (dict, EnOptConfig)):
             msg = "No valid EnOpt configuration provided"
-            raise PlanError(msg, step_name=self.step_config.name)
+            raise PlanError(msg, name=self.step_config.name)
         self._enopt_config = EnOptConfig.model_validate(config)
 
         self.plan.emit_event(
@@ -191,7 +191,7 @@ class DefaultOptimizerStep(PlanStep):
                 )
             if parsed_variables is not None:
                 msg = f"`{self._with.initial_values} does not contain variables."
-                raise PlanError(msg, step_name=self.step_config.name)
+                raise PlanError(msg, name=self.step_config.name)
         return self._enopt_config.variables.initial_values
 
     def _get_metadata(self, *, add_step_name: bool) -> MetaDataType:

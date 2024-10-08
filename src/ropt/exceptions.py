@@ -16,22 +16,15 @@ class PlanError(Exception):
         self,
         message: str,
         *,
-        step_name: Optional[str] = None,
-        context_id: Optional[str] = None,
+        name: Optional[str] = None,
     ) -> None:
         """Initialize with a custom error message.
 
         Args:
-            message:    Error message
-            step_name:  Optional step name to add to the message
-            context_id: Optional context ID to add to the message
+            message: Error message
+            name:    Optional step or context object name to add to the message
         """
-        if step_name is not None:
-            msg = f"Step `{step_name}`: "
-        elif context_id is not None:
-            msg = f"Context object with ID `{context_id}`: "
-        else:
-            msg = ""
+        msg = f"Step `{name}`: " if name is not None else ""
         super().__init__(msg + message)
 
 
