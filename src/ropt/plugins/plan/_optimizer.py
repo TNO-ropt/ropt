@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Set, Tuple, Union
+from typing import TYPE_CHECKING, Dict, Optional, Set, Tuple, Union
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict
@@ -13,7 +13,7 @@ from ropt.config.utils import Array1D  # noqa: TCH001
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import PlanError
-from ropt.plan import EnsembleOptimizer, MetaDataType, Plan
+from ropt.plan import EnsembleOptimizer, Plan
 from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
 from ropt.utils.scaling import scale_variables
@@ -23,6 +23,8 @@ if TYPE_CHECKING:
 
     from ropt.config.plan import StepConfig
     from ropt.results import Results
+
+MetaDataType = Dict[str, Union[int, float, bool, str]]
 
 
 class DefaultOptimizerStepWith(BaseModel):
@@ -35,6 +37,7 @@ class DefaultOptimizerStepWith(BaseModel):
         initial_values: The initial values for the optimizer
         exit_code_var:  Name of the variable to store the exit code
         nested_plan:    Optional nested plan configuration
+        metadata:       Metadata to add to each result
     """
 
     config: str
@@ -42,6 +45,7 @@ class DefaultOptimizerStepWith(BaseModel):
     initial_values: Optional[Union[str, Array1D]] = None
     exit_code_var: Optional[str] = None
     nested_plan: Optional[PlanConfig] = None
+    metadata: MetaDataType = {}
 
     model_config = ConfigDict(
         extra="forbid",
@@ -191,7 +195,10 @@ class DefaultOptimizerStep(PlanStep):
         return self._enopt_config.variables.initial_values
 
     def _get_metadata(self, *, add_step_name: bool) -> MetaDataType:
-        metadata = self.plan.optimizer_context.metadata
+        metadata = {
+            key: self.plan.parse_value(value)
+            for key, value in self._with.metadata.items()
+        }
         if add_step_name and self.step_config.name is not None:
             metadata["step_name"] = self.step_config.name
         return metadata

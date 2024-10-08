@@ -249,26 +249,6 @@ class OptimizationPlanRunner:
         )
         return self
 
-    def _build_plan_config(self) -> Dict[str, Any]:
-        steps = self._steps
-
-        if self._metadata:
-            steps = [
-                {
-                    "run": "metadata",
-                    "with": {
-                        "metadata": self._metadata,
-                    },
-                },
-                *steps,
-            ]
-
-        return {
-            "context": self._context,
-            "steps": steps,
-            "variables": self._variables,
-        }
-
     def run(self) -> Self:
         """Run the optimization.
 
@@ -276,7 +256,13 @@ class OptimizationPlanRunner:
             The `OptimizationPlanRunner` instance, allowing for method chaining.
         """
         plan = Plan(
-            PlanConfig.model_validate(self._build_plan_config()),
+            PlanConfig.model_validate(
+                {
+                    "context": self._context,
+                    "steps": self._steps,
+                    "variables": self._variables,
+                }
+            ),
             self._optimizer_context,
             plugin_manager=self._plugin_manager,
         )

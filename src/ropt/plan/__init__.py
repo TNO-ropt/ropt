@@ -43,7 +43,7 @@ provides a convenient way to build and execute such plans with ease.
 
 from ropt.optimization import EnsembleOptimizer
 
-from ._plan import MetaDataType, OptimizerContext, Plan
+from ._plan import OptimizerContext, Plan
 from ._run import OptimizationPlanRunner
 from ._update import ContextUpdate, ContextUpdateDict
 
@@ -53,6 +53,5 @@ __all__ = [
     "ContextUpdateDict",
     "EnsembleOptimizer",
     "OptimizerContext",
-    "MetaDataType",
     "Plan",
 ]

@@ -102,12 +102,6 @@ class DefaultEvaluatorStep(PlanStep):
         if results[0].functions is None:
             exit_code = OptimizerExitCode.TOO_FEW_REALIZATIONS
 
-        metadata = self.plan.optimizer_context.metadata
-        if self.step_config.name is not None:
-            metadata["step_name"] = self.step_config.name
-        for item in results:
-            item.metadata = metadata
-
         self.plan.optimizer_context.events.emit(
             EventType.FINISHED_EVALUATOR_STEP,
             self._enopt_config,

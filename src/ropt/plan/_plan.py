@@ -7,7 +7,7 @@ import keyword
 import re
 from itertools import count
 from numbers import Number
-from typing import TYPE_CHECKING, Any, Dict, Final, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, Final, List, Optional, Tuple
 
 import numpy as np
 from numpy.random import default_rng
@@ -30,9 +30,6 @@ _BOOL_OPS: Final = (ast.Or, ast.And)
 _CMP_OPS: Final = (ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE)
 
 
-MetaDataType = Dict[str, Union[int, float, bool, str]]
-
-
 class OptimizerContext:
     """Context class for shared state across a plan.
 
@@ -46,7 +43,6 @@ class OptimizerContext:
     - An iterator that generates unique result IDs.
     - An event broker for connecting user-provided callbacks to optimization
       events.
-    - A metadata dictionary that can be shared between steps.
     """
 
     def __init__(self, evaluator: Evaluator, seed: Optional[int] = None) -> None:
@@ -60,7 +56,6 @@ class OptimizerContext:
         self.rng = default_rng(DEFAULT_SEED) if seed is None else default_rng(seed)
         self.result_id_iter = count()
         self.events = EventBroker()
-        self.metadata: MetaDataType = {}
 
 
 class Plan:
