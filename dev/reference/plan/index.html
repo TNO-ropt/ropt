@@ -2335,8 +2335,8 @@ evaluate to a result of any type.</p>
         <p>Add an observer function.</p>
 <p>Observer functions will be called during optimization if an event of the
 given type occurs. The callable must accept an argument of the
-<a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> class that contains information about
-the event that occurred.</p>
+<a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> class that contains information about the
+event that occurred.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2397,11 +2397,11 @@ the event that occurred.</p>
     <div class="doc doc-contents ">
 
         <p>Emit an event of the given type with given data.</p>
-<p>When called, an <a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> object is constructed
-using the given <code>event_type</code> and <code>config</code> for its mandatory fields. When
+<p>When called, an <a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> object is constructed using
+the given <code>event_type</code> and <code>config</code> for its mandatory fields. When
 given, the additional keyword arguments are also passed to the
-<a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> constructor to set the optional
-fields. All callbacks for the given event type, that were added by the
+<a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> constructor to set the optional fields. All
+callbacks for the given event type, that were added by the
 <code>add_observer</code> method are then called using the newly constructed event
 object as their argument.</p>
 
