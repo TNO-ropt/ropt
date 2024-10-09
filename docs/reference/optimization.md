@@ -4,6 +4,4 @@
             - EnsembleOptimizer
             - SignalEvaluationCallback
             - NestedOptimizerCallback
-            - EventBroker
-            - Event
 

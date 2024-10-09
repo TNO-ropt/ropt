@@ -11,8 +11,7 @@ import pytest
 from ropt.config.plan import PlanConfig
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import PlanError
-from ropt.optimization import Event
-from ropt.plan import OptimizationPlanRunner, OptimizerContext, Plan
+from ropt.plan import Event, OptimizationPlanRunner, OptimizerContext, Plan
 from ropt.report import ResultsTable
 from ropt.results import FunctionResults, Results
 

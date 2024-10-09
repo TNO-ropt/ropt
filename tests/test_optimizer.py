@@ -13,7 +13,7 @@ from ropt.plan import OptimizationPlanRunner
 from ropt.results import FunctionResults, GradientResults
 
 if TYPE_CHECKING:
-    from ropt.optimization import Event
+    from ropt.plan import Event
 
 
 @pytest.fixture(name="enopt_config")

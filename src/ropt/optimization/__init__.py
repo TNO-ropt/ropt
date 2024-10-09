@@ -6,7 +6,6 @@ optimizations, the [`Plan`][ropt.plan.Plan] functionality is usually more
 flexible and easier to use.
 """
 
-from ._events import Event
 from ._optimizer import (
     EnsembleOptimizer,
     NestedOptimizerCallback,
@@ -15,7 +14,6 @@ from ._optimizer import (
 
 __all__ = [
     "EnsembleOptimizer",
-    "Event",
     "NestedOptimizerCallback",
     "SignalEvaluationCallback",
 ]

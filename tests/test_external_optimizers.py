@@ -4,8 +4,7 @@ import numpy as np
 import pytest
 
 from ropt.enums import EventType, OptimizerExitCode
-from ropt.optimization import Event
-from ropt.plan import OptimizationPlanRunner
+from ropt.plan import Event, OptimizationPlanRunner
 from ropt.results import FunctionResults
 
 pytestmark = [pytest.mark.slow]

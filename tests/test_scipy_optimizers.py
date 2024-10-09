@@ -6,8 +6,7 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt.enums import ConstraintType, EventType
-from ropt.optimization import Event
-from ropt.plan import OptimizationPlanRunner
+from ropt.plan import Event, OptimizationPlanRunner
 from ropt.plugins.optimizer.scipy import (
     _CONSTRAINT_REQUIRES_BOUNDS,
     _CONSTRAINT_SUPPORT_BOUNDS,

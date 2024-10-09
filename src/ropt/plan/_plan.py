@@ -15,7 +15,7 @@ from numpy.random import default_rng
 from ropt.config.enopt.constants import DEFAULT_SEED
 from ropt.enums import EventType
 from ropt.exceptions import PlanError
-from ropt.optimization import Event
+from ropt.plan import Event
 from ropt.plugins import PluginManager
 
 if TYPE_CHECKING:
@@ -340,8 +340,8 @@ class Plan:
 
         Observer functions will be called during optimization if an event of the
         given type occurs. The callable must accept an argument of the
-        [`Event`][ropt.optimization.Event] class that contains information about
-        the event that occurred.
+        [`Event`][ropt.plan.Event] class that contains information about the
+        event that occurred.
 
         Args:
             event:    The type of events to react to
@@ -358,11 +358,11 @@ class Plan:
     ) -> None:
         """Emit an event of the given type with given data.
 
-        When called, an [`Event`][ropt.optimization.Event] object is constructed
-        using the given `event_type` and `config` for its mandatory fields. When
+        When called, an [`Event`][ropt.plan.Event] object is constructed using
+        the given `event_type` and `config` for its mandatory fields. When
         given, the additional keyword arguments are also passed to the
-        [`Event`][ropt.optimization.Event] constructor to set the optional
-        fields. All callbacks for the given event type, that were added by the
+        [`Event`][ropt.plan.Event] constructor to set the optional fields. All
+        callbacks for the given event type, that were added by the
         `add_observer` method are then called using the newly constructed event
         object as their argument.
 

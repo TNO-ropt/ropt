@@ -5,8 +5,7 @@ import pytest
 
 from ropt.config.enopt import EnOptConfig
 from ropt.enums import EventType
-from ropt.optimization import Event
-from ropt.plan import OptimizationPlanRunner
+from ropt.plan import Event, OptimizationPlanRunner
 from ropt.report import ResultsDataFrame
 
 # Requires pandas:

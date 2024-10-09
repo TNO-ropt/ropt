@@ -11,7 +11,7 @@ from numpy.random import default_rng
 
 from ropt.apps.script_optimizer import ScriptOptimizer
 from ropt.enums import EventType
-from ropt.optimization import Event
+from ropt.plan import Event
 from ropt.results import FunctionResults
 
 # Number of realizations:

@@ -104,7 +104,7 @@ class EventType(IntEnum):
 
     During the execution of the optimization plan, events may be emitted and
     callbacks can be connected to these events . When triggered by an event, the
-    callbacks receive an [`Event`][ropt.optimization.Event] object. This object
+    callbacks receive an [`Event`][ropt.plan.Event] object. This object
     contains at least the type of the event (a value of this enumeration) and
     the current configuration of the step that is executing. If the step has a
     name it is also added to the event. Additionally, depending on the event

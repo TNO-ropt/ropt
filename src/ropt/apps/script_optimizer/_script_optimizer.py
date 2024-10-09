@@ -34,8 +34,7 @@ from ropt.enums import EventType, OptimizerExitCode
 from ropt.evaluator import EvaluatorContext
 from ropt.evaluator.parsl import ParslEvaluator, State
 from ropt.exceptions import ConfigError
-from ropt.optimization import Event
-from ropt.plan import OptimizerContext, Plan
+from ropt.plan import Event, OptimizerContext, Plan
 
 from ._config import ScriptEvaluatorConfig, ScriptOptimizerConfig
 from ._task import ScriptTask

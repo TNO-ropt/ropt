@@ -16,8 +16,7 @@ from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
     from ropt.config.plan import ContextConfig, StepConfig
-    from ropt.optimization import Event
-    from ropt.plan import OptimizerContext, Plan
+    from ropt.plan import Event, OptimizerContext, Plan
 
 
 class ContextObj(ABC):

@@ -1,4 +1,4 @@
 ::: ropt.plan
     options:
-        members: [Plan, OptimizerContext]
+        members: [Plan, OptimizerContext, Event]
 

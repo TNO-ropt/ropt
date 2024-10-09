@@ -43,12 +43,14 @@ provides a convenient way to build and execute such plans with ease.
 
 from ropt.optimization import EnsembleOptimizer
 
+from ._events import Event
 from ._plan import OptimizerContext, Plan
 from ._run import OptimizationPlanRunner
 
 __all__ = [
     "OptimizationPlanRunner",
     "EnsembleOptimizer",
+    "Event",
     "OptimizerContext",
     "Plan",
 ]

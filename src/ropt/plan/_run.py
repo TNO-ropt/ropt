@@ -34,7 +34,7 @@ if TYPE_CHECKING:
 
     from ropt.config.enopt import EnOptConfig
     from ropt.evaluator import Evaluator
-    from ropt.optimization import Event
+    from ropt.plan import Event
     from ropt.plugins._manager import PluginType
     from ropt.plugins.base import Plugin
     from ropt.results import FunctionResults

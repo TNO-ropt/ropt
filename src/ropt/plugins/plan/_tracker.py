@@ -14,8 +14,7 @@ from ._utils import _get_last_result, _update_optimal_result
 
 if TYPE_CHECKING:
     from ropt.config.plan import ContextConfig
-    from ropt.optimization import Event
-    from ropt.plan import Plan
+    from ropt.plan import Event, Plan
 
 
 class DefaultTrackerWith(BaseModel):
