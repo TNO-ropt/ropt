@@ -106,7 +106,9 @@ class DefaultOptimizerStep(PlanStep):
             enopt_config=self._enopt_config,
             ensemble_evaluator=ensemble_evaluator,
             plugin_manager=self.plan.plugin_manager,
-            nested_optimizer=self._run_nested_plan,
+            nested_optimizer=(
+                self._run_nested_plan if self._with.nested_plan is not None else None
+            ),
             signal_evaluation=self._signal_evaluation,
         ).start(variables)
 
