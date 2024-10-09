@@ -15,34 +15,34 @@ from typing import TYPE_CHECKING, Union
 from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
-    from ropt.config.plan import ContextConfig, StepConfig
+    from ropt.config.plan import EventHandlerConfig, StepConfig
     from ropt.plan import Event, OptimizerContext, Plan
 
 
-class ContextObj(ABC):
-    """Base class for context objects."""
+class EventHandler(ABC):
+    """Base class for event handler objects."""
 
-    def __init__(self, config: ContextConfig, plan: Plan) -> None:
-        """Initialize the context object.
+    def __init__(self, config: EventHandlerConfig, plan: Plan) -> None:
+        """Initialize the event handler object.
 
-        The `config` and `plan` arguments are accessible as `context_config`
+        The `config` and `plan` arguments are accessible as `handler_config`
         and `plan` properties.
 
         Args:
-            config: The configuration of the context object
+            config: The configuration of the handler object
             plan:   The parent plan that contains the object
         """
-        self._context_config = config
+        self._handler_config = config
         self._plan = plan
 
     @property
-    def context_config(self) -> ContextConfig:
-        """Return the context object configuration.
+    def handler_config(self) -> EventHandlerConfig:
+        """Return the handler object configuration.
 
         Returns:
             The configuration object.
         """
-        return self._context_config
+        return self._handler_config
 
     @property
     def plan(self) -> Plan:
@@ -103,8 +103,8 @@ class PlanPlugin(Plugin):
 
     @abstractmethod
     def create(
-        self, config: Union[ContextConfig, StepConfig], context: OptimizerContext
-    ) -> Union[ContextObj, PlanStep]:
+        self, config: Union[EventHandlerConfig, StepConfig], context: OptimizerContext
+    ) -> Union[EventHandler, PlanStep]:
         """Create the plan object.
 
         Args:

@@ -8,17 +8,17 @@ from typing import TYPE_CHECKING, Literal, Optional, Set
 from pydantic import BaseModel, ConfigDict, Field
 
 from ropt.enums import EventType
-from ropt.plugins.plan.base import ContextObj
+from ropt.plugins.plan.base import EventHandler
 
 from ._utils import _get_last_result, _update_optimal_result
 
 if TYPE_CHECKING:
-    from ropt.config.plan import ContextConfig
+    from ropt.config.plan import EventHandlerConfig
     from ropt.plan import Event, Plan
 
 
 class DefaultTrackerWith(BaseModel):
-    """Parameters for the tracker context object.
+    """Parameters for the tracker event handler.
 
     The `type` parameter determines what result is tracked:
     - "optimal": Track the best result added
@@ -42,11 +42,11 @@ class DefaultTrackerWith(BaseModel):
     )
 
 
-class DefaultTrackerContext(ContextObj):
-    """The default tracker context object."""
+class DefaultTrackerHandler(EventHandler):
+    """The default tracker event handler object."""
 
-    def __init__(self, config: ContextConfig, plan: Plan) -> None:
-        """Initialize a default tracker context object.
+    def __init__(self, config: EventHandlerConfig, plan: Plan) -> None:
+        """Initialize a default tracker event handler object.
 
         Args:
             config: The configuration of the step

@@ -7,32 +7,27 @@ from typing import Any, Dict, List, Optional, Union
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class ContextConfig(BaseModel):
-    """Configuration of a single context object.
+class EventHandlerConfig(BaseModel):
+    """Configuration of a single event handler object.
 
-    Context objects process and store information that is provided by the steps
-    of the optimization plan. They usually store information in plan variables
-    that are accessible to the steps and to the user via the plan object. In
-    most cases, the context objects store a single result in a variable with a
-    name equal to the `id` of the context object, but additional variables can
-    be defined also.
+    Event handler objects process events emitted by the steps of the
+    optimization plan. They usually store information in plan variables that are
+    accessible to the steps and to the user via the plan object.
 
-    The `init` string identifies the code that is run to initialize the context
+    The `init` string identifies the code that is run to initialize the handler
     object. It is used by the plugin manager to load the code.
 
-    Additional parameters needed by the context objects are configured using the
+    Additional parameters needed by the handler objects are configured using the
     `with_` attribute. The contents of the `with_` attribute depend on the type
-    of the context object.
-
-    Context objects are referred to by their `id`, which is mandatory.
+    of the handler object.
 
     Note: `with` is an alias for `with_`
-        When parsing dictionaries into a `ContextConfig` object, the name of the
+        When parsing dictionaries into a `EventHandlerConfig` object, the name of the
         `with_` attribute should be replaced by by `with`, i.e. without the `_`
         suffix.
 
     Attributes:
-        name:  An identifier used to refer to the context object
+        name:  An identifier used to refer to the handler object
         init:  Identifies the code that initializes the object
         with_: Additional parameters passed to the object
     """
@@ -97,13 +92,13 @@ class StepConfig(BaseModel):
 class PlanConfig(BaseModel):
     """Configuration class for optimization plans.
 
-    An optimization plan configuration consists of two sections: a context
-    section defined using the `context` attribute, and a section that defines
+    An optimization plan configuration consists of two sections: a event handlers
+    section defined using the `handlers` attribute, and a section that defines
     the tasks to perform by the `steps` attribute.
 
-    The `context` attribute contains the configuration of the objects that
-    create and maintain the environment in which the plan runs. Context objects
-    are initialized before creating and running the steps.
+    The `handlers` attribute contains the configuration of the objects that
+    process events emitted by the steps. Event handler objects are initialized
+    before creating and running the steps.
 
     When running a plan, arguments can be passed. The `inputs` attributes
     denotes a list of input variables, that will be initialized with the passed
@@ -113,23 +108,23 @@ class PlanConfig(BaseModel):
     `outputs` attribute contains the names of the variables that will used to
     generate the output tuple.
 
-    Variables can be created on the fly by the steps, or by the context objects,
-    but can also be predefined by the `variables` attribute, giving their name
-    and value.
+    Variables can be created on the fly by the steps, or by the event handler
+    objects, but can also be predefined by the `variables` attribute, giving
+    their name and value.
 
-    After initializing the context objects, the steps are configured by the
-    entries given by the `steps` attribute and are initialized and executed in
-    order.
+    After initializing the event handler objects, the steps are configured by
+    the entries given by the `steps` attribute and are initialized and executed
+    in order.
 
     Attributes:
-        context:   The context objects to initialize
+        handlers:  The event handler objects to initialize
         steps:     The steps that are executed by the plan
         inputs:    The names of input variables
         outputs:   The names of output variables
         variables: Names and values of preset variables.
     """
 
-    context: List[ContextConfig] = []
+    handlers: List[EventHandlerConfig] = []
     steps: List[StepConfig]
     inputs: List[str] = []
     outputs: List[str] = []

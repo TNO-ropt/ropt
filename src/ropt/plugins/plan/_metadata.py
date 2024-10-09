@@ -7,15 +7,15 @@ from typing import TYPE_CHECKING, Any, Dict, Set
 from pydantic import BaseModel, ConfigDict
 
 from ropt.enums import EventType
-from ropt.plugins.plan.base import ContextObj
+from ropt.plugins.plan.base import EventHandler
 
 if TYPE_CHECKING:
-    from ropt.config.plan import ContextConfig
+    from ropt.config.plan import EventHandlerConfig
     from ropt.plan import Event, Plan
 
 
 class DefaultMetadataWith(BaseModel):
-    """Parameters used by the default metadata context.
+    """Parameters used by the default metadata event handler.
 
     Attributes:
         metadata: Data to set into the metadata
@@ -32,11 +32,11 @@ class DefaultMetadataWith(BaseModel):
     )
 
 
-class DefaultMetadataContext(ContextObj):
-    """The default metadata context."""
+class DefaultMetadataHandler(EventHandler):
+    """The default metadata event handler."""
 
-    def __init__(self, config: ContextConfig, plan: Plan) -> None:
-        """Initialize a default metadata context.
+    def __init__(self, config: EventHandlerConfig, plan: Plan) -> None:
+        """Initialize a default metadata event handler.
 
         Args:
             config: The configuration of the step

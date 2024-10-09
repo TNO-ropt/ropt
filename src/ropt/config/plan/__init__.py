@@ -5,10 +5,10 @@ Optimization plans are configured via
 [`Plan`][ropt.plan.Plan] objects and.
 """
 
-from ._plan_config import ContextConfig, PlanConfig, StepConfig
+from ._plan_config import EventHandlerConfig, PlanConfig, StepConfig
 
 __all__ = [
-    "ContextConfig",
+    "EventHandlerConfig",
     "StepConfig",
     "PlanConfig",
 ]

@@ -22,7 +22,7 @@ class PlanError(Exception):
 
         Args:
             message: Error message
-            name:    Optional step or context object name to add to the message
+            name:    Optional step or handler object name to add to the message
         """
         msg = f"Step `{name}`: " if name is not None else ""
         super().__init__(msg + message)

@@ -93,7 +93,7 @@ def main() -> None:
             },
             plan={
                 "variables": {"enopt_config": ENOPT_CONFIG},
-                "context": [
+                "handlers": [
                     {"init": "tracker", "with": {"var": "optimal"}},
                 ],
                 "steps": [

@@ -6,23 +6,23 @@ multiple, potentially nested optimizations.
 
 These plans are configured using [PlanConfig][ropt.config.plan.PlanConfig]
 objects and executed by a [Plan][ropt.plan.Plan] object. A plan is composed of
-[ContextObj][ropt.plugins.plan.base.ContextObj] objects, which process and store
-data generated during execution, and [PlanStep][ropt.plugins.plan.base.PlanStep]
-objects that define the individual steps executed by the plan. Both context and
-step objects are implemented through a [plugin][ropt.plugins.plan] mechanism.
-The ropt library also offers several
-[default][ropt.plugins.plan.default.DefaultPlanPlugin] plan objects to support
+[EventHandler][ropt.plugins.plan.base.EventHandler] objects, which process and
+store data generated during execution, and
+[PlanStep][ropt.plugins.plan.base.PlanStep] objects that define the individual
+steps executed by the plan. Both handler and step objects are implemented
+through a [plugin][ropt.plugins.plan] mechanism. The ropt library also offers
+several [default][ropt.plugins.plan.default.DefaultPlanPlugin] plan objects to
+support
 various optimization workflows.
 
 A plan can store data identified by a name, known as plan variables. These
 variables can be accessed using the `[]` operator, and their existence can be
-checked with the `in` operator. Context objects often store values this way,
-typically using their own `id` field from the configuration as the variable
-name. Step objects can also store values but usually require an explicit
-variable name to be set in their configuration.
+checked with the `in` operator. Event handler and step objects typically store
+values in variables with their names set in their configuration.
 
-Context and step objects are configured using their corresponding configuration
-objects, [`ContextConfig`][ropt.config.plan.ContextConfig] and
+Event handler and step objects are configured using their corresponding
+configuration objects,
+[`EventHandlerConfig`][ropt.config.plan.EventHandlerConfig] and
 [`StepConfig`][ropt.config.plan.StepConfig], respectively. These are Pydantic
 classes initialized via dictionaries of configuration values. These can be
 strings that are interpolated with the variables stored in the plan. Plan

@@ -92,7 +92,7 @@ class OptimizationPlanRunner:
         self._optimizer_context = OptimizerContext(evaluator=evaluator, seed=seed)
         self._observers: List[Tuple[EventType, Callable[[Event], None]]] = []
         self._metadata: Dict[str, Any] = {}
-        self._context: List[Dict[str, Any]] = [
+        self._handlers: List[Dict[str, Any]] = [
             {
                 "init": "tracker",
                 "with": {
@@ -260,7 +260,7 @@ class OptimizationPlanRunner:
         plan = Plan(
             PlanConfig.model_validate(
                 {
-                    "context": self._context,
+                    "handlers": self._handlers,
                     "steps": self._steps,
                     "variables": self._variables,
                 }

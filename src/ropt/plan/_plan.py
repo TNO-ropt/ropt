@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from ropt.config.plan import PlanConfig, StepConfig
     from ropt.evaluator import Evaluator
     from ropt.plan import Event
-    from ropt.plugins.plan.base import ContextObj, PlanStep
+    from ropt.plugins.plan.base import EventHandler, PlanStep
 
 _VALID_TYPES: Final = (int, float, bool)
 _VALID_RESULTS: Final = (list, np.ndarray, *_VALID_TYPES)
@@ -70,8 +70,8 @@ class Plan:
 
         The plan requires a `PlanConfig` object and an `OptimizationContext`
         object. The `plugin_manager` argument is optional and allows you to
-        specify plugins for the context and step objects that the plan may use.
-        If not provided, only plugins installed via Python's standard entry
+        specify plugins for the event handler and step objects that the plan may
+        use. If not provided, only plugins installed via Python's standard entry
         points mechanism will be used.
 
         Args:
@@ -90,11 +90,11 @@ class Plan:
         self._plugin_manager = (
             PluginManager() if plugin_manager is None else plugin_manager
         )
-        self._context: List[ContextObj] = [
+        self._handlers: List[EventHandler] = [
             self._plugin_manager.get_plugin("plan", method=config.init).create(
                 config, self
             )
-            for config in config.context
+            for config in config.handlers
         ]
         self._steps = self.create_steps(config.steps)
         self._aborted = False
@@ -356,8 +356,8 @@ class Plan:
         Args:
             event: The event to emit
         """
-        for context in self._context:
-            event = context.handle_event(event)
+        for handler in self._handlers:
+            event = handler.handle_event(event)
         for callback in self._subscribers[event.event_type]:
             callback(event)
         if self._parent is not None:

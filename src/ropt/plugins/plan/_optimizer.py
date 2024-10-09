@@ -30,7 +30,8 @@ MetaDataType = Dict[str, Union[int, float, bool, str]]
 class DefaultOptimizerStepWith(BaseModel):
     """Parameters used by the default optimizer step.
 
-    Optionally the initial variables to be used can be set from a context object.
+    Optionally the initial variables to be used can be set from an event handler
+    object.
 
     Attributes:
         config:         The optimizer configuration
