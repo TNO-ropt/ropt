@@ -852,6 +852,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Event" class="md-nav__link">
+    <span class="md-ellipsis">
+      Event
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1593,6 +1602,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Event" class="md-nav__link">
+    <span class="md-ellipsis">
+      Event
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2317,7 +2335,7 @@ evaluate to a result of any type.</p>
         <p>Add an observer function.</p>
 <p>Observer functions will be called during optimization if an event of the
 given type occurs. The callable must accept an argument of the
-<a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.Event"><code>Event</code></a> class that contains information about
+<a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> class that contains information about
 the event that occurred.</p>
 
 
@@ -2349,7 +2367,7 @@ the event that occurred.</p>
           <tr class="doc-section-item">
             <td><code>callback</code></td>
             <td>
-                  <code><span title="typing.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="ropt.optimization.Event" href="../optimization/#ropt.optimization.Event">Event</a>], None]</code>
+                  <code><span title="typing.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="ropt.plan.Event" href="#ropt.plan.Event">Event</a>], None]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2379,10 +2397,10 @@ the event that occurred.</p>
     <div class="doc doc-contents ">
 
         <p>Emit an event of the given type with given data.</p>
-<p>When called, an <a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.Event"><code>Event</code></a> object is constructed
+<p>When called, an <a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> object is constructed
 using the given <code>event_type</code> and <code>config</code> for its mandatory fields. When
 given, the additional keyword arguments are also passed to the
-<a class="autorefs autorefs-internal" href="../optimization/#ropt.optimization.Event"><code>Event</code></a> constructor to set the optional
+<a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> constructor to set the optional
 fields. All callbacks for the given event type, that were added by the
 <code>add_observer</code> method are then called using the newly constructed event
 object as their argument.</p>
@@ -2757,6 +2775,122 @@ all steps in an optimization plan. This currently includes the following:</p>
     </div>
 
 </div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.plan.Event" class="doc doc-heading">
+            <code>Event</code>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+        <p>The <code>Event</code> class stores optimization event data.</p>
+<p>While running an optimization plan, callbacks can be connected to react to
+events triggered during execution. These callbacks accept a single <code>Event</code>
+object containing information about the event.</p>
+<p>The actual data contained in the object depends on the nature of the event.
+Refer to the documentation of the <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType"><code>EventType</code></a>
+enumeration for more details.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plan.Event.event_type">event_type</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The type of the event</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plan.Event.config">config</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The current configuration object of the executing plan</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plan.Event.results">results</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional results passed with the event</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plan.Event.exit_code">exit_code</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.enums.OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An optional exit code</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plan.Event.step_name">step_name</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional name of the step emitting the event</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
 
 
 
