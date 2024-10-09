@@ -56,13 +56,17 @@ class DefaultTrackerContext(ContextObj):
         super().__init__(config, plan)
         self._with = DefaultTrackerWith.model_validate(config.with_)
         self.plan[self._with.var] = None
-        self.plan.add_observer(EventType.FINISHED_EVALUATION, self._track_results)
-        self.plan.add_observer(EventType.FINISHED_EVALUATOR_STEP, self._track_results)
 
-    def _track_results(self, event: Event) -> None:
-        if self._with.filter and not (event.tags & self._with.filter):
-            return
-        if event.results is not None:
+    def handle_event(self, event: Event) -> Event:
+        if (
+            event.event_type
+            in {
+                EventType.FINISHED_EVALUATION,
+                EventType.FINISHED_EVALUATOR_STEP,
+            }
+            and event.results is not None
+            and (not self._with.filter or (event.tags & self._with.filter))
+        ):
             results = None
             if self._with.type_ == "optimal":
                 results = _update_optimal_result(
@@ -76,3 +80,4 @@ class DefaultTrackerContext(ContextObj):
                 )
             if results is not None:
                 self.plan[self._with.var] = deepcopy(results)
+        return event

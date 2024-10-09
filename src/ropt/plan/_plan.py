@@ -15,14 +15,14 @@ from numpy.random import default_rng
 from ropt.config.enopt.constants import DEFAULT_SEED
 from ropt.enums import EventType
 from ropt.exceptions import PlanError
-from ropt.optimization import Event, EventBroker
+from ropt.optimization import Event
 from ropt.plugins import PluginManager
 
 if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
     from ropt.config.plan import PlanConfig, StepConfig
     from ropt.evaluator import Evaluator
-    from ropt.plugins.plan.base import PlanStep
+    from ropt.plugins.plan.base import ContextObj, PlanStep
 
 _VALID_TYPES: Final = (int, float, bool)
 _VALID_RESULTS: Final = (list, np.ndarray, *_VALID_TYPES)
@@ -81,13 +81,15 @@ class Plan:
         """
         self._plan_config = config
         self._optimizer_context = optimizer_context
-        self._event_broker = EventBroker()
         self._vars: Dict[str, Any] = {}
+        self._subscribers: Dict[EventType, List[Callable[[Event], None]]] = {
+            event: [] for event in EventType
+        }
 
         self._plugin_manager = (
             PluginManager() if plugin_manager is None else plugin_manager
         )
-        self._context = [
+        self._context: List[ContextObj] = [
             self._plugin_manager.get_plugin("plan", method=config.init).create(
                 config, self
             )
@@ -205,11 +207,9 @@ class Plan:
             plugin_manager=self._plugin_manager,
         )
 
-        def _forward_event(event: Event) -> None:
-            self._event_broker.re_emit(event)
-
         for event_type in EventType:
-            plan.add_observer(event_type, _forward_event)
+            for callback in self._subscribers[event_type]:
+                plan.add_observer(event_type, callback)
 
         return plan
 
@@ -347,7 +347,7 @@ class Plan:
             event:    The type of events to react to
             callback: The function to call if the event is received
         """
-        self._event_broker.add_observer(event, callback)
+        self._subscribers[event].append(callback)
 
     def emit_event(
         self,
@@ -371,7 +371,11 @@ class Plan:
             config:     Optimization configuration used by the emitting object
             kwargs:     Keyword arguments used to create an optimization event
         """
-        self._event_broker.emit(event_type, config, **kwargs)
+        event = Event(event_type, config, **kwargs)
+        for context in self._context:
+            event = context.handle_event(event)
+        for callback in self._subscribers[event.event_type]:
+            callback(event)
 
     def _check_condition(self, config: StepConfig) -> bool:
         if config.if_ is not None:

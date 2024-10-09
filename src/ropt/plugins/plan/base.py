@@ -16,10 +16,11 @@ from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
     from ropt.config.plan import ContextConfig, StepConfig
+    from ropt.optimization import Event
     from ropt.plan import OptimizerContext, Plan
 
 
-class ContextObj:
+class ContextObj(ABC):
     """Base class for context objects."""
 
     def __init__(self, config: ContextConfig, plan: Plan) -> None:
@@ -52,6 +53,14 @@ class ContextObj:
             The plan object.
         """
         return self._plan
+
+    @abstractmethod
+    def handle_event(self, event: Event) -> Event:
+        """Handle and propagate an event.
+
+        Returns:
+            The, possibly modified, event.
+        """
 
 
 class PlanStep(ABC):
