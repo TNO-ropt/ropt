@@ -1654,21 +1654,21 @@ workflow. This can be as simple as a single optimization run or involve
 multiple, potentially nested optimizations.</p>
 <p>These plans are configured using <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanConfig">PlanConfig</a>
 objects and executed by a <a class="autorefs autorefs-internal" href="#ropt.plan.Plan">Plan</a> object. A plan is composed of
-<a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.ContextObj">ContextObj</a> objects, which process and store
-data generated during execution, and <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a>
-objects that define the individual steps executed by the plan. Both context and
-step objects are implemented through a <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan">plugin</a> mechanism.
-The ropt library also offers several
-<a class="autorefs autorefs-internal" href="../default_plan_objects/#ropt.plugins.plan.default.DefaultPlanPlugin">default</a> plan objects to support
+<a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.EventHandler">EventHandler</a> objects, which process and
+store data generated during execution, and
+<a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a> objects that define the individual
+steps executed by the plan. Both handler and step objects are implemented
+through a <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan">plugin</a> mechanism. The ropt library also offers
+several <a class="autorefs autorefs-internal" href="../default_plan_objects/#ropt.plugins.plan.default.DefaultPlanPlugin">default</a> plan objects to
+support
 various optimization workflows.</p>
 <p>A plan can store data identified by a name, known as plan variables. These
 variables can be accessed using the <code>[]</code> operator, and their existence can be
-checked with the <code>in</code> operator. Context objects often store values this way,
-typically using their own <code>id</code> field from the configuration as the variable
-name. Step objects can also store values but usually require an explicit
-variable name to be set in their configuration.</p>
-<p>Context and step objects are configured using their corresponding configuration
-objects, <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.ContextConfig"><code>ContextConfig</code></a> and
+checked with the <code>in</code> operator. Event handler and step objects typically store
+values in variables with their names set in their configuration.</p>
+<p>Event handler and step objects are configured using their corresponding
+configuration objects,
+<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.EventHandlerConfig"><code>EventHandlerConfig</code></a> and
 <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.StepConfig"><code>StepConfig</code></a>, respectively. These are Pydantic
 classes initialized via dictionaries of configuration values. These can be
 strings that are interpolated with the variables stored in the plan. Plan
@@ -1860,7 +1860,7 @@ provides a convenient way to build and execute such plans with ease.</p>
 
 
 <h4 id="ropt.plan.Plan.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">optimizer_context</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">optimizer_context</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
@@ -1870,8 +1870,8 @@ provides a convenient way to build and execute such plans with ease.</p>
         <p>Initialize a plan object.</p>
 <p>The plan requires a <code>PlanConfig</code> object and an <code>OptimizationContext</code>
 object. The <code>plugin_manager</code> argument is optional and allows you to
-specify plugins for the context and step objects that the plan may use.
-If not provided, only plugins installed via Python's standard entry
+specify plugins for the event handler and step objects that the plan may
+use. If not provided, only plugins installed via Python's standard entry
 points mechanism will be used.</p>
 
 
@@ -1922,6 +1922,20 @@ points mechanism will be used.</p>
             <td>
               <div class="doc-md-description">
                 <p>An optional plugin manager</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>parent</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.plan._plan.Plan" href="#ropt.plan.Plan">Plan</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional parent plan that spawned this plan</p>
               </div>
             </td>
             <td>
@@ -2389,7 +2403,7 @@ event that occurred.</p>
 
 
 <h4 id="ropt.plan.Plan.emit_event" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">emit_event</span><span class="p">(</span><span class="n">event_type</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">emit_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></code>
 
 </h4>
 
@@ -2397,13 +2411,9 @@ event that occurred.</p>
     <div class="doc doc-contents ">
 
         <p>Emit an event of the given type with given data.</p>
-<p>When called, an <a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> object is constructed using
-the given <code>event_type</code> and <code>config</code> for its mandatory fields. When
-given, the additional keyword arguments are also passed to the
-<a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> constructor to set the optional fields. All
-callbacks for the given event type, that were added by the
-<code>add_observer</code> method are then called using the newly constructed event
-object as their argument.</p>
+<p>All callbacks for the given event type, that were added by the
+<code>add_observer</code> method are called with the given event object as their
+argument.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2418,45 +2428,17 @@ object as their argument.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>event_type</code></td>
+            <td><code>event</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Event" href="#ropt.plan.Event">Event</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The type of event to emit</p>
+                <p>The event to emit</p>
               </div>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>config</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optimization configuration used by the emitting object</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>kwargs</code></td>
-            <td>
-                  <code><span title="typing.Any">Any</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Keyword arguments used to create an optimization event</p>
-              </div>
-            </td>
-            <td>
-                  <code>{}</code>
             </td>
           </tr>
       </tbody>
