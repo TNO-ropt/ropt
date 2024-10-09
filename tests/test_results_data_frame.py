@@ -136,24 +136,3 @@ def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
     assert list(reporter.frame.columns.get_level_values(level=0)) == [
         ("evaluations.variables", idx) for idx in range(3)
     ] + ["metadata.foo.bar"]
-
-
-def test_dataframe_results_metadata_step_id(enopt_config: Any, evaluator: Any) -> None:
-    reporter = ResultsDataFrame(
-        {
-            "result_id",
-            "evaluations.variables",
-            "metadata.step_name",
-        },
-    )
-
-    def handler(event: Event) -> None:
-        assert event.results is not None
-        reporter.add_results(EnOptConfig.model_validate(enopt_config), event.results)
-
-    runner = OptimizationPlanRunner(enopt_config, evaluator()).add_observer(
-        EventType.FINISHED_EVALUATION, handler
-    )
-    runner._steps[0]["name"] = "opt"  # noqa: SLF001
-    runner.run()
-    assert reporter.frame["metadata.step_name"].to_list() == ["opt"] * 3

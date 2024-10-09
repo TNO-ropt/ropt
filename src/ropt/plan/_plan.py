@@ -15,13 +15,12 @@ from numpy.random import default_rng
 from ropt.config.enopt.constants import DEFAULT_SEED
 from ropt.enums import EventType
 from ropt.exceptions import PlanError
-from ropt.plan import Event
 from ropt.plugins import PluginManager
 
 if TYPE_CHECKING:
-    from ropt.config.enopt import EnOptConfig
     from ropt.config.plan import PlanConfig, StepConfig
     from ropt.evaluator import Evaluator
+    from ropt.plan import Event
     from ropt.plugins.plan.base import ContextObj, PlanStep
 
 _VALID_TYPES: Final = (int, float, bool)
@@ -65,6 +64,7 @@ class Plan:
         config: PlanConfig,
         optimizer_context: OptimizerContext,
         plugin_manager: Optional[PluginManager] = None,
+        parent: Optional[Plan] = None,
     ) -> None:
         """Initialize a plan object.
 
@@ -78,6 +78,7 @@ class Plan:
             config:            The optimizer configuration
             optimizer_context: The context in which the plan executes
             plugin_manager:    An optional plugin manager
+            parent:            Optional parent plan that spawned this plan
         """
         self._plan_config = config
         self._optimizer_context = optimizer_context
@@ -97,6 +98,7 @@ class Plan:
         ]
         self._steps = self.create_steps(config.steps)
         self._aborted = False
+        self._parent = parent
 
     def run(self, *args: Any) -> Tuple[Any, ...]:  # noqa: ANN401
         """Run the Plan.
@@ -201,17 +203,12 @@ class Plan:
         Args:
             config: The configuration of the new plan
         """
-        plan = Plan(
+        return Plan(
             config,
             optimizer_context=self._optimizer_context,
             plugin_manager=self._plugin_manager,
+            parent=self,
         )
-
-        for event_type in EventType:
-            for callback in self._subscribers[event_type]:
-                plan.add_observer(event_type, callback)
-
-        return plan
 
     def parse_value(self, value: Any) -> Any:  # noqa: ANN401
         """Parse a value as an expression or an interpolated string.
@@ -349,33 +346,22 @@ class Plan:
         """
         self._subscribers[event].append(callback)
 
-    def emit_event(
-        self,
-        event_type: EventType,
-        config: EnOptConfig,
-        /,
-        **kwargs: Any,  # noqa: ANN401
-    ) -> None:
+    def emit_event(self, event: Event) -> None:
         """Emit an event of the given type with given data.
 
-        When called, an [`Event`][ropt.plan.Event] object is constructed using
-        the given `event_type` and `config` for its mandatory fields. When
-        given, the additional keyword arguments are also passed to the
-        [`Event`][ropt.plan.Event] constructor to set the optional fields. All
-        callbacks for the given event type, that were added by the
-        `add_observer` method are then called using the newly constructed event
-        object as their argument.
+        All callbacks for the given event type, that were added by the
+        `add_observer` method are called with the given event object as their
+        argument.
 
         Args:
-            event_type: The type of event to emit
-            config:     Optimization configuration used by the emitting object
-            kwargs:     Keyword arguments used to create an optimization event
+            event: The event to emit
         """
-        event = Event(event_type, config, **kwargs)
         for context in self._context:
             event = context.handle_event(event)
         for callback in self._subscribers[event.event_type]:
             callback(event)
+        if self._parent is not None:
+            self._parent.emit_event(event)
 
     def _check_condition(self, config: StepConfig) -> bool:
         if config.if_ is not None:

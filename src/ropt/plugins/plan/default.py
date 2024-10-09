@@ -10,6 +10,7 @@ from ropt.plan import Plan  # noqa: TCH001
 from ropt.plugins.plan.base import ContextObj, PlanStep  # noqa: TCH001
 
 from ._evaluator import DefaultEvaluatorStep
+from ._metadata import DefaultMetadataContext
 from ._optimizer import DefaultOptimizerStep
 from ._repeat import DefaultRepeatStep
 from ._setvar import DefaultSetStep
@@ -18,6 +19,7 @@ from .base import PlanPlugin
 
 _CONTEXT_OBJECTS: Final[Dict[str, Type[ContextObj]]] = {
     "tracker": DefaultTrackerContext,
+    "metadata": DefaultMetadataContext,
 }
 
 _STEP_OBJECTS: Final[Dict[str, Type[PlanStep]]] = {

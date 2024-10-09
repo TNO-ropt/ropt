@@ -12,6 +12,7 @@ from ropt.config.utils import Array2D  # noqa: TCH001
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted, PlanError
+from ropt.plan import Event
 from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
 from ropt.utils.scaling import scale_variables
@@ -72,12 +73,13 @@ class DefaultEvaluatorStep(PlanStep):
         self._enopt_config = EnOptConfig.model_validate(config)
 
         self.plan.emit_event(
-            EventType.START_EVALUATOR_STEP,
-            self._enopt_config,
-            tags=self._with.tags,
-            step_name=self.step_config.name,
+            Event(
+                event_type=EventType.START_EVALUATOR_STEP,
+                config=self._enopt_config,
+                tags=self._with.tags,
+                step_name=self.step_config.name,
+            )
         )
-
         assert self.plan.optimizer_context.rng is not None
         ensemble_evaluator = EnsembleEvaluator(
             self._enopt_config,
@@ -103,12 +105,14 @@ class DefaultEvaluatorStep(PlanStep):
             exit_code = OptimizerExitCode.TOO_FEW_REALIZATIONS
 
         self.plan.emit_event(
-            EventType.FINISHED_EVALUATOR_STEP,
-            self._enopt_config,
-            results=results,
-            tags=self._with.tags,
-            exit_code=exit_code,
-            step_name=self.step_config.name,
+            Event(
+                event_type=EventType.FINISHED_EVALUATOR_STEP,
+                config=self._enopt_config,
+                results=results,
+                tags=self._with.tags,
+                exit_code=exit_code,
+                step_name=self.step_config.name,
+            )
         )
 
         if exit_code == OptimizerExitCode.USER_ABORT:

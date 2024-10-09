@@ -57,6 +57,14 @@ class DefaultTrackerContext(ContextObj):
         self.plan[self._with.var] = None
 
     def handle_event(self, event: Event) -> Event:
+        """Handle an event.
+
+        Args:
+            event: The event to handle
+
+        Returns:
+            The (possibly modified) event.
+        """
         if (
             event.event_type
             in {

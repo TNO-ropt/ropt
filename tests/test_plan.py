@@ -816,6 +816,9 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
             "config": enopt_config,
             "metadata": metadata,
         },
+        "context": [
+            {"init": "metadata", "with": metadata},
+        ],
         "steps": [
             {
                 "run": "repeat",
@@ -825,7 +828,7 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
                     "steps": [
                         {
                             "run": "optimizer",
-                            "with": {"config": "$config", "metadata": metadata},
+                            "with": {"config": "$config"},
                         },
                     ],
                 },
@@ -979,24 +982,24 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["optimizer"]["max_functions"] = 5
 
     inner_config = {
-        "variables": {
-            "config": nested_config,
-        },
+        "inputs": ["initial"],
+        "outputs": ["nested_optimum"],
+        "variables": {"config": nested_config},
         "context": [
-            {"init": "tracker", "with": {"var": "nested_optimum"}},
+            {
+                "init": "tracker",
+                "with": {"var": "nested_optimum"},
+            },
         ],
         "steps": [
             {
                 "run": "optimizer",
                 "with": {
                     "config": "$config",
-                    "tags": ["nested_optimum"],
                     "initial_values": "$initial",
                 },
             },
         ],
-        "inputs": ["initial"],
-        "outputs": ["nested_optimum"],
     }
 
     outer_config = {
@@ -1004,7 +1007,10 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
             "config": enopt_config,
         },
         "context": [
-            {"init": "tracker", "with": {"var": "optimum"}},
+            {
+                "init": "tracker",
+                "with": {"var": "optimum", "filter": ["outer"]},
+            },
         ],
         "steps": [
             {
@@ -1012,6 +1018,7 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
                 "with": {
                     "config": "$config",
                     "nested_plan": inner_config,
+                    "tags": ["outer"],
                 },
             },
         ],
@@ -1027,6 +1034,81 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
     assert results is not None
     assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
     assert completed_functions == 25
+
+
+def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
+    enopt_config["variables"]["initial_values"] = [0.0, 0.2, 0.1]
+
+    def _track_evaluations(event: Event) -> None:
+        assert event.results is not None
+        for item in event.results:
+            if isinstance(item, FunctionResults):
+                assert item.metadata.get("outer") == 1
+                if event.step_name == "inner":
+                    assert item.metadata.get("inner") == "inner_meta_data"
+
+    enopt_config["optimizer"]["tolerance"] = 1e-10
+    enopt_config["optimizer"]["speculative"] = True
+    enopt_config["optimizer"]["max_functions"] = 4
+    enopt_config["variables"]["indices"] = [0, 2]
+    nested_config = deepcopy(enopt_config)
+    nested_config["variables"]["indices"] = [1]
+    enopt_config["optimizer"]["max_functions"] = 5
+
+    inner_config = {
+        "inputs": ["initial"],
+        "outputs": ["nested_optimum"],
+        "variables": {"config": nested_config},
+        "context": [
+            {"init": "tracker", "with": {"var": "nested_optimum"}},
+            {"init": "metadata", "with": {"inner": "inner_meta_data"}},
+        ],
+        "steps": [
+            {
+                "run": "optimizer",
+                "name": "inner",
+                "with": {
+                    "config": "$config",
+                    "initial_values": "$initial",
+                    "tags": ["inner"],
+                },
+            },
+        ],
+    }
+
+    outer_config = {
+        "variables": {
+            "config": enopt_config,
+        },
+        "context": [
+            {"init": "metadata", "with": {"outer": "$x"}},
+            {"init": "tracker", "with": {"var": "optimum", "filter": ["inner"]}},
+        ],
+        "steps": [
+            {"run": "setvar", "with": "x = 1"},
+            {
+                "run": "optimizer",
+                "name": "outer",
+                "with": {
+                    "config": "$config",
+                    "nested_plan": inner_config,
+                },
+            },
+        ],
+    }
+
+    parsed_config = PlanConfig.model_validate(outer_config)
+    context = OptimizerContext(evaluator=evaluator())
+    plan = Plan(parsed_config, context)
+    plan.add_observer(EventType.FINISHED_EVALUATION, _track_evaluations)
+    plan.run()
+    results = plan["optimum"]
+
+    assert results.metadata["inner"] == "inner_meta_data"
+    assert results.metadata["outer"] == 1
+
+    assert results is not None
+    assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 def test_table(enopt_config: Any, evaluator: Any, tmp_path: Path) -> None:

@@ -13,7 +13,7 @@ from ropt.config.utils import Array1D  # noqa: TCH001
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import PlanError
-from ropt.plan import EnsembleOptimizer, Plan
+from ropt.plan import EnsembleOptimizer, Event, Plan
 from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
 from ropt.utils.scaling import scale_variables
@@ -37,7 +37,6 @@ class DefaultOptimizerStepWith(BaseModel):
         initial_values: The initial values for the optimizer
         exit_code_var:  Name of the variable to store the exit code
         nested_plan:    Optional nested plan configuration
-        metadata:       Metadata to add to each result
     """
 
     config: str
@@ -45,7 +44,6 @@ class DefaultOptimizerStepWith(BaseModel):
     initial_values: Optional[Union[str, Array1D]] = None
     exit_code_var: Optional[str] = None
     nested_plan: Optional[PlanConfig] = None
-    metadata: MetaDataType = {}
 
     model_config = ConfigDict(
         extra="forbid",
@@ -86,10 +84,12 @@ class DefaultOptimizerStep(PlanStep):
         self._enopt_config = EnOptConfig.model_validate(config)
 
         self.plan.emit_event(
-            EventType.START_OPTIMIZER_STEP,
-            self._enopt_config,
-            tags=self._with.tags,
-            step_name=self.step_config.name,
+            Event(
+                event_type=EventType.START_OPTIMIZER_STEP,
+                config=self._enopt_config,
+                tags=self._with.tags,
+                step_name=self.step_config.name,
+            )
         )
 
         assert self.plan.optimizer_context.rng is not None
@@ -116,11 +116,13 @@ class DefaultOptimizerStep(PlanStep):
             self.plan[self._with.exit_code_var] = exit_code
 
         self.plan.emit_event(
-            EventType.FINISHED_OPTIMIZER_STEP,
-            self._enopt_config,
-            tags=self._with.tags,
-            exit_code=exit_code,
-            step_name=self.step_config.name,
+            Event(
+                event_type=EventType.FINISHED_OPTIMIZER_STEP,
+                config=self._enopt_config,
+                tags=self._with.tags,
+                exit_code=exit_code,
+                step_name=self.step_config.name,
+            )
         )
 
         if exit_code == OptimizerExitCode.USER_ABORT:
@@ -138,22 +140,22 @@ class DefaultOptimizerStep(PlanStep):
         """
         if results is None:
             self.plan.emit_event(
-                EventType.START_EVALUATION,
-                self._enopt_config,
-                tags=self._with.tags,
-                step_name=self.step_config.name,
+                Event(
+                    event_type=EventType.START_EVALUATION,
+                    config=self._enopt_config,
+                    tags=self._with.tags,
+                    step_name=self.step_config.name,
+                )
             )
         else:
-            metadata = self._get_metadata(add_step_name=True)
-            for item in results:
-                item.metadata = metadata
-
             self.plan.emit_event(
-                EventType.FINISHED_EVALUATION,
-                self._enopt_config,
-                results=results,
-                tags=self._with.tags,
-                step_name=self.step_config.name,
+                Event(
+                    event_type=EventType.FINISHED_EVALUATION,
+                    config=self._enopt_config,
+                    results=results,
+                    tags=self._with.tags,
+                    step_name=self.step_config.name,
+                )
             )
 
     def _run_nested_plan(
@@ -195,12 +197,3 @@ class DefaultOptimizerStep(PlanStep):
                 msg = f"`{self._with.initial_values} does not contain variables."
                 raise PlanError(msg, name=self.step_config.name)
         return self._enopt_config.variables.initial_values
-
-    def _get_metadata(self, *, add_step_name: bool) -> MetaDataType:
-        metadata = {
-            key: self.plan.parse_value(value)
-            for key, value in self._with.metadata.items()
-        }
-        if add_step_name and self.step_config.name is not None:
-            metadata["step_name"] = self.step_config.name
-        return metadata
