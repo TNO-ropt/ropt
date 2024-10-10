@@ -263,11 +263,11 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
         "results": [
             {
                 "init": "tracker",
-                "with": {"var": "optimal1", "filter": ["optimal1"]},
+                "with": {"var": "optimal1", "tags": ["optimal1"]},
             },
             {
                 "init": "tracker",
-                "with": {"var": "optimal2", "filter": ["optimal2"]},
+                "with": {"var": "optimal2", "tags": ["optimal2"]},
             },
         ],
     }
@@ -318,15 +318,15 @@ def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
         "results": [
             {
                 "init": "tracker",
-                "with": {"var": "optimal1", "filter": ["optimal1"]},
+                "with": {"var": "optimal1", "tags": ["optimal1"]},
             },
             {
                 "init": "tracker",
-                "with": {"var": "optimal2", "filter": ["optimal2"]},
+                "with": {"var": "optimal2", "tags": ["optimal2"]},
             },
             {
                 "init": "tracker",
-                "with": {"var": "optimal3", "filter": ["optimal3"]},
+                "with": {"var": "optimal3", "tags": ["optimal3"]},
             },
         ],
     }
@@ -515,7 +515,7 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
         "results": [
             {
                 "init": "tracker",
-                "with": {"var": "last", "type": "last", "filter": ["last"]},
+                "with": {"var": "last", "type": "last", "tags": ["last"]},
             },
         ],
     }
@@ -1054,7 +1054,7 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
         "results": [
             {
                 "init": "tracker",
-                "with": {"var": "optimum", "filter": ["outer"]},
+                "with": {"var": "optimum", "tags": ["outer"]},
             },
         ],
     }
@@ -1129,7 +1129,7 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
         ],
         "results": [
             {"init": "metadata", "with": {"outer": "$x"}},
-            {"init": "tracker", "with": {"var": "optimum", "filter": ["inner"]}},
+            {"init": "tracker", "with": {"var": "optimum", "tags": ["inner"]}},
         ],
     }
 

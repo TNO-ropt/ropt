@@ -28,13 +28,13 @@ class DefaultTrackerWith(BaseModel):
         var:                  The name of the variable to store the tracked result
         type:                 The type of result to store
         constraint_tolerance: Optional constraint tolerance
-        filter:               Optional tags of the sources to track
+        tags:                 Optional tags of the sources to track
     """
 
     var: str
     type_: Literal["optimal", "last"] = Field(default="optimal", alias="type")
     constraint_tolerance: Optional[float] = 1e-10
-    filter: Set[str] = set()
+    tags: Set[str] = set()
 
     model_config = ConfigDict(
         extra="forbid",
@@ -72,7 +72,7 @@ class DefaultTrackerHandler(ResultHandler):
                 EventType.FINISHED_EVALUATOR_STEP,
             }
             and event.results is not None
-            and (not self._with.filter or (event.tag in self._with.filter))
+            and (not self._with.tags or (event.tag in self._with.tags))
         ):
             results = None
             if self._with.type_ == "optimal":

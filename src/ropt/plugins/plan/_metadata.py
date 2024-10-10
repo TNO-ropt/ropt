@@ -19,11 +19,11 @@ class DefaultMetadataWith(BaseModel):
 
     Attributes:
         metadata: Data to set into the metadata
-        filter:   Optional tags of the sources to track
+        tags:     Optional tags of the sources to track
     """
 
     metadata: Dict[str, Any]
-    filter: Set[str] = set()
+    tags: Set[str] = set()
 
     model_config = ConfigDict(
         extra="forbid",
@@ -64,7 +64,7 @@ class DefaultMetadataHandler(ResultHandler):
                 EventType.FINISHED_EVALUATOR_STEP,
             }
             and event.results is not None
-            and (not self._with.filter or (event.tag in self._with.filter))
+            and (not self._with.tags or (event.tag in self._with.tags))
         ):
             for results in event.results:
                 for key, expr in self._with.metadata.items():
