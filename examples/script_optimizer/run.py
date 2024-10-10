@@ -103,7 +103,7 @@ def main() -> None:
                     },
                 ],
                 "results": [
-                    {"init": "tracker", "with": {"var": "optimal", "tags": "opt"}},
+                    {"run": "tracker", "with": {"var": "optimal", "tags": "opt"}},
                 ],
             },
             tasks=tasks,

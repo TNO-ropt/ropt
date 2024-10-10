@@ -52,12 +52,12 @@ class DefaultPlanPlugin(PlanPlugin):
     def _create_result_handler(
         self, config: ResultHandlerConfig, plan: Plan
     ) -> ResultHandler:
-        _, _, name = config.init.lower().rpartition("/")
+        _, _, name = config.run.lower().rpartition("/")
         obj = _RESULT_HANDLER_OBJECTS.get(name)
         if obj is not None:
             return obj(config, plan)
 
-        msg = f"Unknown results handler object type: {config.init}"
+        msg = f"Unknown results handler object type: {config.run}"
         raise TypeError(msg)
 
     @create.register

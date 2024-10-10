@@ -14,7 +14,7 @@ class ResultHandlerConfig(BaseModel):
     optimization plan. They usually store information in plan variables that are
     accessible to the steps and to the user via the plan object.
 
-    The `init` string identifies the code that is run to initialize the result
+    The `run` string identifies the code that is run to initialize the result
     handler object. It is used by the plugin manager to load the code.
 
     Additional parameters needed by the handler objects are configured using the
@@ -27,11 +27,11 @@ class ResultHandlerConfig(BaseModel):
         suffix.
 
     Attributes:
-        init:  Identifies the code that initializes the object
+        run:   Identifies the code that initializes the object
         with_: Additional parameters passed to the object
     """
 
-    init: str
+    run: str
     with_: Any = Field(default_factory=dict, alias="with")
 
     model_config = ConfigDict(

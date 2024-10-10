@@ -100,7 +100,7 @@ class Plan:
                 raise PlanError(msg)
             self._set_item(var, None)
         self._handlers: List[ResultHandler] = [
-            self._plugin_manager.get_plugin("plan", method=config.init).create(
+            self._plugin_manager.get_plugin("plan", method=config.run).create(
                 config, self
             )
             for config in config.results

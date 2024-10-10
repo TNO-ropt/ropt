@@ -56,7 +56,7 @@ def test_run_basic(enopt_config: Any, evaluator: Any) -> None:
         ],
         "results": [
             {
-                "init": "tracker",
+                "run": "tracker",
                 "with": {"var": "results", "tags": "opt"},
             },
         ],
@@ -89,7 +89,7 @@ def test_parse_value(enopt_config: Any, evaluator: Any) -> None:
             },
         ],
         "results": [
-            {"init": "tracker", "with": {"var": "results", "tags": "opt"}},
+            {"run": "tracker", "with": {"var": "results", "tags": "opt"}},
         ],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
@@ -263,11 +263,11 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
         ],
         "results": [
             {
-                "init": "tracker",
+                "run": "tracker",
                 "with": {"var": "optimal1", "tags": "optimal1"},
             },
             {
-                "init": "tracker",
+                "run": "tracker",
                 "with": {"var": "optimal2", "tags": "optimal2"},
             },
         ],
@@ -318,15 +318,15 @@ def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
         ],
         "results": [
             {
-                "init": "tracker",
+                "run": "tracker",
                 "with": {"var": "optimal1", "tags": ["optimal1"]},
             },
             {
-                "init": "tracker",
+                "run": "tracker",
                 "with": {"var": "optimal2", "tags": ["optimal2"]},
             },
             {
-                "init": "tracker",
+                "run": "tracker",
                 "with": {"var": "optimal3", "tags": ["optimal3"]},
             },
         ],
@@ -377,7 +377,7 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
             },
         ],
         "results": [
-            {"init": "tracker", "with": {"var": "optimal", "tags": "opt"}},
+            {"run": "tracker", "with": {"var": "optimal", "tags": "opt"}},
         ],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
@@ -460,9 +460,9 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
             },
         ],
         "results": [
-            {"init": "tracker", "with": {"var": "optimum", "tags": "opt"}},
+            {"run": "tracker", "with": {"var": "optimum", "tags": "opt"}},
             {
-                "init": "tracker",
+                "run": "tracker",
                 "with": {"var": "last", "type": "last", "tags": "opt"},
             },
         ],
@@ -520,7 +520,7 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
         ],
         "results": [
             {
-                "init": "tracker",
+                "run": "tracker",
                 "with": {"var": "last", "type": "last", "tags": "last"},
             },
         ],
@@ -559,7 +559,7 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
             },
         ],
         "results": [
-            {"init": "tracker", "with": {"var": "optimum", "tags": "opt"}},
+            {"run": "tracker", "with": {"var": "optimum", "tags": "opt"}},
         ],
     }
     context = OptimizerContext(evaluator=evaluator())
@@ -679,7 +679,7 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
         ],
         "results": [
             {
-                "init": "tracker",
+                "run": "tracker",
                 "with": {"var": "last", "type": "last", "tags": "opt"},
             },
         ],
@@ -731,7 +731,7 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
             }
         ],
         "results": [
-            {"init": "tracker", "with": {"var": "optimum", "tags": "opt"}},
+            {"run": "tracker", "with": {"var": "optimum", "tags": "opt"}},
         ],
     }
     context = OptimizerContext(evaluator=evaluator())
@@ -809,7 +809,7 @@ def test_restart_optimum_with_reset(
             },
         ],
         "results": [
-            {"init": "tracker", "with": {"var": "optimum", "tags": "opt"}},
+            {"run": "tracker", "with": {"var": "optimum", "tags": "opt"}},
         ],
     }
     context = OptimizerContext(evaluator=evaluator(new_functions))
@@ -872,7 +872,7 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
             }
         ],
         "results": [
-            {"init": "metadata", "with": {"data": metadata, "tags": "opt"}},
+            {"run": "metadata", "with": {"data": metadata, "tags": "opt"}},
         ],
     }
 
@@ -900,7 +900,7 @@ def test_evaluator_step(enopt_config: Any, evaluator: Any) -> None:
             },
         ],
         "results": [
-            {"init": "tracker", "with": {"var": "optimum", "tags": "opt"}},
+            {"run": "tracker", "with": {"var": "optimum", "tags": "opt"}},
         ],
     }
 
@@ -955,7 +955,7 @@ def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
             },
         ],
         "results": [
-            {"init": "tracker", "with": {"var": "optimum", "tags": "opt"}},
+            {"run": "tracker", "with": {"var": "optimum", "tags": "opt"}},
         ],
     }
 
@@ -1044,7 +1044,7 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
         ],
         "results": [
             {
-                "init": "tracker",
+                "run": "tracker",
                 "with": {"var": "nested_optimum", "tags": "inner"},
             },
         ],
@@ -1067,7 +1067,7 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
         ],
         "results": [
             {
-                "init": "tracker",
+                "run": "tracker",
                 "with": {"var": "optimum", "tags": "outer"},
             },
         ],
@@ -1121,9 +1121,9 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
             },
         ],
         "results": [
-            {"init": "tracker", "with": {"var": "nested_optimum", "tags": "inner"}},
+            {"run": "tracker", "with": {"var": "nested_optimum", "tags": "inner"}},
             {
-                "init": "metadata",
+                "run": "metadata",
                 "with": {"data": {"inner": "inner_meta_data"}, "tags": "inner"},
             },
         ],
@@ -1147,10 +1147,10 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
         ],
         "results": [
             {
-                "init": "metadata",
+                "run": "metadata",
                 "with": {"data": {"outer": "$x"}, "tags": ["inner", "outer"]},
             },
-            {"init": "tracker", "with": {"var": "optimum", "tags": "inner"}},
+            {"run": "tracker", "with": {"var": "optimum", "tags": "inner"}},
         ],
     }
 

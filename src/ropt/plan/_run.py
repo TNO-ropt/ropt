@@ -109,7 +109,7 @@ class OptimizationPlanRunner:
         ]
         self._handlers: List[Dict[str, Any]] = [
             {
-                "init": "tracker",
+                "run": "tracker",
                 "with": {
                     "var": "__optimum_tracker__",
                     "constraint_tolerance": constraint_tolerance,
