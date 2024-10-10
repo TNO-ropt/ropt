@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.40">
     
     
       
@@ -1654,21 +1654,20 @@ workflow. This can be as simple as a single optimization run or involve
 multiple, potentially nested optimizations.</p>
 <p>These plans are configured using <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanConfig">PlanConfig</a>
 objects and executed by a <a class="autorefs autorefs-internal" href="#ropt.plan.Plan">Plan</a> object. A plan is composed of
-<a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.EventHandler">EventHandler</a> objects, which process and
-store data generated during execution, and
+<a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler">ResultHandler</a> objects, which process
+and store data generated during execution, and
 <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a> objects that define the individual
 steps executed by the plan. Both handler and step objects are implemented
 through a <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan">plugin</a> mechanism. The ropt library also offers
 several <a class="autorefs autorefs-internal" href="../default_plan_objects/#ropt.plugins.plan.default.DefaultPlanPlugin">default</a> plan objects to
-support
-various optimization workflows.</p>
+support various optimization workflows.</p>
 <p>A plan can store data identified by a name, known as plan variables. These
 variables can be accessed using the <code>[]</code> operator, and their existence can be
-checked with the <code>in</code> operator. Event handler and step objects typically store
+checked with the <code>in</code> operator. Results handler and step objects typically store
 values in variables with their names set in their configuration.</p>
-<p>Event handler and step objects are configured using their corresponding
+<p>Result handler and step objects are configured using their corresponding
 configuration objects,
-<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.EventHandlerConfig"><code>EventHandlerConfig</code></a> and
+<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.ResultHandlerConfig"><code>ResultHandlerConfig</code></a> and
 <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.StepConfig"><code>StepConfig</code></a>, respectively. These are Pydantic
 classes initialized via dictionaries of configuration values. These can be
 strings that are interpolated with the variables stored in the plan. Plan
@@ -1870,9 +1869,9 @@ provides a convenient way to build and execute such plans with ease.</p>
         <p>Initialize a plan object.</p>
 <p>The plan requires a <code>PlanConfig</code> object and an <code>OptimizationContext</code>
 object. The <code>plugin_manager</code> argument is optional and allows you to
-specify plugins for the event handler and step objects that the plan may
-use. If not provided, only plugins installed via Python's standard entry
-points mechanism will be used.</p>
+specify plugins for the results handler and step objects that the plan
+may use. If not provided, only plugins installed via Python's standard
+entry points mechanism will be used.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2848,13 +2847,13 @@ enumeration for more details.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plan.Event.step_name">step_name</span></code></td>
+            <td><code><span title="ropt.plan.Event.tag">tag</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[str]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional name of the step emitting the event</p>
+                <p>Optional tag</p>
               </div>
             </td>
           </tr>
