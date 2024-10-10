@@ -92,15 +92,18 @@ def main() -> None:
                 "work_dir": "work",
             },
             plan={
-                "variables": {"enopt_config": ENOPT_CONFIG},
-                "handlers": [
-                    {"init": "tracker", "with": {"var": "optimal"}},
-                ],
+                "variables": {
+                    "enopt_config": ENOPT_CONFIG,
+                    "optimal": None,
+                },
                 "steps": [
                     {
                         "run": "optimizer",
                         "with": {"config": "$enopt_config"},
                     },
+                ],
+                "handlers": [
+                    {"init": "tracker", "with": {"var": "optimal"}},
                 ],
             },
             tasks=tasks,

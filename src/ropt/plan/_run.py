@@ -97,15 +97,6 @@ class OptimizationPlanRunner:
             "__optimum_tracker__": None,
             "__exit_code__": OptimizerExitCode.UNKNOWN,
         }
-        self._handlers: List[Dict[str, Any]] = [
-            {
-                "init": "tracker",
-                "with": {
-                    "var": "__optimum_tracker__",
-                    "constraint_tolerance": constraint_tolerance,
-                },
-            },
-        ]
         self._steps: List[Dict[str, Any]] = [
             {
                 "run": "optimizer",
@@ -114,6 +105,15 @@ class OptimizationPlanRunner:
                     "exit_code_var": "__exit_code__",
                 },
             }
+        ]
+        self._handlers: List[Dict[str, Any]] = [
+            {
+                "init": "tracker",
+                "with": {
+                    "var": "__optimum_tracker__",
+                    "constraint_tolerance": constraint_tolerance,
+                },
+            },
         ]
         self._results: _Results
 
@@ -263,9 +263,9 @@ class OptimizationPlanRunner:
         plan = Plan(
             PlanConfig.model_validate(
                 {
-                    "handlers": self._handlers,
-                    "steps": self._steps,
                     "variables": self._variables,
+                    "steps": self._steps,
+                    "handlers": self._handlers,
                 }
             ),
             self._optimizer_context,

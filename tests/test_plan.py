@@ -48,16 +48,16 @@ def test_run_basic(enopt_config: Any, evaluator: Any) -> None:
             "enopt_config": enopt_config,
             "results": None,
         },
-        "handlers": [
-            {
-                "init": "tracker",
-                "with": {"var": "results"},
-            },
-        ],
         "steps": [
             {
                 "run": "optimizer",
                 "with": {"config": "$enopt_config"},
+            },
+        ],
+        "handlers": [
+            {
+                "init": "tracker",
+                "with": {"var": "results"},
             },
         ],
     }
@@ -79,9 +79,6 @@ def test_parse_value(enopt_config: Any, evaluator: Any) -> None:
             "config": enopt_config,
             "results": None,
         },
-        "handlers": [
-            {"init": "tracker", "with": {"var": "results"}},
-        ],
         "steps": [
             {
                 "run": "optimizer",
@@ -89,6 +86,9 @@ def test_parse_value(enopt_config: Any, evaluator: Any) -> None:
                     "config": "$config",
                 },
             },
+        ],
+        "handlers": [
+            {"init": "tracker", "with": {"var": "results"}},
         ],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
@@ -241,16 +241,6 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
             "optimal2": None,
             "x": None,
         },
-        "handlers": [
-            {
-                "init": "tracker",
-                "with": {"var": "optimal1", "filter": ["optimal1"]},
-            },
-            {
-                "init": "tracker",
-                "with": {"var": "optimal2", "filter": ["optimal2"]},
-            },
-        ],
         "steps": [
             {
                 "run": "optimizer",
@@ -268,6 +258,16 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
                     "config": "$config",
                     "tag": "optimal2",
                 },
+            },
+        ],
+        "handlers": [
+            {
+                "init": "tracker",
+                "with": {"var": "optimal1", "filter": ["optimal1"]},
+            },
+            {
+                "init": "tracker",
+                "with": {"var": "optimal2", "filter": ["optimal2"]},
             },
         ],
     }
@@ -290,20 +290,6 @@ def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
             "optimal2": None,
             "optimal3": None,
         },
-        "handlers": [
-            {
-                "init": "tracker",
-                "with": {"var": "optimal1", "filter": ["optimal1"]},
-            },
-            {
-                "init": "tracker",
-                "with": {"var": "optimal2", "filter": ["optimal2"]},
-            },
-            {
-                "init": "tracker",
-                "with": {"var": "optimal3", "filter": ["optimal3"]},
-            },
-        ],
         "steps": [
             {
                 "run": "optimizer",
@@ -327,6 +313,20 @@ def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
                     "tag": "optimal3",
                     "initial_values": [0, 0, 0],
                 },
+            },
+        ],
+        "handlers": [
+            {
+                "init": "tracker",
+                "with": {"var": "optimal1", "filter": ["optimal1"]},
+            },
+            {
+                "init": "tracker",
+                "with": {"var": "optimal2", "filter": ["optimal2"]},
+            },
+            {
+                "init": "tracker",
+                "with": {"var": "optimal3", "filter": ["optimal3"]},
             },
         ],
     }
@@ -358,9 +358,6 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
             "optimal": None,
             "saved_results": None,
         },
-        "handlers": [
-            {"init": "tracker", "with": {"var": "optimal"}},
-        ],
         "steps": [
             {
                 "run": "optimizer",
@@ -376,6 +373,9 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 "run": "setvar",
                 "with": "optimal = None",
             },
+        ],
+        "handlers": [
+            {"init": "tracker", "with": {"var": "optimal"}},
         ],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
@@ -424,13 +424,6 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
             "optimum": None,
             "last": None,
         },
-        "handlers": [
-            {"init": "tracker", "with": {"var": "optimum"}},
-            {
-                "init": "tracker",
-                "with": {"var": "last", "type": "last"},
-            },
-        ],
         "steps": [
             {
                 "run": "optimizer",
@@ -458,6 +451,13 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
                     "config": "$enopt_config2",
                     "initial_values": "$last",
                 },
+            },
+        ],
+        "handlers": [
+            {"init": "tracker", "with": {"var": "optimum"}},
+            {
+                "init": "tracker",
+                "with": {"var": "last", "type": "last"},
             },
         ],
     }
@@ -496,12 +496,6 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
             "enopt_config2": enopt_config2,
             "last": None,
         },
-        "handlers": [
-            {
-                "init": "tracker",
-                "with": {"var": "last", "type": "last", "filter": ["last"]},
-            },
-        ],
         "steps": [
             {
                 "run": "optimizer",
@@ -516,6 +510,12 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
                     "config": "$enopt_config2",
                     "initial_values": "$last",
                 },
+            },
+        ],
+        "handlers": [
+            {
+                "init": "tracker",
+                "with": {"var": "last", "type": "last", "filter": ["last"]},
             },
         ],
     }
@@ -543,9 +543,6 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
             "enopt_config": enopt_config,
             "optimum": None,
         },
-        "handlers": [
-            {"init": "tracker", "with": {"var": "optimum"}},
-        ],
         "steps": [
             {
                 "run": "optimizer",
@@ -553,6 +550,9 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
                     "config": "$enopt_config",
                 },
             },
+        ],
+        "handlers": [
+            {"init": "tracker", "with": {"var": "optimum"}},
         ],
     }
     context = OptimizerContext(evaluator=evaluator())
@@ -651,12 +651,6 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
             "enopt_config": enopt_config,
             "last": None,
         },
-        "handlers": [
-            {
-                "init": "tracker",
-                "with": {"var": "last", "type": "last"},
-            },
-        ],
         "steps": [
             {
                 "run": "repeat",
@@ -673,6 +667,12 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
                     ],
                 },
             }
+        ],
+        "handlers": [
+            {
+                "init": "tracker",
+                "with": {"var": "last", "type": "last"},
+            },
         ],
     }
     context = OptimizerContext(evaluator=evaluator())
@@ -703,9 +703,6 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
             "enopt_config": enopt_config,
             "optimum": None,
         },
-        "handlers": [
-            {"init": "tracker", "with": {"var": "optimum"}},
-        ],
         "steps": [
             {
                 "run": "repeat",
@@ -722,6 +719,9 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
                     ],
                 },
             }
+        ],
+        "handlers": [
+            {"init": "tracker", "with": {"var": "optimum"}},
         ],
     }
     context = OptimizerContext(evaluator=evaluator())
@@ -772,9 +772,6 @@ def test_restart_optimum_with_reset(
             "optimum": None,
             "initial": None,
         },
-        "handlers": [
-            {"init": "tracker", "with": {"var": "optimum"}},
-        ],
         "steps": [
             {
                 "run": "repeat",
@@ -799,6 +796,9 @@ def test_restart_optimum_with_reset(
                     ],
                 },
             },
+        ],
+        "handlers": [
+            {"init": "tracker", "with": {"var": "optimum"}},
         ],
     }
     context = OptimizerContext(evaluator=evaluator(new_functions))
@@ -845,9 +845,6 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
             "metadata": metadata,
             "counter": 0,
         },
-        "handlers": [
-            {"init": "metadata", "with": metadata},
-        ],
         "steps": [
             {
                 "run": "repeat",
@@ -862,6 +859,9 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
                     ],
                 },
             }
+        ],
+        "handlers": [
+            {"init": "metadata", "with": metadata},
         ],
     }
 
@@ -879,9 +879,6 @@ def test_evaluator_step(enopt_config: Any, evaluator: Any) -> None:
             "config": enopt_config,
             "optimum": None,
         },
-        "handlers": [
-            {"init": "tracker", "with": {"var": "optimum"}},
-        ],
         "steps": [
             {
                 "run": "evaluator",
@@ -889,6 +886,9 @@ def test_evaluator_step(enopt_config: Any, evaluator: Any) -> None:
                     "config": "$config",
                 },
             },
+        ],
+        "handlers": [
+            {"init": "tracker", "with": {"var": "optimum"}},
         ],
     }
 
@@ -932,9 +932,6 @@ def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
             "config": enopt_config,
             "optimum": None,
         },
-        "handlers": [
-            {"init": "tracker", "with": {"var": "optimum"}},
-        ],
         "steps": [
             {
                 "run": "evaluator",
@@ -943,6 +940,9 @@ def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
                     "values": [[0, 0, 0.1], [0, 0, 0]],
                 },
             },
+        ],
+        "handlers": [
+            {"init": "tracker", "with": {"var": "optimum"}},
         ],
     }
 
@@ -1019,12 +1019,6 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
         "variables": {
             "config": nested_config,
         },
-        "handlers": [
-            {
-                "init": "tracker",
-                "with": {"var": "nested_optimum"},
-            },
-        ],
         "steps": [
             {
                 "run": "optimizer",
@@ -1034,6 +1028,12 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
                 },
             },
         ],
+        "handlers": [
+            {
+                "init": "tracker",
+                "with": {"var": "nested_optimum"},
+            },
+        ],
     }
 
     outer_config = {
@@ -1041,12 +1041,6 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
             "config": enopt_config,
             "optimum": None,
         },
-        "handlers": [
-            {
-                "init": "tracker",
-                "with": {"var": "optimum", "filter": ["outer"]},
-            },
-        ],
         "steps": [
             {
                 "run": "optimizer",
@@ -1055,6 +1049,12 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
                     "nested_plan": inner_config,
                     "tag": "outer",
                 },
+            },
+        ],
+        "handlers": [
+            {
+                "init": "tracker",
+                "with": {"var": "optimum", "filter": ["outer"]},
             },
         ],
     }
@@ -1096,10 +1096,6 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
         "variables": {
             "config": nested_config,
         },
-        "handlers": [
-            {"init": "tracker", "with": {"var": "nested_optimum"}},
-            {"init": "metadata", "with": {"inner": "inner_meta_data"}},
-        ],
         "steps": [
             {
                 "run": "optimizer",
@@ -1110,6 +1106,10 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
                 },
             },
         ],
+        "handlers": [
+            {"init": "tracker", "with": {"var": "nested_optimum"}},
+            {"init": "metadata", "with": {"inner": "inner_meta_data"}},
+        ],
     }
 
     outer_config = {
@@ -1118,10 +1118,6 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
             "optimum": None,
             "x": 1,
         },
-        "handlers": [
-            {"init": "metadata", "with": {"outer": "$x"}},
-            {"init": "tracker", "with": {"var": "optimum", "filter": ["inner"]}},
-        ],
         "steps": [
             {
                 "run": "optimizer",
@@ -1130,6 +1126,10 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
                     "nested_plan": inner_config,
                 },
             },
+        ],
+        "handlers": [
+            {"init": "metadata", "with": {"outer": "$x"}},
+            {"init": "tracker", "with": {"var": "optimum", "filter": ["inner"]}},
         ],
     }
 
