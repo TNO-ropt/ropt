@@ -861,7 +861,7 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 "run": "repeat",
                 "with": {
                     "iterations": 2,
-                    "counter_var": "counter",
+                    "var": "counter",
                     "steps": [
                         {
                             "run": "optimizer",

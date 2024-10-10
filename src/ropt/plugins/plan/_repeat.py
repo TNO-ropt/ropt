@@ -17,14 +17,14 @@ class DefaultRepeatStepWith(BaseModel):
     """Parameters used by the default repeat step.
 
     Attributes:
-        iterations:  The number of repetitions
-        steps:       The steps to repeat
-        counter_var: The variable to update with the counter value
+        iterations: The number of repetitions
+        steps:      The steps to repeat
+        var:        The variable to update with the counter value
     """
 
     iterations: int
     steps: List[StepConfig]
-    counter_var: Optional[str] = None
+    var: Optional[str] = None
 
     model_config = ConfigDict(
         extra="forbid",
@@ -47,13 +47,13 @@ class DefaultRepeatStep(PlanStep):
         with_ = DefaultRepeatStepWith.model_validate(config.with_)
         self._num = with_.iterations
         self._steps = self.plan.create_steps(with_.steps)
-        self._counter_var = with_.counter_var
+        self._var = with_.var
 
     def run(self) -> None:
         """Run the steps repeatedly."""
         for idx in range(self._num):
-            if self._counter_var is not None:
-                self.plan[self._counter_var] = idx
+            if self._var is not None:
+                self.plan[self._var] = idx
             self.plan.run_steps(self._steps)
             if self.plan.aborted:
                 break
