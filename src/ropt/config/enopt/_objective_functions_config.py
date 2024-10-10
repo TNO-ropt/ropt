@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from typing import Optional
 
 import numpy as np
@@ -16,6 +17,11 @@ from ropt.config.utils import (
     broadcast_arrays,
     normalize,
 )
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 
 class ObjectiveFunctionsConfig(BaseModel):
@@ -83,7 +89,7 @@ class ObjectiveFunctionsConfig(BaseModel):
     )
 
     @model_validator(mode="after")
-    def _broadcast_and_normalize(self) -> ObjectiveFunctionsConfig:
+    def _broadcast_and_normalize(self) -> Self:
         if self.names is not None:
             size = len(self.names)
             for name in ("scales", "auto_scale", "weights"):

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from itertools import zip_longest
 from typing import Optional, Tuple, Union
 
@@ -19,6 +20,11 @@ from ropt.config.utils import (
     immutable_array,
 )
 from ropt.enums import VariableType
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 
 class VariablesConfig(BaseModel):
@@ -102,7 +108,7 @@ class VariablesConfig(BaseModel):
     )
 
     @model_validator(mode="after")
-    def _broadcast_and_scale(self) -> "VariablesConfig":
+    def _broadcast_and_scale(self) -> Self:
         if self.names is not None:
             size = len(self.names)
             self.initial_values = broadcast_1d_array(

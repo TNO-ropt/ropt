@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import sys
+
 from pydantic import BaseModel, ConfigDict, model_validator
 
 from ropt.config.utils import (
@@ -12,6 +14,11 @@ from ropt.config.utils import (
     check_enum_values,
 )
 from ropt.enums import ConstraintType
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 
 class LinearConstraintsConfig(BaseModel):
@@ -79,7 +86,7 @@ class LinearConstraintsConfig(BaseModel):
     )
 
     @model_validator(mode="after")
-    def _broadcast_and_check(self) -> LinearConstraintsConfig:
+    def _broadcast_and_check(self) -> Self:
         size = 0 if self.coefficients is None else self.coefficients.shape[0]
         self.rhs_values = broadcast_1d_array(self.rhs_values, "rhs_values", size)
         check_enum_values(self.types, ConstraintType)

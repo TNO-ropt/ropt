@@ -5,7 +5,7 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import TYPE_CHECKING, Literal, Optional, Set, Union
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field
 
 from ropt.enums import EventType
 from ropt.plugins.plan.base import ResultHandler
@@ -40,12 +40,6 @@ class DefaultTrackerWith(BaseModel):
         extra="forbid",
         validate_default=True,
     )
-
-    @model_validator(mode="after")
-    def _validate_tags(self) -> DefaultTrackerWith:
-        if isinstance(self.tags, str):
-            self.tags = {self.tags}
-        return self
 
 
 class DefaultTrackerHandler(ResultHandler):

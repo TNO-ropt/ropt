@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Dict, Set, Union
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict
 
 from ropt.enums import EventType
 from ropt.plugins.plan.base import ResultHandler
@@ -30,12 +30,6 @@ class DefaultMetadataWith(BaseModel):
         validate_default=True,
         arbitrary_types_allowed=True,
     )
-
-    @model_validator(mode="after")
-    def _validate_tags(self) -> DefaultMetadataWith:
-        if isinstance(self.tags, str):
-            self.tags = {self.tags}
-        return self
 
 
 class DefaultMetadataHandler(ResultHandler):

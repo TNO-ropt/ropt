@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from typing import Optional
 
 import numpy as np
@@ -13,6 +14,11 @@ from ropt.config.utils import (
     broadcast_1d_array,
     normalize,
 )
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 
 class RealizationsConfig(BaseModel):
@@ -72,7 +78,7 @@ class RealizationsConfig(BaseModel):
     )
 
     @model_validator(mode="after")
-    def _broadcast_normalize_and_check(self) -> RealizationsConfig:
+    def _broadcast_normalize_and_check(self) -> Self:
         if self.names:
             size = len(self.names)
             self.weights = broadcast_1d_array(self.weights, "weights", size)

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path  # noqa: TCH003
 from typing import Any, Dict, List, Optional, Union
 
@@ -12,6 +13,11 @@ from pydantic import (
     PositiveInt,
     model_validator,
 )
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 
 class OptimizerConfig(BaseModel):
@@ -84,7 +90,7 @@ class OptimizerConfig(BaseModel):
     )
 
     @model_validator(mode="after")
-    def _method(self) -> OptimizerConfig:
+    def _method(self) -> Self:
         plugin, sep, method = self.method.rpartition("/")
         if (sep == "/") and (plugin == "" or method) == "":
             msg = f"malformed method specification: `{self.method}`"

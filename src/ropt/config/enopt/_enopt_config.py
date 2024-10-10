@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from copy import deepcopy
 from typing import Any, Dict, Optional, Tuple
 
@@ -21,6 +22,11 @@ from ._realization_filter_config import RealizationFilterConfig  # noqa: TCH001
 from ._realizations_config import RealizationsConfig
 from ._sampler_config import SamplerConfig
 from ._variables_config import VariablesConfig  # noqa: TCH001
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 
 class EnOptConfig(BaseModel):
@@ -95,7 +101,7 @@ class EnOptConfig(BaseModel):
     )
 
     @model_validator(mode="after")
-    def _linear_constraints(self) -> EnOptConfig:
+    def _linear_constraints(self) -> Self:
         if self.linear_constraints is not None:
             variable_count = self.variables.initial_values.size
             if (
@@ -127,7 +133,7 @@ class EnOptConfig(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def _gradient(self) -> EnOptConfig:
+    def _gradient(self) -> Self:
         variables = self.variables
         variable_count = variables.initial_values.size
         magnitudes = self.gradient.perturbation_magnitudes

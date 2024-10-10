@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from typing import Optional
 
 import numpy as np
@@ -18,6 +19,11 @@ from ropt.config.utils import (
     check_enum_values,
 )
 from ropt.enums import ConstraintType
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 
 class NonlinearConstraintsConfig(BaseModel):
@@ -94,7 +100,7 @@ class NonlinearConstraintsConfig(BaseModel):
     @model_validator(mode="after")
     def _broadcast_and_check(
         self,
-    ) -> NonlinearConstraintsConfig:
+    ) -> Self:
         if self.names is not None:
             size = len(self.names)
             for name in ("rhs_values", "scales", "auto_scale"):

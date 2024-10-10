@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from typing import Optional
 
 import numpy as np
@@ -16,6 +17,11 @@ from .constants import (
     DEFAULT_PERTURBATION_MAGNITUDE,
     DEFAULT_PERTURBATION_TYPE,
 )
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 
 class GradientConfig(BaseModel):
@@ -109,7 +115,7 @@ class GradientConfig(BaseModel):
     )
 
     @model_validator(mode="after")
-    def _check_perturbation_min_success(self) -> GradientConfig:
+    def _check_perturbation_min_success(self) -> Self:
         if (
             self.perturbation_min_success is None
             or self.perturbation_min_success > self.number_of_perturbations
@@ -118,7 +124,7 @@ class GradientConfig(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def _check(self) -> GradientConfig:
+    def _check(self) -> Self:
         check_enum_values(self.perturbation_types, PerturbationType)
         check_enum_values(self.boundary_types, BoundaryType)
         return self
