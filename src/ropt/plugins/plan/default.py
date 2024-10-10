@@ -14,12 +14,14 @@ from ._metadata import DefaultMetadataHandler
 from ._optimizer import DefaultOptimizerStep
 from ._repeat import DefaultRepeatStep
 from ._setvar import DefaultSetStep
+from ._table import DefaultTableHandler
 from ._tracker import DefaultTrackerHandler
 from .base import PlanPlugin
 
 _RESULT_HANDLER_OBJECTS: Final[Dict[str, Type[ResultHandler]]] = {
-    "tracker": DefaultTrackerHandler,
     "metadata": DefaultMetadataHandler,
+    "table": DefaultTableHandler,
+    "tracker": DefaultTrackerHandler,
 }
 
 _STEP_OBJECTS: Final[Dict[str, Type[PlanStep]]] = {

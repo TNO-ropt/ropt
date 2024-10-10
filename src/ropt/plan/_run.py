@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import sys
 from dataclasses import dataclass
-from functools import partial
 from pathlib import Path  # noqa: TCH003
 from typing import (
     TYPE_CHECKING,
@@ -23,8 +22,6 @@ from ropt.config.plan import PlanConfig
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
 from ropt.plugins import PluginManager
-from ropt.report import ResultsTable
-from ropt.results import convert_to_maximize
 
 from ._plan import OptimizerContext, Plan
 
@@ -103,7 +100,7 @@ class OptimizationPlanRunner:
                 "with": {
                     "config": "$__config__",
                     "exit_code_var": "__exit_code__",
-                    "tag": "__tracker_tag__",
+                    "tag": "__optimizer_tag__",
                 },
             }
         ]
@@ -113,7 +110,7 @@ class OptimizationPlanRunner:
                 "with": {
                     "var": "__optimum_tracker__",
                     "constraint_tolerance": constraint_tolerance,
-                    "tags": "__tracker_tag__",
+                    "tags": "__optimizer_tag__",
                 },
             },
         ]
@@ -202,19 +199,6 @@ class OptimizationPlanRunner:
                 self._metadata[key] = value
         return self
 
-    def _handle_results(
-        self, event: Event, table: ResultsTable, *, maximize: bool
-    ) -> None:
-        assert event.results is not None
-        table.add_results(
-            event.config,
-            (
-                (convert_to_maximize(item) for item in event.results)
-                if maximize
-                else event.results
-            ),
-        )
-
     def add_table(
         self,
         columns: Dict[str, str],
@@ -242,17 +226,18 @@ class OptimizationPlanRunner:
         Returns:
             The `OptimizationPlanRunner` instance, allowing for method chaining.
         """
-        table = ResultsTable(
-            columns=columns,
-            path=path,
-            table_type=table_type,
-            min_header_len=min_header_len,
-        )
-        self._observers.append(
-            (
-                EventType.FINISHED_EVALUATION,
-                partial(self._handle_results, table=table, maximize=maximize),
-            ),
+        self._handlers.append(
+            {
+                "run": "table",
+                "with": {
+                    "tags": "__optimizer_tag__",
+                    "columns": columns,
+                    "path": path,
+                    "table_type": table_type,
+                    "min_header_len": min_header_len,
+                    "maximize": maximize,
+                },
+            }
         )
         return self
 

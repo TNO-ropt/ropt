@@ -1212,3 +1212,50 @@ def test_table(enopt_config: Any, evaluator: Any, tmp_path: Path) -> None:
     assert path2.exists()
 
     assert filecmp.cmp(path1, path2)
+
+
+def test_table_handler(enopt_config: Any, evaluator: Any, tmp_path: Path) -> None:
+    enopt_config["optimizer"]["max_functions"] = 5
+
+    path1 = tmp_path / "results1.txt"
+    plan_config = {
+        "variables": {
+            "enopt_config": enopt_config,
+        },
+        "steps": [
+            {
+                "run": "optimizer",
+                "with": {"config": "$enopt_config", "tag": "opt"},
+            },
+        ],
+        "results": [
+            {
+                "run": "table",
+                "with": {
+                    "tags": "opt",
+                    "columns": {
+                        "result_id": "eval-ID",
+                        "evaluations.variables": "Variables",
+                    },
+                    "path": path1,
+                },
+            },
+        ],
+    }
+
+    context = OptimizerContext(evaluator=evaluator())
+    plan = Plan(PlanConfig.model_validate(plan_config), context)
+    plan.run()
+
+    assert path1.exists()
+    with path1.open() as fp:
+        assert len(fp.readlines()) == 8
+
+    path2 = tmp_path / "results2.txt"
+    OptimizationPlanRunner(enopt_config, evaluator()).add_table(
+        columns={"result_id": "eval-ID", "evaluations.variables": "Variables"},
+        path=path2,
+    ).run()
+    assert path2.exists()
+
+    assert filecmp.cmp(path1, path2)

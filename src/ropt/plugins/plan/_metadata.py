@@ -68,6 +68,7 @@ class DefaultMetadataHandler(ResultHandler):
                 EventType.FINISHED_EVALUATOR_STEP,
             }
             and event.results is not None
+            and event.tag is not None
             and event.tag in self._with.tags
         ):
             for results in event.results:
