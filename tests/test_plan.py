@@ -872,7 +872,7 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
             }
         ],
         "results": [
-            {"init": "metadata", "with": {"metadata": metadata, "tags": "opt"}},
+            {"init": "metadata", "with": {"data": metadata, "tags": "opt"}},
         ],
     }
 
@@ -1124,7 +1124,7 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
             {"init": "tracker", "with": {"var": "nested_optimum", "tags": "inner"}},
             {
                 "init": "metadata",
-                "with": {"metadata": {"inner": "inner_meta_data"}, "tags": "inner"},
+                "with": {"data": {"inner": "inner_meta_data"}, "tags": "inner"},
             },
         ],
     }
@@ -1148,7 +1148,7 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
         "results": [
             {
                 "init": "metadata",
-                "with": {"metadata": {"outer": "$x"}, "tags": ["inner", "outer"]},
+                "with": {"data": {"outer": "$x"}, "tags": ["inner", "outer"]},
             },
             {"init": "tracker", "with": {"var": "optimum", "tags": "inner"}},
         ],

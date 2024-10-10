@@ -18,11 +18,11 @@ class DefaultMetadataWith(BaseModel):
     """Parameters used by the default metadata results handler.
 
     Attributes:
-        metadata: Data to set into the metadata
-        tags:     Tags of the sources to track
+        data: Data to set into the metadata
+        tags: Tags of the sources to track
     """
 
-    metadata: Dict[str, Any]
+    data: Dict[str, Any]
     tags: Union[str, Set[str]]
 
     model_config = ConfigDict(
@@ -71,6 +71,6 @@ class DefaultMetadataHandler(ResultHandler):
             and event.tag in self._with.tags
         ):
             for results in event.results:
-                for key, expr in self._with.metadata.items():
+                for key, expr in self._with.data.items():
                     results.metadata[key] = self.plan.parse_value(expr)
         return event
