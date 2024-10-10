@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, Literal, Optional, Set
+from typing import TYPE_CHECKING, Literal, Optional, Set, Union
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from ropt.enums import EventType
 from ropt.plugins.plan.base import ResultHandler
@@ -34,12 +34,18 @@ class DefaultTrackerWith(BaseModel):
     var: str
     type_: Literal["optimal", "last"] = Field(default="optimal", alias="type")
     constraint_tolerance: Optional[float] = 1e-10
-    tags: Set[str] = set()
+    tags: Union[str, Set[str]] = set()
 
     model_config = ConfigDict(
         extra="forbid",
         validate_default=True,
     )
+
+    @model_validator(mode="after")
+    def _validate_tags(self) -> DefaultTrackerWith:
+        if isinstance(self.tags, str):
+            self.tags = {self.tags}
+        return self
 
 
 class DefaultTrackerHandler(ResultHandler):
