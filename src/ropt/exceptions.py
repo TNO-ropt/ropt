@@ -1,7 +1,5 @@
 """Exceptions raised within the `ropt` library."""
 
-from typing import Optional
-
 from .enums import OptimizerExitCode
 
 
@@ -12,20 +10,13 @@ class ConfigError(Exception):
 class PlanError(Exception):
     """Raised when an error occurs in an optimization plan."""
 
-    def __init__(
-        self,
-        message: str,
-        *,
-        name: Optional[str] = None,
-    ) -> None:
+    def __init__(self, message: str) -> None:
         """Initialize with a custom error message.
 
         Args:
             message: Error message
-            name:    Optional step or handler object name to add to the message
         """
-        msg = f"Step `{name}`: " if name is not None else ""
-        super().__init__(msg + message)
+        super().__init__(message)
 
 
 class OptimizationAborted(Exception):  # noqa: N818

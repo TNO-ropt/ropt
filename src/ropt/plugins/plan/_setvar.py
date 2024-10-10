@@ -80,12 +80,12 @@ class DefaultSetStep(PlanStep):
             var, sep, value = expr.partition("=")
             if sep != "=":
                 msg = f"Invalid expression: {expr}"
-                raise PlanError(msg, name=self._step_config.name)
+                raise PlanError(msg)
 
         self._var = var.strip()
         if not self._var.isidentifier():
             msg = f"Invalid identifier: {self._var}"
-            raise PlanError(msg, name=self._step_config.name)
+            raise PlanError(msg)
         self._value = value
 
     def run(self) -> None:

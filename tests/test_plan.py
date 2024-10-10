@@ -1044,7 +1044,7 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
         for item in event.results:
             if isinstance(item, FunctionResults):
                 assert item.metadata.get("outer") == 1
-                if event.step_name == "inner":
+                if event.tag == "inner":
                     assert item.metadata.get("inner") == "inner_meta_data"
 
     enopt_config["optimizer"]["tolerance"] = 1e-10
@@ -1066,7 +1066,6 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
         "steps": [
             {
                 "run": "optimizer",
-                "name": "inner",
                 "with": {
                     "config": "$config",
                     "initial_values": "$initial",
@@ -1088,7 +1087,6 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
             {"run": "setvar", "with": "x = 1"},
             {
                 "run": "optimizer",
-                "name": "outer",
                 "with": {
                     "config": "$config",
                     "nested_plan": inner_config,
@@ -1128,7 +1126,6 @@ def test_table(enopt_config: Any, evaluator: Any, tmp_path: Path) -> None:
         },
         "steps": [
             {
-                "name": "opt",
                 "run": "optimizer",
                 "with": {"config": "$enopt_config"},
             },

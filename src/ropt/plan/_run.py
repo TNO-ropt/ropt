@@ -103,7 +103,6 @@ class OptimizationPlanRunner:
         ]
         self._steps: List[Dict[str, Any]] = [
             {
-                "name": "__optimizer_step__",
                 "run": "optimizer",
                 "with": {
                     "config": "$__config__",

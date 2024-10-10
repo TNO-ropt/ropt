@@ -27,12 +27,10 @@ class EventHandlerConfig(BaseModel):
         suffix.
 
     Attributes:
-        name:  An identifier used to refer to the handler object
         init:  Identifies the code that initializes the object
         with_: Additional parameters passed to the object
     """
 
-    name: Optional[str] = None
     init: str
     with_: Any = Field(default_factory=dict, alias="with")
 
@@ -48,9 +46,6 @@ class StepConfig(BaseModel):
     A step is a single action within an optimization plan. The `run` string
     identifies the code that executes te step. It is used by the plugin manager
     to load the code.
-
-    A step may be named using the optional `name` field, which will only be used
-    for informational purposes, such as in error messages or in generated reports.
 
     Additional parameters needed by the step may be configured using the `with_`
     attribute. The content of the `with_` attribute depends on the type of the
@@ -72,13 +67,11 @@ class StepConfig(BaseModel):
         details on the expressions that can be evaluated.
 
     Attributes:
-        name:  An optional name used to refer to the step
         run:   Identifies the code that runs the step
         with_: Additional parameters passed to the step
         if_:   Optional expression for conditional evaluation
     """
 
-    name: Optional[str] = None
     run: str
     with_: Union[Dict[str, Any], str] = Field(default_factory=dict, alias="with")
     if_: Optional[str] = Field(default=None, alias="if")

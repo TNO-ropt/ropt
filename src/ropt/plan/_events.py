@@ -29,7 +29,6 @@ class Event:
         results:    Optional results passed with the event
         exit_code:  An optional exit code
         tag:        Optional tag
-        step_name:  Optional name of the step emitting the event
     """
 
     event_type: EventType
@@ -37,4 +36,3 @@ class Event:
     results: Optional[Tuple[Results, ...]] = None
     exit_code: Optional[OptimizerExitCode] = None
     tag: Optional[str] = None
-    step_name: Optional[str] = None

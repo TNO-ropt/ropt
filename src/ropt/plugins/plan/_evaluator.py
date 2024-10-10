@@ -69,7 +69,7 @@ class DefaultEvaluatorStep(PlanStep):
         config = self.plan.parse_value(self._with.config)
         if not isinstance(config, (dict, EnOptConfig)):
             msg = "No valid EnOpt configuration provided"
-            raise PlanError(msg, name=self.step_config.name)
+            raise PlanError(msg)
         self._enopt_config = EnOptConfig.model_validate(config)
 
         self.plan.emit_event(
@@ -77,7 +77,6 @@ class DefaultEvaluatorStep(PlanStep):
                 event_type=EventType.START_EVALUATOR_STEP,
                 config=self._enopt_config,
                 tag=self._with.tag,
-                step_name=self.step_config.name,
             )
         )
         assert self.plan.optimizer_context.rng is not None
@@ -111,7 +110,6 @@ class DefaultEvaluatorStep(PlanStep):
                 results=results,
                 tag=self._with.tag,
                 exit_code=exit_code,
-                step_name=self.step_config.name,
             )
         )
 
@@ -134,5 +132,5 @@ class DefaultEvaluatorStep(PlanStep):
                 )
             if parsed_variables is not None:
                 msg = f"`{self._with.values} does not contain variables."  # noqa: PD011
-                raise PlanError(msg, name=self.step_config.name)
+                raise PlanError(msg)
         return self._enopt_config.variables.initial_values

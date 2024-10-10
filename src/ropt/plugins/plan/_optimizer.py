@@ -82,7 +82,7 @@ class DefaultOptimizerStep(PlanStep):
         config = self.plan.parse_value(self._with.config)
         if not isinstance(config, (dict, EnOptConfig)):
             msg = "No valid EnOpt configuration provided"
-            raise PlanError(msg, name=self.step_config.name)
+            raise PlanError(msg)
         self._enopt_config = EnOptConfig.model_validate(config)
 
         self.plan.emit_event(
@@ -90,7 +90,6 @@ class DefaultOptimizerStep(PlanStep):
                 event_type=EventType.START_OPTIMIZER_STEP,
                 config=self._enopt_config,
                 tag=self._with.tag,
-                step_name=self.step_config.name,
             )
         )
 
@@ -123,7 +122,6 @@ class DefaultOptimizerStep(PlanStep):
                 config=self._enopt_config,
                 tag=self._with.tag,
                 exit_code=exit_code,
-                step_name=self.step_config.name,
             )
         )
 
@@ -146,7 +144,6 @@ class DefaultOptimizerStep(PlanStep):
                     event_type=EventType.START_EVALUATION,
                     config=self._enopt_config,
                     tag=self._with.tag,
-                    step_name=self.step_config.name,
                 )
             )
         else:
@@ -156,7 +153,6 @@ class DefaultOptimizerStep(PlanStep):
                     config=self._enopt_config,
                     results=results,
                     tag=self._with.tag,
-                    step_name=self.step_config.name,
                 )
             )
 
@@ -197,5 +193,5 @@ class DefaultOptimizerStep(PlanStep):
                 )
             if parsed_variables is not None:
                 msg = f"`{self._with.initial_values} does not contain variables."
-                raise PlanError(msg, name=self.step_config.name)
+                raise PlanError(msg)
         return self._enopt_config.variables.initial_values
