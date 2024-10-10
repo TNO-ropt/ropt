@@ -2,7 +2,7 @@
     options:
         members:
             - PlanConfig
-            - EventHandlerConfig
+            - ResultHandlerConfig
             - StepConfig
         group_by_category: false
         show_bases: false

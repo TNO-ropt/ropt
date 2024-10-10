@@ -15,15 +15,15 @@ from typing import TYPE_CHECKING, Union
 from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
-    from ropt.config.plan import EventHandlerConfig, StepConfig
+    from ropt.config.plan import ResultHandlerConfig, StepConfig
     from ropt.plan import Event, OptimizerContext, Plan
 
 
-class EventHandler(ABC):
-    """Base class for event handler objects."""
+class ResultHandler(ABC):
+    """Base class for results handler objects."""
 
-    def __init__(self, config: EventHandlerConfig, plan: Plan) -> None:
-        """Initialize the event handler object.
+    def __init__(self, config: ResultHandlerConfig, plan: Plan) -> None:
+        """Initialize the results handler object.
 
         The `config` and `plan` arguments are accessible as `handler_config`
         and `plan` properties.
@@ -36,7 +36,7 @@ class EventHandler(ABC):
         self._plan = plan
 
     @property
-    def handler_config(self) -> EventHandlerConfig:
+    def handler_config(self) -> ResultHandlerConfig:
         """Return the handler object configuration.
 
         Returns:
@@ -103,8 +103,8 @@ class PlanPlugin(Plugin):
 
     @abstractmethod
     def create(
-        self, config: Union[EventHandlerConfig, StepConfig], context: OptimizerContext
-    ) -> Union[EventHandler, PlanStep]:
+        self, config: Union[ResultHandlerConfig, StepConfig], context: OptimizerContext
+    ) -> Union[ResultHandler, PlanStep]:
         """Create the plan object.
 
         Args:

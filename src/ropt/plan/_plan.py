@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from ropt.config.plan import PlanConfig, StepConfig
     from ropt.evaluator import Evaluator
     from ropt.plan import Event
-    from ropt.plugins.plan.base import EventHandler, PlanStep
+    from ropt.plugins.plan.base import PlanStep, ResultHandler
 
 _VALID_TYPES: Final = (int, float, bool)
 _VALID_RESULTS: Final = (list, np.ndarray, *_VALID_TYPES)
@@ -70,9 +70,9 @@ class Plan:
 
         The plan requires a `PlanConfig` object and an `OptimizationContext`
         object. The `plugin_manager` argument is optional and allows you to
-        specify plugins for the event handler and step objects that the plan may
-        use. If not provided, only plugins installed via Python's standard entry
-        points mechanism will be used.
+        specify plugins for the results handler and step objects that the plan
+        may use. If not provided, only plugins installed via Python's standard
+        entry points mechanism will be used.
 
         Args:
             config:            The optimizer configuration
@@ -99,11 +99,11 @@ class Plan:
                 msg = f"Variable already exists: `{var}"
                 raise PlanError(msg)
             self._set_item(var, None)
-        self._handlers: List[EventHandler] = [
+        self._handlers: List[ResultHandler] = [
             self._plugin_manager.get_plugin("plan", method=config.init).create(
                 config, self
             )
-            for config in config.handlers
+            for config in config.results
         ]
         self._steps = self.create_steps(config.steps)
         self._aborted = False

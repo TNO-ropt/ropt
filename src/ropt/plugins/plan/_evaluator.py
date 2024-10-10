@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 class DefaultEvaluatorStepWith(BaseModel):
     """Parameters used by the default optimizer step.
 
-    Optionally the initial variables to be used can be set from an event handler
+    Optionally the initial variables to be used can be set from an results handler
     object.
 
     Attributes:

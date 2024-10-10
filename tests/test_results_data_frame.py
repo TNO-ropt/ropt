@@ -121,7 +121,7 @@ def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
         },
     )
 
-    def handler(event: Event) -> None:
+    def even_handler(event: Event) -> None:
         assert event.results is not None
         assert event.results is not None
         for item in event.results:
@@ -129,7 +129,7 @@ def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
         reporter.add_results(EnOptConfig.model_validate(enopt_config), event.results)
 
     OptimizationPlanRunner(enopt_config, evaluator()).add_observer(
-        EventType.FINISHED_EVALUATION, handler
+        EventType.FINISHED_EVALUATION, even_handler
     ).run()
 
     assert len(reporter.frame) == 3

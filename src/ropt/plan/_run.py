@@ -265,7 +265,7 @@ class OptimizationPlanRunner:
                 {
                     "variables": self._variables,
                     "steps": self._steps,
-                    "handlers": self._handlers,
+                    "results": self._handlers,
                 }
             ),
             self._optimizer_context,

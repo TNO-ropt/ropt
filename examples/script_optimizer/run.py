@@ -102,7 +102,7 @@ def main() -> None:
                         "with": {"config": "$enopt_config"},
                     },
                 ],
-                "handlers": [
+                "results": [
                     {"init": "tracker", "with": {"var": "optimal"}},
                 ],
             },

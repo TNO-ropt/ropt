@@ -5,9 +5,9 @@ from __future__ import annotations
 from functools import singledispatchmethod
 from typing import Dict, Final, Type, Union
 
-from ropt.config.plan import EventHandlerConfig, StepConfig  # noqa: TCH001
+from ropt.config.plan import ResultHandlerConfig, StepConfig  # noqa: TCH001
 from ropt.plan import Plan  # noqa: TCH001
-from ropt.plugins.plan.base import EventHandler, PlanStep  # noqa: TCH001
+from ropt.plugins.plan.base import PlanStep, ResultHandler  # noqa: TCH001
 
 from ._evaluator import DefaultEvaluatorStep
 from ._metadata import DefaultMetadataHandler
@@ -17,7 +17,7 @@ from ._setvar import DefaultSetStep
 from ._tracker import DefaultTrackerHandler
 from .base import PlanPlugin
 
-_HANDLER_OBJECTS: Final[Dict[str, Type[EventHandler]]] = {
+_RESULT_HANDLER_OBJECTS: Final[Dict[str, Type[ResultHandler]]] = {
     "tracker": DefaultTrackerHandler,
     "metadata": DefaultMetadataHandler,
 }
@@ -36,9 +36,9 @@ class DefaultPlanPlugin(PlanPlugin):
     @singledispatchmethod
     def create(  # type: ignore[override]
         self,
-        config: Union[EventHandlerConfig, StepConfig],  # noqa: ARG002
+        config: Union[ResultHandlerConfig, StepConfig],  # noqa: ARG002
         plan: Plan,  # noqa: ARG002
-    ) -> Union[EventHandler, PlanStep]:
+    ) -> Union[ResultHandler, PlanStep]:
         """Initialize the plan plugin.
 
         See the [ropt.plugins.plan.base.PlanPlugin][] abstract base class.
@@ -49,13 +49,15 @@ class DefaultPlanPlugin(PlanPlugin):
         raise NotImplementedError(msg)
 
     @create.register
-    def _create_handler(self, config: EventHandlerConfig, plan: Plan) -> EventHandler:
+    def _create_result_handler(
+        self, config: ResultHandlerConfig, plan: Plan
+    ) -> ResultHandler:
         _, _, name = config.init.lower().rpartition("/")
-        obj = _HANDLER_OBJECTS.get(name)
+        obj = _RESULT_HANDLER_OBJECTS.get(name)
         if obj is not None:
             return obj(config, plan)
 
-        msg = f"Unknown event handler object type: {config.init}"
+        msg = f"Unknown results handler object type: {config.init}"
         raise TypeError(msg)
 
     @create.register
@@ -75,4 +77,6 @@ class DefaultPlanPlugin(PlanPlugin):
 
         # noqa
         """
-        return (method.lower() in _HANDLER_OBJECTS) or (method.lower() in _STEP_OBJECTS)
+        return (method.lower() in _RESULT_HANDLER_OBJECTS) or (
+            method.lower() in _STEP_OBJECTS
+        )
