@@ -5,7 +5,7 @@ from __future__ import annotations
 import ast
 import keyword
 import re
-from itertools import count
+from itertools import chain, count
 from numbers import Number
 from typing import TYPE_CHECKING, Any, Callable, Dict, Final, List, Optional, Tuple
 
@@ -90,6 +90,15 @@ class Plan:
         self._plugin_manager = (
             PluginManager() if plugin_manager is None else plugin_manager
         )
+        for var in chain(
+            self._plan_config.inputs,
+            self._plan_config.outputs,
+            self._plan_config.variables,
+        ):
+            if var in self._vars:
+                msg = f"Variable already exists: `{var}"
+                raise PlanError(msg)
+            self._set_item(var, None)
         self._handlers: List[EventHandler] = [
             self._plugin_manager.get_plugin("plan", method=config.init).create(
                 config, self
@@ -385,6 +394,12 @@ class Plan:
         msg = f"Unknown plan variable: `{name}`"
         raise PlanError(msg)
 
+    def _set_item(self, name: str, value: Any) -> None:  # noqa: ANN401
+        if not name.isidentifier():
+            msg = f"Not a valid variable name: `{name}`"
+            raise PlanError(msg)
+        self._vars[name] = value
+
     def __setitem__(self, name: str, value: Any) -> None:  # noqa: ANN401
         """Set a plan variable to the given value.
 
@@ -395,10 +410,10 @@ class Plan:
             name:  The name of the variable.
             value: The value to assign.
         """
-        if not name.isidentifier():
-            msg = f"Not a valid variable name: `{name}`"
+        if name not in self._vars:
+            msg = f"Unknown variable name: `{name}`"
             raise PlanError(msg)
-        self._vars[name] = value
+        self._set_item(name, value)
 
     def __contains__(self, name: str) -> bool:
         """Check if a variable exists.

@@ -92,6 +92,11 @@ class OptimizationPlanRunner:
         self._optimizer_context = OptimizerContext(evaluator=evaluator, seed=seed)
         self._observers: List[Tuple[EventType, Callable[[Event], None]]] = []
         self._metadata: Dict[str, Any] = {}
+        self._variables = {
+            "__config__": enopt_config,
+            "__optimum_tracker__": None,
+            "__exit_code__": OptimizerExitCode.UNKNOWN,
+        }
         self._handlers: List[Dict[str, Any]] = [
             {
                 "init": "tracker",
@@ -106,11 +111,10 @@ class OptimizationPlanRunner:
                 "run": "optimizer",
                 "with": {
                     "config": "$__config__",
-                    "exit_code_var": "exit_code",
+                    "exit_code_var": "__exit_code__",
                 },
             }
         ]
-        self._variables = {"__config__": enopt_config}
         self._results: _Results
 
     @property
@@ -274,7 +278,7 @@ class OptimizationPlanRunner:
         self._results = _Results(
             results=results,
             variables=None if results is None else results.evaluations.variables,
-            exit_code=plan["exit_code"],
+            exit_code=plan["__exit_code__"],
         )
         return self
 

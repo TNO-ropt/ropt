@@ -288,7 +288,7 @@ class ScriptOptimizer:
             msg = "Optimization finished normally."
         if msg:
             if event.tag is not None:
-                msg = f"Step tagged as '{event.tag}': {msg}"
+                msg = f"Step tagged as `{event.tag}`: {msg}"
             self._logger.info(msg)
 
     def add_observer(

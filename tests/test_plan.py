@@ -46,6 +46,7 @@ def test_run_basic(enopt_config: Any, evaluator: Any) -> None:
     plan_config = {
         "variables": {
             "enopt_config": enopt_config,
+            "results": None,
         },
         "handlers": [
             {
@@ -76,6 +77,7 @@ def test_parse_value(enopt_config: Any, evaluator: Any) -> None:
     plan_config: Dict[str, Any] = {
         "variables": {
             "config": enopt_config,
+            "results": None,
         },
         "handlers": [
             {"init": "tracker", "with": {"var": "results"}},
@@ -139,6 +141,12 @@ def test_parse_value(enopt_config: Any, evaluator: Any) -> None:
 
 def test_setvar(evaluator: Any) -> None:
     plan_config: Dict[str, Any] = {
+        "variables": {
+            "x": None,
+            "y": None,
+            "z": None,
+            "u": None,
+        },
         "steps": [
             {
                 "run": "setvar",
@@ -206,6 +214,10 @@ def test_invalid_setvar(evaluator: Any) -> None:
 
 def test_invalid_identifier(evaluator: Any) -> None:
     plan_config: Dict[str, Any] = {
+        "variables": {
+            "x": None,
+            "y": None,
+        },
         "steps": [
             {"run": "setvar", "with": "x=1"},
             {
@@ -225,6 +237,9 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
     plan_config = {
         "variables": {
             "config": enopt_config,
+            "optimal1": None,
+            "optimal2": None,
+            "x": None,
         },
         "handlers": [
             {
@@ -271,6 +286,9 @@ def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
     plan_config = {
         "variables": {
             "config": enopt_config,
+            "optimal1": None,
+            "optimal2": None,
+            "optimal3": None,
         },
         "handlers": [
             {
@@ -337,6 +355,8 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
     plan_config = {
         "variables": {
             "config": enopt_config,
+            "optimal": None,
+            "saved_results": None,
         },
         "handlers": [
             {"init": "tracker", "with": {"var": "optimal"}},
@@ -401,6 +421,8 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
         "variables": {
             "enopt_config1": enopt_config1,
             "enopt_config2": enopt_config2,
+            "optimum": None,
+            "last": None,
         },
         "handlers": [
             {"init": "tracker", "with": {"var": "optimum"}},
@@ -472,6 +494,7 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
         "variables": {
             "enopt_config": enopt_config,
             "enopt_config2": enopt_config2,
+            "last": None,
         },
         "handlers": [
             {
@@ -518,6 +541,7 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
     plan_config = {
         "variables": {
             "enopt_config": enopt_config,
+            "optimum": None,
         },
         "handlers": [
             {"init": "tracker", "with": {"var": "optimum"}},
@@ -625,6 +649,7 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
     plan_config = {
         "variables": {
             "enopt_config": enopt_config,
+            "last": None,
         },
         "handlers": [
             {
@@ -676,6 +701,7 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
     plan_config = {
         "variables": {
             "enopt_config": enopt_config,
+            "optimum": None,
         },
         "handlers": [
             {"init": "tracker", "with": {"var": "optimum"}},
@@ -743,6 +769,8 @@ def test_restart_optimum_with_reset(
     plan_config = {
         "variables": {
             "enopt_config": enopt_config,
+            "optimum": None,
+            "initial": None,
         },
         "handlers": [
             {"init": "tracker", "with": {"var": "optimum"}},
@@ -815,6 +843,7 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
         "variables": {
             "config": enopt_config,
             "metadata": metadata,
+            "counter": 0,
         },
         "handlers": [
             {"init": "metadata", "with": metadata},
@@ -848,6 +877,7 @@ def test_evaluator_step(enopt_config: Any, evaluator: Any) -> None:
     plan_config: Dict[str, Any] = {
         "variables": {
             "config": enopt_config,
+            "optimum": None,
         },
         "handlers": [
             {"init": "tracker", "with": {"var": "optimum"}},
@@ -900,6 +930,7 @@ def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
     plan_config = {
         "variables": {
             "config": enopt_config,
+            "optimum": None,
         },
         "handlers": [
             {"init": "tracker", "with": {"var": "optimum"}},
@@ -942,6 +973,7 @@ def test_exit_code(enopt_config: Any, evaluator: Any) -> None:
     plan_config = {
         "variables": {
             "enopt_config": enopt_config,
+            "exit_code": None,
         },
         "steps": [
             {
@@ -984,7 +1016,9 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
     inner_config = {
         "inputs": ["initial"],
         "outputs": ["nested_optimum"],
-        "variables": {"config": nested_config},
+        "variables": {
+            "config": nested_config,
+        },
         "handlers": [
             {
                 "init": "tracker",
@@ -1005,6 +1039,7 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
     outer_config = {
         "variables": {
             "config": enopt_config,
+            "optimum": None,
         },
         "handlers": [
             {
@@ -1058,7 +1093,9 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
     inner_config = {
         "inputs": ["initial"],
         "outputs": ["nested_optimum"],
-        "variables": {"config": nested_config},
+        "variables": {
+            "config": nested_config,
+        },
         "handlers": [
             {"init": "tracker", "with": {"var": "nested_optimum"}},
             {"init": "metadata", "with": {"inner": "inner_meta_data"}},
@@ -1078,13 +1115,14 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
     outer_config = {
         "variables": {
             "config": enopt_config,
+            "optimum": None,
+            "x": 1,
         },
         "handlers": [
             {"init": "metadata", "with": {"outer": "$x"}},
             {"init": "tracker", "with": {"var": "optimum", "filter": ["inner"]}},
         ],
         "steps": [
-            {"run": "setvar", "with": "x = 1"},
             {
                 "run": "optimizer",
                 "with": {

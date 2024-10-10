@@ -92,7 +92,7 @@ class SciPySampler(Sampler):
         self._sampler: Union[rv_continuous, QMCEngine]
         self._options: Dict[str, Any]
         if self._method not in _SUPPORTED_METHODS:
-            msg = f"Method '{self._method}' is not implemented by the SciPy plugin"
+            msg = f"Method `{self._method}` is not implemented by the SciPy plugin"
             raise NotImplementedError(msg)
         self._sampler, self._options = self._init_sampler(self._sampler_config.options)
 

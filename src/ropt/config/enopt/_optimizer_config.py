@@ -87,6 +87,6 @@ class OptimizerConfig(BaseModel):
     def _method(self) -> OptimizerConfig:
         plugin, sep, method = self.method.rpartition("/")
         if (sep == "/") and (plugin == "" or method) == "":
-            msg = f"malformed method specification: '{self.method}'"
+            msg = f"malformed method specification: `{self.method}`"
             raise ValueError(msg)
         return self
