@@ -19,11 +19,11 @@ class DefaultMetadataWith(BaseModel):
 
     Attributes:
         metadata: Data to set into the metadata
-        tags:     Optional tags of the sources to track
+        tags:     Tags of the sources to track
     """
 
     metadata: Dict[str, Any]
-    tags: Union[str, Set[str]] = set()
+    tags: Union[str, Set[str]]
 
     model_config = ConfigDict(
         extra="forbid",
@@ -50,9 +50,7 @@ class DefaultMetadataHandler(ResultHandler):
         """
         super().__init__(config, plan)
 
-        self._with = DefaultMetadataWith.model_validate(
-            config.with_ if "metadata" in config.with_ else {"metadata": config.with_}
-        )
+        self._with = DefaultMetadataWith.model_validate(config.with_)
 
     def handle_event(self, event: Event) -> Event:
         """Handle an event.
@@ -70,7 +68,7 @@ class DefaultMetadataHandler(ResultHandler):
                 EventType.FINISHED_EVALUATOR_STEP,
             }
             and event.results is not None
-            and (not self._with.tags or (event.tag in self._with.tags))
+            and event.tag in self._with.tags
         ):
             for results in event.results:
                 for key, expr in self._with.metadata.items():

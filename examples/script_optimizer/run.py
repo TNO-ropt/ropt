@@ -99,11 +99,11 @@ def main() -> None:
                 "steps": [
                     {
                         "run": "optimizer",
-                        "with": {"config": "$enopt_config"},
+                        "with": {"config": "$enopt_config", "tag": "opt"},
                     },
                 ],
                 "results": [
-                    {"init": "tracker", "with": {"var": "optimal"}},
+                    {"init": "tracker", "with": {"var": "optimal", "tags": "opt"}},
                 ],
             },
             tasks=tasks,

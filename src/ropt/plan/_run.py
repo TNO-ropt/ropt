@@ -103,6 +103,7 @@ class OptimizationPlanRunner:
                 "with": {
                     "config": "$__config__",
                     "exit_code_var": "__exit_code__",
+                    "tag": "__tracker_tag__",
                 },
             }
         ]
@@ -112,6 +113,7 @@ class OptimizationPlanRunner:
                 "with": {
                     "var": "__optimum_tracker__",
                     "constraint_tolerance": constraint_tolerance,
+                    "tags": "__tracker_tag__",
                 },
             },
         ]
