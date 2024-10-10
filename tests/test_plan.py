@@ -241,7 +241,7 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$config",
-                    "tags": ["optimal1"],
+                    "tag": "optimal1",
                 },
                 "if": "${{ 1 > 0 }}",
             },
@@ -251,7 +251,7 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 "if": "$x < 0",
                 "with": {
                     "config": "$config",
-                    "tags": ["optimal2"],
+                    "tag": "optimal2",
                 },
             },
         ],
@@ -291,14 +291,14 @@ def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$config",
-                    "tags": ["optimal1"],
+                    "tag": "optimal1",
                 },
             },
             {
                 "run": "optimizer",
                 "with": {
                     "config": "$config",
-                    "tags": ["optimal2"],
+                    "tag": "optimal2",
                     "initial_values": "$optimal1",
                 },
             },
@@ -306,7 +306,7 @@ def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$config",
-                    "tags": ["optimal3"],
+                    "tag": "optimal3",
                     "initial_values": [0, 0, 0],
                 },
             },
@@ -484,7 +484,7 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "$enopt_config",
-                    "tags": ["last"],
+                    "tag": "last",
                 },
             },
             {
@@ -1018,7 +1018,7 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
                 "with": {
                     "config": "$config",
                     "nested_plan": inner_config,
-                    "tags": ["outer"],
+                    "tag": "outer",
                 },
             },
         ],
@@ -1070,7 +1070,7 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
                 "with": {
                     "config": "$config",
                     "initial_values": "$initial",
-                    "tags": ["inner"],
+                    "tag": "inner",
                 },
             },
         ],

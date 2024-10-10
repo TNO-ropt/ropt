@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Optional, Set, Tuple
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Optional, Tuple
 
 if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
@@ -28,6 +28,7 @@ class Event:
         config:     The current configuration object of the executing plan
         results:    Optional results passed with the event
         exit_code:  An optional exit code
+        tag:        Optional tag
         step_name:  Optional name of the step emitting the event
     """
 
@@ -35,5 +36,5 @@ class Event:
     config: EnOptConfig
     results: Optional[Tuple[Results, ...]] = None
     exit_code: Optional[OptimizerExitCode] = None
-    tags: Set[str] = field(default_factory=set)
+    tag: Optional[str] = None
     step_name: Optional[str] = None

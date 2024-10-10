@@ -64,7 +64,7 @@ class DefaultMetadataHandler(EventHandler):
                 EventType.FINISHED_EVALUATOR_STEP,
             }
             and event.results is not None
-            and (not self._with.filter or (event.tags & self._with.filter))
+            and (not self._with.filter or (event.tag in self._with.filter))
         ):
             for results in event.results:
                 for key, expr in self._with.metadata.items():

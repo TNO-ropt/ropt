@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Set, Union
+from typing import TYPE_CHECKING, Optional, Union
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict
@@ -36,7 +36,7 @@ class DefaultEvaluatorStepWith(BaseModel):
     """
 
     config: str
-    tags: Set[str] = set()
+    tag: Optional[str] = None
     values: Optional[Union[str, Array2D]] = None
 
     model_config = ConfigDict(
@@ -76,7 +76,7 @@ class DefaultEvaluatorStep(PlanStep):
             Event(
                 event_type=EventType.START_EVALUATOR_STEP,
                 config=self._enopt_config,
-                tags=self._with.tags,
+                tag=self._with.tag,
                 step_name=self.step_config.name,
             )
         )
@@ -109,7 +109,7 @@ class DefaultEvaluatorStep(PlanStep):
                 event_type=EventType.FINISHED_EVALUATOR_STEP,
                 config=self._enopt_config,
                 results=results,
-                tags=self._with.tags,
+                tag=self._with.tag,
                 exit_code=exit_code,
                 step_name=self.step_config.name,
             )

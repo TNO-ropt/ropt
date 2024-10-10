@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict, Optional, Set, Tuple, Union
+from typing import TYPE_CHECKING, Dict, Optional, Tuple, Union
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict
@@ -35,13 +35,14 @@ class DefaultOptimizerStepWith(BaseModel):
 
     Attributes:
         config:         The optimizer configuration
+        tag:            Optional tag
         initial_values: The initial values for the optimizer
         exit_code_var:  Name of the variable to store the exit code
         nested_plan:    Optional nested plan configuration
     """
 
     config: str
-    tags: Set[str] = set()
+    tag: Optional[str] = None
     initial_values: Optional[Union[str, Array1D]] = None
     exit_code_var: Optional[str] = None
     nested_plan: Optional[PlanConfig] = None
@@ -88,7 +89,7 @@ class DefaultOptimizerStep(PlanStep):
             Event(
                 event_type=EventType.START_OPTIMIZER_STEP,
                 config=self._enopt_config,
-                tags=self._with.tags,
+                tag=self._with.tag,
                 step_name=self.step_config.name,
             )
         )
@@ -120,7 +121,7 @@ class DefaultOptimizerStep(PlanStep):
             Event(
                 event_type=EventType.FINISHED_OPTIMIZER_STEP,
                 config=self._enopt_config,
-                tags=self._with.tags,
+                tag=self._with.tag,
                 exit_code=exit_code,
                 step_name=self.step_config.name,
             )
@@ -144,7 +145,7 @@ class DefaultOptimizerStep(PlanStep):
                 Event(
                     event_type=EventType.START_EVALUATION,
                     config=self._enopt_config,
-                    tags=self._with.tags,
+                    tag=self._with.tag,
                     step_name=self.step_config.name,
                 )
             )
@@ -154,7 +155,7 @@ class DefaultOptimizerStep(PlanStep):
                     event_type=EventType.FINISHED_EVALUATION,
                     config=self._enopt_config,
                     results=results,
-                    tags=self._with.tags,
+                    tag=self._with.tag,
                     step_name=self.step_config.name,
                 )
             )
