@@ -8,7 +8,10 @@ import numpy as np
 from pydantic import BaseModel, ConfigDict
 
 from ropt.config.enopt import EnOptConfig
-from ropt.config.utils import Array2D  # noqa: TCH001
+from ropt.config.utils import (
+    Array2D,  # noqa: TCH001
+    StrOrSet,  # noqa: TCH001
+)
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted, PlanError
@@ -32,11 +35,12 @@ class DefaultEvaluatorStepWith(BaseModel):
 
     Attributes:
         config: The optimizer configuration
+        tags:   Tags to add to the emitted events
         values: Values to evaluate at
     """
 
     config: str
-    tag: Optional[str] = None
+    tags: StrOrSet = set()
     values: Optional[Union[str, Array2D]] = None
 
     model_config = ConfigDict(
@@ -76,7 +80,7 @@ class DefaultEvaluatorStep(PlanStep):
             Event(
                 event_type=EventType.START_EVALUATOR_STEP,
                 config=self._enopt_config,
-                tag=self._with.tag,
+                tags=self._with.tags,
             )
         )
         assert self.plan.optimizer_context.rng is not None
@@ -108,7 +112,7 @@ class DefaultEvaluatorStep(PlanStep):
                 event_type=EventType.FINISHED_EVALUATOR_STEP,
                 config=self._enopt_config,
                 results=results,
-                tag=self._with.tag,
+                tags=self._with.tags,
                 exit_code=exit_code,
             )
         )

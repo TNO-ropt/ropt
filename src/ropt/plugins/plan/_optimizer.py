@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING, Dict, Optional, Tuple, Union
 
 import numpy as np
@@ -9,7 +10,10 @@ from pydantic import BaseModel, ConfigDict
 
 from ropt.config.enopt import EnOptConfig
 from ropt.config.plan import PlanConfig  # noqa: TCH001
-from ropt.config.utils import Array1D  # noqa: TCH001
+from ropt.config.utils import (
+    Array1D,  # noqa: TCH001
+    StrOrSet,  # noqa: TCH001
+)
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import PlanError
@@ -17,6 +21,11 @@ from ropt.plan import EnsembleOptimizer, Event, Plan
 from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
 from ropt.utils.scaling import scale_variables
+
+if sys.version_info >= (3, 11):
+    pass
+else:
+    pass
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -35,14 +44,14 @@ class DefaultOptimizerStepWith(BaseModel):
 
     Attributes:
         config:         The optimizer configuration
-        tag:            Optional tag
+        tags:   Tags to add to the emitted events
         initial_values: The initial values for the optimizer
         exit_code_var:  Name of the variable to store the exit code
         nested_plan:    Optional nested plan configuration
     """
 
     config: str
-    tag: Optional[str] = None
+    tags: StrOrSet = set()
     initial_values: Optional[Union[str, Array1D]] = None
     exit_code_var: Optional[str] = None
     nested_plan: Optional[PlanConfig] = None
@@ -89,7 +98,7 @@ class DefaultOptimizerStep(PlanStep):
             Event(
                 event_type=EventType.START_OPTIMIZER_STEP,
                 config=self._enopt_config,
-                tag=self._with.tag,
+                tags=self._with.tags,
             )
         )
 
@@ -120,7 +129,7 @@ class DefaultOptimizerStep(PlanStep):
             Event(
                 event_type=EventType.FINISHED_OPTIMIZER_STEP,
                 config=self._enopt_config,
-                tag=self._with.tag,
+                tags=self._with.tags,
                 exit_code=exit_code,
             )
         )
@@ -143,7 +152,7 @@ class DefaultOptimizerStep(PlanStep):
                 Event(
                     event_type=EventType.START_EVALUATION,
                     config=self._enopt_config,
-                    tag=self._with.tag,
+                    tags=self._with.tags,
                 )
             )
         else:
@@ -152,7 +161,7 @@ class DefaultOptimizerStep(PlanStep):
                     event_type=EventType.FINISHED_EVALUATION,
                     config=self._enopt_config,
                     results=results,
-                    tag=self._with.tag,
+                    tags=self._with.tags,
                 )
             )
 

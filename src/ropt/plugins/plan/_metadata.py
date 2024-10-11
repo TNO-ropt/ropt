@@ -2,12 +2,20 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, Set, Union
+import sys
+from typing import TYPE_CHECKING, Any, Dict
 
 from pydantic import BaseModel, ConfigDict
 
+from ropt.config.utils import StrOrSet  # noqa: TCH001
 from ropt.enums import EventType
 from ropt.plugins.plan.base import ResultHandler
+
+if sys.version_info >= (3, 11):
+    pass
+else:
+    pass
+
 
 if TYPE_CHECKING:
     from ropt.config.plan import ResultHandlerConfig
@@ -23,7 +31,7 @@ class DefaultMetadataWith(BaseModel):
     """
 
     data: Dict[str, Any]
-    tags: Union[str, Set[str]]
+    tags: StrOrSet
 
     model_config = ConfigDict(
         extra="forbid",
@@ -62,8 +70,7 @@ class DefaultMetadataHandler(ResultHandler):
                 EventType.FINISHED_EVALUATOR_STEP,
             }
             and event.results is not None
-            and event.tag is not None
-            and event.tag in self._with.tags
+            and (event.tags & self._with.tags)
         ):
             for results in event.results:
                 for key, expr in self._with.data.items():

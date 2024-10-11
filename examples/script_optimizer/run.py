@@ -99,7 +99,7 @@ def main() -> None:
                 "steps": [
                     {
                         "run": "optimizer",
-                        "with": {"config": "$enopt_config", "tag": "opt"},
+                        "with": {"config": "$enopt_config", "tags": "opt"},
                     },
                 ],
                 "results": [

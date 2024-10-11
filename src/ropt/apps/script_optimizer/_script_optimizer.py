@@ -287,8 +287,8 @@ class ScriptOptimizer:
         elif event.exit_code == OptimizerExitCode.OPTIMIZER_STEP_FINISHED:
             msg = "Optimization finished normally."
         if msg:
-            if event.tag is not None:
-                msg = f"Step tagged as `{event.tag}`: {msg}"
+            if event.tags is not None:
+                msg = f"Step tagged as `{event.tags}`: {msg}"
             self._logger.info(msg)
 
     def add_observer(

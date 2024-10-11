@@ -2,15 +2,23 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path  # noqa: TCH003
-from typing import TYPE_CHECKING, Dict, Literal, Optional, Set, Union
+from typing import TYPE_CHECKING, Dict, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict
 
+from ropt.config.utils import StrOrSet  # noqa: TCH001
 from ropt.enums import EventType
 from ropt.plugins.plan.base import ResultHandler
 from ropt.report import ResultsTable
 from ropt.results import convert_to_maximize
+
+if sys.version_info >= (3, 11):
+    pass
+else:
+    pass
+
 
 if TYPE_CHECKING:
     from ropt.config.plan import ResultHandlerConfig
@@ -35,7 +43,7 @@ class DefaultTableWith(BaseModel):
                         problem rather than the default minimization
     """
 
-    tags: Union[str, Set[str]]
+    tags: StrOrSet
     columns: Dict[str, str]
     path: Path
     table_type: Literal["functions", "gradients"] = "functions"
@@ -83,8 +91,7 @@ class DefaultTableHandler(ResultHandler):
                 EventType.FINISHED_EVALUATOR_STEP,
             }
             and event.results is not None
-            and event.tag is not None
-            and event.tag in self._with.tags
+            and (event.tags & self._with.tags)
         ):
             self._table.add_results(
                 event.config,

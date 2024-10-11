@@ -2,15 +2,23 @@
 
 from __future__ import annotations
 
+import sys
 from copy import deepcopy
-from typing import TYPE_CHECKING, Literal, Optional, Set, Union
+from typing import TYPE_CHECKING, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from ropt.config.utils import StrOrSet  # noqa: TCH001
 from ropt.enums import EventType
 from ropt.plugins.plan.base import ResultHandler
 
 from ._utils import _get_last_result, _update_optimal_result
+
+if sys.version_info >= (3, 11):
+    pass
+else:
+    pass
+
 
 if TYPE_CHECKING:
     from ropt.config.plan import ResultHandlerConfig
@@ -32,7 +40,7 @@ class DefaultTrackerWith(BaseModel):
     """
 
     var: str
-    tags: Union[str, Set[str]]
+    tags: StrOrSet
     type_: Literal["optimal", "last"] = Field(default="optimal", alias="type")
     constraint_tolerance: Optional[float] = 1e-10
 
@@ -72,8 +80,7 @@ class DefaultTrackerHandler(ResultHandler):
                 EventType.FINISHED_EVALUATOR_STEP,
             }
             and event.results is not None
-            and event.tag is not None
-            and event.tag in self._with.tags
+            and (event.tags & self._with.tags)
         ):
             results = None
             if self._with.type_ == "optimal":
