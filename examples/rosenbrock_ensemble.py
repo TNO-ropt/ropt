@@ -35,7 +35,8 @@ CONFIG: Dict[str, Any] = {
 def rosenbrock(
     variables: NDArray[np.float64],
     context: EvaluatorContext,
-    parameters: NDArray[np.float64],
+    a: NDArray[np.float64],
+    b: NDArray[np.float64],
 ) -> EvaluatorResult:
     """Function evaluator for the rosenbrock function.
 
@@ -43,15 +44,15 @@ def rosenbrock(
     `None`, the latter because no constraints are calculated.
 
     Args:
-        variables:  The variables to evaluate
-        context:    Evaluator context
-        parameters: The set of parameters for all realizations
+        variables: The variables to evaluate
+        context:   Evaluator context
+        a:         The 'a' parameters
+        b:         The 'b' parameters
 
     Returns:
         The calculated objective, and `None`
     """
     objectives = np.zeros((variables.shape[0], 1), dtype=np.float64)
-    a, b = parameters[:2, :]
     for v_idx, r in enumerate(context.realizations):
         for d_idx in range(DIM - 1):
             x, y = variables[v_idx, d_idx : d_idx + 2]
@@ -85,12 +86,11 @@ def run_optimization(config: Dict[str, Any]) -> FunctionResults:
     rng = default_rng(seed=123)
 
     realizations = len(config["realizations"]["weights"])
-    parameters = np.zeros((4, realizations), dtype=np.float64)
-    parameters[0, :] = rng.normal(loc=1.0, scale=UNCERTAINTY, size=realizations)
-    parameters[1, :] = rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=realizations)
+    a = rng.normal(loc=1.0, scale=UNCERTAINTY, size=realizations)
+    b = rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=realizations)
 
     optimal_result = (
-        OptimizationPlanRunner(CONFIG, partial(rosenbrock, parameters=parameters))
+        OptimizationPlanRunner(CONFIG, partial(rosenbrock, a=a, b=b))
         .add_observer(EventType.FINISHED_EVALUATION, report)
         .run()
         .results
