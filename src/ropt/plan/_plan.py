@@ -23,8 +23,7 @@ if TYPE_CHECKING:
     from ropt.plan import Event
     from ropt.plugins.plan.base import PlanStep, ResultHandler
 
-_VALID_TYPES: Final = (int, float, bool)
-_VALID_RESULTS: Final = (list, np.ndarray, *_VALID_TYPES)
+_VALID_TYPES: Final = (int, float, bool, str)
 _UNARY_OPS: Final = (ast.UAdd, ast.USub, ast.Not)
 _BIN_OPS: Final = (ast.Add, ast.Sub, ast.Div, ast.FloorDiv, ast.Mult, ast.Mod, ast.Pow)
 _BOOL_OPS: Final = (ast.Or, ast.And)
@@ -258,7 +257,7 @@ class Plan:
 
     def _eval_expr(self, expr: str) -> Any:  # noqa: ANN401
         # Check for identifiers that are not preceded by $:
-        for word in re.findall(r"(?<!\$)\b\w+\b", expr):
+        for word in re.findall(r""""[^"]*"|'[^']*'|(?<!\$)\b\w+\b""", expr):
             if word.isidentifier() and not keyword.iskeyword(word):
                 msg = f"Syntax error in expression: {expr}"
                 raise PlanError(msg)
@@ -285,9 +284,8 @@ class Plan:
                     compile(tree, "", mode="eval"), {"__builtins__": {}}, replacer.vars
                 )
             except TypeError as exc:
-                msg = f"Type error in expression: {expr}"
+                msg = f"Error in expression: {expr}"
                 raise PlanError(msg) from exc
-            assert result is None or isinstance(result, _VALID_RESULTS)
             return result
 
         msg = f"Invalid expression: {expr}"
@@ -452,6 +450,8 @@ def _is_valid(node: ast.AST) -> bool:  # noqa: PLR0911
         )
     if isinstance(node, ast.List):
         return all(_is_valid(item) for item in node.elts)
+    if isinstance(node, ast.Subscript):
+        return _is_valid(node.slice)
     return bool(isinstance(node, ast.Name))
 
 
@@ -462,7 +462,7 @@ class _ReplaceFields(ast.NodeTransformer):
 
     def visit_Name(self, node: ast.Name) -> ast.AST:  # noqa: N802
         value = self._plan[node.id]
-        if value is None or isinstance(value, (Number, np.ndarray)):
+        if value is None or isinstance(value, (Number, str, np.ndarray, Dict, List)):
             self.vars[node.id] = value
             return node
         msg = f"Error in expression: the type of `{node.id}` is not supported"

@@ -159,6 +159,10 @@ def _convert_set(value: Union[str, Set[str]]) -> Set[str]:
     return {value} if isinstance(value, str) else value
 
 
+def _convert_tuple(value: Union[str, Tuple[str, ...]]) -> Tuple[str, ...]:
+    return (value,) if isinstance(value, str) else value
+
+
 if sys.version_info >= (3, 9):
     Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
     Array2D = Annotated[NDArray[np.float64], BeforeValidator(_convert_2d_array)]
@@ -176,3 +180,4 @@ else:
     Array1DBool = Annotated[ArrayLike, BeforeValidator(_convert_1d_array_bool)]
     UniqueNames = Annotated[Tuple[Any, ...], BeforeValidator(_check_duplicates)]
 StrOrSet = Annotated[Set[str], BeforeValidator(_convert_set)]
+StrOrTuple = Annotated[Tuple[str, ...], BeforeValidator(_convert_tuple)]

@@ -142,12 +142,7 @@ def test_parse_value(enopt_config: Any, evaluator: Any) -> None:
 
 def test_setvar(evaluator: Any) -> None:
     plan_config: Dict[str, Any] = {
-        "variables": {
-            "x": None,
-            "y": None,
-            "z": None,
-            "u": None,
-        },
+        "variables": {"x": None, "y": None, "z": None, "u": None, "q": {"a": 1}},
         "steps": [
             {
                 "run": "setvar",
@@ -160,7 +155,7 @@ def test_setvar(evaluator: Any) -> None:
                 "run": "setvar",
                 "with": {
                     "var": "y",
-                    "value": 1,
+                    "value": "1",
                 },
             },
             {
@@ -171,7 +166,7 @@ def test_setvar(evaluator: Any) -> None:
             },
             {
                 "run": "setvar",
-                "with": "u = 1",
+                "with": "u = $q['a']",
             },
         ],
     }
@@ -203,14 +198,71 @@ def test_invalid_setvar(evaluator: Any) -> None:
         "steps": [
             {
                 "run": "setvar",
-                "with": "2a = 1",
+                "with": "x = 1",
             },
         ],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
-    with pytest.raises(PlanError, match=re.escape("Invalid identifier: 2a")):
+    with pytest.raises(PlanError, match=re.escape("Unknown variable name: x")):
         Plan(parsed_config, context)
+
+
+def test_setvar_keys1(evaluator: Any) -> None:
+    plan_config: Dict[str, Any] = {
+        "variables": {
+            "x": {},
+            "y": {"a": {10: {}}},
+            "u": {},
+            "v": {"a": {10: {}}},
+            "q": "a",
+        },
+        "steps": [
+            {
+                "run": "setvar",
+                "with": {"var": "x['a']", "value": 1},
+            },
+            {
+                "run": "setvar",
+                "with": {"var": "y['a'][10]", "value": 1},
+            },
+            {
+                "run": "setvar",
+                "with": {"expr": "u[$q] = 1"},
+            },
+            {
+                "run": "setvar",
+                "with": "v['a'][10] = 1",
+            },
+        ],
+    }
+    parsed_config = PlanConfig.model_validate(plan_config)
+    context = OptimizerContext(evaluator=evaluator())
+    plan = Plan(parsed_config, context)
+    plan.run()
+    assert plan["x"] == {"a": 1}
+    assert plan["y"] == {"a": {10: 1}}
+    assert plan["u"] == {"a": 1}
+    assert plan["v"] == {"a": {10: 1}}
+
+
+def test_setvar_keys_invalid(evaluator: Any) -> None:
+    plan_config: Dict[str, Any] = {
+        "variables": {
+            "y": {"a": None},
+        },
+        "steps": [
+            {
+                "run": "setvar",
+                "with": {"var": "y['a']['b']", "value": 1},
+            },
+        ],
+    }
+    parsed_config = PlanConfig.model_validate(plan_config)
+    context = OptimizerContext(evaluator=evaluator())
+    plan = Plan(parsed_config, context)
+    with pytest.raises(PlanError, match="Not a valid dict-like variable: y"):
+        plan.run()
 
 
 def test_invalid_identifier(evaluator: Any) -> None:

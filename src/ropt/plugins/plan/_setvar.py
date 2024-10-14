@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional
+import re
+from collections.abc import Mapping, Sequence
+from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple
 
 from pydantic import BaseModel, ConfigDict
 
+from ropt.config.utils import StrOrTuple  # noqa: TCH001
 from ropt.exceptions import PlanError
 from ropt.plugins.plan.base import PlanStep
 
@@ -40,6 +43,7 @@ class DefaultSetStepVarValueWith(BaseModel):
 
     var: str
     value: Any
+    keys: StrOrTuple = ()
 
     model_config = ConfigDict(
         extra="forbid",
@@ -61,17 +65,18 @@ class DefaultSetStep(PlanStep):
         super().__init__(config, plan)
 
         expr: Optional[str] = None
-        var: str
         value: Any
 
+        self._keys: Tuple[str, ...] = ()
         if isinstance(config.with_, str):
             expr = config.with_
         elif "expr" in config.with_:
             expr = DefaultSetStepExprWith.model_validate(config.with_).expr
         elif "var" in config.with_:
             with_ = DefaultSetStepVarValueWith.model_validate(config.with_)
-            var = with_.var
+            var = with_.var.strip()
             value = with_.value
+            self._keys = with_.keys
         else:
             msg = "Either `expr` or `var` must be provided"
             raise ValueError(msg)
@@ -82,12 +87,28 @@ class DefaultSetStep(PlanStep):
                 msg = f"Invalid expression: {expr}"
                 raise PlanError(msg)
 
-        self._var = var.strip()
-        if not self._var.isidentifier():
-            msg = f"Invalid identifier: {self._var}"
+        pattern = re.findall(r"([^\[]+)|\[(.*?)\]", var.strip())
+        self._var, *keys = (x.strip() for group in pattern for x in group if x)
+        self._keys = tuple(keys)
+
+        if self._var not in self._plan:
+            msg = f"Unknown variable name: {self._var}"
             raise PlanError(msg)
+
         self._value = value
 
     def run(self) -> None:
         """Run the setvar step."""
-        self._plan[self._var] = self._plan.eval(self._value)
+        if self._keys:
+            msg = f"Not a valid dict-like variable: {self._var}"
+            try:
+                target: Dict[str, Any] = self._plan.eval(
+                    f"${self._var}" + "".join(f"[{key}]" for key in self._keys[:-1])
+                )
+            except PlanError as exc:
+                raise PlanError(msg) from exc
+            if not isinstance(target, (Mapping, Sequence)):
+                raise PlanError(msg)
+            target[self._plan.eval(self._keys[-1])] = self._plan.eval(self._value)
+        else:
+            self._plan[self._var] = self._plan.eval(self._value)
