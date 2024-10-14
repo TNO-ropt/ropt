@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from importlib.util import find_spec
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, Final, Optional, Type, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Dict, Final, Optional, Type, TypeVar, Union
 
 from ._gradient_evaluations import GradientEvaluations
 from ._gradients import Gradients
@@ -82,7 +82,7 @@ class GradientResults(Results):
         }
 
         results = _from_netcdf(Path(filename), cls)
-        kwargs = {
+        kwargs: Dict[str, Any] = {
             key: _types[key](**_from_dataset(value)) if key in _types else value
             for key, value in results.items()
         }

@@ -130,7 +130,7 @@ class DefaultFunctionTransform(FunctionTransform):
         functions = np.nan_to_num(functions)
         norm, mean, stddev = self._mean_stddev(functions, weights)
         mean_gradient = np.dot(gradient, weights)
-        return (  # type: ignore[no-any-return]
+        return (
             np.zeros(mean_gradient.shape, dtype=np.float64)
             if np.allclose(np.abs(stddev), 0.0)
             else (
