@@ -452,6 +452,8 @@ def _is_valid(node: ast.AST) -> bool:  # noqa: PLR0911
         return all(_is_valid(item) for item in node.elts)
     if isinstance(node, ast.Subscript):
         return _is_valid(node.slice)
+    if isinstance(node, ast.Index):
+        return _is_valid(node.value)  # type: ignore[attr-defined]
     return bool(isinstance(node, ast.Name))
 
 
