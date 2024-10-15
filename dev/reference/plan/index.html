@@ -761,9 +761,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.parse_value" class="md-nav__link">
+  <a href="#ropt.plan.Plan.interpolate_string" class="md-nav__link">
     <span class="md-ellipsis">
-      parse_value
+      interpolate_string
     </span>
   </a>
   
@@ -1511,9 +1511,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.parse_value" class="md-nav__link">
+  <a href="#ropt.plan.Plan.interpolate_string" class="md-nav__link">
     <span class="md-ellipsis">
-      parse_value
+      interpolate_string
     </span>
   </a>
   
@@ -2160,8 +2160,8 @@ plan.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.parse_value" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">parse_value</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></code>
+<h4 id="ropt.plan.Plan.interpolate_string" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">interpolate_string</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></code>
 
 </h4>
 
@@ -2256,19 +2256,8 @@ parsed according to the following rules:</p>
     <div class="doc doc-contents ">
 
         <p>Evaluate the provided value as an expression.</p>
-<p>If the value is a string, it is returned unchanged. Otherwise, it is
-evaluated as follows:</p>
-<ul>
-<li>If the value is a string that starts with <code>$</code>, it is assumed to denote
-  a plan variable, and its value is returned.</li>
-<li>If the value is enclosed in <code>${{</code> and <code>}}</code> delimiters, these
-  delimiters are removed. The string is then evaluated as a mathematical
-  expression, with variables of the form <code>$identifier</code> replaced by their
-  corresponding plan variable values.</li>
-<li>Arbitrary strings that do not start with <code>$</code> are treated as if they
-  are enclosed in <code>${{</code> and <code>}}</code> delimiters and evaluated in the same
-  way.</li>
-</ul>
+<p>If the value is not  a string, it is returned unchanged. Otherwise, it
+is evaluates the expression and returns the result.</p>
 
 
 <details class="note" open>
