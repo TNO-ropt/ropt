@@ -102,9 +102,8 @@ class DefaultSetStep(PlanStep):
         if self._keys:
             msg = f"Not a valid dict-like variable: {self._var}"
             try:
-                target: Dict[str, Any] = self._plan.eval(
-                    f"${self._var}" + "".join(f"[{key}]" for key in self._keys[:-1])
-                )
+                expr = f"{self._var}" + "".join(f"[{key}]" for key in self._keys[:-1])
+                target: Dict[str, Any] = self._plan.eval(expr)
             except PlanError as exc:
                 raise PlanError(msg) from exc
             if not isinstance(target, (Mapping, Sequence)):

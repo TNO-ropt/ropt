@@ -70,7 +70,7 @@ class DefaultEvaluatorStep(PlanStep):
 
     def run(self) -> None:
         """Run the evaluator step."""
-        config = self.plan.parse_value(self._with.config)
+        config = self.plan.eval(self._with.config)
         if not isinstance(config, (dict, EnOptConfig)):
             msg = "No valid EnOpt configuration provided"
             raise PlanError(msg)
@@ -122,7 +122,7 @@ class DefaultEvaluatorStep(PlanStep):
 
     def _get_variables(self, config: EnOptConfig) -> NDArray[np.float64]:
         if self._with.values is not None:  # noqa: PD011
-            parsed_variables = self.plan.parse_value(self._with.values)
+            parsed_variables = self.plan.eval(self._with.values)
             if isinstance(parsed_variables, FunctionResults):
                 return (
                     parsed_variables.evaluations.variables

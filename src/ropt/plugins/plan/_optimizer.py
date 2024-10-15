@@ -85,7 +85,7 @@ class DefaultOptimizerStep(PlanStep):
         Returns:
             Whether a user abort occurred.
         """
-        config = self.plan.parse_value(self._with.config)
+        config = self.plan.eval(self._with.config)
         if not isinstance(config, (dict, EnOptConfig)):
             msg = "No valid EnOpt configuration provided"
             raise PlanError(msg)
@@ -185,7 +185,7 @@ class DefaultOptimizerStep(PlanStep):
 
     def _get_variables(self, config: EnOptConfig) -> NDArray[np.float64]:
         if self._with.initial_values is not None:
-            parsed_variables = self.plan.parse_value(self._with.initial_values)
+            parsed_variables = self.plan.eval(self._with.initial_values)
             if isinstance(parsed_variables, FunctionResults):
                 return (
                     parsed_variables.evaluations.variables

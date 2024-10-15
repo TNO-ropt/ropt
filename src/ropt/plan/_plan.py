@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import ast
-import keyword
 import re
 from itertools import chain, count
 from numbers import Number
@@ -12,10 +11,12 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, Final, List, Optional, Tu
 import numpy as np
 from numpy.random import default_rng
 
+from ropt.config.enopt import EnOptConfig
 from ropt.config.enopt.constants import DEFAULT_SEED
 from ropt.enums import EventType
 from ropt.exceptions import PlanError
 from ropt.plugins import PluginManager
+from ropt.results import Results
 
 if TYPE_CHECKING:
     from ropt.config.plan import PlanConfig, StepConfig
@@ -28,6 +29,8 @@ _UNARY_OPS: Final = (ast.UAdd, ast.USub, ast.Not)
 _BIN_OPS: Final = (ast.Add, ast.Sub, ast.Div, ast.FloorDiv, ast.Mult, ast.Mod, ast.Pow)
 _BOOL_OPS: Final = (ast.Or, ast.And)
 _CMP_OPS: Final = (ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE)
+
+_SUPPORTED_VARIABLE_TYPES = (Number, str, np.ndarray, Dict, List, Results, EnOptConfig)
 
 
 class OptimizerContext:
@@ -115,7 +118,7 @@ class Plan:
         occurs, the method will return `True`.
         """
         for var, value in self._plan_config.variables.items():
-            self[var] = value
+            self[var] = self.eval(value)
         len_args = len(args)
         len_inputs = len(self._plan_config.inputs)
         if len_args != len_inputs:
@@ -218,7 +221,7 @@ class Plan:
             parent=self,
         )
 
-    def parse_value(self, value: Any) -> Any:  # noqa: ANN401
+    def interpolate_string(self, value: Any) -> Any:  # noqa: ANN401
         """Parse a value as an expression or an interpolated string.
 
         If the value is not a string, it is returned unchanged. If it is a
@@ -246,36 +249,17 @@ class Plan:
 
         def _substitute(matched: re.Match[str]) -> str:
             value = matched.string[matched.start() : matched.end()]
-            return "$" if value == "$$" else str(self.eval(value))
+            return str(self.eval(value[3:-2]))
 
-        if isinstance(value, str):
-            stripped = value.strip()
-            if stripped.startswith("$"):
-                return self.eval(stripped)
-            return re.sub(r"\${{(.*?)}}|\$\$|\$([^\W0-9][\w\.]*)", _substitute, value)
-        return value
+        return re.sub(r"\${{(.*?)}}", _substitute, value)
 
     def _eval_expr(self, expr: str) -> Any:  # noqa: ANN401
-        # Check for identifiers that are not preceded by $:
-        for word in re.findall(r""""[^"]*"|'[^']*'|(?<!\$)\b\w+\b""", expr):
-            if word.isidentifier() and not keyword.iskeyword(word):
-                msg = f"Syntax error in expression: {expr}"
-                raise PlanError(msg)
-
-        # Remove $ from identifiers, before sending the string to the parser:
-        stripped = expr
-        for word in re.findall(r"(?<=\$)\b\w+\b", expr):
-            if word.isidentifier() and not keyword.iskeyword(word):
-                stripped = stripped.replace(f"${word}", word)
-
-        # Parse the string:
         try:
-            tree = ast.parse(stripped, mode="eval")
+            tree = ast.parse(expr, mode="eval")
         except SyntaxError as exc:
             msg = f"Syntax error in expression: {expr}"
             raise PlanError(msg) from exc
 
-        # Replace identifiers with their value and evaluate:
         if _is_valid(tree.body):
             replacer = _ReplaceFields(self)
             tree = ast.fix_missing_locations(replacer.visit(tree))
@@ -294,18 +278,8 @@ class Plan:
     def eval(self, value: Any) -> Any:  # noqa: ANN401
         """Evaluate the provided value as an expression.
 
-        If the value is a string, it is returned unchanged. Otherwise, it is
-        evaluated as follows:
-
-        - If the value is a string that starts with `$`, it is assumed to denote
-          a plan variable, and its value is returned.
-        - If the value is enclosed in `${{` and `}}` delimiters, these
-          delimiters are removed. The string is then evaluated as a mathematical
-          expression, with variables of the form `$identifier` replaced by their
-          corresponding plan variable values.
-        - Arbitrary strings that do not start with `$` are treated as if they
-          are enclosed in `${{` and `}}` delimiters and evaluated in the same
-          way.
+        If the value is not  a string, it is returned unchanged. Otherwise, it
+        is evaluates the expression and returns the result.
 
         Note:
             The result of a mathematical expression is restricted to numerical
@@ -319,21 +293,7 @@ class Plan:
         Returns:
             The result of the expression.
         """
-        if not isinstance(value, str):
-            return value
-
-        value = value.strip()
-
-        # Recursively evaluate when enclosed in `${{ }}`:
-        if value.startswith("${{") and value.endswith("}}"):
-            return self.eval(value[3:-2].strip())
-
-        # Identifiers are not evaluated, their value is returned unchanged:
-        if value.startswith("$") and value[1:].isidentifier():
-            return self[value[1:]]
-
-        # Evaluate as an expression:
-        return self._eval_expr(value)
+        return self._eval_expr(value.strip()) if isinstance(value, str) else value
 
     def add_observer(
         self,
@@ -464,7 +424,7 @@ class _ReplaceFields(ast.NodeTransformer):
 
     def visit_Name(self, node: ast.Name) -> ast.AST:  # noqa: N802
         value = self._plan[node.id]
-        if value is None or isinstance(value, (Number, str, np.ndarray, Dict, List)):
+        if value is None or isinstance(value, _SUPPORTED_VARIABLE_TYPES):
             self.vars[node.id] = value
             return node
         msg = f"Error in expression: the type of `{node.id}` is not supported"

@@ -1,13 +1,10 @@
-from functools import partial
 from pathlib import Path
 from typing import Any, Dict, Optional
 
 import pytest
 
 from ropt.config.enopt import EnOptConfig
-from ropt.enums import EventType
-from ropt.plan import Event, OptimizationPlanRunner
-from ropt.report import ResultsTable
+from ropt.plan import OptimizationPlanRunner
 
 # Requires pandas:
 pd = pytest.importorskip("pandas")
@@ -35,20 +32,12 @@ def enopt_config_fixture() -> Dict[str, Any]:
     }
 
 
-def _handle_results(event: Event, reporter: ResultsTable) -> None:
-    assert event.results is not None
-    reporter.add_results(event.config, event.results)
-
-
 def test_tabular_report_no_results(
     enopt_config: Any, evaluator: Any, tmp_path: Path
 ) -> None:
     path = tmp_path / "results.txt"
-    config = EnOptConfig.model_validate(enopt_config)
-    reporter = ResultsTable({}, path=tmp_path / "results.txt")
-    OptimizationPlanRunner(config, evaluator()).add_observer(
-        EventType.FINISHED_EVALUATION,
-        partial(_handle_results, reporter=reporter),
+    OptimizationPlanRunner(enopt_config, evaluator()).add_table(
+        {}, path=tmp_path / "results.txt"
     ).run()
     assert not path.exists()
 
@@ -58,16 +47,12 @@ def test_tabular_report_results(
 ) -> None:
     path = tmp_path / "results.txt"
     config = EnOptConfig.model_validate(enopt_config)
-    reporter = ResultsTable(
+    OptimizationPlanRunner(config, evaluator()).add_table(
         {
             "result_id": "eval-ID",
             "evaluations.variables": "Variables",
         },
         path=path,
-    )
-    OptimizationPlanRunner(config, evaluator()).add_observer(
-        EventType.FINISHED_EVALUATION,
-        partial(_handle_results, reporter=reporter),
     ).run()
 
     assert path.exists()
@@ -91,16 +76,12 @@ def test_tabular_report_data_frames_results_formatted_names(
     path = tmp_path / "results.txt"
     enopt_config["variables"]["names"] = [("a", 1), ("a", 2), ("a", 3)]
     config = EnOptConfig.model_validate(enopt_config)
-    reporter = ResultsTable(
+    OptimizationPlanRunner(config, evaluator()).add_table(
         {
             "result_id": "eval-ID",
             "evaluations.variables": "Variables",
         },
         path=path,
-    )
-    OptimizationPlanRunner(config, evaluator()).add_observer(
-        EventType.FINISHED_EVALUATION,
-        partial(_handle_results, reporter=reporter),
     ).run()
 
     assert path.exists()
@@ -117,17 +98,13 @@ def test_tabular_report_data_frames_gradients(
     path = tmp_path / "gradients.txt"
     enopt_config["variables"]["names"] = [("a", 1), ("a", 2), ("a", 3)]
     config = EnOptConfig.model_validate(enopt_config)
-    reporter = ResultsTable(
+    OptimizationPlanRunner(config, evaluator()).add_table(
         {
             "result_id": "eval-ID",
             "gradients.weighted_objective": "Total Objective",
         },
         path,
         table_type="gradients",
-    )
-    OptimizationPlanRunner(config, evaluator()).add_observer(
-        EventType.FINISHED_EVALUATION,
-        partial(_handle_results, reporter=reporter),
     ).run()
     assert path.exists()
     gradients = pd.read_fwf(path, header=[0, 1], skiprows=[2])
@@ -150,17 +127,13 @@ def test_tabular_report_data_frames_min_header_len(
     path = tmp_path / "results.txt"
     enopt_config["variables"]["names"] = [("a", 1), ("a", 2), ("a", 3)]
     config = EnOptConfig.model_validate(enopt_config)
-    reporter = ResultsTable(
+    OptimizationPlanRunner(config, evaluator()).add_table(
         {
             "result_id": "eval-ID",
             "evaluations.variables": "Variables",
         },
         path=path,
         min_header_len=min_header_len,
-    )
-    OptimizationPlanRunner(config, evaluator()).add_observer(
-        EventType.FINISHED_EVALUATION,
-        partial(_handle_results, reporter=reporter),
     ).run()
 
     assert path.exists()
