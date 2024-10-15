@@ -1126,11 +1126,8 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["optimizer"]["max_functions"] = 5
 
     inner_config = {
-        "inputs": ["initial"],
+        "inputs": ["initial", "config"],
         "outputs": ["nested_optimum"],
-        "variables": {
-            "config": nested_config,
-        },
         "steps": [
             {
                 "run": "optimizer",
@@ -1159,7 +1156,10 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "config",
-                    "nested_plan": inner_config,
+                    "nested_optimization": {
+                        "plan": inner_config,
+                        "extra_inputs": [nested_config],
+                    },
                     "tags": "outer",
                 },
             },
@@ -1239,7 +1239,7 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
                 "run": "optimizer",
                 "with": {
                     "config": "config",
-                    "nested_plan": inner_config,
+                    "nested_optimization": {"plan": inner_config},
                     "tags": "outer",
                 },
             },
