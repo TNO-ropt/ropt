@@ -99,11 +99,17 @@ class ExternalOptimizer(Optimizer):
                         # If the message has been sent, then reraise any exceptions:
                         if exception is not None:
                             # The process should have aborted:
-                            process.wait(_PROCESS_TIMEOUT)
+                            with contextlib.suppress(ProcessLookupError):
+                                os.kill(self._process_pid, signal.SIGTERM)
+                            with contextlib.suppress(subprocess.TimeoutExpired):
+                                process.wait(_PROCESS_TIMEOUT)
                             raise exception
                     time.sleep(0.1)
 
-                process.wait(_PROCESS_TIMEOUT)
+                with contextlib.suppress(ProcessLookupError):
+                    os.kill(self._process_pid, signal.SIGTERM)
+                with contextlib.suppress(subprocess.TimeoutExpired):
+                    process.wait(_PROCESS_TIMEOUT)
 
     @property
     def allow_nan(self) -> bool:

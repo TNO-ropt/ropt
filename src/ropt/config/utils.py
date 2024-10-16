@@ -7,7 +7,7 @@ from typing import Any, Optional, Set, Tuple, Type, TypeVar, Union, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
-from pydantic import BeforeValidator
+from pydantic import AfterValidator, BeforeValidator
 
 if sys.version_info >= (3, 9):
     from typing import Annotated
@@ -147,12 +147,16 @@ def _convert_indices(array: Optional[ArrayLike]) -> Optional[NDArray[np.intc]]:
 
 
 def _check_duplicates(names: Optional[Tuple[Any, ...]]) -> Optional[Tuple[Any, ...]]:
-    if names is not None:
-        counts = Counter(names)
-        duplicates = [name for name, count in counts.items() if count > 1]
-        if duplicates:
-            raise ValueError("duplicate names: " + ", ".join(duplicates))
-    return names
+    if names is None:
+        return None
+    converted_names = tuple(
+        tuple(name) if isinstance(name, list) else name for name in names
+    )
+    counts = Counter(converted_names)
+    duplicates = [str(name) for name, count in counts.items() if count > 1]
+    if duplicates:
+        raise ValueError("duplicate names: " + ", ".join(duplicates))
+    return converted_names
 
 
 def _convert_set(value: Union[str, Set[str]]) -> Set[str]:
@@ -170,7 +174,7 @@ if sys.version_info >= (3, 9):
     ArrayEnum = Annotated[NDArray[np.ubyte], BeforeValidator(_convert_enum_array)]
     Array1DInt = Annotated[NDArray[np.intc], BeforeValidator(_convert_1d_array_intc)]
     Array1DBool = Annotated[NDArray[np.bool_], BeforeValidator(_convert_1d_array_bool)]
-    UniqueNames = Annotated[Tuple[Any, ...], BeforeValidator(_check_duplicates)]
+    UniqueNames = Annotated[Tuple[Any, ...], AfterValidator(_check_duplicates)]
 else:
     Array1D = Annotated[ArrayLike, BeforeValidator(_convert_1d_array)]
     Array2D = Annotated[ArrayLike, BeforeValidator(_convert_2d_array)]
@@ -178,7 +182,7 @@ else:
     ArrayEnum = Annotated[ArrayLike, BeforeValidator(_convert_enum_array)]
     Array1DInt = Annotated[ArrayLike, BeforeValidator(_convert_1d_array_intc)]
     Array1DBool = Annotated[ArrayLike, BeforeValidator(_convert_1d_array_bool)]
-    UniqueNames = Annotated[Tuple[Any, ...], BeforeValidator(_check_duplicates)]
+    UniqueNames = Annotated[Tuple[Any, ...], AfterValidator(_check_duplicates)]
 
 T = TypeVar("T")
 ItemOrSet = Annotated[Set[T], BeforeValidator(_convert_set)]
