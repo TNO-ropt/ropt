@@ -191,7 +191,8 @@ class DefaultOptimizerStep(PlanStep):
             return None, False
         plan = self.plan.spawn(self._with.nested_optimization.plan)
         extra_inputs = [
-            plan.eval(item) for item in self._with.nested_optimization.extra_inputs
+            self._plan.eval(item)
+            for item in self._with.nested_optimization.extra_inputs
         ]
         results = plan.run(variables, *extra_inputs)
         assert len(results) == 1
