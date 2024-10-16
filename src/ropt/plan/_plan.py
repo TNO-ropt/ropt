@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import ast
+import keyword
 import re
 from itertools import chain, count
 from numbers import Number
-from typing import TYPE_CHECKING, Any, Callable, Dict, Final, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Dict, Final, List, Optional, Set, Tuple
 
 import numpy as np
 from numpy.random import default_rng
@@ -249,19 +250,38 @@ class Plan:
 
         def _substitute(matched: re.Match[str]) -> str:
             value = matched.string[matched.start() : matched.end()]
-            return str(self.eval(value[3:-2]))
+            return "$" if value == "$$" else str(self.eval(value))
+
+        if isinstance(value, str):
+            stripped = value.strip()
+            if stripped.startswith("$"):
+                return str(self.eval(stripped))
+            return re.sub(r"\${{(.*?)}}|\$\$|\$([^\W0-9][\w\.]*)", _substitute, value)
+        return str(value)
 
         return re.sub(r"\${{(.*?)}}", _substitute, value)
 
     def _eval_expr(self, expr: str) -> Any:  # noqa: ANN401
+        # Remove $ from identifiers, before sending the string to the parser:
+        stripped = expr
+        found: Set[str] = set()
+        for word in re.findall(r"(?<=\$)\b\w+\b", expr):
+            if word.isidentifier() and not keyword.iskeyword(word):
+                if word not in self:
+                    msg = f"Unknown plan variable: `{word}`"
+                    raise PlanError(msg)
+                found.add(word)
+                stripped = stripped.replace(f"${word}", word)
+
+        # Parse the string:
         try:
-            tree = ast.parse(expr, mode="eval")
+            tree = ast.parse(stripped, mode="eval")
         except SyntaxError as exc:
             msg = f"Syntax error in expression: {expr}"
             raise PlanError(msg) from exc
 
         if _is_valid(tree.body):
-            replacer = _ReplaceFields(self)
+            replacer = _ReplaceFields(self, found)
             tree = ast.fix_missing_locations(replacer.visit(tree))
             try:
                 result = eval(  # noqa: S307
@@ -293,7 +313,24 @@ class Plan:
         Returns:
             The result of the expression.
         """
-        return self._eval_expr(value.strip()) if isinstance(value, str) else value
+        if not isinstance(value, str):
+            return value
+
+        value = value.strip()
+
+        # Recursively evaluate when enclosed in `${{ }}`:
+        if value.startswith("${{") and value.endswith("}}"):
+            return self.eval(value[3:-2].strip())
+
+        # Identifiers are not evaluated, their value is returned unchanged:
+        if value.startswith("$") and value.isidentifier():
+            if value[1:] in self:
+                return self[value[1:]]
+            msg = f"Unknown plan variable: `{value[1:]}`"
+            raise PlanError(msg)
+
+        # Evaluate as an expression:
+        return self._eval_expr(value)
 
     def add_observer(
         self,
@@ -418,14 +455,17 @@ def _is_valid(node: ast.AST) -> bool:  # noqa: PLR0911
 
 
 class _ReplaceFields(ast.NodeTransformer):
-    def __init__(self, plan: Plan) -> None:
+    def __init__(self, plan: Plan, found: Set[str]) -> None:
         self._plan = plan
         self.vars: Dict[str, Any] = {}
+        self._found = found
 
     def visit_Name(self, node: ast.Name) -> ast.AST:  # noqa: N802
-        value = self._plan[node.id]
-        if value is None or isinstance(value, _SUPPORTED_VARIABLE_TYPES):
-            self.vars[node.id] = value
-            return node
-        msg = f"Error in expression: the type of `{node.id}` is not supported"
-        raise PlanError(msg)
+        if node.id in self._found:
+            value = self._plan[node.id]
+            if value is None or isinstance(value, _SUPPORTED_VARIABLE_TYPES):
+                self.vars[node.id] = value
+                return node
+            msg = f"Error in expression: the type of `{node.id}` is not supported"
+            raise PlanError(msg)
+        return ast.Constant(node.id)

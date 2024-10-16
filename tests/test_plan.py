@@ -51,7 +51,7 @@ def test_run_basic(enopt_config: Any, evaluator: Any) -> None:
         "steps": [
             {
                 "run": "optimizer",
-                "with": {"config": "enopt_config", "tags": "opt"},
+                "with": {"config": "$enopt_config", "tags": "opt"},
             },
         ],
         "results": [
@@ -77,13 +77,16 @@ def test_eval(enopt_config: Any, evaluator: Any) -> None:
     plan_config: Dict[str, Any] = {
         "variables": {
             "config": enopt_config,
+            "dummy": None,
             "results": None,
+            "x": 1,
+            "y": 1,
         },
         "steps": [
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "config",
+                    "config": "$config",
                     "tags": "opt",
                 },
             },
@@ -95,6 +98,8 @@ def test_eval(enopt_config: Any, evaluator: Any) -> None:
     parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(parsed_config, context)
+    plan.run()
+
     assert plan.eval("1") == 1
     assert plan.eval(" -1 ") == -1
     assert not plan.eval("not 1")
@@ -108,10 +113,11 @@ def test_eval(enopt_config: Any, evaluator: Any) -> None:
     assert plan.eval("1 < 2")
     assert plan.eval("1 < 23")
     assert not plan.eval("1 < 2 > 3")
+    assert plan.eval("$x + $y") == 2
 
-    assert plan.eval("results") is None
+    assert plan.eval("$dummy") is None
     assert plan.eval("[1, 2]") == [1, 2]
-    assert plan.eval("[results, 2]") == [None, 2]
+    assert plan.eval("[$dummy, 2]") == [None, 2]
 
     with pytest.raises(
         PlanError, match=re.escape("Syntax error in expression: 1 + * 1")
@@ -120,13 +126,11 @@ def test_eval(enopt_config: Any, evaluator: Any) -> None:
 
     with pytest.raises(
         PlanError,
-        match=re.escape("Unknown plan variable: `y`"),
+        match=re.escape("Unknown plan variable: `z`"),
     ):
-        plan.eval("y + 1")
+        plan.eval("$z + 1")
 
-    plan.run()
-
-    assert isinstance(plan.eval("results"), Results)
+    assert isinstance(plan.eval("$results"), Results)
 
 
 def test_interpolate_string(enopt_config: Any, evaluator: Any) -> None:
@@ -139,7 +143,7 @@ def test_interpolate_string(enopt_config: Any, evaluator: Any) -> None:
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "config",
+                    "config": "$config",
                     "tags": "opt",
                 },
             },
@@ -165,13 +169,13 @@ def test_interpolate_string(enopt_config: Any, evaluator: Any) -> None:
     assert plan.interpolate_string("${{ 1 < 2 < 3 }}") == "True"
     assert plan.interpolate_string("${{ 1 < 2 > 3 }}") == "False"
 
-    assert plan.interpolate_string("${{ results }}") == "None"
+    assert plan.interpolate_string("${{ $results }}") == "None"
     assert plan.interpolate_string("${{ [1, 2] }}") == "[1, 2]"
-    assert plan.interpolate_string("${{ [results, 2] }}") == "[None, 2]"
+    assert plan.interpolate_string("${{ [$results, 2] }}") == "[None, 2]"
 
     assert plan.interpolate_string("a ${{ 1 }} b") == "a 1 b"
     assert plan.interpolate_string("a ${{ 1 + 1 }} b") == "a 2 b"
-    assert plan.interpolate_string("a ${{ 1 + 1 }} b ${{ results }}") == "a 2 b None"
+    assert plan.interpolate_string("a ${{ 1 + 1 }} b ${{ $results }}") == "a 2 b None"
 
     with pytest.raises(
         PlanError,
@@ -197,7 +201,7 @@ def test_set(evaluator: Any) -> None:
         },
         "steps": [
             {"run": "set", "with": {"x": 1}},
-            {"run": "set", "with": {"y": "x + 1", "z": "q['a']"}},
+            {"run": "set", "with": {"y": "$x + 1", "z": "$q['a']"}},
             {"run": "set", "with": {"q['a']": 2}},
             {"run": "set", "with": {"r['a'][10]": 1}},
         ],
@@ -253,9 +257,9 @@ def test_copy(evaluator: Any) -> None:
     plan_config: Dict[str, Any] = {
         "variables": {"x": {"a": 1}, "y": None, "z": None},
         "steps": [
-            {"run": "copy", "with": {"y": "x"}},
+            {"run": "copy", "with": {"y": "$x"}},
             {"run": "set", "with": {"y['a']": 2}},
-            {"run": "copy", "with": {"z": "y"}},
+            {"run": "copy", "with": {"z": "$y"}},
         ],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
@@ -279,7 +283,7 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "config",
+                    "config": "$config",
                     "tags": "optimal1",
                 },
                 "if": "1 > 0",
@@ -287,9 +291,9 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
             {"run": "set", "with": {"x": 1}},
             {
                 "run": "optimizer",
-                "if": "x < 0",
+                "if": "$x < 0",
                 "with": {
-                    "config": "config",
+                    "config": "$config",
                     "tags": "optimal2",
                 },
             },
@@ -328,22 +332,22 @@ def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "config",
+                    "config": "$config",
                     "tags": "optimal1",
                 },
             },
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "config",
+                    "config": "$config",
                     "tags": "optimal2",
-                    "initial_values": "optimal1",
+                    "initial_values": "$optimal1",
                 },
             },
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "config",
+                    "config": "$config",
                     "tags": "optimal3",
                     "initial_values": [0, 0, 0],
                 },
@@ -396,14 +400,14 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "config",
+                    "config": "$config",
                     "tags": "opt",
                 },
             },
             {
                 "run": "set",
                 "with": {
-                    "saved_results": "optimal",
+                    "saved_results": "$optimal",
                     "optimal": "None",
                 },
             },
@@ -462,31 +466,31 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "enopt_config1",
+                    "config": "$enopt_config1",
                     "tags": "opt",
                 },
             },
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "enopt_config2",
-                    "initial_values": "last",
+                    "config": "$enopt_config2",
+                    "initial_values": "$last",
                     "tags": "opt",
                 },
             },
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "enopt_config1",
-                    "initial_values": "last",
+                    "config": "$enopt_config1",
+                    "initial_values": "$last",
                     "tags": "opt",
                 },
             },
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "enopt_config2",
-                    "initial_values": "last",
+                    "config": "$enopt_config2",
+                    "initial_values": "$last",
                     "tags": "opt",
                 },
             },
@@ -538,15 +542,15 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "enopt_config",
+                    "config": "$enopt_config",
                     "tags": "last",
                 },
             },
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "enopt_config2",
-                    "initial_values": "last",
+                    "config": "$enopt_config2",
+                    "initial_values": "$last",
                 },
             },
         ],
@@ -585,7 +589,7 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "enopt_config",
+                    "config": "$enopt_config",
                     "tags": "opt",
                 },
             },
@@ -610,7 +614,7 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
                     {
                         "run": "optimizer",
                         "with": {
-                            "config": "enopt_config",
+                            "config": "$enopt_config",
                             "tags": "opt",
                         },
                     },
@@ -652,7 +656,7 @@ def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
                         {
                             "run": "optimizer",
                             "with": {
-                                "config": "enopt_config",
+                                "config": "$enopt_config",
                             },
                         },
                     ],
@@ -700,8 +704,8 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
                         {
                             "run": "optimizer",
                             "with": {
-                                "config": "enopt_config",
-                                "initial_values": "last",
+                                "config": "$enopt_config",
+                                "initial_values": "$last",
                                 "tags": "opt",
                             },
                         },
@@ -753,9 +757,9 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
                         {
                             "run": "optimizer",
                             "with": {
-                                "config": "enopt_config",
+                                "config": "$enopt_config",
                                 "tags": "opt",
-                                "initial_values": "optimum",
+                                "initial_values": "$optimum",
                             },
                         },
                     ],
@@ -823,15 +827,15 @@ def test_restart_optimum_with_reset(
                         {
                             "run": "set",
                             "with": {
-                                "initial": "optimum",
+                                "initial": "$optimum",
                                 "optimum": "None",
                             },
                         },
                         {
                             "run": "optimizer",
                             "with": {
-                                "config": "enopt_config",
-                                "initial_values": "initial",
+                                "config": "$enopt_config",
+                                "initial_values": "$initial",
                                 "tags": "opt",
                             },
                         },
@@ -878,7 +882,7 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
         "restart": "$counter",
         "foo": 1,
         "bar": "string",
-        "complex": "string ${{ 1 + 1 }} ${{ counter }}",
+        "complex": "string ${{ 1 + 1 }} ${{ $counter }}",
     }
 
     plan_config = {
@@ -896,7 +900,7 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
                     "steps": [
                         {
                             "run": "optimizer",
-                            "with": {"config": "config", "tags": "opt"},
+                            "with": {"config": "$config", "tags": "opt"},
                         },
                     ],
                 },
@@ -925,7 +929,7 @@ def test_evaluator_step(enopt_config: Any, evaluator: Any) -> None:
             {
                 "run": "evaluator",
                 "with": {
-                    "config": "config",
+                    "config": "$config",
                     "tags": "opt",
                 },
             },
@@ -979,7 +983,7 @@ def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
             {
                 "run": "evaluator",
                 "with": {
-                    "config": "config",
+                    "config": "$config",
                     "values": [[0, 0, 0.1], [0, 0, 0]],
                     "tags": "opt",
                 },
@@ -1023,7 +1027,7 @@ def test_exit_code(enopt_config: Any, evaluator: Any) -> None:
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "enopt_config",
+                    "config": "$enopt_config",
                     "exit_code_var": "exit_code",
                 },
             },
@@ -1064,8 +1068,8 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "config",
-                    "initial_values": "initial",
+                    "config": "$config",
+                    "initial_values": "$initial",
                     "tags": "inner",
                 },
             },
@@ -1087,7 +1091,7 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "config",
+                    "config": "$config",
                     "nested_optimization": {
                         "plan": inner_config,
                         "extra_inputs": [nested_config],
@@ -1145,8 +1149,8 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "config",
-                    "initial_values": "initial",
+                    "config": "$config",
+                    "initial_values": "$initial",
                     "tags": "inner",
                 },
             },
@@ -1170,7 +1174,7 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "config",
+                    "config": "$config",
                     "nested_optimization": {"plan": inner_config},
                     "tags": "outer",
                 },
@@ -1217,7 +1221,7 @@ def test_table(enopt_config: Any, evaluator: Any, tmp_path: Path) -> None:
         "steps": [
             {
                 "run": "optimizer",
-                "with": {"config": "enopt_config"},
+                "with": {"config": "$enopt_config"},
             },
         ],
     }
@@ -1256,7 +1260,7 @@ def test_table_handler(enopt_config: Any, evaluator: Any, tmp_path: Path) -> Non
         "steps": [
             {
                 "run": "optimizer",
-                "with": {"config": "enopt_config", "tags": "opt"},
+                "with": {"config": "$enopt_config", "tags": "opt"},
             },
         ],
         "results": [

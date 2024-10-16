@@ -50,7 +50,7 @@ class DefaultSetStep(PlanStep):
             else:
                 msg = f"Not a valid dict-like variable: {var}"
                 try:
-                    expr = f"{var}" + "".join(f"[{key}]" for key in keys[:-1])
+                    expr = f"${var}" + "".join(f"[{key}]" for key in keys[:-1])
                     target: Dict[str, Any] = self._plan.eval(expr)
                 except PlanError as exc:
                     raise PlanError(msg) from exc

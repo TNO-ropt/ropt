@@ -98,7 +98,7 @@ class OptimizationPlanRunner:
             {
                 "run": "optimizer",
                 "with": {
-                    "config": "__config__",
+                    "config": "$__config__",
                     "exit_code_var": "__exit_code__",
                     "tags": "__optimizer_tag__",
                 },
