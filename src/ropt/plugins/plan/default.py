@@ -13,7 +13,7 @@ from ._evaluator import DefaultEvaluatorStep
 from ._metadata import DefaultMetadataHandler
 from ._optimizer import DefaultOptimizerStep
 from ._repeat import DefaultRepeatStep
-from ._setvar import DefaultSetStep
+from ._set import DefaultSetStep
 from ._table import DefaultTableHandler
 from ._tracker import DefaultTrackerHandler
 from .base import PlanPlugin
@@ -28,7 +28,7 @@ _STEP_OBJECTS: Final[Dict[str, Type[PlanStep]]] = {
     "evaluator": DefaultEvaluatorStep,
     "optimizer": DefaultOptimizerStep,
     "repeat": DefaultRepeatStep,
-    "setvar": DefaultSetStep,
+    "set": DefaultSetStep,
 }
 
 

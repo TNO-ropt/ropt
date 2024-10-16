@@ -185,34 +185,21 @@ def test_interpolate_string(enopt_config: Any, evaluator: Any) -> None:
         plan.interpolate_string("${{ 1 + * 1 }}")
 
 
-def test_setvar(evaluator: Any) -> None:
+def test_set(evaluator: Any) -> None:
     plan_config: Dict[str, Any] = {
-        "variables": {"x": None, "y": None, "z": None, "u": None, "q": {"a": 1}},
+        "variables": {
+            "x": None,
+            "y": None,
+            "z": None,
+            "u": None,
+            "q": {"a": 1},
+            "r": {"a": {10: {}}},
+        },
         "steps": [
-            {
-                "run": "setvar",
-                "with": {
-                    "var": "x",
-                    "value": 1,
-                },
-            },
-            {
-                "run": "setvar",
-                "with": {
-                    "var": "y",
-                    "value": "1",
-                },
-            },
-            {
-                "run": "setvar",
-                "with": {
-                    "expr": "z = y + 1",
-                },
-            },
-            {
-                "run": "setvar",
-                "with": "u = q['a']",
-            },
+            {"run": "set", "with": {"x": 1}},
+            {"run": "set", "with": {"y": "x + 1", "z": "q['a']"}},
+            {"run": "set", "with": {"q['a']": 2}},
+            {"run": "set", "with": {"r['a'][10]": 1}},
         ],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
@@ -220,87 +207,19 @@ def test_setvar(evaluator: Any) -> None:
     plan = Plan(parsed_config, context)
     plan.run()
     assert plan["x"] == 1
-    assert plan["y"] == 1
-    assert plan["z"] == 2
-    assert plan["u"] == 1
+    assert plan["y"] == 2
+    assert plan["z"] == 1
+    assert plan["q"] == {"a": 2}
+    assert plan["r"] == {"a": {10: 1}}
 
 
-def test_invalid_setvar(evaluator: Any) -> None:
-    plan_config: Dict[str, Any] = {
-        "steps": [
-            {
-                "run": "setvar",
-                "with": "1",
-            },
-        ],
-    }
-    parsed_config = PlanConfig.model_validate(plan_config)
-    context = OptimizerContext(evaluator=evaluator())
-    with pytest.raises(PlanError, match=re.escape("Invalid expression: 1")):
-        Plan(parsed_config, context)
-
-    plan_config = {
-        "steps": [
-            {
-                "run": "setvar",
-                "with": "x = 1",
-            },
-        ],
-    }
-    parsed_config = PlanConfig.model_validate(plan_config)
-    context = OptimizerContext(evaluator=evaluator())
-    with pytest.raises(PlanError, match=re.escape("Unknown variable name: x")):
-        Plan(parsed_config, context)
-
-
-def test_setvar_keys(evaluator: Any) -> None:
-    plan_config: Dict[str, Any] = {
-        "variables": {
-            "x": {},
-            "y": {"a": {10: {}}},
-            "u": {},
-            "v": {"a": {10: {}}},
-            "q": "'a'",
-        },
-        "steps": [
-            {
-                "run": "setvar",
-                "with": {"var": "x['a']", "value": 1},
-            },
-            {
-                "run": "setvar",
-                "with": {"var": "y['a'][10]", "value": 1},
-            },
-            {
-                "run": "setvar",
-                "with": {"expr": "u[q] = 1"},
-            },
-            {
-                "run": "setvar",
-                "with": "v['a'][10] = 1",
-            },
-        ],
-    }
-    parsed_config = PlanConfig.model_validate(plan_config)
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(parsed_config, context)
-    plan.run()
-    assert plan["x"] == {"a": 1}
-    assert plan["y"] == {"a": {10: 1}}
-    assert plan["u"] == {"a": 1}
-    assert plan["v"] == {"a": {10: 1}}
-
-
-def test_setvar_keys_invalid(evaluator: Any) -> None:
+def test_set_keys_invalid(evaluator: Any) -> None:
     plan_config: Dict[str, Any] = {
         "variables": {
             "y": {"a": None},
         },
         "steps": [
-            {
-                "run": "setvar",
-                "with": {"var": "y['a']['b']", "value": 1},
-            },
+            {"run": "set", "with": {"y['a']['b']": 1}},
         ],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
@@ -317,11 +236,8 @@ def test_invalid_identifier(evaluator: Any) -> None:
             "y": None,
         },
         "steps": [
-            {"run": "setvar", "with": "x=1"},
-            {
-                "run": "setvar",
-                "with": "y=1x + 1",
-            },
+            {"run": "set", "with": {"x": 1}},
+            {"run": "set", "with": {"y": "1x + 1"}},
         ],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
@@ -350,7 +266,7 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 },
                 "if": "1 > 0",
             },
-            {"run": "setvar", "with": "x = 1"},
+            {"run": "set", "with": {"x": 1}},
             {
                 "run": "optimizer",
                 "if": "x < 0",
@@ -467,12 +383,11 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 },
             },
             {
-                "run": "setvar",
-                "with": "saved_results = optimal",
-            },
-            {
-                "run": "setvar",
-                "with": "optimal = None",
+                "run": "set",
+                "with": {
+                    "saved_results": "optimal",
+                    "optimal": "None",
+                },
             },
         ],
         "results": [
@@ -888,12 +803,11 @@ def test_restart_optimum_with_reset(
                     "iterations": 3,
                     "steps": [
                         {
-                            "run": "setvar",
-                            "with": "initial = optimum",
-                        },
-                        {
-                            "run": "setvar",
-                            "with": "optimum = None",
+                            "run": "set",
+                            "with": {
+                                "initial": "optimum",
+                                "optimum": "None",
+                            },
                         },
                         {
                             "run": "optimizer",
