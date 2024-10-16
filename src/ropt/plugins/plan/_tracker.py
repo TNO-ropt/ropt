@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from ropt.config.utils import StrOrSet  # noqa: TCH001
+from ropt.config.utils import ItemOrSet  # noqa: TCH001
 from ropt.enums import EventType
 from ropt.plugins.plan.base import ResultHandler
 
@@ -40,7 +40,7 @@ class DefaultTrackerWith(BaseModel):
     """
 
     var: str
-    tags: StrOrSet
+    tags: ItemOrSet[str]
     type_: Literal["optimal", "last"] = Field(default="optimal", alias="type")
     constraint_tolerance: Optional[float] = 1e-10
 

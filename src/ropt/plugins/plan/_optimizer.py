@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, Union
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict
 
 from ropt.config.enopt import EnOptConfig
 from ropt.config.plan import PlanConfig  # noqa: TCH001
-from ropt.config.utils import Array1D, StrOrSet  # noqa: TCH001
+from ropt.config.utils import Array1D, ItemOrSet, ItemOrTuple  # noqa: TCH001
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import PlanError
@@ -42,7 +42,7 @@ class NestedPlanConfig(BaseModel):
     """
 
     plan: PlanConfig
-    extra_inputs: List[Any] = []
+    extra_inputs: ItemOrTuple[Any] = ()
 
 
 class DefaultOptimizerStepWith(BaseModel):
@@ -60,7 +60,7 @@ class DefaultOptimizerStepWith(BaseModel):
     """
 
     config: str
-    tags: StrOrSet = set()
+    tags: ItemOrSet[str] = set()
     initial_values: Optional[Union[str, Array1D]] = None
     exit_code_var: Optional[str] = None
     nested_optimization: Optional[NestedPlanConfig] = None

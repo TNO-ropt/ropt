@@ -10,7 +10,7 @@ from pydantic import BaseModel, ConfigDict
 from ropt.config.enopt import EnOptConfig
 from ropt.config.utils import (
     Array2D,  # noqa: TCH001
-    StrOrSet,  # noqa: TCH001
+    ItemOrSet,  # noqa: TCH001
 )
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
@@ -40,7 +40,7 @@ class DefaultEvaluatorStepWith(BaseModel):
     """
 
     config: str
-    tags: StrOrSet = set()
+    tags: ItemOrSet[str] = set()
     values: Optional[Union[str, Array2D]] = None
 
     model_config = ConfigDict(

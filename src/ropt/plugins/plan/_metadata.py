@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, Dict
 
 from pydantic import BaseModel, ConfigDict
 
-from ropt.config.utils import StrOrSet  # noqa: TCH001
+from ropt.config.utils import ItemOrSet  # noqa: TCH001
 from ropt.enums import EventType
 from ropt.plugins.plan.base import ResultHandler
 
@@ -31,7 +31,7 @@ class DefaultMetadataWith(BaseModel):
     """
 
     data: Dict[str, Any]
-    tags: StrOrSet
+    tags: ItemOrSet[str]
 
     model_config = ConfigDict(
         extra="forbid",

@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Dict, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict
 
-from ropt.config.utils import StrOrSet  # noqa: TCH001
+from ropt.config.utils import ItemOrSet  # noqa: TCH001
 from ropt.enums import EventType
 from ropt.plugins.plan.base import ResultHandler
 from ropt.report import ResultsTable
@@ -43,7 +43,7 @@ class DefaultTableWith(BaseModel):
                         problem rather than the default minimization
     """
 
-    tags: StrOrSet
+    tags: ItemOrSet[str]
     columns: Dict[str, str]
     path: Path
     table_type: Literal["functions", "gradients"] = "functions"

@@ -3,7 +3,7 @@
 import sys
 from collections import Counter
 from enum import IntEnum
-from typing import Any, Optional, Set, Tuple, Type, Union, cast
+from typing import Any, Optional, Set, Tuple, Type, TypeVar, Union, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -179,5 +179,7 @@ else:
     Array1DInt = Annotated[ArrayLike, BeforeValidator(_convert_1d_array_intc)]
     Array1DBool = Annotated[ArrayLike, BeforeValidator(_convert_1d_array_bool)]
     UniqueNames = Annotated[Tuple[Any, ...], BeforeValidator(_check_duplicates)]
-StrOrSet = Annotated[Set[str], BeforeValidator(_convert_set)]
-StrOrTuple = Annotated[Tuple[str, ...], BeforeValidator(_convert_tuple)]
+
+T = TypeVar("T")
+ItemOrSet = Annotated[Set[T], BeforeValidator(_convert_set)]
+ItemOrTuple = Annotated[Tuple[T, ...], BeforeValidator(_convert_tuple)]
