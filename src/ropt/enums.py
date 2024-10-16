@@ -4,6 +4,7 @@ from enum import Enum, IntEnum
 
 
 # x
+# y
 class VariableType(IntEnum):
     """Enumerates the variable types.
 
