@@ -3,6 +3,7 @@
 from enum import Enum, IntEnum
 
 
+# x
 class VariableType(IntEnum):
     """Enumerates the variable types.
 
