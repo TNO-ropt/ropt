@@ -103,6 +103,13 @@ class DefaultOptimizerStep(PlanStep):
             raise PlanError(msg)
         self._enopt_config = EnOptConfig.model_validate(config)
 
+        if (
+            self._with.nested_optimization is not None
+            and self._enopt_config.optimizer.parallel
+        ):
+            msg = "Nested optimization detected: parallel evaluation not supported. "
+            raise PlanError(msg)
+
         self.plan.emit_event(
             Event(
                 event_type=EventType.START_OPTIMIZER_STEP,
