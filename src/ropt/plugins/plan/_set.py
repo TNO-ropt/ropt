@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import re
 from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING, Any, Dict, List
@@ -48,7 +49,7 @@ class DefaultSetStep(PlanStep):
         for var_and_keys, value in zip(self._vars, self._values):
             var, *keys = var_and_keys
             if not keys:
-                self._plan[var] = self._plan.eval(value)
+                self._plan[var] = copy.deepcopy(self._plan.eval(value))
             else:
                 msg = f"Not a valid dict-like variable: {var}"
                 try:
@@ -58,4 +59,6 @@ class DefaultSetStep(PlanStep):
                     raise PlanError(msg) from exc
                 if not isinstance(target, (Mapping, Sequence)):
                     raise PlanError(msg)
-                target[self._plan.eval(keys[-1])] = self._plan.eval(value)
+                target[self._plan.eval(keys[-1])] = copy.deepcopy(
+                    self._plan.eval(value)
+                )

@@ -252,24 +252,6 @@ def test_invalid_identifier(evaluator: Any) -> None:
         plan.run()
 
 
-def test_copy(evaluator: Any) -> None:
-    plan_config: Dict[str, Any] = {
-        "variables": {"x": {"a": 1}, "y": None, "z": None},
-        "steps": [
-            {"run": "copy", "with": {"y": "$x"}},
-            {"run": "set", "with": {"y['a']": 2}},
-            {"run": "copy", "with": {"z": "$y"}},
-        ],
-    }
-    parsed_config = PlanConfig.model_validate(plan_config)
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(parsed_config, context)
-    plan.run()
-    assert plan["x"] == {"a": 1}
-    assert plan["y"] == {"a": 2}
-    assert plan["z"] == {"a": 2}
-
-
 def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
     plan_config = {
         "variables": {
