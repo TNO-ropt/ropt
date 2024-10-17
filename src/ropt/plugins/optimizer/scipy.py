@@ -198,6 +198,9 @@ class SciPyOptimizer(Optimizer):
                 + self._initialize_nonlinear_constraints()
             )
         self._options = self._parse_options()
+        self._parallel = (
+            self._config.optimizer.parallel and self._method == "differential_evolution"
+        )
 
         self._cached_variables: Optional[NDArray[np.float64]] = None
         self._cached_function: Optional[NDArray[np.float64]] = None
@@ -214,11 +217,10 @@ class SciPyOptimizer(Optimizer):
         self._cached_variables = None
         self._cached_function = None
         self._cached_gradient = None
-        self._parallel = False
 
         variable_indices = self._config.variables.indices
         if variable_indices is not None:
-            initial_values = initial_values[variable_indices]
+            initial_values = np.take(initial_values, variable_indices, axis=-1)
 
         output_dir = self._config.optimizer.output_dir
         output_file: Union[str, Path]
@@ -232,10 +234,9 @@ class SciPyOptimizer(Optimizer):
             output,
         ):
             if self._method == "differential_evolution":
-                if self._config.optimizer.parallel:
+                if self._parallel:
                     self._options["updating"] = "deferred"
                     self._options["workers"] = 1
-                    self._parallel = True
                 differential_evolution(
                     func=self._function,
                     x0=initial_values,
@@ -266,6 +267,16 @@ class SciPyOptimizer(Optimizer):
         # noqa
         """
         return self._method == "differential_evolution"
+
+    @property
+    def is_parallel(self) -> bool:
+        """Whether the current run is parallel.
+
+        See the [ropt.plugins.optimizer.base.Optimizer][] abstract base class.
+
+        # noqa
+        """
+        return self._parallel
 
     def _initialize_bounds(self) -> Optional[Bounds]:
         if (

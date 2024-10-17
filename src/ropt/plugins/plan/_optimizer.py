@@ -103,13 +103,6 @@ class DefaultOptimizerStep(PlanStep):
             raise PlanError(msg)
         self._enopt_config = EnOptConfig.model_validate(config)
 
-        if (
-            self._with.nested_optimization is not None
-            and self._enopt_config.optimizer.parallel
-        ):
-            msg = "Nested optimization detected: parallel evaluation not supported. "
-            raise PlanError(msg)
-
         self.plan.emit_event(
             Event(
                 event_type=EventType.START_OPTIMIZER_STEP,
@@ -128,7 +121,7 @@ class DefaultOptimizerStep(PlanStep):
         )
 
         variables = self._get_variables(self._enopt_config)
-        exit_code = EnsembleOptimizer(
+        ensemble_optimizer = EnsembleOptimizer(
             enopt_config=self._enopt_config,
             ensemble_evaluator=ensemble_evaluator,
             plugin_manager=self.plan.plugin_manager,
@@ -138,7 +131,16 @@ class DefaultOptimizerStep(PlanStep):
                 else None
             ),
             signal_evaluation=self._signal_evaluation,
-        ).start(variables)
+        )
+
+        if (
+            ensemble_optimizer.is_parallel
+            and self._with.nested_optimization is not None
+        ):
+            msg = "Nested optimization detected: parallel evaluation not supported. "
+            raise PlanError(msg)
+
+        exit_code = ensemble_optimizer.start(variables)
 
         if self._with.exit_code_var is not None:
             self.plan[self._with.exit_code_var] = exit_code

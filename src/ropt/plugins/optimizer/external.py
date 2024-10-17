@@ -57,7 +57,15 @@ class ExternalOptimizer(Optimizer):
         self._config = config
         self._optimizer_callback = optimizer_callback
         self._process_pid: Optional[int] = None
-        self._allow_nan = False
+
+        optimizer: Optimizer = (
+            PluginManager()
+            .get_plugin("optimizer", config.optimizer.method.split("/", maxsplit=1)[1])
+            .create(config, lambda *_: None)
+        )
+        self._allow_nan = optimizer.allow_nan
+        self._is_parallel = optimizer.is_parallel
+        del optimizer
 
     def start(self, initial_values: NDArray[np.float64]) -> None:
         """Start the optimization.
@@ -121,6 +129,16 @@ class ExternalOptimizer(Optimizer):
         """
         return self._allow_nan
 
+    @property
+    def is_parallel(self) -> bool:
+        """Whether the current run is parallel.
+
+        See the [ropt.plugins.optimizer.base.Optimizer][] abstract base class.
+
+        # noqa
+        """
+        return self._is_parallel
+
     def _handle_request(
         self, comm: _JSONPipeCommunicator, initial_values: NDArray[np.float64]
     ) -> Optional[Union[str, List[Any], Dict[str, Any]]]:
@@ -133,9 +151,6 @@ class ExternalOptimizer(Optimizer):
             return initial_values.tolist()  # type: ignore[no-any-return]
 
         if isinstance(request, dict):
-            if (allow_nan := request.get("allow_nan")) is not None:
-                self._allow_nan = allow_nan
-                return "OK"
             if (evaluation := request.get("evaluation")) is not None:
                 functions, gradients = self._optimizer_callback(
                     np.array(evaluation["variables"], dtype=np.float64),
@@ -241,7 +256,6 @@ class _PluginOptimizer:
                 )
                 .create(config, self._callback)
             )
-            assert self._request({"allow_nan": optimizer.allow_nan}) == "OK"
             try:
                 optimizer.start(
                     np.array(self._request("initial_values"), dtype=np.float64)

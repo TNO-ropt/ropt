@@ -125,6 +125,15 @@ class Optimizer(ABC):
             `True` if `NaN` is allowed.
         """
 
+    @property
+    @abstractmethod
+    def is_parallel(self) -> bool:
+        """Whether the current uses parallel evaluations.
+
+        Returns:
+            `True` if optimization is parallelized.
+        """
+
 
 class OptimizerPlugin(Plugin):
     """Abstract base class for optimizer plugins.

@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
     from ropt.ensemble_evaluator import EnsembleEvaluator
     from ropt.plugins import PluginManager
+    from ropt.plugins.optimizer.base import Optimizer
     from ropt.results import Functions, Gradients, Results
 
 
@@ -114,6 +115,19 @@ class EnsembleOptimizer:
 
         # Whether NaN values are allowed:
         self._allow_nan = False
+        self._optimizer: Optimizer = self._plugin_manager.get_plugin(
+            "optimizer", method=self._enopt_config.optimizer.method
+        ).create(self._enopt_config, self._optimizer_callback)
+        self._allow_nan = self._optimizer.allow_nan
+
+    @property
+    def is_parallel(self) -> bool:
+        """Whether the optimization is parallelized.
+
+        Returns:
+            True if the optimization is parallized.
+        """
+        return self._optimizer.is_parallel
 
     def start(self, variables: NDArray[np.float64]) -> OptimizerExitCode:
         """Start the optimization.
@@ -125,15 +139,9 @@ class EnsembleOptimizer:
             An exit code indicating the reason for termination.
         """
         self._fixed_variables = variables.copy()
-
-        optimizer = self._plugin_manager.get_plugin(
-            "optimizer", method=self._enopt_config.optimizer.method
-        ).create(self._enopt_config, self._optimizer_callback)
-        self._allow_nan = optimizer.allow_nan
-
         exit_code = OptimizerExitCode.OPTIMIZER_STEP_FINISHED
         try:
-            optimizer.start(variables)
+            self._optimizer.start(variables)
         except OptimizationAborted as exc:
             exit_code = exc.exit_code
         return exit_code
@@ -154,19 +162,35 @@ class EnsembleOptimizer:
         # Run any nested steps, when this improves the objective, this may
         # change the fixed variables and the current optimal result:
         if self._nested_optimizer is not None:
-            nested_results, aborted = self._nested_optimizer(variables)
+            # The dimension of variables can be 2 when the optimizer supports
+            # parallel evaluation, but in that case the first dimension has
+            # length 1, since nested optimization does not support parallel
+            # evaluation.
+            nested_results, aborted = self._nested_optimizer(
+                variables[0, ...] if variables.ndim > 1 else variables
+            )
             if aborted:
                 raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
             if nested_results is None:
                 raise OptimizationAborted(
                     exit_code=OptimizerExitCode.NESTED_OPTIMIZER_FAILED
                 )
-            variables = (
+            new_variables = (
                 nested_results.evaluations.variables
                 if nested_results.evaluations.scaled_variables is None
                 else nested_results.evaluations.scaled_variables
             ).copy()
-            self._fixed_variables = variables.copy()
+            # The fixed variables are a single 1D vector, but the variables
+            # vector may be 2D when used with an optimizer that supports
+            # parallel evaluation. Since parallel evaluation is currently not
+            # supported when nesting is used, the size of the first dimension
+            # will then be one, which we just squeeze.
+            self._fixed_variables = new_variables
+            variables = (
+                np.expand_dims(new_variables, axis=0)
+                if variables.ndim > 1
+                else new_variables
+            ).copy()
 
         results = self._run_evaluations(
             variables,
