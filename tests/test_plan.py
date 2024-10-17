@@ -202,8 +202,7 @@ def test_set(evaluator: Any) -> None:
         "steps": [
             {"run": "set", "with": {"x": 1}},
             {"run": "set", "with": {"y": "$x + 1", "z": "$q['a']"}},
-            {"run": "set", "with": {"q['a']": 2}},
-            {"run": "set", "with": {"r['a'][10]": 1}},
+            {"run": "set", "with": [{"q['a']": 2}, {"r['a'][10]": 1}]},
         ],
     }
     parsed_config = PlanConfig.model_validate(plan_config)

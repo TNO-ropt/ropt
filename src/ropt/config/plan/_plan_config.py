@@ -73,7 +73,9 @@ class StepConfig(BaseModel):
     """
 
     run: str
-    with_: Union[Dict[str, Any], str] = Field(default_factory=dict, alias="with")
+    with_: Union[List[Any], Dict[str, Any], str] = Field(
+        default_factory=dict, alias="with"
+    )
     if_: Optional[str] = Field(default=None, alias="if")
 
     model_config = ConfigDict(

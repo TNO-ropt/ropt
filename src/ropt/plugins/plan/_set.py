@@ -26,20 +26,22 @@ class DefaultSetStep(PlanStep):
         """
         super().__init__(config, plan)
 
-        if not isinstance(config.with_, Mapping):
-            msg = "`set` must be called with a var/value dict"
-            raise PlanError(msg)
-
         self._vars: List[Any] = []
         self._values: List[Any] = []
 
-        for var, value in config.with_.items():
-            pattern = re.findall(r"([^\[]+)|\[(.*?)\]", var.strip())
-            self._vars.append([x.strip() for group in pattern for x in group if x])
-            self._values.append(value)
-            if self._vars[-1][0] not in self._plan:
-                msg = f"Unknown variable name: {self._vars[-1]}"
+        for list_item in (
+            [config.with_] if isinstance(config.with_, Mapping) else config.with_
+        ):
+            if not isinstance(list_item, Mapping):
+                msg = "`set` must be called with a var/value dict or a list of var/value dicts"
                 raise PlanError(msg)
+            for var, value in list_item.items():
+                pattern = re.findall(r"([^\[]+)|\[(.*?)\]", var.strip())
+                self._vars.append([x.strip() for group in pattern for x in group if x])
+                self._values.append(value)
+                if self._vars[-1][0] not in self._plan:
+                    msg = f"Unknown variable name: {self._vars[-1]}"
+                    raise PlanError(msg)
 
     def run(self) -> None:
         """Run the setvar step."""
