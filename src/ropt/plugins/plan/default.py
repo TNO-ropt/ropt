@@ -12,6 +12,7 @@ from ropt.plugins.plan.base import PlanStep, ResultHandler  # noqa: TCH001
 from ._evaluator import DefaultEvaluatorStep
 from ._metadata import DefaultMetadataHandler
 from ._optimizer import DefaultOptimizerStep
+from ._print import DefaultPrintStep
 from ._repeat import DefaultRepeatStep
 from ._set import DefaultSetStep
 from ._table import DefaultTableHandler
@@ -27,6 +28,7 @@ _RESULT_HANDLER_OBJECTS: Final[Dict[str, Type[ResultHandler]]] = {
 _STEP_OBJECTS: Final[Dict[str, Type[PlanStep]]] = {
     "evaluator": DefaultEvaluatorStep,
     "optimizer": DefaultOptimizerStep,
+    "print": DefaultPrintStep,
     "repeat": DefaultRepeatStep,
     "set": DefaultSetStep,
 }

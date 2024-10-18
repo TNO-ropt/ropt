@@ -1,4 +1,4 @@
-"""This module implements the default setvar step."""
+"""This module implements the default set step."""
 
 from __future__ import annotations
 
@@ -45,7 +45,7 @@ class DefaultSetStep(PlanStep):
                     raise PlanError(msg)
 
     def run(self) -> None:
-        """Run the setvar step."""
+        """Run the set step."""
         for var_and_keys, value in zip(self._vars, self._values):
             var, *keys = var_and_keys
             if not keys:
