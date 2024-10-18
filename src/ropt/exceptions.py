@@ -19,6 +19,10 @@ class PlanError(Exception):
         super().__init__(message)
 
 
+class PlanExprError(PlanError):
+    """Raised when an error occurs in a plan expression."""
+
+
 class OptimizationAborted(Exception):  # noqa: N818
     """Raised when an optimization is aborted.
 

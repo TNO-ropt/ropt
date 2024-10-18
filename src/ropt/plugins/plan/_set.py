@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import copy
 import re
-from collections.abc import Mapping, Sequence
-from typing import TYPE_CHECKING, Any, Dict, List
+from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
+from typing import TYPE_CHECKING, Any, List, Union
 
 from ropt.exceptions import PlanError
 from ropt.plugins.plan.base import PlanStep
@@ -52,13 +52,13 @@ class DefaultSetStep(PlanStep):
                 self._plan[var] = copy.deepcopy(self._plan.eval(value))
             else:
                 msg = f"Not a valid dict-like variable: {var}"
+                keys = [self.plan.eval("{{" + key + "}}") for key in keys]
+                target: Union[MutableMapping[Any, Any], Sequence[Any]] = self._plan[var]
                 try:
-                    expr = f"${var}" + "".join(f"[{key}]" for key in keys[:-1])
-                    target: Dict[str, Any] = self._plan.eval(expr)
-                except PlanError as exc:
-                    raise PlanError(msg) from exc
-                if not isinstance(target, (Mapping, Sequence)):
+                    for key in keys[:-1]:
+                        target = target[key]
+                except KeyError:
+                    raise PlanError(msg) from None
+                if not isinstance(target, (MutableMapping, MutableSequence)):
                     raise PlanError(msg)
-                target[self._plan.eval(keys[-1])] = copy.deepcopy(
-                    self._plan.eval(value)
-                )
+                target[keys[-1]] = copy.deepcopy(self._plan.eval(value))

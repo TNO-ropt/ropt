@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import ast
-import keyword
 import re
 from itertools import chain, count
 from numbers import Number
@@ -222,78 +221,51 @@ class Plan:
             parent=self,
         )
 
-    def interpolate_string(self, value: Any) -> Any:  # noqa: ANN401
-        """Parse a value as an expression or an interpolated string.
-
-        If the value is not a string, it is returned unchanged. If it is a
-        string, it is first stripped of leading and trailing whitespace and then
-        parsed according to the following rules:
-
-        - If the string starts with a `$`, it is evaluated using the
-          [`eval`][ropt.plan.Plan.eval] method of the plan object. This will
-          replace strings of the form `$identifier` with the corresponding plan
-          value and evaluate strings of the form `${{ expr }}` as a mathematical
-          expression, optionally containing variables in the form `$identifier`.
-        - If the string does not start with a `$`, it is returned after
-          interpolating any substrings delimited by `${{` and `}}` by passing
-          them to the [`eval`][ropt.plan.Plan.eval] method.
-
-        Note:
-            The string `$$` is not interpolated but replaced with a single `$`.
-
-        Args:
-            value: The value to evaluate
-
-        Returns:
-            The result of the evaluation.
-        """
-
-        def _substitute(matched: re.Match[str]) -> str:
-            value = matched.string[matched.start() : matched.end()]
-            return "$" if value == "$$" else str(self.eval(value))
-
-        if isinstance(value, str):
-            stripped = value.strip()
-            if stripped.startswith("$"):
-                return str(self.eval(stripped))
-            return re.sub(r"\${{(.*?)}}|\$\$|\$([^\W0-9][\w\.]*)", _substitute, value)
-        return str(value)
-
-        return re.sub(r"\${{(.*?)}}", _substitute, value)
-
     def _eval_expr(self, expr: str) -> Any:  # noqa: ANN401
-        # Remove $ from identifiers, before sending the string to the parser:
-        stripped = expr
+        # find all variables:
         found: Set[str] = set()
         for word in re.findall(r"(?<=\$)\b\w+\b", expr):
-            if word.isidentifier() and not keyword.iskeyword(word):
-                if word not in self:
-                    msg = f"Unknown plan variable: `{word}`"
-                    raise PlanError(msg)
-                found.add(word)
-                stripped = stripped.replace(f"${word}", word)
+            if word not in self:
+                msg = f"Unknown plan variable: `{word}`"
+                raise PlanError(msg)
+            found.add(word)
 
         # Parse the string:
-        try:
-            tree = ast.parse(stripped, mode="eval")
-        except SyntaxError as exc:
-            msg = f"Syntax error in expression: {expr}"
-            raise PlanError(msg) from exc
-
+        stripped = re.sub(r"\$(\$*)", "\\1", expr)
+        tree = ast.parse(stripped, mode="eval")
         if _is_valid(tree.body):
             replacer = _ReplaceFields(self, found)
             tree = ast.fix_missing_locations(replacer.visit(tree))
-            try:
-                result = eval(  # noqa: S307
-                    compile(tree, "", mode="eval"), {"__builtins__": {}}, replacer.vars
-                )
-            except TypeError as exc:
-                msg = f"Error in expression: {expr}"
-                raise PlanError(msg) from exc
-            return result
+            return eval(  # noqa: S307
+                compile(tree, "", mode="eval"), {"__builtins__": {}}, replacer.vars
+            )
 
-        msg = f"Invalid expression: {expr}"
-        raise PlanError(msg)
+        raise SyntaxError
+
+    def _substitute(self, matched: re.Match[str]) -> str:
+        value = matched.string[matched.start() : matched.end()]
+        return "$" if value == "$$" else str(self._eval(value))
+
+    def _eval(self, value: str) -> Any:  # noqa: ANN401
+        value = value.strip()
+        if value.startswith("$$"):
+            return value.replace("$$", "$", 1)
+        if value.startswith("{{") and value.endswith("}}"):
+            return self._eval_expr(value[2:-2].strip())
+        if value.startswith("[[") and value.endswith("]]"):
+            parts = value[2:-2].split("{{")
+            parts[1:] = ["{{" + part for part in parts[1:]]
+            return "".join(
+                re.sub(
+                    r"\{{(.*)}}|\$\$|\$([^\W0-9][\w\.]*)",
+                    self._substitute,
+                    part,
+                )
+                for part in parts
+            )
+        if value.startswith("$"):
+            return self._eval_expr(value)
+        return value
 
     def eval(self, value: Any) -> Any:  # noqa: ANN401
         """Evaluate the provided value as an expression.
@@ -313,24 +285,13 @@ class Plan:
         Returns:
             The result of the expression.
         """
-        if not isinstance(value, str):
-            return value
-
-        value = value.strip()
-
-        # Recursively evaluate when enclosed in `${{ }}`:
-        if value.startswith("${{") and value.endswith("}}"):
-            return self.eval(value[3:-2].strip())
-
-        # Identifiers are not evaluated, their value is returned unchanged:
-        if value.startswith("$") and value.isidentifier():
-            if value[1:] in self:
-                return self[value[1:]]
-            msg = f"Unknown plan variable: `{value[1:]}`"
-            raise PlanError(msg)
-
-        # Evaluate as an expression:
-        return self._eval_expr(value)
+        if isinstance(value, str):
+            try:
+                return self._eval(value)
+            except (SyntaxError, TypeError) as exc:
+                msg = f"Invalid expression: {value}"
+                raise PlanError(msg) from exc
+        return value
 
     def add_observer(
         self,
@@ -369,7 +330,12 @@ class Plan:
 
     def _check_condition(self, config: StepConfig) -> bool:
         if config.if_ is not None:
-            return bool(self.eval(config.if_))
+            stripped = config.if_.strip()
+            return (
+                bool(self.eval(stripped))
+                if stripped.startswith("{{") and stripped.endswith("}}")
+                else bool(self.eval("{{" + stripped + "}}"))
+            )
         return True
 
     def __getitem__(self, name: str) -> Any:  # noqa: ANN401
@@ -447,6 +413,11 @@ def _is_valid(node: ast.AST) -> bool:  # noqa: C901, PLR0911
         )
     if isinstance(node, ast.List):
         return all(_is_valid(item) for item in node.elts)
+    if isinstance(node, ast.Dict):
+        return (
+            all(item is None or _is_valid(item) for item in node.keys)
+            and all(_is_valid(item) for item in node.values)  # noqa: PD011
+        )
     if isinstance(node, ast.Subscript):
         return _is_valid(node.slice)
     if isinstance(node, ast.Index):
@@ -472,4 +443,4 @@ class _ReplaceFields(ast.NodeTransformer):
                 return node
             msg = f"Error in expression: the type of `{node.id}` is not supported"
             raise PlanError(msg)
-        return ast.Constant(node.id)
+        return node

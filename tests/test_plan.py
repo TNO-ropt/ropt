@@ -100,36 +100,43 @@ def test_eval(enopt_config: Any, evaluator: Any) -> None:
     plan = Plan(parsed_config, context)
     plan.run()
 
-    assert plan.eval("1") == 1
-    assert plan.eval(" -1 ") == -1
-    assert not plan.eval("not 1")
-    assert not plan.eval("True and False")
-    assert plan.eval("True or False")
-    assert plan.eval("1 + 1") == 2
-    assert plan.eval("2**3") == 8
-    assert plan.eval("3 % 2") == 1
-    assert plan.eval("3 // 2") == 1
-    assert plan.eval("2.5 + (2 + 3) / 2") == 5
-    assert plan.eval("1 < 2")
-    assert plan.eval("1 < 23")
-    assert not plan.eval("1 < 2 > 3")
-    assert plan.eval("$x + $y") == 2
-
+    assert plan.eval("") == ""
+    assert plan.eval(" ") == ""
+    assert plan.eval("{{1}}") == 1
+    assert plan.eval("{{'1'}}") == "1"
+    assert plan.eval("{{'{{1}}'}}") == "{{1}}"
+    assert plan.eval(" {{-1}} ") == -1
+    assert not plan.eval("{{not 1}}")
+    assert not plan.eval("{{True and False}}")
+    assert plan.eval("{{True or False}}")
+    assert plan.eval("{{1 + 1}}") == 2
+    assert plan.eval("{{2**3}}") == 8
+    assert plan.eval("{{3 % 2}}") == 1
+    assert plan.eval("{{3 // 2}}") == 1
+    assert plan.eval("{{2.5 + (2 + 3) / 2}}") == 5
+    assert plan.eval("{{1 < 2}}")
+    assert plan.eval("{{1 < 23}}")
+    assert not plan.eval("{{1 < 2 > 3}}")
+    assert plan.eval("{{$x}}") == 1
+    assert plan.eval("{{'$x'}}") == "x"
+    assert plan.eval("{{'$$x'}}") == "$x"
+    assert plan.eval("{{$x + $y}}") == 2
+    assert plan.eval("$x + 1") == 2
+    assert plan.eval("1 + $x") == "1 + $x"
+    assert plan.eval("{{1 + $y}}") == 2
+    assert plan.eval("{{ {'a': {'b': 1}} }}") == {"a": {"b": 1}}
     assert plan.eval("$dummy") is None
-    assert plan.eval("[1, 2]") == [1, 2]
-    assert plan.eval("[$dummy, 2]") == [None, 2]
-
-    with pytest.raises(
-        PlanError, match=re.escape("Syntax error in expression: 1 + * 1")
-    ):
-        plan.eval("1 + * 1")
-
+    assert plan.eval("$$dummy") == "$dummy"
+    assert plan.eval("{{[1, 2]}}") == [1, 2]
+    assert plan.eval("{{[$dummy, 2]}}") == [None, 2]
+    expr = "{{1 + * 1}}"
+    with pytest.raises(PlanError, match=re.escape(f"Invalid expression: {expr}")):
+        plan.eval(expr)
     with pytest.raises(
         PlanError,
         match=re.escape("Unknown plan variable: `z`"),
     ):
-        plan.eval("$z + 1")
-
+        plan.eval("$z")
     assert isinstance(plan.eval("$results"), Results)
     assert plan.eval("$results.result_id") >= 0
 
@@ -139,55 +146,33 @@ def test_interpolate_string(enopt_config: Any, evaluator: Any) -> None:
         "variables": {
             "config": enopt_config,
             "results": None,
+            "x": 1,
+            "i": "b",
         },
-        "steps": [
-            {
-                "run": "optimizer",
-                "with": {
-                    "config": "$config",
-                    "tags": "opt",
-                },
-            },
-        ],
-        "results": [
-            {"run": "tracker", "with": {"var": "results", "tags": "opt"}},
-        ],
+        "steps": [],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(parsed_config, context)
-    assert plan.interpolate_string("${{ 1 }}") == "1"
-    assert plan.interpolate_string("${{ -1 }}") == "-1"
-    assert plan.interpolate_string("${{ not 1 }}") == "False"
-    assert plan.interpolate_string("${{ True and False }}") == "False"
-    assert plan.interpolate_string("${{ True or False }}") == "True"
-    assert plan.interpolate_string("${{ 1 + 1 }}") == "2"
-    assert plan.interpolate_string("${{ 2**3 }}") == "8"
-    assert plan.interpolate_string("${{ 3 % 2 }}") == "1"
-    assert plan.interpolate_string("${{ 3 // 2 }}") == "1"
-    assert plan.interpolate_string("${{ 2.5 + (2 + 3) / 2 }}") == "5.0"
-    assert plan.interpolate_string("${{ 1 < 2 }}") == "True"
-    assert plan.interpolate_string("${{ 1 < 2 < 3 }}") == "True"
-    assert plan.interpolate_string("${{ 1 < 2 > 3 }}") == "False"
-
-    assert plan.interpolate_string("${{ $results }}") == "None"
-    assert plan.interpolate_string("${{ [1, 2] }}") == "[1, 2]"
-    assert plan.interpolate_string("${{ [$results, 2] }}") == "[None, 2]"
-
-    assert plan.interpolate_string("a ${{ 1 }} b") == "a 1 b"
-    assert plan.interpolate_string("a ${{ 1 + 1 }} b") == "a 2 b"
-    assert plan.interpolate_string("a ${{ 1 + 1 }} b ${{ $results }}") == "a 2 b None"
-
-    with pytest.raises(
-        PlanError,
-        match=re.escape("Syntax error in expression: 1 + 1 ${{ x"),
-    ):
-        plan.interpolate_string("a $results ${{ 1 + 1 ${{ x }} }} b")
-
-    with pytest.raises(
-        PlanError, match=re.escape("Syntax error in expression: 1 + * 1")
-    ):
-        plan.interpolate_string("${{ 1 + * 1 }}")
+    plan.run()
+    assert plan.eval("[[1]]") == "1"
+    assert plan.eval("[[[1]]]") == "[1]"
+    assert plan.eval("[[{{ $x }}]]") == "1"
+    assert plan.eval("[[ {{not 1}} ]]") == " False "
+    assert plan.eval("[[{{True and False}}]]") == "False"
+    assert plan.eval("[[a {{ 1 }} b]]") == "a 1 b"
+    assert plan.eval("[[a {{ 1 + 1 }} b]]") == "a 2 b"
+    assert plan.eval("[[{{ {'a': {'b': 1}} }}]]") == "{'a': {'b': 1}}"
+    assert (
+        plan.eval("[[{{ {'a': {$i: 1}} }} - {{ {'a': {'b': $x}} }}]]")
+        == "{'a': {'b': 1}} - {'a': {'b': 1}}"
+    )
+    expr = "[[a $results {{ 1 + 1 {{ x }} }} b]]"
+    with pytest.raises(PlanError, match=re.escape(f"Invalid expression: {expr}")):
+        plan.eval(expr)
+    expr = "[[{{ 1 + * 1 }}]]"
+    with pytest.raises(PlanError, match=re.escape(f"Invalid expression: {expr}")):
+        plan.eval(expr)
 
 
 def test_set(evaluator: Any) -> None:
@@ -199,11 +184,13 @@ def test_set(evaluator: Any) -> None:
             "u": None,
             "q": {"a": 1},
             "r": {"a": {10: {}}},
+            "i": "a",
         },
         "steps": [
             {"run": "set", "with": {"x": 1}},
-            {"run": "set", "with": {"y": "$x + 1", "z": "$q['a']"}},
-            {"run": "set", "with": [{"q['a']": 2}, {"r['a'][10]": 1}]},
+            {"run": "set", "with": {"y": "{{$x + 1}}", "z": "$q[$i]"}},
+            {"run": "set", "with": {"q[$i]": 2}},
+            {"run": "set", "with": {"r['a'][10]": 1}},
         ],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
@@ -233,26 +220,6 @@ def test_set_keys_invalid(evaluator: Any) -> None:
         plan.run()
 
 
-def test_invalid_identifier(evaluator: Any) -> None:
-    plan_config: Dict[str, Any] = {
-        "variables": {
-            "x": None,
-            "y": None,
-        },
-        "steps": [
-            {"run": "set", "with": {"x": 1}},
-            {"run": "set", "with": {"y": "1x + 1"}},
-        ],
-    }
-    parsed_config = PlanConfig.model_validate(plan_config)
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(parsed_config, context)
-    with pytest.raises(
-        PlanError, match=re.escape("Syntax error in expression: 1x + 1")
-    ):
-        plan.run()
-
-
 def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
     plan_config = {
         "variables": {
@@ -268,7 +235,7 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
                     "config": "$config",
                     "tags": "optimal1",
                 },
-                "if": "1 > 0",
+                "if": "{{1 > 0}}",
             },
             {"run": "set", "with": {"x": 1}},
             {
@@ -390,7 +357,7 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 "run": "set",
                 "with": {
                     "saved_results": "$optimal",
-                    "optimal": "None",
+                    "optimal": None,
                 },
             },
         ],
@@ -810,7 +777,7 @@ def test_restart_optimum_with_reset(
                             "run": "set",
                             "with": {
                                 "initial": "$optimum",
-                                "optimum": "None",
+                                "optimum": None,
                             },
                         },
                         {
@@ -864,7 +831,7 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
         "restart": "$counter",
         "foo": 1,
         "bar": "string",
-        "complex": "string ${{ 1 + 1 }} ${{ $counter }}",
+        "complex": "[[string {{ 1 + 1 }} {{ $counter }}]]",
     }
 
     plan_config = {

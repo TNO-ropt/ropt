@@ -41,12 +41,15 @@ class DefaultPrintStep(PlanStep):
             plan:   The plan that runs this step
         """
         super().__init__(config, plan)
-        self._with = (
+        _with = (
             DefaultPrintWith.model_validate({"message": config.with_})
             if isinstance(config.with_, str)
             else DefaultPrintWith.model_validate(config.with_)
         )
+        self._message = _with.message.strip()
+        if not (self._message.startswith("[[]]") and self._message.endswith("]]")):
+            self._message = "[[" + self._message + "]]"
 
     def run(self) -> None:
         """Run the print step."""
-        print(self.plan.interpolate_string(self._with.message))  # noqa: T201
+        print(self.plan.eval(self._message))  # noqa: T201

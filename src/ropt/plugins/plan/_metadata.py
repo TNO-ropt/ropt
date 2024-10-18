@@ -74,10 +74,5 @@ class DefaultMetadataHandler(ResultHandler):
         ):
             for results in event.results:
                 for key, expr in self._with.data.items():
-                    if not isinstance(expr, str):
-                        results.metadata[key] = expr
-                    elif expr.startswith("$") and expr[1:] in self._plan:
-                        results.metadata[key] = self._plan[expr[1:]]
-                    else:
-                        results.metadata[key] = self.plan.interpolate_string(expr)
+                    results.metadata[key] = self._plan.eval(expr)
         return event
