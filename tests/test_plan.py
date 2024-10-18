@@ -100,35 +100,36 @@ def test_eval(enopt_config: Any, evaluator: Any) -> None:
     plan = Plan(parsed_config, context)
     plan.run()
 
-    assert plan.eval("1") == 1
-    assert plan.eval(" -1 ") == -1
-    assert not plan.eval("not 1")
-    assert not plan.eval("True and False")
-    assert plan.eval("True or False")
-    assert plan.eval("1 + 1") == 2
-    assert plan.eval("2**3") == 8
-    assert plan.eval("3 % 2") == 1
-    assert plan.eval("3 // 2") == 1
-    assert plan.eval("2.5 + (2 + 3) / 2") == 5
-    assert plan.eval("1 < 2")
-    assert plan.eval("1 < 23")
-    assert not plan.eval("1 < 2 > 3")
-    assert plan.eval("$x + $y") == 2
+    assert plan.eval("${{1}}") == 1
+    assert plan.eval(" ${{-1}} ") == -1
+    assert not plan.eval("${{not 1}}")
+    assert not plan.eval("${{True and False}}")
+    assert plan.eval("${{True or False}}")
+    assert plan.eval("${{1 + 1}}") == 2
+    assert plan.eval("${{2**3}}") == 8
+    assert plan.eval("${{3 % 2}}") == 1
+    assert plan.eval("${{3 // 2}}") == 1
+    assert plan.eval("${{2.5 + (2 + 3) / 2}}") == 5
+    assert plan.eval("${{1 < 2}}")
+    assert plan.eval("${{1 < 23}}")
+    assert not plan.eval("${{1 < 2 > 3}}")
+    assert plan.eval("${{$x + $y}}") == 2
+    assert plan.eval("${{1 + $y}}") == 2
 
     assert plan.eval("$dummy") is None
-    assert plan.eval("[1, 2]") == [1, 2]
-    assert plan.eval("[$dummy, 2]") == [None, 2]
+    assert plan.eval("${{[1, 2]}}") == [1, 2]
+    assert plan.eval("${{[$dummy, 2]}}") == [None, 2]
 
     with pytest.raises(
         PlanError, match=re.escape("Syntax error in expression: 1 + * 1")
     ):
-        plan.eval("1 + * 1")
+        plan.eval("${{1 + * 1}}")
 
     with pytest.raises(
         PlanError,
         match=re.escape("Unknown plan variable: `z`"),
     ):
-        plan.eval("$z + 1")
+        plan.eval("$z")
 
     assert isinstance(plan.eval("$results"), Results)
     assert plan.eval("$results.result_id") >= 0
@@ -202,8 +203,9 @@ def test_set(evaluator: Any) -> None:
         },
         "steps": [
             {"run": "set", "with": {"x": 1}},
-            {"run": "set", "with": {"y": "$x + 1", "z": "$q['a']"}},
-            {"run": "set", "with": [{"q['a']": 2}, {"r['a'][10]": 1}]},
+            {"run": "set", "with": {"y": "${{$x + 1}}", "z": "$q['a']"}},
+            {"run": "set", "with": {"q['a']": 2}},
+            {"run": "set", "with": {"r['a'][10]": 1}},
         ],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
@@ -230,26 +232,6 @@ def test_set_keys_invalid(evaluator: Any) -> None:
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(parsed_config, context)
     with pytest.raises(PlanError, match="Not a valid dict-like variable: y"):
-        plan.run()
-
-
-def test_invalid_identifier(evaluator: Any) -> None:
-    plan_config: Dict[str, Any] = {
-        "variables": {
-            "x": None,
-            "y": None,
-        },
-        "steps": [
-            {"run": "set", "with": {"x": 1}},
-            {"run": "set", "with": {"y": "1x + 1"}},
-        ],
-    }
-    parsed_config = PlanConfig.model_validate(plan_config)
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(parsed_config, context)
-    with pytest.raises(
-        PlanError, match=re.escape("Syntax error in expression: 1x + 1")
-    ):
         plan.run()
 
 
@@ -390,7 +372,7 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 "run": "set",
                 "with": {
                     "saved_results": "$optimal",
-                    "optimal": "None",
+                    "optimal": None,
                 },
             },
         ],
@@ -810,7 +792,7 @@ def test_restart_optimum_with_reset(
                             "run": "set",
                             "with": {
                                 "initial": "$optimum",
-                                "optimum": "None",
+                                "optimum": None,
                             },
                         },
                         {

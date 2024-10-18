@@ -259,8 +259,6 @@ class Plan:
             return re.sub(r"\${{(.*?)}}|\$\$|\$([^\W0-9][\w\.]*)", _substitute, value)
         return str(value)
 
-        return re.sub(r"\${{(.*?)}}", _substitute, value)
-
     def _eval_expr(self, expr: str) -> Any:  # noqa: ANN401
         # Remove $ from identifiers, before sending the string to the parser:
         stripped = expr
@@ -318,19 +316,20 @@ class Plan:
 
         value = value.strip()
 
-        # Recursively evaluate when enclosed in `${{ }}`:
-        if value.startswith("${{") and value.endswith("}}"):
-            return self.eval(value[3:-2].strip())
+        if value:
+            # Evaluate when enclosed in `${{ }}`:
+            if value.startswith("${{") and value.endswith("}}"):
+                return self._eval_expr(value[3:-2].strip())
 
-        # Identifiers are not evaluated, their value is returned unchanged:
-        if value.startswith("$") and value.isidentifier():
-            if value[1:] in self:
-                return self[value[1:]]
-            msg = f"Unknown plan variable: `{value[1:]}`"
-            raise PlanError(msg)
+            # Evaluate as an identifier when starting with `$`:
+            if value.startswith("$"):
+                split_value = value.replace("[", ".").split(".", maxsplit=1)[0][1:]
+                if split_value.isidentifier() and split_value in self:
+                    return self._eval_expr(value)
+                msg = f"Unknown plan variable: `{split_value}`"
+                raise PlanError(msg)
 
-        # Evaluate as an expression:
-        return self._eval_expr(value)
+        return value
 
     def add_observer(
         self,
@@ -369,7 +368,7 @@ class Plan:
 
     def _check_condition(self, config: StepConfig) -> bool:
         if config.if_ is not None:
-            return bool(self.eval(config.if_))
+            return bool(self.eval("${{" + config.if_ + "}}"))
         return True
 
     def __getitem__(self, name: str) -> Any:  # noqa: ANN401
@@ -472,4 +471,4 @@ class _ReplaceFields(ast.NodeTransformer):
                 return node
             msg = f"Error in expression: the type of `{node.id}` is not supported"
             raise PlanError(msg)
-        return ast.Constant(node.id)
+        return node
