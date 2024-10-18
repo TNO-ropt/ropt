@@ -425,7 +425,7 @@ class Plan:
         return name in self._vars
 
 
-def _is_valid(node: ast.AST) -> bool:  # noqa: PLR0911
+def _is_valid(node: ast.AST) -> bool:  # noqa: C901, PLR0911
     if isinstance(node, ast.Constant):
         return node.value is None or type(node.value) in _VALID_TYPES
     if isinstance(node, ast.UnaryOp):
@@ -451,6 +451,10 @@ def _is_valid(node: ast.AST) -> bool:  # noqa: PLR0911
         return _is_valid(node.slice)
     if isinstance(node, ast.Index):
         return _is_valid(node.value)  # type: ignore[attr-defined]
+    if isinstance(node, ast.Attribute):
+        if isinstance(node.value, ast.Attribute):
+            return _is_valid(node.value)
+        return bool(isinstance(node.value, ast.Name))
     return bool(isinstance(node, ast.Name))
 
 

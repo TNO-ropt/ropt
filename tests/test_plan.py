@@ -131,6 +131,7 @@ def test_eval(enopt_config: Any, evaluator: Any) -> None:
         plan.eval("$z + 1")
 
     assert isinstance(plan.eval("$results"), Results)
+    assert plan.eval("$results.result_id") >= 0
 
 
 def test_interpolate_string(enopt_config: Any, evaluator: Any) -> None:
