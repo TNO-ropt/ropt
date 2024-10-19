@@ -761,15 +761,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.interpolate_string" class="md-nav__link">
-    <span class="md-ellipsis">
-      interpolate_string
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.eval" class="md-nav__link">
     <span class="md-ellipsis">
       eval
@@ -1511,15 +1502,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.interpolate_string" class="md-nav__link">
-    <span class="md-ellipsis">
-      interpolate_string
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.eval" class="md-nav__link">
     <span class="md-ellipsis">
       eval
@@ -2148,93 +2130,6 @@ plan.</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plan.Plan.interpolate_string" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">interpolate_string</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Parse a value as an expression or an interpolated string.</p>
-<p>If the value is not a string, it is returned unchanged. If it is a
-string, it is first stripped of leading and trailing whitespace and then
-parsed according to the following rules:</p>
-<ul>
-<li>If the string starts with a <code>$</code>, it is evaluated using the
-  <a class="autorefs autorefs-internal" href="#ropt.plan.Plan.eval"><code>eval</code></a> method of the plan object. This will
-  replace strings of the form <code>$identifier</code> with the corresponding plan
-  value and evaluate strings of the form <code>${{ expr }}</code> as a mathematical
-  expression, optionally containing variables in the form <code>$identifier</code>.</li>
-<li>If the string does not start with a <code>$</code>, it is returned after
-  interpolating any substrings delimited by <code>${{</code> and <code>}}</code> by passing
-  them to the <a class="autorefs autorefs-internal" href="#ropt.plan.Plan.eval"><code>eval</code></a> method.</li>
-</ul>
-
-
-<details class="note" open>
-  <summary>Note</summary>
-  <p>The string <code>$$</code> is not interpolated but replaced with a single <code>$</code>.</p>
-</details>
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>value</code></td>
-            <td>
-                  <code><span title="typing.Any">Any</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The value to evaluate</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="typing.Any">Any</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The result of the evaluation.</p>
-              </div>
             </td>
           </tr>
       </tbody>
