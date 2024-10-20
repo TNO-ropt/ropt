@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import copy
 import re
-from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
-from typing import TYPE_CHECKING, Any, List, Union
+from collections.abc import Mapping, MutableMapping, MutableSequence
+from typing import TYPE_CHECKING, Any, List
 
 from ropt.exceptions import PlanError
 from ropt.plugins.plan.base import PlanStep
@@ -27,7 +27,10 @@ class DefaultSetStep(PlanStep):
         """
         super().__init__(config, plan)
 
-        self._vars: List[Any] = []
+        self._targets: List[Any] = []
+        self._names: List[str] = []
+        self._is_attrs: List[List[bool]] = []
+        self._keys: List[List[str]] = []
         self._values: List[Any] = []
 
         for list_item in (
@@ -36,29 +39,46 @@ class DefaultSetStep(PlanStep):
             if not isinstance(list_item, Mapping):
                 msg = "`set` must be called with a var/value dict or a list of var/value dicts"
                 raise PlanError(msg)
-            for var, value in list_item.items():
-                pattern = re.findall(r"([^\[]+)|\[(.*?)\]", var.strip())
-                self._vars.append([x.strip() for group in pattern for x in group if x])
+            for target, value in list_item.items():
+                pattern = re.findall(
+                    r"([^\[^\.]+)|(\[.*?\])|(\.\b\w+\b)", target.strip()
+                )
+                name, *keys = [x.strip() for group in pattern for x in group if x]
+                self._targets.append(target)
+                self._names.append(name)
+                self._is_attrs.append([key.startswith(".") for key in keys])
+                self._keys.append(
+                    [
+                        key[1:] if key.startswith(".") else "{{" + key[1:-1] + "}}"
+                        for key in keys
+                    ]
+                )
                 self._values.append(value)
-                if self._vars[-1][0] not in self._plan:
-                    msg = f"Unknown variable name: {self._vars[-1]}"
+                if name not in self._plan:
+                    msg = f"Unknown variable name: {name}"
                     raise PlanError(msg)
 
     def run(self) -> None:
         """Run the set step."""
-        for var_and_keys, value in zip(self._vars, self._values):
-            var, *keys = var_and_keys
+        for target_string, name, is_attrs, keys, value in zip(
+            self._targets, self._names, self._is_attrs, self._keys, self._values
+        ):
             if not keys:
-                self._plan[var] = copy.deepcopy(self._plan.eval(value))
+                self._plan[name] = copy.deepcopy(self._plan.eval(value))
             else:
-                msg = f"Not a valid dict-like variable: {var}"
-                keys = [self.plan.eval("{{" + key + "}}") for key in keys]
-                target: Union[MutableMapping[Any, Any], Sequence[Any]] = self._plan[var]
+                msg = f"Not a valid target: {target_string}"
+                *parsed_keys, last_key = [self.plan.eval(key) for key in keys]
+                target = self._plan[name]
                 try:
-                    for key in keys[:-1]:
-                        target = target[key]
-                except KeyError:
+                    for key, attr in zip(parsed_keys, is_attrs[:-1]):
+                        target = getattr(target, key) if attr else target[key]
+                except (AttributeError, KeyError):
                     raise PlanError(msg) from None
-                if not isinstance(target, (MutableMapping, MutableSequence)):
-                    raise PlanError(msg)
-                target[keys[-1]] = copy.deepcopy(self._plan.eval(value))
+                if is_attrs[-1]:
+                    if not (hasattr(target, last_key)):
+                        raise PlanError(msg)
+                    setattr(target, last_key, copy.deepcopy(self._plan.eval(value)))
+                else:
+                    if not isinstance(target, (MutableMapping, MutableSequence)):
+                        raise PlanError(msg)
+                    target[last_key] = copy.deepcopy(self._plan.eval(value))

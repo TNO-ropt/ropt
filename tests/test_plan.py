@@ -175,7 +175,15 @@ def test_interpolate_string(enopt_config: Any, evaluator: Any) -> None:
         plan.eval(expr)
 
 
-def test_set(evaluator: Any) -> None:
+def test_set1(evaluator: Any) -> None:
+    class Obj:
+        pass
+
+    obj1 = Obj()
+    obj2 = Obj()
+    obj2.c1 = {20: 1}  # type: ignore[attr-defined]
+    obj1.b_b = obj2  # type: ignore[attr-defined]
+
     plan_config: Dict[str, Any] = {
         "variables": {
             "x": None,
@@ -185,12 +193,14 @@ def test_set(evaluator: Any) -> None:
             "q": {"a": 1},
             "r": {"a": {10: {}}},
             "i": "a",
+            "s": obj1,
         },
         "steps": [
             {"run": "set", "with": {"x": 1}},
             {"run": "set", "with": {"y": "{{$x + 1}}", "z": "$q[$i]"}},
             {"run": "set", "with": {"q[$i]": 2}},
             {"run": "set", "with": {"r['a'][10]": 1}},
+            {"run": "set", "with": {"s.b_b.c1[20]": 1}},
         ],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
@@ -202,6 +212,7 @@ def test_set(evaluator: Any) -> None:
     assert plan["z"] == 1
     assert plan["q"] == {"a": 2}
     assert plan["r"] == {"a": {10: 1}}
+    assert plan["s"].b_b.c1 == {20: 1}
 
 
 def test_set_keys_invalid(evaluator: Any) -> None:
@@ -216,7 +227,7 @@ def test_set_keys_invalid(evaluator: Any) -> None:
     parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(parsed_config, context)
-    with pytest.raises(PlanError, match="Not a valid dict-like variable: y"):
+    with pytest.raises(PlanError, match="Not a valid target: y"):
         plan.run()
 
 
