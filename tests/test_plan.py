@@ -271,7 +271,9 @@ def test_set_keys_exception(evaluator: Any) -> None:
     parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(parsed_config, context)
-    with pytest.raises(PlanError, match="Not a valid target: y"):
+    with pytest.raises(
+        PlanError, match=re.escape("Invalid attribute access: y['a']['b']")
+    ):
         plan.run()
 
 

@@ -29,7 +29,6 @@ class DefaultSetStep(PlanStep):
 
         self._targets: List[Any] = []
         self._names: List[str] = []
-        self._is_attrs: List[List[bool]] = []
         self._keys: List[List[str]] = []
         self._values: List[Any] = []
 
@@ -44,9 +43,11 @@ class DefaultSetStep(PlanStep):
                     r"([^\[^\.]+)|(\[.*?\])|(\.\b\w+\b)", target.strip()
                 )
                 name, *keys = [x.strip() for group in pattern for x in group if x]
+                if name not in self._plan:
+                    msg = f"Unknown variable name: {name}"
+                    raise PlanError(msg)
                 self._targets.append(target)
                 self._names.append(name)
-                self._is_attrs.append([key.startswith(".") for key in keys])
                 self._keys.append(
                     [
                         key[1:] if key.startswith(".") else "{{" + key[1:-1] + "}}"
@@ -54,31 +55,35 @@ class DefaultSetStep(PlanStep):
                     ]
                 )
                 self._values.append(value)
-                if name not in self._plan:
-                    msg = f"Unknown variable name: {name}"
-                    raise PlanError(msg)
 
     def run(self) -> None:
         """Run the set step."""
-        for target_string, name, is_attrs, keys, value in zip(
-            self._targets, self._names, self._is_attrs, self._keys, self._values
+        for target_string, name, keys, value in zip(
+            self._targets, self._names, self._keys, self._values
         ):
             if not keys:
                 self._plan[name] = copy.deepcopy(self._plan.eval(value))
             else:
-                msg = f"Not a valid target: {target_string}"
-                *parsed_keys, last_key = [self.plan.eval(key) for key in keys]
                 target = self._plan[name]
                 try:
-                    for key, attr in zip(parsed_keys, is_attrs[:-1]):
-                        target = getattr(target, key) if attr else target[key]
+                    for key in keys[:-1]:
+                        target = self._get_target(target, key)
+                    self._set_target(target, keys[-1], value)
                 except (AttributeError, KeyError):
+                    msg = f"Invalid attribute access: {target_string}"
                     raise PlanError(msg) from None
-                if is_attrs[-1]:
-                    if not (hasattr(target, last_key)):
-                        raise PlanError(msg)
-                    setattr(target, last_key, copy.deepcopy(self._plan.eval(value)))
-                else:
-                    if not isinstance(target, (MutableMapping, MutableSequence)):
-                        raise PlanError(msg)
-                    target[last_key] = copy.deepcopy(self._plan.eval(value))
+
+    def _get_target(self, target: Any, key: str) -> Any:  # noqa: ANN401
+        if key.startswith("{{"):
+            if not isinstance(target, (MutableMapping, MutableSequence)):
+                raise KeyError
+            return target[self.plan.eval(key)]
+        return getattr(target, key)
+
+    def _set_target(self, target: Any, key: str, value: Any) -> None:  # noqa: ANN401
+        if key.startswith("{{"):
+            if not isinstance(target, (MutableMapping, MutableSequence)):
+                raise KeyError
+            target[self.plan.eval(key)] = copy.deepcopy(self._plan.eval(value))
+        else:
+            setattr(target, key, copy.deepcopy(self._plan.eval(value)))

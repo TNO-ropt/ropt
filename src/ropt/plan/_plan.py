@@ -440,7 +440,7 @@ class _ReplaceFields(ast.NodeTransformer):
             value = self._plan[node.id]
             if value is None or isinstance(value, _SUPPORTED_VARIABLE_TYPES):
                 self.vars[node.id] = value
-                return node
+                return self.generic_visit(node)
             msg = f"Error in expression: the type of `{node.id}` is not supported"
             raise PlanError(msg)
-        return node
+        return self.generic_visit(node)
