@@ -73,14 +73,98 @@ def test_run_basic(enopt_config: Any, evaluator: Any) -> None:
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
-def test_eval(enopt_config: Any, evaluator: Any) -> None:
+@pytest.mark.parametrize(
+    ("expr", "expected"),
+    [
+        ("", ""),
+        (" ", ""),
+        ("{{1}}", 1),
+        ("{{'1'}}", "1"),
+        ("{{'{{1}}'}}", "{{1}}"),
+        (" {{-1}} ", -1),
+        ("{{not 1}}", False),
+        ("{{True and False}}", False),
+        ("{{True or False}}", True),
+        ("{{1 + 1}}", 2),
+        ("{{2**3}}", 8),
+        ("{{3 % 2}}", 1),
+        ("{{3 // 2}}", 1),
+        ("{{2.5 + (2 + 3) / 2}}", 5),
+        ("{{1 < 2}}", True),
+        ("{{1 < 23}}", True),
+        ("{{1 < 2 > 3}}", False),
+        ("{{$x}}", 1),
+        ("{{'$x'}}", "x"),
+        ("{{'$$x'}}", "$x"),
+        ("{{$x + $y}}", 2),
+        ("$x + 1", 2),
+        ("1 + $x", "1 + $x"),
+        ("{{1 + $y}}", 2),
+        ("{{ {'a': {'b': 1}} }}", {"a": {"b": 1}}),
+        ("$dummy", None),
+        ("$$dummy", "$dummy"),
+        ("{{[1, 2]}}", [1, 2]),
+        ("{{[$dummy, 2]}}", [None, 2]),
+        ("[[1]]", "1"),
+        ("[[[1]]]", "[1]"),
+        ("[[{{ $x }}]]", "1"),
+        ("[[ {{not 1}} ]]", " False "),
+        ("[[{{True and False}}]]", "False"),
+        ("[[a {{ 1 }} b]]", "a 1 b"),
+        ("[[a {{ 1 + 1 }} b]]", "a 2 b"),
+        ("[[{{ {'a': {'b': 1}} }}]]", "{'a': {'b': 1}}"),
+        (
+            "[[{{ {'a': {$i: 1}} }} - {{ {'a': {'b': $x}} }}]]",
+            "{'a': {'b': 1}} - {'a': {'b': 1}}",
+        ),
+    ],
+)
+def test_eval_expr(evaluator: Any, expr: str, expected: Any) -> None:
+    plan_config: Dict[str, Any] = {
+        "variables": {
+            "dummy": None,
+            "x": 1,
+            "y": 1,
+            "i": "b",
+        },
+        "steps": [],
+    }
+    parsed_config = PlanConfig.model_validate(plan_config)
+    context = OptimizerContext(evaluator=evaluator())
+    plan = Plan(parsed_config, context)
+    plan.run()
+
+    assert plan.eval(expr) == expected
+
+
+@pytest.mark.parametrize(
+    ("expr", "message"),
+    [
+        ("{{1 + * 1}}", "Invalid expression: {}"),
+        ("$z", "Unknown plan variable: `z`"),
+        ("[[a {{ 1 + 1 {{ x }} }} b]]", "Invalid expression: {}"),
+        ("[[{{ 1 + * 1 }}]]", "Invalid expression: {}"),
+    ],
+)
+def test_eval_exception(evaluator: Any, expr: str, message: Any) -> None:
+    plan_config: Dict[str, Any] = {
+        "steps": [],
+    }
+    parsed_config = PlanConfig.model_validate(plan_config)
+    context = OptimizerContext(evaluator=evaluator())
+    plan = Plan(parsed_config, context)
+    plan.run()
+
+    with pytest.raises(PlanError, match=re.escape(message.format(expr))):
+        plan.eval(expr)
+
+
+def test_eval_attribute(enopt_config: Any, evaluator: Any) -> None:
     plan_config: Dict[str, Any] = {
         "variables": {
             "config": enopt_config,
             "dummy": None,
             "results": None,
-            "x": 1,
-            "y": 1,
         },
         "steps": [
             {
@@ -99,123 +183,83 @@ def test_eval(enopt_config: Any, evaluator: Any) -> None:
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(parsed_config, context)
     plan.run()
-
-    assert plan.eval("") == ""
-    assert plan.eval(" ") == ""
-    assert plan.eval("{{1}}") == 1
-    assert plan.eval("{{'1'}}") == "1"
-    assert plan.eval("{{'{{1}}'}}") == "{{1}}"
-    assert plan.eval(" {{-1}} ") == -1
-    assert not plan.eval("{{not 1}}")
-    assert not plan.eval("{{True and False}}")
-    assert plan.eval("{{True or False}}")
-    assert plan.eval("{{1 + 1}}") == 2
-    assert plan.eval("{{2**3}}") == 8
-    assert plan.eval("{{3 % 2}}") == 1
-    assert plan.eval("{{3 // 2}}") == 1
-    assert plan.eval("{{2.5 + (2 + 3) / 2}}") == 5
-    assert plan.eval("{{1 < 2}}")
-    assert plan.eval("{{1 < 23}}")
-    assert not plan.eval("{{1 < 2 > 3}}")
-    assert plan.eval("{{$x}}") == 1
-    assert plan.eval("{{'$x'}}") == "x"
-    assert plan.eval("{{'$$x'}}") == "$x"
-    assert plan.eval("{{$x + $y}}") == 2
-    assert plan.eval("$x + 1") == 2
-    assert plan.eval("1 + $x") == "1 + $x"
-    assert plan.eval("{{1 + $y}}") == 2
-    assert plan.eval("{{ {'a': {'b': 1}} }}") == {"a": {"b": 1}}
-    assert plan.eval("$dummy") is None
-    assert plan.eval("$$dummy") == "$dummy"
-    assert plan.eval("{{[1, 2]}}") == [1, 2]
-    assert plan.eval("{{[$dummy, 2]}}") == [None, 2]
-    expr = "{{1 + * 1}}"
-    with pytest.raises(PlanError, match=re.escape(f"Invalid expression: {expr}")):
-        plan.eval(expr)
-    with pytest.raises(
-        PlanError,
-        match=re.escape("Unknown plan variable: `z`"),
-    ):
-        plan.eval("$z")
     assert isinstance(plan.eval("$results"), Results)
     assert plan.eval("$results.result_id") >= 0
 
 
-def test_interpolate_string(enopt_config: Any, evaluator: Any) -> None:
+@pytest.mark.parametrize(
+    ("variables", "expr", "check", "expected"),
+    [
+        ({"x": None}, {"x": 1}, "x", 1),
+        ({"x": None, "y": None}, {"x": 1, "y": "{{$x + 1}}"}, "y", 2),
+        ({"x": {"a": 1}, "i": "a"}, {"x[$i]": 2}, "x", {"a": 2}),
+        ({"x": {"a": {10: {}}}}, {"x['a'][10]": 1}, "x", {"a": {10: 1}}),
+    ],
+)
+def test_set_step(
+    evaluator: Any,
+    variables: Dict[str, Any],
+    expr: Dict[str, Any],
+    check: str,
+    expected: Any,
+) -> None:
     plan_config: Dict[str, Any] = {
-        "variables": {
-            "config": enopt_config,
-            "results": None,
-            "x": 1,
-            "i": "b",
-        },
-        "steps": [],
+        "variables": variables,
+        "steps": [{"run": "set", "with": expr}],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(parsed_config, context)
     plan.run()
-    assert plan.eval("[[1]]") == "1"
-    assert plan.eval("[[[1]]]") == "[1]"
-    assert plan.eval("[[{{ $x }}]]") == "1"
-    assert plan.eval("[[ {{not 1}} ]]") == " False "
-    assert plan.eval("[[{{True and False}}]]") == "False"
-    assert plan.eval("[[a {{ 1 }} b]]") == "a 1 b"
-    assert plan.eval("[[a {{ 1 + 1 }} b]]") == "a 2 b"
-    assert plan.eval("[[{{ {'a': {'b': 1}} }}]]") == "{'a': {'b': 1}}"
-    assert (
-        plan.eval("[[{{ {'a': {$i: 1}} }} - {{ {'a': {'b': $x}} }}]]")
-        == "{'a': {'b': 1}} - {'a': {'b': 1}}"
-    )
-    expr = "[[a $results {{ 1 + 1 {{ x }} }} b]]"
-    with pytest.raises(PlanError, match=re.escape(f"Invalid expression: {expr}")):
-        plan.eval(expr)
-    expr = "[[{{ 1 + * 1 }}]]"
-    with pytest.raises(PlanError, match=re.escape(f"Invalid expression: {expr}")):
-        plan.eval(expr)
+    assert plan[check] == expected
 
 
-def test_set1(evaluator: Any) -> None:
-    class Obj:
-        pass
-
-    obj1 = Obj()
-    obj2 = Obj()
-    obj2.c1 = {20: 1}  # type: ignore[attr-defined]
-    obj1.b_b = obj2  # type: ignore[attr-defined]
-
+@pytest.mark.parametrize(
+    ("variables", "expr", "check", "expected"),
+    [
+        (
+            {"o": type("Obj", (object,), {"b_b": type("Obj", (object,), {"c1": 1})})},
+            {"o.b_b.c1": 2},
+            'plan["o"].b_b.c1',
+            2,
+        ),
+        (
+            {
+                "o": type(
+                    "Obj", (object,), {"b_b": type("Obj", (object,), {"c1": {20: 1}})}
+                )
+            },
+            {"o.b_b.c1[20]": 2},
+            'plan["o"].b_b.c1',
+            {20: 2},
+        ),
+        (
+            {"o": type("Obj", (object,), {"b_b": [type("Obj", (object,), {"c1": 1})]})},
+            {"o.b_b[0].c1": 2},
+            'plan["o"].b_b[0].c1',
+            2,
+        ),
+    ],
+)
+def test_set_step_attribute(
+    evaluator: Any,
+    variables: Dict[str, Any],
+    expr: Dict[str, Any],
+    check: str,
+    expected: Any,
+) -> None:
     plan_config: Dict[str, Any] = {
-        "variables": {
-            "x": None,
-            "y": None,
-            "z": None,
-            "u": None,
-            "q": {"a": 1},
-            "r": {"a": {10: {}}},
-            "i": "a",
-            "s": obj1,
-        },
-        "steps": [
-            {"run": "set", "with": {"x": 1}},
-            {"run": "set", "with": {"y": "{{$x + 1}}", "z": "$q[$i]"}},
-            {"run": "set", "with": {"q[$i]": 2}},
-            {"run": "set", "with": {"r['a'][10]": 1}},
-            {"run": "set", "with": {"s.b_b.c1[20]": 1}},
-        ],
+        "variables": variables,
+        "steps": [{"run": "set", "with": expr}],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(parsed_config, context)
     plan.run()
-    assert plan["x"] == 1
-    assert plan["y"] == 2
-    assert plan["z"] == 1
-    assert plan["q"] == {"a": 2}
-    assert plan["r"] == {"a": {10: 1}}
-    assert plan["s"].b_b.c1 == {20: 1}
+    assert eval(check) == expected  # noqa: S307
 
 
-def test_set_keys_invalid(evaluator: Any) -> None:
+def test_set_keys_exception(evaluator: Any) -> None:
     plan_config: Dict[str, Any] = {
         "variables": {
             "y": {"a": None},
