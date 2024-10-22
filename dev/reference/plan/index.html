@@ -1942,8 +1942,14 @@ entry points mechanism will be used.</p>
     <div class="doc doc-contents ">
 
         <p>Run the Plan.</p>
-<p>This method executes the steps of the plan. If a user abort event
-occurs, the method will return <code>True</code>.</p>
+<p>This method accepts an arbitrary number of inputs that are stored in the
+plan variables that are specified in the <code>inputs</code> section of the plan
+<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanConfig"><code>configuration</code></a>. The number of arguments
+must be equal to the number elements in that section otherwise an error
+will be raised.</p>
+<p>After execution of the steps, this method will return the contents of
+the plan variables that are specified in the <code>outputs</code> section of the
+plan <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanConfig"><code>configuration</code></a> as a tuple.</p>
 
     </div>
 
