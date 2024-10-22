@@ -122,7 +122,7 @@ class PlanConfig(BaseModel):
     inputs: List[str] = []
     outputs: List[str] = []
     variables: Dict[str, Any] = {}
-    steps: List[StepConfig]
+    steps: List[StepConfig] = []
     results: List[ResultHandlerConfig] = []
 
     model_config = ConfigDict(

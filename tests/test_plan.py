@@ -127,7 +127,6 @@ def test_eval_expr(evaluator: Any, expr: str, expected: Any) -> None:
             "y": 1,
             "i": "b",
         },
-        "steps": [],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
@@ -147,9 +146,7 @@ def test_eval_expr(evaluator: Any, expr: str, expected: Any) -> None:
     ],
 )
 def test_eval_exception(evaluator: Any, expr: str, message: Any) -> None:
-    plan_config: Dict[str, Any] = {
-        "steps": [],
-    }
+    plan_config: Dict[str, Any] = {}
     parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(parsed_config, context)
