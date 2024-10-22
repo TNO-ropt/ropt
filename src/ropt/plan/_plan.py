@@ -114,8 +114,15 @@ class Plan:
     def run(self, *args: Any) -> Tuple[Any, ...]:  # noqa: ANN401
         """Run the Plan.
 
-        This method executes the steps of the plan. If a user abort event
-        occurs, the method will return `True`.
+        This method accepts an arbitrary number of inputs that are stored in the
+        plan variables that are specified in the `inputs` section of the plan
+        [`configuration`][ropt.config.plan.PlanConfig]. The number of arguments
+        must be equal to the number elements in that section otherwise an error
+        will be raised.
+
+        After execution of the steps, this method will return the contents of
+        the plan variables that are specified in the `outputs` section of the
+        plan [`configuration`][ropt.config.plan.PlanConfig] as a tuple.
         """
         for var, value in self._plan_config.variables.items():
             self[var] = self.eval(value)

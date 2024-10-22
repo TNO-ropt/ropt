@@ -8,27 +8,29 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class ResultHandlerConfig(BaseModel):
-    """Configuration of a single result object.
+    """Configuration for a single result handler object.
 
-    Results handler objects process events emitted by the steps of the
-    optimization plan. They usually store information in plan variables that are
-    accessible to the steps and to the user via the plan object.
+    Result handler objects process events emitted by the steps of an
+    optimization plan. These objects can receive [`events`][ropt.plan.Event]
+    directly from the plan's steps, or from another result handler in a chain of
+    handlers, as defined in the `results` section of a
+    [`PlanConfig`][ropt.config.plan.PlanConfig] object. Upon receiving events,
+    handlers may perform actions such as modifying plan variables, generating
+    output, or updating the result objects included in the event.
 
-    The `run` string identifies the code that is run to initialize the result
-    handler object. It is used by the plugin manager to load the code.
+    The `run` string specifies the code that initializes the result handler.
+    This string is used by the plugin manager to load the handler's code.
 
-    Additional parameters needed by the handler objects are configured using the
-    `with_` attribute. The contents of the `with_` attribute depend on the type
-    of the handler object.
+    Additional parameters for the handler are configured using the `with_`
+    attribute, which varies depending on the type of handler.
 
     Note: `with` is an alias for `with_`
-        When parsing dictionaries into a `ResultHandlerConfig` object, the name of the
-        `with_` attribute should be replaced by by `with`, i.e. without the `_`
-        suffix.
+        When parsing dictionaries into a `ResultHandlerConfig` object, the
+        `with_` attribute should be replaced by `with` (without the underscore).
 
     Attributes:
-        run:   Identifies the code that initializes the object
-        with_: Additional parameters passed to the object
+        run:   Specifies the code used to initialize the result handler.
+        with_: Additional parameters passed to the result handler.
     """
 
     run: str
@@ -41,35 +43,42 @@ class ResultHandlerConfig(BaseModel):
 
 
 class StepConfig(BaseModel):
-    """Configuration of a single step.
+    """Configuration for a single step within an optimization plan.
 
-    A step is a single action within an optimization plan. The `run` string
-    identifies the code that executes te step. It is used by the plugin manager
-    to load the code.
+    A step represents a single action in the optimization process. It can access
+    and modify plan variables, execute tasks such as optimization runs, and emit
+    [`events`][ropt.plan.Event], for example, when intermediate optimization
+    results are generated.
 
-    Additional parameters needed by the step may be configured using the `with_`
-    attribute. The content of the `with_` attribute depends on the type of the
-    step.
+    The `run` string specifies the code that executes the step, and is used by
+    the plugin manager to load the appropriate code.
 
-    Execution of the step can be made conditional by providing an expression via
-    the `if_` attribute. The expression will be parsed and evaluated, and the
-    step will only be executed if the result is `True`.
+    Additional parameters required by the step can be configured using the
+    `with_` attribute, with its content varying based on the step type.
+
+    Execution of the step can be made conditional by providing an expression
+    through the `if_` attribute. This expression is evaluated, and the step is
+    executed only if the result is `True`.
 
     Note: `with` and `if` aliases
-        When parsing dictionaries into a `StepConfig` object, the name of the
-        `with_` attribute should be replaced by by `with`, and the name of the
-        `if_` attribute by `if`, i.e. without the `_` suffix
+        When parsing dictionaries into a `StepConfig` object, replace the
+        `with_` attribute with `with`, and `if_` with `if` (without the
+        underscore).
 
     Info: Conditional evaluation
-        Conditions defined via the `if_` attribute are evaluated by passing them
-        to the [`eval`][ropt.plan.Plan.eval] method of the plan object that is
-        executing the steps. Consult the documentation of the method for more
-        details on the expressions that can be evaluated.
+        Conditions specified via the `if_` attribute are evaluated using the
+        [`eval`][ropt.plan.Plan.eval] method of the plan object executing the
+        steps. Refer to the method's documentation for more information on
+        supported expressions.
+
+        While mathematical expressions often need to be enclosed within
+        `{{ ... }}` (double braces) in a plan configuration string, this is
+        optional for expressions passed via the `if_` attribute.
 
     Attributes:
-        run:   Identifies the code that runs the step
-        with_: Additional parameters passed to the step
-        if_:   Optional expression for conditional evaluation
+        run:   Specifies the code that runs the step.
+        with_: Additional parameters passed to the step.
+        if_:   An optional expression for conditional execution.
     """
 
     run: str
@@ -87,36 +96,43 @@ class StepConfig(BaseModel):
 class PlanConfig(BaseModel):
     """Configuration class for optimization plans.
 
-    An optimization plan configuration consists of two sections: a event
-    handlers section defined using the `handlers` attribute, and a section that
-    defines the tasks to perform by the `steps` attribute.
+    This class is used to configure the optimization workflows executed by a
+    [`Plan`][ropt.plan.Plan] object. A `PlanConfig` object is passed when the
+    plan is created, and it defines several key sections, each corresponding to
+    a different aspect of the plan's configuration:
 
-    The `handlers` attribute contains the configuration of the objects that
-    process events emitted by the steps. Result handler objects are initialized
-    before creating and running the steps.
+    `inputs`
+    : Defines the names of variables that will store the input values passed
+      when the optimization workflow is started via the
+      [`run`][ropt.plan.Plan.run] method.
 
-    When running a plan, arguments can be passed. The `inputs` attributes
-    denotes a list of input variables, that will be initialized with the passed
-    values.
+    `outputs`
+    : Specifies the names of variables whose values will be returned as a tuple
+      after the optimization workflow completes and the
+      [`run`][ropt.plan.Plan.run] method finishes execution.
 
-    After the plan has finished, a tuple of outputs can be returned. The
-    `outputs` attribute contains the names of the variables that will used to
-    generate the output tuple.
+    `variables`
+    : A dictionary of variable names and their associated values, which are set
+      and accessed during the execution of the plan.
 
-    Variables can be created on the fly by the steps, or by the result handler
-    objects, but can also be predefined by the `variables` attribute, giving
-    their name and value.
+    `steps`
+    : Describes the individual steps that are executed once the plan starts.
+      These steps can access and modify the variables defined in the `inputs`,
+      `outputs`, and `variables` sections. Additionally, steps may emit
+      [`events`][ropt.plan.Event], which are processed by the result handlers
+      defined in the `results` section.
 
-    After initializing the result handler objects, the steps are configured by
-    the entries given by the `steps` attribute and are initialized and executed
-    in order.
+    `results`
+    : Defines the result handlers that process events emitted by the steps.
+      Events are passed sequentially through each handler, with the first handler
+      receiving events directly from the steps and passing them along the chain.
 
     Attributes:
-        inputs:    The names of input variables
-        outputs:   The names of output variables
-        variables: Names and values of preset variables.
-        steps:     The steps that are executed by the plan
-        results:   The result handler objects to initialize
+        inputs:    A list of input variable names.
+        outputs:   A list of output variable names.
+        variables: A dictionary of preset variable names and values.
+        steps:     The steps to be executed in the plan.
+        results:   The result handler objects to initialize.
     """
 
     inputs: List[str] = []
