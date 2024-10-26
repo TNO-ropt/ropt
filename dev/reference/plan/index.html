@@ -1630,40 +1630,44 @@
 
     <div class="doc doc-contents first">
 
-        <p>Code to run optimization plans.</p>
+        <p>Code for executing optimization plans.</p>
 <p>Optimization plans consist of a series of steps that define an optimization
-workflow. This can be as simple as a single optimization run or involve
-multiple, potentially nested optimizations.</p>
-<p>These plans are configured using <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanConfig">PlanConfig</a>
-objects and executed by a <a class="autorefs autorefs-internal" href="#ropt.plan.Plan">Plan</a> object. A plan is composed of
-<a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler">ResultHandler</a> objects, which process
-and store data generated during execution, and
-<a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a> objects that define the individual
-steps executed by the plan. Both handler and step objects are implemented
-through a <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan">plugin</a> mechanism. The ropt library also offers
-several <a class="autorefs autorefs-internal" href="../default_plan_objects/#ropt.plugins.plan.default.DefaultPlanPlugin">default</a> plan objects to
-support various optimization workflows.</p>
-<p>A plan can store data identified by a name, known as plan variables. These
-variables can be accessed using the <code>[]</code> operator, and their existence can be
-checked with the <code>in</code> operator. Results handler and step objects typically store
-values in variables with their names set in their configuration.</p>
-<p>Result handler and step objects are configured using their corresponding
-configuration objects,
-<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.ResultHandlerConfig"><code>ResultHandlerConfig</code></a> and
-<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.StepConfig"><code>StepConfig</code></a>, respectively. These are Pydantic
-classes initialized via dictionaries of configuration values. These can be
-strings that are interpolated with the variables stored in the plan. Plan
-variables, prefixed with the <code>$</code> sign, will be substituted with their
-corresponding values. Any part of a string enclosed by <code>${{</code> and <code>}}</code> will be
-parsed as a mathematical expression, with variables replaced by their
-corresponding values in the plan.</p>
-<p>To execute optimization plans, additional shared state may be required across
-all steps, such as a callable for function evaluations or a random number
-generator. For this purpose, an <a class="autorefs autorefs-internal" href="#ropt.plan.OptimizerContext">OptimizerContext</a>
-object is supplied when creating the plan, which maintains this shared state.</p>
-<p>Initializing and executing a plan object for simple optimization cases can be
-cumbersome. The <a class="autorefs autorefs-internal" href="../plan_runner/#ropt.plan.OptimizationPlanRunner"><code>OptimizationPlanRunner</code></a>
-provides a convenient way to build and execute such plans with ease.</p>
+workflow. This workflow may be as simple as a single optimization run or as
+complex as multiple, potentially nested optimizations.</p>
+<p>These plans are configured using <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanConfig"><code>PlanConfig</code></a>
+objects and executed by a <a class="autorefs autorefs-internal" href="#ropt.plan.Plan"><code>Plan</code></a> object. A plan comprises
+<a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a> objects, which define the
+individual steps executed by the plan, and
+<a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler"><code>ResultHandler</code></a> objects, which process
+and store data generated during execution. Both step and handler objects are
+implemented through a <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan"><code>plugin</code></a> mechanism, which makes it
+convenient to extend the set of supported steps and result handlers. The <code>ropt</code>
+library also provides several <a class="autorefs autorefs-internal" href="../default_plan_objects/#ropt.plugins.plan.default.DefaultPlanPlugin">default plan
+objects</a> to support various
+optimization workflows.</p>
+<p>Plan objects can store values in plan variables, which are used to supply
+inputs, temporarily hold intermediate values, and provide output values for the
+optimization workflow. The plan object also supports the <code>[]</code> and <code>in</code>
+operators, allowing steps and result handlers to access the variables as needed.</p>
+<p>Steps and result handlers are configured via their respective configuration
+classes, <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.StepConfig"><code>StepConfig</code></a> and
+<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.ResultHandlerConfig"><code>ResultHandlerConfig</code></a>. These classes,
+built with Pydantic, are initialized with dictionaries of configuration values.
+Values can be specified directly or by referencing a variable name prefixed with
+<code>$</code>, which will be replaced by the variable’s value. Depending on their type,
+variables can be indexed (for mappings or sequences) or accessed via attributes
+using the <code>.</code> operator. Configuration values may also accept expression strings
+enclosed in <code>{{ ... }}</code> delimiters, allowing the use of variable references with
+the <code>$</code> prefix. These expressions are evaluated when the step or result handler
+runs, dynamically resolving to the desired value.</p>
+<p>Some optimization plans may require shared state across all steps, such as a
+callable for function evaluations or a random number generator. This shared
+state is provided through an <a class="autorefs autorefs-internal" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a>
+object, supplied when creating the plan.</p>
+<p>Setting up and executing a plan object for simple optimization cases can be
+complex. The <a class="autorefs autorefs-internal" href="../plan_runner/#ropt.plan.OptimizationPlanRunner"><code>OptimizationPlanRunner</code></a> class
+simplifies this process, providing a convenient way to build and execute
+straightforward plans.</p>
 
 
 
