@@ -71,16 +71,22 @@ class Plan:
         """Initialize a plan object.
 
         The plan requires a `PlanConfig` object and an `OptimizationContext`
-        object. The `plugin_manager` argument is optional and allows you to
-        specify plugins for the results handler and step objects that the plan
-        may use. If not provided, only plugins installed via Python's standard
-        entry points mechanism will be used.
+        object. An optional `plugin_manager` argument allows specification of
+        custom plugins for result handlers and step objects within the plan. If
+        omitted, the plan will use only plugins installed through Python's
+        standard entry points mechanism.
+
+        Plans may create other plans to be used within their workflow. If this
+        happens, the new plan will receive a reference to the original plan via
+        the `parent` argument.
 
         Args:
-            config:            The optimizer configuration
-            optimizer_context: The context in which the plan executes
-            plugin_manager:    An optional plugin manager
-            parent:            Optional parent plan that spawned this plan
+            config:            The configuration for the optimizer.
+            optimizer_context: The context in which the plan will execute,
+                               providing shared resources across steps.
+            plugin_manager:    Optional custom plugin manager for step and
+                               result handler plugins.
+            parent:            Optional parent plan that spawned this plan.
         """
         self._plan_config = config
         self._optimizer_context = optimizer_context
@@ -146,22 +152,25 @@ class Plan:
 
     @property
     def aborted(self) -> bool:
-        """Whether the plan was aborted by the user.
+        """Check if the plan was aborted by the user.
 
         Returns:
-            `True` if the user aborted the plan.
+            bool: `True` if the plan was aborted by the user; otherwise, `False`.
         """
         return self._aborted
 
     def create_steps(self, step_configs: List[StepConfig]) -> List[PlanStep]:
-        """Create step objects from step configs.
+        """Instantiate step objects from step configurations.
 
-        Given a list of step configuration objects, this method returns a list
-        of step objects, each configured according to its corresponding
-        configuration.
+        This method takes a list of step configuration objects and creates a
+        corresponding list of initialized step objects, each configured based on
+        its respective configuration.
 
         Args:
-            step_configs: A list of step configuration objects.
+            step_configs: List of configuration objects defining each step.
+
+        Returns:
+            List of configured step objects ready for execution in the plan.
         """
         return [
             self._plugin_manager.get_plugin("plan", method=step_config.run).create(
@@ -171,16 +180,17 @@ class Plan:
         ]
 
     def run_steps(self, steps: List[PlanStep]) -> None:
-        """Execute a list of steps.
+        """Execute a list of steps in the plan.
 
-        This method executes a list of plan steps and returns `True` if the
-        execution is aborted by the user.
+        This method iterates through and executes a provided list of plan steps.
+        If execution is interrupted by the user, it returns `True` to indicate
+        an aborted run.
 
         Args:
-            steps: A list of steps to execute.
+            steps: A list of steps to be executed sequentially.
 
         Returns:
-            `True` if the execution was aborted by the user; otherwise, `False`.
+            `True` if execution was aborted by the user; otherwise, `False`.
         """
         for task in steps:
             if self._check_condition(task.step_config):
@@ -190,16 +200,22 @@ class Plan:
 
     @property
     def plugin_manager(self) -> PluginManager:
-        """Return the plugin manager used by the plan.
+        """Return the plugin manager associated with the plan.
+
+        This method retrieves the plugin manager that is used to manage plugins
+        for the plan's steps and result handlers.
 
         Returns:
-            The plugin manager.
+            The plugin manager instance used by the plan.
         """
         return self._plugin_manager
 
     @property
     def optimizer_context(self) -> OptimizerContext:
-        """Return the optimizer context of the plan.
+        """Return the optimizer context associated with the plan.
+
+        This method retrieves the optimizer context object that provides shared
+        state and functionality for executing the optimization plan.
 
         Returns:
             The optimizer context object used by the plan.
@@ -213,13 +229,16 @@ class Plan:
         and plugin manager as the current plan. However, it does not inherit
         other properties, such as variables.
 
-        In addition, any signals that are emitted by the spawned plan are
-        forwarded to the observers that are connected to this plan. In other
-        words, signals emitted by the spawn plan 'bubble' up to the current
-        plan.
+        Any signals emitted within the spawned plan are forwarded to the result
+        handlers of the current plan and to the connected observers. In other
+        words, signals emitted by the spawned plan will "bubble up" to the
+        current plan.
 
         Args:
-            config: The configuration of the new plan
+            config: The configuration for the new plan.
+
+        Returns:
+            A new plan object configured with the provided configuration.
         """
         return Plan(
             config,
@@ -277,20 +296,31 @@ class Plan:
     def eval(self, value: Any) -> Any:  # noqa: ANN401
         """Evaluate the provided value as an expression.
 
-        If the value is not  a string, it is returned unchanged. Otherwise, it
-        is evaluates the expression and returns the result.
+        Evaluates an expression and returns the result based on the following
+        rules:
+
+        1. Non-string values are returned unchanged.
+        2. Strings starting with `$` are evaluated as expressions, primarily
+           replacing variable references with their values.
+        3. Strings starting with `$$` will return the string with one `$`
+           removed.
+        4. Strings enclosed in `{{ ... }}` are evaluated as mathematical
+           expressions, allowing variable references prefixed by `$`.
+        5. Strings enclosed in `[[ ... ]]` are treated as templates: `$`
+           prefixes or `{{ ... }}` expressions within the string are evaluated
+           and interpolated.
 
         Note:
-            The result of a mathematical expression is restricted to numerical
-            values, lists, and numpy arrays. However, plan variables can contain
+            The result of mathematical expressions is restricted to numerical
+            types, lists, and NumPy arrays. However, plan variables may contain
             values of any type, so expressions of the form `$identifier` may
-            evaluate to a result of any type.
+            evaluate to values of varying types.
 
         Args:
-            value: The expression to evaluate.
+            value: The expression to evaluate, as a string or any other type.
 
         Returns:
-            The result of the expression.
+            The evaluated result, which may vary in type depending on the evaluation context.
         """
         if isinstance(value, str):
             try:
@@ -307,26 +337,37 @@ class Plan:
     ) -> None:
         """Add an observer function.
 
-        Observer functions will be called during optimization if an event of the
-        given type occurs. The callable must accept an argument of the
-        [`Event`][ropt.plan.Event] class that contains information about the
-        event that occurred.
+        Observer functions are called during optimization when an event of the
+        specified type occurs. The provided callable must accept a single
+        argument of the [`Event`][ropt.plan.Event] class, which contains
+        information about the occurred event.
+
+        Note:
+            Before the observer functions are called, all result handlers are
+            executed, which may potentially modify the event.
 
         Args:
-            event:    The type of events to react to
-            callback: The function to call if the event is received
+            event:    The type of events that the observer will react to.
+            callback: The function to call when the specified event is received.
+                      This function should accept one argument, which will be
+                      an instance of the [`Event`][ropt.plan.Event] class.
         """
         self._subscribers[event].append(callback)
 
     def emit_event(self, event: Event) -> None:
-        """Emit an event of the given type with given data.
+        """Emit an event of the specified type with the provided data.
 
-        All callbacks for the given event type, that were added by the
-        `add_observer` method are called with the given event object as their
-        argument.
+        When this method is called, the following steps are executed:
+
+        1. All event handlers associated with the plan are invoked, which may
+           modify the event.
+        2. All observer functions registered for the specified event type via
+           the `add_observer` method are called.
+        3. If the plan was spawned from another plan, the `emit_event` method of
+           the parent plan is also called.
 
         Args:
-            event: The event to emit
+            event: The event object to emit.
         """
         for handler in self._handlers:
             event = handler.handle_event(event)
@@ -349,13 +390,13 @@ class Plan:
         """Get the value of a plan variable.
 
         This method implements the `[]` operator on the plan object to retrieve
-        the value of a plan variable.
+        the value associated with a specific plan variable.
 
         Args:
-            name: The name of the variable.
+            name: The name of the variable whose value is to be retrieved.
 
         Returns:
-            The value of the variable.
+            The value of the specified variable, which can be of any type.
         """
         if name in self._vars:
             return self._vars[name]
@@ -372,11 +413,11 @@ class Plan:
         """Set a plan variable to the given value.
 
         This method implements the `[]` operator on the plan object to set the
-        value of a plan variable.
+        value of a specific plan variable.
 
         Args:
-            name:  The name of the variable.
-            value: The value to assign.
+            name:  The name of the variable to set.
+            value: The value to assign to the variable.
         """
         if name not in self._vars:
             msg = f"Unknown variable name: `{name}`"

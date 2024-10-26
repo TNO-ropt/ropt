@@ -116,13 +116,19 @@ class EvaluatorResult:
 class Evaluator(Protocol):
     """Protocol for evaluator objects or callables.
 
-    The optimizers require a callback that follows this protocol.
+    The [`EnsembleEvaluator`][ropt.ensemble_evaluator.EnsembleEvaluator] class
+    requires a function evaluator callback that conforms to the
+    [`Evaluator`][ropt.evaluator.Evaluator] signature. This callback accepts
+    one or more variable vectors to evaluate, along with an
+    [`EvaluatorContext`][ropt.evaluator.EvaluatorContext] object that provides
+    relevant information for the evaluation. It returns an
+    [`EvaluatorResult`][ropt.evaluator.EvaluatorResult] object containing the results.
     """
 
     def __call__(
         self, variables: NDArray[np.float64], context: EvaluatorContext, /
     ) -> EvaluatorResult:
-        """The function evaluator callback signature.
+        r"""The function evaluator callback signature.
 
         The first argument of the function should be a matrix where each column is a
         variable vector. Depending on the information passed by the second argument, all
@@ -130,12 +136,37 @@ class Evaluator(Protocol):
         calculated.
 
         The second argument is an [`EvaluatorContext`][ropt.evaluator.EvaluatorContext]
-        object, providing supplementary information to the evaluation function.
+        object that provides supplementary information to the evaluation function.
+
+        The return value should be an [`EvaluatorResult`][ropt.evaluator.EvaluatorResult]
+        object containing the calculated values of the objective and constraint functions for
+        all variable vectors and realizations, along with any additional metadata.
 
         Args:
-            variables: The matrix of variables to evaluate
-            context:   The evaluation context
+            variables: The matrix of variables to evaluate.
+            context:   The evaluation context.
 
         Returns:
             An evaluation results object.
+
+        Tip: Reusing Objective and Non-linear Constraint Values
+            When defining multiple objectives, there may be a need to reuse the
+            same objective value multiple times. For instance, a total objective could
+            consist of the mean of the objectives for each realization, plus the
+            standard deviation of the same values. This can be implemented by defining
+            two objectives: the first calculated as the mean of the realizations, and
+            the second using a function transform to compute the standard deviations.
+            The optimizer is unaware that both objectives use the same set of
+            realizations. To prevent redundant calculations, the evaluator should
+            compute the results of the realizations once and return them for both
+            objectives.
+
+            Non-linear constraint values may potentially appear multiple times in the
+            `constraint_results` matrix. For example, to express the constraint \(a < F_c \le b\),
+            two constraints must be defined: \(F_c \ge a\) and \(F_c \le b\),
+            sharing the same function value \(F_c\) but differing in types and
+            right-hand sides (`ConstraintType.GE`/`ConstraintType.LE` and \(a\)/\(b\)). The
+            run method should ensure that the calculated value of \(F_c\) is the same in
+            both cases, which is most efficiently achieved by evaluating \(F_c\) only
+            once.
         """

@@ -1,43 +1,29 @@
-r"""Code to run optimization plans.
+r"""Code for executing optimization plans.
 
-Optimization plans consist of a series of steps that define an optimization
-workflow. This can be as simple as a single optimization run or involve
-multiple, potentially nested optimizations.
+The [`Plan`][ropt.plan.Plan] class is responsible for executing optimization
+plans, accepting optional input values and returning output values. The plan's
+configuration is handled by the [`PlanConfig`][ropt.config.plan.PlanConfig]
+class, which specifies the inputs, outputs, variables, steps, and result
+handlers.
 
-These plans are configured using [PlanConfig][ropt.config.plan.PlanConfig]
-objects and executed by a [Plan][ropt.plan.Plan] object. A plan is composed of
-[ResultHandler][ropt.plugins.plan.base.ResultHandler] objects, which process
-and store data generated during execution, and
-[PlanStep][ropt.plugins.plan.base.PlanStep] objects that define the individual
-steps executed by the plan. Both handler and step objects are implemented
-through a [plugin][ropt.plugins.plan] mechanism. The ropt library also offers
-several [default][ropt.plugins.plan.default.DefaultPlanPlugin] plan objects to
-support various optimization workflows.
+A plan comprises [`PlanStep`][ropt.plugins.plan.base.PlanStep] objects, which define
+individual steps, and [`ResultHandler`][ropt.plugins.plan.base.ResultHandler]
+objects, which process and store data generated during execution. Both step and
+handler objects are implemented through a [`plugin`][ropt.plugins.plan]
+mechanism, making it easy to extend the range of supported steps and result
+handlers. The `ropt` library also includes a [default plan
+plugin][ropt.plugins.plan.default.DefaultPlanPlugin] that provides a variety of
+steps and result handlers to support a broad range of optimization workflows.
 
-A plan can store data identified by a name, known as plan variables. These
-variables can be accessed using the `[]` operator, and their existence can be
-checked with the `in` operator. Results handler and step objects typically store
-values in variables with their names set in their configuration.
+Most optimization plans require shared state across all steps, such as a
+callable for function evaluations or a random number generator. This shared
+state is provided through an [`OptimizerContext`][ropt.plan.OptimizerContext]
+object, supplied when creating the plan.
 
-Result handler and step objects are configured using their corresponding
-configuration objects,
-[`ResultHandlerConfig`][ropt.config.plan.ResultHandlerConfig] and
-[`StepConfig`][ropt.config.plan.StepConfig], respectively. These are Pydantic
-classes initialized via dictionaries of configuration values. These can be
-strings that are interpolated with the variables stored in the plan. Plan
-variables, prefixed with the `$` sign, will be substituted with their
-corresponding values. Any part of a string enclosed by `${{` and `}}` will be
-parsed as a mathematical expression, with variables replaced by their
-corresponding values in the plan.
-
-To execute optimization plans, additional shared state may be required across
-all steps, such as a callable for function evaluations or a random number
-generator. For this purpose, an [OptimizerContext][ropt.plan.OptimizerContext]
-object is supplied when creating the plan, which maintains this shared state.
-
-Initializing and executing a plan object for simple optimization cases can be
-cumbersome. The [`OptimizationPlanRunner`][ropt.plan.OptimizationPlanRunner]
-provides a convenient way to build and execute such plans with ease.
+Setting up and executing a plan object for simple optimization cases can be
+complex. The [`OptimizationPlanRunner`][ropt.plan.OptimizationPlanRunner] class
+simplifies this process, providing a convenient way to build and execute
+straightforward plans involving a single optimization.
 """
 
 from ropt.optimization import EnsembleOptimizer

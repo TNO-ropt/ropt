@@ -54,7 +54,7 @@ class NonlinearConstraintsConfig(BaseModel):
     optimization. Both the `scales` and `auto_scale` arrays will be broadcasted
     to have a size equal to the number of constraint functions.
 
-    Info:
+    Info: Manual scaling and auto_scaling
         Both the `scales` values and the values obtained by auto-scaling will be
         applied. If `scales` is not supplied, auto-scaling will scale the
         constraints such that their initial values will be equal to one. Setting
@@ -71,6 +71,15 @@ class NonlinearConstraintsConfig(BaseModel):
     fields contain indices to the realization filter or function transform
     objects to use. These objects are configured in the parent
     [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
+
+    Info: Calculating auto-scaling values
+        For auto-scaling, the initial value of the constraint functions is used
+        based on the assumption that it is calculated as a weighted sum from an
+        ensemble of realizations, with weights specified by the `realizations`
+        field in the [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object. If
+        the `realizations_filters` and/or `function_transforms` fields are also
+        set, this assumption may not strictly hold; however, the scaling value
+        will still be calculated in the same way for practical purposes.
 
     Attributes:
         names:               The names of the constraint functions (optional)

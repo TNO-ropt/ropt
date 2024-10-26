@@ -1,9 +1,10 @@
-"""The optimizer and event classes.
+"""The main functionality for ensemble-based optimizations.
 
-The [`EnsembleOptimizer`][ropt.optimization.EnsembleOptimizer] class runs
-ensemble based optimizations. It is not recommended to used them directly to run
-optimizations, the [`Plan`][ropt.plan.Plan] functionality is usually more
-flexible and easier to use.
+The [`EnsembleOptimizer`][ropt.optimization.EnsembleOptimizer] class provides
+the core functionality for running ensemble-based optimizations. Direct use of
+this class is generally discouraged; instead, the [`Plan`][ropt.plan.Plan] or
+[`OptimizationPlanRunner`][ropt.plan.OptimizationPlanRunner] classes are
+recommended for more flexibility and ease of use.
 """
 
 from ._optimizer import (

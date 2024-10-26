@@ -7,41 +7,6 @@ from typing import Any, Dict, List, Optional, Union
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class ResultHandlerConfig(BaseModel):
-    """Configuration for a single result handler object.
-
-    Result handler objects process events emitted by the steps of an
-    optimization plan. These objects can receive [`events`][ropt.plan.Event]
-    directly from the plan's steps, or from another result handler in a chain of
-    handlers, as defined in the `results` section of a
-    [`PlanConfig`][ropt.config.plan.PlanConfig] object. Upon receiving events,
-    handlers may perform actions such as modifying plan variables, generating
-    output, or updating the result objects included in the event.
-
-    The `run` string specifies the code that initializes the result handler.
-    This string is used by the plugin manager to load the handler's code.
-
-    Additional parameters for the handler are configured using the `with_`
-    attribute, which varies depending on the type of handler.
-
-    Note: `with` is an alias for `with_`
-        When parsing dictionaries into a `ResultHandlerConfig` object, the
-        `with_` attribute should be replaced by `with` (without the underscore).
-
-    Attributes:
-        run:   Specifies the code used to initialize the result handler.
-        with_: Additional parameters passed to the result handler.
-    """
-
-    run: str
-    with_: Any = Field(default_factory=dict, alias="with")
-
-    model_config = ConfigDict(
-        extra="forbid",
-        validate_default=True,
-    )
-
-
 class StepConfig(BaseModel):
     """Configuration for a single step within an optimization plan.
 
@@ -86,6 +51,41 @@ class StepConfig(BaseModel):
         default_factory=dict, alias="with"
     )
     if_: Optional[str] = Field(default=None, alias="if")
+
+    model_config = ConfigDict(
+        extra="forbid",
+        validate_default=True,
+    )
+
+
+class ResultHandlerConfig(BaseModel):
+    """Configuration for a single result handler object.
+
+    Result handler objects process events emitted by the steps of an
+    optimization plan. These objects can receive [`events`][ropt.plan.Event]
+    directly from the plan's steps, or from another result handler in a chain of
+    handlers, as defined in the `results` section of a
+    [`PlanConfig`][ropt.config.plan.PlanConfig] object. Upon receiving events,
+    handlers may perform actions such as modifying plan variables, generating
+    output, or updating the result objects included in the event.
+
+    The `run` string specifies the code that initializes the result handler.
+    This string is used by the plugin manager to load the handler's code.
+
+    Additional parameters for the handler are configured using the `with_`
+    attribute, which varies depending on the type of handler.
+
+    Note: `with` is an alias for `with_`
+        When parsing dictionaries into a `ResultHandlerConfig` object, the
+        `with_` attribute should be replaced by `with` (without the underscore).
+
+    Attributes:
+        run:   Specifies the code used to initialize the result handler.
+        with_: Additional parameters passed to the result handler.
+    """
+
+    run: str
+    with_: Any = Field(default_factory=dict, alias="with")
 
     model_config = ConfigDict(
         extra="forbid",

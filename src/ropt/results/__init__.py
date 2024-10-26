@@ -1,42 +1,39 @@
 """Data classes for storing intermediate optimization results.
 
 During the optimization process, functions and gradients are calculated and need
-to be reported. To streamline this process, after new results become available,
-these are passed to callbacks as a tuple of [`Results`][ropt.results.Results]
-objects. These may be instances of the derived
-[`FunctionResults`][ropt.results.FunctionResults] or
-[`GradientResults`][ropt.results.GradientResults] classes, containing results
+to be reported. To streamline this process, new results are passed to callbacks
+as a tuple of [`Results`][ropt.results.Results] objects. These may be instances
+of the derived [`FunctionResults`][ropt.results.FunctionResults] or
+[`GradientResults`][ropt.results.GradientResults] classes, which contain results
 for function and gradient evaluations, respectively.
 
-These classes are nested `dataclasses` with some added features:
+These classes are nested `dataclasses` with several added features:
 
-- Variables may have scaling and offset factors associated with them. The
-  optimization will generally deal with scaled values. When the results object
-  is created, and variable scaling is configured, the values are scaled back and
-  added to the results object.
-- Objective and constraint function values may also have a scaling factor
-  associated with them. These are generally handled in unscaled form, and when
-  the report object is created, scaled values are added.
-- Methods are available to export the results to
-  [`pandas`](https://pandas.pydata.org/) data frames or
-  [`xarray`](https://xarray.dev/) data sets.
-- Methods are added to write and read netCDF version 4 files using the
-  [`netcdf4`](https://unidata.github.io/netcdf4-python/) Python package.
+- **Scaling and Offsets**: Variables may have associated scaling and offset
+  factors; if so, scaled values are also stored.
+- **Objective and Constraint Scaling**: Objective and constraint function values
+  may also have scaling factors, with scaled values stored as necessary.
+- **Data Export Methods**: Functions are provided to export results to
+  [`pandas`](https://pandas.pydata.org/) DataFrames or
+  [`xarray`](https://xarray.dev/) datasets.
+- **NetCDF Support**: Methods for reading and writing netCDF version 4 files
+  using the [`netcdf4`](https://unidata.github.io/netcdf4-python/) Python
+  package are included.
 
-Much of the data stored in the result objects is of a multi-dimensional nature.
-For instance, the `objectives` field, which is part of the nested
+Much of the data stored in the result objects is multi-dimensional. For example,
+the `objectives` field, which is part of the nested
 [`evaluations`][ropt.results.FunctionEvaluations] object in the
-[`FunctionResults`][ropt.results.FunctionResults] object, is a two-dimensional
-`numpy` array. In this array, the columns correspond to the objectives, and the
-rows correspond to the realization number.
+[`FunctionResults`][ropt.results.FunctionResults], is a two-dimensional `numpy`
+array. In this array, columns correspond to the objectives, and rows correspond
+to the realization numbers.
 
-To facilitate exporting and reporting the results, the identity of the axes in
-such multi-dimensional arrays is stored in metadata associated with the
-corresponding field. These fields derive from the
-[`ResultField`][ropt.results.ResultField] class, which has a
+To facilitate exporting and reporting results, the identity of the axes in such
+multi-dimensional arrays is stored in metadata associated with the corresponding
+field. These fields derive from the [`ResultField`][ropt.results.ResultField]
+class, which includes a
 [`get_axis_names`][ropt.results.ResultField.get_axis_names] class method to
-retrieve the names. For the `objectives` example above, this retrieves the axis
-names:
+retrieve the names. For example, for the `objectives` field, this method
+retrieves the axis names:
 
 ```py
 >>> from ropt.results import FunctionEvaluations
@@ -47,8 +44,9 @@ names:
 Using this metadata, the exporting or reporting code can refer to the optimizer
 configuration to associate realization and objective names with any entry in the
 result matrix. For instance, the [`pandas`](https://pandas.pydata.org/)
-exporting code will use this to construct a multi-index for the generated data
-frame and optionally unstack such multi-dimensional data into multiple columns.
+exporting code will utilize this information to construct a multi-index for the
+generated DataFrame and may also unstack such multi-dimensional data into
+multiple columns.
 """
 
 from ._bound_constraints import BoundConstraints

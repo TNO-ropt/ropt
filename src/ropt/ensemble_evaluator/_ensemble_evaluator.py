@@ -49,10 +49,10 @@ class EnsembleEvaluator:
     """A class for constructing functions and gradients from an ensemble of functions.
 
     This class implements the calculation of functions and gradients from an
-    ensemble of functions, according to the settings defined in an
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] configuration object, given
-    an [`Evaluator`][ropt.evaluator.Evaluator] callable that is used to evaluate
-    the individual functions.
+    ensemble of functions, based on the settings defined in an
+    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] configuration object. It uses
+    an [`Evaluator`][ropt.evaluator.Evaluator] callable to evaluate the individual
+    functions.
     """
 
     def __init__(
@@ -87,7 +87,7 @@ class EnsembleEvaluator:
         """Return optional auto-calculated scales for constraints.
 
         Returns:
-            The calculate scales, or `None`.
+            The calculated scales, or `None` if no scales are available.
         """
         return self._constraint_auto_scales
 
@@ -100,18 +100,18 @@ class EnsembleEvaluator:
     ) -> Tuple[Results, ...]:
         """Evaluate the given variable vectors.
 
-        The `variables` argument may be a single vector of variables, or a set
+        The `variables` argument may be a single vector of variables or a set
         of variable vectors represented as row-vectors in a matrix. The
-        `compute_functions` and `compute_gradient` flags determine with results
-        are returned: functions, gradients, or both.
+        `compute_functions` and `compute_gradients` flags determine which
+        results are returned: functions, gradients, or both.
 
         Args:
-            variables:         The variable vectors to evaluate
-            compute_functions: Whether to calculate functions
-            compute_gradients: Whether to calculate gradients
+            variables:         The variable vectors to evaluate.
+            compute_functions: Whether to calculate functions.
+            compute_gradients: Whether to calculate gradients.
 
         Returns:
-            The results, representing single function or gradient evaluations.
+            The results for function evaluations and/or gradient evaluations.
         """
         assert compute_functions or compute_gradients
 
@@ -241,7 +241,7 @@ class EnsembleEvaluator:
             bound_constraints=BoundConstraints.create(self._config, evaluations),
             linear_constraints=LinearConstraints.create(self._config, evaluations),
             nonlinear_constraints=NonlinearConstraints.create(
-                self._config, functions, self.constraint_auto_scales
+                self._config, functions, self._constraint_auto_scales
             ),
         )
 

@@ -24,42 +24,47 @@ if TYPE_CHECKING:
 
 
 class SignalEvaluationCallback(Protocol):
-    """Protocol for the callback that is used to signal that an evaluation is occurring."""
+    """Protocol for a callback signaling the occurrence of an evaluation.
+
+    This callback is invoked whenever an evaluation occurs, enabling custom
+    handling or tracking of evaluation events.
+    """
 
     def __call__(self, results: Optional[Tuple[Results, ...]] = None, /) -> None:
-        """Callback protocol for signaling that evaluations are occurring.
+        """Callback protocol for signaling the start and end of evaluations.
 
-        When a function with this signature is provided to an ensemble
-        optimizer, it is called before and after the optimizer finishes an
-        evaluation.Before the evaluation starts, this method is called with the
-        `results` argument set to `None`. When an evaluation is has finished, it
-        is called with `results` set to the results of the evaluation.
+        When provided to an ensemble optimizer, this callback is invoked both
+        before and after each evaluation. Prior to the start of an evaluation,
+        this method is called with `results` set to `None`. Upon completion of
+        the evaluation, it is called with `results` containing the evaluation
+        output.
 
         Args:
-            results: The results produced by the evaluation.
+            results: The results produced by the evaluation, or `None` if the
+                     evaluation has not yet completed.
         """
 
 
 class NestedOptimizerCallback(Protocol):
-    """Run a nested optimization."""
+    """Protocol for functions that start a nested optimization."""
 
     def __call__(
         self, variables: NDArray[np.float64], /
     ) -> Tuple[Optional[FunctionResults], bool]:
-        """Callback protocol for running a nested optimization.
+        """Callback protocol for executing a nested optimization.
 
-        When a function with this signature is provided to an ensemble
-        optimizer, it is called at each function evaluation to run a nested
-        optimization. It accepts the current variables as its arguments and
-        returns a tuple consisting of the result (or `None` if no result is
-        available), and a boolean value that indicates if the optimization was
-        aborted by a user signal.
+        This function is called during each function evaluation within an
+        ensemble optimizer to initiate a nested optimization process. It
+        takes the current variables as arguments and returns a tuple containing
+        the result of the nested optimization (or `None` if no result is
+        available) and a boolean indicating whether the optimization was
+        aborted by the user.
 
         Args:
-            variables: The variables to start the nested optimization with
+            variables: The current variables to initialize the nested optimization.
 
         Returns:
-            The nested optimization results and whether the user aborted the optimization.
+            The result of the nested optimization and a boolean indicating abortion.
         """
 
 
@@ -76,30 +81,29 @@ class EnsembleOptimizer:
     ) -> None:
         """Initialize the ensemble optimizer class.
 
-        This class requires at least three argument that together define a
+        This class requires at least three arguments that together define a
         single optimization run:
 
         1. An [`EnOptConfig`][ropt.config.enopt.EnOptConfig] that contains all
            configuration settings for the optimization.
-        2. An [`EnsembleEvaluator`][ropt.ensemble_evaluator.EnsembleEvaluator] object
-           that is responsible for evaluating functions.
+        2. An [`EnsembleEvaluator`][ropt.ensemble_evaluator.EnsembleEvaluator]
+           object responsible for evaluating functions.
         3. A [`PluginManager`][ropt.plugins.PluginManager] object that provides
            access to optimizer plugins.
 
-        In addition, two optional callbacks can be provided:
+        Additionally, two optional callbacks can be provided:
 
         1. A [`SignalEvaluationCallback`][ropt.optimization.SignalEvaluationCallback]
-           callback that is called before and after each function evaluation.
+           that is called before and after each function evaluation.
         2. A [`NestedOptimizerCallback`][ropt.optimization.NestedOptimizerCallback]
-           callback that is called at each function evaluation to run a nested
-           optimization.
+           that is called at each function evaluation to run a nested optimization.
 
         Args:
-            enopt_config:       The ensemble optimization configuration
-            ensemble_evaluator: The evaluator object
-            plugin_manager:     Plugin manager
-            signal_evaluation:  Optional callback to signal evaluations
-            nested_optimizer:   Optional nested optimization call
+            enopt_config:       The ensemble optimization configuration.
+            ensemble_evaluator: The evaluator object for function evaluations.
+            plugin_manager:     The plugin manager for accessing optimizer plugins.
+            signal_evaluation:  Optional callback to signal evaluations.
+            nested_optimizer:   Optional callback for running nested optimizations.
         """
         self._enopt_config = enopt_config
         self._function_evaluator = ensemble_evaluator
@@ -122,10 +126,10 @@ class EnsembleOptimizer:
 
     @property
     def is_parallel(self) -> bool:
-        """Whether the optimization is parallelized.
+        """Check if the optimization is parallelized.
 
         Returns:
-            True if the optimization is parallized.
+            True if the optimization is parallelized; otherwise, False.
         """
         return self._optimizer.is_parallel
 
