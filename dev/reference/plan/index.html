@@ -1703,25 +1703,25 @@ straightforward plans involving a single optimization.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Whether the plan was aborted by the user.</p>
+        <p>Check if the plan was aborted by the user.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
     <table>
       <thead>
         <tr>
-          <th>Type</th>
+<th>Name</th>          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td>
+<td><code>bool</code></td>            <td>
                   <code>bool</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>True</code> if the user aborted the plan.</p>
+                <p><code>True</code> if the plan was aborted by the user; otherwise, <code>False</code>.</p>
               </div>
             </td>
           </tr>
@@ -1747,7 +1747,9 @@ straightforward plans involving a single optimization.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the plugin manager used by the plan.</p>
+        <p>Return the plugin manager associated with the plan.</p>
+<p>This method retrieves the plugin manager that is used to manage plugins
+for the plan's steps and result handlers.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -1765,7 +1767,7 @@ straightforward plans involving a single optimization.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The plugin manager.</p>
+                <p>The plugin manager instance used by the plan.</p>
               </div>
             </td>
           </tr>
@@ -1791,7 +1793,9 @@ straightforward plans involving a single optimization.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the optimizer context of the plan.</p>
+        <p>Return the optimizer context associated with the plan.</p>
+<p>This method retrieves the optimizer context object that provides shared
+state and functionality for executing the optimization plan.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -1834,10 +1838,10 @@ straightforward plans involving a single optimization.</p>
 
         <p>Initialize a plan object.</p>
 <p>The plan requires a <code>PlanConfig</code> object and an <code>OptimizationContext</code>
-object. The <code>plugin_manager</code> argument is optional and allows you to
-specify plugins for the results handler and step objects that the plan
-may use. If not provided, only plugins installed via Python's standard
-entry points mechanism will be used.</p>
+object. An optional <code>plugin_manager</code> argument allows specification of
+custom plugins for result handlers and step objects within the plan. If
+omitted, the plan will use only plugins installed through Python's
+standard entry points mechanism.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1858,7 +1862,7 @@ entry points mechanism will be used.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The optimizer configuration</p>
+                <p>The configuration for the optimizer.</p>
               </div>
             </td>
             <td>
@@ -1872,7 +1876,8 @@ entry points mechanism will be used.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The context in which the plan executes</p>
+                <p>The context in which the plan will execute,
+               providing shared resources across steps.</p>
               </div>
             </td>
             <td>
@@ -1886,7 +1891,8 @@ entry points mechanism will be used.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional plugin manager</p>
+                <p>Optional custom plugin manager for step and
+               result handler plugins.</p>
               </div>
             </td>
             <td>
@@ -1900,7 +1906,7 @@ entry points mechanism will be used.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional parent plan that spawned this plan</p>
+                <p>Optional parent plan that spawned this plan.</p>
               </div>
             </td>
             <td>
@@ -1967,10 +1973,10 @@ plan <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.pla
 
     <div class="doc doc-contents ">
 
-        <p>Create step objects from step configs.</p>
-<p>Given a list of step configuration objects, this method returns a list
-of step objects, each configured according to its corresponding
-configuration.</p>
+        <p>Instantiate step objects from step configurations.</p>
+<p>This method takes a list of step configuration objects and creates a
+corresponding list of initialized step objects, each configured based on
+its respective configuration.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1991,11 +1997,34 @@ configuration.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A list of step configuration objects.</p>
+                <p>List of configuration objects defining each step.</p>
               </div>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of configured step objects ready for execution in the plan.</p>
+              </div>
             </td>
           </tr>
       </tbody>
@@ -2016,9 +2045,10 @@ configuration.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Execute a list of steps.</p>
-<p>This method executes a list of plan steps and returns <code>True</code> if the
-execution is aborted by the user.</p>
+        <p>Execute a list of steps in the plan.</p>
+<p>This method iterates through and executes a provided list of plan steps.
+If execution is interrupted by the user, it returns <code>True</code> to indicate
+an aborted run.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2039,7 +2069,7 @@ execution is aborted by the user.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A list of steps to execute.</p>
+                <p>A list of steps to be executed sequentially.</p>
               </div>
             </td>
             <td>
@@ -2065,7 +2095,7 @@ execution is aborted by the user.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>True</code> if the execution was aborted by the user; otherwise, <code>False</code>.</p>
+                <p><code>True</code> if execution was aborted by the user; otherwise, <code>False</code>.</p>
               </div>
             </td>
           </tr>
@@ -2091,10 +2121,9 @@ execution is aborted by the user.</p>
 <p>This method creates a new plan that shares the same optimization context
 and plugin manager as the current plan. However, it does not inherit
 other properties, such as variables.</p>
-<p>In addition, any signals that are emitted by the spawned plan are
-forwarded to the observers that are connected to this plan. In other
-words, signals emitted by the spawn plan 'bubble' up to the current
-plan.</p>
+<p>Additionally, any signals emitted by the spawned plan are forwarded
+to the observers connected to the current plan. In other words, signals
+emitted by the spawned plan will "bubble up" to the current plan.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2115,11 +2144,34 @@ plan.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The configuration of the new plan</p>
+                <p>The configuration for the new plan.</p>
               </div>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plan._plan.Plan" href="#ropt.plan.Plan">Plan</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A new plan object configured with the provided configuration.</p>
+              </div>
             </td>
           </tr>
       </tbody>
@@ -2141,16 +2193,16 @@ plan.</p>
     <div class="doc doc-contents ">
 
         <p>Evaluate the provided value as an expression.</p>
-<p>If the value is not  a string, it is returned unchanged. Otherwise, it
-is evaluates the expression and returns the result.</p>
+<p>If the value is not a string, it is returned unchanged. If it is a
+string, the expression is evaluated, and the result is returned.</p>
 
 
 <details class="note" open>
   <summary>Note</summary>
   <p>The result of a mathematical expression is restricted to numerical
-values, lists, and numpy arrays. However, plan variables can contain
+values, lists, and NumPy arrays. However, plan variables can contain
 values of any type, so expressions of the form <code>$identifier</code> may
-evaluate to a result of any type.</p>
+evaluate to results of any type.</p>
 </details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2171,7 +2223,8 @@ evaluate to a result of any type.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The expression to evaluate.</p>
+                <p>The expression to evaluate. This can be a string or any other
+   type.</p>
               </div>
             </td>
             <td>
@@ -2197,7 +2250,17 @@ evaluate to a result of any type.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The result of the expression.</p>
+                <p>The result of the evaluated expression, which may be of any type</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>depending on the evaluation context.</p>
               </div>
             </td>
           </tr>
@@ -2220,11 +2283,17 @@ evaluate to a result of any type.</p>
     <div class="doc doc-contents ">
 
         <p>Add an observer function.</p>
-<p>Observer functions will be called during optimization if an event of the
-given type occurs. The callable must accept an argument of the
-<a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> class that contains information about the
-event that occurred.</p>
+<p>Observer functions are called during optimization when an event of the
+specified type occurs. The provided callable must accept a single
+argument of the <a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> class, which contains
+information about the occurred event.</p>
 
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>Before the observer functions are called, all result handlers are
+executed, which may potentially modify the event.</p>
+</details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>
@@ -2244,7 +2313,7 @@ event that occurred.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The type of events to react to</p>
+                <p>The type of events that the observer will react to.</p>
               </div>
             </td>
             <td>
@@ -2258,7 +2327,9 @@ event that occurred.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The function to call if the event is received</p>
+                <p>The function to call when the specified event is received.
+      This function should accept one argument, which will be
+      an instance of the <a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> class.</p>
               </div>
             </td>
             <td>
@@ -2283,10 +2354,16 @@ event that occurred.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Emit an event of the given type with given data.</p>
-<p>All callbacks for the given event type, that were added by the
-<code>add_observer</code> method are called with the given event object as their
-argument.</p>
+        <p>Emit an event of the specified type with the provided data.</p>
+<p>When this method is called, the following steps are executed:</p>
+<ol>
+<li>All event handlers associated with the plan are invoked, which may
+   modify the event.</li>
+<li>All observer functions registered for the specified event type via
+   the <code>add_observer</code> method are called.</li>
+<li>If the plan was spawned from another plan, the <code>emit_event</code> method of
+   the parent plan is also called.</li>
+</ol>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2307,7 +2384,7 @@ argument.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The event to emit</p>
+                <p>The event object to emit.</p>
               </div>
             </td>
             <td>
@@ -2334,7 +2411,7 @@ argument.</p>
 
         <p>Get the value of a plan variable.</p>
 <p>This method implements the <code>[]</code> operator on the plan object to retrieve
-the value of a plan variable.</p>
+the value associated with a specific plan variable.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2355,7 +2432,7 @@ the value of a plan variable.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The name of the variable.</p>
+                <p>The name of the variable whose value is to be retrieved.</p>
               </div>
             </td>
             <td>
@@ -2381,7 +2458,7 @@ the value of a plan variable.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The value of the variable.</p>
+                <p>The value of the specified variable, which can be of any type.</p>
               </div>
             </td>
           </tr>
@@ -2405,7 +2482,7 @@ the value of a plan variable.</p>
 
         <p>Set a plan variable to the given value.</p>
 <p>This method implements the <code>[]</code> operator on the plan object to set the
-value of a plan variable.</p>
+value of a specific plan variable.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2426,7 +2503,7 @@ value of a plan variable.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The name of the variable.</p>
+                <p>The name of the variable to set.</p>
               </div>
             </td>
             <td>
@@ -2440,7 +2517,7 @@ value of a plan variable.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The value to assign.</p>
+                <p>The value to assign to the variable.</p>
               </div>
             </td>
             <td>
