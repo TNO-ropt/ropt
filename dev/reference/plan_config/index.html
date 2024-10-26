@@ -1320,12 +1320,10 @@
 
         <p>Configuration classes for optimization plans.</p>
 <p>Optimization plans are used to run workflows consisting of multiple steps,
-typically executed sequentially. However, they may also include nested steps
-that run repeatedly, such as in loops or within nested optimization processes.
-These plans can store information in "plan variables," which can either be
-provided as inputs when starting the plan or defined during the configuration.
-Additionally, optional output variables may be specified to return values when
-the plan is completed.</p>
+typically executed sequentially. These plans can store information in "plan
+variables," which can either be provided as inputs when starting the plan or
+defined during the configuration. Additionally, optional output variables may be
+specified to return values when the plan is completed.</p>
 <p>Each plan can define steps that execute code to access or modify plan variables
 and/or generate intermediate results. These results can be broadcast via an
 event mechanism. Additionally, plans may include result handlers that respond to
