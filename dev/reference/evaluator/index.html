@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ensemble-evaluator" class="md-skip">
+        <a href="#ropt.ensemble_evaluator" class="md-skip">
           Skip to content
         </a>
       
@@ -723,13 +723,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ensemble-evaluator" class="md-nav__link">
+  <a href="#ropt.ensemble_evaluator" class="md-nav__link">
     <span class="md-ellipsis">
-      Ensemble evaluator
+      ensemble_evaluator
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Ensemble evaluator">
+    <nav class="md-nav" aria-label="ensemble_evaluator">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -780,13 +780,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#evaluator-callbacks" class="md-nav__link">
+  <a href="#ropt.evaluator" class="md-nav__link">
     <span class="md-ellipsis">
-      Evaluator callbacks
+      evaluator
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Evaluator callbacks">
+    <nav class="md-nav" aria-label="evaluator">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -846,21 +846,6 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#optional-evaluator-implementations" class="md-nav__link">
-    <span class="md-ellipsis">
-      Optional evaluator implementations
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Optional evaluator implementations">
-      <ul class="md-nav__list">
-        
           <li class="md-nav__item">
   <a href="#ropt.evaluator.ConcurrentEvaluator" class="md-nav__link">
     <span class="md-ellipsis">
@@ -893,6 +878,15 @@
   <a href="#ropt.evaluator.ConcurrentEvaluator.monitor" class="md-nav__link">
     <span class="md-ellipsis">
       monitor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.evaluator.ConcurrentEvaluator.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
     </span>
   </a>
   
@@ -1422,13 +1416,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ensemble-evaluator" class="md-nav__link">
+  <a href="#ropt.ensemble_evaluator" class="md-nav__link">
     <span class="md-ellipsis">
-      Ensemble evaluator
+      ensemble_evaluator
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Ensemble evaluator">
+    <nav class="md-nav" aria-label="ensemble_evaluator">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1479,13 +1473,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#evaluator-callbacks" class="md-nav__link">
+  <a href="#ropt.evaluator" class="md-nav__link">
     <span class="md-ellipsis">
-      Evaluator callbacks
+      evaluator
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Evaluator callbacks">
+    <nav class="md-nav" aria-label="evaluator">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1545,21 +1539,6 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#optional-evaluator-implementations" class="md-nav__link">
-    <span class="md-ellipsis">
-      Optional evaluator implementations
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Optional evaluator implementations">
-      <ul class="md-nav__list">
-        
           <li class="md-nav__item">
   <a href="#ropt.evaluator.ConcurrentEvaluator" class="md-nav__link">
     <span class="md-ellipsis">
@@ -1592,6 +1571,15 @@
   <a href="#ropt.evaluator.ConcurrentEvaluator.monitor" class="md-nav__link">
     <span class="md-ellipsis">
       monitor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.evaluator.ConcurrentEvaluator.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
     </span>
   </a>
   
@@ -1660,7 +1648,29 @@
 
   <h1>Function evaluations</h1>
 
-<h2 id="ensemble-evaluator">Ensemble evaluator</h2>
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="ropt.ensemble_evaluator" class="doc doc-heading">
+            <code>ropt.ensemble_evaluator</code>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Functionality for the evaluation of ensembles.</p>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
 
 
 <div class="doc doc-object doc-class">
@@ -1668,21 +1678,21 @@
 
 
 <h3 id="ropt.ensemble_evaluator.EnsembleEvaluator" class="doc doc-heading">
-            <code>ropt.ensemble_evaluator.EnsembleEvaluator</code>
+            <code>EnsembleEvaluator</code>
 
 
 </h3>
 
 
-    <div class="doc doc-contents first">
+    <div class="doc doc-contents ">
 
 
         <p>A class for constructing functions and gradients from an ensemble of functions.</p>
 <p>This class implements the calculation of functions and gradients from an
-ensemble of functions, according to the settings defined in an
-<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> configuration object, given
-an <a class="autorefs autorefs-internal" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a> callable that is used to evaluate
-the individual functions.</p>
+ensemble of functions, based on the settings defined in an
+<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> configuration object. It uses
+an <a class="autorefs autorefs-internal" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a> callable to evaluate the individual
+functions.</p>
 
 
 
@@ -1729,7 +1739,7 @@ the individual functions.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The calculate scales, or <code>None</code>.</p>
+                <p>The calculated scales, or <code>None</code> if no scales are available.</p>
               </div>
             </td>
           </tr>
@@ -1855,10 +1865,10 @@ the individual functions.</p>
     <div class="doc doc-contents ">
 
         <p>Evaluate the given variable vectors.</p>
-<p>The <code>variables</code> argument may be a single vector of variables, or a set
+<p>The <code>variables</code> argument may be a single vector of variables or a set
 of variable vectors represented as row-vectors in a matrix. The
-<code>compute_functions</code> and <code>compute_gradient</code> flags determine with results
-are returned: functions, gradients, or both.</p>
+<code>compute_functions</code> and <code>compute_gradients</code> flags determine which
+results are returned: functions, gradients, or both.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1879,7 +1889,7 @@ are returned: functions, gradients, or both.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The variable vectors to evaluate</p>
+                <p>The variable vectors to evaluate.</p>
               </div>
             </td>
             <td>
@@ -1893,7 +1903,7 @@ are returned: functions, gradients, or both.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether to calculate functions</p>
+                <p>Whether to calculate functions.</p>
               </div>
             </td>
             <td>
@@ -1907,7 +1917,7 @@ are returned: functions, gradients, or both.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether to calculate gradients</p>
+                <p>Whether to calculate gradients.</p>
               </div>
             </td>
             <td>
@@ -1933,7 +1943,7 @@ are returned: functions, gradients, or both.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The results, representing single function or gradient evaluations.</p>
+                <p>The results for function evaluations and/or gradient evaluations.</p>
               </div>
             </td>
           </tr>
@@ -1950,7 +1960,40 @@ are returned: functions, gradients, or both.</p>
 
     </div>
 
-</div><h2 id="evaluator-callbacks">Evaluator callbacks</h2>
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="ropt.evaluator" class="doc doc-heading">
+            <code>ropt.evaluator</code>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Function evaluation protocols and classes.</p>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
 
 
 <div class="doc doc-object doc-class">
@@ -1958,19 +2001,25 @@ are returned: functions, gradients, or both.</p>
 
 
 <h3 id="ropt.evaluator.Evaluator" class="doc doc-heading">
-            <code>ropt.evaluator.Evaluator</code>
+            <code>Evaluator</code>
 
 
 </h3>
 
 
-    <div class="doc doc-contents first">
+    <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
               Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
 
 
         <p>Protocol for evaluator objects or callables.</p>
-<p>The optimizers require a callback that follows this protocol.</p>
+<p>The <a class="autorefs autorefs-internal" href="#ropt.ensemble_evaluator.EnsembleEvaluator"><code>EnsembleEvaluator</code></a> class
+requires a function evaluator callback that conforms to the
+<a class="autorefs autorefs-internal" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a> signature. This callback accepts
+one or more variable vectors to evaluate, along with an
+<a class="autorefs autorefs-internal" href="#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a> object that provides
+relevant information for the evaluation. It returns an
+<a class="autorefs autorefs-internal" href="#ropt.evaluator.EvaluatorResult"><code>EvaluatorResult</code></a> object containing the results.</p>
 
 
 
@@ -2002,7 +2051,10 @@ variable vector. Depending on the information passed by the second argument, all
 objective and constraint functions for all vectors or for a subset are to be
 calculated.</p>
 <p>The second argument is an <a class="autorefs autorefs-internal" href="#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a>
-object, providing supplementary information to the evaluation function.</p>
+object that provides supplementary information to the evaluation function.</p>
+<p>The return value should be an <a class="autorefs autorefs-internal" href="#ropt.evaluator.EvaluatorResult"><code>EvaluatorResult</code></a>
+object containing the calculated values of the objective and constraint functions for
+all variable vectors and realizations, along with any additional metadata.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2023,7 +2075,7 @@ object, providing supplementary information to the evaluation function.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The matrix of variables to evaluate</p>
+                <p>The matrix of variables to evaluate.</p>
               </div>
             </td>
             <td>
@@ -2037,7 +2089,7 @@ object, providing supplementary information to the evaluation function.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The evaluation context</p>
+                <p>The evaluation context.</p>
               </div>
             </td>
             <td>
@@ -2070,6 +2122,28 @@ object, providing supplementary information to the evaluation function.</p>
       </tbody>
     </table>
 
+
+<details class="tip" open>
+  <summary>Reusing Objective and Non-linear Constraint Values</summary>
+  <p>When defining multiple objectives, there may be a need to reuse the
+same objective value multiple times. For instance, a total objective could
+consist of the mean of the objectives for each realization, plus the
+standard deviation of the same values. This can be implemented by defining
+two objectives: the first calculated as the mean of the realizations, and
+the second using a function transform to compute the standard deviations.
+The optimizer is unaware that both objectives use the same set of
+realizations. To prevent redundant calculations, the evaluator should
+compute the results of the realizations once and return them for both
+objectives.</p>
+<p>Non-linear constraint values may potentially appear multiple times in the
+<code>constraint_results</code> matrix. For example, to express the constraint <span class="arithmatex">\(a &lt; F_c \le b\)</span>,
+two constraints must be defined: <span class="arithmatex">\(F_c \ge a\)</span> and <span class="arithmatex">\(F_c \le b\)</span>,
+sharing the same function value <span class="arithmatex">\(F_c\)</span> but differing in types and
+right-hand sides (<code>ConstraintType.GE</code>/<code>ConstraintType.LE</code> and <span class="arithmatex">\(a\)</span>/<span class="arithmatex">\(b\)</span>). The
+run method should ensure that the calculated value of <span class="arithmatex">\(F_c\)</span> is the same in
+both cases, which is most efficiently achieved by evaluating <span class="arithmatex">\(F_c\)</span> only
+once.</p>
+</details>
     </div>
 
 </div>
@@ -2087,7 +2161,7 @@ object, providing supplementary information to the evaluation function.</p>
 
 
 <h3 id="ropt.evaluator.EvaluatorContext" class="doc doc-heading">
-            <code>ropt.evaluator.EvaluatorContext</code>
+            <code>EvaluatorContext</code>
 
 
   <span class="doc doc-labels">
@@ -2097,7 +2171,7 @@ object, providing supplementary information to the evaluation function.</p>
 </h3>
 
 
-    <div class="doc doc-contents first">
+    <div class="doc doc-contents ">
 
 
         <p>Capture additional details for the function evaluator.</p>
@@ -2259,7 +2333,7 @@ the functions should be calculated.</p>
 
 
 <h3 id="ropt.evaluator.EvaluatorResult" class="doc doc-heading">
-            <code>ropt.evaluator.EvaluatorResult</code>
+            <code>EvaluatorResult</code>
 
 
   <span class="doc doc-labels">
@@ -2269,7 +2343,7 @@ the functions should be calculated.</p>
 </h3>
 
 
-    <div class="doc doc-contents first">
+    <div class="doc doc-contents ">
 
 
         <p>Store the results of a function evaluation.</p>
@@ -2365,39 +2439,38 @@ input vectors.</p>
 
     </div>
 
-</div><h2 id="optional-evaluator-implementations">Optional evaluator implementations</h2>
-
+</div>
 
 <div class="doc doc-object doc-class">
 
 
 
 <h3 id="ropt.evaluator.ConcurrentEvaluator" class="doc doc-heading">
-            <code>ropt.evaluator.ConcurrentEvaluator</code>
+            <code>ConcurrentEvaluator</code>
 
 
 </h3>
 
 
-    <div class="doc doc-contents first">
+    <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
               Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
 
         <p>Abstract base class for implementing a concurrent evaluator.</p>
-<p>This abstract base class provides the framework for implementing an
-evaluator that uses a concurrent executor.</p>
-<p>The <code>launch</code> method must be implemented to start an evaluation for one
-vector of variables, and return a future-like object, compatible with the
-<code>concurrent.futures</code> module of Python, implementing at least the <code>done()</code>,
-<code>exception()</code>, and <code>result()</code> methods. The <code>monitor</code> method can be overloaded
-to implement specific monitoring functionality, the default implementation does
-nothing.</p>
-<p>The class implements an optional caching mechanism to prevent repeated
-evaluation of functions. When enabled, all evaluation results are cached in
-memory and reused when requested. This is in particular useful in
-optimization plans with multiple or nested optimizations where often
-restarts occur from points that already have been evaluated before.</p>
+<p>This abstract base class provides the framework for creating an
+evaluator that utilizes a concurrent executor.</p>
+<p>The <code>launch</code> method must be implemented to initiate an evaluation for one
+vector of variables, returning a future-like object compatible with the
+<code>concurrent.futures</code> module of Python. This object must implement at least
+the <code>done()</code>, <code>exception()</code>, and <code>result()</code> methods. The <code>monitor</code> method
+can be overridden to implement specific monitoring functionality; the
+default implementation does nothing.</p>
+<p>This class also includes an optional caching mechanism to avoid repeated
+evaluations of functions. When enabled, all evaluation results are cached
+in memory and reused when requested. This is particularly useful in
+optimization plans with multiple or nested optimizations, where restarts
+often occur from points that have already been evaluated.</p>
 
 
 
@@ -2424,16 +2497,16 @@ restarts occur from points that already have been evaluated before.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize a concurrent evaluator object.</p>
-<p>Some general properties of the evaluator are fixed at initialization time:</p>
+<p>Several general properties of the evaluator are set at initialization time:</p>
 <ul>
-<li>The cache may be enabled or disabled using the <code>enable_cache</code> parameter.</li>
-<li>While evaluations are running concurrently the evaluator will
+<li>The cache can be enabled or disabled using the <code>enable_cache</code> parameter.</li>
+<li>While evaluations are running concurrently, the evaluator will
   regularly poll them to check their status. The <code>polling</code> parameter
-  determine the delay between polling events.</li>
-<li>When a very large number of jobs is submitted this may overwhelm the
-  evaluator, depending on the implementation. To prevent this, the jobs
-  may be submitted in smaller portions, the size of which are defined by
-  the <code>max_submit</code> argument.</li>
+  determines the delay, in seconds, between polling events.</li>
+<li>When a very large number of jobs is submitted, this may overwhelm the
+  evaluator, depending on its implementation. To prevent this, jobs
+  may be submitted in smaller portions, with the size defined by the
+  <code>max_submit</code> argument.</li>
 </ul>
 
 
@@ -2455,7 +2528,7 @@ restarts occur from points that already have been evaluated before.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Enable the caching mechanism</p>
+                <p>Enable or disable the caching mechanism.</p>
               </div>
             </td>
             <td>
@@ -2469,7 +2542,7 @@ restarts occur from points that already have been evaluated before.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Time in seconds between checking job status</p>
+                <p>Time in seconds between checking job status.</p>
               </div>
             </td>
             <td>
@@ -2483,7 +2556,7 @@ restarts occur from points that already have been evaluated before.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Maximum number of variables to submit simultaneously</p>
+                <p>Maximum number of variables to submit simultaneously.</p>
               </div>
             </td>
             <td>
@@ -2512,20 +2585,20 @@ restarts occur from points that already have been evaluated before.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Launch an evaluation return a future for each job.</p>
-<p>This method must implement the process of launching a a single function
+        <p>Launch an evaluation and return a future for each job.</p>
+<p>This method implements the process of launching a single function
 evaluation for a variable vector passed via the <code>variables</code> parameter. A
-unique batch ID is passed via the <code>batch_id</code>, which can be optionally
+unique batch ID is provided through the <code>batch_id</code>, which can be optionally
 used by the evaluator to identify the current batch of functions.</p>
 <p>This method should return a dictionary mapping the indices of the jobs
-to the tasks that will contain the result. The tasks are objects
-deriving from the <a class="autorefs autorefs-internal" href="#ropt.evaluator.ConcurrentTask"><code>ConcurrentTask</code></a>
+to the tasks that will contain the results. The tasks are objects
+derived from the <a class="autorefs autorefs-internal" href="#ropt.evaluator.ConcurrentTask"><code>ConcurrentTask</code></a>
 class, containing the future object representing the launched task and
 its result. Under the hood, other tasks may be launched, but only those
 that contain results should be returned.</p>
 <p>This method is called by the <code>__call__</code> method, which implements the
 <a class="autorefs autorefs-internal" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a> callback signature.</p>
-<p>The <code>context</code> argument with optional information is passed from the
+<p>The <code>context</code> argument, containing optional information, is passed from the
 <code>__call__</code> method unchanged.</p>
 
 
@@ -2561,7 +2634,7 @@ that contain results should be returned.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The ID of the job launched for the variables</p>
+                <p>The ID of the job launched for the variables.</p>
               </div>
             </td>
             <td>
@@ -2589,7 +2662,7 @@ that contain results should be returned.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Evaluator context.</p>
+                <p>The evaluator context.</p>
               </div>
             </td>
             <td>
@@ -2615,7 +2688,7 @@ that contain results should be returned.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The last future or <code>None</code> if no tasks were launched.</p>
+                <p>A dictionary mapping job indices to tasks, or <code>None</code> if no tasks were launched.</p>
               </div>
             </td>
           </tr>
@@ -2639,10 +2712,95 @@ that contain results should be returned.</p>
 
         <p>Monitor the states of the running evaluations.</p>
 <p>This method is called regularly in the polling loop that checks the
-futures until all results are collected. If the status of the
-evaluations should be monitored, this method should be overridden.</p>
-<p>The time in seconds between calls in the polling loop can be modified by
-setting the <code>polling</code> attribute upon object initialization.</p>
+futures until all results are collected. If you wish to monitor the
+status of the evaluations, this method should be overridden.</p>
+<p>The time interval between calls in the polling loop can be modified
+by setting the <code>polling</code> attribute during object initialization.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.evaluator.ConcurrentEvaluator.__call__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Launch all evaluations and collect the results.</p>
+<p>This method implements the evaluation function provided to the
+ensemble optimizer constructor.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>variables</code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The matrix of variables to evaluate.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>context</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.evaluator._evaluator.EvaluatorContext" href="#ropt.evaluator.EvaluatorContext">EvaluatorContext</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The evaluation context.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.evaluator._evaluator.EvaluatorResult" href="#ropt.evaluator.EvaluatorResult">EvaluatorResult</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A tuple containing the batch ID and the values of the objectives and constraints.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
     </div>
 
@@ -2661,7 +2819,7 @@ setting the <code>polling</code> attribute upon object initialization.</p>
 
 
 <h3 id="ropt.evaluator.ConcurrentTask" class="doc doc-heading">
-            <code>ropt.evaluator.ConcurrentTask</code>
+            <code>ConcurrentTask</code>
 
 
   <span class="doc doc-labels">
@@ -2671,16 +2829,16 @@ setting the <code>polling</code> attribute upon object initialization.</p>
 </h3>
 
 
-    <div class="doc doc-contents first">
+    <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
               Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
 
         <p>Abstract data class for tasks in a concurrent evaluator.</p>
-<p>These task objects should contain the future that represents the task and
-return the results of the evaluation.</p>
-<p>It should implement two methods to retrieve the objective function values
-and optionally the constraint values.</p>
+<p>These task objects should encapsulate the future that represents the task
+and return the results of the evaluation. The class should implement two
+methods to retrieve the objective function values and, optionally, the
+constraint values.</p>
 
 
 
@@ -2711,14 +2869,14 @@ and optionally the constraint values.</p>
     <div class="doc doc-contents ">
 
         <p>Return the objectives calculated by the task.</p>
-<p>This method will only be called after the future is done, and if no
+<p>This method is called only after the future is completed and if no
 exception was raised during the execution of the task.</p>
 
 
-<details class="info" open>
-  <summary>Info</summary>
-  <p>The return value might be None, as derived evaluator classes might
-also employ tasks that do not return results.</p>
+<details class="note" open>
+  <summary>Note</summary>
+  <p>The return value may be <code>None</code>, as derived evaluator classes
+might employ tasks that do not return results.</p>
 </details>
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2759,11 +2917,11 @@ also employ tasks that do not return results.</p>
     <div class="doc doc-contents ">
 
         <p>Return the constraints calculated by the task, if available.</p>
-<p>This method will only be called after the future is done, and if no
+<p>This method is called only after the future is completed and if no
 exception was raised during the execution of the task.</p>
-<p>This has a default implementation that returns <code>None</code>, which is only
-usable when it is certain that there are no non-linear constraints. If
-there are non-linear constraints, this method should be overridden.</p>
+<p>This method has a default implementation that returns <code>None</code>, which is
+appropriate when it is certain that there are no non-linear constraints.
+If non-linear constraints exist, this method should be overridden.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2791,6 +2949,15 @@ there are non-linear constraints, this method should be overridden.</p>
     </div>
 
 </div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
 
 
 

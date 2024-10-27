@@ -1444,11 +1444,12 @@
 
     <div class="doc doc-contents first">
 
-        <p>The optimizer and event classes.</p>
-<p>The <a class="autorefs autorefs-internal" href="#ropt.optimization.EnsembleOptimizer"><code>EnsembleOptimizer</code></a> class runs
-ensemble based optimizations. It is not recommended to used them directly to run
-optimizations, the <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> functionality is usually more
-flexible and easier to use.</p>
+        <p>The main functionality for ensemble-based optimizations.</p>
+<p>The <a class="autorefs autorefs-internal" href="#ropt.optimization.EnsembleOptimizer"><code>EnsembleOptimizer</code></a> class provides
+the core functionality for running ensemble-based optimizations. Direct use of
+this class is generally discouraged; instead, the <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> or
+<a class="autorefs autorefs-internal" href="../plan_runner/#ropt.plan.OptimizationPlanRunner"><code>OptimizationPlanRunner</code></a> classes are
+recommended for more flexibility and ease of use.</p>
 
 
 
@@ -1504,7 +1505,7 @@ flexible and easier to use.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Whether the optimization is parallelized.</p>
+        <p>Check if the optimization is parallelized.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -1522,7 +1523,7 @@ flexible and easier to use.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>True if the optimization is parallized.</p>
+                <p>True if the optimization is parallelized; otherwise, False.</p>
               </div>
             </td>
           </tr>
@@ -1546,23 +1547,22 @@ flexible and easier to use.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize the ensemble optimizer class.</p>
-<p>This class requires at least three argument that together define a
+<p>This class requires at least three arguments that together define a
 single optimization run:</p>
 <ol>
 <li>An <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> that contains all
    configuration settings for the optimization.</li>
-<li>An <a class="autorefs autorefs-internal" href="../evaluator/#ropt.ensemble_evaluator.EnsembleEvaluator"><code>EnsembleEvaluator</code></a> object
-   that is responsible for evaluating functions.</li>
+<li>An <a class="autorefs autorefs-internal" href="../evaluator/#ropt.ensemble_evaluator.EnsembleEvaluator"><code>EnsembleEvaluator</code></a>
+   object responsible for evaluating functions.</li>
 <li>A <a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> object that provides
    access to optimizer plugins.</li>
 </ol>
-<p>In addition, two optional callbacks can be provided:</p>
+<p>Additionally, two optional callbacks can be provided:</p>
 <ol>
 <li>A <a class="autorefs autorefs-internal" href="#ropt.optimization.SignalEvaluationCallback"><code>SignalEvaluationCallback</code></a>
-   callback that is called before and after each function evaluation.</li>
+   that is called before and after each function evaluation.</li>
 <li>A <a class="autorefs autorefs-internal" href="#ropt.optimization.NestedOptimizerCallback"><code>NestedOptimizerCallback</code></a>
-   callback that is called at each function evaluation to run a nested
-   optimization.</li>
+   that is called at each function evaluation to run a nested optimization.</li>
 </ol>
 
 
@@ -1584,7 +1584,7 @@ single optimization run:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The ensemble optimization configuration</p>
+                <p>The ensemble optimization configuration.</p>
               </div>
             </td>
             <td>
@@ -1598,7 +1598,7 @@ single optimization run:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The evaluator object</p>
+                <p>The evaluator object for function evaluations.</p>
               </div>
             </td>
             <td>
@@ -1612,7 +1612,7 @@ single optimization run:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Plugin manager</p>
+                <p>The plugin manager for accessing optimizer plugins.</p>
               </div>
             </td>
             <td>
@@ -1626,7 +1626,7 @@ single optimization run:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional callback to signal evaluations</p>
+                <p>Optional callback to signal evaluations.</p>
               </div>
             </td>
             <td>
@@ -1640,7 +1640,7 @@ single optimization run:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional nested optimization call</p>
+                <p>Optional callback for running nested optimizations.</p>
               </div>
             </td>
             <td>
@@ -1747,7 +1747,9 @@ single optimization run:</p>
               Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
 
 
-        <p>Protocol for the callback that is used to signal that an evaluation is occurring.</p>
+        <p>Protocol for a callback signaling the occurrence of an evaluation.</p>
+<p>This callback is invoked whenever an evaluation occurs, enabling custom
+handling or tracking of evaluation events.</p>
 
 
 
@@ -1773,12 +1775,12 @@ single optimization run:</p>
 
     <div class="doc doc-contents ">
 
-        <p>Callback protocol for signaling that evaluations are occurring.</p>
-<p>When a function with this signature is provided to an ensemble
-optimizer, it is called before and after the optimizer finishes an
-evaluation.Before the evaluation starts, this method is called with the
-<code>results</code> argument set to <code>None</code>. When an evaluation is has finished, it
-is called with <code>results</code> set to the results of the evaluation.</p>
+        <p>Callback protocol for signaling the start and end of evaluations.</p>
+<p>When provided to an ensemble optimizer, this callback is invoked both
+before and after each evaluation. Prior to the start of an evaluation,
+this method is called with <code>results</code> set to <code>None</code>. Upon completion of
+the evaluation, it is called with <code>results</code> containing the evaluation
+output.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1799,7 +1801,8 @@ is called with <code>results</code> set to the results of the evaluation.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The results produced by the evaluation.</p>
+                <p>The results produced by the evaluation, or <code>None</code> if the
+     evaluation has not yet completed.</p>
               </div>
             </td>
             <td>
@@ -1837,7 +1840,7 @@ is called with <code>results</code> set to the results of the evaluation.</p>
               Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
 
 
-        <p>Run a nested optimization.</p>
+        <p>Protocol for functions that start a nested optimization.</p>
 
 
 
@@ -1863,13 +1866,13 @@ is called with <code>results</code> set to the results of the evaluation.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Callback protocol for running a nested optimization.</p>
-<p>When a function with this signature is provided to an ensemble
-optimizer, it is called at each function evaluation to run a nested
-optimization. It accepts the current variables as its arguments and
-returns a tuple consisting of the result (or <code>None</code> if no result is
-available), and a boolean value that indicates if the optimization was
-aborted by a user signal.</p>
+        <p>Callback protocol for executing a nested optimization.</p>
+<p>This function is called during each function evaluation within an
+ensemble optimizer to initiate a nested optimization process. It
+takes the current variables as arguments and returns a tuple containing
+the result of the nested optimization (or <code>None</code> if no result is
+available) and a boolean indicating whether the optimization was
+aborted by the user.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1890,7 +1893,7 @@ aborted by a user signal.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The variables to start the nested optimization with</p>
+                <p>The current variables to initialize the nested optimization.</p>
               </div>
             </td>
             <td>
@@ -1916,7 +1919,7 @@ aborted by a user signal.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The nested optimization results and whether the user aborted the optimization.</p>
+                <p>The result of the nested optimization and a boolean indicating abortion.</p>
               </div>
             </td>
           </tr>

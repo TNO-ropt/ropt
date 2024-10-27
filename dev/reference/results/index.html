@@ -1656,40 +1656,37 @@
 
         <p>Data classes for storing intermediate optimization results.</p>
 <p>During the optimization process, functions and gradients are calculated and need
-to be reported. To streamline this process, after new results become available,
-these are passed to callbacks as a tuple of <a class="autorefs autorefs-internal" href="#ropt.results.Results"><code>Results</code></a>
-objects. These may be instances of the derived
-<a class="autorefs autorefs-internal" href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> or
-<a class="autorefs autorefs-internal" href="#ropt.results.GradientResults"><code>GradientResults</code></a> classes, containing results
+to be reported. To streamline this process, new results are passed to callbacks
+as a tuple of <a class="autorefs autorefs-internal" href="#ropt.results.Results"><code>Results</code></a> objects. These may be instances
+of the derived <a class="autorefs autorefs-internal" href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> or
+<a class="autorefs autorefs-internal" href="#ropt.results.GradientResults"><code>GradientResults</code></a> classes, which contain results
 for function and gradient evaluations, respectively.</p>
-<p>These classes are nested <code>dataclasses</code> with some added features:</p>
+<p>These classes are nested <code>dataclasses</code> with several added features:</p>
 <ul>
-<li>Variables may have scaling and offset factors associated with them. The
-  optimization will generally deal with scaled values. When the results object
-  is created, and variable scaling is configured, the values are scaled back and
-  added to the results object.</li>
-<li>Objective and constraint function values may also have a scaling factor
-  associated with them. These are generally handled in unscaled form, and when
-  the report object is created, scaled values are added.</li>
-<li>Methods are available to export the results to
-  <a href="https://pandas.pydata.org/"><code>pandas</code></a> data frames or
-  <a href="https://xarray.dev/"><code>xarray</code></a> data sets.</li>
-<li>Methods are added to write and read netCDF version 4 files using the
-  <a href="https://unidata.github.io/netcdf4-python/"><code>netcdf4</code></a> Python package.</li>
+<li><strong>Scaling and Offsets</strong>: Variables may have associated scaling and offset
+  factors; if so, scaled values are also stored.</li>
+<li><strong>Objective and Constraint Scaling</strong>: Objective and constraint function values
+  may also have scaling factors, with scaled values stored as necessary.</li>
+<li><strong>Data Export Methods</strong>: Functions are provided to export results to
+  <a href="https://pandas.pydata.org/"><code>pandas</code></a> DataFrames or
+  <a href="https://xarray.dev/"><code>xarray</code></a> datasets.</li>
+<li><strong>NetCDF Support</strong>: Methods for reading and writing netCDF version 4 files
+  using the <a href="https://unidata.github.io/netcdf4-python/"><code>netcdf4</code></a> Python
+  package are included.</li>
 </ul>
-<p>Much of the data stored in the result objects is of a multi-dimensional nature.
-For instance, the <code>objectives</code> field, which is part of the nested
+<p>Much of the data stored in the result objects is multi-dimensional. For example,
+the <code>objectives</code> field, which is part of the nested
 <a class="autorefs autorefs-internal" href="#ropt.results.FunctionEvaluations"><code>evaluations</code></a> object in the
-<a class="autorefs autorefs-internal" href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> object, is a two-dimensional
-<code>numpy</code> array. In this array, the columns correspond to the objectives, and the
-rows correspond to the realization number.</p>
-<p>To facilitate exporting and reporting the results, the identity of the axes in
-such multi-dimensional arrays is stored in metadata associated with the
-corresponding field. These fields derive from the
-<a class="autorefs autorefs-internal" href="#ropt.results.ResultField"><code>ResultField</code></a> class, which has a
+<a class="autorefs autorefs-internal" href="#ropt.results.FunctionResults"><code>FunctionResults</code></a>, is a two-dimensional <code>numpy</code>
+array. In this array, columns correspond to the objectives, and rows correspond
+to the realization numbers.</p>
+<p>To facilitate exporting and reporting results, the identity of the axes in such
+multi-dimensional arrays is stored in metadata associated with the corresponding
+field. These fields derive from the <a class="autorefs autorefs-internal" href="#ropt.results.ResultField"><code>ResultField</code></a>
+class, which includes a
 <a class="autorefs autorefs-internal" href="#ropt.results.ResultField.get_axis_names"><code>get_axis_names</code></a> class method to
-retrieve the names. For the <code>objectives</code> example above, this retrieves the axis
-names:</p>
+retrieve the names. For example, for the <code>objectives</code> field, this method
+retrieves the axis names:</p>
 <div class="language-py highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">ropt.results</span> <span class="kn">import</span> <span class="n">FunctionEvaluations</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">FunctionEvaluations</span><span class="o">.</span><span class="n">get_axis_names</span><span class="p">(</span><span class="s2">&quot;objectives&quot;</span><span class="p">)</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">(</span><span class="o">&lt;</span><span class="n">ResultAxisName</span><span class="o">.</span><span class="n">REALIZATION</span><span class="p">:</span> <span class="s1">&#39;realization&#39;</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">ResultAxisName</span><span class="o">.</span><span class="n">OBJECTIVE</span><span class="p">:</span> <span class="s1">&#39;objective&#39;</span><span class="o">&gt;</span><span class="p">)</span>
@@ -1697,8 +1694,9 @@ names:</p>
 <p>Using this metadata, the exporting or reporting code can refer to the optimizer
 configuration to associate realization and objective names with any entry in the
 result matrix. For instance, the <a href="https://pandas.pydata.org/"><code>pandas</code></a>
-exporting code will use this to construct a multi-index for the generated data
-frame and optionally unstack such multi-dimensional data into multiple columns.</p>
+exporting code will utilize this information to construct a multi-index for the
+generated DataFrame and may also unstack such multi-dimensional data into
+multiple columns.</p>
 
 
 
@@ -1743,8 +1741,7 @@ frame and optionally unstack such multi-dimensional data into multiple columns.<
         <p>The <code>Results</code> class serves as an abstract base class for storing results.</p>
 <p>This class contains the following generic information:</p>
 <ol>
-<li>The result ID, a unique integer value that is incremented as the
-   results become available.</li>
+<li>The result ID, a unique integer value.</li>
 <li>An optional batch ID, which may be generated by the function evaluator.
    The interpretation of this ID depends on the evaluator code. It is
    intended to be used as a unique identifier for the group of function
