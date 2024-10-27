@@ -2119,7 +2119,7 @@ functions.</p>
 
 
 <details class="info" open>
-  <summary>Info</summary>
+  <summary>Manual scaling and auto_scaling</summary>
   <p>Both the <code>scales</code> values and the values obtained by auto-scaling will be
 applied. Thus, if <code>scales</code> is not supplied, auto-scaling will scale the
 objectives such that their initial values will be equal to one. Setting
@@ -2130,6 +2130,17 @@ contain indices to the realization filter or function transform objects to
 use. The objects referred to are configured in the parent
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 
+
+<details class="info" open>
+  <summary>Calculating auto-scaling values</summary>
+  <p>For auto-scaling, the initial value of the objective functions is used
+based on the assumption that it is calculated as a weighted sum from an
+ensemble of realizations, with weights specified by the <code>realizations</code>
+field in the <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. If
+the <code>realizations_filters</code> and/or <code>function_transforms</code> fields are also
+set, this assumption may not strictly hold; however, the scaling value
+will still be calculated in the same way for practical purposes.</p>
+</details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
     <table>
@@ -2392,7 +2403,7 @@ to have a size equal to the number of constraint functions.</p>
 
 
 <details class="info" open>
-  <summary>Info</summary>
+  <summary>Manual scaling and auto_scaling</summary>
   <p>Both the <code>scales</code> values and the values obtained by auto-scaling will be
 applied. If <code>scales</code> is not supplied, auto-scaling will scale the
 constraints such that their initial values will be equal to one. Setting
@@ -2408,6 +2419,17 @@ fields contain indices to the realization filter or function transform
 objects to use. These objects are configured in the parent
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 
+
+<details class="info" open>
+  <summary>Calculating auto-scaling values</summary>
+  <p>For auto-scaling, the initial value of the constraint functions is used
+based on the assumption that it is calculated as a weighted sum from an
+ensemble of realizations, with weights specified by the <code>realizations</code>
+field in the <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. If
+the <code>realizations_filters</code> and/or <code>function_transforms</code> fields are also
+set, this assumption may not strictly hold; however, the scaling value
+will still be calculated in the same way for practical purposes.</p>
+</details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
     <table>

@@ -1631,8 +1631,12 @@
     <div class="doc doc-contents first">
 
         <p>Code for executing optimization plans.</p>
-<p>Optimization plans are executed by a <a class="autorefs autorefs-internal" href="#ropt.plan.Plan"><code>Plan</code></a> object. A plan
-comprises <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a> objects, which define
+<p>The <a class="autorefs autorefs-internal" href="#ropt.plan.Plan"><code>Plan</code></a> class is responsible for executing optimization
+plans, accepting optional input values and returning output values. The plan's
+configuration is handled by the <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanConfig"><code>PlanConfig</code></a>
+class, which specifies the inputs, outputs, variables, steps, and result
+handlers.</p>
+<p>A plan comprises <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a> objects, which define
 individual steps, and <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler"><code>ResultHandler</code></a>
 objects, which process and store data generated during execution. Both step and
 handler objects are implemented through a <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan"><code>plugin</code></a>
@@ -1842,6 +1846,9 @@ object. An optional <code>plugin_manager</code> argument allows specification of
 custom plugins for result handlers and step objects within the plan. If
 omitted, the plan will use only plugins installed through Python's
 standard entry points mechanism.</p>
+<p>Plans may create other plans to be used within their workflow. If this
+happens, the new plan will receive a reference to the original plan via
+the <code>parent</code> argument.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2121,9 +2128,10 @@ an aborted run.</p>
 <p>This method creates a new plan that shares the same optimization context
 and plugin manager as the current plan. However, it does not inherit
 other properties, such as variables.</p>
-<p>Additionally, any signals emitted by the spawned plan are forwarded
-to the observers connected to the current plan. In other words, signals
-emitted by the spawned plan will "bubble up" to the current plan.</p>
+<p>Any signals emitted within the spawned plan are forwarded to the result
+handlers of the current plan and to the connected observers. In other
+words, signals emitted by the spawned plan will "bubble up" to the
+current plan.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2193,16 +2201,28 @@ emitted by the spawned plan will "bubble up" to the current plan.</p>
     <div class="doc doc-contents ">
 
         <p>Evaluate the provided value as an expression.</p>
-<p>If the value is not a string, it is returned unchanged. If it is a
-string, the expression is evaluated, and the result is returned.</p>
+<p>Evaluates an expression and returns the result based on the following
+rules:</p>
+<ol>
+<li>Non-string values are returned unchanged.</li>
+<li>Strings starting with <code>$</code> are evaluated as expressions, primarily
+   replacing variable references with their values.</li>
+<li>Strings starting with <code>$$</code> will return the string with one <code>$</code>
+   removed.</li>
+<li>Strings enclosed in <code>{{ ... }}</code> are evaluated as mathematical
+   expressions, allowing variable references prefixed by <code>$</code>.</li>
+<li>Strings enclosed in <code>[[ ... ]]</code> are treated as templates: <code>$</code>
+   prefixes or <code>{{ ... }}</code> expressions within the string are evaluated
+   and interpolated.</li>
+</ol>
 
 
 <details class="note" open>
   <summary>Note</summary>
-  <p>The result of a mathematical expression is restricted to numerical
-values, lists, and NumPy arrays. However, plan variables can contain
+  <p>The result of mathematical expressions is restricted to numerical
+types, lists, and NumPy arrays. However, plan variables may contain
 values of any type, so expressions of the form <code>$identifier</code> may
-evaluate to results of any type.</p>
+evaluate to values of varying types.</p>
 </details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2223,8 +2243,7 @@ evaluate to results of any type.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The expression to evaluate. This can be a string or any other
-   type.</p>
+                <p>The expression to evaluate, as a string or any other type.</p>
               </div>
             </td>
             <td>
@@ -2250,7 +2269,7 @@ evaluate to results of any type.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The result of the evaluated expression, which may be of any type</p>
+                <p>The evaluated result, which may vary in type depending on the</p>
               </div>
             </td>
           </tr>
@@ -2260,7 +2279,7 @@ evaluate to results of any type.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>depending on the evaluation context.</p>
+                <p>evaluation context.</p>
               </div>
             </td>
           </tr>
