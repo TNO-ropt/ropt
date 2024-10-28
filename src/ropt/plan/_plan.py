@@ -2,48 +2,32 @@
 
 from __future__ import annotations
 
-import ast
-import re
 from itertools import chain, count
-from numbers import Number
 from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
     Dict,
-    Final,
     List,
     Optional,
-    Set,
     Tuple,
     Union,
 )
 
-import numpy as np
 from numpy.random import default_rng
 
-from ropt.config.enopt import EnOptConfig
 from ropt.config.enopt.constants import DEFAULT_SEED
 from ropt.config.plan import RunStepConfig, SetStepConfig
 from ropt.enums import EventType
-from ropt.exceptions import PlanError
 from ropt.plugins import PluginManager
-from ropt.results import Results
 
+from ._expr import ExpressionEvaluator
 from ._set import SetStep
 
 if TYPE_CHECKING:
     from ropt.config.plan import PlanConfig
     from ropt.evaluator import Evaluator
     from ropt.plan import Event, ResultHandler, RunStep
-
-_VALID_TYPES: Final = (int, float, bool, str)
-_UNARY_OPS: Final = (ast.UAdd, ast.USub, ast.Not)
-_BIN_OPS: Final = (ast.Add, ast.Sub, ast.Div, ast.FloorDiv, ast.Mult, ast.Mod, ast.Pow)
-_BOOL_OPS: Final = (ast.Or, ast.And)
-_CMP_OPS: Final = (ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE)
-
-_SUPPORTED_VARIABLE_TYPES = (Number, str, np.ndarray, Dict, List, Results, EnOptConfig)
 
 
 class OptimizerContext:
@@ -118,7 +102,7 @@ class Plan:
         ):
             if var in self._vars:
                 msg = f"Variable already exists: `{var}"
-                raise PlanError(msg)
+                raise AttributeError(msg)
             self._set_item(var, None)
         self._steps = self.create_steps(config.steps)
         self._handlers: List[ResultHandler] = [
@@ -129,6 +113,7 @@ class Plan:
         ]
         self._aborted = False
         self._parent = parent
+        self._expression_evaluator = ExpressionEvaluator(self._vars)
 
     def run(self, *args: Any) -> Tuple[Any, ...]:  # noqa: ANN401
         """Run the Plan.
@@ -149,14 +134,14 @@ class Plan:
         len_inputs = len(self._plan_config.inputs)
         if len_args != len_inputs:
             msg = f"The number of inputs is incorrect: expected {len_inputs}, passed {len_args}"
-            raise PlanError(msg)
+            raise RuntimeError(msg)
         for name, arg in zip(self._plan_config.inputs, args):
             self[name] = arg
         self.run_steps(self._steps)
         missing = [name for name in self._plan_config.outputs if name not in self]
         if missing:
             msg = f"Missing outputs: {missing}"
-            raise PlanError(msg)
+            raise RuntimeError(msg)
         return tuple(self[name] for name in self._plan_config.outputs)
 
     def abort(self) -> None:
@@ -264,52 +249,6 @@ class Plan:
             parent=self,
         )
 
-    def _eval_expr(self, expr: str) -> Any:  # noqa: ANN401
-        # find all variables:
-        found: Set[str] = set()
-        for word in re.findall(r"(?<=\$)\b\w+\b", expr):
-            if word not in self:
-                msg = f"Unknown plan variable: `{word}`"
-                raise PlanError(msg)
-            found.add(word)
-
-        # Parse the string:
-        stripped = re.sub(r"\$(\$*)", "\\1", expr)
-        tree = ast.parse(stripped, mode="eval")
-        if _is_valid(tree.body):
-            replacer = _ReplaceFields(self, found)
-            tree = ast.fix_missing_locations(replacer.visit(tree))
-            return eval(  # noqa: S307
-                compile(tree, "", mode="eval"), {"__builtins__": {}}, replacer.vars
-            )
-
-        raise SyntaxError
-
-    def _substitute(self, matched: re.Match[str]) -> str:
-        value = matched.string[matched.start() : matched.end()]
-        return "$" if value == "$$" else str(self._eval(value))
-
-    def _eval(self, value: str) -> Any:  # noqa: ANN401
-        value = value.strip()
-        if value.startswith("$$"):
-            return value.replace("$$", "$", 1)
-        if value.startswith("{{") and value.endswith("}}"):
-            return self._eval_expr(value[2:-2].strip())
-        if value.startswith("[[") and value.endswith("]]"):
-            parts = value[2:-2].split("{{")
-            parts[1:] = ["{{" + part for part in parts[1:]]
-            return "".join(
-                re.sub(
-                    r"\{{(.*)}}|\$\$|\$([^\W0-9][\w\.]*)",
-                    self._substitute,
-                    part,
-                )
-                for part in parts
-            )
-        if value.startswith("$"):
-            return self._eval_expr(value)
-        return value
-
     def eval(self, value: Any) -> Any:  # noqa: ANN401
         """Evaluate the provided value as an expression.
 
@@ -339,13 +278,9 @@ class Plan:
         Returns:
             The evaluated result, which may vary in type depending on the evaluation context.
         """
-        if isinstance(value, str):
-            try:
-                return self._eval(value)
-            except (SyntaxError, TypeError) as exc:
-                msg = f"Invalid expression: {value}"
-                raise PlanError(msg) from exc
-        return value
+        return (
+            self._expression_evaluator.eval(value) if isinstance(value, str) else value
+        )
 
     def add_observer(
         self,
@@ -418,12 +353,12 @@ class Plan:
         if name in self._vars:
             return self._vars[name]
         msg = f"Unknown plan variable: `{name}`"
-        raise PlanError(msg)
+        raise AttributeError(msg)
 
     def _set_item(self, name: str, value: Any) -> None:  # noqa: ANN401
         if not name.isidentifier():
             msg = f"Not a valid variable name: `{name}`"
-            raise PlanError(msg)
+            raise AttributeError(msg)
         self._vars[name] = value
 
     def __setitem__(self, name: str, value: Any) -> None:  # noqa: ANN401
@@ -438,7 +373,7 @@ class Plan:
         """
         if name not in self._vars:
             msg = f"Unknown variable name: `{name}`"
-            raise PlanError(msg)
+            raise AttributeError(msg)
         self._set_item(name, value)
 
     def __contains__(self, name: str) -> bool:
@@ -454,58 +389,3 @@ class Plan:
             `True` if the variable exists; otherwise, `False`.
         """
         return name in self._vars
-
-
-def _is_valid(node: ast.AST) -> bool:  # noqa: C901, PLR0911
-    if isinstance(node, ast.Constant):
-        return node.value is None or type(node.value) in _VALID_TYPES
-    if isinstance(node, ast.UnaryOp):
-        return isinstance(node.op, _UNARY_OPS) and _is_valid(node.operand)
-    if isinstance(node, ast.BinOp):
-        return (
-            isinstance(node.op, _BIN_OPS)
-            and _is_valid(node.left)
-            and _is_valid(node.right)
-        )
-    if isinstance(node, ast.BoolOp):
-        return (
-            isinstance(node.op, _BOOL_OPS)
-            and all(_is_valid(value) for value in node.values)  # noqa: PD011
-        )
-    if isinstance(node, ast.Compare):
-        return all(isinstance(op, _CMP_OPS) for op in node.ops) and all(
-            _is_valid(value) for value in node.comparators
-        )
-    if isinstance(node, ast.List):
-        return all(_is_valid(item) for item in node.elts)
-    if isinstance(node, ast.Dict):
-        return (
-            all(item is None or _is_valid(item) for item in node.keys)
-            and all(_is_valid(item) for item in node.values)  # noqa: PD011
-        )
-    if isinstance(node, ast.Subscript):
-        return _is_valid(node.slice)
-    if isinstance(node, ast.Index):
-        return _is_valid(node.value)  # type: ignore[attr-defined]
-    if isinstance(node, ast.Attribute):
-        if isinstance(node.value, ast.Attribute):
-            return _is_valid(node.value)
-        return bool(isinstance(node.value, ast.Name))
-    return bool(isinstance(node, ast.Name))
-
-
-class _ReplaceFields(ast.NodeTransformer):
-    def __init__(self, plan: Plan, found: Set[str]) -> None:
-        self._plan = plan
-        self.vars: Dict[str, Any] = {}
-        self._found = found
-
-    def visit_Name(self, node: ast.Name) -> ast.AST:  # noqa: N802
-        if node.id in self._found:
-            value = self._plan[node.id]
-            if value is None or isinstance(value, _SUPPORTED_VARIABLE_TYPES):
-                self.vars[node.id] = value
-                return self.generic_visit(node)
-            msg = f"Error in expression: the type of `{node.id}` is not supported"
-            raise PlanError(msg)
-        return self.generic_visit(node)

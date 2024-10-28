@@ -13,7 +13,6 @@ from ropt.config.plan import PlanConfig  # noqa: TCH001
 from ropt.config.utils import Array1D, ItemOrSet, ItemOrTuple  # noqa: TCH001
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
-from ropt.exceptions import PlanError
 from ropt.optimization import EnsembleOptimizer
 from ropt.plan import Event, Plan, RunStep
 from ropt.results import FunctionResults
@@ -100,7 +99,7 @@ class DefaultOptimizerStep(RunStep):
         config = self.plan.eval(self._with.config)
         if not isinstance(config, (dict, EnOptConfig)):
             msg = "No valid EnOpt configuration provided"
-            raise PlanError(msg)
+            raise TypeError(msg)
         self._enopt_config = EnOptConfig.model_validate(config)
 
         self.plan.emit_event(
@@ -138,7 +137,7 @@ class DefaultOptimizerStep(RunStep):
             and self._with.nested_optimization is not None
         ):
             msg = "Nested optimization detected: parallel evaluation not supported. "
-            raise PlanError(msg)
+            raise RuntimeError(msg)
 
         exit_code = ensemble_optimizer.start(variables)
 
@@ -226,5 +225,5 @@ class DefaultOptimizerStep(RunStep):
                 )
             if parsed_variables is not None:
                 msg = f"`{self._with.initial_values} does not contain variables."
-                raise PlanError(msg)
+                raise ValueError(msg)
         return self._enopt_config.variables.initial_values

@@ -3,14 +3,13 @@ from __future__ import annotations
 import filecmp
 import re
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, Dict, List
+from typing import TYPE_CHECKING, Any, Dict, List, Union
 
 import numpy as np
 import pytest
 
 from ropt.config.plan import PlanConfig
 from ropt.enums import EventType, OptimizerExitCode
-from ropt.exceptions import PlanError
 from ropt.plan import Event, OptimizationPlanRunner, OptimizerContext, Plan
 from ropt.report import ResultsTable
 from ropt.results import FunctionResults, Results
@@ -137,22 +136,26 @@ def test_eval_expr(evaluator: Any, expr: str, expected: Any) -> None:
 
 
 @pytest.mark.parametrize(
-    ("expr", "message"),
+    ("expr", "message", "exception"),
     [
-        ("{{1 + * 1}}", "Invalid expression: {}"),
-        ("$z", "Unknown plan variable: `z`"),
-        ("[[a {{ 1 + 1 {{ x }} }} b]]", "Invalid expression: {}"),
-        ("[[{{ 1 + * 1 }}]]", "Invalid expression: {}"),
+        ("{{1 + * 1}}", "invalid syntax", SyntaxError),
+        ("$z", "Unknown plan variable: `z`", AttributeError),
+        ("[[a {{ 1 + 1 {{ 1 }} }} b]]", "unmatched '}'", SyntaxError),
+        ("[[{{ 1 + * 1 }}]]", "invalid syntax", SyntaxError),
     ],
 )
-def test_eval_exception(evaluator: Any, expr: str, message: Any) -> None:
+def test_eval_exception(
+    evaluator: Any,
+    expr: str,
+    message: Any,
+    exception: Union[AttributeError, SyntaxError],
+) -> None:
     plan_config: Dict[str, Any] = {}
     parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(parsed_config, context)
     plan.run()
-
-    with pytest.raises(PlanError, match=re.escape(message.format(expr))):
+    with pytest.raises(exception, match=message):  # type: ignore[call-overload]
         plan.eval(expr)
 
 
@@ -269,7 +272,7 @@ def test_set_keys_exception(evaluator: Any) -> None:
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(parsed_config, context)
     with pytest.raises(
-        PlanError, match=re.escape("Invalid attribute access: y['a']['b']")
+        AttributeError, match=re.escape("Invalid attribute access: y['a']['b']")
     ):
         plan.run()
 

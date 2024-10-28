@@ -7,8 +7,6 @@ import re
 from collections.abc import Mapping, MutableMapping, MutableSequence
 from typing import TYPE_CHECKING, Any, List
 
-from ropt.exceptions import PlanError
-
 if TYPE_CHECKING:
     from ropt.config.plan import SetStepConfig
     from ropt.plan import Plan
@@ -35,7 +33,7 @@ class SetStep:
         ):
             if not isinstance(list_item, Mapping):
                 msg = "`set` must be called with a var/value dict or a list of var/value dicts"
-                raise PlanError(msg)
+                raise TypeError(msg)
             for target, value in list_item.items():
                 pattern = re.findall(
                     r"([^\[^\.]+)|(\[.*?\])|(\.\b\w+\b)", target.strip()
@@ -43,7 +41,7 @@ class SetStep:
                 name, *keys = [x.strip() for group in pattern for x in group if x]
                 if name not in self._plan:
                     msg = f"Unknown variable name: {name}"
-                    raise PlanError(msg)
+                    raise AttributeError(msg)
                 self._targets.append(target)
                 self._names.append(name)
                 self._keys.append(
@@ -69,7 +67,7 @@ class SetStep:
                     self._set_target(target, keys[-1], value)
                 except (AttributeError, KeyError):
                     msg = f"Invalid attribute access: {target_string}"
-                    raise PlanError(msg) from None
+                    raise AttributeError(msg) from None
 
     def _get_target(self, target: Any, key: str) -> Any:  # noqa: ANN401
         if key.startswith("{{"):

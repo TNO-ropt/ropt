@@ -14,7 +14,7 @@ from ropt.config.utils import (
 )
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
-from ropt.exceptions import OptimizationAborted, PlanError
+from ropt.exceptions import OptimizationAborted
 from ropt.plan import Event, RunStep
 from ropt.results import FunctionResults
 from ropt.utils.scaling import scale_variables
@@ -72,7 +72,7 @@ class DefaultEvaluatorStep(RunStep):
         config = self.plan.eval(self._with.config)
         if not isinstance(config, (dict, EnOptConfig)):
             msg = "No valid EnOpt configuration provided"
-            raise PlanError(msg)
+            raise TypeError(msg)
         self._enopt_config = EnOptConfig.model_validate(config)
 
         self.plan.emit_event(
@@ -135,5 +135,5 @@ class DefaultEvaluatorStep(RunStep):
                 )
             if parsed_variables is not None:
                 msg = f"`{self._with.values} does not contain variables."  # noqa: PD011
-                raise PlanError(msg)
+                raise ValueError(msg)
         return self._enopt_config.variables.initial_values

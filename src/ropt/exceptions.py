@@ -7,22 +7,6 @@ class ConfigError(Exception):
     """Raised when an configuration error occurs."""
 
 
-class PlanError(Exception):
-    """Raised when an error occurs in an optimization plan."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize with a custom error message.
-
-        Args:
-            message: Error message
-        """
-        super().__init__(message)
-
-
-class PlanExprError(PlanError):
-    """Raised when an error occurs in a plan expression."""
-
-
 class OptimizationAborted(Exception):  # noqa: N818
     """Raised when an optimization is aborted.
 
