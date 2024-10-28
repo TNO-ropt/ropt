@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../function_transform_plugins/">
+        <link rel="prev" href="../scipy_sampler_plugin/">
       
       
-        <link rel="next" href="../scipy_sampler/">
+        <link rel="next" href="../default_function_transform_plugin/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>SciPy Optimizer Plugin - ropt Documentation</title>
+        <title>Default Realization Filter Plugin - ropt Documentation</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.plugins.optimizer.scipy.SciPyOptimizer" class="md-skip">
+        <a href="#ropt.plugins.realization_filter.default.DefaultRealizationFilter" class="md-skip">
           Skip to content
         </a>
       
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              SciPy Optimizer Plugin
+              Default Realization Filter Plugin
             
           </span>
         </div>
@@ -532,7 +532,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization Plan configuration
+    Optimization Plan Configuration
   </span>
   
 
@@ -553,7 +553,7 @@
         
   
   <span class="md-ellipsis">
-    Optimizer configuration
+    Optimizer Configuration
   </span>
   
 
@@ -622,7 +622,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization plans
+    Optimization Plans
   </span>
   
 
@@ -643,7 +643,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization plan runner
+    Basic Plan runner
   </span>
   
 
@@ -685,7 +685,7 @@
         
   
   <span class="md-ellipsis">
-    Function evaluations
+    Function Evaluations
   </span>
   
 
@@ -706,7 +706,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization results
+    Optimization Results
   </span>
   
 
@@ -817,7 +817,7 @@
         
   
   <span class="md-ellipsis">
-    Plan objects
+    Plan Plugins
   </span>
   
 
@@ -838,7 +838,7 @@
         
   
   <span class="md-ellipsis">
-    Optimizer plugins
+    Optimizer Plugins
   </span>
   
 
@@ -859,7 +859,7 @@
         
   
   <span class="md-ellipsis">
-    Sampler plugins
+    Sampler Plugins
   </span>
   
 
@@ -880,7 +880,7 @@
         
   
   <span class="md-ellipsis">
-    Realization filters
+    Realization Filter Plugins
   </span>
   
 
@@ -901,7 +901,7 @@
         
   
   <span class="md-ellipsis">
-    Function transforms
+    Function transform Plugins
   </span>
   
 
@@ -963,6 +963,69 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_plan_plugin/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Default Plan Plugin
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scipy_optimizer_plugin/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SciPy Optimizer Plugin
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scipy_sampler_plugin/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    SciPy Sampler Plugin
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -977,7 +1040,7 @@
           
   
   <span class="md-ellipsis">
-    SciPy Optimizer Plugin
+    Default Realization Filter Plugin
   </span>
   
 
@@ -988,7 +1051,7 @@
         
   
   <span class="md-ellipsis">
-    SciPy Optimizer Plugin
+    Default Realization Filter Plugin
   </span>
   
 
@@ -1008,9 +1071,45 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.optimizer.scipy.SciPyOptimizer" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.default.DefaultRealizationFilter" class="md-nav__link">
     <span class="md-ellipsis">
-      SciPyOptimizer
+      DefaultRealizationFilter
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.default.SortObjectiveOptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      SortObjectiveOptions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.default.SortConstraintOptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      SortConstraintOptions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.default.CVaRObjectiveOptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      CVaRObjectiveOptions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.default.CVaRConstraintOptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      CVaRConstraintOptions
     </span>
   </a>
   
@@ -1032,74 +1131,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../scipy_sampler/" class="md-nav__link">
+      <a href="../default_function_transform_plugin/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    SciPy Sampler Plugin
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../default_realization_filters/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Default Realization Filters
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../default_function_transforms/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Default Function Transforms
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../default_plan_objects/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Default Plan Objects
+    Default Function Transform Plugin
   </span>
   
 
@@ -1212,9 +1248,45 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.optimizer.scipy.SciPyOptimizer" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.default.DefaultRealizationFilter" class="md-nav__link">
     <span class="md-ellipsis">
-      SciPyOptimizer
+      DefaultRealizationFilter
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.default.SortObjectiveOptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      SortObjectiveOptions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.default.SortConstraintOptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      SortConstraintOptions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.default.CVaRObjectiveOptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      CVaRObjectiveOptions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.default.CVaRConstraintOptions" class="md-nav__link">
+    <span class="md-ellipsis">
+      CVaRConstraintOptions
     </span>
   </a>
   
@@ -1238,14 +1310,14 @@
   
 
 
-  <h1>SciPy Optimizer Plugin</h1>
+  <h1>Default Realization Filter Plugin</h1>
 
 <div class="doc doc-object doc-class">
 
 
 
-<h2 id="ropt.plugins.optimizer.scipy.SciPyOptimizer" class="doc doc-heading">
-            <code>ropt.plugins.optimizer.scipy.SciPyOptimizer</code>
+<h2 id="ropt.plugins.realization_filter.default.DefaultRealizationFilter" class="doc doc-heading">
+            <code>ropt.plugins.realization_filter.default.DefaultRealizationFilter</code>
 
 
 </h2>
@@ -1253,55 +1325,398 @@
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.optimizer.base.Optimizer" href="../optimizer_plugins/#ropt.plugins.optimizer.base.Optimizer">Optimizer</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.realization_filter.base.RealizationFilter" href="../realization_filter_plugins/#ropt.plugins.realization_filter.base.RealizationFilter">RealizationFilter</a></code></p>
 
 
-        <p>Plugin class for optimization via SciPy.</p>
-<p>This class implements several optimizers provided by SciPy in the
-<a href="https://docs.scipy.org/doc/scipy/tutorial/optimize.html"><code>scipy.optimize</code></a>
-package:</p>
+        <p>The default realization filter plugin class.</p>
+<p>This plugin currently implements four methods:</p>
+<dl>
+<dt><code>sort-objective</code>:</dt>
+<dd>Filter realizations by selecting a range of objective values. This filter
+   requires additional configuration using an options dict that can be
+   parsed into a
+   <a class="autorefs autorefs-internal" href="#ropt.plugins.realization_filter.default.SortObjectiveOptions"><code>SortObjectiveOptions</code></a>
+   class. This method sorts realizations according to the weighted sum of
+   the values of objective functions specified in the options. It then
+   selects the set of realizations from a given index range.</dd>
+<dt><code>sort-constraint</code>:</dt>
+<dd>Filter realizations by selecting a range of constraint values. This
+   filter requires additional configuration using an options dict that can
+   be parsed into a
+   <a class="autorefs autorefs-internal" href="#ropt.plugins.realization_filter.default.SortConstraintOptions"><code>SortConstraintOptions</code></a>
+   class. This method sorts realizations according to the values of
+   constraint functions specified in the options. It then selects the set of
+   realizations from a given index range.</dd>
+<dt><code>cvar-objective</code>:</dt>
+<dd>Filter realizations by selecting a range of objective values. This filter
+   requires additional configuration using an options dict that can be
+   parsed into a
+   <a class="autorefs autorefs-internal" href="#ropt.plugins.realization_filter.default.CVaRObjectiveOptions"><code>CVaRObjectiveOptions</code></a>
+   class. This method sorts realizations according to the weighted sum of
+   the values of objective functions specified in the options. It then
+   selects a percentile of the realizations, applying interpolation whenever
+   the number of selected realizations is not an integer number.</dd>
+<dt><code>cvar-constraint</code>:</dt>
+<dd>Filter realizations by selecting a range of constraint values. This
+   filter requires additional configuration using an options dict that can
+   be parsed into a
+   <a class="autorefs autorefs-internal" href="#ropt.plugins.realization_filter.default.CVaRConstraintOptions"><code>CVaRConstraintOptions</code></a>
+   class. This method sorts realizations according to the values of
+   constraint functions specified in the options. It then selects a
+   percentile of the realizations, applying interpolation whenever the
+   number of selected realizations is not an integer number.</dd>
+</dl>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.realization_filter.default.SortObjectiveOptions" class="doc doc-heading">
+            <code>ropt.plugins.realization_filter.default.SortObjectiveOptions</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
+
+
+        <p>Configuration settings for the <code>sort-objective</code> method.</p>
+<p>The <code>sort-objective</code> method sorts realizations according to the value of one
+or multiple objectives, and retains a number of realizations within a given
+index range in the sorted list. If more than one objective index is given, a
+weighted sum of these objectives is used, using the weights given in the
+configuration of the optimizer.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.SortObjectiveOptions.sort">sort</span></code></td>
+            <td>
+                  <code><span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<span title="pydantic.StrictStr">StrictStr</span>, <span title="pydantic.NonNegativeInt">NonNegativeInt</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The indices of the objectives to sort</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.SortObjectiveOptions.first">first</span></code></td>
+            <td>
+                  <code><span title="pydantic.NonNegativeInt">NonNegativeInt</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Index of the first realization to use</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.SortObjectiveOptions.last">last</span></code></td>
+            <td>
+                  <code><span title="pydantic.NonNegativeInt">NonNegativeInt</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Index of the last realization to use</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.realization_filter.default.SortConstraintOptions" class="doc doc-heading">
+            <code>ropt.plugins.realization_filter.default.SortConstraintOptions</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
+
+
+        <p>Configuration settings for the <code>sort-constraint</code> method.</p>
+<p>The <code>sort-constraint</code> method sorts realizations according to the value of a
+constraint, and retains a number of realizations within a given index range
+in the sorted list.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.SortConstraintOptions.sort">sort</span></code></td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[<span title="pydantic.StrictStr">StrictStr</span>, <span title="pydantic.NonNegativeInt">NonNegativeInt</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The index of the constraint to sort</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.SortConstraintOptions.first">first</span></code></td>
+            <td>
+                  <code><span title="pydantic.NonNegativeInt">NonNegativeInt</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Index of the first realization to use</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.SortConstraintOptions.last">last</span></code></td>
+            <td>
+                  <code><span title="pydantic.NonNegativeInt">NonNegativeInt</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Index of the last realization to use</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.realization_filter.default.CVaRObjectiveOptions" class="doc doc-heading">
+            <code>ropt.plugins.realization_filter.default.CVaRObjectiveOptions</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
+
+
+        <p>Configuration settings for the <code>cvar-objective</code> method.</p>
+<p>The <code>cvar-objective</code> method finds realizations weights by applying the CVaR
+method to the objective values. If more than one objective index is given, a
+weighted sum of these objectives is used, using the weights given in the
+configuration of the optimizer.</p>
+<p>The percentile argument defines the contribution of the "worst" performing
+realizations in the distribution that is used to calculate the ensemble
+value. "Worst" is defined as those realizations having the highest values in
+case of a minimization and those having the lowest values in case of
+maximizing.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.CVaRObjectiveOptions.sort">sort</span></code></td>
+            <td>
+                  <code><span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<span title="pydantic.StrictStr">StrictStr</span>, <span title="pydantic.NonNegativeInt">NonNegativeInt</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The indices of the objectives to sort</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.CVaRObjectiveOptions.percentile">percentile</span></code></td>
+            <td>
+                  <code><span title="typing_extensions.Annotated">Annotated</span>[float, <span title="pydantic.Field">Field</span>(gt=0.0, le=1.0)]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The CVaR percentile</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.realization_filter.default.CVaRConstraintOptions" class="doc doc-heading">
+            <code>ropt.plugins.realization_filter.default.CVaRConstraintOptions</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
+
+
+        <p>Configuration settings for the <code>cvar-constraint</code> method.</p>
+<p>The <code>cvar-constraint</code> method finds realizations weights by applying the CVaR
+method to the objective values.</p>
+<p>The percentile argument defines the contribution of the "worst" performing
+realizations in the distribution that is used to calculate the ensemble
+value. The definition of worst depends on the type of the constraints. After
+subtracting the right-hand-side value the following applies:</p>
 <ul>
-<li>Nelder-Mead</li>
-<li>Powell</li>
-<li>CG</li>
-<li>BFGS</li>
-<li>Newton-CG</li>
-<li>L-BFGS-B</li>
-<li>TNC</li>
-<li>COBYLA</li>
-<li>SLSQP</li>
-<li>differential_evolution</li>
-</ul>
-<p>The optimizer to use is selected by setting the <code>method</code> field in the
-<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.OptimizerConfig"><code>optimizer</code></a> field of
-<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> to the name of the algorithm.
-Most of these methods support the general options set in the
-<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. However, specific
-options that are normally passed as arguments in the SciPy functions can be
-provided via the <code>options</code> dictionary in the configuration object. Consult
-the
-<a href="https://docs.scipy.org/doc/scipy/tutorial/optimize.html"><code>scipy.optimize</code></a>
-manual for details on these options.</p>
-<p>Not all constraints are supported by all optimizers:</p>
-<ul>
-<li>Bound constraints: Nelder-Mead, L-BFGS-B, SLSQP, TNC,
-  differential_evolution</li>
-<li>Linear constraints: SLSQP, differential_evolution</li>
-<li>Nonlinear constraints: COBYLA (only inequality), SLSQP,
-  differential_evolution</li>
+<li>For LE constraints, realizations with the largest values are the worst</li>
+<li>For GE constraints, realizations with the smallest values are the worst</li>
+<li>For EQ constraints, realizations with the largest absolute values are the worst</li>
 </ul>
 
 
-<details class="info" open>
-  <summary>Info</summary>
-  <ul>
-<li>The Nelder-Mead algorithm only supports bound constraints if SciPy
-  version &gt;= 1.7.</li>
-<li>Some SciPy algorithms that require a Hessian or a Hessian-vector
-  product are not supported. These include dogleg, trust-ncg,
-  trust-exact, and trust-krylov.</li>
-</ul>
-</details>
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.CVaRConstraintOptions.sort">sort</span></code></td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[<span title="pydantic.StrictStr">StrictStr</span>, <span title="pydantic.NonNegativeInt">NonNegativeInt</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The index of the constraint to sort</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.realization_filter.default.CVaRConstraintOptions.percentile">percentile</span></code></td>
+            <td>
+                  <code><span title="typing_extensions.Annotated">Annotated</span>[float, <span title="pydantic.Field">Field</span>(gt=0.0, le=1.0)]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The CVaR percentile</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
 
 
 
@@ -1376,9 +1791,7 @@ manual for details on these options.</p>
       
         <script src="../../javascripts/mathjax.js"></script>
       
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-      
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
       
     
   </body>

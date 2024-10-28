@@ -532,7 +532,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization Plan configuration
+    Optimization Plan Configuration
   </span>
   
 
@@ -553,7 +553,7 @@
         
   
   <span class="md-ellipsis">
-    Optimizer configuration
+    Optimizer Configuration
   </span>
   
 
@@ -622,7 +622,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization plans
+    Optimization Plans
   </span>
   
 
@@ -643,7 +643,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization plan runner
+    Basic Plan runner
   </span>
   
 
@@ -685,7 +685,7 @@
         
   
   <span class="md-ellipsis">
-    Function evaluations
+    Function Evaluations
   </span>
   
 
@@ -706,7 +706,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization results
+    Optimization Results
   </span>
   
 
@@ -952,7 +952,7 @@
         
   
   <span class="md-ellipsis">
-    Plan objects
+    Plan Plugins
   </span>
   
 
@@ -973,7 +973,7 @@
         
   
   <span class="md-ellipsis">
-    Optimizer plugins
+    Optimizer Plugins
   </span>
   
 
@@ -994,7 +994,7 @@
         
   
   <span class="md-ellipsis">
-    Sampler plugins
+    Sampler Plugins
   </span>
   
 
@@ -1015,7 +1015,7 @@
         
   
   <span class="md-ellipsis">
-    Realization filters
+    Realization Filter Plugins
   </span>
   
 
@@ -1036,7 +1036,7 @@
         
   
   <span class="md-ellipsis">
-    Function transforms
+    Function transform Plugins
   </span>
   
 
@@ -1101,7 +1101,28 @@
   
   
     <li class="md-nav__item">
-      <a href="../scipy_optimizer/" class="md-nav__link">
+      <a href="../default_plan_plugin/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Default Plan Plugin
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scipy_optimizer_plugin/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1122,7 +1143,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../scipy_sampler/" class="md-nav__link">
+      <a href="../scipy_sampler_plugin/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1143,11 +1164,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../default_realization_filters/" class="md-nav__link">
+      <a href="../default_realization_filter_plugin/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Default Realization Filters
+    Default Realization Filter Plugin
   </span>
   
 
@@ -1164,32 +1185,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../default_function_transforms/" class="md-nav__link">
+      <a href="../default_function_transform_plugin/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Default Function Transforms
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../default_plan_objects/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Default Plan Objects
+    Default Function Transform Plugin
   </span>
   
 
@@ -1440,30 +1440,30 @@ types of functionality:</p>
 <dl>
 <dt><a class="autorefs autorefs-internal" href="../optimizer_plugins/#ropt.plugins.optimizer"><code>optimizer</code></a>:</dt>
 <dd>Plugins that implement specific optimization methods. The builtin
-  <a class="autorefs autorefs-internal" href="../scipy_optimizer/#ropt.plugins.optimizer.scipy.SciPyOptimizer"><code>scipy</code></a> plugin utilizes the
+  <a class="autorefs autorefs-internal" href="../scipy_optimizer_plugin/#ropt.plugins.optimizer.scipy.SciPyOptimizer"><code>scipy</code></a> plugin utilizes the
   <a href="https://docs.scipy.org/doc/scipy/reference/optimize.html"><code>scipy.optimize</code></a>
 module to implement various optimization algorithms.</dd>
 <dt><a class="autorefs autorefs-internal" href="../sampler_plugins/#ropt.plugins.sampler"><code>sampler</code></a>:</dt>
 <dd>Plugins responsible for generating perturbations for estimating gradients.
-  The builtin <a class="autorefs autorefs-internal" href="../scipy_sampler/#ropt.plugins.sampler.scipy.SciPySampler"><code>scipy</code></a> plugin is based
+  The builtin <a class="autorefs autorefs-internal" href="../scipy_sampler_plugin/#ropt.plugins.sampler.scipy.SciPySampler"><code>scipy</code></a> plugin is based
   on <a href="https://docs.scipy.org/doc/scipy/reference/stats.html"><code>scipy.stats</code></a>,
   providing various sampling methods.</dd>
 <dt><a class="autorefs autorefs-internal" href="../realization_filter_plugins/#ropt.plugins.realization_filter"><code>realization_filter</code></a>:</dt>
 <dd>These plugins implement filters for selecting a sub-set of realizations used
   in calculating objective or constraint functions and their gradients. The
   included
-  <a class="autorefs autorefs-internal" href="../default_realization_filters/#ropt.plugins.realization_filter.default.DefaultRealizationFilter"><code>default</code></a>
+  <a class="autorefs autorefs-internal" href="../default_realization_filter_plugin/#ropt.plugins.realization_filter.default.DefaultRealizationFilter"><code>default</code></a>
   plugin provides filters based on ranking and for CVaR optimization.</dd>
 <dt><a class="autorefs autorefs-internal" href="../function_transform_plugins/#ropt.plugins.function_transform"><code>function_transform</code></a>:</dt>
 <dd>These plugins calculate the final objective and gradient from sets of
   objectives or constraints and their gradients for individual realizations. The
   included
-  <a class="autorefs autorefs-internal" href="../default_function_transforms/#ropt.plugins.function_transform.default.DefaultFunctionTransform"><code>default</code></a>
+  <a class="autorefs autorefs-internal" href="../default_function_transform_plugin/#ropt.plugins.function_transform.default.DefaultFunctionTransform"><code>default</code></a>
   plugin supports objectives defined by the mean or standard deviation of these
   values.</dd>
 <dt><a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan"><code>plan</code></a>:</dt>
 <dd>Plan plugins implement the objects that execute an optimization plan.
-  The built-in <a class="autorefs autorefs-internal" href="../default_plan_objects/#ropt.plugins.plan.default.DefaultPlanPlugin"><code>default</code></a> plugin
+  The built-in <a class="autorefs autorefs-internal" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanPlugin"><code>default</code></a> plugin
   offers a full set of optimization plan objects for executing complex
   optimization plans.</dd>
 </dl>
@@ -1999,9 +1999,7 @@ this argument can be ignored.</p>
       
         <script src="../../javascripts/mathjax.js"></script>
       
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-      
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
       
     
   </body>

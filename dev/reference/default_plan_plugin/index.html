@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../scipy_optimizer/">
+        <link rel="prev" href="../function_transform_plugins/">
       
       
-        <link rel="next" href="../default_realization_filters/">
+        <link rel="next" href="../scipy_optimizer_plugin/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>SciPy Sampler Plugin - ropt Documentation</title>
+        <title>Default Plan Plugin - ropt Documentation</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.plugins.sampler.scipy.SciPySampler" class="md-skip">
+        <a href="#ropt.plugins.plan.default.DefaultPlanPlugin" class="md-skip">
           Skip to content
         </a>
       
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              SciPy Sampler Plugin
+              Default Plan Plugin
             
           </span>
         </div>
@@ -532,7 +532,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization Plan configuration
+    Optimization Plan Configuration
   </span>
   
 
@@ -553,7 +553,7 @@
         
   
   <span class="md-ellipsis">
-    Optimizer configuration
+    Optimizer Configuration
   </span>
   
 
@@ -622,7 +622,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization plans
+    Optimization Plans
   </span>
   
 
@@ -643,7 +643,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization plan runner
+    Basic Plan runner
   </span>
   
 
@@ -685,7 +685,7 @@
         
   
   <span class="md-ellipsis">
-    Function evaluations
+    Function Evaluations
   </span>
   
 
@@ -706,7 +706,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization results
+    Optimization Results
   </span>
   
 
@@ -817,7 +817,7 @@
         
   
   <span class="md-ellipsis">
-    Plan objects
+    Plan Plugins
   </span>
   
 
@@ -838,7 +838,7 @@
         
   
   <span class="md-ellipsis">
-    Optimizer plugins
+    Optimizer Plugins
   </span>
   
 
@@ -859,7 +859,7 @@
         
   
   <span class="md-ellipsis">
-    Sampler plugins
+    Sampler Plugins
   </span>
   
 
@@ -880,7 +880,7 @@
         
   
   <span class="md-ellipsis">
-    Realization filters
+    Realization Filter Plugins
   </span>
   
 
@@ -901,7 +901,7 @@
         
   
   <span class="md-ellipsis">
-    Function transforms
+    Function transform Plugins
   </span>
   
 
@@ -963,27 +963,6 @@
                 
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../scipy_optimizer/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    SciPy Optimizer Plugin
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
     
   
   
@@ -998,7 +977,7 @@
           
   
   <span class="md-ellipsis">
-    SciPy Sampler Plugin
+    Default Plan Plugin
   </span>
   
 
@@ -1009,7 +988,7 @@
         
   
   <span class="md-ellipsis">
-    SciPy Sampler Plugin
+    Default Plan Plugin
   </span>
   
 
@@ -1029,9 +1008,72 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.scipy.SciPySampler" class="md-nav__link">
+  <a href="#ropt.plugins.plan.default.DefaultPlanPlugin" class="md-nav__link">
     <span class="md-ellipsis">
-      SciPySampler
+      DefaultPlanPlugin
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultEvaluatorStep" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultEvaluatorStep
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultOptimizerStep" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultOptimizerStep
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultPrintStep" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultPrintStep
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultRepeatStep" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultRepeatStep
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultMetadataHandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultMetadataHandler
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultTableHandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultTableHandler
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultTrackerHandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultTrackerHandler
     </span>
   </a>
   
@@ -1053,11 +1095,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../default_realization_filters/" class="md-nav__link">
+      <a href="../scipy_optimizer_plugin/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Default Realization Filters
+    SciPy Optimizer Plugin
   </span>
   
 
@@ -1074,11 +1116,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../default_function_transforms/" class="md-nav__link">
+      <a href="../scipy_sampler_plugin/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Default Function Transforms
+    SciPy Sampler Plugin
   </span>
   
 
@@ -1095,11 +1137,32 @@
   
   
     <li class="md-nav__item">
-      <a href="../default_plan_objects/" class="md-nav__link">
+      <a href="../default_realization_filter_plugin/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Default Plan Objects
+    Default Realization Filter Plugin
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_function_transform_plugin/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Default Function Transform Plugin
   </span>
   
 
@@ -1212,9 +1275,72 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.scipy.SciPySampler" class="md-nav__link">
+  <a href="#ropt.plugins.plan.default.DefaultPlanPlugin" class="md-nav__link">
     <span class="md-ellipsis">
-      SciPySampler
+      DefaultPlanPlugin
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultEvaluatorStep" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultEvaluatorStep
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultOptimizerStep" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultOptimizerStep
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultPrintStep" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultPrintStep
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultRepeatStep" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultRepeatStep
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultMetadataHandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultMetadataHandler
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultTableHandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultTableHandler
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultTrackerHandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultTrackerHandler
     </span>
   </a>
   
@@ -1238,14 +1364,14 @@
   
 
 
-  <h1>SciPy Sampler Plugin</h1>
+  <h1>Default Plan Plugin</h1>
 
 <div class="doc doc-object doc-class">
 
 
 
-<h2 id="ropt.plugins.sampler.scipy.SciPySampler" class="doc doc-heading">
-            <code>ropt.plugins.sampler.scipy.SciPySampler</code>
+<h2 id="ropt.plugins.plan.default.DefaultPlanPlugin" class="doc doc-heading">
+            <code>ropt.plugins.plan.default.DefaultPlanPlugin</code>
 
 
 </h2>
@@ -1253,44 +1379,330 @@
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.sampler.base.Sampler" href="../sampler_plugins/#ropt.plugins.sampler.base.Sampler">Sampler</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.PlanPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanPlugin">PlanPlugin</a></code></p>
 
 
-        <p>Plugin class for producing sampling values via SciPy.</p>
-<p>This plugin implements the following sampling methods using the
-corresponding methods from the SciPy stats module:</p>
+        <p>The default plan plugin class.</p>
+<p>This class provides a number of run steps and result handlers:</p>
+<dl>
+<dt><code>Run Steps</code>:</dt>
+<dd>
 <ul>
-<li>
-<p>Sampling from <a href="https://docs.scipy.org/doc/scipy/reference/stats.html">probability
-  distributions</a>:</p>
-<dl>
-<dt><code>uniform</code></dt>
-<dd>Uniform distribution with a default range of [-1, 1].</dd>
-<dt><code>norm</code></dt>
-<dd>Normal distribution with mean zero and standard deviation 1.</dd>
-<dt><code>truncnorm</code></dt>
-<dd>Truncated normal distribution with mean zero and standard
-  deviation 1 truncated a the range [-1, 1].</dd>
-</dl>
-</li>
-<li>
-<p>Sampling using methods from the <a href="https://docs.scipy.org/doc/scipy/reference/stats.qmc.html">Quasi-Monte Carlo
-  submodule</a>:</p>
-<dl>
-<dt><code>sobol</code></dt>
-<dd>Using Sobol sequences, scaled to -1 and 1.</dd>
-<dt><code>halton</code></dt>
-<dd>Using Halton sequences, scaled to -1 and 1.</dd>
-<dt><code>lhs</code></dt>
-<dd>Using Latin Hypercube sampling, scaled to -1 and 1.</dd>
-</dl>
-</li>
+<li>A step that performs a single ensemble evaluation
+(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.default.DefaultEvaluatorStep"><code>evaluator</code></a>).</li>
 </ul>
-<p>Specific options that are normally passed as arguments in the SciPy
-functions can be provided via the options dictionary in the configuration
-object. Consult the
-<a href="https://docs.scipy.org/doc/scipy/reference/stats.html"><code>scipy.stats</code></a>
-manual for details on these options.</p>
+</dd>
+<dd>
+<ul>
+<li>A step that performs an optimization
+(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.default.DefaultOptimizerStep"><code>optimizer</code></a>).</li>
+</ul>
+</dd>
+<dd>
+<ul>
+<li>A step that prints a message to the console
+(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.default.DefaultPrintStep"><code>print</code></a>).</li>
+</ul>
+</dd>
+<dd>
+<ul>
+<li>A step that repeats a number of steps
+(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.default.DefaultRepeatStep"><code>repeat</code></a>).</li>
+</ul>
+</dd>
+<dt><code>Result Handlers</code>:</dt>
+<dd>
+<ul>
+<li>A handler that adds metadata to results
+(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.default.DefaultMetadataHandler"><code>metadata</code></a>).</li>
+</ul>
+</dd>
+<dd>
+<ul>
+<li>A handler that generates and saves tables of results
+(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.default.DefaultTableHandler"><code>table</code></a>).</li>
+</ul>
+</dd>
+<dd>
+<ul>
+<li>A handler that tracks optimal results
+(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.default.DefaultTrackerHandler"><code>tracker</code></a>).</li>
+</ul>
+</dd>
+</dl>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.plan.default.DefaultEvaluatorStep" class="doc doc-heading">
+            <code>ropt.plugins.plan.default.DefaultEvaluatorStep</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.RunStep" href="../plan_plugins/#ropt.plugins.plan.base.RunStep">RunStep</a></code></p>
+
+
+        <p>The default evaluator step.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.plan.default.DefaultOptimizerStep" class="doc doc-heading">
+            <code>ropt.plugins.plan.default.DefaultOptimizerStep</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.RunStep" href="../plan_plugins/#ropt.plugins.plan.base.RunStep">RunStep</a></code></p>
+
+
+        <p>The default optimizer step.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.plan.default.DefaultPrintStep" class="doc doc-heading">
+            <code>ropt.plugins.plan.default.DefaultPrintStep</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.RunStep" href="../plan_plugins/#ropt.plugins.plan.base.RunStep">RunStep</a></code></p>
+
+
+        <p>The default print step.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.plan.default.DefaultRepeatStep" class="doc doc-heading">
+            <code>ropt.plugins.plan.default.DefaultRepeatStep</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.RunStep" href="../plan_plugins/#ropt.plugins.plan.base.RunStep">RunStep</a></code></p>
+
+
+        <p>The default optimizer step.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.plan.default.DefaultMetadataHandler" class="doc doc-heading">
+            <code>ropt.plugins.plan.default.DefaultMetadataHandler</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.ResultHandler" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler">ResultHandler</a></code></p>
+
+
+        <p>The default metadata results handler.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.plan.default.DefaultTableHandler" class="doc doc-heading">
+            <code>ropt.plugins.plan.default.DefaultTableHandler</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.ResultHandler" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler">ResultHandler</a></code></p>
+
+
+        <p>The default tracker results handler object.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.plan.default.DefaultTrackerHandler" class="doc doc-heading">
+            <code>ropt.plugins.plan.default.DefaultTrackerHandler</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.ResultHandler" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler">ResultHandler</a></code></p>
+
+
+        <p>The default tracker results handler object.</p>
 
 
 
@@ -1366,9 +1778,7 @@ manual for details on these options.</p>
       
         <script src="../../javascripts/mathjax.js"></script>
       
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-      
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
       
     
   </body>

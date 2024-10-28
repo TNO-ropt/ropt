@@ -20,7 +20,7 @@
     
     
       
-        <title>Plan objects - ropt Documentation</title>
+        <title>Plan Plugins - ropt Documentation</title>
       
     
     
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Plan objects
+              Plan Plugins
             
           </span>
         </div>
@@ -532,7 +532,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization Plan configuration
+    Optimization Plan Configuration
   </span>
   
 
@@ -553,7 +553,7 @@
         
   
   <span class="md-ellipsis">
-    Optimizer configuration
+    Optimizer Configuration
   </span>
   
 
@@ -622,7 +622,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization plans
+    Optimization Plans
   </span>
   
 
@@ -643,7 +643,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization plan runner
+    Basic Plan runner
   </span>
   
 
@@ -685,7 +685,7 @@
         
   
   <span class="md-ellipsis">
-    Function evaluations
+    Function Evaluations
   </span>
   
 
@@ -706,7 +706,7 @@
         
   
   <span class="md-ellipsis">
-    Optimization results
+    Optimization Results
   </span>
   
 
@@ -824,7 +824,7 @@
           
   
   <span class="md-ellipsis">
-    Plan objects
+    Plan Plugins
   </span>
   
 
@@ -835,7 +835,7 @@
         
   
   <span class="md-ellipsis">
-    Plan objects
+    Plan Plugins
   </span>
   
 
@@ -872,6 +872,108 @@
   
     <nav class="md-nav" aria-label="base">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.RunStep" class="md-nav__link">
+    <span class="md-ellipsis">
+      RunStep
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RunStep">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.RunStep.step_config" class="md-nav__link">
+    <span class="md-ellipsis">
+      step_config
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.RunStep.plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      plan
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.RunStep.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.RunStep.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      run
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.ResultHandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      ResultHandler
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ResultHandler">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.ResultHandler.handler_config" class="md-nav__link">
+    <span class="md-ellipsis">
+      handler_config
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.ResultHandler.plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      plan
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.ResultHandler.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.ResultHandler.handle_event" class="md-nav__link">
+    <span class="md-ellipsis">
+      handle_event
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#ropt.plugins.plan.base.PlanPlugin" class="md-nav__link">
@@ -922,7 +1024,7 @@
         
   
   <span class="md-ellipsis">
-    Optimizer plugins
+    Optimizer Plugins
   </span>
   
 
@@ -943,7 +1045,7 @@
         
   
   <span class="md-ellipsis">
-    Sampler plugins
+    Sampler Plugins
   </span>
   
 
@@ -964,7 +1066,7 @@
         
   
   <span class="md-ellipsis">
-    Realization filters
+    Realization Filter Plugins
   </span>
   
 
@@ -985,7 +1087,7 @@
         
   
   <span class="md-ellipsis">
-    Function transforms
+    Function transform Plugins
   </span>
   
 
@@ -1050,7 +1152,28 @@
   
   
     <li class="md-nav__item">
-      <a href="../scipy_optimizer/" class="md-nav__link">
+      <a href="../default_plan_plugin/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Default Plan Plugin
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scipy_optimizer_plugin/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1071,7 +1194,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../scipy_sampler/" class="md-nav__link">
+      <a href="../scipy_sampler_plugin/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1092,11 +1215,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../default_realization_filters/" class="md-nav__link">
+      <a href="../default_realization_filter_plugin/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Default Realization Filters
+    Default Realization Filter Plugin
   </span>
   
 
@@ -1113,32 +1236,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../default_function_transforms/" class="md-nav__link">
+      <a href="../default_function_transform_plugin/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Default Function Transforms
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../default_plan_objects/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Default Plan Objects
+    Default Function Transform Plugin
   </span>
   
 
@@ -1270,6 +1372,108 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.RunStep" class="md-nav__link">
+    <span class="md-ellipsis">
+      RunStep
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RunStep">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.RunStep.step_config" class="md-nav__link">
+    <span class="md-ellipsis">
+      step_config
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.RunStep.plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      plan
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.RunStep.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.RunStep.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      run
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.ResultHandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      ResultHandler
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ResultHandler">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.ResultHandler.handler_config" class="md-nav__link">
+    <span class="md-ellipsis">
+      handler_config
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.ResultHandler.plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      plan
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.ResultHandler.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.ResultHandler.handle_event" class="md-nav__link">
+    <span class="md-ellipsis">
+      handle_event
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.plugins.plan.base.PlanPlugin" class="md-nav__link">
     <span class="md-ellipsis">
       PlanPlugin
@@ -1316,7 +1520,7 @@
   
 
 
-  <h1>Plan objects</h1>
+  <h1>Plan Plugins</h1>
 
 <div class="doc doc-object doc-module">
 
@@ -1364,12 +1568,13 @@
 
     <div class="doc doc-contents first">
 
-        <p>This module defines the base classes for optimization plan objects.</p>
-<p>Optimization plan objects can be added via the plugin mechanism to implement
-additional functionality. This is done by creating a plugin class that derives
-from the <a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.PlanPlugin"><code>PlanPlugin</code></a> class. It
-needs to define a <a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.PlanPlugin"><code>create</code></a>.create
-method that generates the plan objects.</p>
+        <p>This module defines the base classes for optimization plan plugins.</p>
+<p>Optimization plan run steps and result handlers can be added via the plugin
+mechanism to implement additional functionality. This is done by creating a
+plugin class that derives from the
+<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.PlanPlugin"><code>PlanPlugin</code></a> class. It needs to define a
+<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.PlanPlugin.create"><code>create</code></a> method that generates the
+plan objects.</p>
 
 
 
@@ -1381,6 +1586,465 @@ method that generates the plan objects.</p>
 
 
 
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.plugins.plan.base.RunStep" class="doc doc-heading">
+            <code>RunStep</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="abc.ABC">ABC</span></code></p>
+
+
+        <p>Base class for run steps.</p>
+<p>Run steps loaded and created by the plugin manager must inherit from this
+abstract base class. It defines a <code>run</code> method that must be overridden to
+implement the specific functionality of each step. The class also provides
+default properties for accessing the configuration and the plan that
+executes the step.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.plugins.plan.base.RunStep.step_config" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">step_config</span><span class="p">:</span> <span class="n">RunStepConfig</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the step object's configuration.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.plan.RunStepConfig" href="../plan_config/#ropt.config.plan.RunStepConfig">RunStepConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.plugins.plan.base.RunStep.plan" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the plan that executes the step.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Plan" href="../plan/#ropt.plan.Plan">Plan</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The plan object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+    </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plugins.plan.base.RunStep.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">plan</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize the run step.</p>
+<p>The <code>config</code> and <code>plan</code> arguments are accessible as <code>step_config</code>
+and <code>plan</code> properties.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.plan.RunStepConfig" href="../plan_config/#ropt.config.plan.RunStepConfig">RunStepConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration for this step.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>plan</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Plan" href="../plan/#ropt.plan.Plan">Plan</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The parent plan that manages this step.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plugins.plan.base.RunStep.run" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">run</span><span class="p">()</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Execute the step object.</p>
+<p>This method must be overloaded to implement the functionality of the
+step.</p>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.plugins.plan.base.ResultHandler" class="doc doc-heading">
+            <code>ResultHandler</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="abc.ABC">ABC</span></code></p>
+
+
+        <p>Base class for result handler objects.</p>
+<p>Result handlers loaded and created by the plugin manager must inherit from
+this abstract base class. It defines a <code>handle_event</code> method that must be
+overridden to implement specific functionality and provides default
+properties for accessing the handler's configuration and the plan that runs
+it.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.plugins.plan.base.ResultHandler.handler_config" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">handler_config</span><span class="p">:</span> <span class="n">ResultHandlerConfig</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the configuration of the handler object.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.plan.ResultHandlerConfig" href="../plan_config/#ropt.config.plan.ResultHandlerConfig">ResultHandlerConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.plugins.plan.base.ResultHandler.plan" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the associated plan that executes the handler.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Plan" href="../plan/#ropt.plan.Plan">Plan</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The plan object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+    </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plugins.plan.base.ResultHandler.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">plan</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize a results handler.</p>
+<p>The <code>config</code> and <code>plan</code> arguments are accessible as <code>handler_config</code>
+and <code>plan</code> properties.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>config</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.plan.ResultHandlerConfig" href="../plan_config/#ropt.config.plan.ResultHandlerConfig">ResultHandlerConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration of the handler object</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>plan</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Plan" href="../plan/#ropt.plan.Plan">Plan</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The parent plan that contains the object</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plugins.plan.base.ResultHandler.handle_event" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Handle and propagate an event.</p>
+<p>This method must be overloaded to implement the functionality of the
+handler, based on the information passed via the event object. The
+handler may modify the event, which may be propagated further to other
+handlers or to callbacks that react to the event.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Event" href="../plan/#ropt.plan.Event">Event</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The event, possibly modified.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-class">
 
@@ -1399,6 +2063,13 @@ method that generates the plan objects.</p>
 
 
         <p>The abstract base class for plan plugins.</p>
+<p>Plan run steps and result handlers are implemented through plugins that must derive
+from this base class. Plugins can be built-in, installed via a plugin mechanism,
+or loaded dynamically. During execution of an optimization plan, the
+required optimizer plugin will be located via the
+<a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> and used to create
+<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.RunStep"><code>RunStep</code></a> or <a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.ResultHandler"><code>ResultHandler</code></a> objects via its
+<code>create</code> function.</p>
 
 
 
@@ -1428,7 +2099,10 @@ method that generates the plan objects.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Create the plan object.</p>
+        <p>Create a run step or result handler.</p>
+<p>This factory function instantiates either a run step or a result handler
+object based on the provided configuration. The configuration determines
+which type of object to return—either a run step or a result handler.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1449,7 +2123,7 @@ method that generates the plan objects.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The configuration of the plan object</p>
+                <p>The configuration for the plan object.</p>
               </div>
             </td>
             <td>
@@ -1463,7 +2137,7 @@ method that generates the plan objects.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The context in which the plan operates</p>
+                <p>The context in which the plan operates.</p>
               </div>
             </td>
             <td>
@@ -1547,9 +2221,7 @@ method that generates the plan objects.</p>
       
         <script src="../../javascripts/mathjax.js"></script>
       
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-      
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
       
     
   </body>
