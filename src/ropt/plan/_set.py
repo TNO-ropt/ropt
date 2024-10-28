@@ -8,32 +8,30 @@ from collections.abc import Mapping, MutableMapping, MutableSequence
 from typing import TYPE_CHECKING, Any, List
 
 from ropt.exceptions import PlanError
-from ropt.plugins.plan.base import PlanStep
 
 if TYPE_CHECKING:
-    from ropt.config.plan import StepConfig
+    from ropt.config.plan import SetStepConfig
     from ropt.plan import Plan
 
 
-class DefaultSetStep(PlanStep):
+class SetStep:
     """The default set step."""
 
-    def __init__(self, config: StepConfig, plan: Plan) -> None:
-        """Initialize a default set step.
+    def __init__(self, config: SetStepConfig, plan: Plan) -> None:
+        """Initialize a set step.
 
         Args:
             config: The configuration of the step
             plan:   The plan that runs this step
         """
-        super().__init__(config, plan)
-
+        self._plan = plan
         self._targets: List[Any] = []
         self._names: List[str] = []
         self._keys: List[List[str]] = []
         self._values: List[Any] = []
 
         for list_item in (
-            [config.with_] if isinstance(config.with_, Mapping) else config.with_
+            [config.set] if isinstance(config.set, Mapping) else config.set
         ):
             if not isinstance(list_item, Mapping):
                 msg = "`set` must be called with a var/value dict or a list of var/value dicts"
@@ -77,13 +75,13 @@ class DefaultSetStep(PlanStep):
         if key.startswith("{{"):
             if not isinstance(target, (MutableMapping, MutableSequence)):
                 raise KeyError
-            return target[self.plan.eval(key)]
+            return target[self._plan.eval(key)]
         return getattr(target, key)
 
     def _set_target(self, target: Any, key: str, value: Any) -> None:  # noqa: ANN401
         if key.startswith("{{"):
             if not isinstance(target, (MutableMapping, MutableSequence)):
                 raise KeyError
-            target[self.plan.eval(key)] = copy.deepcopy(self._plan.eval(value))
+            target[self._plan.eval(key)] = copy.deepcopy(self._plan.eval(value))
         else:
             setattr(target, key, copy.deepcopy(self._plan.eval(value)))

@@ -6,23 +6,36 @@ import ast
 import re
 from itertools import chain, count
 from numbers import Number
-from typing import TYPE_CHECKING, Any, Callable, Dict, Final, List, Optional, Set, Tuple
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Final,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Union,
+)
 
 import numpy as np
 from numpy.random import default_rng
 
 from ropt.config.enopt import EnOptConfig
 from ropt.config.enopt.constants import DEFAULT_SEED
+from ropt.config.plan import RunStepConfig, SetStepConfig
 from ropt.enums import EventType
 from ropt.exceptions import PlanError
 from ropt.plugins import PluginManager
 from ropt.results import Results
 
+from ._set import SetStep
+
 if TYPE_CHECKING:
-    from ropt.config.plan import PlanConfig, StepConfig
+    from ropt.config.plan import PlanConfig
     from ropt.evaluator import Evaluator
-    from ropt.plan import Event
-    from ropt.plugins.plan.base import PlanStep, ResultHandler
+    from ropt.plan import Event, ResultHandler, RunStep
 
 _VALID_TYPES: Final = (int, float, bool, str)
 _UNARY_OPS: Final = (ast.UAdd, ast.USub, ast.Not)
@@ -107,13 +120,13 @@ class Plan:
                 msg = f"Variable already exists: `{var}"
                 raise PlanError(msg)
             self._set_item(var, None)
+        self._steps = self.create_steps(config.steps)
         self._handlers: List[ResultHandler] = [
             self._plugin_manager.get_plugin("plan", method=config.run).create(
                 config, self
             )
             for config in config.results
         ]
-        self._steps = self.create_steps(config.steps)
         self._aborted = False
         self._parent = parent
 
@@ -159,7 +172,9 @@ class Plan:
         """
         return self._aborted
 
-    def create_steps(self, step_configs: List[StepConfig]) -> List[PlanStep]:
+    def create_steps(
+        self, step_configs: List[Union[RunStepConfig, SetStepConfig]]
+    ) -> List[Union[RunStep, SetStep]]:
         """Instantiate step objects from step configurations.
 
         This method takes a list of step configuration objects and creates a
@@ -176,10 +191,12 @@ class Plan:
             self._plugin_manager.get_plugin("plan", method=step_config.run).create(
                 step_config, self
             )
+            if isinstance(step_config, RunStepConfig)
+            else SetStep(step_config, self)
             for step_config in step_configs
         ]
 
-    def run_steps(self, steps: List[PlanStep]) -> None:
+    def run_steps(self, steps: List[Union[SetStep, RunStep]]) -> None:
         """Execute a list of steps in the plan.
 
         This method iterates through and executes a provided list of plan steps.
@@ -193,7 +210,7 @@ class Plan:
             `True` if execution was aborted by the user; otherwise, `False`.
         """
         for task in steps:
-            if self._check_condition(task.step_config):
+            if isinstance(task, SetStep) or self._check_condition(task.step_config):
                 task.run()
             if self._aborted:
                 break
@@ -376,7 +393,7 @@ class Plan:
         if self._parent is not None:
             self._parent.emit_event(event)
 
-    def _check_condition(self, config: StepConfig) -> bool:
+    def _check_condition(self, config: RunStepConfig) -> bool:
         if config.if_ is not None:
             stripped = config.if_.strip()
             return (

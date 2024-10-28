@@ -14,8 +14,8 @@ from ropt.config.utils import Array1D, ItemOrSet, ItemOrTuple  # noqa: TCH001
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import PlanError
-from ropt.plan import EnsembleOptimizer, Event, Plan
-from ropt.plugins.plan.base import PlanStep
+from ropt.optimization import EnsembleOptimizer
+from ropt.plan import Event, Plan, RunStep
 from ropt.results import FunctionResults
 from ropt.utils.scaling import scale_variables
 
@@ -27,7 +27,7 @@ else:
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt.config.plan import StepConfig
+    from ropt.config.plan import RunStepConfig
     from ropt.results import Results
 
 MetaDataType = Dict[str, Union[int, float, bool, str]]
@@ -72,10 +72,10 @@ class DefaultOptimizerStepWith(BaseModel):
     )
 
 
-class DefaultOptimizerStep(PlanStep):
+class DefaultOptimizerStep(RunStep):
     """The default optimizer step."""
 
-    def __init__(self, config: StepConfig, plan: Plan) -> None:
+    def __init__(self, config: RunStepConfig, plan: Plan) -> None:
         """Initialize a default optimizer step.
 
         Args:

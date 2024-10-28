@@ -15,15 +15,14 @@ from ropt.config.utils import (
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted, PlanError
-from ropt.plan import Event
-from ropt.plugins.plan.base import PlanStep
+from ropt.plan import Event, RunStep
 from ropt.results import FunctionResults
 from ropt.utils.scaling import scale_variables
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt.config.plan import StepConfig
+    from ropt.config.plan import RunStepConfig
     from ropt.plan import Plan
 
 
@@ -50,10 +49,10 @@ class DefaultEvaluatorStepWith(BaseModel):
     )
 
 
-class DefaultEvaluatorStep(PlanStep):
+class DefaultEvaluatorStep(RunStep):
     """The default evaluator step."""
 
-    def __init__(self, config: StepConfig, plan: Plan) -> None:
+    def __init__(self, config: RunStepConfig, plan: Plan) -> None:
         """Initialize a default evaluator step.
 
         Args:

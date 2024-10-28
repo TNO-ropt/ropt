@@ -202,7 +202,7 @@ def test_set_step(
 ) -> None:
     plan_config: Dict[str, Any] = {
         "variables": variables,
-        "steps": [{"run": "set", "with": expr}],
+        "steps": [{"set": expr}],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
@@ -247,7 +247,7 @@ def test_set_step_attribute(
 ) -> None:
     plan_config: Dict[str, Any] = {
         "variables": variables,
-        "steps": [{"run": "set", "with": expr}],
+        "steps": [{"set": expr}],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
@@ -262,7 +262,7 @@ def test_set_keys_exception(evaluator: Any) -> None:
             "y": {"a": None},
         },
         "steps": [
-            {"run": "set", "with": {"y['a']['b']": 1}},
+            {"set": {"y['a']['b']": 1}},
         ],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
@@ -291,7 +291,7 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 },
                 "if": "{{1 > 0}}",
             },
-            {"run": "set", "with": {"x": 1}},
+            {"set": {"x": 1}},
             {
                 "run": "optimizer",
                 "if": "$x < 0",
@@ -408,8 +408,7 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 },
             },
             {
-                "run": "set",
-                "with": {
+                "set": {
                     "saved_results": "$optimal",
                     "optimal": None,
                 },
@@ -828,8 +827,7 @@ def test_restart_optimum_with_reset(
                     "iterations": 3,
                     "steps": [
                         {
-                            "run": "set",
-                            "with": {
+                            "set": {
                                 "initial": "$optimum",
                                 "optimum": None,
                             },

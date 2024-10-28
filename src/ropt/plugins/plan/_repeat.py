@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, List, Optional, Union
 
 from pydantic import BaseModel, ConfigDict
 
-from ropt.config.plan import StepConfig  # noqa: TCH001
-from ropt.plugins.plan.base import PlanStep
+from ropt.config.plan import RunStepConfig, SetStepConfig  # noqa: TCH001
+from ropt.plan import RunStep
 
 if TYPE_CHECKING:
     from ropt.plan import Plan
@@ -23,7 +23,7 @@ class DefaultRepeatStepWith(BaseModel):
     """
 
     iterations: int
-    steps: List[StepConfig]
+    steps: List[Union[SetStepConfig, RunStepConfig]]
     var: Optional[str] = None
 
     model_config = ConfigDict(
@@ -32,10 +32,10 @@ class DefaultRepeatStepWith(BaseModel):
     )
 
 
-class DefaultRepeatStep(PlanStep):
+class DefaultRepeatStep(RunStep):
     """The default optimizer step."""
 
-    def __init__(self, config: StepConfig, plan: Plan) -> None:
+    def __init__(self, config: RunStepConfig, plan: Plan) -> None:
         """Initialize a default optimizer step.
 
         Args:

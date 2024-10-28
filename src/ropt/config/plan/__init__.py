@@ -1,18 +1,20 @@
 """Configuration classes for optimization plans.
 
-[`PlanConfig`][ropt.config.plan.PlanConfig] is a
-[Pydantic](https://docs.pydantic.dev/)-based class used by the
-[`Plan`][ropt.plan.Plan] class to configure optimization workflows. In addition
-to plan variable definitions, it uses
-[`StepConfig`][ropt.config.plan.StepConfig] and
+The [`PlanConfig`][ropt.config.plan.PlanConfig] class, based on
+[Pydantic](https://docs.pydantic.dev/), configures optimization workflows
+managed by the [`Plan`][ropt.plan.Plan] class. Alongside defining variables for
+the plan, `PlanConfig` utilizes
+[`SetStepConfig`][ropt.config.plan.SetStepConfig],
+[`RunStepConfig`][ropt.config.plan.RunStepConfig], and
 [`ResultHandlerConfig`][ropt.config.plan.ResultHandlerConfig] classes to
-describe the steps and result handlers that comprise a workflow.
+structure the steps and result handlers that define a complete workflow.
 """
 
-from ._plan_config import PlanConfig, ResultHandlerConfig, StepConfig
+from ._plan_config import PlanConfig, ResultHandlerConfig, RunStepConfig, SetStepConfig
 
 __all__ = [
     "ResultHandlerConfig",
-    "StepConfig",
+    "SetStepConfig",
+    "RunStepConfig",
     "PlanConfig",
 ]
