@@ -46,7 +46,7 @@ class SetStep:
                 self._names.append(name)
                 self._keys.append(
                     [
-                        key[1:] if key.startswith(".") else "{{" + key[1:-1] + "}}"
+                        key[1:] if key.startswith(".") else "${{" + key[1:-1] + "}}"
                         for key in keys
                     ]
                 )
@@ -70,14 +70,14 @@ class SetStep:
                     raise AttributeError(msg) from None
 
     def _get_target(self, target: Any, key: str) -> Any:  # noqa: ANN401
-        if key.startswith("{{"):
+        if key.startswith("${{"):
             if not isinstance(target, (MutableMapping, MutableSequence)):
                 raise KeyError
             return target[self._plan.eval(key)]
         return getattr(target, key)
 
     def _set_target(self, target: Any, key: str, value: Any) -> None:  # noqa: ANN401
-        if key.startswith("{{"):
+        if key.startswith("${{"):
             if not isinstance(target, (MutableMapping, MutableSequence)):
                 raise KeyError
             target[self._plan.eval(key)] = copy.deepcopy(self._plan.eval(value))

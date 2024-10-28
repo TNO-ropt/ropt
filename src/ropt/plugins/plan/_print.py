@@ -47,8 +47,8 @@ class DefaultPrintStep(RunStep):
             else DefaultPrintWith.model_validate(config.with_)
         )
         self._message = _with.message.strip()
-        if not (self._message.startswith("[[]]") and self._message.endswith("]]")):
-            self._message = "[[" + self._message + "]]"
+        if not (self._message.startswith("$[[") and self._message.endswith("]]")):
+            self._message = "$[[" + self._message + "]]"
 
     def run(self) -> None:
         """Run the print step."""

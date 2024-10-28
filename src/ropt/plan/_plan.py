@@ -342,8 +342,8 @@ class Plan:
             stripped = config.if_.strip()
             return (
                 bool(self.eval(stripped))
-                if stripped.startswith("{{") and stripped.endswith("}}")
-                else bool(self.eval("{{" + stripped + "}}"))
+                if stripped.startswith("${{") and stripped.endswith("}}")
+                else bool(self.eval("${{" + stripped + "}}"))
             )
         return True
 

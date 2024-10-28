@@ -71,7 +71,7 @@ class RunStepConfig(BaseModel):
         supported expressions.
 
         While mathematical expressions often need to be enclosed within
-        `{{ ... }}` (double braces) in a plan configuration string, this is
+        `${{ ... }}` (double braces) in a plan configuration string, this is
         optional for expressions passed via the `if_` attribute.
 
     Attributes:

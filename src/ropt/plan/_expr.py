@@ -5,7 +5,6 @@ from __future__ import annotations
 import ast
 import copy
 import re
-from functools import partial
 from numbers import Number
 from typing import Any, Callable, Dict, Final, List, Mapping, Optional
 
@@ -29,7 +28,7 @@ _SUPPORTED_VARIABLE_TYPES: Final = (
     Results,
     EnOptConfig,
 )
-_SUPPORTED_FUNCTIONS: Final[Dict[str, Callable[..., Any]]] = {
+_BUILTIN_FUNCTIONS: Final[Dict[str, Callable[..., Any]]] = {
     "abs": abs,
     "bool": bool,
     "divmod": divmod,
@@ -50,7 +49,7 @@ class _ReplaceFields(ast.NodeTransformer):
     ) -> None:
         self.values: Dict[str, Any] = {}
         self._variables = variables
-        self._functions = functions
+        self._functions = set(functions.keys()) | set(_BUILTIN_FUNCTIONS.keys())
 
     def visit_Name(self, node: ast.Name) -> ast.AST:  # noqa: N802
         if node.id in self._variables:
@@ -65,8 +64,8 @@ class _ReplaceFields(ast.NodeTransformer):
     def visit_Call(self, node: ast.Call) -> ast.AST:  # noqa: N802
         assert isinstance(node.func, ast.Name)
         if node.func.id not in self._functions:
-            msg = f"function `{node.func.id}` not supported"
-            raise NameError(msg)
+            msg = f"Unknown plan function: `{node.func.id}`"
+            raise AttributeError(msg)
         return self.generic_visit(node)
 
 
@@ -74,10 +73,10 @@ class ExpressionEvaluator:
     def __init__(
         self, functions: Optional[Dict[str, Callable[..., Any]]] = None
     ) -> None:
-        self._functions = copy.deepcopy(_SUPPORTED_FUNCTIONS)
+        self._functions = copy.deepcopy(_BUILTIN_FUNCTIONS)
         if functions is not None:
             for key, value in functions.items():
-                if key in _SUPPORTED_FUNCTIONS:
+                if key in _BUILTIN_FUNCTIONS:
                     msg = f"cannot override builtin: `{key}`"
                     raise ValueError(msg)
                 self._functions[key] = value
@@ -127,23 +126,32 @@ class ExpressionEvaluator:
 
     def _eval_expr(self, expr: str, variables: Mapping[str, Any]) -> Any:  # noqa: ANN401
         # find all functions and variables:
+        found_functions: Dict[str, Callable[..., Any]] = {}
         for word in re.findall(r"(?<=\$)\b(\w+)\b\s*\(", expr):
-            if word not in self._functions:
+            if word in self._functions:
+                found_functions[word] = self._functions[word]
+            else:
                 msg = f"Unknown plan function: `{word}`"
                 raise AttributeError(msg)
-        found: Dict[str, Any] = {}
+        found_variables: Dict[str, Any] = {}
         for word in re.findall(r"(?<=\$)\b\w+\b", expr):
             if word in variables:
-                found[word] = variables[word]
+                found_variables[word] = variables[word]
             elif word not in self._functions:
                 msg = f"Unknown plan variable: `{word}`"
                 raise AttributeError(msg)
 
+        def _substitute(matched: re.Match[str]) -> str:
+            value = matched.string[matched.start() : matched.end()]
+            if value[1:] in self._functions or value[1:] in variables:
+                return value[1:]
+            return value
+
         # Parse the string:
-        stripped = re.sub(r"\$(\$*)", "\\1", expr)
+        stripped = re.sub(r"(\$\b\w+\b)", _substitute, expr)
         tree = ast.parse(stripped, mode="eval")
         if self._is_valid(tree.body):
-            replacer = _ReplaceFields(found, self._functions)
+            replacer = _ReplaceFields(found_variables, found_functions)
             tree = ast.fix_missing_locations(replacer.visit(tree))
             return eval(  # noqa: S307
                 compile(tree, "", mode="eval"),
@@ -154,15 +162,15 @@ class ExpressionEvaluator:
         msg = "invalid expression"
         raise SyntaxError(msg)
 
-    def _substitute(self, matched: re.Match[str], variables: Mapping[str, Any]) -> str:
-        value = matched.string[matched.start() : matched.end()]
-        return "$" if value == "$$" else str(self.eval(value, variables))
-
     def eval(
         self,
         value: str,
         variables: Mapping[str, Any],
     ) -> Any:  # noqa: ANN401
+        def _substitute(matched: re.Match[str]) -> str:
+            value = matched.string[matched.start() : matched.end()]
+            return "$" if value == "$$" else str(self.eval(value, variables))
+
         for variable in variables:
             if variable in self._functions:
                 msg = f"conflicting variable/function names: `{variable}`"
@@ -171,17 +179,13 @@ class ExpressionEvaluator:
         value = value.strip()
         if value.startswith("$$"):
             return value.replace("$$", "$", 1)
-        if value.startswith("{{") and value.endswith("}}"):
-            return self._eval_expr(value[2:-2].strip(), variables)
-        if value.startswith("[[") and value.endswith("]]"):
-            parts = value[2:-2].split("{{")
-            parts[1:] = ["{{" + part for part in parts[1:]]
+        if value.startswith("${{") and value.endswith("}}"):
+            return self._eval_expr(value[3:-2].strip(), variables)
+        if value.startswith("$[[") and value.endswith("]]"):
+            parts = value[3:-2].split("${{")
+            parts[1:] = ["${{" + part for part in parts[1:]]
             return "".join(
-                re.sub(
-                    r"\{{(.*)}}|\$\$|\$([^\W0-9][\w\.]*)",
-                    partial(self._substitute, variables=variables),
-                    part,
-                )
+                re.sub(r"\${{(.*)}}|\$\$|\$([^\W0-9][\w\.]*)", _substitute, part)
                 for part in parts
             )
         if value.startswith("$"):
