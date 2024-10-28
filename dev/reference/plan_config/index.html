@@ -589,9 +589,18 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.config.plan.StepConfig" class="md-nav__link">
+  <a href="#ropt.config.plan.SetStepConfig" class="md-nav__link">
     <span class="md-ellipsis">
-      StepConfig
+      SetStepConfig
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.plan.RunStepConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      RunStepConfig
     </span>
   </a>
   
@@ -1264,9 +1273,18 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.config.plan.StepConfig" class="md-nav__link">
+  <a href="#ropt.config.plan.SetStepConfig" class="md-nav__link">
     <span class="md-ellipsis">
-      StepConfig
+      SetStepConfig
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.plan.RunStepConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      RunStepConfig
     </span>
   </a>
   
@@ -1319,13 +1337,14 @@
     <div class="doc doc-contents first">
 
         <p>Configuration classes for optimization plans.</p>
-<p><a class="autorefs autorefs-internal" href="#ropt.config.plan.PlanConfig"><code>PlanConfig</code></a> is a
-<a href="https://docs.pydantic.dev/">Pydantic</a>-based class used by the
-<a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> class to configure optimization workflows. In addition
-to plan variable definitions, it uses
-<a class="autorefs autorefs-internal" href="#ropt.config.plan.StepConfig"><code>StepConfig</code></a> and
+<p>The <a class="autorefs autorefs-internal" href="#ropt.config.plan.PlanConfig"><code>PlanConfig</code></a> class, based on
+<a href="https://docs.pydantic.dev/">Pydantic</a>, configures optimization workflows
+managed by the <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> class. Alongside defining variables for
+the plan, <code>PlanConfig</code> utilizes
+<a class="autorefs autorefs-internal" href="#ropt.config.plan.SetStepConfig"><code>SetStepConfig</code></a>,
+<a class="autorefs autorefs-internal" href="#ropt.config.plan.RunStepConfig"><code>RunStepConfig</code></a>, and
 <a class="autorefs autorefs-internal" href="#ropt.config.plan.ResultHandlerConfig"><code>ResultHandlerConfig</code></a> classes to
-describe the steps and result handlers that comprise a workflow.</p>
+structure the steps and result handlers that define a complete workflow.</p>
 
 
 
@@ -1352,32 +1371,30 @@ describe the steps and result handlers that comprise a workflow.</p>
 
 
         <p>Configuration class for optimization plans.</p>
-<p>This class is used to configure the optimization workflows executed by a
-<a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> object. A <code>PlanConfig</code> object is passed when the
-plan is created, and it defines several key sections, each corresponding to
-a different aspect of the plan's configuration:</p>
+<p>This class configures the workflows managed by a <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan"><code>Plan</code></a>
+object, specifying key sections that define the plan's behavior and data
+flow. Each section aligns with a distinct aspect of the optimization plan:</p>
 <dl>
 <dt><code>inputs</code></dt>
-<dd>Defines the names of variables that will store the input values passed
-  when the optimization workflow is started via the
-  <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan.run"><code>run</code></a> method.</dd>
+<dd>Specifies the names of variables to hold input values when the
+  optimization workflow is started using the <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan.run"><code>run</code></a>
+  method.</dd>
 <dt><code>outputs</code></dt>
-<dd>Specifies the names of variables whose values will be returned as a tuple
-  after the optimization workflow completes and the
-  <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan.run"><code>run</code></a> method finishes execution.</dd>
+<dd>Lists the names of variables whose final values will be returned as a
+  tuple when the optimization completes and the <code>run</code> method finishes.</dd>
 <dt><code>variables</code></dt>
-<dd>A dictionary of variable names and their associated values, which are set
-  and accessed during the execution of the plan.</dd>
+<dd>Defines a dictionary of variable names and initial values, used during
+  plan execution.</dd>
 <dt><code>steps</code></dt>
-<dd>Describes the individual steps that are executed once the plan starts.
-  These steps can access and modify the variables defined in the <code>inputs</code>,
-  <code>outputs</code>, and <code>variables</code> sections. Additionally, steps may emit
-  <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Event"><code>events</code></a>, which are processed by the result handlers
-  defined in the <code>results</code> section.</dd>
+<dd>Outlines each step executed once the plan begins. Steps can be set steps,
+  which update plan variables, or run steps loaded from plan plugins. Run
+  steps support a variety of actions, such as initiating an optimization,
+  accessing or modifying variables, and emitting events. Emitted events are
+  processed by the handlers specified in the <code>results</code> section.</dd>
 <dt><code>results</code></dt>
-<dd>Defines the result handlers that process events emitted by the steps.
-  Events are passed sequentially through each handler, with the first handler
-  receiving events directly from the steps and passing them along the chain.</dd>
+<dd>Specifies the event handlers that process events emitted by run steps.
+  Handlers receive events sequentially, with each handler passing events to
+  the next in the chain.</dd>
 </dl>
 
 
@@ -1398,7 +1415,7 @@ a different aspect of the plan's configuration:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A list of input variable names.</p>
+                <p>List of input variable names.</p>
               </div>
             </td>
           </tr>
@@ -1409,7 +1426,7 @@ a different aspect of the plan's configuration:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A list of output variable names.</p>
+                <p>List of output variable names.</p>
               </div>
             </td>
           </tr>
@@ -1420,18 +1437,18 @@ a different aspect of the plan's configuration:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A dictionary of preset variable names and values.</p>
+                <p>Dictionary of variable names with initial values.</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.plan.PlanConfig.steps">steps</span></code></td>
             <td>
-                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.config.plan._plan_config.StepConfig" href="#ropt.config.plan.StepConfig">StepConfig</a>]</code>
+                  <code><span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="ropt.config.plan._plan_config.SetStepConfig" href="#ropt.config.plan.SetStepConfig">SetStepConfig</a>, <a class="autorefs autorefs-internal" title="ropt.config.plan._plan_config.RunStepConfig" href="#ropt.config.plan.RunStepConfig">RunStepConfig</a>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The steps to be executed in the plan.</p>
+                <p>List of steps defining plan actions.</p>
               </div>
             </td>
           </tr>
@@ -1442,7 +1459,7 @@ a different aspect of the plan's configuration:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The result handler objects to initialize.</p>
+                <p>List of result handler instances.</p>
               </div>
             </td>
           </tr>
@@ -1473,8 +1490,8 @@ a different aspect of the plan's configuration:</p>
 
 
 
-<h3 id="ropt.config.plan.StepConfig" class="doc doc-heading">
-            <code>StepConfig</code>
+<h3 id="ropt.config.plan.SetStepConfig" class="doc doc-heading">
+            <code>SetStepConfig</code>
 
 
 </h3>
@@ -1483,16 +1500,77 @@ a different aspect of the plan's configuration:</p>
     <div class="doc doc-contents ">
 
 
-        <p>Configuration for a single step within an optimization plan.</p>
-<p>A step represents a single action in the optimization process. It can access
-and modify plan variables, execute tasks such as optimization runs, and emit
-<a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Event"><code>events</code></a>, for example, when intermediate optimization
-results are generated.</p>
+        <p>Configuration for a single set step within an optimization plan.</p>
+<p>A set step is used to change the value of one or more plan variables. The
+attributes of the step should either be a dictionary of variable-name/value
+pairs, or a list of such dictionaries. When the set step is run by the plan,
+the variables are set to the given values. Variables that are referenced may
+be dictionaries or objects with attributes. These can be modified by using
+the <code>[]</code> or <code>.</code> operators (possibly nested) with the specified variable
+name.</p>
+
+
+<details class="info" open>
+  <summary>Using Expressions in the Value</summary>
+  <p>Optionally, the supplied value may be an expression, following the rules
+of the <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan.eval"><code>eval</code></a> method of the plan object executing
+the run steps. Refer to the method's documentation for more information
+on supported expressions.</p>
+</details>
+
+<details class="note" open>
+  <summary>Dictionaries vs. Lists</summary>
+  <p>The arguments of the set step may be dictionaries or lists of
+dictionaries. Multiple variables can be set in this manner in both
+cases. However, care should be taken if a dictionary is used where the
+order of the keys is not well defined, for instance, if it has been read
+from a JSON file. If the order in which variables are set is important,
+it is recommended to use a list.</p>
+</details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.plan.RunStepConfig" class="doc doc-heading">
+            <code>RunStepConfig</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+        <p>Configuration for a single run step within an optimization plan.</p>
+<p>A run step represents a single action in the optimization process. It can
+access and modify plan variables, execute tasks such as optimization runs,
+and emit <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Event"><code>events</code></a>, for example, when intermediate
+optimization results are generated.</p>
 <p>The <code>run</code> string specifies the code that executes the step, and is used by
 the plugin manager to load the appropriate code.</p>
-<p>Additional parameters required by the step can be configured using the
+<p>Additional parameters required by the run step can be configured using the
 <code>with_</code> attribute, with its content varying based on the step type.</p>
-<p>Execution of the step can be made conditional by providing an expression
+<p>Execution of the run step can be made conditional by providing an expression
 through the <code>if_</code> attribute. This expression is evaluated, and the step is
 executed only if the result is <code>True</code>.</p>
 
@@ -1508,7 +1586,7 @@ underscore).</p>
   <summary>Conditional evaluation</summary>
   <p>Conditions specified via the <code>if_</code> attribute are evaluated using the
 <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan.eval"><code>eval</code></a> method of the plan object executing the
-steps. Refer to the method's documentation for more information on
+run steps. Refer to the method's documentation for more information on
 supported expressions.</p>
 <p>While mathematical expressions often need to be enclosed within
 <code>{{ ... }}</code> (double braces) in a plan configuration string, this is
@@ -1526,7 +1604,7 @@ optional for expressions passed via the <code>if_</code> attribute.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.plan.StepConfig.run">run</span></code></td>
+            <td><code><span title="ropt.config.plan.RunStepConfig.run">run</span></code></td>
             <td>
                   <code>str</code>
             </td>
@@ -1537,7 +1615,7 @@ optional for expressions passed via the <code>if_</code> attribute.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.plan.StepConfig.with_">with_</span></code></td>
+            <td><code><span title="ropt.config.plan.RunStepConfig.with_">with_</span></code></td>
             <td>
                   <code><span title="typing.Union">Union</span>[<span title="typing.List">List</span>[<span title="typing.Any">Any</span>], <span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>], str]</code>
             </td>
@@ -1548,7 +1626,7 @@ optional for expressions passed via the <code>if_</code> attribute.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.plan.StepConfig.if_">if_</span></code></td>
+            <td><code><span title="ropt.config.plan.RunStepConfig.if_">if_</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[str]</code>
             </td>
@@ -1596,10 +1674,10 @@ optional for expressions passed via the <code>if_</code> attribute.</p>
 
 
         <p>Configuration for a single result handler object.</p>
-<p>Result handler objects process events emitted by the steps of an
+<p>Result handler objects process events emitted by the run steps of an
 optimization plan. These objects can receive <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Event"><code>events</code></a>
-directly from the plan's steps, or from another result handler in a chain of
-handlers, as defined in the <code>results</code> section of a
+directly from the plan's run steps, or from another result handler in a
+chain of handlers, as defined in the <code>results</code> section of a
 <a class="autorefs autorefs-internal" href="#ropt.config.plan.PlanConfig"><code>PlanConfig</code></a> object. Upon receiving events,
 handlers may perform actions such as modifying plan variables, generating
 output, or updating the result objects included in the event.</p>
