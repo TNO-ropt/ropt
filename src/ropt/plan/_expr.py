@@ -70,9 +70,23 @@ class _ReplaceFields(ast.NodeTransformer):
 
 
 class ExpressionEvaluator:
+    """A class for evaluating mathematical expressions in strings."""
+
     def __init__(
         self, functions: Optional[Dict[str, Callable[..., Any]]] = None
     ) -> None:
+        """Initialize the expression evaluator.
+
+        The `functions` argument allows adding a dictionary of functions that
+        can be called within the expression using the `$name()` format. Note
+        that these functions cannot override the evaluator's built-in functions.
+
+        Args:
+            functions: Optional dictionary of additional functions to add.
+
+        Raises:
+            ValueError: Raised if any provided function overrides a built-in.
+        """
         self._functions = copy.deepcopy(_BUILTIN_FUNCTIONS)
         if functions is not None:
             for key, value in functions.items():
@@ -80,6 +94,92 @@ class ExpressionEvaluator:
                     msg = f"cannot override builtin: `{key}`"
                     raise ValueError(msg)
                 self._functions[key] = value
+
+    def eval(
+        self,
+        expr: str,
+        variables: Mapping[str, Any],
+    ) -> Any:  # noqa: ANN401
+        """Evaluate an expression string, given a dictionary of variable values.
+
+        The `expr` string may take one of the following forms:
+
+        1. Strings enclosed in `${{ ... }}` are evaluated as mathematical
+           expressions. Within the expression, variables may be referred to
+           using the `$name` format, and functions added to the evaluator may be
+           called using the `$function()` format.
+        2. Strings enclosed in `$[[ ... ]]` are treated as templates: `$`
+           prefixes or `${{ ... }}` expressions within the string are evaluated
+           and interpolated as above.
+        3. Strings starting with `$` that do not match one of the previous rules
+           are evaluated as mathematical expressions. This requires that the
+           string starts with a variable or function reference.
+
+        Variables may be referenced in `$name` format. This includes indexing
+        using the `[]` operator and attribute access using the `.` operator,
+        when appropriate. Multiple `[]` and `.` operators are allowed to an
+        arbitrary depth, if supported by the variable. For example, the
+        expression `$var['foo'].bar[0]` is valid if `var` contains a dict-like
+        value with a `foo` entry that has a `bar` attribute containing a list.
+
+        Info: Supported operators
+            A subset of Python operators is supported, including common
+            mathematical, boolean, and comparison operators.
+
+        Info: Supported literal types
+            Literal types in expressions reflect corresponding Python types.
+            Supported literal types include `int`, `float`, `bool`, and `str`.
+            Lists (`[ ... ]`) and dictionaries (`{ ... }`) may also be
+            constructed and arbitrarily nested, with support for containing
+            references to variables and calls to supported functions.
+
+        Info: Supported variable types
+            Allowed variable types within expressions include numbers, strings,
+            `numpy` arrays, dicts, lists, [`Results`][ropt.results.Results], and
+            [`EnOptConfig`][ropt.config.enopt.EnOptConfig] objects.
+
+        Info: Built-in functions
+            Functions added at initialization must be prefixed by `$` within
+            expressions. However, an exception exists for certain built-in
+            functions, where this is optional. For example, the `max` function
+            can be called as `$max()` or as `max()` within expressions.
+
+            The following built-in functions are supported: `abs`, `bool`,
+            `divmod`, `float`, `int`, `max`, `min`, `pow`, `range`, `round`, and
+            `sum`, which map to their corresponding Python built-ins.
+
+        Args:
+            expr:      The expression to evaluate.
+            variables: A dictionary of variable values.
+
+        Returns:
+            The result of the evaluated expression.
+        """
+
+        def _substitute(matched: re.Match[str]) -> str:
+            value = matched.string[matched.start() : matched.end()]
+            return "$" if value == "$$" else str(self.eval(value, variables))
+
+        for variable in variables:
+            if variable in self._functions:
+                msg = f"conflicting variable/function names: `{variable}`"
+                raise ValueError(msg)
+
+        expr = expr.strip()
+        if expr.startswith("$$"):
+            return expr.replace("$$", "$", 1)
+        if expr.startswith("${{") and expr.endswith("}}"):
+            return self._eval_expr(expr[3:-2].strip(), variables)
+        if expr.startswith("$[[") and expr.endswith("]]"):
+            parts = expr[3:-2].split("${{")
+            parts[1:] = ["${{" + part for part in parts[1:]]
+            return "".join(
+                re.sub(r"\${{(.*)}}|\$\$|\$([^\W0-9][\w\.]*)", _substitute, part)
+                for part in parts
+            )
+        if expr.startswith("$"):
+            return self._eval_expr(expr, variables)
+        return expr
 
     def _is_valid(self, node: ast.AST) -> bool:  # noqa: C901, PLR0911
         if isinstance(node, ast.Constant):
@@ -161,33 +261,3 @@ class ExpressionEvaluator:
 
         msg = "invalid expression"
         raise SyntaxError(msg)
-
-    def eval(
-        self,
-        value: str,
-        variables: Mapping[str, Any],
-    ) -> Any:  # noqa: ANN401
-        def _substitute(matched: re.Match[str]) -> str:
-            value = matched.string[matched.start() : matched.end()]
-            return "$" if value == "$$" else str(self.eval(value, variables))
-
-        for variable in variables:
-            if variable in self._functions:
-                msg = f"conflicting variable/function names: `{variable}`"
-                raise ValueError(msg)
-
-        value = value.strip()
-        if value.startswith("$$"):
-            return value.replace("$$", "$", 1)
-        if value.startswith("${{") and value.endswith("}}"):
-            return self._eval_expr(value[3:-2].strip(), variables)
-        if value.startswith("$[[") and value.endswith("]]"):
-            parts = value[3:-2].split("${{")
-            parts[1:] = ["${{" + part for part in parts[1:]]
-            return "".join(
-                re.sub(r"\${{(.*)}}|\$\$|\$([^\W0-9][\w\.]*)", _substitute, part)
-                for part in parts
-            )
-        if value.startswith("$"):
-            return self._eval_expr(value, variables)
-        return value

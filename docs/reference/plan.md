@@ -1,4 +1,11 @@
 ::: ropt.plan
     options:
-        members: [Plan, OptimizerContext, Event, SetStep, RunStep, ResultHandler]
+        members: 
+            - Plan
+            - OptimizerContext
+            - ExpressionEvaluator
+            - Event
+            - SetStep
+            - RunStep
+            - ResultHandler
 

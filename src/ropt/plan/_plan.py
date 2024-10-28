@@ -263,21 +263,16 @@ class Plan:
         rules:
 
         1. Non-string values are returned unchanged.
-        2. Strings starting with `$` are evaluated as expressions, primarily
-           replacing variable references with their values.
-        3. Strings starting with `$$` will return the string with one `$`
+        2. Strings starting with `$$` will return the string with one `$`
            removed.
-        4. Strings enclosed in `{{ ... }}` are evaluated as mathematical
-           expressions, allowing variable references prefixed by `$`.
-        5. Strings enclosed in `[[ ... ]]` are treated as templates: `$`
-           prefixes or `{{ ... }}` expressions within the string are evaluated
+        3. Strings starting with `$` are evaluated as expressions, primarily
+           intended to replace variable references with their values.
+        4. Strings enclosed in `${{ ... }}` are evaluated as mathematical
+           expressions, possibly embedding plan variable and plan function
+           references prefixed by `$`.
+        5. Strings enclosed in `$[[ ... ]]` are treated as templates: `$`
+           prefixes or `${{ ... }}` expressions within the string are evaluated
            and interpolated.
-
-        Note:
-            The result of mathematical expressions is restricted to numerical
-            types, lists, and NumPy arrays. However, plan variables may contain
-            values of any type, so expressions of the form `$identifier` may
-            evaluate to values of varying types.
 
         Args:
             value: The expression to evaluate, as a string or any other type.

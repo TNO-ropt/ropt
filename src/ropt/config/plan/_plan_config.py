@@ -71,7 +71,7 @@ class RunStepConfig(BaseModel):
         supported expressions.
 
         While mathematical expressions often need to be enclosed within
-        `${{ ... }}` (double braces) in a plan configuration string, this is
+        `${{ ... }}` delimiters in a plan configuration string, this is
         optional for expressions passed via the `if_` attribute.
 
     Attributes:
@@ -135,17 +135,17 @@ class PlanConfig(BaseModel):
     flow. Each section aligns with a distinct aspect of the optimization plan:
 
     `inputs`
-    : Specifies the names of variables to hold input values when the
+    : Specifies the names of plan variables to hold input values when the
       optimization workflow is started using the [`run`][ropt.plan.Plan.run]
       method.
 
     `outputs`
-    : Lists the names of variables whose final values will be returned as a
+    : Lists the names of plan variables whose final values will be returned as a
       tuple when the optimization completes and the `run` method finishes.
 
     `variables`
-    : Defines a dictionary of variable names and initial values, used during
-      plan execution.
+    : Defines a dictionary of plan variable names and initial values, used
+      during plan execution.
 
     `steps`
     : Outlines each step executed once the plan begins. Steps can be set steps,

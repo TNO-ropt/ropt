@@ -81,28 +81,28 @@ nav:
       - "Running Optimizations": usage/running.md
   - Reference:
       - "Configuration":
-          - "Optimization Plan configuration": reference/plan_config.md
-          - "Optimizer configuration": reference/enopt_config.md
+          - "Optimization Plan Configuration": reference/plan_config.md
+          - "Optimizer Configuration": reference/enopt_config.md
       - "Optimization":
-          - "Optimization plans": reference/plan.md
-          - "Optimization plan runner": reference/plan_runner.md
+          - "Optimization Plans": reference/plan.md
+          - "Basic Plan runner": reference/plan_runner.md
           - "Optimization": reference/optimization.md
-          - "Function evaluations": reference/evaluator.md
-          - "Optimization results": reference/results.md
+          - "Function Evaluations": reference/evaluator.md
+          - "Optimization Results": reference/results.md
           - "Reporting": reference/reporting.md
       - "Plugins":
           - "Plugins": reference/plugin_manager.md
-          - "Plan objects": reference/plan_plugins.md
-          - "Optimizer plugins": reference/optimizer_plugins.md
-          - "Sampler plugins": reference/sampler_plugins.md
-          - "Realization filters": reference/realization_filter_plugins.md
-          - "Function transforms": reference/function_transform_plugins.md
+          - "Plan Plugins": reference/plan_plugins.md
+          - "Optimizer Plugins": reference/optimizer_plugins.md
+          - "Sampler Plugins": reference/sampler_plugins.md
+          - "Realization Filter Plugins": reference/realization_filter_plugins.md
+          - "Function transform Plugins": reference/function_transform_plugins.md
       - "Default Plugins":
           - "SciPy Optimizer Plugin": reference/scipy_optimizer.md
           - "SciPy Sampler Plugin": reference/scipy_sampler.md
-          - "Default Realization Filters": reference/default_realization_filters.md
-          - "Default Function Transforms": reference/default_function_transforms.md
-          - "Default Plan Objects": reference/default_plan_objects.md
+          - "Default Realization Filter Plugin": reference/default_realization_filters.md
+          - "Default Function Transform Plugin": reference/default_function_transforms.md
+          - "Default Plan Plugin": reference/default_plan_objects.md
       - "Enumerations": reference/enums.md
       - "Exceptions": reference/exceptions.md
       - "Utilities": reference/utilities.md
