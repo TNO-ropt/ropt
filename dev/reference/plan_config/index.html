@@ -1376,15 +1376,15 @@ object, specifying key sections that define the plan's behavior and data
 flow. Each section aligns with a distinct aspect of the optimization plan:</p>
 <dl>
 <dt><code>inputs</code></dt>
-<dd>Specifies the names of variables to hold input values when the
+<dd>Specifies the names of plan variables to hold input values when the
   optimization workflow is started using the <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan.run"><code>run</code></a>
   method.</dd>
 <dt><code>outputs</code></dt>
-<dd>Lists the names of variables whose final values will be returned as a
+<dd>Lists the names of plan variables whose final values will be returned as a
   tuple when the optimization completes and the <code>run</code> method finishes.</dd>
 <dt><code>variables</code></dt>
-<dd>Defines a dictionary of variable names and initial values, used during
-  plan execution.</dd>
+<dd>Defines a dictionary of plan variable names and initial values, used
+  during plan execution.</dd>
 <dt><code>steps</code></dt>
 <dd>Outlines each step executed once the plan begins. Steps can be set steps,
   which update plan variables, or run steps loaded from plan plugins. Run
@@ -1589,7 +1589,7 @@ underscore).</p>
 run steps. Refer to the method's documentation for more information on
 supported expressions.</p>
 <p>While mathematical expressions often need to be enclosed within
-<code>${{ ... }}</code> (double braces) in a plan configuration string, this is
+<code>${{ ... }}</code> delimiters in a plan configuration string, this is
 optional for expressions passed via the <code>if_</code> attribute.</p>
 </details>
 
