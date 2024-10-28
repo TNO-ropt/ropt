@@ -13,10 +13,33 @@ if TYPE_CHECKING:
 
 
 class SetStep:
-    """The default set step."""
+    """The default set step.
+
+    Set steps are used to modify the contents of plan variables. They specify
+    one or more variables to set, either as a dictionary of variable-name/value
+    pairs, or as a list of such dictionaries.
+
+    Variables containing dictionaries can be modified by specifying an entry
+    using the `[]` operator. Similarly, variables containing objects with
+    attributes can be modified using the `.` operator. These can be mixed and
+    nested to any depth to modify complex variables. For example, the expression
+    `$var['foo'].bar[0]` is valid if `var` contains a dict-like value with a
+    `foo` entry that has a `bar` attribute containing a list.
+
+    Note: Dictionary vs Lists
+        Multiple variables may be set in a single step, either by using a single
+        dictionary of variable/value pairs or by providing a list of
+        dictionaries. Both approaches are generally equivalent. However, if a
+        dictionary is loaded from a JSON or YAML file, the order of the keys is
+        not guaranteed. Keep this in mind if the variables are interdependent
+        and the assignment order matters.
+    """
 
     def __init__(self, config: SetStepConfig, plan: Plan) -> None:
         """Initialize a set step.
+
+        The configuration of the step contains either a dictionary, or a list of
+        dictionaries, specifying the variables and their values.
 
         Args:
             config: The configuration of the step

@@ -13,25 +13,39 @@ if TYPE_CHECKING:
     from ropt.plan import Plan
 
 
-class DefaultPrintWith(BaseModel):
-    """Parameters used by the default metadata results handler.
+class DefaultPrintStep(RunStep):
+    """The default print step.
 
-    Attributes:
-        data: Data to set into the metadata
-        tags: Tags of the sources to track
+    The print step is used to display messages on the console, using Python's
+    `print` function. The message to be printed must be a string evaluated by
+    the [`eval`][ropt.plan.Plan.eval] method of the executing
+    [`Plan`][ropt.plan.Plan] object. The message should be enclosed in `$[[ ... ]]`
+    delimiters; if these delimiters are missing, they are implicitly added around the
+    message. This format allows for optional interpolation of embedded expressions,
+    starting with `$` (for variable references) or delimited by `${{ ... }}`
+    (for evaluating expressions within the message).
+
+    The print step uses the [`DefaultPrintStepWith`]
+    [ropt.plugins.plan._print.DefaultPrintStep.DefaultPrintStepWith]
+    configuration class to parse the `with` field of the
+    [`RunStepConfig`][ropt.config.plan.RunStepConfig] used to specify this step
+    in a plan configuration.
     """
 
-    message: str
+    class DefaultPrintStepWith(BaseModel):
+        """Parameters used by the print step.
 
-    model_config = ConfigDict(
-        extra="forbid",
-        validate_default=True,
-        arbitrary_types_allowed=True,
-    )
+        Attributes:
+            message: The message to print
+        """
 
+        message: str
 
-class DefaultPrintStep(RunStep):
-    """The default print step."""
+        model_config = ConfigDict(
+            extra="forbid",
+            validate_default=True,
+            arbitrary_types_allowed=True,
+        )
 
     def __init__(self, config: RunStepConfig, plan: Plan) -> None:
         """Initialize a default print step.
@@ -41,11 +55,7 @@ class DefaultPrintStep(RunStep):
             plan:   The plan that runs this step
         """
         super().__init__(config, plan)
-        _with = (
-            DefaultPrintWith.model_validate({"message": config.with_})
-            if isinstance(config.with_, str)
-            else DefaultPrintWith.model_validate(config.with_)
-        )
+        _with = self.DefaultPrintStepWith.model_validate(config.with_)
         self._message = _with.message.strip()
         if not (self._message.startswith("$[[") and self._message.endswith("]]")):
             self._message = "$[[" + self._message + "]]"

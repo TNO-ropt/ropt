@@ -8,15 +8,13 @@ from typing import Optional
 import numpy as np
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from ropt.config.utils import (
+from ropt.config.utils import broadcast_1d_array, broadcast_arrays, check_enum_values
+from ropt.config.validated_types import (  # noqa: TCH001
     Array1D,
     Array1DBool,
     Array1DInt,
     ArrayEnum,
     UniqueNames,
-    broadcast_1d_array,
-    broadcast_arrays,
-    check_enum_values,
 )
 from ropt.enums import ConstraintType
 

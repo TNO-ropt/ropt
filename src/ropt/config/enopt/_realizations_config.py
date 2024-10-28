@@ -8,12 +8,8 @@ from typing import Optional
 import numpy as np
 from pydantic import BaseModel, ConfigDict, NonNegativeInt, model_validator
 
-from ropt.config.utils import (
-    Array1D,
-    UniqueNames,
-    broadcast_1d_array,
-    normalize,
-)
+from ropt.config.utils import broadcast_1d_array, normalize
+from ropt.config.validated_types import Array1D, UniqueNames  # noqa: TCH001
 
 if sys.version_info >= (3, 11):
     from typing import Self

@@ -3,7 +3,7 @@
 ::: ropt.plugins.plan.base
     options:
         members:
-            - PlanPlugin
             - RunStep
             - ResultHandler
+            - PlanPlugin
 

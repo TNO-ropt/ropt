@@ -10,7 +10,7 @@ from pydantic import BaseModel, ConfigDict
 
 from ropt.config.enopt import EnOptConfig
 from ropt.config.plan import PlanConfig  # noqa: TCH001
-from ropt.config.utils import Array1D, ItemOrSet, ItemOrTuple  # noqa: TCH001
+from ropt.config.validated_types import Array1D, ItemOrSet, ItemOrTuple  # noqa: TCH001
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.optimization import EnsembleOptimizer
@@ -33,47 +33,115 @@ if TYPE_CHECKING:
 MetaDataType = Dict[str, Union[int, float, bool, str]]
 
 
-class NestedPlanConfig(BaseModel):
-    """Parameters needed by a nested plan.
-
-    Attributes:
-        plan:         The nested plan
-        extra_inputs: Extra inputs passed to the plan
-    """
-
-    plan: PlanConfig
-    extra_inputs: ItemOrTuple[Any] = ()
-
-
-class DefaultOptimizerStepWith(BaseModel):
-    """Parameters used by the default optimizer step.
-
-    Optionally the initial variables to be used can be set from an results
-    handler object.
-
-    Attributes:
-        config:              The optimizer configuration
-        tags:   Tags to      add to the emitted events
-        initial_values:      The initial values for the optimizer
-        exit_code_var:       Name of the variable to store the exit code
-        nested_optimization: Optional nested optimization plan configuration
-    """
-
-    config: str
-    tags: ItemOrSet[str] = set()
-    initial_values: Optional[Union[str, Array1D]] = None
-    exit_code_var: Optional[str] = None
-    nested_optimization: Optional[NestedPlanConfig] = None
-
-    model_config = ConfigDict(
-        extra="forbid",
-        validate_default=True,
-        arbitrary_types_allowed=True,
-    )
-
-
 class DefaultOptimizerStep(RunStep):
-    """The default optimizer step."""
+    """The default optimizer run step.
+
+    The optimizer run step performs an optimization, yielding a sequence of
+    [`FunctionResults`][ropt.results.FunctionResults] and
+    [`GradientResults`][ropt.results.GradientResults] objects. The optimizer is
+    configured using an [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object or
+    a dictionary that can be parsed into such an object. While the initial values
+    for optimization are typically specified in the configuration, they can be
+    overridden by providing them directly.
+
+    The optimizer step emits several signals:
+
+    - [`START_OPTIMIZER_STEP`][ropt.enums.EventType.START_OPTIMIZER_STEP]:
+      Emitted before the optimization starts.
+    - [`FINISHED_OPTIMIZER_STEP`][ropt.enums.EventType.FINISHED_OPTIMIZER_STEP]:
+      Emitted after the optimization finishes.
+    - [`START_EVALUATION`][ropt.enums.EventType.START_EVALUATION]: Emitted
+      before a function or gradient evaluation.
+    - [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION]: Emitted
+      after a function or gradient evaluation.
+
+      The `FINISHED_EVALUATION` signal is particularly important as it passes
+      the generated [`Results`][ropt.results.Results] objects. Result handlers
+      specified in the plan will respond to this signal to process those results.
+
+    The optimizer run step supports nested optimizations, where each function
+    evaluation in the optimization triggers a nested optimization plan that
+    should produce the result for the function evaluation.
+
+    The optimizer run step utilizes the
+    [`DefaultOptimizerStepWith`]
+    [ropt.plugins.plan._optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith]
+    configuration class to parse the `with` field of the
+    [`RunStepConfig`][ropt.config.plan.RunStepConfig] used to specify this step
+    in a plan configuration.
+    """
+
+    class NestedPlanConfig(BaseModel):
+        """Parameters needed by a nested plan.
+
+        A nested plan will be executed by its parent plan each time it evaluates
+        a function. While a nested plan is a standard [`Plan`][ropt.plan.Plan],
+        it must adhere to certain rules:
+
+        - It must accept at least one input variable that holds the variable
+          values at which the parent plan intends to evaluate a function.
+        - It must return one result, which the parent plan will accept as the
+          result of the function evaluation.
+
+        Extra inputs to the nested plan can be specified using the
+        `extra_inputs` field. The nested plan must account for these extra
+        inputs accordingly.
+
+        Nested plans run independently, similar to a standard plan. They
+        typically produce [`Results`][ropt.results.Results], which may be
+        processed using result handlers defined in the nested plan. Once these
+        handlers have executed, the results are also 'bubbled' up to the parent
+        plan, where they are processed with its own handlers.
+
+        Attributes:
+            plan:         The nested plan.
+            extra_inputs: Extra inputs passed to the plan.
+        """
+
+        plan: PlanConfig
+        extra_inputs: ItemOrTuple[Any] = ()
+
+    class DefaultOptimizerStepWith(BaseModel):
+        """Parameters used by the default optimizer step.
+
+        The [`DefaultOptimizerStep`][ropt.plugins.plan._optimizer.DefaultOptimizerStep]
+        requires an optimizer configuration; all other parameters are optional.
+        The configuration object must be an
+        [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object or a dictionary
+        that can be parsed into such an object. Initial values can be provided
+        optionally; if not specified, the initial values defined by the optimizer
+        configuration will be used.
+
+        The `exit_code_var` field can be used to specify the name of a plan
+        variable where the [`exit code`][ropt.enums.OptimizerExitCode] is
+        stored, which the optimizer returns upon completion.
+
+        The `tags` field allows optional labels to be attached to each result,
+        assisting result handlers in filtering relevant results.
+
+        The `nested_optimization_plan` is parsed as a [`NestedPlanConfig`]
+        [ropt.plugins.plan._optimizer.DefaultOptimizerStep.NestedPlanConfig] to
+        define an optional nested optimization procedure.
+
+        Attributes:
+            config:              The optimizer configuration.
+            tags:                Tags to add to the emitted events.
+            initial_values:      The initial values for the optimizer.
+            exit_code_var:       Name of the variable to store the exit code.
+            nested_optimization: Optional nested optimization plan configuration.
+        """
+
+        config: str
+        tags: ItemOrSet[str] = set()
+        initial_values: Optional[Union[str, Array1D]] = None
+        exit_code_var: Optional[str] = None
+        nested_optimization: Optional[DefaultOptimizerStep.NestedPlanConfig] = None
+
+        model_config = ConfigDict(
+            extra="forbid",
+            validate_default=True,
+            arbitrary_types_allowed=True,
+        )
 
     def __init__(self, config: RunStepConfig, plan: Plan) -> None:
         """Initialize a default optimizer step.
@@ -84,11 +152,7 @@ class DefaultOptimizerStep(RunStep):
         """
         super().__init__(config, plan)
 
-        self._with = (
-            DefaultOptimizerStepWith.model_validate({"config": config.with_})
-            if isinstance(config.with_, str)
-            else DefaultOptimizerStepWith.model_validate(config.with_)
-        )
+        self._with = self.DefaultOptimizerStepWith.model_validate(config.with_)
         self._enopt_config: EnOptConfig
 
     def run(self) -> None:

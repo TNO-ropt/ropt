@@ -8,10 +8,7 @@ import numpy as np
 from pydantic import BaseModel, ConfigDict
 
 from ropt.config.enopt import EnOptConfig
-from ropt.config.utils import (
-    Array2D,  # noqa: TCH001
-    ItemOrSet,  # noqa: TCH001
-)
+from ropt.config.validated_types import Array2D, ItemOrSet  # noqa: TCH001
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
@@ -27,31 +24,64 @@ if TYPE_CHECKING:
     from ropt.plan import Plan
 
 
-class DefaultEvaluatorStepWith(BaseModel):
-    """Parameters used by the default optimizer step.
+class DefaultEvaluatorStep(RunStep):
+    """The default evaluator run step.
 
-    Optionally the initial variables to be used can be set from an results handler
-    object.
+    This step performs a single ensemble evaluation, yielding one or more
+    [`FunctionResults`][ropt.results.FunctionResults] objects. The evaluation
+    can process multiple variable vectors, each of which is evaluated
+    separately, producing an individual results object for each vector.
 
-    Attributes:
-        config: The optimizer configuration
-        tags:   Tags to add to the emitted events
-        values: Values to evaluate at
+    Before executing the evaluator step, a
+    [`START_EVALUATOR_STEP`][ropt.enums.EventType.START_EVALUATOR_STEP] event is
+    emitted. After the evaluator step finishes, an
+    [`FINISHED_EVALUATOR_STEP`][ropt.enums.EventType.FINISHED_EVALUATOR_STEP]
+    event is emitted. Result handlers should respond to the latter event to
+    process the generated results.
+
+    The evaluator step uses the [`DefaultEvaluatorStepWith`]
+    [ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith]
+    configuration class to parse the `with` field of the
+    [`RunStepConfig`][ropt.config.plan.RunStepConfig] used to specify this step
+    in a plan configuration.
     """
 
-    config: str
-    tags: ItemOrSet[str] = set()
-    values: Optional[Union[str, Array2D]] = None
+    class DefaultEvaluatorStepWith(BaseModel):
+        """Parameters used by the default evaluator step.
 
-    model_config = ConfigDict(
-        extra="forbid",
-        validate_default=True,
-        arbitrary_types_allowed=True,
-    )
+        The [`DefaultEvaluatorStep`][ropt.plugins.plan._evaluator.DefaultEvaluatorStep]
+        requires an optimizer configuration; the `tags` and `values` parameters
+        are optional. The configuration  object must be an
+        [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object, or a dictionary
+        that can be parsed into such an object. If no `values` are provided, the
+        initial values specified
+        by the optimizer configuration are used. If `values` is given, it may be
+        a single vector or a two-dimensional array. In the latter case, each row
+        of the matrix is treated as a separate set of values to be evaluated.
 
+        The `tags` field allows optional labels to be attached to each result,
+        which can assist result handlers in filtering relevant results.
 
-class DefaultEvaluatorStep(RunStep):
-    """The default evaluator step."""
+        Note: Variable Scaling
+            Internally, the evaluator may use scaled variables as configured by
+            the optimizer. When providing `values`, ensure they are unscaled;
+            scaling is handled internally.
+
+        Attributes:
+            config: The optimizer configuration.
+            tags:   Tags to add to the emitted events.
+            values: Values to evaluate at.
+        """
+
+        config: str
+        tags: ItemOrSet[str] = set()
+        values: Optional[Union[str, Array2D]] = None
+
+        model_config = ConfigDict(
+            extra="forbid",
+            validate_default=True,
+            arbitrary_types_allowed=True,
+        )
 
     def __init__(self, config: RunStepConfig, plan: Plan) -> None:
         """Initialize a default evaluator step.
@@ -62,11 +92,7 @@ class DefaultEvaluatorStep(RunStep):
         """
         super().__init__(config, plan)
 
-        self._with = (
-            DefaultEvaluatorStepWith.model_validate({"config": config.with_})
-            if isinstance(config.with_, str)
-            else DefaultEvaluatorStepWith.model_validate(config.with_)
-        )
+        self._with = self.DefaultEvaluatorStepWith.model_validate(config.with_)
 
     def run(self) -> None:
         """Run the evaluator step."""
@@ -123,12 +149,6 @@ class DefaultEvaluatorStep(RunStep):
     def _get_variables(self, config: EnOptConfig) -> NDArray[np.float64]:
         if self._with.values is not None:  # noqa: PD011
             parsed_variables = self.plan.eval(self._with.values)
-            if isinstance(parsed_variables, FunctionResults):
-                return (
-                    parsed_variables.evaluations.variables
-                    if parsed_variables.evaluations.scaled_variables is None
-                    else parsed_variables.evaluations.scaled_variables
-                )
             if isinstance(parsed_variables, np.ndarray):
                 scaled_variables = scale_variables(config, parsed_variables, axis=-1)
                 return (

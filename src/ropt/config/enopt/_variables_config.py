@@ -10,14 +10,16 @@ import numpy as np
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from ropt.config.utils import (
-    Array1D,
-    ArrayEnum,
-    ArrayIndices,
-    UniqueNames,
     broadcast_1d_array,
     broadcast_arrays,
     check_enum_values,
     immutable_array,
+)
+from ropt.config.validated_types import (  # noqa: TCH001
+    Array1D,
+    ArrayEnum,
+    ArrayIndices,
+    UniqueNames,
 )
 from ropt.enums import VariableType
 

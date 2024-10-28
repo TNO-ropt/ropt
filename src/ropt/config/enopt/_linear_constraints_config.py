@@ -6,13 +6,8 @@ import sys
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from ropt.config.utils import (
-    Array1D,
-    Array2D,
-    ArrayEnum,
-    broadcast_1d_array,
-    check_enum_values,
-)
+from ropt.config.utils import broadcast_1d_array, check_enum_values
+from ropt.config.validated_types import Array1D, Array2D, ArrayEnum  # noqa: TCH001
 from ropt.enums import ConstraintType
 
 if sys.version_info >= (3, 11):

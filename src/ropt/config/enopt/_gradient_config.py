@@ -8,7 +8,8 @@ from typing import Optional
 import numpy as np
 from pydantic import BaseModel, ConfigDict, PositiveInt, model_validator
 
-from ropt.config.utils import Array1D, Array1DInt, ArrayEnum, check_enum_values
+from ropt.config.utils import check_enum_values
+from ropt.config.validated_types import Array1D, Array1DInt, ArrayEnum  # noqa: TCH001
 from ropt.enums import BoundaryType, PerturbationType
 
 from .constants import (

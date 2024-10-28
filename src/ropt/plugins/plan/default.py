@@ -36,7 +36,28 @@ _STEP_OBJECTS: Final[Dict[str, Type[RunStep]]] = {
 
 
 class DefaultPlanPlugin(PlanPlugin):
-    """Default plan plugin class."""
+    """The default plan plugin class.
+
+    This class provides a number of run steps and result handlers:
+
+    `Run Steps`:
+    : - A step that performs a single ensemble evaluation
+        ([`evaluator`][ropt.plugins.plan._evaluator.DefaultEvaluatorStep]).
+    : - A step that performs an optimization
+        ([`optimizer`][ropt.plugins.plan._optimizer.DefaultOptimizerStep]).
+    : - A step that prints a message to the console
+        ([`print`][ropt.plugins.plan._print.DefaultPrintStep]).
+    : - A step that repeats a number of steps
+        ([`repeat`][ropt.plugins.plan._repeat.DefaultRepeatStep]).
+
+    `Result Handlers`:
+    : - A handler that adds metadata to results
+        ([`metadata`][ropt.plugins.plan._metadata.DefaultMetadataHandler]).
+    : - A handler that generates and saves tables of results
+        ([`table`][ropt.plugins.plan._table.DefaultTableHandler]).
+    : - A handler that tracks optimal results
+        ([`tracker`][ropt.plugins.plan._tracker.DefaultTrackerHandler]).
+    """
 
     @singledispatchmethod
     def create(  # type: ignore[override]

@@ -1,24 +1,20 @@
-"""Utilities for checking configuration values."""
+"""Utilities for checking configuration values.
 
-import sys
+These utilities are intended to be used in the model validation code of Pydantic models.
+"""
+
 from collections import Counter
 from enum import IntEnum
-from typing import Any, Optional, Set, Tuple, Type, TypeVar, Union, cast
+from typing import Any, Optional, Set, Tuple, Type, Union, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
-from pydantic import AfterValidator, BeforeValidator
-
-if sys.version_info >= (3, 9):
-    from typing import Annotated
-else:
-    from typing_extensions import Annotated
 
 
 def normalize(array: NDArray[np.float64]) -> NDArray[np.float64]:
     """Normalize a vector.
 
-        Normalize the sum of the values to one.
+    Normalize the sum of the values to one.
 
     Args:
         array: The input array
@@ -53,7 +49,7 @@ def immutable_array(
 
 
 def broadcast_arrays(*args: Any) -> Tuple[NDArray[Any], ...]:  # noqa: ANN401
-    """Broadcast a set of arrays and makes them immutable.
+    """Broadcast a set of arrays to a common dimensionality and makes them immutable.
 
     Args:
         args: The input arrays
@@ -165,25 +161,3 @@ def _convert_set(value: Union[str, Set[str]]) -> Set[str]:
 
 def _convert_tuple(value: Union[str, Tuple[str, ...]]) -> Tuple[str, ...]:
     return (value,) if isinstance(value, str) else value
-
-
-if sys.version_info >= (3, 9):
-    Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
-    Array2D = Annotated[NDArray[np.float64], BeforeValidator(_convert_2d_array)]
-    ArrayIndices = Annotated[NDArray[np.intc], BeforeValidator(_convert_indices)]
-    ArrayEnum = Annotated[NDArray[np.ubyte], BeforeValidator(_convert_enum_array)]
-    Array1DInt = Annotated[NDArray[np.intc], BeforeValidator(_convert_1d_array_intc)]
-    Array1DBool = Annotated[NDArray[np.bool_], BeforeValidator(_convert_1d_array_bool)]
-    UniqueNames = Annotated[Tuple[Any, ...], AfterValidator(_check_duplicates)]
-else:
-    Array1D = Annotated[ArrayLike, BeforeValidator(_convert_1d_array)]
-    Array2D = Annotated[ArrayLike, BeforeValidator(_convert_2d_array)]
-    ArrayIndices = Annotated[ArrayLike, BeforeValidator(_convert_indices)]
-    ArrayEnum = Annotated[ArrayLike, BeforeValidator(_convert_enum_array)]
-    Array1DInt = Annotated[ArrayLike, BeforeValidator(_convert_1d_array_intc)]
-    Array1DBool = Annotated[ArrayLike, BeforeValidator(_convert_1d_array_bool)]
-    UniqueNames = Annotated[Tuple[Any, ...], AfterValidator(_check_duplicates)]
-
-T = TypeVar("T")
-ItemOrSet = Annotated[Set[T], BeforeValidator(_convert_set)]
-ItemOrTuple = Annotated[Tuple[T, ...], BeforeValidator(_convert_tuple)]

@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from ropt.config.utils import ItemOrSet  # noqa: TCH001
+from ropt.config.validated_types import ItemOrSet  # noqa: TCH001
 from ropt.enums import EventType
 from ropt.plugins.plan.base import ResultHandler
 
@@ -25,33 +25,32 @@ if TYPE_CHECKING:
     from ropt.plan import Event, Plan
 
 
-class DefaultTrackerWith(BaseModel):
-    """Parameters for the tracker results handler.
-
-    The `type` parameter determines what result is tracked:
-    - "optimal": Track the best result added
-    - "last": Track the last result added
-
-    Attributes:
-        var:                  The name of the variable to store the tracked result
-        tags:                 Tags of the sources to track
-        type:                 The type of result to store
-        constraint_tolerance: Optional constraint tolerance
-    """
-
-    var: str
-    tags: ItemOrSet[str]
-    type_: Literal["optimal", "last"] = Field(default="optimal", alias="type")
-    constraint_tolerance: Optional[float] = 1e-10
-
-    model_config = ConfigDict(
-        extra="forbid",
-        validate_default=True,
-    )
-
-
 class DefaultTrackerHandler(ResultHandler):
     """The default tracker results handler object."""
+
+    class DefaultTrackerHandlerWith(BaseModel):
+        """Parameters for the tracker results handler.
+
+        The `type` parameter determines what result is tracked:
+        - "optimal": Track the best result added
+        - "last": Track the last result added
+
+        Attributes:
+            var:                  The name of the variable to store the tracked result
+            tags:                 Tags of the sources to track
+            type:                 The type of result to store
+            constraint_tolerance: Optional constraint tolerance
+        """
+
+        var: str
+        tags: ItemOrSet[str]
+        type_: Literal["optimal", "last"] = Field(default="optimal", alias="type")
+        constraint_tolerance: Optional[float] = 1e-10
+
+        model_config = ConfigDict(
+            extra="forbid",
+            validate_default=True,
+        )
 
     def __init__(self, config: ResultHandlerConfig, plan: Plan) -> None:
         """Initialize a default tracker results handler object.
@@ -61,7 +60,7 @@ class DefaultTrackerHandler(ResultHandler):
             plan:   The plan that runs this step
         """
         super().__init__(config, plan)
-        self._with = DefaultTrackerWith.model_validate(config.with_)
+        self._with = self.DefaultTrackerHandlerWith.model_validate(config.with_)
         self.plan[self._with.var] = None
 
     def handle_event(self, event: Event) -> Event:
