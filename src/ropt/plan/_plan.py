@@ -27,7 +27,8 @@ from ._set import SetStep
 if TYPE_CHECKING:
     from ropt.config.plan import PlanConfig
     from ropt.evaluator import Evaluator
-    from ropt.plan import Event, ResultHandler, RunStep
+    from ropt.plan import Event
+    from ropt.plugins.plan.base import ResultHandler, RunStep
 
 
 class OptimizerContext:

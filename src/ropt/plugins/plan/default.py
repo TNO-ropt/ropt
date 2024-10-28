@@ -6,8 +6,8 @@ from functools import singledispatchmethod
 from typing import Dict, Final, Type, Union
 
 from ropt.config.plan import ResultHandlerConfig, RunStepConfig  # noqa: TCH001
-from ropt.plan import (  # noqa: TCH001
-    Plan,
+from ropt.plan import Plan  # noqa: TCH001
+from ropt.plugins.plan.base import (  # noqa: TCH001
     ResultHandler,
     RunStep,
 )

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, ConfigDict
 
-from ropt.plan import RunStep
+from ropt.plugins.plan.base import RunStep
 
 if TYPE_CHECKING:
     from ropt.config.plan import RunStepConfig

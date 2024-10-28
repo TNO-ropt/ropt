@@ -15,7 +15,8 @@ from ropt.config.utils import (
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
-from ropt.plan import Event, RunStep
+from ropt.plan import Event
+from ropt.plugins.plan.base import RunStep
 from ropt.results import FunctionResults
 from ropt.utils.scaling import scale_variables
 

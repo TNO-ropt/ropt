@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict
 
 from ropt.config.utils import ItemOrSet  # noqa: TCH001
 from ropt.enums import EventType
-from ropt.plan import ResultHandler
+from ropt.plugins.plan.base import ResultHandler
 
 if sys.version_info >= (3, 11):
     pass

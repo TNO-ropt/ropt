@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, List, Optional, Union
 from pydantic import BaseModel, ConfigDict
 
 from ropt.config.plan import RunStepConfig, SetStepConfig  # noqa: TCH001
-from ropt.plan import RunStep
+from ropt.plugins.plan.base import RunStep
 
 if TYPE_CHECKING:
     from ropt.plan import Plan

@@ -10,7 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from ropt.config.utils import ItemOrSet  # noqa: TCH001
 from ropt.enums import EventType
-from ropt.plan import ResultHandler
+from ropt.plugins.plan.base import ResultHandler
 
 from ._utils import _get_last_result, _update_optimal_result
 

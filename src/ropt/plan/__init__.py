@@ -7,8 +7,8 @@ class, which specifies the inputs, outputs, variables, steps, and result
 handlers.
 
 A plan comprises [`SetStep`][ropt.plan.SetStep] and
-[`RunStep`][ropt.plan.RunStep] objects that define individual actions, as well
-as [`ResultHandler`][ropt.plan.ResultHandler] objects that process and store
+[`RunStep`][ropt.plugins.plan.base.RunStep] objects that define individual actions, as well
+as [`ResultHandler`][ropt.plugins.plan.base.ResultHandler] objects that process and store
 data generated during execution. Both run steps and result handlers are
 implemented through a [`plugin`][ropt.plugins.plan] mechanism, making it easy to
 extend the range of supported steps and result handlers. The `ropt` library also
@@ -32,7 +32,6 @@ from ._expr import ExpressionEvaluator
 from ._plan import OptimizerContext, Plan
 from ._run import OptimizationPlanRunner
 from ._set import SetStep
-from .base import ResultHandler, RunStep
 
 __all__ = [
     "Event",
@@ -40,7 +39,5 @@ __all__ = [
     "OptimizationPlanRunner",
     "OptimizerContext",
     "Plan",
-    "ResultHandler",
-    "RunStep",
     "SetStep",
 ]

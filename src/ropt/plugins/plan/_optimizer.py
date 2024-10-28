@@ -14,7 +14,8 @@ from ropt.config.utils import Array1D, ItemOrSet, ItemOrTuple  # noqa: TCH001
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.optimization import EnsembleOptimizer
-from ropt.plan import Event, Plan, RunStep
+from ropt.plan import Event, Plan
+from ropt.plugins.plan.base import RunStep
 from ropt.results import FunctionResults
 from ropt.utils.scaling import scale_variables
 
