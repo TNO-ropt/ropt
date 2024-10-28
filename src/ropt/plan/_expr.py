@@ -3,15 +3,11 @@
 from __future__ import annotations
 
 import ast
+import copy
 import re
+from functools import partial
 from numbers import Number
-from typing import (
-    Any,
-    Dict,
-    Final,
-    List,
-    Mapping,
-)
+from typing import Any, Callable, Dict, Final, List, Mapping, Optional
 
 import numpy as np
 
@@ -24,13 +20,37 @@ _BIN_OPS: Final = (ast.Add, ast.Sub, ast.Div, ast.FloorDiv, ast.Mult, ast.Mod, a
 _BOOL_OPS: Final = (ast.Or, ast.And)
 _CMP_OPS: Final = (ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE)
 
-_SUPPORTED_VARIABLE_TYPES = (Number, str, np.ndarray, Dict, List, Results, EnOptConfig)
+_SUPPORTED_VARIABLE_TYPES: Final = (
+    Number,
+    str,
+    np.ndarray,
+    Dict,
+    List,
+    Results,
+    EnOptConfig,
+)
+_SUPPORTED_FUNCTIONS: Final[Dict[str, Callable[..., Any]]] = {
+    "abs": abs,
+    "bool": bool,
+    "divmod": divmod,
+    "float": float,
+    "int": int,
+    "max": max,
+    "min": min,
+    "pow": pow,
+    "range": range,
+    "round": round,
+    "sum": sum,
+}
 
 
 class _ReplaceFields(ast.NodeTransformer):
-    def __init__(self, variables: Dict[str, Any]) -> None:
+    def __init__(
+        self, variables: Dict[str, Any], functions: Dict[str, Callable[..., Any]]
+    ) -> None:
         self.values: Dict[str, Any] = {}
         self._variables = variables
+        self._functions = functions
 
     def visit_Name(self, node: ast.Name) -> ast.AST:  # noqa: N802
         if node.id in self._variables:
@@ -42,10 +62,25 @@ class _ReplaceFields(ast.NodeTransformer):
             raise TypeError(msg)
         return self.generic_visit(node)
 
+    def visit_Call(self, node: ast.Call) -> ast.AST:  # noqa: N802
+        assert isinstance(node.func, ast.Name)
+        if node.func.id not in self._functions:
+            msg = f"function `{node.func.id}` not supported"
+            raise NameError(msg)
+        return self.generic_visit(node)
+
 
 class ExpressionEvaluator:
-    def __init__(self, variables: Mapping[str, Any]) -> None:
-        self._variables = variables
+    def __init__(
+        self, functions: Optional[Dict[str, Callable[..., Any]]] = None
+    ) -> None:
+        self._functions = copy.deepcopy(_SUPPORTED_FUNCTIONS)
+        if functions is not None:
+            for key, value in functions.items():
+                if key in _SUPPORTED_FUNCTIONS:
+                    msg = f"cannot override builtin: `{key}`"
+                    raise ValueError(msg)
+                self._functions[key] = value
 
     def _is_valid(self, node: ast.AST) -> bool:  # noqa: C901, PLR0911
         if isinstance(node, ast.Constant):
@@ -82,47 +117,73 @@ class ExpressionEvaluator:
             if isinstance(node.value, ast.Attribute):
                 return self._is_valid(node.value)
             return bool(isinstance(node.value, ast.Name))
+        if isinstance(node, ast.Call):
+            return (
+                isinstance(node.func, ast.Name)
+                and all(isinstance(arg, (ast.Name, ast.Constant)) for arg in node.args)
+                and not node.keywords
+            )
         return bool(isinstance(node, ast.Name))
 
-    def _eval_expr(self, expr: str) -> Any:  # noqa: ANN401
-        # find all variables:
+    def _eval_expr(self, expr: str, variables: Mapping[str, Any]) -> Any:  # noqa: ANN401
+        # find all functions and variables:
+        for word in re.findall(r"(?<=\$)\b(\w+)\b\s*\(", expr):
+            if word not in self._functions:
+                msg = f"Unknown plan function: `{word}`"
+                raise AttributeError(msg)
         found: Dict[str, Any] = {}
         for word in re.findall(r"(?<=\$)\b\w+\b", expr):
-            if word not in self._variables:
+            if word in variables:
+                found[word] = variables[word]
+            elif word not in self._functions:
                 msg = f"Unknown plan variable: `{word}`"
                 raise AttributeError(msg)
-            found[word] = self._variables[word]
 
         # Parse the string:
         stripped = re.sub(r"\$(\$*)", "\\1", expr)
         tree = ast.parse(stripped, mode="eval")
         if self._is_valid(tree.body):
-            replacer = _ReplaceFields(found)
+            replacer = _ReplaceFields(found, self._functions)
             tree = ast.fix_missing_locations(replacer.visit(tree))
             return eval(  # noqa: S307
-                compile(tree, "", mode="eval"), {"__builtins__": {}}, replacer.values
+                compile(tree, "", mode="eval"),
+                {"__builtins__": self._functions},
+                replacer.values,
             )
 
         msg = "invalid expression"
         raise SyntaxError(msg)
 
-    def _substitute(self, matched: re.Match[str]) -> str:
+    def _substitute(self, matched: re.Match[str], variables: Mapping[str, Any]) -> str:
         value = matched.string[matched.start() : matched.end()]
-        return "$" if value == "$$" else str(self.eval(value))
+        return "$" if value == "$$" else str(self.eval(value, variables))
 
-    def eval(self, value: str) -> Any:  # noqa: ANN401
+    def eval(
+        self,
+        value: str,
+        variables: Mapping[str, Any],
+    ) -> Any:  # noqa: ANN401
+        for variable in variables:
+            if variable in self._functions:
+                msg = f"conflicting variable/function names: `{variable}`"
+                raise ValueError(msg)
+
         value = value.strip()
         if value.startswith("$$"):
             return value.replace("$$", "$", 1)
         if value.startswith("{{") and value.endswith("}}"):
-            return self._eval_expr(value[2:-2].strip())
+            return self._eval_expr(value[2:-2].strip(), variables)
         if value.startswith("[[") and value.endswith("]]"):
             parts = value[2:-2].split("{{")
             parts[1:] = ["{{" + part for part in parts[1:]]
             return "".join(
-                re.sub(r"\{{(.*)}}|\$\$|\$([^\W0-9][\w\.]*)", self._substitute, part)
+                re.sub(
+                    r"\{{(.*)}}|\$\$|\$([^\W0-9][\w\.]*)",
+                    partial(self._substitute, variables=variables),
+                    part,
+                )
                 for part in parts
             )
         if value.startswith("$"):
-            return self._eval_expr(value)
+            return self._eval_expr(value, variables)
         return value

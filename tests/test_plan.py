@@ -10,7 +10,13 @@ import pytest
 
 from ropt.config.plan import PlanConfig
 from ropt.enums import EventType, OptimizerExitCode
-from ropt.plan import Event, OptimizationPlanRunner, OptimizerContext, Plan
+from ropt.plan import (
+    Event,
+    ExpressionEvaluator,
+    OptimizationPlanRunner,
+    OptimizerContext,
+    Plan,
+)
 from ropt.report import ResultsTable
 from ropt.results import FunctionResults, Results
 
@@ -104,6 +110,11 @@ def test_run_basic(enopt_config: Any, evaluator: Any) -> None:
         ("$$dummy", "$dummy"),
         ("{{[1, 2]}}", [1, 2]),
         ("{{[$dummy, 2]}}", [None, 2]),
+        ("{{max (1, 2)}}", 2),
+        ("{{max ($x, 2)}}", 2),
+        ("{{$max ($x, 2)}}", 2),
+        ("$max($x, 2)", 2),
+        ("$incr($x)", 2),
         ("[[1]]", "1"),
         ("[[[1]]]", "[1]"),
         ("[[{{ $x }}]]", "1"),
@@ -128,7 +139,9 @@ def test_eval_expr(evaluator: Any, expr: str, expected: Any) -> None:
         },
     }
     parsed_config = PlanConfig.model_validate(plan_config)
-    context = OptimizerContext(evaluator=evaluator())
+    context = OptimizerContext(
+        evaluator=evaluator(), expr=ExpressionEvaluator({"incr": lambda x: x + 1})
+    )
     plan = Plan(parsed_config, context)
     plan.run()
 
@@ -142,6 +155,8 @@ def test_eval_expr(evaluator: Any, expr: str, expected: Any) -> None:
         ("$z", "Unknown plan variable: `z`", AttributeError),
         ("[[a {{ 1 + 1 {{ 1 }} }} b]]", "unmatched '}'", SyntaxError),
         ("[[{{ 1 + * 1 }}]]", "invalid syntax", SyntaxError),
+        ("{{ foo() }}", "function `foo` not supported", NameError),
+        ("{{ $foo() }}", "Unknown plan function: `foo`", AttributeError),
     ],
 )
 def test_eval_exception(

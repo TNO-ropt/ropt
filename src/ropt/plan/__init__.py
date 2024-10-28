@@ -28,6 +28,7 @@ straightforward plans involving a single optimization.
 """
 
 from ._events import Event
+from ._expr import ExpressionEvaluator
 from ._plan import OptimizerContext, Plan
 from ._run import OptimizationPlanRunner
 from ._set import SetStep
@@ -35,6 +36,7 @@ from .base import ResultHandler, RunStep
 
 __all__ = [
     "Event",
+    "ExpressionEvaluator",
     "OptimizationPlanRunner",
     "OptimizerContext",
     "Plan",

@@ -40,18 +40,26 @@ class OptimizerContext:
       functions.
     - A seed for a random number generator used in stochastic gradient
       estimation.
+    - An expression evaluator object.
     - An iterator that generates unique result IDs.
     """
 
-    def __init__(self, evaluator: Evaluator, seed: Optional[int] = None) -> None:
+    def __init__(
+        self,
+        evaluator: Evaluator,
+        seed: Optional[int] = None,
+        expr: Optional[ExpressionEvaluator] = None,
+    ) -> None:
         """Initialize the optimization context.
 
         Args:
-            evaluator:      The callable for running function evaluations
-            seed:           Optional seed for the random number generator
+            evaluator: The callable for running function evaluations
+            seed:      Optional seed for the random number generator
+            expr:      Optional expression evaluator
         """
         self.evaluator = evaluator
         self.rng = default_rng(DEFAULT_SEED) if seed is None else default_rng(seed)
+        self.expr = ExpressionEvaluator() if expr is None else expr
         self.result_id_iter = count()
 
 
@@ -101,7 +109,7 @@ class Plan:
             self._plan_config.variables,
         ):
             if var in self._vars:
-                msg = f"Variable already exists: `{var}"
+                msg = f"Plan variable already exists: `{var}`"
                 raise AttributeError(msg)
             self._set_item(var, None)
         self._steps = self.create_steps(config.steps)
@@ -113,7 +121,6 @@ class Plan:
         ]
         self._aborted = False
         self._parent = parent
-        self._expression_evaluator = ExpressionEvaluator(self._vars)
 
     def run(self, *args: Any) -> Tuple[Any, ...]:  # noqa: ANN401
         """Run the Plan.
@@ -279,7 +286,9 @@ class Plan:
             The evaluated result, which may vary in type depending on the evaluation context.
         """
         return (
-            self._expression_evaluator.eval(value) if isinstance(value, str) else value
+            self._optimizer_context.expr.eval(value, self._vars)
+            if isinstance(value, str)
+            else value
         )
 
     def add_observer(
