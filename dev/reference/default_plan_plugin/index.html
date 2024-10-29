@@ -1696,7 +1696,21 @@
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.RunStep" href="../plan_plugins/#ropt.plugins.plan.base.RunStep">RunStep</a></code></p>
 
 
-        <p>The default evaluator step.</p>
+        <p>The default evaluator run step.</p>
+<p>This step performs a single ensemble evaluation, yielding one or more
+<a class="autorefs autorefs-internal" href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> objects. The evaluation
+can process multiple variable vectors, each of which is evaluated
+separately, producing an individual results object for each vector.</p>
+<p>Before executing the evaluator step, a
+<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType.START_EVALUATOR_STEP"><code>START_EVALUATOR_STEP</code></a> event is
+emitted. After the evaluator step finishes, an
+<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType.FINISHED_EVALUATOR_STEP"><code>FINISHED_EVALUATOR_STEP</code></a>
+event is emitted. Result handlers should respond to the latter event to
+process the generated results.</p>
+<p>The evaluator step uses the <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith"><code>DefaultEvaluatorStepWith</code></a>
+configuration class to parse the <code>with</code> field of the
+<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.RunStepConfig"><code>RunStepConfig</code></a> used to specify this step
+in a plan configuration.</p>
 
 
 
@@ -1726,10 +1740,26 @@
               Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
 
 
-        <p>Parameters used by the default optimizer step.</p>
-<p>Optionally the initial variables to be used can be set from an results handler
-object.</p>
+        <p>Parameters used by the default evaluator step.</p>
+<p>The <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep"><code>DefaultEvaluatorStep</code></a>
+requires an optimizer configuration; the <code>tags</code> and <code>values</code> parameters
+are optional. The configuration  object must be an
+<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object, or a dictionary
+that can be parsed into such an object. If no <code>values</code> are provided, the
+initial values specified
+by the optimizer configuration are used. If <code>values</code> is given, it may be
+a single vector or a two-dimensional array. In the latter case, each row
+of the matrix is treated as a separate set of values to be evaluated.</p>
+<p>The <code>tags</code> field allows optional labels to be attached to each result,
+which can assist result handlers in filtering relevant results.</p>
 
+
+<details class="note" open>
+  <summary>Variable Scaling</summary>
+  <p>Internally, the evaluator may use scaled variables as configured by
+the optimizer. When providing <code>values</code>, ensure they are unscaled;
+scaling is handled internally.</p>
+</details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
     <table>
@@ -1748,7 +1778,7 @@ object.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The optimizer configuration</p>
+                <p>The optimizer configuration.</p>
               </div>
             </td>
           </tr>
@@ -1759,7 +1789,7 @@ object.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Tags to add to the emitted events</p>
+                <p>Tags to add to the emitted events.</p>
               </div>
             </td>
           </tr>
@@ -1770,7 +1800,7 @@ object.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Values to evaluate at</p>
+                <p>Values to evaluate at.</p>
               </div>
             </td>
           </tr>
@@ -1823,7 +1853,36 @@ object.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.RunStep" href="../plan_plugins/#ropt.plugins.plan.base.RunStep">RunStep</a></code></p>
 
 
-        <p>The default optimizer step.</p>
+        <p>The default optimizer run step.</p>
+<p>The optimizer run step performs an optimization, yielding a sequence of
+<a class="autorefs autorefs-internal" href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> and
+<a class="autorefs autorefs-internal" href="../results/#ropt.results.GradientResults"><code>GradientResults</code></a> objects. The optimizer is
+configured using an <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object or
+a dictionary that can be parsed into such an object. While the initial values
+for optimization are typically specified in the configuration, they can be
+overridden by providing them directly.</p>
+<p>The optimizer step emits several signals:</p>
+<ul>
+<li><a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType.START_OPTIMIZER_STEP"><code>START_OPTIMIZER_STEP</code></a>:
+  Emitted before the optimization starts.</li>
+<li><a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType.FINISHED_OPTIMIZER_STEP"><code>FINISHED_OPTIMIZER_STEP</code></a>:
+  Emitted after the optimization finishes.</li>
+<li><a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType.START_EVALUATION"><code>START_EVALUATION</code></a>: Emitted
+  before a function or gradient evaluation.</li>
+<li><a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a>: Emitted
+  after a function or gradient evaluation.</li>
+</ul>
+<p>The <code>FINISHED_EVALUATION</code> signal is particularly important as it passes
+  the generated <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a> objects. Result handlers
+  specified in the plan will respond to this signal to process those results.</p>
+<p>The optimizer run step supports nested optimizations, where each function
+evaluation in the optimization triggers a nested optimization plan that
+should produce the result for the function evaluation.</p>
+<p>The optimizer run step utilizes the
+<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith"><code>DefaultOptimizerStepWith</code></a>
+configuration class to parse the <code>with</code> field of the
+<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.RunStepConfig"><code>RunStepConfig</code></a> used to specify this step
+in a plan configuration.</p>
 
 
 
@@ -1854,8 +1913,20 @@ object.</p>
 
 
         <p>Parameters used by the default optimizer step.</p>
-<p>Optionally the initial variables to be used can be set from an results
-handler object.</p>
+<p>The <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep"><code>DefaultOptimizerStep</code></a>
+requires an optimizer configuration; all other parameters are optional.
+The configuration object must be an
+<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object or a dictionary
+that can be parsed into such an object. Initial values can be provided
+optionally; if not specified, the initial values defined by the optimizer
+configuration will be used.</p>
+<p>The <code>exit_code_var</code> field can be used to specify the name of a plan
+variable where the <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.OptimizerExitCode"><code>exit code</code></a> is
+stored, which the optimizer returns upon completion.</p>
+<p>The <code>tags</code> field allows optional labels to be attached to each result,
+assisting result handlers in filtering relevant results.</p>
+<p>The <code>nested_optimization_plan</code> is parsed as a <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep.NestedPlanConfig"><code>NestedPlanConfig</code></a> to
+define an optional nested optimization procedure.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -1875,7 +1946,7 @@ handler object.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The optimizer configuration</p>
+                <p>The optimizer configuration.</p>
               </div>
             </td>
           </tr>
@@ -1886,7 +1957,7 @@ handler object.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Tags to      add to the emitted events</p>
+                <p>Tags to add to the emitted events.</p>
               </div>
             </td>
           </tr>
@@ -1897,7 +1968,7 @@ handler object.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The initial values for the optimizer</p>
+                <p>The initial values for the optimizer.</p>
               </div>
             </td>
           </tr>
@@ -1908,7 +1979,7 @@ handler object.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Name of the variable to store the exit code</p>
+                <p>Name of the variable to store the exit code.</p>
               </div>
             </td>
           </tr>
@@ -1919,7 +1990,7 @@ handler object.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional nested optimization plan configuration</p>
+                <p>Optional nested optimization plan configuration.</p>
               </div>
             </td>
           </tr>
@@ -1964,6 +2035,23 @@ handler object.</p>
 
 
         <p>Parameters needed by a nested plan.</p>
+<p>A nested plan will be executed by its parent plan each time it evaluates
+a function. While a nested plan is a standard <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan"><code>Plan</code></a>,
+it must adhere to certain rules:</p>
+<ul>
+<li>It must accept at least one input variable that holds the variable
+  values at which the parent plan intends to evaluate a function.</li>
+<li>It must return one result, which the parent plan will accept as the
+  result of the function evaluation.</li>
+</ul>
+<p>Extra inputs to the nested plan can be specified using the
+<code>extra_inputs</code> field. The nested plan must account for these extra
+inputs accordingly.</p>
+<p>Nested plans run independently, similar to a standard plan. They
+typically produce <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a>, which may be
+processed using result handlers defined in the nested plan. Once these
+handlers have executed, the results are also 'bubbled' up to the parent
+plan, where they are processed with its own handlers.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -1983,7 +2071,7 @@ handler object.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The nested plan</p>
+                <p>The nested plan.</p>
               </div>
             </td>
           </tr>
@@ -1994,7 +2082,7 @@ handler object.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Extra inputs passed to the plan</p>
+                <p>Extra inputs passed to the plan.</p>
               </div>
             </td>
           </tr>
@@ -2285,6 +2373,19 @@ handler object.</p>
 
 
         <p>The default metadata results handler.</p>
+<p>This handler adds arbitrary metadata to results produced by run steps by
+merging them into the <code>metadata</code> field of the
+<a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a> objects that it receives. It is configured
+using a dictionary that maps keys to the data to store. These data entries
+can be of any type; however, if they are strings, they will be evaluated
+using the <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan.eval"><code>eval</code></a> method of the executing
+<a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> object. This evaluation occurs when the metadata
+handler processes an event, enabling dynamic data insertion based on the
+current content of plan variables.</p>
+<p>The metadata step uses the <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._metadata.DefaultMetadataHandler.DefaultMetadataHandlerWith"><code>DefaultMetadataHandlerWith</code></a>
+configuration class to parse the <code>with</code> field of the
+<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.ResultHandlerConfig"><code>ResultHandler</code></a> used to specify this
+handler in a plan configuration.</p>
 
 
 
@@ -2315,6 +2416,9 @@ handler object.</p>
 
 
         <p>Parameters used by the default metadata results handler.</p>
+<p>The data to merge into the metadata of a result are required.</p>
+<p>The <code>tags</code> field allows optional labels to be attached to each result,
+which can assist result handlers in filtering relevant results.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2334,7 +2438,7 @@ handler object.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Data to set into the metadata</p>
+                <p>Data to merge into the metadata of the results.</p>
               </div>
             </td>
           </tr>
@@ -2345,7 +2449,7 @@ handler object.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Tags of the sources to track</p>
+                <p>Optional tags specifying which result sources to modify.</p>
               </div>
             </td>
           </tr>
