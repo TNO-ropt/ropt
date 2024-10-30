@@ -2136,6 +2136,18 @@ plan, where they are processed with its own handlers.</p>
 
 
         <p>The default print step.</p>
+<p>The print step is used to display messages on the console, using Python's
+<code>print</code> function. The message to be printed must be a string evaluated by
+the <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan.eval"><code>eval</code></a> method of the executing
+<a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> object. The message should be enclosed in <code>$[[ ... ]]</code>
+delimiters; if these delimiters are missing, they are implicitly added around the
+message. This format allows for optional interpolation of embedded expressions,
+starting with <code>$</code> (for variable references) or delimited by <code>${{ ... }}</code>
+(for evaluating expressions within the message).</p>
+<p>The print step uses the <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._print.DefaultPrintStep.DefaultPrintStepWith"><code>DefaultPrintStepWith</code></a>
+configuration class to parse the <code>with</code> field of the
+<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.RunStepConfig"><code>RunStepConfig</code></a> used to specify this step
+in a plan configuration.</p>
 
 
 
@@ -2165,7 +2177,7 @@ plan, where they are processed with its own handlers.</p>
               Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
 
 
-        <p>Parameters used by the default metadata results handler.</p>
+        <p>Parameters used by the print step.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2179,22 +2191,13 @@ plan, where they are processed with its own handlers.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._print.DefaultPrintStep.DefaultPrintStepWith.data">data</span></code></td>
+            <td><code><span title="ropt.plugins.plan._print.DefaultPrintStep.DefaultPrintStepWith.message">message</span></code></td>
             <td>
+                  <code>str</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Data to set into the metadata</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._print.DefaultPrintStep.DefaultPrintStepWith.tags">tags</span></code></td>
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Tags of the sources to track</p>
+                <p>The message to print</p>
               </div>
             </td>
           </tr>
