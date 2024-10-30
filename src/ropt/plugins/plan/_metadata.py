@@ -33,7 +33,6 @@ class DefaultMetadataHandler(ResultHandler):
     configuration class to parse the `with` field of the
     [`ResultHandler`][ropt.config.plan.ResultHandlerConfig] used to specify this
     handler in a plan configuration.
-
     """
 
     class DefaultMetadataHandlerWith(BaseModel):

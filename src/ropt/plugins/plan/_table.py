@@ -26,24 +26,44 @@ if TYPE_CHECKING:
 
 
 class DefaultTableHandler(ResultHandler):
-    """The default tracker results handler object."""
+    """The default table results handler object.
+
+    The table results handler generates a table that summarizes the results it
+    receives. This is implemented through a
+    [`ResultsTable`][ropt.report.ResultsTable] object; refer to its
+    documentation for detailed information on table generation and formatting.
+
+    This table handler uses the [`DefaultTableHandlerWith`]
+    [ropt.plugins.plan._table.DefaultTableHandler.DefaultTableHandlerWith]
+    configuration class to parse the `with` field in the
+    [`ResultHandler`][ropt.config.plan.ResultHandlerConfig] used to specify this
+    handler in a plan configuration.
+    """
 
     class DefaultTableHandlerWith(BaseModel):
         """Parameters for the table results handler.
 
-        This results handler generates a table summarizing the results of an
-        optimization. This is implemented via a
-        [`ResultsTable`][ropt.report.ResultsTable] object. Refer to its
-        documentation for more details.
+        The `columns`, `path`, `table_type`, and `min_header_len` fields
+        correspond to the parameters of the
+        [`ResultsTable`][ropt.report.ResultsTable] constructor. Refer to its
+        documentation for more detailed information on these arguments.
+
+        The `maximize` field allows adaptation for maximization problems.
+        Typically, results are generated for minimization problems, but setting
+        `maximize` to `True` will invert this interpretation for scenarios where
+        the negative of an objective function is minimized.
+
+        The `tags` field enables optional labels to be attached to results,
+        which assists in filtering relevant results for the table.
 
         Attributes:
-            tags:           Tags of the sources to track
-            columns:        A mapping of column names for the results table
-            path:           The location where the results file will be saved
-            table_type:     The type of table to generate
-            min_header_len: The minimum number of header lines to generate
-            maximize:       If `True`, interpret the results as a maximization
-                            problem rather than the default minimization
+            tags:           Tags of the sources to track.
+            columns:        A mapping of column names for the results table.
+            path:           The file path where the results table will be saved.
+            table_type:     The format or type of table to generate.
+            min_header_len: The minimum number of header lines to include.
+            maximize:       If `True`, interprets results as a maximization
+                            problem rather than the default minimization.
         """
 
         tags: ItemOrSet[str]

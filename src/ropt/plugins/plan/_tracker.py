@@ -26,25 +26,48 @@ if TYPE_CHECKING:
 
 
 class DefaultTrackerHandler(ResultHandler):
-    """The default tracker results handler object."""
+    """The default tracker results handler object.
+
+    This handler tracks the
+    [`Results`][ropt.results.Results] objects that it receives and selects one
+    to retain in a variable. Currently it tracks either the last result it
+    receives, or the best result. The best result is defined as the result that
+    has the lowest weighted objective value. Optionally, results may be filtered
+    by checking for violations of constraints, by comparing constraint values to
+    a threshold.
+
+    The tracker step uses the [`DefaultTrackerHandlerWith`]
+    [ropt.plugins.plan._tracker.DefaultTrackerHandler.DefaultTrackerHandlerWith]
+    configuration class to parse the `with` field of the
+    [`ResultHandler`][ropt.config.plan.ResultHandlerConfig] used to specify this
+    handler in a plan configuration.
+    """
 
     class DefaultTrackerHandlerWith(BaseModel):
         """Parameters for the tracker results handler.
 
-        The `type` parameter determines what result is tracked:
-        - "optimal": Track the best result added
-        - "last": Track the last result added
+        The tracker stores the tracked result in the variable specified by the
+        `var` field. The `type` parameter determines which result is tracked:
+
+        - `"best"`: Tracks the best result added.
+        - `"last"`: Tracks the last result added.
+
+        If `constraint_tolerance` is set, results that exceed this tolerance on
+        constraint values are not tracked.
+
+        The `tags` field allows optional labels to be attached to each result,
+        assisting result handlers in filtering relevant results.
 
         Attributes:
-            var:                  The name of the variable to store the tracked result
-            tags:                 Tags of the sources to track
-            type:                 The type of result to store
-            constraint_tolerance: Optional constraint tolerance
+            var:                  The name of the variable to store the tracked result.
+            tags:                 Tags to filter the sources to track.
+            type:                 Specifies the type of result to store (`"best"` or `"last"`).
+            constraint_tolerance: An optional constraint tolerance level.
         """
 
         var: str
         tags: ItemOrSet[str]
-        type_: Literal["optimal", "last"] = Field(default="optimal", alias="type")
+        type_: Literal["best", "last"] = Field(default="best", alias="type")
         constraint_tolerance: Optional[float] = 1e-10
 
         model_config = ConfigDict(
@@ -82,7 +105,7 @@ class DefaultTrackerHandler(ResultHandler):
             and (event.tags & self._with.tags)
         ):
             results = None
-            if self._with.type_ == "optimal":
+            if self._with.type_ == "best":
                 results = _update_optimal_result(
                     self.plan[self._with.var],
                     event.results,

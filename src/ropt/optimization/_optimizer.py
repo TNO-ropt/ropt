@@ -8,10 +8,7 @@ import numpy as np
 
 from ropt.enums import ConstraintType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
-from ropt.results import (
-    FunctionResults,
-    GradientResults,
-)
+from ropt.results import FunctionResults, GradientResults
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray

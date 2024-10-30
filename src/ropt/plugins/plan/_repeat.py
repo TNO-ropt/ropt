@@ -14,15 +14,32 @@ if TYPE_CHECKING:
 
 
 class DefaultRepeatStep(RunStep):
-    """The default optimizer step."""
+    """The default repeat run step.
+
+    This step executes a defined list of steps in sequence for a specified
+    number of repetitions. Optionally, it can store the current iteration number
+    in a variable for tracking purposes. Each iteration preserves the original
+    order of steps, ensuring sequential execution rather than parallel.
+
+    The repeat run step uses the [`DefaultRepeatStepWith`]
+    [ropt.plugins.plan._repeat.DefaultRepeatStep.DefaultRepeatStepWith]
+    configuration class to interpret the `with` field of the
+    [`RunStepConfig`][ropt.config.plan.RunStepConfig] in a plan configuration.
+    """
 
     class DefaultRepeatStepWith(BaseModel):
         """Parameters used by the default repeat step.
 
+        The `steps` parameter defines a sequence of actions that are executed
+        repeatedly, with the number of repetitions determined by `iterations`.
+        If `var` is specified, it will be set to the current iteration count
+        before each round of steps, allowing for iteration-specific actions or
+        tracking.
+
         Attributes:
-            iterations: The number of repetitions
-            steps:      The steps to repeat
-            var:        The variable to update with the counter value
+            iterations: The number of repetitions to perform.
+            steps:      The list of steps to repeat in each iteration.
+            var:        Optional variable to update with the current iteration count.
         """
 
         iterations: int
