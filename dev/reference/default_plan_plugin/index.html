@@ -2414,7 +2414,14 @@ in a plan configuration.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.RunStep" href="../plan_plugins/#ropt.plugins.plan.base.RunStep">RunStep</a></code></p>
 
 
-        <p>The default optimizer step.</p>
+        <p>The default repeat run step.</p>
+<p>This step executes a defined list of steps in sequence for a specified
+number of repetitions. Optionally, it can store the current iteration number
+in a variable for tracking purposes. Each iteration preserves the original
+order of steps, ensuring sequential execution rather than parallel.</p>
+<p>The repeat run step uses the <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._repeat.DefaultRepeatStep.DefaultRepeatStepWith"><code>DefaultRepeatStepWith</code></a>
+configuration class to interpret the <code>with</code> field of the
+<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.RunStepConfig"><code>RunStepConfig</code></a> in a plan configuration.</p>
 
 
 
@@ -2445,6 +2452,11 @@ in a plan configuration.</p>
 
 
         <p>Parameters used by the default repeat step.</p>
+<p>The <code>steps</code> parameter defines a sequence of actions that are executed
+repeatedly, with the number of repetitions determined by <code>iterations</code>.
+If <code>var</code> is specified, it will be set to the current iteration count
+before each round of steps, allowing for iteration-specific actions or
+tracking.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2464,7 +2476,7 @@ in a plan configuration.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The number of repetitions</p>
+                <p>The number of repetitions to perform.</p>
               </div>
             </td>
           </tr>
@@ -2475,7 +2487,7 @@ in a plan configuration.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The steps to repeat</p>
+                <p>The list of steps to repeat in each iteration.</p>
               </div>
             </td>
           </tr>
@@ -2486,7 +2498,7 @@ in a plan configuration.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The variable to update with the counter value</p>
+                <p>Optional variable to update with the current iteration count.</p>
               </div>
             </td>
           </tr>
