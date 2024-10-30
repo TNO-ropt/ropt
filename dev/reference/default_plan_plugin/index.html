@@ -1017,19 +1017,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep" class="md-nav__link">
+  <a href="#ropt.plugins.plan._set.DefaultSetStep" class="md-nav__link">
     <span class="md-ellipsis">
-      DefaultEvaluatorStep
+      DefaultSetStep
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="DefaultEvaluatorStep">
+    <nav class="md-nav" aria-label="DefaultSetStep">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith" class="md-nav__link">
+  <a href="#ropt.plugins.plan._set.DefaultSetStep.DefaultSetStepWith" class="md-nav__link">
     <span class="md-ellipsis">
-      DefaultEvaluatorStepWith
+      DefaultSetStepWith
     </span>
   </a>
   
@@ -1063,6 +1063,30 @@
   <a href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep.NestedPlanConfig" class="md-nav__link">
     <span class="md-ellipsis">
       NestedPlanConfig
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultEvaluatorStep
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DefaultEvaluatorStep">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultEvaluatorStepWith
     </span>
   </a>
   
@@ -1398,19 +1422,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep" class="md-nav__link">
+  <a href="#ropt.plugins.plan._set.DefaultSetStep" class="md-nav__link">
     <span class="md-ellipsis">
-      DefaultEvaluatorStep
+      DefaultSetStep
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="DefaultEvaluatorStep">
+    <nav class="md-nav" aria-label="DefaultSetStep">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith" class="md-nav__link">
+  <a href="#ropt.plugins.plan._set.DefaultSetStep.DefaultSetStepWith" class="md-nav__link">
     <span class="md-ellipsis">
-      DefaultEvaluatorStepWith
+      DefaultSetStepWith
     </span>
   </a>
   
@@ -1444,6 +1468,30 @@
   <a href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep.NestedPlanConfig" class="md-nav__link">
     <span class="md-ellipsis">
       NestedPlanConfig
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultEvaluatorStep
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DefaultEvaluatorStep">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultEvaluatorStepWith
     </span>
   </a>
   
@@ -1616,14 +1664,20 @@
 <dt><code>Run Steps</code>:</dt>
 <dd>
 <ul>
+<li>A step that modifies one or more variables
+(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._set.DefaultSetStep"><code>optimizer</code></a>).</li>
+</ul>
+</dd>
+<dd>
+<ul>
 <li>A step that performs a single ensemble evaluation
 (<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep"><code>evaluator</code></a>).</li>
 </ul>
 </dd>
 <dd>
 <ul>
-<li>A step that performs an optimization
-(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep"><code>optimizer</code></a>).</li>
+<li>A step that performs a single ensemble evaluation
+(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep"><code>evaluator</code></a>).</li>
 </ul>
 </dd>
 <dd>
@@ -1684,8 +1738,8 @@
 
 
 
-<h2 id="ropt.plugins.plan._evaluator.DefaultEvaluatorStep" class="doc doc-heading">
-            <code>ropt.plugins.plan._evaluator.DefaultEvaluatorStep</code>
+<h2 id="ropt.plugins.plan._set.DefaultSetStep" class="doc doc-heading">
+            <code>ropt.plugins.plan._set.DefaultSetStep</code>
 
 
 </h2>
@@ -1696,22 +1750,31 @@
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.RunStep" href="../plan_plugins/#ropt.plugins.plan.base.RunStep">RunStep</a></code></p>
 
 
-        <p>The default evaluator run step.</p>
-<p>This step performs a single ensemble evaluation, yielding one or more
-<a class="autorefs autorefs-internal" href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> objects. The evaluation
-can process multiple variable vectors, each of which is evaluated
-separately, producing an individual results object for each vector.</p>
-<p>Before executing the evaluator step, a
-<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType.START_EVALUATOR_STEP"><code>START_EVALUATOR_STEP</code></a> event is
-emitted. After the evaluator step finishes, an
-<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType.FINISHED_EVALUATOR_STEP"><code>FINISHED_EVALUATOR_STEP</code></a>
-event is emitted. Result handlers should respond to the latter event to
-process the generated results.</p>
-<p>The evaluator step uses the <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith"><code>DefaultEvaluatorStepWith</code></a>
+        <p>The default set step.</p>
+<p>Set steps are used to modify the contents of plan variables. They specify
+one or more variables to set, either as a dictionary of variable-name/value
+pairs, or as a list of such dictionaries.</p>
+<p>Variables containing dictionaries can be modified by specifying an entry
+using the <code>[]</code> operator. Similarly, variables containing objects with
+attributes can be modified using the <code>.</code> operator. These can be mixed and
+nested to any depth to modify complex variables. For example, the expression
+<code>$var['foo'].bar[0]</code> is valid if <code>var</code> contains a dict-like value with a
+<code>foo</code> entry that has a <code>bar</code> attribute containing a list.</p>
+<p>The evaluator step uses the <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._set.DefaultSetStep.DefaultSetStepWith"><code>DefaultSetStepWith</code></a>
 configuration class to parse the <code>with</code> field of the
 <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.RunStepConfig"><code>RunStepConfig</code></a> used to specify this step
 in a plan configuration.</p>
 
+
+<details class="note" open>
+  <summary>Dictionary vs Lists</summary>
+  <p>Multiple variables may be set in a single step, either by using a single
+dictionary of variable/value pairs or by providing a list of
+dictionaries. Both approaches are generally equivalent. However, if a
+dictionary is loaded from a JSON or YAML file, the order of the keys is
+not guaranteed. Keep this in mind if the variables are interdependent
+and the assignment order matters.</p>
+</details>
 
 
 
@@ -1728,8 +1791,8 @@ in a plan configuration.</p>
 
 
 
-<h3 id="ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith" class="doc doc-heading">
-            <code>DefaultEvaluatorStepWith</code>
+<h3 id="ropt.plugins.plan._set.DefaultSetStep.DefaultSetStepWith" class="doc doc-heading">
+            <code>DefaultSetStepWith</code>
 
 
 </h3>
@@ -1737,92 +1800,36 @@ in a plan configuration.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+              Bases: <code><span title="pydantic.RootModel">RootModel</span>[<span title="typing.Union">Union</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>], <span title="typing.Tuple">Tuple</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>], ...]]]</code></p>
 
 
-        <p>Parameters used by the default evaluator step.</p>
-<p>The <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep"><code>DefaultEvaluatorStep</code></a>
-requires an optimizer configuration; the <code>tags</code> and <code>values</code> parameters
-are optional. The configuration  object must be an
-<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object, or a dictionary
-that can be parsed into such an object. If no <code>values</code> are provided, the
-initial values specified
-by the optimizer configuration are used. If <code>values</code> is given, it may be
-a single vector or a two-dimensional array. In the latter case, each row
-of the matrix is treated as a separate set of values to be evaluated.</p>
-<p>The <code>tags</code> field allows optional labels to be attached to each result,
-which can assist result handlers in filtering relevant results.</p>
+        <p>Configuration for a set step.</p>
+<p>A set step is used to change the value of one or more plan variables.
+The parameters provided to the step should either be a dictionary of
+variable-name/value pairs, or a list of such dictionaries. When the set
+step is run by the plan, the variables are set to the given values.
+Variables that are referenced may be dictionaries or objects with
+attributes. These can be modified by using the <code>[]</code> or <code>.</code> operators
+(possibly nested) with the specified variable name.</p>
 
 
-<details class="note" open>
-  <summary>Variable Scaling</summary>
-  <p>Internally, the evaluator may use scaled variables as configured by
-the optimizer. When providing <code>values</code>, ensure they are unscaled;
-scaling is handled internally.</p>
+<details class="info" open>
+  <summary>Using Expressions in the Value</summary>
+  <p>Optionally, the supplied value may be an expression, following the rules
+of the <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan.eval"><code>eval</code></a> method of the plan object executing
+the run steps. Refer to the method's documentation for more information
+on supported expressions.</p>
 </details>
 
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith.config">config</span></code></td>
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The optimizer configuration.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith.tags">tags</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.ItemOrSet" href="../utilities/#ropt.config.validated_types.ItemOrSet">ItemOrSet</a>[str]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Tags to add to the emitted events.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith.values">values</span></code></td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[str, <a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array2D" href="../utilities/#ropt.config.validated_types.Array2D">Array2D</a>]]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Values to evaluate at.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-  </div>
+<details class="note" open>
+  <summary>Dictionaries vs. Lists</summary>
+  <p>The parameters provided to the set step may be dictionaries or lists
+of dictionaries. Multiple variables can be set in this manner in
+both cases. However, care should be taken if a dictionary is used
+where the order of the keys is not well defined, for instance, if it
+has been read from a JSON file. If the order in which variables are
+set is important, it is recommended to use a list.</p>
+</details>
 
     </div>
 
@@ -2123,6 +2130,163 @@ plan, where they are processed with its own handlers.</p>
 
 
 
+<h2 id="ropt.plugins.plan._evaluator.DefaultEvaluatorStep" class="doc doc-heading">
+            <code>ropt.plugins.plan._evaluator.DefaultEvaluatorStep</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.RunStep" href="../plan_plugins/#ropt.plugins.plan.base.RunStep">RunStep</a></code></p>
+
+
+        <p>The default evaluator run step.</p>
+<p>This step performs a single ensemble evaluation, yielding one or more
+<a class="autorefs autorefs-internal" href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> objects. The evaluation
+can process multiple variable vectors, each of which is evaluated
+separately, producing an individual results object for each vector.</p>
+<p>Before executing the evaluator step, a
+<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType.START_EVALUATOR_STEP"><code>START_EVALUATOR_STEP</code></a> event is
+emitted. After the evaluator step finishes, an
+<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType.FINISHED_EVALUATOR_STEP"><code>FINISHED_EVALUATOR_STEP</code></a>
+event is emitted. Result handlers should respond to the latter event to
+process the generated results.</p>
+<p>The evaluator step uses the <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith"><code>DefaultEvaluatorStepWith</code></a>
+configuration class to parse the <code>with</code> field of the
+<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.RunStepConfig"><code>RunStepConfig</code></a> used to specify this step
+in a plan configuration.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith" class="doc doc-heading">
+            <code>DefaultEvaluatorStepWith</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+        <p>Parameters used by the default evaluator step.</p>
+<p>The <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep"><code>DefaultEvaluatorStep</code></a>
+requires an optimizer configuration; the <code>tags</code> and <code>values</code> parameters
+are optional. The configuration  object must be an
+<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object, or a dictionary
+that can be parsed into such an object. If no <code>values</code> are provided, the
+initial values specified
+by the optimizer configuration are used. If <code>values</code> is given, it may be
+a single vector or a two-dimensional array. In the latter case, each row
+of the matrix is treated as a separate set of values to be evaluated.</p>
+<p>The <code>tags</code> field allows optional labels to be attached to each result,
+which can assist result handlers in filtering relevant results.</p>
+
+
+<details class="note" open>
+  <summary>Variable Scaling</summary>
+  <p>Internally, the evaluator may use scaled variables as configured by
+the optimizer. When providing <code>values</code>, ensure they are unscaled;
+scaling is handled internally.</p>
+</details>
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith.config">config</span></code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The optimizer configuration.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith.tags">tags</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.ItemOrSet" href="../utilities/#ropt.config.validated_types.ItemOrSet">ItemOrSet</a>[str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Tags to add to the emitted events.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith.values">values</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[str, <a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array2D" href="../utilities/#ropt.config.validated_types.Array2D">Array2D</a>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Values to evaluate at.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
 <h2 id="ropt.plugins.plan._print.DefaultPrintStep" class="doc doc-heading">
             <code>ropt.plugins.plan._print.DefaultPrintStep</code>
 
@@ -2307,7 +2471,7 @@ in a plan configuration.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.plan._repeat.DefaultRepeatStep.DefaultRepeatStepWith.steps">steps</span></code></td>
             <td>
-                  <code><span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="ropt.config.plan.SetStepConfig" href="../plan_config/#ropt.config.plan.SetStepConfig">SetStepConfig</a>, <a class="autorefs autorefs-internal" title="ropt.config.plan.RunStepConfig" href="../plan_config/#ropt.config.plan.RunStepConfig">RunStepConfig</a>]]</code>
+                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.config.plan.RunStepConfig" href="../plan_config/#ropt.config.plan.RunStepConfig">RunStepConfig</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">

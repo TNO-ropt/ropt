@@ -885,39 +885,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plan.SetStep" class="md-nav__link">
-    <span class="md-ellipsis">
-      SetStep
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="SetStep">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.SetStep.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.SetStep.run" class="md-nav__link">
-    <span class="md-ellipsis">
-      run
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1692,39 +1659,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plan.SetStep" class="md-nav__link">
-    <span class="md-ellipsis">
-      SetStep
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="SetStep">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.SetStep.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.SetStep.run" class="md-nav__link">
-    <span class="md-ellipsis">
-      run
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1768,10 +1702,10 @@ plans, accepting optional input values and returning output values. The plan's
 configuration is managed by the <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanConfig"><code>PlanConfig</code></a>
 class, which specifies the inputs, outputs, variables, steps, and result
 handlers.</p>
-<p>A plan comprises <a class="autorefs autorefs-internal" href="#ropt.plan.SetStep"><code>SetStep</code></a> and
-<a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.RunStep"><code>RunStep</code></a> objects that define individual actions, as well
-as <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler"><code>ResultHandler</code></a> objects that process and store
-data generated during execution. Both run steps and result handlers are
+<p>A plan comprises <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.RunStep"><code>RunStep</code></a> objects that define
+individual actions, as well as
+<a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler"><code>ResultHandler</code></a> objects that process and
+store data generated during execution. Both run steps and result handlers are
 implemented through a <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan"><code>plugin</code></a> mechanism, making it easy to
 extend the range of supported steps and result handlers. The <code>ropt</code> library also
 includes a <a class="autorefs autorefs-internal" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanPlugin">default plan plugin</a>
@@ -2133,7 +2067,7 @@ its respective configuration.</p>
           <tr class="doc-section-item">
             <td><code>step_configs</code></td>
             <td>
-                  <code><span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="ropt.config.plan.RunStepConfig" href="../plan_config/#ropt.config.plan.RunStepConfig">RunStepConfig</a>, <a class="autorefs autorefs-internal" title="ropt.config.plan.SetStepConfig" href="../plan_config/#ropt.config.plan.SetStepConfig">SetStepConfig</a>]]</code>
+                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.config.plan.RunStepConfig" href="../plan_config/#ropt.config.plan.RunStepConfig">RunStepConfig</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2159,7 +2093,7 @@ its respective configuration.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.RunStep" href="../plan_plugins/#ropt.plugins.plan.base.RunStep">RunStep</a>, <a class="autorefs autorefs-internal" title="ropt.plan._set.SetStep" href="#ropt.plan.SetStep">SetStep</a>]]</code>
+                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.RunStep" href="../plan_plugins/#ropt.plugins.plan.base.RunStep">RunStep</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2205,7 +2139,7 @@ an aborted run.</p>
           <tr class="doc-section-item">
             <td><code>steps</code></td>
             <td>
-                  <code><span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="ropt.plan._set.SetStep" href="#ropt.plan.SetStep">SetStep</a>, <a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.RunStep" href="../plan_plugins/#ropt.plugins.plan.base.RunStep">RunStep</a>]]</code>
+                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.RunStep" href="../plan_plugins/#ropt.plugins.plan.base.RunStep">RunStep</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3217,141 +3151,6 @@ enumeration for more details.</p>
 
 
 
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.plan.SetStep" class="doc doc-heading">
-            <code>SetStep</code>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-
-        <p>The default set step.</p>
-<p>Set steps are used to modify the contents of plan variables. They specify
-one or more variables to set, either as a dictionary of variable-name/value
-pairs, or as a list of such dictionaries.</p>
-<p>Variables containing dictionaries can be modified by specifying an entry
-using the <code>[]</code> operator. Similarly, variables containing objects with
-attributes can be modified using the <code>.</code> operator. These can be mixed and
-nested to any depth to modify complex variables. For example, the expression
-<code>$var['foo'].bar[0]</code> is valid if <code>var</code> contains a dict-like value with a
-<code>foo</code> entry that has a <code>bar</code> attribute containing a list.</p>
-
-
-<details class="note" open>
-  <summary>Dictionary vs Lists</summary>
-  <p>Multiple variables may be set in a single step, either by using a single
-dictionary of variable/value pairs or by providing a list of
-dictionaries. Both approaches are generally equivalent. However, if a
-dictionary is loaded from a JSON or YAML file, the order of the keys is
-not guaranteed. Keep this in mind if the variables are interdependent
-and the assignment order matters.</p>
-</details>
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plan.SetStep.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">plan</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Initialize a set step.</p>
-<p>The configuration of the step contains either a dictionary, or a list of
-dictionaries, specifying the variables and their values.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>config</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.plan.SetStepConfig" href="../plan_config/#ropt.config.plan.SetStepConfig">SetStepConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The configuration of the step</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>plan</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Plan" href="#ropt.plan.Plan">Plan</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The plan that runs this step</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plan.SetStep.run" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">run</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Run the set step.</p>
-
-    </div>
-
-</div>
 
 
 

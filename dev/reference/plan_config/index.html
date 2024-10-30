@@ -589,15 +589,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.config.plan.SetStepConfig" class="md-nav__link">
-    <span class="md-ellipsis">
-      SetStepConfig
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.config.plan.RunStepConfig" class="md-nav__link">
     <span class="md-ellipsis">
       RunStepConfig
@@ -1273,15 +1264,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.config.plan.SetStepConfig" class="md-nav__link">
-    <span class="md-ellipsis">
-      SetStepConfig
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.config.plan.RunStepConfig" class="md-nav__link">
     <span class="md-ellipsis">
       RunStepConfig
@@ -1341,8 +1323,7 @@
 <a href="https://docs.pydantic.dev/">Pydantic</a>, configures optimization workflows
 managed by the <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> class. Alongside defining variables for
 the plan, <code>PlanConfig</code> utilizes
-<a class="autorefs autorefs-internal" href="#ropt.config.plan.SetStepConfig"><code>SetStepConfig</code></a>,
-<a class="autorefs autorefs-internal" href="#ropt.config.plan.RunStepConfig"><code>RunStepConfig</code></a>, and
+<a class="autorefs autorefs-internal" href="#ropt.config.plan.RunStepConfig"><code>RunStepConfig</code></a> and
 <a class="autorefs autorefs-internal" href="#ropt.config.plan.ResultHandlerConfig"><code>ResultHandlerConfig</code></a> classes to
 structure the steps and result handlers that define a complete workflow.</p>
 
@@ -1386,11 +1367,10 @@ flow. Each section aligns with a distinct aspect of the optimization plan:</p>
 <dd>Defines a dictionary of plan variable names and initial values, used
   during plan execution.</dd>
 <dt><code>steps</code></dt>
-<dd>Outlines each step executed once the plan begins. Steps can be set steps,
-  which update plan variables, or run steps loaded from plan plugins. Run
-  steps support a variety of actions, such as initiating an optimization,
-  accessing or modifying variables, and emitting events. Emitted events are
-  processed by the handlers specified in the <code>results</code> section.</dd>
+<dd>Outlines each step executed once the plan begins Steps support a variety
+  of actions, such as initiating an optimization, accessing or modifying
+  variables, and emitting events. Emitted events are processed by the
+  handlers specified in the <code>results</code> section.</dd>
 <dt><code>results</code></dt>
 <dd>Specifies the event handlers that process events emitted by run steps.
   Handlers receive events sequentially, with each handler passing events to
@@ -1444,7 +1424,7 @@ flow. Each section aligns with a distinct aspect of the optimization plan:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.plan.PlanConfig.steps">steps</span></code></td>
             <td>
-                  <code><span title="typing.List">List</span>[<span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="ropt.config.plan._plan_config.SetStepConfig" href="#ropt.config.plan.SetStepConfig">SetStepConfig</a>, <a class="autorefs autorefs-internal" title="ropt.config.plan._plan_config.RunStepConfig" href="#ropt.config.plan.RunStepConfig">RunStepConfig</a>]]</code>
+                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.config.plan._plan_config.RunStepConfig" href="#ropt.config.plan.RunStepConfig">RunStepConfig</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1466,67 +1446,6 @@ flow. Each section aligns with a distinct aspect of the optimization plan:</p>
       </tbody>
     </table>
 
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.config.plan.SetStepConfig" class="doc doc-heading">
-            <code>SetStepConfig</code>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-
-        <p>Configuration for a single set step within an optimization plan.</p>
-<p>A set step is used to change the value of one or more plan variables. The
-attributes of the step should either be a dictionary of variable-name/value
-pairs, or a list of such dictionaries. When the set step is run by the plan,
-the variables are set to the given values. Variables that are referenced may
-be dictionaries or objects with attributes. These can be modified by using
-the <code>[]</code> or <code>.</code> operators (possibly nested) with the specified variable
-name.</p>
-
-
-<details class="info" open>
-  <summary>Using Expressions in the Value</summary>
-  <p>Optionally, the supplied value may be an expression, following the rules
-of the <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan.eval"><code>eval</code></a> method of the plan object executing
-the run steps. Refer to the method's documentation for more information
-on supported expressions.</p>
-</details>
-
-<details class="note" open>
-  <summary>Dictionaries vs. Lists</summary>
-  <p>The arguments of the set step may be dictionaries or lists of
-dictionaries. Multiple variables can be set in this manner in both
-cases. However, care should be taken if a dictionary is used where the
-order of the keys is not well defined, for instance, if it has been read
-from a JSON file. If the order in which variables are set is important,
-it is recommended to use a list.</p>
-</details>
 
 
 
@@ -1591,6 +1510,35 @@ supported expressions.</p>
 <p>While mathematical expressions often need to be enclosed within
 <code>${{ ... }}</code> delimiters in a plan configuration string, this is
 optional for expressions passed via the <code>if_</code> attribute.</p>
+</details>
+
+<details class="info" open>
+  <summary>Alternative specification of the run step config.</summary>
+  <p>The standard format for defining a run step configuration follows the
+attribute-based structure shown here. Typically, a dictionary
+initializing a step would resemble:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">&quot;run&quot;</span><span class="p">:</span> <span class="s2">&quot;step_name&quot;</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">&quot;with&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="s2">&quot;parameter1&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="s2">&quot;parameter2&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="o">...</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="p">}</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s2">&quot;if&quot;</span><span class="p">:</span> <span class="s2">&quot;... optional expression ...&quot;</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>However, a pre-processing step allows a short-hand alternative notation,
+converting it into the above format before constructing the
+configuration object:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="s2">&quot;step_name&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>        <span class="s2">&quot;parameter1&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        <span class="s2">&quot;parameter2&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>        <span class="o">...</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="p">}</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="s2">&quot;if&quot;</span><span class="p">:</span> <span class="s2">&quot;... optional expression ...&quot;</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">}</span>
+</span></code></pre></div>
 </details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -1691,6 +1639,33 @@ attribute, which varies depending on the type of handler.</p>
   <summary><code>with</code> is an alias for <code>with_</code></summary>
   <p>When parsing dictionaries into a <code>ResultHandlerConfig</code> object, the
 <code>with_</code> attribute should be replaced by <code>with</code> (without the underscore).</p>
+</details>
+
+<details class="info" open>
+  <summary>Alternative specification of the result handler config.</summary>
+  <p>The standard format for defining a result handler configuration follows
+the attribute-based structure shown here. Typically, a dictionary
+initializing a step would resemble:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">&quot;run&quot;</span><span class="p">:</span> <span class="s2">&quot;handler_name&quot;</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">&quot;with&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="s2">&quot;parameter1&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="s2">&quot;parameter2&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="o">...</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="p">}</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>However, a pre-processing step allows a short-hand alternative notation,
+converting it into the above format before constructing the
+configuration object:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">{</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="s2">&quot;handler_name&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>        <span class="s2">&quot;parameter1&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        <span class="s2">&quot;parameter2&quot;</span><span class="p">:</span> <span class="o">...</span><span class="p">,</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>        <span class="o">...</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="p">}</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">}</span>
+</span></code></pre></div>
 </details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
