@@ -2,43 +2,10 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import BaseModel, ConfigDict, Field
-
-
-class SetStepConfig(BaseModel):
-    """Configuration for a single set step within an optimization plan.
-
-    A set step is used to change the value of one or more plan variables. The
-    attributes of the step should either be a dictionary of variable-name/value
-    pairs, or a list of such dictionaries. When the set step is run by the plan,
-    the variables are set to the given values. Variables that are referenced may
-    be dictionaries or objects with attributes. These can be modified by using
-    the `[]` or `.` operators (possibly nested) with the specified variable
-    name.
-
-    Info: Using Expressions in the Value
-        Optionally, the supplied value may be an expression, following the rules
-        of the [`eval`][ropt.plan.Plan.eval] method of the plan object executing
-        the run steps. Refer to the method's documentation for more information
-        on supported expressions.
-
-    Note: Dictionaries vs. Lists
-        The arguments of the set step may be dictionaries or lists of
-        dictionaries. Multiple variables can be set in this manner in both
-        cases. However, care should be taken if a dictionary is used where the
-        order of the keys is not well defined, for instance, if it has been read
-        from a JSON file. If the order in which variables are set is important,
-        it is recommended to use a list.
-    """
-
-    set: Union[Dict[str, Any], List[Dict[str, Any]]]
-
-    model_config = ConfigDict(
-        extra="forbid",
-        validate_default=True,
-    )
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class RunStepConfig(BaseModel):
@@ -74,6 +41,38 @@ class RunStepConfig(BaseModel):
         `${{ ... }}` delimiters in a plan configuration string, this is
         optional for expressions passed via the `if_` attribute.
 
+    Info: Alternative specification of the run step config.
+        The standard format for defining a run step configuration follows the
+        attribute-based structure shown here. Typically, a dictionary
+        initializing a step would resemble:
+
+        ```python
+        {
+            "run": "step_name",
+            "with": {
+                "parameter1": ...,
+                "parameter2": ...,
+                ...
+            }
+            "if": "... optional expression ..."
+        }
+        ```
+
+        However, a pre-processing step allows a short-hand alternative notation,
+        converting it into the above format before constructing the
+        configuration object:
+
+        ```python
+        {
+            "step_name": {
+                "parameter1": ...,
+                "parameter2": ...,
+                ...
+            }
+            "if": "... optional expression ..."
+        }
+        ```
+
     Attributes:
         run:   Specifies the code that runs the step.
         with_: Additional parameters passed to the step.
@@ -90,6 +89,18 @@ class RunStepConfig(BaseModel):
         extra="forbid",
         validate_default=True,
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def _parse_dict(cls, data: Mapping[str, Any]) -> Mapping[str, Any]:
+        if isinstance(data, Mapping) and "run" not in data:
+            if len(data) == 1:
+                key, value = next(iter(data.items()))
+                return {"run": key, "with": value}
+            if len(data) == 2 and "if" in data:  # noqa: PLR2004
+                key = next(key for key in data if key != "if")
+                return {"run": key, "with": data[key], "if": data["if"]}
+        return data
 
 
 class ResultHandlerConfig(BaseModel):
@@ -113,6 +124,36 @@ class ResultHandlerConfig(BaseModel):
         When parsing dictionaries into a `ResultHandlerConfig` object, the
         `with_` attribute should be replaced by `with` (without the underscore).
 
+    Info: Alternative specification of the result handler config.
+        The standard format for defining a result handler configuration follows
+        the attribute-based structure shown here. Typically, a dictionary
+        initializing a step would resemble:
+
+        ```python
+        {
+            "run": "handler_name",
+            "with": {
+                "parameter1": ...,
+                "parameter2": ...,
+                ...
+            }
+        }
+        ```
+
+        However, a pre-processing step allows a short-hand alternative notation,
+        converting it into the above format before constructing the
+        configuration object:
+
+        ```python
+        {
+            "handler_name": {
+                "parameter1": ...,
+                "parameter2": ...,
+                ...
+            }
+        }
+        ```
+
     Attributes:
         run:   Specifies the code used to initialize the result handler.
         with_: Additional parameters passed to the result handler.
@@ -125,6 +166,18 @@ class ResultHandlerConfig(BaseModel):
         extra="forbid",
         validate_default=True,
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def _parse_dict(cls, data: Mapping[str, Any]) -> Mapping[str, Any]:
+        if not isinstance(data, Mapping):
+            msg = "Input should be a mapping"
+            raise ValueError(msg)  # noqa: TRY004
+        if len(data) == 1:
+            key, value = next(iter(data.items()))
+            if key != "run":
+                return {"run": key, "with": value}
+        return data
 
 
 class PlanConfig(BaseModel):
@@ -148,11 +201,10 @@ class PlanConfig(BaseModel):
       during plan execution.
 
     `steps`
-    : Outlines each step executed once the plan begins. Steps can be set steps,
-      which update plan variables, or run steps loaded from plan plugins. Run
-      steps support a variety of actions, such as initiating an optimization,
-      accessing or modifying variables, and emitting events. Emitted events are
-      processed by the handlers specified in the `results` section.
+    : Outlines each step executed once the plan begins Steps support a variety
+      of actions, such as initiating an optimization, accessing or modifying
+      variables, and emitting events. Emitted events are processed by the
+      handlers specified in the `results` section.
 
     `results`
     : Specifies the event handlers that process events emitted by run steps.
@@ -170,7 +222,7 @@ class PlanConfig(BaseModel):
     inputs: List[str] = []
     outputs: List[str] = []
     variables: Dict[str, Any] = {}
-    steps: List[Union[SetStepConfig, RunStepConfig]] = []
+    steps: List[RunStepConfig] = []
     results: List[ResultHandlerConfig] = []
 
     model_config = ConfigDict(

@@ -2,13 +2,17 @@
     options:
         members: none
 
-::: ropt.plugins.plan._evaluator.DefaultEvaluatorStep
+::: ropt.plugins.plan._set.DefaultSetStep
     options:
-        members: [DefaultEvaluatorStepWith]
+        members: [DefaultSetStepWith]
 
 ::: ropt.plugins.plan._optimizer.DefaultOptimizerStep
     options:
         members: [DefaultOptimizerStepWith, NestedPlanConfig]
+
+::: ropt.plugins.plan._evaluator.DefaultEvaluatorStep
+    options:
+        members: [DefaultEvaluatorStepWith]
 
 ::: ropt.plugins.plan._print.DefaultPrintStep
     options:

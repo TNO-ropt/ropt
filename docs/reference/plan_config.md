@@ -2,7 +2,6 @@
     options:
         members:
             - PlanConfig
-            - SetStepConfig
             - RunStepConfig
             - ResultHandlerConfig
         group_by_category: false

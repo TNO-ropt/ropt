@@ -5,7 +5,6 @@
             - OptimizerContext
             - ExpressionEvaluator
             - Event
-            - SetStep
             - RunStep
             - ResultHandler
 

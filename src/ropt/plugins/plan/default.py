@@ -17,21 +17,23 @@ from ._metadata import DefaultMetadataHandler
 from ._optimizer import DefaultOptimizerStep
 from ._print import DefaultPrintStep
 from ._repeat import DefaultRepeatStep
+from ._set import DefaultSetStep
 from ._table import DefaultTableHandler
 from ._tracker import DefaultTrackerHandler
 from .base import PlanPlugin
-
-_RESULT_HANDLER_OBJECTS: Final[Dict[str, Type[ResultHandler]]] = {
-    "metadata": DefaultMetadataHandler,
-    "table": DefaultTableHandler,
-    "tracker": DefaultTrackerHandler,
-}
 
 _STEP_OBJECTS: Final[Dict[str, Type[RunStep]]] = {
     "evaluator": DefaultEvaluatorStep,
     "optimizer": DefaultOptimizerStep,
     "print": DefaultPrintStep,
     "repeat": DefaultRepeatStep,
+    "set": DefaultSetStep,
+}
+
+_RESULT_HANDLER_OBJECTS: Final[Dict[str, Type[ResultHandler]]] = {
+    "metadata": DefaultMetadataHandler,
+    "table": DefaultTableHandler,
+    "tracker": DefaultTrackerHandler,
 }
 
 
@@ -41,10 +43,12 @@ class DefaultPlanPlugin(PlanPlugin):
     This class provides a number of run steps and result handlers:
 
     `Run Steps`:
+    : - A step that modifies one or more variables
+        ([`optimizer`][ropt.plugins.plan._set.DefaultSetStep]).
     : - A step that performs a single ensemble evaluation
         ([`evaluator`][ropt.plugins.plan._evaluator.DefaultEvaluatorStep]).
-    : - A step that performs an optimization
-        ([`optimizer`][ropt.plugins.plan._optimizer.DefaultOptimizerStep]).
+    : - A step that performs a single ensemble evaluation
+        ([`evaluator`][ropt.plugins.plan._evaluator.DefaultEvaluatorStep]).
     : - A step that prints a message to the console
         ([`print`][ropt.plugins.plan._print.DefaultPrintStep]).
     : - A step that repeats a number of steps
@@ -75,6 +79,16 @@ class DefaultPlanPlugin(PlanPlugin):
         raise NotImplementedError(msg)
 
     @create.register
+    def _create_step(self, config: RunStepConfig, plan: Plan) -> RunStep:
+        _, _, step_name = config.run.lower().rpartition("/")
+        step_obj = _STEP_OBJECTS.get(step_name)
+        if step_obj is not None:
+            return step_obj(config, plan)
+
+        msg = f"Unknown step type: {config.run}"
+        raise TypeError(msg)
+
+    @create.register
     def _create_result_handler(
         self, config: ResultHandlerConfig, plan: Plan
     ) -> ResultHandler:
@@ -84,16 +98,6 @@ class DefaultPlanPlugin(PlanPlugin):
             return obj(config, plan)
 
         msg = f"Unknown results handler object type: {config.run}"
-        raise TypeError(msg)
-
-    @create.register
-    def _create_step(self, config: RunStepConfig, plan: Plan) -> RunStep:
-        _, _, step_name = config.run.lower().rpartition("/")
-        step_obj = _STEP_OBJECTS.get(step_name)
-        if step_obj is not None:
-            return step_obj(config, plan)
-
-        msg = f"Unknown step type: {config.run}"
         raise TypeError(msg)
 
     def is_supported(self, method: str, *, explicit: bool) -> bool:  # noqa: ARG002

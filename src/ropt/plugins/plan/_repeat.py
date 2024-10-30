@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional, Union
+from typing import TYPE_CHECKING, List, Optional
 
 from pydantic import BaseModel, ConfigDict
 
-from ropt.config.plan import RunStepConfig, SetStepConfig  # noqa: TCH001
+from ropt.config.plan import RunStepConfig  # noqa: TCH001
 from ropt.plugins.plan.base import RunStep
 
 if TYPE_CHECKING:
@@ -26,7 +26,7 @@ class DefaultRepeatStep(RunStep):
         """
 
         iterations: int
-        steps: List[Union[SetStepConfig, RunStepConfig]]
+        steps: List[RunStepConfig]
         var: Optional[str] = None
 
         model_config = ConfigDict(

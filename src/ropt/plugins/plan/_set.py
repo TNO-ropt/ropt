@@ -5,14 +5,18 @@ from __future__ import annotations
 import copy
 import re
 from collections.abc import Mapping, MutableMapping, MutableSequence
-from typing import TYPE_CHECKING, Any, List
+from typing import TYPE_CHECKING, Any, Dict, List, Tuple, Union
+
+from pydantic import ConfigDict, RootModel
+
+from ropt.plugins.plan.base import RunStep
 
 if TYPE_CHECKING:
-    from ropt.config.plan import SetStepConfig
+    from ropt.config.plan import RunStepConfig
     from ropt.plan import Plan
 
 
-class SetStep:
+class DefaultSetStep(RunStep):
     """The default set step.
 
     Set steps are used to modify the contents of plan variables. They specify
@@ -26,6 +30,12 @@ class SetStep:
     `$var['foo'].bar[0]` is valid if `var` contains a dict-like value with a
     `foo` entry that has a `bar` attribute containing a list.
 
+    The evaluator step uses the [`DefaultSetStepWith`]
+    [ropt.plugins.plan._set.DefaultSetStep.DefaultSetStepWith]
+    configuration class to parse the `with` field of the
+    [`RunStepConfig`][ropt.config.plan.RunStepConfig] used to specify this step
+    in a plan configuration.
+
     Note: Dictionary vs Lists
         Multiple variables may be set in a single step, either by using a single
         dictionary of variable/value pairs or by providing a list of
@@ -35,25 +45,60 @@ class SetStep:
         and the assignment order matters.
     """
 
-    def __init__(self, config: SetStepConfig, plan: Plan) -> None:
-        """Initialize a set step.
+    class DefaultSetStepWith(
+        RootModel[Union[Dict[str, Any], Tuple[Dict[str, Any], ...]]]
+    ):
+        """Configuration for a set step.
 
-        The configuration of the step contains either a dictionary, or a list of
-        dictionaries, specifying the variables and their values.
+        A set step is used to change the value of one or more plan variables.
+        The parameters provided to the step should either be a dictionary of
+        variable-name/value pairs, or a list of such dictionaries. When the set
+        step is run by the plan, the variables are set to the given values.
+        Variables that are referenced may be dictionaries or objects with
+        attributes. These can be modified by using the `[]` or `.` operators
+        (possibly nested) with the specified variable name.
+
+        Info: Using Expressions in the Value
+            Optionally, the supplied value may be an expression, following the rules
+            of the [`eval`][ropt.plan.Plan.eval] method of the plan object executing
+            the run steps. Refer to the method's documentation for more information
+            on supported expressions.
+
+        Note: Dictionaries vs. Lists
+            The parameters provided to the set step may be dictionaries or lists
+            of dictionaries. Multiple variables can be set in this manner in
+            both cases. However, care should be taken if a dictionary is used
+            where the order of the keys is not well defined, for instance, if it
+            has been read from a JSON file. If the order in which variables are
+            set is important, it is recommended to use a list.
+        """
+
+    root: Union[Dict[str, Any], Tuple[Dict[str, Any], ...]]
+
+    model_config = ConfigDict(
+        extra="forbid",
+        validate_default=True,
+    )
+
+    def __init__(self, config: RunStepConfig, plan: Plan) -> None:
+        """Initialize a set step.
 
         Args:
             config: The configuration of the step
             plan:   The plan that runs this step
         """
+        super().__init__(config, plan)
+        expr = self.DefaultSetStepWith.model_validate(config.with_).root
+        if isinstance(expr, Mapping):
+            expr = (expr,)
+
         self._plan = plan
         self._targets: List[Any] = []
         self._names: List[str] = []
         self._keys: List[List[str]] = []
         self._values: List[Any] = []
 
-        for list_item in (
-            [config.set] if isinstance(config.set, Mapping) else config.set
-        ):
+        for list_item in expr:
             if not isinstance(list_item, Mapping):
                 msg = "`set` must be called with a var/value dict or a list of var/value dicts"
                 raise TypeError(msg)
