@@ -2669,7 +2669,15 @@ which can assist result handlers in filtering relevant results.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.ResultHandler" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler">ResultHandler</a></code></p>
 
 
-        <p>The default tracker results handler object.</p>
+        <p>The default table results handler object.</p>
+<p>The table results handler generates a table that summarizes the results it
+receives. This is implemented through a
+<a class="autorefs autorefs-internal" href="../reporting/#ropt.report.ResultsTable"><code>ResultsTable</code></a> object; refer to its
+documentation for detailed information on table generation and formatting.</p>
+<p>This table handler uses the <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._table.DefaultTableHandler.DefaultTableHandlerWith"><code>DefaultTableHandlerWith</code></a>
+configuration class to parse the <code>with</code> field in the
+<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.ResultHandlerConfig"><code>ResultHandler</code></a> used to specify this
+handler in a plan configuration.</p>
 
 
 
@@ -2700,10 +2708,16 @@ which can assist result handlers in filtering relevant results.</p>
 
 
         <p>Parameters for the table results handler.</p>
-<p>This results handler generates a table summarizing the results of an
-optimization. This is implemented via a
-<a class="autorefs autorefs-internal" href="../reporting/#ropt.report.ResultsTable"><code>ResultsTable</code></a> object. Refer to its
-documentation for more details.</p>
+<p>The <code>columns</code>, <code>path</code>, <code>table_type</code>, and <code>min_header_len</code> fields
+correspond to the parameters of the
+<a class="autorefs autorefs-internal" href="../reporting/#ropt.report.ResultsTable"><code>ResultsTable</code></a> constructor. Refer to its
+documentation for more detailed information on these arguments.</p>
+<p>The <code>maximize</code> field allows adaptation for maximization problems.
+Typically, results are generated for minimization problems, but setting
+<code>maximize</code> to <code>True</code> will invert this interpretation for scenarios where
+the negative of an objective function is minimized.</p>
+<p>The <code>tags</code> field enables optional labels to be attached to results,
+which assists in filtering relevant results for the table.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2723,7 +2737,7 @@ documentation for more details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Tags of the sources to track</p>
+                <p>Tags of the sources to track.</p>
               </div>
             </td>
           </tr>
@@ -2734,7 +2748,7 @@ documentation for more details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A mapping of column names for the results table</p>
+                <p>A mapping of column names for the results table.</p>
               </div>
             </td>
           </tr>
@@ -2745,7 +2759,7 @@ documentation for more details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The location where the results file will be saved</p>
+                <p>The file path where the results table will be saved.</p>
               </div>
             </td>
           </tr>
@@ -2756,7 +2770,7 @@ documentation for more details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The type of table to generate</p>
+                <p>The format or type of table to generate.</p>
               </div>
             </td>
           </tr>
@@ -2767,7 +2781,7 @@ documentation for more details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The minimum number of header lines to generate</p>
+                <p>The minimum number of header lines to include.</p>
               </div>
             </td>
           </tr>
@@ -2778,8 +2792,8 @@ documentation for more details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>True</code>, interpret the results as a maximization
-            problem rather than the default minimization</p>
+                <p>If <code>True</code>, interprets results as a maximization
+            problem rather than the default minimization.</p>
               </div>
             </td>
           </tr>
@@ -2833,6 +2847,17 @@ documentation for more details.</p>
 
 
         <p>The default tracker results handler object.</p>
+<p>This handler tracks the
+<a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a> objects that it receives and selects one
+to retain in a variable. Currently it tracks either the last result it
+receives, or the best result. The best result is defined as the result that
+has the lowest weighted objective value. Optionally, results may be filtered
+by checking for violations of constraints, by comparing constraint values to
+a threshold.</p>
+<p>The tracker step uses the <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._tracker.DefaultTrackerHandler.DefaultTrackerHandlerWith"><code>DefaultTrackerHandlerWith</code></a>
+configuration class to parse the <code>with</code> field of the
+<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.ResultHandlerConfig"><code>ResultHandler</code></a> used to specify this
+handler in a plan configuration.</p>
 
 
 
@@ -2863,9 +2888,16 @@ documentation for more details.</p>
 
 
         <p>Parameters for the tracker results handler.</p>
-<p>The <code>type</code> parameter determines what result is tracked:
-- "optimal": Track the best result added
-- "last": Track the last result added</p>
+<p>The tracker stores the tracked result in the variable specified by the
+<code>var</code> field. The <code>type</code> parameter determines which result is tracked:</p>
+<ul>
+<li><code>"best"</code>: Tracks the best result added.</li>
+<li><code>"last"</code>: Tracks the last result added.</li>
+</ul>
+<p>If <code>constraint_tolerance</code> is set, results that exceed this tolerance on
+constraint values are not tracked.</p>
+<p>The <code>tags</code> field allows optional labels to be attached to each result,
+assisting result handlers in filtering relevant results.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2885,7 +2917,7 @@ documentation for more details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The name of the variable to store the tracked result</p>
+                <p>The name of the variable to store the tracked result.</p>
               </div>
             </td>
           </tr>
@@ -2896,7 +2928,7 @@ documentation for more details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Tags of the sources to track</p>
+                <p>Tags to filter the sources to track.</p>
               </div>
             </td>
           </tr>
@@ -2907,7 +2939,7 @@ documentation for more details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The type of result to store</p>
+                <p>Specifies the type of result to store (<code>"best"</code> or <code>"last"</code>).</p>
               </div>
             </td>
           </tr>
@@ -2918,7 +2950,7 @@ documentation for more details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional constraint tolerance</p>
+                <p>An optional constraint tolerance level.</p>
               </div>
             </td>
           </tr>
