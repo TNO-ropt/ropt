@@ -1702,14 +1702,14 @@ plans, accepting optional input values and returning output values. The plan's
 configuration is managed by the <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanConfig"><code>PlanConfig</code></a>
 class, which specifies the inputs, outputs, variables, steps, and result
 handlers.</p>
-<p>A plan comprises <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.RunStep"><code>RunStep</code></a> objects that define
+<p>A plan comprises <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a> objects that define
 individual actions, as well as
 <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler"><code>ResultHandler</code></a> objects that process and
-store data generated during execution. Both run steps and result handlers are
+store data generated during execution. Both steps and result handlers are
 implemented through a <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan"><code>plugin</code></a> mechanism, making it easy to
 extend the range of supported steps and result handlers. The <code>ropt</code> library also
 includes a <a class="autorefs autorefs-internal" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanPlugin">default plan plugin</a>
-that provides various run steps and result handlers to support a broad range of
+that provides various steps and result handlers to support a broad range of
 optimization workflows.</p>
 <p>Most optimization plans require shared state across all steps, such as a
 callable for function evaluations or a random number generator. This shared
@@ -2067,7 +2067,7 @@ its respective configuration.</p>
           <tr class="doc-section-item">
             <td><code>step_configs</code></td>
             <td>
-                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.config.plan.RunStepConfig" href="../plan_config/#ropt.config.plan.RunStepConfig">RunStepConfig</a>]</code>
+                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.config.plan.PlanStepConfig" href="../plan_config/#ropt.config.plan.PlanStepConfig">PlanStepConfig</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2093,7 +2093,7 @@ its respective configuration.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.RunStep" href="../plan_plugins/#ropt.plugins.plan.base.RunStep">RunStep</a>]</code>
+                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2139,7 +2139,7 @@ an aborted run.</p>
           <tr class="doc-section-item">
             <td><code>steps</code></td>
             <td>
-                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.RunStep" href="../plan_plugins/#ropt.plugins.plan.base.RunStep">RunStep</a>]</code>
+                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">

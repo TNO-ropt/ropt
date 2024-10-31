@@ -589,9 +589,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.config.plan.RunStepConfig" class="md-nav__link">
+  <a href="#ropt.config.plan.PlanStepConfig" class="md-nav__link">
     <span class="md-ellipsis">
-      RunStepConfig
+      PlanStepConfig
     </span>
   </a>
   
@@ -1264,9 +1264,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.config.plan.RunStepConfig" class="md-nav__link">
+  <a href="#ropt.config.plan.PlanStepConfig" class="md-nav__link">
     <span class="md-ellipsis">
-      RunStepConfig
+      PlanStepConfig
     </span>
   </a>
   
@@ -1323,7 +1323,7 @@
 <a href="https://docs.pydantic.dev/">Pydantic</a>, configures optimization workflows
 managed by the <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> class. Alongside defining variables for
 the plan, <code>PlanConfig</code> utilizes
-<a class="autorefs autorefs-internal" href="#ropt.config.plan.RunStepConfig"><code>RunStepConfig</code></a> and
+<a class="autorefs autorefs-internal" href="#ropt.config.plan.PlanStepConfig"><code>PlanStepConfig</code></a> and
 <a class="autorefs autorefs-internal" href="#ropt.config.plan.ResultHandlerConfig"><code>ResultHandlerConfig</code></a> classes to
 structure the steps and result handlers that define a complete workflow.</p>
 
@@ -1372,7 +1372,7 @@ flow. Each section aligns with a distinct aspect of the optimization plan:</p>
   variables, and emitting events. Emitted events are processed by the
   handlers specified in the <code>results</code> section.</dd>
 <dt><code>results</code></dt>
-<dd>Specifies the event handlers that process events emitted by run steps.
+<dd>Specifies the event handlers that process events emitted by steps.
   Handlers receive events sequentially, with each handler passing events to
   the next in the chain.</dd>
 </dl>
@@ -1424,7 +1424,7 @@ flow. Each section aligns with a distinct aspect of the optimization plan:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.plan.PlanConfig.steps">steps</span></code></td>
             <td>
-                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.config.plan._plan_config.RunStepConfig" href="#ropt.config.plan.RunStepConfig">RunStepConfig</a>]</code>
+                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.config.plan._plan_config.PlanStepConfig" href="#ropt.config.plan.PlanStepConfig">PlanStepConfig</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1470,8 +1470,8 @@ flow. Each section aligns with a distinct aspect of the optimization plan:</p>
 
 
 
-<h3 id="ropt.config.plan.RunStepConfig" class="doc doc-heading">
-            <code>RunStepConfig</code>
+<h3 id="ropt.config.plan.PlanStepConfig" class="doc doc-heading">
+            <code>PlanStepConfig</code>
 
 
 </h3>
@@ -1480,16 +1480,16 @@ flow. Each section aligns with a distinct aspect of the optimization plan:</p>
     <div class="doc doc-contents ">
 
 
-        <p>Configuration for a single run step within an optimization plan.</p>
-<p>A run step represents a single action in the optimization process. It can
+        <p>Configuration for a single step within an optimization plan.</p>
+<p>A step represents a single action in the optimization process. It can
 access and modify plan variables, execute tasks such as optimization runs,
 and emit <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Event"><code>events</code></a>, for example, when intermediate
 optimization results are generated.</p>
 <p>The <code>run</code> string specifies the code that executes the step, and is used by
 the plugin manager to load the appropriate code.</p>
-<p>Additional parameters required by the run step can be configured using the
+<p>Additional parameters required by the step can be configured using the
 <code>with_</code> attribute, with its content varying based on the step type.</p>
-<p>Execution of the run step can be made conditional by providing an expression
+<p>Execution of the step can be made conditional by providing an expression
 through the <code>if_</code> attribute. This expression is evaluated, and the step is
 executed only if the result is <code>True</code>.</p>
 
@@ -1505,7 +1505,7 @@ underscore).</p>
   <summary>Conditional evaluation</summary>
   <p>Conditions specified via the <code>if_</code> attribute are evaluated using the
 <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan.eval"><code>eval</code></a> method of the plan object executing the
-run steps. Refer to the method's documentation for more information on
+steps. Refer to the method's documentation for more information on
 supported expressions.</p>
 <p>While mathematical expressions often need to be enclosed within
 <code>${{ ... }}</code> delimiters in a plan configuration string, this is
@@ -1513,8 +1513,8 @@ optional for expressions passed via the <code>if_</code> attribute.</p>
 </details>
 
 <details class="info" open>
-  <summary>Alternative specification of the run step config.</summary>
-  <p>The standard format for defining a run step configuration follows the
+  <summary>Alternative specification of the step config.</summary>
+  <p>The standard format for defining a step configuration follows the
 attribute-based structure shown here. Typically, a dictionary
 initializing a step would resemble:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
@@ -1552,7 +1552,7 @@ configuration object:</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.plan.RunStepConfig.run">run</span></code></td>
+            <td><code><span title="ropt.config.plan.PlanStepConfig.run">run</span></code></td>
             <td>
                   <code>str</code>
             </td>
@@ -1563,7 +1563,7 @@ configuration object:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.plan.RunStepConfig.with_">with_</span></code></td>
+            <td><code><span title="ropt.config.plan.PlanStepConfig.with_">with_</span></code></td>
             <td>
                   <code><span title="typing.Union">Union</span>[<span title="typing.List">List</span>[<span title="typing.Any">Any</span>], <span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>], str]</code>
             </td>
@@ -1574,7 +1574,7 @@ configuration object:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.plan.RunStepConfig.if_">if_</span></code></td>
+            <td><code><span title="ropt.config.plan.PlanStepConfig.if_">if_</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[str]</code>
             </td>
@@ -1622,9 +1622,9 @@ configuration object:</p>
 
 
         <p>Configuration for a single result handler object.</p>
-<p>Result handler objects process events emitted by the run steps of an
+<p>Result handler objects process events emitted by the steps of an
 optimization plan. These objects can receive <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Event"><code>events</code></a>
-directly from the plan's run steps, or from another result handler in a
+directly from the plan's steps, or from another result handler in a
 chain of handlers, as defined in the <code>results</code> section of a
 <a class="autorefs autorefs-internal" href="#ropt.config.plan.PlanConfig"><code>PlanConfig</code></a> object. Upon receiving events,
 handlers may perform actions such as modifying plan variables, generating

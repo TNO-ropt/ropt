@@ -874,17 +874,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.RunStep" class="md-nav__link">
+  <a href="#ropt.plugins.plan.base.PlanStep" class="md-nav__link">
     <span class="md-ellipsis">
-      RunStep
+      PlanStep
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="RunStep">
+    <nav class="md-nav" aria-label="PlanStep">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.RunStep.step_config" class="md-nav__link">
+  <a href="#ropt.plugins.plan.base.PlanStep.step_config" class="md-nav__link">
     <span class="md-ellipsis">
       step_config
     </span>
@@ -893,7 +893,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.RunStep.plan" class="md-nav__link">
+  <a href="#ropt.plugins.plan.base.PlanStep.plan" class="md-nav__link">
     <span class="md-ellipsis">
       plan
     </span>
@@ -902,7 +902,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.RunStep.__init__" class="md-nav__link">
+  <a href="#ropt.plugins.plan.base.PlanStep.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -911,7 +911,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.RunStep.run" class="md-nav__link">
+  <a href="#ropt.plugins.plan.base.PlanStep.run" class="md-nav__link">
     <span class="md-ellipsis">
       run
     </span>
@@ -1372,17 +1372,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.RunStep" class="md-nav__link">
+  <a href="#ropt.plugins.plan.base.PlanStep" class="md-nav__link">
     <span class="md-ellipsis">
-      RunStep
+      PlanStep
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="RunStep">
+    <nav class="md-nav" aria-label="PlanStep">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.RunStep.step_config" class="md-nav__link">
+  <a href="#ropt.plugins.plan.base.PlanStep.step_config" class="md-nav__link">
     <span class="md-ellipsis">
       step_config
     </span>
@@ -1391,7 +1391,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.RunStep.plan" class="md-nav__link">
+  <a href="#ropt.plugins.plan.base.PlanStep.plan" class="md-nav__link">
     <span class="md-ellipsis">
       plan
     </span>
@@ -1400,7 +1400,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.RunStep.__init__" class="md-nav__link">
+  <a href="#ropt.plugins.plan.base.PlanStep.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -1409,7 +1409,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.RunStep.run" class="md-nav__link">
+  <a href="#ropt.plugins.plan.base.PlanStep.run" class="md-nav__link">
     <span class="md-ellipsis">
       run
     </span>
@@ -1569,7 +1569,7 @@
     <div class="doc doc-contents first">
 
         <p>This module defines the base classes for optimization plan plugins.</p>
-<p>Optimization plan run steps and result handlers can be added via the plugin
+<p>Optimization plan steps and result handlers can be added via the plugin
 mechanism to implement additional functionality. This is done by creating a
 plugin class that derives from the
 <a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.PlanPlugin"><code>PlanPlugin</code></a> class. It needs to define a
@@ -1591,8 +1591,8 @@ plan objects.</p>
 
 
 
-<h3 id="ropt.plugins.plan.base.RunStep" class="doc doc-heading">
-            <code>RunStep</code>
+<h3 id="ropt.plugins.plan.base.PlanStep" class="doc doc-heading">
+            <code>PlanStep</code>
 
 
 </h3>
@@ -1603,8 +1603,8 @@ plan objects.</p>
               Bases: <code><span title="abc.ABC">ABC</span></code></p>
 
 
-        <p>Base class for run steps.</p>
-<p>Run steps loaded and created by the plugin manager must inherit from this
+        <p>Base class for steps.</p>
+<p>steps loaded and created by the plugin manager must inherit from this
 abstract base class. It defines a <code>run</code> method that must be overridden to
 implement the specific functionality of each step. The class also provides
 default properties for accessing the configuration and the plan that
@@ -1625,8 +1625,8 @@ executes the step.</p>
 
 
 
-<h4 id="ropt.plugins.plan.base.RunStep.step_config" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">step_config</span><span class="p">:</span> <span class="n">RunStepConfig</span></code>
+<h4 id="ropt.plugins.plan.base.PlanStep.step_config" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">step_config</span><span class="p">:</span> <span class="n">PlanStepConfig</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -1651,7 +1651,7 @@ executes the step.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.plan.RunStepConfig" href="../plan_config/#ropt.config.plan.RunStepConfig">RunStepConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.plan.PlanStepConfig" href="../plan_config/#ropt.config.plan.PlanStepConfig">PlanStepConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1669,7 +1669,7 @@ executes the step.</p>
 
 
 
-<h4 id="ropt.plugins.plan.base.RunStep.plan" class="doc doc-heading">
+<h4 id="ropt.plugins.plan.base.PlanStep.plan" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span></code>
 
   <span class="doc doc-labels">
@@ -1714,7 +1714,7 @@ executes the step.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.plan.base.RunStep.__init__" class="doc doc-heading">
+<h4 id="ropt.plugins.plan.base.PlanStep.__init__" class="doc doc-heading">
             <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">plan</span><span class="p">)</span></code>
 
 </h4>
@@ -1722,7 +1722,7 @@ executes the step.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the run step.</p>
+        <p>Initialize the step.</p>
 <p>The <code>config</code> and <code>plan</code> arguments are accessible as <code>step_config</code>
 and <code>plan</code> properties.</p>
 
@@ -1741,7 +1741,7 @@ and <code>plan</code> properties.</p>
           <tr class="doc-section-item">
             <td><code>config</code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.plan.RunStepConfig" href="../plan_config/#ropt.config.plan.RunStepConfig">RunStepConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.plan.PlanStepConfig" href="../plan_config/#ropt.config.plan.PlanStepConfig">PlanStepConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1776,7 +1776,7 @@ and <code>plan</code> properties.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.plan.base.RunStep.run" class="doc doc-heading">
+<h4 id="ropt.plugins.plan.base.PlanStep.run" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">run</span><span class="p">()</span></code>
 
   <span class="doc doc-labels">
@@ -2063,12 +2063,12 @@ handlers or to callbacks that react to the event.</p>
 
 
         <p>The abstract base class for plan plugins.</p>
-<p>Plan run steps and result handlers are implemented through plugins that must derive
+<p>Plan steps and result handlers are implemented through plugins that must derive
 from this base class. Plugins can be built-in, installed via a plugin mechanism,
 or loaded dynamically. During execution of an optimization plan, the
 required optimizer plugin will be located via the
 <a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> and used to create
-<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.RunStep"><code>RunStep</code></a> or <a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.ResultHandler"><code>ResultHandler</code></a> objects via its
+<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a> or <a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.ResultHandler"><code>ResultHandler</code></a> objects via its
 <code>create</code> function.</p>
 
 
@@ -2099,10 +2099,10 @@ required optimizer plugin will be located via the
 
     <div class="doc doc-contents ">
 
-        <p>Create a run step or result handler.</p>
-<p>This factory function instantiates either a run step or a result handler
+        <p>Create a step or result handler.</p>
+<p>This factory function instantiates either a step or a result handler
 object based on the provided configuration. The configuration determines
-which type of object to return—either a run step or a result handler.</p>
+which type of object to return—either a step or a result handler.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2119,7 +2119,7 @@ which type of object to return—either a run step or a result handler.</p>
           <tr class="doc-section-item">
             <td><code>config</code></td>
             <td>
-                  <code><span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="ropt.config.plan.ResultHandlerConfig" href="../plan_config/#ropt.config.plan.ResultHandlerConfig">ResultHandlerConfig</a>, <a class="autorefs autorefs-internal" title="ropt.config.plan.RunStepConfig" href="../plan_config/#ropt.config.plan.RunStepConfig">RunStepConfig</a>]</code>
+                  <code><span title="typing.Union">Union</span>[<a class="autorefs autorefs-internal" title="ropt.config.plan.ResultHandlerConfig" href="../plan_config/#ropt.config.plan.ResultHandlerConfig">ResultHandlerConfig</a>, <a class="autorefs autorefs-internal" title="ropt.config.plan.PlanStepConfig" href="../plan_config/#ropt.config.plan.PlanStepConfig">PlanStepConfig</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
