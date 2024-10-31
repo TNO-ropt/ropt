@@ -6,25 +6,25 @@ from typing import TYPE_CHECKING, List, Optional
 
 from pydantic import BaseModel, ConfigDict
 
-from ropt.config.plan import RunStepConfig  # noqa: TCH001
-from ropt.plugins.plan.base import RunStep
+from ropt.config.plan import PlanStepConfig  # noqa: TCH001
+from ropt.plugins.plan.base import PlanStep
 
 if TYPE_CHECKING:
     from ropt.plan import Plan
 
 
-class DefaultRepeatStep(RunStep):
-    """The default repeat run step.
+class DefaultRepeatStep(PlanStep):
+    """The default repeat step.
 
     This step executes a defined list of steps in sequence for a specified
     number of repetitions. Optionally, it can store the current iteration number
     in a variable for tracking purposes. Each iteration preserves the original
     order of steps, ensuring sequential execution rather than parallel.
 
-    The repeat run step uses the [`DefaultRepeatStepWith`]
+    The repeat step uses the [`DefaultRepeatStepWith`]
     [ropt.plugins.plan._repeat.DefaultRepeatStep.DefaultRepeatStepWith]
     configuration class to interpret the `with` field of the
-    [`RunStepConfig`][ropt.config.plan.RunStepConfig] in a plan configuration.
+    [`PlanStepConfig`][ropt.config.plan.PlanStepConfig] in a plan configuration.
     """
 
     class DefaultRepeatStepWith(BaseModel):
@@ -43,7 +43,7 @@ class DefaultRepeatStep(RunStep):
         """
 
         iterations: int
-        steps: List[RunStepConfig]
+        steps: List[PlanStepConfig]
         var: Optional[str] = None
 
         model_config = ConfigDict(
@@ -51,7 +51,7 @@ class DefaultRepeatStep(RunStep):
             validate_default=True,
         )
 
-    def __init__(self, config: RunStepConfig, plan: Plan) -> None:
+    def __init__(self, config: PlanStepConfig, plan: Plan) -> None:
         """Initialize a default optimizer step.
 
         Args:

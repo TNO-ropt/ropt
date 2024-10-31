@@ -15,7 +15,7 @@ from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.optimization import EnsembleOptimizer
 from ropt.plan import Event, Plan
-from ropt.plugins.plan.base import RunStep
+from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
 from ropt.utils.scaling import scale_variables
 
@@ -27,16 +27,16 @@ else:
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt.config.plan import RunStepConfig
+    from ropt.config.plan import PlanStepConfig
     from ropt.results import Results
 
 MetaDataType = Dict[str, Union[int, float, bool, str]]
 
 
-class DefaultOptimizerStep(RunStep):
-    """The default optimizer run step.
+class DefaultOptimizerStep(PlanStep):
+    """The default optimizer step.
 
-    The optimizer run step performs an optimization, yielding a sequence of
+    The optimizer step performs an optimization, yielding a sequence of
     [`FunctionResults`][ropt.results.FunctionResults] and
     [`GradientResults`][ropt.results.GradientResults] objects. The optimizer is
     configured using an [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object or
@@ -59,15 +59,15 @@ class DefaultOptimizerStep(RunStep):
       the generated [`Results`][ropt.results.Results] objects. Result handlers
       specified in the plan will respond to this signal to process those results.
 
-    The optimizer run step supports nested optimizations, where each function
+    The optimizer step supports nested optimizations, where each function
     evaluation in the optimization triggers a nested optimization plan that
     should produce the result for the function evaluation.
 
-    The optimizer run step utilizes the
+    The optimizer step utilizes the
     [`DefaultOptimizerStepWith`]
     [ropt.plugins.plan._optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith]
     configuration class to parse the `with` field of the
-    [`RunStepConfig`][ropt.config.plan.RunStepConfig] used to specify this step
+    [`PlanStepConfig`][ropt.config.plan.PlanStepConfig] used to specify this step
     in a plan configuration.
     """
 
@@ -143,7 +143,7 @@ class DefaultOptimizerStep(RunStep):
             arbitrary_types_allowed=True,
         )
 
-    def __init__(self, config: RunStepConfig, plan: Plan) -> None:
+    def __init__(self, config: PlanStepConfig, plan: Plan) -> None:
         """Initialize a default optimizer step.
 
         Args:

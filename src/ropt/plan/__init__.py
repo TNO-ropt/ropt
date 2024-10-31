@@ -6,14 +6,14 @@ configuration is managed by the [`PlanConfig`][ropt.config.plan.PlanConfig]
 class, which specifies the inputs, outputs, variables, steps, and result
 handlers.
 
-A plan comprises [`RunStep`][ropt.plugins.plan.base.RunStep] objects that define
+A plan comprises [`PlanStep`][ropt.plugins.plan.base.PlanStep] objects that define
 individual actions, as well as
 [`ResultHandler`][ropt.plugins.plan.base.ResultHandler] objects that process and
-store data generated during execution. Both run steps and result handlers are
+store data generated during execution. Both steps and result handlers are
 implemented through a [`plugin`][ropt.plugins.plan] mechanism, making it easy to
 extend the range of supported steps and result handlers. The `ropt` library also
 includes a [default plan plugin][ropt.plugins.plan.default.DefaultPlanPlugin]
-that provides various run steps and result handlers to support a broad range of
+that provides various steps and result handlers to support a broad range of
 optimization workflows.
 
 Most optimization plans require shared state across all steps, such as a

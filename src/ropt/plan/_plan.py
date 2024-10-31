@@ -22,10 +22,10 @@ from ropt.plugins import PluginManager
 from ._expr import ExpressionEvaluator
 
 if TYPE_CHECKING:
-    from ropt.config.plan import PlanConfig, RunStepConfig
+    from ropt.config.plan import PlanConfig, PlanStepConfig
     from ropt.evaluator import Evaluator
     from ropt.plan import Event
-    from ropt.plugins.plan.base import ResultHandler, RunStep
+    from ropt.plugins.plan.base import PlanStep, ResultHandler
 
 
 class OptimizerContext:
@@ -162,7 +162,7 @@ class Plan:
         """
         return self._aborted
 
-    def create_steps(self, step_configs: List[RunStepConfig]) -> List[RunStep]:
+    def create_steps(self, step_configs: List[PlanStepConfig]) -> List[PlanStep]:
         """Instantiate step objects from step configurations.
 
         This method takes a list of step configuration objects and creates a
@@ -182,7 +182,7 @@ class Plan:
             for step_config in step_configs
         ]
 
-    def run_steps(self, steps: List[RunStep]) -> None:
+    def run_steps(self, steps: List[PlanStep]) -> None:
         """Execute a list of steps in the plan.
 
         This method iterates through and executes a provided list of plan steps.
@@ -326,7 +326,7 @@ class Plan:
         if self._parent is not None:
             self._parent.emit_event(event)
 
-    def _check_condition(self, config: RunStepConfig) -> bool:
+    def _check_condition(self, config: PlanStepConfig) -> bool:
         if config.if_ is not None:
             stripped = config.if_.strip()
             return (

@@ -13,19 +13,19 @@ from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
 from ropt.plan import Event
-from ropt.plugins.plan.base import RunStep
+from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
 from ropt.utils.scaling import scale_variables
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt.config.plan import RunStepConfig
+    from ropt.config.plan import PlanStepConfig
     from ropt.plan import Plan
 
 
-class DefaultEvaluatorStep(RunStep):
-    """The default evaluator run step.
+class DefaultEvaluatorStep(PlanStep):
+    """The default evaluator step.
 
     This step performs a single ensemble evaluation, yielding one or more
     [`FunctionResults`][ropt.results.FunctionResults] objects. The evaluation
@@ -42,7 +42,7 @@ class DefaultEvaluatorStep(RunStep):
     The evaluator step uses the [`DefaultEvaluatorStepWith`]
     [ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith]
     configuration class to parse the `with` field of the
-    [`RunStepConfig`][ropt.config.plan.RunStepConfig] used to specify this step
+    [`PlanStepConfig`][ropt.config.plan.PlanStepConfig] used to specify this step
     in a plan configuration.
     """
 
@@ -83,7 +83,7 @@ class DefaultEvaluatorStep(RunStep):
             arbitrary_types_allowed=True,
         )
 
-    def __init__(self, config: RunStepConfig, plan: Plan) -> None:
+    def __init__(self, config: PlanStepConfig, plan: Plan) -> None:
         """Initialize a default evaluator step.
 
         Args:

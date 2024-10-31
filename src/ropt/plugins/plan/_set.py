@@ -9,14 +9,14 @@ from typing import TYPE_CHECKING, Any, Dict, List, Tuple, Union
 
 from pydantic import ConfigDict, RootModel
 
-from ropt.plugins.plan.base import RunStep
+from ropt.plugins.plan.base import PlanStep
 
 if TYPE_CHECKING:
-    from ropt.config.plan import RunStepConfig
+    from ropt.config.plan import PlanStepConfig
     from ropt.plan import Plan
 
 
-class DefaultSetStep(RunStep):
+class DefaultSetStep(PlanStep):
     """The default set step.
 
     Set steps are used to modify the contents of plan variables. They specify
@@ -33,7 +33,7 @@ class DefaultSetStep(RunStep):
     The evaluator step uses the [`DefaultSetStepWith`]
     [ropt.plugins.plan._set.DefaultSetStep.DefaultSetStepWith]
     configuration class to parse the `with` field of the
-    [`RunStepConfig`][ropt.config.plan.RunStepConfig] used to specify this step
+    [`PlanStepConfig`][ropt.config.plan.PlanStepConfig] used to specify this step
     in a plan configuration.
 
     Note: Dictionary vs Lists
@@ -61,7 +61,7 @@ class DefaultSetStep(RunStep):
         Info: Using Expressions in the Value
             Optionally, the supplied value may be an expression, following the rules
             of the [`eval`][ropt.plan.Plan.eval] method of the plan object executing
-            the run steps. Refer to the method's documentation for more information
+            the steps. Refer to the method's documentation for more information
             on supported expressions.
 
         Note: Dictionaries vs. Lists
@@ -80,7 +80,7 @@ class DefaultSetStep(RunStep):
         validate_default=True,
     )
 
-    def __init__(self, config: RunStepConfig, plan: Plan) -> None:
+    def __init__(self, config: PlanStepConfig, plan: Plan) -> None:
         """Initialize a set step.
 
         Args:

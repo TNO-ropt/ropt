@@ -6,14 +6,14 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, ConfigDict
 
-from ropt.plugins.plan.base import RunStep
+from ropt.plugins.plan.base import PlanStep
 
 if TYPE_CHECKING:
-    from ropt.config.plan import RunStepConfig
+    from ropt.config.plan import PlanStepConfig
     from ropt.plan import Plan
 
 
-class DefaultPrintStep(RunStep):
+class DefaultPrintStep(PlanStep):
     """The default print step.
 
     The print step is used to display messages on the console, using Python's
@@ -28,7 +28,7 @@ class DefaultPrintStep(RunStep):
     The print step uses the [`DefaultPrintStepWith`]
     [ropt.plugins.plan._print.DefaultPrintStep.DefaultPrintStepWith]
     configuration class to parse the `with` field of the
-    [`RunStepConfig`][ropt.config.plan.RunStepConfig] used to specify this step
+    [`PlanStepConfig`][ropt.config.plan.PlanStepConfig] used to specify this step
     in a plan configuration.
     """
 
@@ -47,7 +47,7 @@ class DefaultPrintStep(RunStep):
             arbitrary_types_allowed=True,
         )
 
-    def __init__(self, config: RunStepConfig, plan: Plan) -> None:
+    def __init__(self, config: PlanStepConfig, plan: Plan) -> None:
         """Initialize a default print step.
 
         Args:

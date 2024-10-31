@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 class DefaultMetadataHandler(ResultHandler):
     """The default metadata results handler.
 
-    This handler adds arbitrary metadata to results produced by run steps by
+    This handler adds arbitrary metadata to results produced by steps by
     merging them into the `metadata` field of the
     [`Results`][ropt.results.Results] objects that it receives. It is configured
     using a dictionary that maps keys to the data to store. These data entries

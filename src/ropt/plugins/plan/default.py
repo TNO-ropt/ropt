@@ -5,11 +5,11 @@ from __future__ import annotations
 from functools import singledispatchmethod
 from typing import Dict, Final, Type, Union
 
-from ropt.config.plan import ResultHandlerConfig, RunStepConfig  # noqa: TCH001
+from ropt.config.plan import PlanStepConfig, ResultHandlerConfig  # noqa: TCH001
 from ropt.plan import Plan  # noqa: TCH001
 from ropt.plugins.plan.base import (  # noqa: TCH001
+    PlanStep,
     ResultHandler,
-    RunStep,
 )
 
 from ._evaluator import DefaultEvaluatorStep
@@ -22,7 +22,7 @@ from ._table import DefaultTableHandler
 from ._tracker import DefaultTrackerHandler
 from .base import PlanPlugin
 
-_STEP_OBJECTS: Final[Dict[str, Type[RunStep]]] = {
+_STEP_OBJECTS: Final[Dict[str, Type[PlanStep]]] = {
     "evaluator": DefaultEvaluatorStep,
     "optimizer": DefaultOptimizerStep,
     "print": DefaultPrintStep,
@@ -40,9 +40,9 @@ _RESULT_HANDLER_OBJECTS: Final[Dict[str, Type[ResultHandler]]] = {
 class DefaultPlanPlugin(PlanPlugin):
     """The default plan plugin class.
 
-    This class provides a number of run steps and result handlers:
+    This class provides a number of steps and result handlers:
 
-    `Run Steps`:
+    `Steps`:
     : - A step that modifies one or more variables
         ([`optimizer`][ropt.plugins.plan._set.DefaultSetStep]).
     : - A step that performs a single ensemble evaluation
@@ -66,9 +66,9 @@ class DefaultPlanPlugin(PlanPlugin):
     @singledispatchmethod
     def create(  # type: ignore[override]
         self,
-        config: Union[ResultHandlerConfig, RunStepConfig],
+        config: Union[PlanStepConfig, ResultHandlerConfig],
         plan: Plan,
-    ) -> Union[ResultHandler, RunStep]:
+    ) -> Union[ResultHandler, PlanStep]:
         """Initialize the plan plugin.
 
         See the [ropt.plugins.plan.base.PlanPlugin][] abstract base class.
@@ -79,7 +79,7 @@ class DefaultPlanPlugin(PlanPlugin):
         raise NotImplementedError(msg)
 
     @create.register
-    def _create_step(self, config: RunStepConfig, plan: Plan) -> RunStep:
+    def _create_step(self, config: PlanStepConfig, plan: Plan) -> PlanStep:
         _, _, step_name = config.run.lower().rpartition("/")
         step_obj = _STEP_OBJECTS.get(step_name)
         if step_obj is not None:

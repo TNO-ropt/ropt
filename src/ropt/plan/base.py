@@ -13,7 +13,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ropt.config.plan import ResultHandlerConfig, RunStepConfig
+    from ropt.config.plan import PlanStepConfig, ResultHandlerConfig
     from ropt.plan import Event, Plan
 
 
@@ -60,10 +60,10 @@ class ResultHandler(ABC):
         """
 
 
-class RunStep(ABC):
+class PlanStep(ABC):
     """Base class for plan steps."""
 
-    def __init__(self, config: RunStepConfig, plan: Plan) -> None:
+    def __init__(self, config: PlanStepConfig, plan: Plan) -> None:
         """Initialize the plan object.
 
         Args:
@@ -74,7 +74,7 @@ class RunStep(ABC):
         self._plan = plan
 
     @property
-    def step_config(self) -> RunStepConfig:
+    def step_config(self) -> PlanStepConfig:
         """Return the step object config.
 
         Returns:

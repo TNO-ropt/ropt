@@ -1,6 +1,6 @@
 """This module defines the base classes for optimization plan plugins.
 
-Optimization plan run steps and result handlers can be added via the plugin
+Optimization plan steps and result handlers can be added via the plugin
 mechanism to implement additional functionality. This is done by creating a
 plugin class that derives from the
 [`PlanPlugin`][ropt.plugins.plan.base.PlanPlugin] class. It needs to define a
@@ -16,33 +16,33 @@ from typing import TYPE_CHECKING, Union
 from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
-    from ropt.config.plan import ResultHandlerConfig, RunStepConfig
+    from ropt.config.plan import PlanStepConfig, ResultHandlerConfig
     from ropt.plan import Event, OptimizerContext, Plan
 
 
 class PlanPlugin(Plugin):
     """The abstract base class for plan plugins.
 
-    Plan run steps and result handlers are implemented through plugins that must derive
+    Plan steps and result handlers are implemented through plugins that must derive
     from this base class. Plugins can be built-in, installed via a plugin mechanism,
     or loaded dynamically. During execution of an optimization plan, the
     required optimizer plugin will be located via the
     [`PluginManager`][ropt.plugins.PluginManager] and used to create
-    [`RunStep`][ropt.plugins.plan.base.RunStep] or [`ResultHandler`][ropt.plugins.plan.base.ResultHandler] objects via its
+    [`PlanStep`][ropt.plugins.plan.base.PlanStep] or [`ResultHandler`][ropt.plugins.plan.base.ResultHandler] objects via its
     `create` function.
     """
 
     @abstractmethod
     def create(
         self,
-        config: Union[ResultHandlerConfig, RunStepConfig],
+        config: Union[ResultHandlerConfig, PlanStepConfig],
         context: OptimizerContext,
-    ) -> Union[ResultHandler, RunStep]:
-        """Create a run step or result handler.
+    ) -> Union[ResultHandler, PlanStep]:
+        """Create a step or result handler.
 
-        This factory function instantiates either a run step or a result handler
+        This factory function instantiates either a step or a result handler
         object based on the provided configuration. The configuration determines
-        which type of object to return—either a run step or a result handler.
+        which type of object to return—either a step or a result handler.
 
         Args:
             config:  The configuration for the plan object.
@@ -50,18 +50,18 @@ class PlanPlugin(Plugin):
         """
 
 
-class RunStep(ABC):
-    """Base class for run steps.
+class PlanStep(ABC):
+    """Base class for steps.
 
-    Run steps loaded and created by the plugin manager must inherit from this
+    steps loaded and created by the plugin manager must inherit from this
     abstract base class. It defines a `run` method that must be overridden to
     implement the specific functionality of each step. The class also provides
     default properties for accessing the configuration and the plan that
     executes the step.
     """
 
-    def __init__(self, config: RunStepConfig, plan: Plan) -> None:
-        """Initialize the run step.
+    def __init__(self, config: PlanStepConfig, plan: Plan) -> None:
+        """Initialize the step.
 
         The `config` and `plan` arguments are accessible as `step_config`
         and `plan` properties.
@@ -74,7 +74,7 @@ class RunStep(ABC):
         self._plan = plan
 
     @property
-    def step_config(self) -> RunStepConfig:
+    def step_config(self) -> PlanStepConfig:
         """Return the step object's configuration.
 
         Returns:

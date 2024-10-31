@@ -2,7 +2,7 @@
     options:
         members:
             - PlanConfig
-            - RunStepConfig
+            - PlanStepConfig
             - ResultHandlerConfig
         group_by_category: false
         show_bases: false

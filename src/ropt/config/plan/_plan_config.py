@@ -8,10 +8,10 @@ from typing import Any, Dict, List, Optional, Union
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
-class RunStepConfig(BaseModel):
-    """Configuration for a single run step within an optimization plan.
+class PlanStepConfig(BaseModel):
+    """Configuration for a single step within an optimization plan.
 
-    A run step represents a single action in the optimization process. It can
+    A step represents a single action in the optimization process. It can
     access and modify plan variables, execute tasks such as optimization runs,
     and emit [`events`][ropt.plan.Event], for example, when intermediate
     optimization results are generated.
@@ -19,10 +19,10 @@ class RunStepConfig(BaseModel):
     The `run` string specifies the code that executes the step, and is used by
     the plugin manager to load the appropriate code.
 
-    Additional parameters required by the run step can be configured using the
+    Additional parameters required by the step can be configured using the
     `with_` attribute, with its content varying based on the step type.
 
-    Execution of the run step can be made conditional by providing an expression
+    Execution of the step can be made conditional by providing an expression
     through the `if_` attribute. This expression is evaluated, and the step is
     executed only if the result is `True`.
 
@@ -34,15 +34,15 @@ class RunStepConfig(BaseModel):
     Info: Conditional evaluation
         Conditions specified via the `if_` attribute are evaluated using the
         [`eval`][ropt.plan.Plan.eval] method of the plan object executing the
-        run steps. Refer to the method's documentation for more information on
+        steps. Refer to the method's documentation for more information on
         supported expressions.
 
         While mathematical expressions often need to be enclosed within
         `${{ ... }}` delimiters in a plan configuration string, this is
         optional for expressions passed via the `if_` attribute.
 
-    Info: Alternative specification of the run step config.
-        The standard format for defining a run step configuration follows the
+    Info: Alternative specification of the step config.
+        The standard format for defining a step configuration follows the
         attribute-based structure shown here. Typically, a dictionary
         initializing a step would resemble:
 
@@ -106,9 +106,9 @@ class RunStepConfig(BaseModel):
 class ResultHandlerConfig(BaseModel):
     """Configuration for a single result handler object.
 
-    Result handler objects process events emitted by the run steps of an
+    Result handler objects process events emitted by the steps of an
     optimization plan. These objects can receive [`events`][ropt.plan.Event]
-    directly from the plan's run steps, or from another result handler in a
+    directly from the plan's steps, or from another result handler in a
     chain of handlers, as defined in the `results` section of a
     [`PlanConfig`][ropt.config.plan.PlanConfig] object. Upon receiving events,
     handlers may perform actions such as modifying plan variables, generating
@@ -207,7 +207,7 @@ class PlanConfig(BaseModel):
       handlers specified in the `results` section.
 
     `results`
-    : Specifies the event handlers that process events emitted by run steps.
+    : Specifies the event handlers that process events emitted by steps.
       Handlers receive events sequentially, with each handler passing events to
       the next in the chain.
 
@@ -222,7 +222,7 @@ class PlanConfig(BaseModel):
     inputs: List[str] = []
     outputs: List[str] = []
     variables: Dict[str, Any] = {}
-    steps: List[RunStepConfig] = []
+    steps: List[PlanStepConfig] = []
     results: List[ResultHandlerConfig] = []
 
     model_config = ConfigDict(
