@@ -157,8 +157,9 @@ class ExpressionEvaluator:
         """
 
         def _substitute(matched: re.Match[str]) -> str:
-            value = matched.string[matched.start() : matched.end()]
-            return "$" if value == "$$" else str(self.eval(value, variables))
+            return str(
+                self.eval(matched.string[matched.start() : matched.end()], variables)
+            )
 
         for variable in variables:
             if variable in self._functions:
@@ -173,10 +174,7 @@ class ExpressionEvaluator:
         if expr.startswith("$[[") and expr.endswith("]]"):
             parts = expr[3:-2].split("${{")
             parts[1:] = ["${{" + part for part in parts[1:]]
-            return "".join(
-                re.sub(r"\${{(.*)}}|\$\$|\$([^\W0-9][\w\.]*)", _substitute, part)
-                for part in parts
-            )
+            return "".join(re.sub(r"\${{(.*)}}", _substitute, part) for part in parts)
         if expr.startswith("$"):
             return self._eval_expr(expr, variables)
         return expr
