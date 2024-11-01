@@ -770,15 +770,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.add_observer" class="md-nav__link">
-    <span class="md-ellipsis">
-      add_observer
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.emit_event" class="md-nav__link">
     <span class="md-ellipsis">
       emit_event
@@ -833,6 +824,24 @@
   <a href="#ropt.plan.OptimizerContext.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizerContext.add_observer" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_observer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizerContext.call_observers" class="md-nav__link">
+    <span class="md-ellipsis">
+      call_observers
     </span>
   </a>
   
@@ -1544,15 +1553,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.add_observer" class="md-nav__link">
-    <span class="md-ellipsis">
-      add_observer
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.emit_event" class="md-nav__link">
     <span class="md-ellipsis">
       emit_event
@@ -1607,6 +1607,24 @@
   <a href="#ropt.plan.OptimizerContext.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizerContext.add_observer" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_observer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.OptimizerContext.call_observers" class="md-nav__link">
+    <span class="md-ellipsis">
+      call_observers
     </span>
   </a>
   
@@ -2343,78 +2361,6 @@ rules:</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.add_observer" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">add_observer</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Add an observer function.</p>
-<p>Observer functions are called during optimization when an event of the
-specified type occurs. The provided callable must accept a single
-argument of the <a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> class, which contains
-information about the occurred event.</p>
-
-
-<details class="note" open>
-  <summary>Note</summary>
-  <p>Before the observer functions are called, all result handlers are
-executed, which may potentially modify the event.</p>
-</details>
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>event</code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The type of events that the observer will react to.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>callback</code></td>
-            <td>
-                  <code><span title="typing.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="ropt.plan.Event" href="#ropt.plan.Event">Event</a>], None]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The function to call when the specified event is received.
-      This function should accept one argument, which will be
-      an instance of the <a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> class.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
 <h4 id="ropt.plan.Plan.emit_event" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">emit_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></code>
 
@@ -2783,6 +2729,149 @@ all steps in an optimization plan. This currently includes the following:</p>
             </td>
             <td>
                   <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plan.OptimizerContext.add_observer" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">add_observer</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Add an observer function.</p>
+<p>Observer functions are called during optimization when an event of the
+specified type occurs. The provided callable must accept a single
+argument of the <a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> class, which contains
+information about the occurred event.</p>
+
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>Before the observer functions are called, all result handlers are
+executed, which may potentially modify the event.</p>
+</details>
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>event</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The type of events that the observer will react to.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>callback</code></td>
+            <td>
+                  <code><span title="typing.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="ropt.plan.Event" href="#ropt.plan.Event">Event</a>], None]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The function to call when the specified event is received.
+      This function should accept one argument, which will be
+      an instance of the <a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> class.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing_extensions.Self">Self</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Self, to allow for method chaining.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plan.OptimizerContext.call_observers" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">call_observers</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Call observers for a specified event.</p>
+<p>This method invokes all observers associated with the context for the
+type of event passed as an argument.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>event</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Event" href="#ropt.plan.Event">Event</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The event that is emitted.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
             </td>
           </tr>
       </tbody>
