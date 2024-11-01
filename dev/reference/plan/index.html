@@ -680,6 +680,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.plan_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      plan_id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.aborted" class="md-nav__link">
     <span class="md-ellipsis">
       aborted
@@ -1463,6 +1472,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.plan_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      plan_id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.aborted" class="md-nav__link">
     <span class="md-ellipsis">
       aborted
@@ -1780,6 +1798,53 @@ straightforward plans involving a single optimization.</p>
 
 
 
+<h4 id="ropt.plan.Plan.plan_id" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">plan_id</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the list of plan IDs.</p>
+<p>Plans can spawn other plans sequentially, in parallel, or as nested
+workflows. The plan IDs uniquely represent the order and nesting of
+these plans, using a list of sequence numbers.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Tuple">Tuple</span>[int, ...]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The list of plan IDs for this plan.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
 <h4 id="ropt.plan.Plan.aborted" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">aborted</span><span class="p">:</span> <span class="nb">bool</span></code>
 
@@ -1918,7 +1983,7 @@ state and functionality for executing the optimization plan.</p>
 
 
 <h4 id="ropt.plan.Plan.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">optimizer_context</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">optimizer_context</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plan_id</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
@@ -1926,14 +1991,20 @@ state and functionality for executing the optimization plan.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize a plan object.</p>
-<p>The plan requires a <code>PlanConfig</code> object and an <code>OptimizationContext</code>
-object. An optional <code>plugin_manager</code> argument allows specification of
-custom plugins for result handlers and step objects within the plan. If
-omitted, the plan will use only plugins installed through Python's
-standard entry points mechanism.</p>
-<p>Plans may create other plans to be used within their workflow. If this
-happens, the new plan will receive a reference to the original plan via
-the <code>parent</code> argument.</p>
+<p>This method initializes a plan using a <code>PlanConfig</code> object and an
+<code>OptimizationContext</code> object. An optional <code>plugin_manager</code> argument
+allows the specification of custom plugins for result handlers and step
+objects within the plan. If omitted, only plugins installed through
+Python's standard entry points are used.</p>
+<p>Plans can spawn additional plans within their workflow, and any spawned
+plan receives a reference to the original plan via the <code>parent</code>
+argument.</p>
+<p>Each plan is assigned a unique integer sequence number at creation,
+which is stored as a tuple of sequence numbers reflecting plan nesting.
+When spawning a child plan with the <a class="autorefs autorefs-internal" href="#ropt.plan.Plan.spawn"><code>spawn</code></a>
+method, the new plan receives an incremented sequence number at the
+beginning. This creates an ordered sequence of IDs that uniquely
+reflects the hierarchy and order of spawned plans.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1998,7 +2069,22 @@ the <code>parent</code> argument.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional parent plan that spawned this plan.</p>
+                <p>Optional reference to the parent plan that
+               spawned this plan.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>plan_id</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Tuple">Tuple</span>[int, ...]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A list of plan IDs reflecting the plan hierarchy.</p>
               </div>
             </td>
             <td>
@@ -3222,6 +3308,17 @@ enumeration for more details.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional tags added to the results</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plan.Event.plan_id">plan_id</span></code></td>
+            <td>
+                  <code><span title="typing.Tuple">Tuple</span>[int, ...]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the plan that generated the event</p>
               </div>
             </td>
           </tr>
