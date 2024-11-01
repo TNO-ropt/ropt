@@ -66,7 +66,9 @@ def test_run_basic(enopt_config: Any, evaluator: Any) -> None:
     }
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(PlanConfig.model_validate(plan_config), context)
+    assert plan["plan_id"] == [0]
     plan.run()
+    assert plan.plan_id == (0,)
     variables = plan["results"].evaluations.variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
@@ -100,6 +102,7 @@ def test_run_basic(enopt_config: Any, evaluator: Any) -> None:
         ("${{'$x'}}", "x"),
         ("${{'$$x'}}", "$x"),
         ("${{$x + $y}}", 2),
+        ("${{ [1, 2] + $plan_id }}", [1, 2, 0]),
         ("$x + 1", 2),
         ("1 + $x", "1 + $x"),
         ("${{1 + $y}}", 2),
@@ -1041,6 +1044,10 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
 
     def _track_evaluations(event: Event) -> None:
         nonlocal completed_functions
+        if "outer" in event.tags:
+            assert event.plan_id == (0,)
+        if "inner" in event.tags:
+            assert event.plan_id == (0, completed_functions // 5)
         assert event.results is not None
         for item in event.results:
             if isinstance(item, FunctionResults):

@@ -29,6 +29,7 @@ class Event:
         results:    Optional results passed with the event
         exit_code:  An optional exit code
         tags:       Optional tags added to the results
+        plan_id:    The ID of the plan that generated the event
     """
 
     event_type: EventType
@@ -36,3 +37,4 @@ class Event:
     results: Optional[Tuple[Results, ...]] = None
     exit_code: Optional[OptimizerExitCode] = None
     tags: Set[str] = field(default_factory=set)
+    plan_id: Tuple[int, ...] = field(default_factory=tuple)
