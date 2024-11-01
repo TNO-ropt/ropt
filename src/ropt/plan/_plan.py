@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from itertools import chain, count
 from typing import (
     TYPE_CHECKING,
@@ -26,6 +27,11 @@ if TYPE_CHECKING:
     from ropt.evaluator import Evaluator
     from ropt.plan import Event
     from ropt.plugins.plan.base import PlanStep, ResultHandler
+
+if sys.version_info >= (3, 11):
+    from typing import Self
+else:
+    from typing_extensions import Self
 
 
 class OptimizerContext:
@@ -59,6 +65,49 @@ class OptimizerContext:
         self.rng = default_rng(DEFAULT_SEED) if seed is None else default_rng(seed)
         self.expr = ExpressionEvaluator() if expr is None else expr
         self.result_id_iter = count()
+        self._subscribers: Dict[EventType, List[Callable[[Event], None]]] = {
+            event: [] for event in EventType
+        }
+
+    def add_observer(
+        self,
+        event: EventType,
+        callback: Callable[[Event], None],
+    ) -> Self:
+        """Add an observer function.
+
+        Observer functions are called during optimization when an event of the
+        specified type occurs. The provided callable must accept a single
+        argument of the [`Event`][ropt.plan.Event] class, which contains
+        information about the occurred event.
+
+        Note:
+            Before the observer functions are called, all result handlers are
+            executed, which may potentially modify the event.
+
+        Args:
+            event:    The type of events that the observer will react to.
+            callback: The function to call when the specified event is received.
+                      This function should accept one argument, which will be
+                      an instance of the [`Event`][ropt.plan.Event] class.
+
+        Returns:
+            Self, to allow for method chaining.
+        """
+        self._subscribers[event].append(callback)
+        return self
+
+    def call_observers(self, event: Event) -> None:
+        """Call observers for a specified event.
+
+        This method invokes all observers associated with the context for the
+        type of event passed as an argument.
+
+        Args:
+            event: The event that is emitted.
+        """
+        for callback in self._subscribers[event.event_type]:
+            callback(event)
 
 
 class Plan:
@@ -94,9 +143,6 @@ class Plan:
         self._plan_config = config
         self._optimizer_context = optimizer_context
         self._vars: Dict[str, Any] = {}
-        self._subscribers: Dict[EventType, List[Callable[[Event], None]]] = {
-            event: [] for event in EventType
-        }
 
         self._plugin_manager = (
             PluginManager() if plugin_manager is None else plugin_manager
@@ -280,30 +326,6 @@ class Plan:
             else value
         )
 
-    def add_observer(
-        self,
-        event: EventType,
-        callback: Callable[[Event], None],
-    ) -> None:
-        """Add an observer function.
-
-        Observer functions are called during optimization when an event of the
-        specified type occurs. The provided callable must accept a single
-        argument of the [`Event`][ropt.plan.Event] class, which contains
-        information about the occurred event.
-
-        Note:
-            Before the observer functions are called, all result handlers are
-            executed, which may potentially modify the event.
-
-        Args:
-            event:    The type of events that the observer will react to.
-            callback: The function to call when the specified event is received.
-                      This function should accept one argument, which will be
-                      an instance of the [`Event`][ropt.plan.Event] class.
-        """
-        self._subscribers[event].append(callback)
-
     def emit_event(self, event: Event) -> None:
         """Emit an event of the specified type with the provided data.
 
@@ -321,9 +343,9 @@ class Plan:
         """
         for handler in self._handlers:
             event = handler.handle_event(event)
-        for callback in self._subscribers[event.event_type]:
-            callback(event)
-        if self._parent is not None:
+        if self._parent is None:
+            self._optimizer_context.call_observers(event)
+        else:
             self._parent.emit_event(event)
 
     def _check_condition(self, config: PlanStepConfig) -> bool:

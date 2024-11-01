@@ -509,9 +509,10 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
         ],
     }
 
-    context = OptimizerContext(evaluator=evaluator())
+    context = OptimizerContext(evaluator=evaluator()).add_observer(
+        EventType.FINISHED_EVALUATION, _track_evaluations
+    )
     plan = Plan(PlanConfig.model_validate(plan_config), context)
-    plan.add_observer(EventType.FINISHED_EVALUATION, _track_evaluations)
     plan.run()
 
     assert completed_functions == 14
@@ -564,9 +565,10 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
         ],
     }
 
-    context = OptimizerContext(evaluator=evaluator())
+    context = OptimizerContext(evaluator=evaluator()).add_observer(
+        EventType.FINISHED_EVALUATION, _track_evaluations
+    )
     plan = Plan(PlanConfig.model_validate(plan_config), context)
-    plan.add_observer(EventType.FINISHED_EVALUATION, _track_evaluations)
     plan.run()
 
     assert not np.allclose(
@@ -662,9 +664,10 @@ def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
         ],
     }
 
-    context = OptimizerContext(evaluator=evaluator())
+    context = OptimizerContext(evaluator=evaluator()).add_observer(
+        EventType.FINISHED_EVALUATION, _track_evaluations
+    )
     plan = Plan(PlanConfig.model_validate(plan_config), context)
-    plan.add_observer(EventType.FINISHED_EVALUATION, _track_evaluations)
     plan.run()
 
     assert len(completed) == 6
@@ -714,9 +717,10 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
             },
         ],
     }
-    context = OptimizerContext(evaluator=evaluator())
+    context = OptimizerContext(evaluator=evaluator()).add_observer(
+        EventType.FINISHED_EVALUATION, _track_evaluations
+    )
     plan = Plan(PlanConfig.model_validate(plan_config), context)
-    plan.add_observer(EventType.FINISHED_EVALUATION, _track_evaluations)
     plan.run()
 
     assert np.all(
@@ -762,9 +766,10 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
             {"tracker": {"var": "optimum", "tags": "opt"}},
         ],
     }
-    context = OptimizerContext(evaluator=evaluator())
+    context = OptimizerContext(evaluator=evaluator()).add_observer(
+        EventType.FINISHED_EVALUATION, _track_evaluations
+    )
     plan = Plan(PlanConfig.model_validate(plan_config), context)
-    plan.add_observer(EventType.FINISHED_EVALUATION, _track_evaluations)
     plan.run()
 
     assert np.all(
@@ -836,9 +841,10 @@ def test_restart_optimum_with_reset(
             {"tracker": {"var": "optimum", "tags": "opt"}},
         ],
     }
-    context = OptimizerContext(evaluator=evaluator(new_functions))
+    context = OptimizerContext(evaluator=evaluator(new_functions)).add_observer(
+        EventType.FINISHED_EVALUATION, _track_evaluations
+    )
     plan = Plan(PlanConfig.model_validate(plan_config), context)
-    plan.add_observer(EventType.FINISHED_EVALUATION, _track_evaluations)
     plan.run()
 
     # The third evaluation is the optimum, and used to restart the second run:
@@ -899,9 +905,10 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
     }
 
     parsed_config = PlanConfig.model_validate(plan_config)
-    context = OptimizerContext(evaluator=evaluator())
+    context = OptimizerContext(evaluator=evaluator()).add_observer(
+        EventType.FINISHED_EVALUATION, _track_results
+    )
     plan = Plan(parsed_config, context)
-    plan.add_observer(EventType.FINISHED_EVALUATION, _track_results)
     plan.run()
     assert restarts == [0, 1]
 
@@ -980,9 +987,10 @@ def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
     }
 
     parsed_config = PlanConfig.model_validate(plan_config)
-    context = OptimizerContext(evaluator=evaluator())
+    context = OptimizerContext(evaluator=evaluator()).add_observer(
+        EventType.FINISHED_EVALUATOR_STEP, _track_evaluations
+    )
     plan = Plan(parsed_config, context)
-    plan.add_observer(EventType.FINISHED_EVALUATOR_STEP, _track_evaluations)
     plan.run()
 
     assert len(completed) == 2
@@ -1017,9 +1025,10 @@ def test_exit_code(enopt_config: Any, evaluator: Any) -> None:
             },
         ],
     }
-    context = OptimizerContext(evaluator=evaluator())
+    context = OptimizerContext(evaluator=evaluator()).add_observer(
+        EventType.FINISHED_OPTIMIZER_STEP, _exit_code
+    )
     plan = Plan(PlanConfig.model_validate(plan_config), context)
-    plan.add_observer(EventType.FINISHED_OPTIMIZER_STEP, _exit_code)
     plan.run()
     assert plan["exit_code"] == OptimizerExitCode.MAX_FUNCTIONS_REACHED
     assert is_called
@@ -1089,9 +1098,10 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
     }
 
     parsed_config = PlanConfig.model_validate(outer_config)
-    context = OptimizerContext(evaluator=evaluator())
+    context = OptimizerContext(evaluator=evaluator()).add_observer(
+        EventType.FINISHED_EVALUATION, _track_evaluations
+    )
     plan = Plan(parsed_config, context)
-    plan.add_observer(EventType.FINISHED_EVALUATION, _track_evaluations)
     plan.run()
     results = plan["optimum"]
 
@@ -1166,9 +1176,10 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
     }
 
     parsed_config = PlanConfig.model_validate(outer_config)
-    context = OptimizerContext(evaluator=evaluator())
+    context = OptimizerContext(evaluator=evaluator()).add_observer(
+        EventType.FINISHED_EVALUATION, _track_evaluations
+    )
     plan = Plan(parsed_config, context)
-    plan.add_observer(EventType.FINISHED_EVALUATION, _track_evaluations)
     plan.run()
     results = plan["optimum"]
 
@@ -1205,9 +1216,10 @@ def test_table(enopt_config: Any, evaluator: Any, tmp_path: Path) -> None:
         assert event.results is not None
         table.add_results(event.config, event.results)
 
-    context = OptimizerContext(evaluator=evaluator())
+    context = OptimizerContext(evaluator=evaluator()).add_observer(
+        EventType.FINISHED_EVALUATION, handle_results
+    )
     plan = Plan(PlanConfig.model_validate(plan_config), context)
-    plan.add_observer(EventType.FINISHED_EVALUATION, handle_results)
     plan.run()
 
     assert path1.exists()

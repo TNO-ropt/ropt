@@ -259,7 +259,7 @@ class OptimizationPlanRunner:
             plugin_manager=self._plugin_manager,
         )
         for event_type, function in self._observers:
-            plan.add_observer(event_type, function)
+            self._optimizer_context.add_observer(event_type, function)
         plan.run()
         results = plan["__optimum_tracker__"]
         self._results = _Results(

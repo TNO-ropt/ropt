@@ -333,7 +333,7 @@ class ScriptOptimizer:
                     (EventType.FINISHED_OPTIMIZER_STEP, self._log_exit_code),
                     *self._observers,
                 ):
-                    plan.add_observer(event_type, function)
+                    context.add_observer(event_type, function)
                 plan.run()
         finally:
             os.chdir(cwd)
