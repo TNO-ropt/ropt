@@ -2877,7 +2877,8 @@ the number of perturbations.</p>
 parent <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. The <code>samplers</code>
 field contains, for each variable, an index into the tuple of these
 configured samplers, indicating which sampler should be used to generate
-perturbation values for that variable.</p>
+perturbation values for that variable. To support samplers that need random number,
+a random number generator object is created</p>
 <p>The generated perturbation values are added to the unperturbed variables
 after multiplication with the perturbation magnitudes given by the
 <code>perturbation_magnitudes</code> field. The perturbation values may be used
@@ -2988,6 +2989,17 @@ gradient.</p>
             <td>
               <div class="doc-md-description">
                 <p>The index of the sampler to use for each variable</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.GradientConfig.seed">seed</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.ItemOrTuple" href="../utilities/#ropt.config.validated_types.ItemOrTuple">ItemOrTuple</a>[int]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The seed for the random number generator passed to each sampler</p>
               </div>
             </td>
           </tr>

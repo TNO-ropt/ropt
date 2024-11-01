@@ -680,18 +680,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.plan_id" class="md-nav__link">
+  <a href="#ropt.plan.Plan.aborted" class="md-nav__link">
     <span class="md-ellipsis">
-      plan_id
+      aborted
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.aborted" class="md-nav__link">
+  <a href="#ropt.plan.Plan.plan_id" class="md-nav__link">
     <span class="md-ellipsis">
-      aborted
+      plan_id
     </span>
   </a>
   
@@ -1472,18 +1472,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.plan_id" class="md-nav__link">
+  <a href="#ropt.plan.Plan.aborted" class="md-nav__link">
     <span class="md-ellipsis">
-      plan_id
+      aborted
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.aborted" class="md-nav__link">
+  <a href="#ropt.plan.Plan.plan_id" class="md-nav__link">
     <span class="md-ellipsis">
-      aborted
+      plan_id
     </span>
   </a>
   
@@ -1798,6 +1798,50 @@ straightforward plans involving a single optimization.</p>
 
 
 
+<h4 id="ropt.plan.Plan.aborted" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">aborted</span><span class="p">:</span> <span class="nb">bool</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Check if the plan was aborted by the user.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>bool</code></td>            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the plan was aborted by the user; otherwise, <code>False</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
 <h4 id="ropt.plan.Plan.plan_id" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">plan_id</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span></code>
 
@@ -1832,50 +1876,6 @@ these plans, using a list of sequence numbers.</p>
             <td>
               <div class="doc-md-description">
                 <p>The list of plan IDs for this plan.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h4 id="ropt.plan.Plan.aborted" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">aborted</span><span class="p">:</span> <span class="nb">bool</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Check if the plan was aborted by the user.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>bool</code></td>            <td>
-                  <code>bool</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p><code>True</code> if the plan was aborted by the user; otherwise, <code>False</code>.</p>
               </div>
             </td>
           </tr>
@@ -2731,8 +2731,6 @@ all steps in an optimization plan. This currently includes the following:</p>
 <ul>
 <li>An <a class="autorefs autorefs-internal" href="../evaluator/#ropt.evaluator.Evaluator"><code>Evaluator</code></a> callable for evaluating
   functions.</li>
-<li>A seed for a random number generator used in stochastic gradient
-  estimation.</li>
 <li>An expression evaluator object.</li>
 <li>An iterator that generates unique result IDs.</li>
 </ul>
@@ -2754,7 +2752,7 @@ all steps in an optimization plan. This currently includes the following:</p>
 
 
 <h4 id="ropt.plan.OptimizerContext.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">evaluator</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expr</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">evaluator</span><span class="p">,</span> <span class="n">expr</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
@@ -2787,20 +2785,6 @@ all steps in an optimization plan. This currently includes the following:</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>seed</code></td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[int]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional seed for the random number generator</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
