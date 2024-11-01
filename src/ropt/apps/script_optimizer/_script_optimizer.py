@@ -68,8 +68,6 @@ class ScriptOptimizer:
         config: Union[Dict[str, Any], ScriptOptimizerConfig],
         plan: Dict[str, Any],
         tasks: Dict[str, str],
-        *,
-        seed: Optional[int] = None,
     ) -> None:
         """Initialize the optimizer.
 
@@ -82,7 +80,6 @@ class ScriptOptimizer:
             config: Script optimizer configuration
             plan:   The optimization plan to run
             tasks:  A dictionary mapping task names to strings containing bash code
-            seed:   Optional seed used by the optimization code
         """
         self._config = (
             config
@@ -91,7 +88,6 @@ class ScriptOptimizer:
         )
         self._plan_config = plan
         self._tasks = tasks
-        self._seed = seed
         self._status: Dict[int, Any] = {}
         self._optimal_result: Optional[FunctionResults] = None
         self._observers: List[Tuple[EventType, Callable[[Event], None]]] = []
@@ -326,7 +322,7 @@ class ScriptOptimizer:
             ).with_monitor(
                 self._monitor,
             ) as evaluator:
-                context = OptimizerContext(evaluator=evaluator, seed=self._seed)
+                context = OptimizerContext(evaluator=evaluator)
                 config = PlanConfig.model_validate(self._plan_config)
                 plan = Plan(config, context)
                 for event_type, function in (

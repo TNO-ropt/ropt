@@ -14,9 +14,6 @@ from typing import (
     Tuple,
 )
 
-from numpy.random import default_rng
-
-from ropt.config.enopt.constants import DEFAULT_SEED
 from ropt.enums import EventType
 from ropt.plugins import PluginManager
 
@@ -42,8 +39,6 @@ class OptimizerContext:
 
     - An [`Evaluator`][ropt.evaluator.Evaluator] callable for evaluating
       functions.
-    - A seed for a random number generator used in stochastic gradient
-      estimation.
     - An expression evaluator object.
     - An iterator that generates unique result IDs.
     """
@@ -51,18 +46,15 @@ class OptimizerContext:
     def __init__(
         self,
         evaluator: Evaluator,
-        seed: Optional[int] = None,
         expr: Optional[ExpressionEvaluator] = None,
     ) -> None:
         """Initialize the optimization context.
 
         Args:
             evaluator: The callable for running function evaluations
-            seed:      Optional seed for the random number generator
             expr:      Optional expression evaluator
         """
         self.evaluator = evaluator
-        self.rng = default_rng(DEFAULT_SEED) if seed is None else default_rng(seed)
         self.expr = ExpressionEvaluator() if expr is None else expr
         self.result_id_iter = count()
         self._subscribers: Dict[EventType, List[Callable[[Event], None]]] = {
@@ -216,6 +208,15 @@ class Plan:
         self._aborted = True
 
     @property
+    def aborted(self) -> bool:
+        """Check if the plan was aborted by the user.
+
+        Returns:
+            bool: `True` if the plan was aborted by the user; otherwise, `False`.
+        """
+        return self._aborted
+
+    @property
     def plan_id(self) -> Tuple[int, ...]:
         """Return the list of plan IDs.
 
@@ -227,15 +228,6 @@ class Plan:
             The list of plan IDs for this plan.
         """
         return self._plan_ids[:-1]
-
-    @property
-    def aborted(self) -> bool:
-        """Check if the plan was aborted by the user.
-
-        Returns:
-            bool: `True` if the plan was aborted by the user; otherwise, `False`.
-        """
-        return self._aborted
 
     def create_steps(self, step_configs: List[PlanStepConfig]) -> List[PlanStep]:
         """Instantiate step objects from step configurations.

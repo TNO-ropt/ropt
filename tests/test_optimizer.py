@@ -391,20 +391,13 @@ def test_rng(enopt_config: Any, evaluator: Any) -> None:
     assert variables1 is not None
     assert np.allclose(variables1, [0.0, 0.0, 0.5], atol=0.02)
 
-    variables2 = (
-        OptimizationPlanRunner(enopt_config, evaluator(), seed=DEFAULT_SEED)
-        .run()
-        .variables
-    )
+    variables2 = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     assert variables2 is not None
     assert np.allclose(variables2, [0.0, 0.0, 0.5], atol=0.02)
     assert np.all(variables1 == variables2)
 
-    variables3 = (
-        OptimizationPlanRunner(enopt_config, evaluator(), seed=DEFAULT_SEED + 123)
-        .run()
-        .variables
-    )
+    enopt_config["gradient"]["seed"] = (1, DEFAULT_SEED)
+    variables3 = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
     assert variables3 is not None
     assert np.allclose(variables3, [0.0, 0.0, 0.5], atol=0.02)
     assert not np.all(variables3 == variables1)

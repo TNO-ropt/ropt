@@ -71,7 +71,6 @@ class OptimizationPlanRunner:
         evaluator: Evaluator,
         *,
         constraint_tolerance: float = 1e-10,
-        seed: Optional[int] = None,
     ) -> None:
         """Initialize an `OptimizationPlanRunner` object.
 
@@ -82,11 +81,9 @@ class OptimizationPlanRunner:
             enopt_config:         The configuration for the optimization.
             evaluator:            The evaluator object used to evaluate functions.
             constraint_tolerance: The tolerance level used to detect constraint violations.
-            seed:                 The seed for the random number generator used
-                                  for stochastic gradient estimation.
         """
         self._plugin_manager: Optional[PluginManager] = None
-        self._optimizer_context = OptimizerContext(evaluator=evaluator, seed=seed)
+        self._optimizer_context = OptimizerContext(evaluator=evaluator)
         self._observers: List[Tuple[EventType, Callable[[Event], None]]] = []
         self._metadata: Dict[str, Any] = {}
         self._variables = {

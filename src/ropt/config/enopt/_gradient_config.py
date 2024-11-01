@@ -9,7 +9,12 @@ import numpy as np
 from pydantic import BaseModel, ConfigDict, PositiveInt, model_validator
 
 from ropt.config.utils import check_enum_values
-from ropt.config.validated_types import Array1D, Array1DInt, ArrayEnum  # noqa: TCH001
+from ropt.config.validated_types import (  # noqa: TCH001
+    Array1D,
+    Array1DInt,
+    ArrayEnum,
+    ItemOrTuple,
+)
 from ropt.enums import BoundaryType, PerturbationType
 
 from .constants import (
@@ -17,6 +22,7 @@ from .constants import (
     DEFAULT_PERTURBATION_BOUNDARY_TYPE,
     DEFAULT_PERTURBATION_MAGNITUDE,
     DEFAULT_PERTURBATION_TYPE,
+    DEFAULT_SEED,
 )
 
 if sys.version_info >= (3, 11):
@@ -49,7 +55,8 @@ class GradientConfig(BaseModel):
     parent [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object. The `samplers`
     field contains, for each variable, an index into the tuple of these
     configured samplers, indicating which sampler should be used to generate
-    perturbation values for that variable.
+    perturbation values for that variable. To support samplers that need random number,
+    a random number generator object is created
 
     The generated perturbation values are added to the unperturbed variables
     after multiplication with the perturbation magnitudes given by the
@@ -97,6 +104,7 @@ class GradientConfig(BaseModel):
                                   default:
             [`DEFAULT_PERTURBATION_BOUNDARY_TYPE`][ropt.config.enopt.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE]).
         samplers:                 The index of the sampler to use for each variable
+        seed:                     The seed for the random number generator passed to each sampler
         merge_realizations:       If all realizations should be merged for the final
                                   gradient calculation (default: `False`)
     """
@@ -107,6 +115,7 @@ class GradientConfig(BaseModel):
     perturbation_types: ArrayEnum = np.array(DEFAULT_PERTURBATION_TYPE)
     boundary_types: ArrayEnum = np.array(DEFAULT_PERTURBATION_BOUNDARY_TYPE)
     samplers: Optional[Array1DInt] = None
+    seed: ItemOrTuple[int] = (DEFAULT_SEED,)
     merge_realizations: bool = False
 
     model_config = ConfigDict(

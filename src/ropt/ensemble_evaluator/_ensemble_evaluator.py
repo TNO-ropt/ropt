@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Iterator, List, Optional, Tuple
 
 import numpy as np
+from numpy.random import default_rng
 
 from ropt.results import (
     BoundConstraints,
@@ -60,7 +61,6 @@ class EnsembleEvaluator:
         config: EnOptConfig,
         evaluator: Evaluator,
         result_id_iter: Iterator[int],
-        rng: Generator,
         plugin_manager: PluginManager,
     ) -> None:
         """Initialize the ensemble evaluator.
@@ -69,7 +69,6 @@ class EnsembleEvaluator:
             config:         The configuration object
             evaluator:      The callable for evaluation individual functions
             result_id_iter: An iterator that generates ID's for generated results
-            rng:            A random number generator used for stochastic gradient estimation
             plugin_manager: A plugin manager to load required plugins
         """
         self._config = config
@@ -77,6 +76,7 @@ class EnsembleEvaluator:
         self._result_id_iter = result_id_iter
         self._realization_filters = self._init_realization_filters(plugin_manager)
         self._function_transforms = self._init_function_transforms(plugin_manager)
+        rng = default_rng(config.gradient.seed)
         self._samplers = self._init_samplers(rng, plugin_manager)
         self._cache_for_gradient: Optional[FunctionResults] = None
         self._objective_auto_scales: Optional[NDArray[np.float64]] = None

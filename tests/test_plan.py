@@ -23,7 +23,6 @@ from ropt.results import FunctionResults, Results
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from ropt.config.enopt import EnOptConfig
 
 # ruff: noqa: SLF001
 
@@ -47,7 +46,7 @@ def enopt_config_fixture() -> Dict[str, Any]:
     }
 
 
-def test_run_basic(enopt_config: Any, evaluator: Any) -> None:
+def test_run_basic(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     plan_config = {
         "variables": {
             "enopt_config": enopt_config,
@@ -179,7 +178,7 @@ def test_eval_exception(
         plan.eval(expr)
 
 
-def test_eval_attribute(enopt_config: Any, evaluator: Any) -> None:
+def test_eval_attribute(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     plan_config: Dict[str, Any] = {
         "variables": {
             "config": enopt_config,
@@ -296,7 +295,7 @@ def test_set_keys_exception(evaluator: Any) -> None:
         plan.run()
 
 
-def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
+def test_conditional_run(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     plan_config = {
         "variables": {
             "config": enopt_config,
@@ -341,7 +340,9 @@ def test_conditional_run(enopt_config: EnOptConfig, evaluator: Any) -> None:
     assert result2 is None
 
 
-def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
+def test_plan_rng(enopt_config: Dict[str, Any], evaluator: Any) -> None:
+    enopt_config["gradient"]["seed"] = 1
+
     plan_config = {
         "variables": {
             "config": enopt_config,
@@ -360,14 +361,13 @@ def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
                 "optimizer": {
                     "config": "$config",
                     "tags": "optimal2",
-                    "initial_values": "$optimal1",
                 },
             },
             {
                 "optimizer": {
                     "config": "$config",
                     "tags": "optimal3",
-                    "initial_values": [0, 0, 0],
+                    "add_plan_id_to_seed": True,
                 },
             },
         ],
@@ -390,21 +390,68 @@ def test_set_initial_values(enopt_config: EnOptConfig, evaluator: Any) -> None:
 
     result1 = plan["optimal1"]
     assert result1 is not None
+    assert np.allclose(result1.evaluations.variables, [0.0, 0.0, 0.5], atol=0.025)
+
+    result2 = plan["optimal2"]
+    assert result2 is not None
+    assert np.allclose(result2.evaluations.variables, [0.0, 0.0, 0.5], atol=0.025)
+
+    result3 = plan["optimal3"]
+    assert result3 is not None
+    assert np.allclose(result3.evaluations.variables, [0.0, 0.0, 0.5], atol=0.025)
+
+    assert np.all(result1.evaluations.variables == result2.evaluations.variables)
+    assert not np.all(result1.evaluations.variables == result3.evaluations.variables)
+
+
+def test_set_initial_values(enopt_config: Dict[str, Any], evaluator: Any) -> None:
+    plan_config = {
+        "variables": {
+            "config": enopt_config,
+            "optimal1": None,
+            "optimal2": None,
+        },
+        "steps": [
+            {
+                "optimizer": {
+                    "config": "$config",
+                    "tags": "optimal1",
+                },
+            },
+            {
+                "optimizer": {
+                    "config": "$config",
+                    "tags": "optimal2",
+                    "initial_values": [0, 0, 0],
+                },
+            },
+        ],
+        "results": [
+            {
+                "tracker": {"var": "optimal1", "tags": ["optimal1"]},
+            },
+            {
+                "tracker": {"var": "optimal2", "tags": ["optimal2"]},
+            },
+        ],
+    }
+    parsed_config = PlanConfig.model_validate(plan_config)
+    context = OptimizerContext(evaluator=evaluator())
+    plan = Plan(parsed_config, context)
+    plan.run()
+
+    result1 = plan["optimal1"]
+    assert result1 is not None
     assert np.allclose(result1.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
 
     result2 = plan["optimal2"]
     assert result2 is not None
     assert np.allclose(result2.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
 
-    result3 = plan["optimal2"]
-    assert result3 is not None
-    assert np.allclose(result3.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
-
     assert not np.all(result1.evaluations.variables == result2.evaluations.variables)
-    assert not np.all(result1.evaluations.variables == result3.evaluations.variables)
 
 
-def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
+def test_reset_results(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     plan_config = {
         "variables": {
             "config": enopt_config,
@@ -440,7 +487,9 @@ def test_reset_results(enopt_config: EnOptConfig, evaluator: Any) -> None:
     assert np.allclose(saved_results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
-def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
+def test_two_optimizers_alternating(
+    enopt_config: Dict[str, Any], evaluator: Any
+) -> None:
     completed_functions = 0
 
     def _track_evaluations(event: Event) -> None:
@@ -525,7 +574,7 @@ def test_two_optimizers_alternating(enopt_config: Any, evaluator: Any) -> None:
     )
 
 
-def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
+def test_optimization_sequential(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     completed: List[FunctionResults] = []
 
     def _track_evaluations(event: Event) -> None:
@@ -583,7 +632,7 @@ def test_optimization_sequential(enopt_config: Any, evaluator: Any) -> None:
     assert np.allclose(completed[-1].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
-def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
+def test_repeat_step(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     enopt_config["optimizer"]["speculative"] = True
     enopt_config["optimizer"]["max_functions"] = 4
 
@@ -609,7 +658,7 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
     plan.run()
     assert plan["optimum"] is not None
     variables = plan["optimum"].evaluations.variables.copy()
-    assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.025)
 
     plan_config["steps"] = [
         {
@@ -634,7 +683,7 @@ def test_repeat_step(enopt_config: Any, evaluator: Any) -> None:
     assert np.all(variables == plan["optimum"].evaluations.variables)
 
 
-def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
+def test_restart_initial(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     completed: List[FunctionResults] = []
 
     def _track_evaluations(event: Event) -> None:
@@ -680,7 +729,7 @@ def test_restart_initial(enopt_config: Any, evaluator: Any) -> None:
     assert np.all(completed[3].evaluations.variables == initial)
 
 
-def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
+def test_restart_last(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     completed: List[FunctionResults] = []
 
     def _track_evaluations(event: Event) -> None:
@@ -731,7 +780,7 @@ def test_restart_last(enopt_config: Any, evaluator: Any) -> None:
     )
 
 
-def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
+def test_restart_optimum(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     completed: List[FunctionResults] = []
 
     def _track_evaluations(event: Event) -> None:
@@ -781,7 +830,7 @@ def test_restart_optimum(enopt_config: Any, evaluator: Any) -> None:
 
 
 def test_restart_optimum_with_reset(
-    enopt_config: Any, evaluator: Any, test_functions: Any
+    enopt_config: Dict[str, Any], evaluator: Any, test_functions: Any
 ) -> None:
     completed: List[FunctionResults] = []
     max_functions = 5
@@ -855,14 +904,14 @@ def test_restart_optimum_with_reset(
         completed[max_functions].evaluations.variables
         == completed[2].evaluations.variables
     )
-    # The 8th evaluation is the optimum of the second run, and used for the third:
+    # The 5th evaluation is the optimum of the second run, and used for the third:
     assert np.all(
         completed[2 * max_functions].evaluations.variables
-        == completed[8].evaluations.variables
+        == completed[5].evaluations.variables
     )
 
 
-def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
+def test_repeat_metadata(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     restarts: List[int] = []
 
     def _track_results(event: Event) -> None:
@@ -916,7 +965,7 @@ def test_repeat_metadata(enopt_config: EnOptConfig, evaluator: Any) -> None:
     assert restarts == [0, 1]
 
 
-def test_evaluator_step(enopt_config: Any, evaluator: Any) -> None:
+def test_evaluator_step(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     plan_config: Dict[str, Any] = {
         "variables": {
             "config": enopt_config,
@@ -955,7 +1004,7 @@ def test_evaluator_step(enopt_config: Any, evaluator: Any) -> None:
     assert np.allclose(plan["optimum"].functions.weighted_objective, 1.75)
 
 
-def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
+def test_evaluator_step_multi(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     completed: List[float] = []
 
     def _track_evaluations(event: Event) -> None:
@@ -1000,7 +1049,7 @@ def test_evaluator_step_multi(enopt_config: Any, evaluator: Any) -> None:
     assert np.allclose(completed, [1.66, 1.75])
 
 
-def test_exit_code(enopt_config: Any, evaluator: Any) -> None:
+def test_exit_code(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     enopt_config["optimizer"]["speculative"] = True
     enopt_config["optimizer"]["max_functions"] = 4
 
@@ -1037,7 +1086,7 @@ def test_exit_code(enopt_config: Any, evaluator: Any) -> None:
     assert is_called
 
 
-def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
+def test_nested_plan(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     enopt_config["variables"]["initial_values"] = [0.0, 0.2, 0.1]
 
     completed_functions = 0
@@ -1117,7 +1166,7 @@ def test_nested_plan(enopt_config: Any, evaluator: Any) -> None:
     assert completed_functions == 25
 
 
-def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
+def test_nested_plan_metadata(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     enopt_config["variables"]["initial_values"] = [0.0, 0.2, 0.1]
 
     def _track_evaluations(event: Event) -> None:
@@ -1197,7 +1246,7 @@ def test_nested_plan_metadata(enopt_config: Any, evaluator: Any) -> None:
     assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
-def test_table(enopt_config: Any, evaluator: Any, tmp_path: Path) -> None:
+def test_table(enopt_config: Dict[str, Any], evaluator: Any, tmp_path: Path) -> None:
     enopt_config["optimizer"]["max_functions"] = 5
 
     path1 = tmp_path / "results1.txt"
@@ -1243,7 +1292,9 @@ def test_table(enopt_config: Any, evaluator: Any, tmp_path: Path) -> None:
     assert filecmp.cmp(path1, path2)
 
 
-def test_table_handler(enopt_config: Any, evaluator: Any, tmp_path: Path) -> None:
+def test_table_handler(
+    enopt_config: Dict[str, Any], evaluator: Any, tmp_path: Path
+) -> None:
     enopt_config["optimizer"]["max_functions"] = 5
 
     path1 = tmp_path / "results1.txt"

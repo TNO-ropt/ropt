@@ -109,8 +109,8 @@ class DefaultOptimizerStep(PlanStep):
         The configuration object must be an
         [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object or a dictionary
         that can be parsed into such an object. Initial values can be provided
-        optionally; if not specified, the initial values defined by the optimizer
-        configuration will be used.
+        optionally; if not specified, the initial values defined by the
+        optimizer configuration will be used.
 
         The `exit_code_var` field can be used to specify the name of a plan
         variable where the [`exit code`][ropt.enums.OptimizerExitCode] is
@@ -118,6 +118,16 @@ class DefaultOptimizerStep(PlanStep):
 
         The `tags` field allows optional labels to be attached to each result,
         assisting result handlers in filtering relevant results.
+
+        Some gradient-based optimizers use stochastic methods to approximate
+        gradients. The optimizer's configuration includes a seed for the random
+        number generator to ensure consistent results across repeated runs
+        within the same plan, provided the seed remains fixed. If unique results
+        are desired for each optimization, the `add_plan_seed` attribute can be
+        set to `True`, which modifies the configuration seed by incorporating
+        the optimizer's unique plan ID, as recommended in the `numpy` manual.
+        This approach maintains reproducibility across nested and parallel plan
+        evaluations.
 
         The `nested_optimization_plan` is parsed as a [`NestedPlanConfig`]
         [ropt.plugins.plan._optimizer.DefaultOptimizerStep.NestedPlanConfig] to
@@ -128,6 +138,7 @@ class DefaultOptimizerStep(PlanStep):
             tags:                Tags to add to the emitted events.
             initial_values:      The initial values for the optimizer.
             exit_code_var:       Name of the variable to store the exit code.
+            add_plan_id_to_seed: If `True`, appends the plan ID to the config seed.
             nested_optimization: Optional nested optimization plan configuration.
         """
 
@@ -135,6 +146,7 @@ class DefaultOptimizerStep(PlanStep):
         tags: ItemOrSet[str] = set()
         initial_values: Optional[Union[str, Array1D]] = None
         exit_code_var: Optional[str] = None
+        add_plan_id_to_seed: bool = False
         nested_optimization: Optional[DefaultOptimizerStep.NestedPlanConfig] = None
 
         model_config = ConfigDict(
@@ -167,6 +179,12 @@ class DefaultOptimizerStep(PlanStep):
             raise TypeError(msg)
         self._enopt_config = EnOptConfig.model_validate(config)
 
+        if self._with.add_plan_id_to_seed:
+            self._enopt_config.gradient.seed = (
+                *self.plan.plan_id,
+                self._enopt_config.gradient.seed,
+            )
+
         self.plan.emit_event(
             Event(
                 event_type=EventType.START_OPTIMIZER_STEP,
@@ -175,16 +193,13 @@ class DefaultOptimizerStep(PlanStep):
             )
         )
 
-        assert self.plan.optimizer_context.rng is not None
         ensemble_evaluator = EnsembleEvaluator(
             self._enopt_config,
             self.plan.optimizer_context.evaluator,
             self.plan.optimizer_context.result_id_iter,
-            self.plan.optimizer_context.rng,
             self.plan.plugin_manager,
         )
 
-        variables = self._get_variables(self._enopt_config)
         ensemble_optimizer = EnsembleOptimizer(
             enopt_config=self._enopt_config,
             ensemble_evaluator=ensemble_evaluator,
@@ -204,6 +219,7 @@ class DefaultOptimizerStep(PlanStep):
             msg = "Nested optimization detected: parallel evaluation not supported. "
             raise RuntimeError(msg)
 
+        variables = self._get_variables(self._enopt_config)
         exit_code = ensemble_optimizer.start(variables)
 
         if self._with.exit_code_var is not None:

@@ -109,12 +109,10 @@ class DefaultEvaluatorStep(PlanStep):
                 tags=self._with.tags,
             )
         )
-        assert self.plan.optimizer_context.rng is not None
         ensemble_evaluator = EnsembleEvaluator(
             self._enopt_config,
             self.plan.optimizer_context.evaluator,
             self.plan.optimizer_context.result_id_iter,
-            self.plan.optimizer_context.rng,
             self.plan.plugin_manager,
         )
 
