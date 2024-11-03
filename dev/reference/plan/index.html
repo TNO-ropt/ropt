@@ -2732,8 +2732,9 @@ all steps in an optimization plan. This currently includes the following:</p>
 <ul>
 <li>An <a class="autorefs autorefs-internal" href="../evaluator/#ropt.evaluator.Evaluator"><code>Evaluator</code></a> callable for evaluating
   functions.</li>
-<li>An expression evaluator object.</li>
-<li>An iterator that generates unique result IDs.</li>
+<li>An expression evaluator object for processing expressions.</li>
+<li>Event callbacks that are triggered in response to specific events,
+  executed after the plan has processed them.</li>
 </ul>
 
 
@@ -2761,6 +2762,9 @@ all steps in an optimization plan. This currently includes the following:</p>
     <div class="doc doc-contents ">
 
         <p>Initialize the optimization context.</p>
+<p>Initializes shared state and resources needed across an optimization
+plan, including a function evaluator and an optional expression
+evaluator for processing plan-specific expressions.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2781,7 +2785,7 @@ all steps in an optimization plan. This currently includes the following:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The callable for running function evaluations</p>
+                <p>A callable used to evaluate functions within the plan.</p>
               </div>
             </td>
             <td>
@@ -2795,7 +2799,8 @@ all steps in an optimization plan. This currently includes the following:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional expression evaluator</p>
+                <p>An optional expression evaluator for handling
+       expressions within plan steps.</p>
               </div>
             </td>
             <td>
@@ -3248,7 +3253,7 @@ enumeration for more details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The type of the event</p>
+                <p>The type of the event.</p>
               </div>
             </td>
           </tr>
@@ -3259,7 +3264,7 @@ enumeration for more details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The current configuration object of the executing plan</p>
+                <p>The current configuration object of the executing plan.</p>
               </div>
             </td>
           </tr>
@@ -3270,7 +3275,7 @@ enumeration for more details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional results passed with the event</p>
+                <p>Optional results passed with the event.</p>
               </div>
             </td>
           </tr>
@@ -3281,7 +3286,7 @@ enumeration for more details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional exit code</p>
+                <p>An optional exit code.</p>
               </div>
             </td>
           </tr>
@@ -3292,7 +3297,7 @@ enumeration for more details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional tags added to the results</p>
+                <p>Optional tags added to the results.</p>
               </div>
             </td>
           </tr>
@@ -3303,7 +3308,7 @@ enumeration for more details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The ID of the plan that generated the event</p>
+                <p>The ID of the plan that generated the event.</p>
               </div>
             </td>
           </tr>

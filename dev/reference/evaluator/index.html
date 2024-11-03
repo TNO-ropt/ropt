@@ -1755,7 +1755,7 @@ functions.</p>
 
 
 <h4 id="ropt.ensemble_evaluator.EnsembleEvaluator.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">evaluator</span><span class="p">,</span> <span class="n">result_id_iter</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">evaluator</span><span class="p">,</span> <span class="n">plan_path</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="p">)</span></code>
 
 </h4>
 
@@ -1783,7 +1783,7 @@ functions.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The configuration object</p>
+                <p>The configuration object.</p>
               </div>
             </td>
             <td>
@@ -1797,7 +1797,7 @@ functions.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The callable for evaluation individual functions</p>
+                <p>The callable for evaluation individual functions.</p>
               </div>
             </td>
             <td>
@@ -1805,13 +1805,13 @@ functions.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>result_id_iter</code></td>
+            <td><code>plan_path</code></td>
             <td>
-                  <code><span title="typing.Iterator">Iterator</span>[int]</code>
+                  <code><span title="typing.Tuple">Tuple</span>[int, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An iterator that generates ID's for generated results</p>
+                <p>A tuple identifying the plan running this evaluator.</p>
               </div>
             </td>
             <td>
@@ -1825,7 +1825,7 @@ functions.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A plugin manager to load required plugins</p>
+                <p>A plugin manager to load required plugins.</p>
               </div>
             </td>
             <td>

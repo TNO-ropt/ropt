@@ -1785,7 +1785,7 @@ classes:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.results.Results.result_id">result_id</span></code></td>
             <td>
-                  <code>int</code>
+                  <code><span title="typing.Union">Union</span>[int, <span title="typing.Tuple">Tuple</span>[int, ...]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1886,7 +1886,7 @@ and/or batch ID.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The ensemble optimizer configuration object</p>
+                <p>The ensemble optimizer configuration object.</p>
               </div>
             </td>
             <td>
@@ -1900,7 +1900,7 @@ and/or batch ID.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The field to export</p>
+                <p>The field to export.</p>
               </div>
             </td>
             <td>
@@ -1914,7 +1914,7 @@ and/or batch ID.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Select the sub-fields to export, by default all fields</p>
+                <p>Select the sub-fields to export, by default all fields.</p>
               </div>
             </td>
             <td>
@@ -1928,7 +1928,7 @@ and/or batch ID.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Select axes to unstack, by default none</p>
+                <p>Select axes to unstack, by default none.</p>
               </div>
             </td>
             <td>
@@ -1954,7 +1954,7 @@ and/or batch ID.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the pandas module is not installed</p>
+                <p>If the pandas module is not installed.</p>
               </div>
             </td>
           </tr>
@@ -1964,7 +1964,7 @@ and/or batch ID.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the field name is incorrect</p>
+                <p>If the field name is incorrect.</p>
               </div>
             </td>
           </tr>
@@ -2049,7 +2049,7 @@ also added under the <code>metadata</code> key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The ensemble optimizer configuration object</p>
+                <p>The ensemble optimizer configuration object.</p>
               </div>
             </td>
             <td>
@@ -2063,7 +2063,7 @@ also added under the <code>metadata</code> key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The field to export</p>
+                <p>The field to export.</p>
               </div>
             </td>
             <td>
@@ -2077,7 +2077,7 @@ also added under the <code>metadata</code> key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Select the fields to export; by default, all fields</p>
+                <p>Select the fields to export; by default, all fields.</p>
               </div>
             </td>
             <td>
@@ -2091,7 +2091,7 @@ also added under the <code>metadata</code> key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If true, add the metadata as a field in the dataset attrs</p>
+                <p>If true, add the metadata as a field in the dataset attrs.</p>
               </div>
             </td>
             <td>
@@ -2356,7 +2356,7 @@ stored <code>numpy</code> array from the metadata and return them.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The name of the sub-field in the instance or class</p>
+                <p>The name of the sub-field in the instance or class.</p>
               </div>
             </td>
             <td>
@@ -2455,99 +2455,80 @@ stored <code>numpy</code> array from the metadata and return them.</p>
 </ol>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
+<p><span class="doc-section-title">Attributes:</span></p>
     <table>
       <thead>
         <tr>
           <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>evaluations</code></td>
+            <td><code><span title="ropt.results.FunctionResults.evaluations">evaluations</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.results._function_evaluations.FunctionEvaluations" href="#ropt.results.FunctionEvaluations">FunctionEvaluations</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Results of the function evaluations</p>
+                <p>Results of the function evaluations.</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>realizations</code></td>
+            <td><code><span title="ropt.results.FunctionResults.realizations">realizations</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.results._realizations.Realizations" href="#ropt.results.Realizations">Realizations</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The calculated parameters of the realizations</p>
+                <p>The calculated parameters of the realizations.</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>functions</code></td>
+            <td><code><span title="ropt.results.FunctionResults.functions">functions</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.results._functions.Functions" href="#ropt.results.Functions">Functions</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The calculated functions</p>
+                <p>The calculated functions.</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>bound_constraints</code></td>
+            <td><code><span title="ropt.results.FunctionResults.bound_constraints">bound_constraints</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.results._bound_constraints.BoundConstraints" href="#ropt.results.BoundConstraints">BoundConstraints</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Bound constraints</p>
+                <p>Bound constraints.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>linear_constraints</code></td>
+            <td><code><span title="ropt.results.FunctionResults.linear_constraints">linear_constraints</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.results._linear_constraints.LinearConstraints" href="#ropt.results.LinearConstraints">LinearConstraints</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Linear constraints</p>
+                <p>Linear constraints.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>nonlinear_constraints</code></td>
+            <td><code><span title="ropt.results.FunctionResults.nonlinear_constraints">nonlinear_constraints</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.results._nonlinear_constraints.NonlinearConstraints" href="#ropt.results.NonlinearConstraints">NonlinearConstraints</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Nonlinear constraints</p>
+                <p>Nonlinear constraints.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -2716,19 +2697,18 @@ functions. It contains the following information:</p>
 </ol>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
+<p><span class="doc-section-title">Attributes:</span></p>
     <table>
       <thead>
         <tr>
           <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>variables</code></td>
+            <td><code><span title="ropt.results.FunctionEvaluations.variables">variables</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
             </td>
@@ -2737,12 +2717,9 @@ functions. It contains the following information:</p>
                 <p>The unperturbed variable vector.</p>
               </div>
             </td>
-            <td>
-                <em>required</em>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>objectives</code></td>
+            <td><code><span title="ropt.results.FunctionEvaluations.objectives">objectives</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
             </td>
@@ -2751,12 +2728,9 @@ functions. It contains the following information:</p>
                 <p>The objective functions for each realization.</p>
               </div>
             </td>
-            <td>
-                <em>required</em>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>constraints</code></td>
+            <td><code><span title="ropt.results.FunctionEvaluations.constraints">constraints</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
@@ -2765,12 +2739,9 @@ functions. It contains the following information:</p>
                 <p>The constraint functions for each realization.</p>
               </div>
             </td>
-            <td>
-                  <code>None</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>scaled_variables</code></td>
+            <td><code><span title="ropt.results.FunctionEvaluations.scaled_variables">scaled_variables</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
@@ -2779,12 +2750,9 @@ functions. It contains the following information:</p>
                 <p>Optional variables after scaling.</p>
               </div>
             </td>
-            <td>
-                  <code>None</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>scaled_objectives</code></td>
+            <td><code><span title="ropt.results.FunctionEvaluations.scaled_objectives">scaled_objectives</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
@@ -2793,12 +2761,9 @@ functions. It contains the following information:</p>
                 <p>Optional scaled objectives.</p>
               </div>
             </td>
-            <td>
-                  <code>None</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>scaled_constraints</code></td>
+            <td><code><span title="ropt.results.FunctionEvaluations.scaled_constraints">scaled_constraints</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
@@ -2807,12 +2772,9 @@ functions. It contains the following information:</p>
                 <p>Optional scaled constraints.</p>
               </div>
             </td>
-            <td>
-                  <code>None</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>evaluation_ids</code></td>
+            <td><code><span title="ropt.results.FunctionEvaluations.evaluation_ids">evaluation_ids</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>]]</code>
             </td>
@@ -2820,9 +2782,6 @@ functions. It contains the following information:</p>
               <div class="doc-md-description">
                 <p>Optional id of each evaluated realization.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -2879,57 +2838,47 @@ for each objective and constraint a vector of weight values.</p>
 the function or constraint. The second axis index denotes the realization.</p>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
+<p><span class="doc-section-title">Attributes:</span></p>
     <table>
       <thead>
         <tr>
           <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>failed_realizations</code></td>
+            <td><code><span title="ropt.results.Realizations.failed_realizations">failed_realizations</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Failed realizations</p>
+                <p>Failed realizations.</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>objective_weights</code></td>
+            <td><code><span title="ropt.results.Realizations.objective_weights">objective_weights</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Realization weights for the objectives</p>
+                <p>Realization weights for the objectives.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>constraint_weights</code></td>
+            <td><code><span title="ropt.results.Realizations.constraint_weights">constraint_weights</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Realization weights for the constraints</p>
+                <p>Realization weights for the constraints.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -2987,61 +2936,51 @@ optimizer.</p>
 versions of the objective or constraint values are stored.</p>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
+<p><span class="doc-section-title">Attributes:</span></p>
     <table>
       <thead>
         <tr>
           <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>weighted_objective</code></td>
+            <td><code><span title="ropt.results.Functions.weighted_objective">weighted_objective</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The weighted sum of the objectives</p>
+                <p>The weighted sum of the objectives.</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>objectives</code></td>
+            <td><code><span title="ropt.results.Functions.objectives">objectives</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The value of each objective</p>
+                <p>The value of each objective.</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>constraints</code></td>
+            <td><code><span title="ropt.results.Functions.constraints">constraints</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The value of each constraint</p>
+                <p>The value of each constraint.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>scaled_objectives</code></td>
+            <td><code><span title="ropt.results.Functions.scaled_objectives">scaled_objectives</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
@@ -3050,12 +2989,9 @@ versions of the objective or constraint values are stored.</p>
                 <p>Optional scaled objectives.</p>
               </div>
             </td>
-            <td>
-                  <code>None</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>scaled_constraints</code></td>
+            <td><code><span title="ropt.results.Functions.scaled_constraints">scaled_constraints</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
@@ -3063,9 +2999,6 @@ versions of the objective or constraint values are stored.</p>
               <div class="doc-md-description">
                 <p>Optional scaled constraints.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -3122,127 +3055,102 @@ versions of the objective or constraint values are stored.</p>
 </ol>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
+<p><span class="doc-section-title">Attributes:</span></p>
     <table>
       <thead>
         <tr>
           <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>lower_values</code></td>
+            <td><code><span title="ropt.results.BoundConstraints.lower_values">lower_values</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Lower bound differences</p>
+                <p>Lower bound differences.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>lower_violations</code></td>
+            <td><code><span title="ropt.results.BoundConstraints.lower_violations">lower_violations</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Lower bound violations</p>
+                <p>Lower bound violations.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>upper_values</code></td>
+            <td><code><span title="ropt.results.BoundConstraints.upper_values">upper_values</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Upper bound differences</p>
+                <p>Upper bound differences.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>upper_violations</code></td>
+            <td><code><span title="ropt.results.BoundConstraints.upper_violations">upper_violations</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Upper bound violations</p>
+                <p>Upper bound violations.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>scaled_lower_values</code></td>
+            <td><code><span title="ropt.results.BoundConstraints.scaled_lower_values">scaled_lower_values</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional scaled lower bound differences</p>
+                <p>Optional scaled lower bound differences.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>scaled_lower_violations</code></td>
+            <td><code><span title="ropt.results.BoundConstraints.scaled_lower_violations">scaled_lower_violations</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional scaled lower bound violations</p>
+                <p>Optional scaled lower bound violations.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>scaled_upper_values</code></td>
+            <td><code><span title="ropt.results.BoundConstraints.scaled_upper_values">scaled_upper_values</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional scaled upper bound differences</p>
+                <p>Optional scaled upper bound differences.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>scaled_upper_violations</code></td>
+            <td><code><span title="ropt.results.BoundConstraints.scaled_upper_violations">scaled_upper_violations</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional scaled upper bound violations</p>
+                <p>Optional scaled upper bound violations.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -3299,43 +3207,36 @@ versions of the objective or constraint values are stored.</p>
 </ol>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
+<p><span class="doc-section-title">Attributes:</span></p>
     <table>
       <thead>
         <tr>
           <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>values</code></td>
+            <td><code><span title="ropt.results.LinearConstraints.values">values</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Linear constraint values</p>
+                <p>Linear constraint values.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>violations</code></td>
+            <td><code><span title="ropt.results.LinearConstraints.violations">violations</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Violations of the linear constraints</p>
+                <p>Violations of the linear constraints.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -3393,71 +3294,58 @@ versions of the objective or constraint values are stored.</p>
 </ol>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
+<p><span class="doc-section-title">Attributes:</span></p>
     <table>
       <thead>
         <tr>
           <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>values</code></td>
+            <td><code><span title="ropt.results.NonlinearConstraints.values">values</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Non-linear constraint values</p>
+                <p>Non-linear constraint values.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>violations</code></td>
+            <td><code><span title="ropt.results.NonlinearConstraints.violations">violations</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Violations of the nonlinear constraints</p>
+                <p>Violations of the nonlinear constraints.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>scaled_values</code></td>
+            <td><code><span title="ropt.results.NonlinearConstraints.scaled_values">scaled_values</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional scaled non-linear constraint values</p>
+                <p>Optional scaled non-linear constraint values.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>scaled_violations</code></td>
+            <td><code><span title="ropt.results.NonlinearConstraints.scaled_violations">scaled_violations</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional scaled violations of the nonlinear constraints</p>
+                <p>Optional scaled violations of the nonlinear constraints.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -3514,57 +3402,47 @@ versions of the objective or constraint values are stored.</p>
 </ol>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
+<p><span class="doc-section-title">Attributes:</span></p>
     <table>
       <thead>
         <tr>
           <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>evaluations</code></td>
+            <td><code><span title="ropt.results.GradientResults.evaluations">evaluations</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.results._gradient_evaluations.GradientEvaluations" href="#ropt.results.GradientEvaluations">GradientEvaluations</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Results of the function evaluations</p>
+                <p>Results of the function evaluations.</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>realizations</code></td>
+            <td><code><span title="ropt.results.GradientResults.realizations">realizations</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.results._realizations.Realizations" href="#ropt.results.Realizations">Realizations</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The calculated parameters of the realizations</p>
+                <p>The calculated parameters of the realizations.</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>gradients</code></td>
+            <td><code><span title="ropt.results.GradientResults.gradients">gradients</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.results._gradients.Gradients" href="#ropt.results.Gradients">Gradients</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The calculated gradients</p>
+                <p>The calculated gradients.</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
       </tbody>
@@ -3739,19 +3617,18 @@ constraints gradients. It contains the following information:</p>
 </ol>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
+<p><span class="doc-section-title">Attributes:</span></p>
     <table>
       <thead>
         <tr>
           <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>variables</code></td>
+            <td><code><span title="ropt.results.GradientEvaluations.variables">variables</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
             </td>
@@ -3760,12 +3637,9 @@ constraints gradients. It contains the following information:</p>
                 <p>The unperturbed variable vector.</p>
               </div>
             </td>
-            <td>
-                <em>required</em>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>perturbed_variables</code></td>
+            <td><code><span title="ropt.results.GradientEvaluations.perturbed_variables">perturbed_variables</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
             </td>
@@ -3774,12 +3648,9 @@ constraints gradients. It contains the following information:</p>
                 <p>The variables for each realization and perturbation.</p>
               </div>
             </td>
-            <td>
-                <em>required</em>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>perturbed_objectives</code></td>
+            <td><code><span title="ropt.results.GradientEvaluations.perturbed_objectives">perturbed_objectives</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
             </td>
@@ -3789,12 +3660,9 @@ constraints gradients. It contains the following information:</p>
                           perturbation.</p>
               </div>
             </td>
-            <td>
-                <em>required</em>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>perturbed_constraints</code></td>
+            <td><code><span title="ropt.results.GradientEvaluations.perturbed_constraints">perturbed_constraints</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
@@ -3804,12 +3672,9 @@ constraints gradients. It contains the following information:</p>
                           perturbation.</p>
               </div>
             </td>
-            <td>
-                  <code>None</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>scaled_variables</code></td>
+            <td><code><span title="ropt.results.GradientEvaluations.scaled_variables">scaled_variables</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
@@ -3818,12 +3683,9 @@ constraints gradients. It contains the following information:</p>
                 <p>Optional variables after scaling back.</p>
               </div>
             </td>
-            <td>
-                  <code>None</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>scaled_perturbed_variables</code></td>
+            <td><code><span title="ropt.results.GradientEvaluations.scaled_perturbed_variables">scaled_perturbed_variables</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
@@ -3832,12 +3694,9 @@ constraints gradients. It contains the following information:</p>
                 <p>Optional variables after scaling back.</p>
               </div>
             </td>
-            <td>
-                  <code>None</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>scaled_perturbed_objectives</code></td>
+            <td><code><span title="ropt.results.GradientEvaluations.scaled_perturbed_objectives">scaled_perturbed_objectives</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
@@ -3846,12 +3705,9 @@ constraints gradients. It contains the following information:</p>
                 <p>Optional scaled objectives.</p>
               </div>
             </td>
-            <td>
-                  <code>None</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>scaled_perturbed_constraints</code></td>
+            <td><code><span title="ropt.results.GradientEvaluations.scaled_perturbed_constraints">scaled_perturbed_constraints</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
@@ -3860,12 +3716,9 @@ constraints gradients. It contains the following information:</p>
                 <p>Optional scaled constraints.</p>
               </div>
             </td>
-            <td>
-                  <code>None</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>perturbed_evaluation_ids</code></td>
+            <td><code><span title="ropt.results.GradientEvaluations.perturbed_evaluation_ids">perturbed_evaluation_ids</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>]]</code>
             </td>
@@ -3873,9 +3726,6 @@ constraints gradients. It contains the following information:</p>
               <div class="doc-md-description">
                 <p>Optional id of each evaluated realization.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -3933,61 +3783,51 @@ handled by the optimizer.</p>
 versions of the objective or constraint gradients are stored.</p>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
+<p><span class="doc-section-title">Attributes:</span></p>
     <table>
       <thead>
         <tr>
           <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code>weighted_objective</code></td>
+            <td><code><span title="ropt.results.Gradients.weighted_objective">weighted_objective</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The weighted sum of the objective gradients</p>
+                <p>The weighted sum of the objective gradients.</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>objectives</code></td>
+            <td><code><span title="ropt.results.Gradients.objectives">objectives</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The value of each objective gradient</p>
+                <p>The value of each objective gradient.</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>constraints</code></td>
+            <td><code><span title="ropt.results.Gradients.constraints">constraints</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The value of each constraint gradient</p>
+                <p>The value of each constraint gradient.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>scaled_objectives</code></td>
+            <td><code><span title="ropt.results.Gradients.scaled_objectives">scaled_objectives</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
@@ -3996,12 +3836,9 @@ versions of the objective or constraint gradients are stored.</p>
                 <p>Optional scaled objective gradients.</p>
               </div>
             </td>
-            <td>
-                  <code>None</code>
-            </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>scaled_constraints</code></td>
+            <td><code><span title="ropt.results.Gradients.scaled_constraints">scaled_constraints</span></code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
             </td>
@@ -4009,9 +3846,6 @@ versions of the objective or constraint gradients are stored.</p>
               <div class="doc-md-description">
                 <p>Optional scaled constraint gradients.</p>
               </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -4077,7 +3911,7 @@ multiplied by -1, which would correspond to a maximization.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The result to convert</p>
+                <p>The result to convert.</p>
               </div>
             </td>
             <td>
