@@ -12,6 +12,7 @@ from typing import (
     Optional,
     Tuple,
     Type,
+    Union,
 )
 
 import xarray
@@ -30,7 +31,7 @@ if TYPE_CHECKING:
 def _to_dataset(  # noqa: PLR0913
     config: EnOptConfig,
     result_field: ResultField,
-    result_id: int,
+    result_id: Union[int, Tuple[int, ...]],
     batch_id: Optional[int],
     metadata: Dict[str, Any],
     select: Optional[Iterable[str]],

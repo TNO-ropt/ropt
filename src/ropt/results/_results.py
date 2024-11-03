@@ -4,7 +4,17 @@ from abc import ABC
 from dataclasses import dataclass
 from importlib.util import find_spec
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Final, Iterable, Optional, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Dict,
+    Final,
+    Iterable,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+)
 
 if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
@@ -70,7 +80,7 @@ class Results(ABC):
         metadata:  The metadata.
     """
 
-    result_id: int
+    result_id: Union[int, Tuple[int, ...]]
     batch_id: Optional[int]
     metadata: Dict[str, Any]
 

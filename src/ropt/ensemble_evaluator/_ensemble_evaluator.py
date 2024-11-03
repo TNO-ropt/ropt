@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterator, List, Optional, Tuple
+from typing import TYPE_CHECKING, List, Optional, Tuple
 
 import numpy as np
 from numpy.random import default_rng
@@ -60,7 +60,7 @@ class EnsembleEvaluator:
         self,
         config: EnOptConfig,
         evaluator: Evaluator,
-        result_id_iter: Iterator[int],
+        plan_path: Tuple[int, ...],
         plugin_manager: PluginManager,
     ) -> None:
         """Initialize the ensemble evaluator.
@@ -68,12 +68,13 @@ class EnsembleEvaluator:
         Args:
             config:         The configuration object
             evaluator:      The callable for evaluation individual functions
-            result_id_iter: An iterator that generates ID's for generated results
+            plan_path:      A tuple identifying the plan running this evaluator
             plugin_manager: A plugin manager to load required plugins
         """
         self._config = config
         self._evaluator = evaluator
-        self._result_id_iter = result_id_iter
+        self._plan_path = plan_path
+        self._result_id = -1
         self._realization_filters = self._init_realization_filters(plugin_manager)
         self._function_transforms = self._init_function_transforms(plugin_manager)
         rng = default_rng(config.gradient.seed)
@@ -227,8 +228,12 @@ class EnsembleEvaluator:
             evaluation_ids=f_eval_results.evaluation_ids,
         )
 
+        self._result_id += 1
+        result_id = (
+            (*self._plan_path, self._result_id) if self._plan_path else self._result_id
+        )
         return FunctionResults(
-            result_id=next(self._result_id_iter),
+            result_id=result_id,
             batch_id=f_eval_results.batch_id,
             metadata={},
             evaluations=evaluations,
@@ -304,9 +309,13 @@ class EnsembleEvaluator:
             gradients = None
 
         assert g_eval_results.perturbed_objectives is not None
+        self._result_id += 1
+        result_id = (
+            (*self._plan_path, self._result_id) if self._plan_path else self._result_id
+        )
         return (
             GradientResults(
-                result_id=next(self._result_id_iter),
+                result_id=result_id,
                 batch_id=g_eval_results.batch_id,
                 metadata={},
                 evaluations=GradientEvaluations.create(
@@ -384,8 +393,12 @@ class EnsembleEvaluator:
         else:
             functions = None
 
+        self._result_id += 1
+        result_id = (
+            (*self._plan_path, self._result_id) if self._plan_path else self._result_id
+        )
         function_results = FunctionResults(
-            result_id=next(self._result_id_iter),
+            result_id=result_id,
             batch_id=f_eval_results.batch_id,
             metadata={},
             evaluations=evaluations,
@@ -423,8 +436,12 @@ class EnsembleEvaluator:
         else:
             gradients = None
 
+        self._result_id += 1
+        result_id = (
+            (*self._plan_path, self._result_id) if self._plan_path else self._result_id
+        )
         gradient_results = GradientResults(
-            result_id=next(self._result_id_iter),
+            result_id=result_id,
             batch_id=g_eval_results.batch_id,
             metadata={},
             evaluations=GradientEvaluations.create(

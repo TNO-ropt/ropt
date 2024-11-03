@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import fields
-from typing import TYPE_CHECKING, Any, Iterable, Optional, Tuple, cast
+from typing import TYPE_CHECKING, Any, Iterable, Optional, Tuple, Union, cast
 
 import pandas as pd
 
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 def _to_dataframe(  # noqa: PLR0913
     config: EnOptConfig,
     result_field: ResultField,
-    result_id: int,
+    result_id: Union[int, Tuple[int, ...]],
     batch_id: Optional[int],
     select: Optional[Iterable[str]],
     unstack: Optional[Iterable[ResultAxisName]],
@@ -44,7 +44,7 @@ def _to_dataframe(  # noqa: PLR0913
 def _to_series(
     config: EnOptConfig,
     result_field: ResultField,
-    result_id: int,
+    result_id: Union[int, Tuple[int, ...]],
     batch_id: Optional[int],
     field: str,
 ) -> Optional[pd.Series[Any]]:

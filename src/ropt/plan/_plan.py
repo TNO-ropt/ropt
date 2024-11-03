@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import sys
-from itertools import chain, count
+from itertools import chain
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -39,8 +39,9 @@ class OptimizerContext:
 
     - An [`Evaluator`][ropt.evaluator.Evaluator] callable for evaluating
       functions.
-    - An expression evaluator object.
-    - An iterator that generates unique result IDs.
+    - An expression evaluator object for processing expressions.
+    - Event callbacks that are triggered in response to specific events,
+      executed after the plan has processed them.
     """
 
     def __init__(
@@ -56,7 +57,6 @@ class OptimizerContext:
         """
         self.evaluator = evaluator
         self.expr = ExpressionEvaluator() if expr is None else expr
-        self.result_id_iter = count()
         self._subscribers: Dict[EventType, List[Callable[[Event], None]]] = {
             event: [] for event in EventType
         }

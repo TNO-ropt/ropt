@@ -41,6 +41,7 @@ def test_max_functions_exceeded(enopt_config: Any, evaluator: Any) -> None:
     def track_results(event: Event) -> None:
         nonlocal last_evaluation
         assert event.results
+        assert isinstance(event.results[0].result_id, int)
         last_evaluation = event.results[0].result_id
 
     max_functions = 2
@@ -59,6 +60,7 @@ def test_max_functions_not_exceeded(enopt_config: Any, evaluator: Any) -> None:
     def track_results(event: Event) -> None:
         nonlocal last_evaluation
         assert event.results
+        assert isinstance(event.results[0].result_id, int)
         last_evaluation = event.results[0].result_id
 
     max_functions = 100
@@ -106,6 +108,7 @@ def test_user_abort(enopt_config: Any, evaluator: Any) -> None:
     def _observer(event: Event) -> None:
         nonlocal last_evaluation
         assert event.results
+        assert isinstance(event.results[0].result_id, int)
         last_evaluation = event.results[0].result_id
         if event.results[0].result_id == 1:
             optimizer.abort_optimization()
