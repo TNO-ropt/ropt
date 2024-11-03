@@ -88,25 +88,25 @@ class GradientConfig(BaseModel):
 
     Attributes:
         number_of_perturbations:  The number of perturbations (default:
-            [`DEFAULT_NUMBER_OF_PERTURBATIONS`][ropt.config.enopt.constants.DEFAULT_NUMBER_OF_PERTURBATIONS])
+            [`DEFAULT_NUMBER_OF_PERTURBATIONS`][ropt.config.enopt.constants.DEFAULT_NUMBER_OF_PERTURBATIONS]).
         perturbation_min_success: The minimum number of successful function
                                   evaluations for perturbed variables (default:
-                                  equal to the number of perturbations)
+                                  equal to the number of perturbations).
         perturbation_magnitudes:  The magnitudes of the perturbations for each variable
                                   (default:
-            [`DEFAULT_PERTURBATION_MAGNITUDE`][ropt.config.enopt.constants.DEFAULT_PERTURBATION_MAGNITUDE])
+            [`DEFAULT_PERTURBATION_MAGNITUDE`][ropt.config.enopt.constants.DEFAULT_PERTURBATION_MAGNITUDE]).
         perturbation_types:       The type of perturbation for each variable
                                   ([`PerturbationType`][ropt.enums.PerturbationType],
                                   default:
-            [`DEFAULT_PERTURBATION_TYPE`][ropt.config.enopt.constants.DEFAULT_PERTURBATION_TYPE])
+            [`DEFAULT_PERTURBATION_TYPE`][ropt.config.enopt.constants.DEFAULT_PERTURBATION_TYPE]).
         boundary_types:           How perturbations that violate boundary conditions
                                   are treated (see [`BoundaryType`][ropt.enums.BoundaryType]),
                                   default:
             [`DEFAULT_PERTURBATION_BOUNDARY_TYPE`][ropt.config.enopt.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE]).
-        samplers:                 The index of the sampler to use for each variable
-        seed:                     The seed for the random number generator passed to each sampler
+        samplers:                 The index of the sampler to use for each variable.
+        seed:                     The seed for the random number generator passed to each sampler.
         merge_realizations:       If all realizations should be merged for the final
-                                  gradient calculation (default: `False`)
+                                  gradient calculation (default: `False`).
     """
 
     number_of_perturbations: PositiveInt = DEFAULT_NUMBER_OF_PERTURBATIONS

@@ -64,7 +64,7 @@ def report(event: Event) -> None:
     """Report results of an evaluation.
 
     Args:
-        event: event data
+        event: event data.
     """
     assert event.results is not None
     for item in event.results:

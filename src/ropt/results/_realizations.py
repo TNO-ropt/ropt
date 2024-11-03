@@ -27,10 +27,10 @@ class Realizations(ResultField):
     All fields are two-dimensional matrices, where the first axis index denotes
     the function or constraint. The second axis index denotes the realization.
 
-    Args:
-        failed_realizations: Failed realizations
-        objective_weights:   Realization weights for the objectives
-        constraint_weights:  Realization weights for the constraints
+    Attributes:
+        failed_realizations: Failed realizations.
+        objective_weights:   Realization weights for the objectives.
+        constraint_weights:  Realization weights for the constraints.
     """
 
     failed_realizations: NDArray[np.bool_] = field(

@@ -33,9 +33,9 @@ class LinearConstraints(ResultField):
     2. Violations of constraints, defined as the absolute value of the
        difference if the constraint is violated, or else zero.
 
-    Args:
-        values:     Linear constraint values
-        violations: Violations of the linear constraints
+    Attributes:
+        values:     Linear constraint values.
+        violations: Violations of the linear constraints.
     """
 
     values: Optional[NDArray[np.float64]] = field(
@@ -70,8 +70,8 @@ class LinearConstraints(ResultField):
         evaluations and functions.
 
         Args:
-            config:      The ensemble optimizer configuration object
-            evaluations: An instance of the Evaluations class
+            config:      The ensemble optimizer configuration object.
+            evaluations: An instance of the Evaluations class.
 
         Returns:
             A newly created LinearConstraints object.

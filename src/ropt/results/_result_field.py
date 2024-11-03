@@ -23,7 +23,7 @@ class ResultField:
         stored `numpy` array from the metadata and return them.
 
         Args:
-            name: The name of the sub-field in the instance or class
+            name: The name of the sub-field in the instance or class.
 
         Raises:
             ValueError: Raised if an unknown field name is passed.

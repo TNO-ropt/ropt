@@ -34,7 +34,7 @@ class FunctionEvaluations(ResultField):
     5. Optional evaluation IDs that may have been passed from the evaluator,
        identifying each calculated realization.
 
-    Args:
+    Attributes:
         variables:          The unperturbed variable vector.
         objectives:         The objective functions for each realization.
         constraints:        The constraint functions for each realization.
@@ -124,13 +124,13 @@ class FunctionEvaluations(ResultField):
         """Create a FunctionEvaluations object with the given information.
 
         Args:
-            config:                 Configuration object
-            variables:              The unperturbed variable vector
-            objectives:             The objective functions for each realization
-            constraints:            The constraint functions for each realization
-            objective_auto_scales:  Objective auto-scaling information
-            constraint_auto_scales: Constraint auto-scaling information
-            evaluation_ids:         Optional IDs of the objective calculations
+            config:                 Configuration object.
+            variables:              The unperturbed variable vector.
+            objectives:             The objective functions for each realization.
+            constraints:            The constraint functions for each realization.
+            objective_auto_scales:  Objective auto-scaling information.
+            constraint_auto_scales: Constraint auto-scaling information.
+            evaluation_ids:         Optional IDs of the objective calculations.
 
         Returns:
             A new FunctionEvaluations object.

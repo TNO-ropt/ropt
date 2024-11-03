@@ -44,10 +44,10 @@ def rosenbrock(
     `None`, the latter because no constraints are calculated.
 
     Args:
-        variables: The variables to evaluate
-        context:   Evaluator context
-        a:         The 'a' parameters
-        b:         The 'b' parameters
+        variables: The variables to evaluate.
+        context:   Evaluator context.
+        a:         The 'a' parameters.
+        b:         The 'b' parameters.
 
     Returns:
         The calculated objective, and `None`
@@ -64,7 +64,7 @@ def report(event: Event) -> None:
     """Report results of an evaluation.
 
     Args:
-        event: event data
+        event: event data.
     """
     assert event.results is not None
     for item in event.results:
@@ -78,7 +78,7 @@ def run_optimization(config: Dict[str, Any]) -> FunctionResults:
     """Run the optimization.
 
     Args:
-        config: The configuration of the optimizer
+        config: The configuration of the optimizer.
 
     Returns:
         The optimal results.

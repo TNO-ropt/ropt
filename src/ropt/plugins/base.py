@@ -24,8 +24,9 @@ class Plugin(ABC):
         this argument can be ignored.
 
         Args:
-            method:   The method name
-            explicit: Whether the plugin was requested explicitly
+            method:   The method name.
+            explicit: Whether the plugin was requested explicitly.
+
         Returns:
             True if the method is supported.
         """

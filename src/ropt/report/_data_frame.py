@@ -63,8 +63,8 @@ class ResultsDataFrame:
         gradient results (`gradients`).
 
         Args:
-            fields:     The fields of the results to store
-            table_type: The type of the table
+            fields:     The fields of the results to store.
+            table_type: The type of the table.
         """
         if not _HAVE_PANDAS:
             msg = "ResultsDataFrame requires the `pandas` modules"
@@ -81,8 +81,8 @@ class ResultsDataFrame:
         events that produce results.
 
         Args:
-            config:  The configuration of the optimizer generating the results
-            results: The results to add
+            config:  The configuration of the optimizer generating the results.
+            results: The results to add.
 
         Returns:
             True if a result was added, else False

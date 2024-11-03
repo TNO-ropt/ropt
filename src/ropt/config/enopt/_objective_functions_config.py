@@ -74,12 +74,12 @@ class ObjectiveFunctionsConfig(BaseModel):
         will still be calculated in the same way for practical purposes.
 
     Attributes:
-        names:               Optional names of the objective functions
-        weights:             Objective functions weights (default: 1.0)
-        scales:              The scaling factors (default: 1.0)
-        auto_scale:          Enable/disable auto-scaling (default: `False`)
-        realization_filters: Optional realization filter indices
-        function_transforms: Optional function transform indices
+        names:               Optional names of the objective functions.
+        weights:             Objective functions weights (default: 1.0).
+        scales:              The scaling factors (default: 1.0).
+        auto_scale:          Enable/disable auto-scaling (default: `False`).
+        realization_filters: Optional realization filter indices.
+        function_transforms: Optional function transform indices.
     """
 
     names: Optional[UniqueNames] = None

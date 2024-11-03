@@ -8,8 +8,8 @@ def update_dict(mapping: Dict[str, Any], values: Dict[str, Any]) -> Dict[str, An
     """Recursively update a dictionary.
 
     Args:
-        mapping: The dictionary to update
-        values:  The values to be updated or added
+        mapping: The dictionary to update.
+        values:  The values to be updated or added.
 
     Returns:
         The updated dictionary.

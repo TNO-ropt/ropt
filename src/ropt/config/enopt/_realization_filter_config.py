@@ -30,8 +30,8 @@ class RealizationFilterConfig(BaseModel):
     method.
 
     Attributes:
-        method:  The realization filter method
-        options: Options to be passed to the filter
+        method:  The realization filter method.
+        options: Options to be passed to the filter.
     """
 
     method: str

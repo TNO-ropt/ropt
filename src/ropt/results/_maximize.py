@@ -19,7 +19,7 @@ def convert_to_maximize(results: Results) -> Results:
     multiplied by -1, which would correspond to a maximization.
 
     Args:
-        results: The result to convert
+        results: The result to convert.
 
     Returns:
         A copy of the result, modified to reflect maximization.

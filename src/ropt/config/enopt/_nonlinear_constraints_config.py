@@ -80,14 +80,14 @@ class NonlinearConstraintsConfig(BaseModel):
         will still be calculated in the same way for practical purposes.
 
     Attributes:
-        names:               The names of the constraint functions (optional)
-        rhs_values:          The right-hand-side values
-        scales:              The scaling factors (default: 1.0)
-        auto_scale:          Enable/disable auto-scaling (default: `False`)
-        types:               The type of each non-linear constraint
-                             ([`ConstraintType`][ropt.enums.ConstraintType])
-        realization_filters: Optional realization filter indices
-        function_transforms: Optional function transform indices
+        names:               The names of the constraint functions (optional).
+        rhs_values:          The right-hand-side values.
+        scales:              The scaling factors (default: 1.0).
+        auto_scale:          Enable/disable auto-scaling (default: `False`).
+        types:               The type of each non-linear constraint.
+                             ([`ConstraintType`][ropt.enums.ConstraintType]).
+        realization_filters: Optional realization filter indices.
+        function_transforms: Optional function transform indices.
     """
 
     names: Optional[UniqueNames] = None

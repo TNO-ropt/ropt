@@ -61,8 +61,8 @@ class DefaultMetadataHandler(ResultHandler):
         """Initialize a default metadata results handler.
 
         Args:
-            config: The configuration of the step
-            plan:   The plan that runs this step
+            config: The configuration of the step.
+            plan:   The plan that runs this step.
         """
         super().__init__(config, plan)
 
@@ -72,7 +72,7 @@ class DefaultMetadataHandler(ResultHandler):
         """Handle an event.
 
         Args:
-            event: The event to handle
+            event: The event to handle.
 
         Returns:
             The (possibly modified) event.

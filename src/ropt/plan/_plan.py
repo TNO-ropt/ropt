@@ -51,9 +51,14 @@ class OptimizerContext:
     ) -> None:
         """Initialize the optimization context.
 
+        Initializes shared state and resources needed across an optimization
+        plan, including a function evaluator and an optional expression
+        evaluator for processing plan-specific expressions.
+
         Args:
-            evaluator: The callable for running function evaluations
-            expr:      Optional expression evaluator
+            evaluator: A callable used to evaluate functions within the plan.
+            expr:      An optional expression evaluator for handling
+                       expressions within plan steps.
         """
         self.evaluator = evaluator
         self.expr = ExpressionEvaluator() if expr is None else expr
@@ -219,14 +224,15 @@ class Plan:
 
     @property
     def plan_path(self) -> Tuple[int, ...]:
-        """Return the list of plan IDs.
+        """Return the path of the plan.
 
-        Plans can spawn other plans sequentially, in parallel, or as nested
-        workflows. The plan IDs uniquely represent the order and nesting of
-        these plans, using a list of sequence numbers.
+        Each plan maintains a unique path that reflects its creation order and
+        any nesting structure. When a plan spawns additional plans, the
+        resulting hierarchy is captured in the `plan_path` attribute as a
+        sequence of numbers.
 
         Returns:
-            The list of plan IDs for this plan.
+            tuple: A tuple representing the plan path for this plan.
         """
         return self._plan_path
 

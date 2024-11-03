@@ -59,17 +59,17 @@ class OptimizerConfig(BaseModel):
       and how it is interpreted.
 
     Attributes:
-        method:            Name of the optimization method used
-        max_iterations:    Optional maximum number of iterations
-        max_functions:     Optional maximum number of function evaluations
-        tolerance:         Optional tolerance for convergence
+        method:            Name of the optimization method used.
+        max_iterations:    Optional maximum number of iterations.
+        max_functions:     Optional maximum number of function evaluations.
+        tolerance:         Optional tolerance for convergence.
         speculative:       Force gradient evaluations; disabled if
-                           split_evaluations is True (default `False`)
+                           split_evaluations is True (default `False`).
         split_evaluations: Evaluate function and gradient separately
-                           (default: `False`)
-        parallel:          Allow for parallelized evaluation (default: `False`)
-        output_dir:        Optional output directory for use by the optimizer
-        options:           Optional generic options for use by the optimizer
+                           (default: `False`).
+        parallel:          Allow for parallelized evaluation (default: `False`).
+        output_dir:        Optional output directory for use by the optimizer.
+        options:           Optional generic options for use by the optimizer.
     """
 
     method: str = "scipy/default"

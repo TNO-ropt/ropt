@@ -24,12 +24,12 @@ class Event:
     enumeration for more details.
 
     Attributes:
-        event_type: The type of the event
-        config:     The current configuration object of the executing plan
-        results:    Optional results passed with the event
-        exit_code:  An optional exit code
-        tags:       Optional tags added to the results
-        plan_path:    The ID of the plan that generated the event
+        event_type: The type of the event.
+        config:     The current configuration object of the executing plan.
+        results:    Optional results passed with the event.
+        exit_code:  An optional exit code.
+        tags:       Optional tags added to the results.
+        plan_path:    The ID of the plan that generated the event.
     """
 
     event_type: EventType

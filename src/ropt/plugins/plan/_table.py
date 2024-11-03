@@ -82,8 +82,8 @@ class DefaultTableHandler(ResultHandler):
         """Initialize a default tracker results handler object.
 
         Args:
-            config: The configuration of the step
-            plan:   The plan that runs this step
+            config: The configuration of the step.
+            plan:   The plan that runs this step.
         """
         super().__init__(config, plan)
         self._with = self.DefaultTableHandlerWith.model_validate(config.with_)
@@ -98,7 +98,7 @@ class DefaultTableHandler(ResultHandler):
         """Handle an event.
 
         Args:
-            event: The event to handle
+            event: The event to handle.
 
         Returns:
             The (possibly modified) event.

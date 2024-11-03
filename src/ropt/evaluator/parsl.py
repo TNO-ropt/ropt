@@ -57,9 +57,9 @@ class Task(ConcurrentTask):
     the `monitor` method of the `ParslEvaluator`class.
 
     Attributes:
-        future:    The future of the task
-        state:     The last sampled state
-        exception: Any exception that may have occurred,  None otherwise
+        future:    The future of the task.
+        state:     The last sampled state.
+        exception: Any exception that may have occurred,  None otherwise.
     """
 
     future: Optional[AppFuture]
@@ -84,11 +84,11 @@ class ParslEvaluator(ConcurrentEvaluator):
         """Create a parsl evaluator object.
 
         Args:
-            function:     Function to evaluate
+            function:     Function to evaluate.
             enable_cache: If `True` enable function value caching.
-            polling:      Time in seconds between checking job status
-            max_submit:   Maximum number of variables to submit simultaneously
-            max_threads:  Maximum number of threads for local execution. Defaults to 4
+            polling:      Time in seconds between checking job status.
+            max_submit:   Maximum number of variables to submit simultaneously.
+            max_threads:  Maximum number of threads for local execution. Defaults to 4.
         """
         super().__init__(
             enable_cache=enable_cache, polling=polling, max_submit=max_submit
@@ -139,8 +139,8 @@ class ParslEvaluator(ConcurrentEvaluator):
 
         Args:
             provider:       Parsl execution provider to use.
-            htex_kwargs:    Keyword arguments forwarded to the htex executor
-            retries:        Number of retries upon failure of a task. Defaults to 0
+            htex_kwargs:    Keyword arguments forwarded to the htex executor.
+            retries:        Number of retries upon failure of a task. Defaults to 0.
             worker_restart: Restart the workers every `worker_restart` batch.
 
         Returns:
@@ -164,7 +164,7 @@ class ParslEvaluator(ConcurrentEvaluator):
         """Set the monitor callback.
 
         Args:
-            monitor: Monitor function
+            monitor: Monitor function.
 
         Returns:
             The evaluator object.

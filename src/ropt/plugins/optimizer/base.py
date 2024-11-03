@@ -58,9 +58,9 @@ class OptimizerCallback(Protocol):
         only a single evaluation, hence there is also only a single result.
 
         Args:
-            variables:        The variable vector or matrix to evaluate
-            return_functions: If `True`, evaluate and return functions
-            return_gradients: If `True`, evaluate and return gradients
+            variables:        The variable vector or matrix to evaluate.
+            return_functions: If `True`, evaluate and return functions.
+            return_gradients: If `True`, evaluate and return gradients.
 
         Returns:
             A tuple with function and gradient values.
@@ -92,8 +92,8 @@ class Optimizer(ABC):
         forwarded to the optimizer.
 
         Args:
-            config:             The optimizer configuration to used
-            optimizer_callback: The optimizer callback
+            config:             The optimizer configuration to used.
+            optimizer_callback: The optimizer callback.
         """
 
     @abstractmethod
@@ -157,6 +157,6 @@ class OptimizerPlugin(Plugin):
         implemented in the plugin.
 
         Args:
-            config:             The optimizer configuration to used
-            optimizer_callback: The optimizer callback
+            config:             The optimizer configuration to used.
+            optimizer_callback: The optimizer callback.
         """

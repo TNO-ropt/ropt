@@ -84,8 +84,8 @@ class DefaultSetStep(PlanStep):
         """Initialize a set step.
 
         Args:
-            config: The configuration of the step
-            plan:   The plan that runs this step
+            config: The configuration of the step.
+            plan:   The plan that runs this step.
         """
         super().__init__(config, plan)
         expr = self.DefaultSetStepWith.model_validate(config.with_).root

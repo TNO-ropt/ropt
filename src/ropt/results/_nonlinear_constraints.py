@@ -35,11 +35,11 @@ class NonlinearConstraints(ResultField):
        difference if the constraint is violated, or else zero.
     3. Scaled versions for these values.
 
-    Args:
-        values:            Non-linear constraint values
-        violations:        Violations of the nonlinear constraints
-        scaled_values:     Optional scaled non-linear constraint values
-        scaled_violations: Optional scaled violations of the nonlinear constraints
+    Attributes:
+        values:            Non-linear constraint values.
+        violations:        Violations of the nonlinear constraints.
+        scaled_values:     Optional scaled non-linear constraint values.
+        scaled_violations: Optional scaled violations of the nonlinear constraints.
     """
 
     values: Optional[NDArray[np.float64]] = field(
@@ -89,9 +89,10 @@ class NonlinearConstraints(ResultField):
         evaluations and functions.
 
         Args:
-            config:                 The ensemble optimizer configuration object
-            functions:              An instance of the Function class
-            constraint_auto_scales: Optional constraint scales
+            config:                 The ensemble optimizer configuration object.
+            functions:              An instance of the Function class.
+            constraint_auto_scales: Optional constraint scales.
+
         Returns:
             A newly created NonlinearConstraints object.
         """

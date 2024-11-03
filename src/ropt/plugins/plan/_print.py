@@ -36,7 +36,7 @@ class DefaultPrintStep(PlanStep):
         """Parameters used by the print step.
 
         Attributes:
-            message: The message to print
+            message: The message to print.
         """
 
         message: str
@@ -51,8 +51,8 @@ class DefaultPrintStep(PlanStep):
         """Initialize a default print step.
 
         Args:
-            config: The configuration of the step
-            plan:   The plan that runs this step
+            config: The configuration of the step.
+            plan:   The plan that runs this step.
         """
         super().__init__(config, plan)
         _with = self.DefaultPrintStepWith.model_validate(config.with_)

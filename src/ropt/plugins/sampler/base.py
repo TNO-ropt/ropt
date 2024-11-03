@@ -51,7 +51,7 @@ class Sampler(ABC):
         The sampler may be used for a subset of the variables. The `variable_indices`
         array lists the indices of the variables that are handled by this sampler.
 
-        Arguments:
+        Args:
             enopt_config:     The configuration of the optimizer.
             sampler_index:    The index of the sampler to use.
             variable_indices: The indices of the variables to sample.
@@ -104,7 +104,7 @@ class SamplerPlugin(Plugin):
     ) -> Sampler:
         """Create a sampler.
 
-        Arguments:
+        Args:
             enopt_config:     The configuration of the optimizer.
             sampler_index:    The index of the sampler to use.
             variable_indices: The indices of the variables to sample.

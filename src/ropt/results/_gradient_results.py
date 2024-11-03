@@ -36,10 +36,10 @@ class GradientResults(Results):
        constraints, and realization failures.
     3. The gradients of the calculated objectives and constraints.
 
-    Arguments:
-        evaluations:  Results of the function evaluations
-        realizations: The calculated parameters of the realizations
-        gradients:    The calculated gradients
+    Attributes:
+        evaluations:  Results of the function evaluations.
+        realizations: The calculated parameters of the realizations.
+        gradients:    The calculated gradients.
     """
 
     evaluations: GradientEvaluations

@@ -68,17 +68,17 @@ class EnOptConfig(BaseModel):
         used for all variables.
 
     Attributes:
-        variables:             Configuration of the variables
-        objective_functions:   Configuration of the objective functions
-        linear_constraints:    Configuration of linear constraints
-        nonlinear_constraints: Configuration of non-linear constraints
-        realizations:          Configuration of the realizations
-        optimizer:             Configuration of the optimizer
-        gradient:              Configuration for gradient calculations
-        realization_filters:   Configuration of realization filters
-        function_transforms:   Configuration of function transforms
-        samplers:              Configuration of samplers
-        original_inputs:       The original input to the constructor
+        variables:             Configuration of the variables.
+        objective_functions:   Configuration of the objective functions.
+        linear_constraints:    Configuration of linear constraints.
+        nonlinear_constraints: Configuration of non-linear constraints.
+        realizations:          Configuration of the realizations.
+        optimizer:             Configuration of the optimizer.
+        gradient:              Configuration for gradient calculations.
+        realization_filters:   Configuration of realization filters.
+        function_transforms:   Configuration of function transforms.
+        samplers:              Configuration of samplers.
+        original_inputs:       The original input to the constructor.
     """
 
     variables: VariablesConfig

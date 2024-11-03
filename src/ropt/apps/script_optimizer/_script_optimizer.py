@@ -77,9 +77,9 @@ class ScriptOptimizer:
         using the `work_dir` parameter of the `run()` method.
 
         Args:
-            config: Script optimizer configuration
-            plan:   The optimization plan to run
-            tasks:  A dictionary mapping task names to strings containing bash code
+            config: Script optimizer configuration.
+            plan:   The optimization plan to run.
+            tasks:  A dictionary mapping task names to strings containing bash code.
         """
         self._config = (
             config

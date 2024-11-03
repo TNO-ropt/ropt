@@ -40,7 +40,7 @@ class GradientEvaluations(ResultField):
     6. Optional evaluation IDs that may have been passed from the evaluator,
        identifying each calculated realization and perturbation.
 
-    Args:
+    Attributes:
         variables:                    The unperturbed variable vector.
         perturbed_variables:          The variables for each realization and perturbation.
         perturbed_objectives:         The objective functions for each realization and
@@ -169,14 +169,14 @@ class GradientEvaluations(ResultField):
         """Create a FunctionEvaluations object with the given information.
 
         Args:
-            config:                   Configuration object
-            variables:                The unperturbed variable vector
-            perturbed_variables:      The unperturbed variable vector
-            perturbed_objectives:     The objective functions for each realization
-            perturbed_constraints:    The constraint functions for each realization
-            objective_auto_scales:    Objective auto-scaling information
-            constraint_auto_scales:   Constraint auto-scaling information
-            perturbed_evaluation_ids: Optional IDs of the objective calculations
+            config:                   Configuration object.
+            variables:                The unperturbed variable vector.
+            perturbed_variables:      The unperturbed variable vector.
+            perturbed_objectives:     The objective functions for each realization.
+            perturbed_constraints:    The constraint functions for each realization.
+            objective_auto_scales:    Objective auto-scaling information.
+            constraint_auto_scales:   Constraint auto-scaling information.
+            perturbed_evaluation_ids: Optional IDs of the objective calculations.
 
         Returns:
             A new FunctionEvaluations object.

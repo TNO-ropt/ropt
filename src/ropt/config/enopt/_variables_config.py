@@ -82,15 +82,15 @@ class VariablesConfig(BaseModel):
     should change while others remain fixed.
 
     Attributes:
-        names:          Optional names of the variables
+        names:          Optional names of the variables.
         types:          The type of the variables (optional).
-        initial_values: The initial values of the variables
-        lower_bounds:   Lower bound of the variables (default: $-\infty$)
-        upper_bounds:   Upper bound of the variables (default: $+\infty$)
-        offsets:        Optional offsets, used for scaling the variables
-        scales:         Optional scales, used for scaling the variables
+        initial_values: The initial values of the variables.
+        lower_bounds:   Lower bound of the variables (default: $-\infty$).
+        upper_bounds:   Upper bound of the variables (default: $+\infty$).
+        offsets:        Optional offsets, used for scaling the variables.
+        scales:         Optional scales, used for scaling the variables.
         indices:        Optional indices of variables to optimize.
-        delimiters:     Delimiters used to construct names from tuples
+        delimiters:     Delimiters used to construct names from tuples.
     """
 
     names: Optional[UniqueNames] = None

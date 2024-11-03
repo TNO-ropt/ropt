@@ -36,15 +36,15 @@ class BoundConstraints(ResultField):
        difference if the constraint is violated, or else zero.
     3. If variable scaling is configured, scaled versions of all values.
 
-    Args:
-        lower_values:            Lower bound differences
-        lower_violations:        Lower bound violations
-        upper_values:            Upper bound differences
-        upper_violations:        Upper bound violations
-        scaled_lower_values:     Optional scaled lower bound differences
-        scaled_lower_violations: Optional scaled lower bound violations
-        scaled_upper_values:     Optional scaled upper bound differences
-        scaled_upper_violations: Optional scaled upper bound violations
+    Attributes:
+        lower_values:            Lower bound differences.
+        lower_violations:        Lower bound violations.
+        upper_values:            Upper bound differences.
+        upper_violations:        Upper bound violations.
+        scaled_lower_values:     Optional scaled lower bound differences.
+        scaled_lower_violations: Optional scaled lower bound violations.
+        scaled_upper_values:     Optional scaled upper bound differences.
+        scaled_upper_violations: Optional scaled upper bound violations.
     """
 
     lower_values: Optional[NDArray[np.float64]] = field(
@@ -121,8 +121,8 @@ class BoundConstraints(ResultField):
         evaluations.
 
         Args:
-            config:      The ensemble optimizer configuration object
-            evaluations: An instance of the Evaluations class
+            config:      The ensemble optimizer configuration object.
+            evaluations: An instance of the Evaluations class.
 
         Returns:
             A newly created BoundConstraints object.

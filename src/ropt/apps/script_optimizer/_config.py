@@ -32,10 +32,10 @@ class ScriptOptimizerConfig(BaseModel):
       a name given by the `var_filename` attribute.
 
     Attributes:
-        work_dir:     Working directory
-        job_dir:      The directory to store files generated during optimization
-        job_labels:   Label formats to use in generating filenames reports
-        var_filename: Name of the generated variable file
+        work_dir:     Working directory.
+        job_dir:      The directory to store files generated during optimization.
+        job_labels:   Label formats to use in generating filenames reports.
+        var_filename: Name of the generated variable file.
     """
 
     work_dir: Path
@@ -61,11 +61,11 @@ class ScriptEvaluatorConfig(BaseModel):
     """Configuration of the parsl evaluator used by the ScriptOptimizer.
 
     Attributes:
-        htex_kwargs:    Keyword arguments forwarded to the htex executor
-        max_threads:    Maximum number of threads for local runs
-        worker_restart: Restart the workers every `worker_restart` batch
-        polling:        How often should be polled for status
-        max_submit:     Maximum number of variables to submit simultaneously
+        htex_kwargs:    Keyword arguments forwarded to the htex executor.
+        max_threads:    Maximum number of threads for local runs.
+        worker_restart: Restart the workers every `worker_restart` batch.
+        polling:        How often should be polled for status.
+        max_submit:     Maximum number of variables to submit simultaneously.
     """
 
     htex_kwargs: Optional[Dict[str, Any]] = None

@@ -29,8 +29,8 @@ class RealizationFilter(ABC):
         """Initialize the realization filter plugin.
 
         Args:
-            enopt_config:    The configuration of the optimizer
-            filter_index: The index of the transform to use
+            enopt_config:    The configuration of the optimizer.
+            filter_index: The index of the transform to use.
         """
 
     @abstractmethod
@@ -55,8 +55,8 @@ class RealizationFilter(ABC):
             before use, hence any non-negative weight value is permissable.
 
         Args:
-            objectives:  The objectives of all realizations
-            constraints: The constraints for all realizations
+            objectives:  The objectives of all realizations.
+            constraints: The constraints for all realizations.
 
         Returns:
             A vector of weights of the realizations.
@@ -71,6 +71,6 @@ class RealizationFilterPlugin(Plugin):
         """Initialize the realization filter plugin.
 
         Args:
-            enopt_config: The configuration of the optimizer
-            filter_index: The index of the transform to use
+            enopt_config: The configuration of the optimizer.
+            filter_index: The index of the transform to use.
         """

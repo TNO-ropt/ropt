@@ -38,8 +38,8 @@ def function(variables: NDArray[np.float64], _: EvaluatorContext) -> EvaluatorRe
     """Evaluate the function.
 
     Args:
-        variables: The variables to evaluate
-        context:   Evaluator context
+        variables: The variables to evaluate.
+        context:   Evaluator context.
 
     Returns:
         Calculated objectives and constraints.
@@ -55,7 +55,7 @@ def report(event: Event) -> None:
     """Report results of an evaluation.
 
     Args:
-        event: event data
+        event: event data.
     """
     assert event.results is not None
     for item in event.results:

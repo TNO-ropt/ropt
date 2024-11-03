@@ -87,8 +87,8 @@ class DefaultEvaluatorStep(PlanStep):
         """Initialize a default evaluator step.
 
         Args:
-            config: The configuration of the step
-            plan:   The optimization plan that runs this step
+            config: The configuration of the step.
+            plan:   The optimization plan that runs this step.
         """
         super().__init__(config, plan)
 

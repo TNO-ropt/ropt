@@ -117,14 +117,14 @@ class Results(ABC):
             and/or batch ID.
 
         Args:
-            config:     The ensemble optimizer configuration object
-            field_name: The field to export
-            select:     Select the sub-fields to export, by default all fields
-            unstack:    Select axes to unstack, by default none
+            config:     The ensemble optimizer configuration object.
+            field_name: The field to export.
+            select:     Select the sub-fields to export, by default all fields.
+            unstack:    Select axes to unstack, by default none.
 
         Raises:
-            NotImplementedError: If the pandas module is not installed
-            ValueError:          If the field name is incorrect
+            NotImplementedError: If the pandas module is not installed.
+            ValueError:          If the field name is incorrect.
 
         Returns:
             A pandas data frame containing the results.
@@ -178,10 +178,10 @@ class Results(ABC):
         also added under the `metadata` key.
 
         Args:
-            config:       The ensemble optimizer configuration object
-            field_name:   The field to export
-            select:       Select the fields to export; by default, all fields
-            add_metadata: If true, add the metadata as a field in the dataset attrs
+            config:       The ensemble optimizer configuration object.
+            field_name:   The field to export.
+            select:       Select the fields to export; by default, all fields.
+            add_metadata: If true, add the metadata as a field in the dataset attrs.
 
         Raises:
             NotImplementedError: If the `xarray` module is not installed.

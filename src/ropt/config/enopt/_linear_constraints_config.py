@@ -39,10 +39,10 @@ class LinearConstraintsConfig(BaseModel):
     [`ConstraintType`][ropt.enums.ConstraintType] enumeration.
 
     Attributes:
-        coefficients: The matrix of coefficients
-        rhs_values:   The right-hand-sides of the constraint equations
+        coefficients: The matrix of coefficients.
+        rhs_values:   The right-hand-sides of the constraint equations.
         types:        The type of each equation
-                      (see [`ConstraintType`][ropt.enums.ConstraintType])
+                      (see [`ConstraintType`][ropt.enums.ConstraintType]).
 
     Info: Rescaled variables
         If a `LinearConstraintsConfig` object is part of an

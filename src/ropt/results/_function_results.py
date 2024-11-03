@@ -40,13 +40,13 @@ class FunctionResults(Results):
     3. The calculated objective and constraint function values.
     4. Information on constraint values and violations.
 
-    Arguments:
-        evaluations:           Results of the function evaluations
-        realizations:          The calculated parameters of the realizations
-        functions:             The calculated functions
-        bound_constraints:     Bound constraints
-        linear_constraints:    Linear constraints
-        nonlinear_constraints: Nonlinear constraints
+    Attributes:
+        evaluations:           Results of the function evaluations.
+        realizations:          The calculated parameters of the realizations.
+        functions:             The calculated functions.
+        bound_constraints:     Bound constraints.
+        linear_constraints:    Linear constraints.
+        nonlinear_constraints: Nonlinear constraints.
     """
 
     evaluations: FunctionEvaluations

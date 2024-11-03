@@ -34,8 +34,8 @@ def rosenbrock(variables: NDArray[np.float64], _: EvaluatorContext) -> Evaluator
     `None`, the latter because no constraints are calculated.
 
     Args:
-        variables: The variables to evaluate
-        dimension: The number of variables
+        variables: The variables to evaluate.
+        dimension: The number of variables.
 
     Returns:
         The calculated objective, and `None`
@@ -52,7 +52,7 @@ def report(event: Event) -> None:
     """Report results of an evaluation.
 
     Args:
-        event: event data
+        event: event data.
     """
     assert event.results is not None
     for item in event.results:
@@ -66,7 +66,7 @@ def run_optimization(config: Dict[str, Any]) -> FunctionResults:
     """Run the optimization.
 
     Args:
-        config: The configuration of the optimizer
+        config: The configuration of the optimizer.
 
     Returns:
         The optimal results.

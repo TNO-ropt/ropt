@@ -66,10 +66,10 @@ class EnsembleEvaluator:
         """Initialize the ensemble evaluator.
 
         Args:
-            config:         The configuration object
-            evaluator:      The callable for evaluation individual functions
-            plan_path:      A tuple identifying the plan running this evaluator
-            plugin_manager: A plugin manager to load required plugins
+            config:         The configuration object.
+            evaluator:      The callable for evaluation individual functions.
+            plan_path:      A tuple identifying the plan running this evaluator.
+            plugin_manager: A plugin manager to load required plugins.
         """
         self._config = config
         self._evaluator = evaluator

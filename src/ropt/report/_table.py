@@ -67,10 +67,10 @@ class ResultsTable(ResultsDataFrame):
             ```
 
         Args:
-            columns:        Mapping of column names for the results table
-            path:           Optional location of the result file
-            table_type:     Type of the table
-            min_header_len: Minimal number of header lines
+            columns:        Mapping of column names for the results table.
+            path:           Optional location of the result file.
+            table_type:     Type of the table.
+            min_header_len: Minimal number of header lines.
 
         Raises:
             NotImplementedError: If the pandas or tabulate modules are not
@@ -92,8 +92,8 @@ class ResultsTable(ResultsDataFrame):
         events that produce results.
 
         Args:
-            config:  The configuration of the optimizer generating the results
-            results: The results to add
+            config:  The configuration of the optimizer generating the results.
+            results: The results to add.
 
         Returns:
             True if a result was added, else False

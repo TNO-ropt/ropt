@@ -27,8 +27,8 @@ class ResultHandler(ABC):
         and `plan` properties.
 
         Args:
-            config: The configuration of the handler object
-            plan:   The parent plan that contains the object
+            config: The configuration of the handler object.
+            plan:   The parent plan that contains the object.
         """
         self._handler_config = config
         self._plan = plan
@@ -67,8 +67,8 @@ class PlanStep(ABC):
         """Initialize the plan object.
 
         Args:
-            config: The configuration of the plan object
-            plan:   The parent plan
+            config: The configuration of the plan object.
+            plan:   The parent plan.
         """
         self._step_config = config
         self._plan = plan

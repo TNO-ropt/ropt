@@ -30,10 +30,10 @@ class Functions(ResultField):
     If scaling of objectives and/or constraint functions is enabled, also scaled
     versions of the objective or constraint values are stored.
 
-    Args:
-        weighted_objective: The weighted sum of the objectives
-        objectives:         The value of each objective
-        constraints:        The value of each constraint
+    Attributes:
+        weighted_objective: The weighted sum of the objectives.
+        objectives:         The value of each objective.
+        constraints:        The value of each constraint.
         scaled_objectives:  Optional scaled objectives.
         scaled_constraints: Optional scaled constraints.
     """
@@ -89,12 +89,12 @@ class Functions(ResultField):
         """Create a Functions object with the given information.
 
         Args:
-            config:                 Configuration object
-            weighted_objective:     The weighted objective
-            objectives:             The objective functions for each realization
-            constraints:            The constraint functions for each realization
-            objective_auto_scales:  Objective auto-scaling information
-            constraint_auto_scales: Constraint auto-scaling information
+            config:                 Configuration object.
+            weighted_objective:     The weighted objective.
+            objectives:             The objective functions for each realization.
+            constraints:            The constraint functions for each realization.
+            objective_auto_scales:  Objective auto-scaling information.
+            constraint_auto_scales: Constraint auto-scaling information.
 
         Returns:
             A new Functions object.

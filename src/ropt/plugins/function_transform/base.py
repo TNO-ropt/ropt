@@ -29,8 +29,8 @@ class FunctionTransform(ABC):
         """Initialize the function transform object.
 
         Args:
-            enopt_config:    The configuration of the optimizer
-            transform_index: The index of the transform to use
+            enopt_config:    The configuration of the optimizer.
+            transform_index: The index of the transform to use.
         """
 
     @abstractmethod
@@ -53,8 +53,8 @@ class FunctionTransform(ABC):
            be raised.
 
         Args:
-            functions: The functions for each realization
-            weights:   The weight of each realization
+            functions: The functions for each realization.
+            weights:   The weight of each realization.
 
         Returns:
             The expected function values.
@@ -70,9 +70,9 @@ class FunctionTransform(ABC):
         """Combine gradients from realizations into an expected gradient.
 
         Args:
-            functions: The functions for each realization
-            gradient:  The gradient for each realization
-            weights:   The weight of each realization
+            functions: The functions for each realization.
+            gradient:  The gradient for each realization.
+            weights:   The weight of each realization.
 
         Returns:
             The expected gradients.
@@ -89,6 +89,6 @@ class FunctionTransformPlugin(Plugin):
         """Initialize the function transform object.
 
         Args:
-            enopt_config:    The configuration of the optimizer
-            transform_index: The index of the transform to use
+            enopt_config:    The configuration of the optimizer.
+            transform_index: The index of the transform to use.
         """

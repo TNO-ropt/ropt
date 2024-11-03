@@ -25,8 +25,8 @@ def filter_linear_constraints(
     configuration constraint.
 
     Args:
-        config:           The linear configuration constraint
-        variable_indices: The indices of the variables used by the optimizer
+        config:           The linear configuration constraint.
+        variable_indices: The indices of the variables used by the optimizer.
 
     Returns:
         The filtered linear constraint configuration.
@@ -80,10 +80,10 @@ def validate_supported_constraints(
     }
 
     Args:
-        config:                The ensemble optimizer configuration object
-        method:                The method to check
-        supported_constraints: Specify the supported constraints
-        required_constraints:  Specify the required constraints
+        config:                The ensemble optimizer configuration object.
+        method:                The method to check.
+        supported_constraints: Specify the supported constraints.
+        required_constraints:  Specify the required constraints.
     """
     _validate_bounds(config, method, supported_constraints, required_constraints)
     _validate_linear_constraints(
@@ -213,10 +213,10 @@ def create_output_path(
     If the path already exists, an index is appended to it.
 
     Args:
-        base_name: Base name of the path
-        base_dir:  Optional directory to base the path in
-        name:      Optional optimization step name to include in the name
-        suffix:    Optional suffix for the resulting path
+        base_name: Base name of the path.
+        base_dir:  Optional directory to base the path in.
+        name:      Optional optimization step name to include in the name.
+        suffix:    Optional suffix for the resulting path.
 
     Returns:
         The constructed path

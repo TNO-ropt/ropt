@@ -30,10 +30,10 @@ class Gradients(ResultField):
     If scaling of objectives and/or constraint functions is enabled, also scaled
     versions of the objective or constraint gradients are stored.
 
-    Args:
-        weighted_objective: The weighted sum of the objective gradients
-        objectives:         The value of each objective gradient
-        constraints:        The value of each constraint gradient
+    Attributes:
+        weighted_objective: The weighted sum of the objective gradients.
+        objectives:         The value of each objective gradient.
+        constraints:        The value of each constraint gradient.
         scaled_objectives:  Optional scaled objective gradients.
         scaled_constraints: Optional scaled constraint gradients.
     """
@@ -101,12 +101,12 @@ class Gradients(ResultField):
         """Create a Gradients object with the given information.
 
         Args:
-            config:                 Configuration object
-            weighted_objective:     The weighted objective
-            objectives:             The objective gradients for each realization
-            constraints:            The constraint gradients for each realization
-            objective_auto_scales:  Objective auto-scaling information
-            constraint_auto_scales: Constraint auto-scaling information
+            config:                 Configuration object.
+            weighted_objective:     The weighted objective.
+            objectives:             The objective gradients for each realization.
+            constraints:            The constraint gradients for each realization.
+            objective_auto_scales:  Objective auto-scaling information.
+            constraint_auto_scales: Constraint auto-scaling information.
 
         Returns:
             A new Functions object.

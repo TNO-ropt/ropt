@@ -57,10 +57,10 @@ class RealizationsConfig(BaseModel):
         and will behave as if the value is set to one.
 
     Attributes:
-        names:                   Optional names of the realizations
-        weights:                 The weights of the realizations (default: 1)
+        names:                   Optional names of the realizations.
+        weights:                 The weights of the realizations (default: 1).
         realization_min_success: The minimum number of successful realizations
-                                 (default: equal to the number of realizations)
+                                 (default: equal to the number of realizations).
     """
 
     names: Optional[UniqueNames] = None

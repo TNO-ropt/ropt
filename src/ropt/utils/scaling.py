@@ -21,9 +21,9 @@ def scale_variables(
     argument.
 
     Args:
-        config:    The ensemble optimizer configuration object
-        variables: The scaled variables
-        axis:      The variables axis
+        config:    The ensemble optimizer configuration object.
+        variables: The scaled variables.
+        axis:      The variables axis.
 
     Returns:
         The scaled variables, or `None` if no scaling is applied.
@@ -57,10 +57,10 @@ def scale_back_variables(
     argument.
 
     Args:
-        config:          The ensemble optimizer configuration object
-        variables:       The scaled variables
-        axis:            The variables axis
-        correct_offsets: If True also correct for offsets
+        config:          The ensemble optimizer configuration object.
+        variables:       The scaled variables.
+        axis:            The variables axis.
+        correct_offsets: If True also correct for offsets.
 
     Returns:
         The unscaled variables, or `None` if no scaling is applied.
@@ -93,10 +93,10 @@ def scale_objectives(
     argument.
 
     Args:
-        config:     The ensemble optimizer configuration object
-        objectives: Objective functions
-        scales:     Optional additional scales
-        axis:       The objectives axis
+        config:     The ensemble optimizer configuration object.
+        objectives: Objective functions.
+        scales:     Optional additional scales.
+        axis:       The objectives axis.
 
     Returns:
         The scaled objectives or `None` if no scaling was applied.
@@ -128,10 +128,10 @@ def scale_constraints(
     argument.
 
     Args:
-        config:      The ensemble optimizer configuration object
-        constraints: Constraint functions
-        scales:      Optional additional scales
-        axis:        The constraints axis
+        config:      The ensemble optimizer configuration object.
+        constraints: Constraint functions.
+        scales:      Optional additional scales.
+        axis:        The constraints axis.
 
     Returns:
         The scaled constraints or `None` if no scaling was applied.

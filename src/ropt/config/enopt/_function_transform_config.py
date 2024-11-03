@@ -27,8 +27,8 @@ class FunctionTransformConfig(BaseModel):
     interpretation of these options depends on the chosen method.
 
     Attributes:
-        method:  The function transform method
-        options: Options to be passed to the transform
+        method:  The function transform method.
+        options: Options to be passed to the transform.
     """
 
     method: str = "default/default"

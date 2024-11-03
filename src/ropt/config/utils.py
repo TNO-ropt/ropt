@@ -19,7 +19,7 @@ def normalize(array: NDArray[np.float64]) -> NDArray[np.float64]:
     Normalize the sum of the values to one.
 
     Args:
-        array: The input array
+        array: The input array.
 
     Returns:
         ValueError: The normalized array
@@ -39,8 +39,8 @@ def immutable_array(
     Converts the input to an array and makes it immutable.`
 
     Args:
-        array_like: The input
-        kwargs    : Additional keyword arguments for array conversion
+        array_like: The input.
+        kwargs    : Additional keyword arguments for array conversion.
 
     Returns:
         The immutable array.
@@ -54,7 +54,7 @@ def broadcast_arrays(*args: Any) -> Tuple[NDArray[Any], ...]:  # noqa: ANN401
     """Broadcast a set of arrays to a common dimensionality and makes them immutable.
 
     Args:
-        args: The input arrays
+        args: The input arrays.
 
     Returns:
         The broadcasted immutable arrays.
@@ -67,9 +67,9 @@ def broadcast_1d_array(array: NDArray[Any], name: str, size: int) -> NDArray[Any
     """Broadcast the input array to an 1D array of given size.
 
     Args:
-        array: The input array
-        name:  The name of the array, used in an error message
-        size:  The size of the result
+        array: The input array.
+        name:  The name of the array, used in an error message.
+        size:  The size of the result.
 
     Returns:
         An 1D array of the requested size.
@@ -90,8 +90,8 @@ def check_enum_values(value: NDArray[np.ubyte], enum_type: Type[IntEnum]) -> Non
     values of the given enum.
 
     Args:
-        value:     The enum values
-        enum_type: The type to check
+        value:     The enum values.
+        enum_type: The type to check.
 
     Raises:
         ValueError: If the array contains an invalid value.
