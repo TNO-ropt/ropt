@@ -1854,28 +1854,29 @@ straightforward plans involving a single optimization.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the list of plan IDs.</p>
-<p>Plans can spawn other plans sequentially, in parallel, or as nested
-workflows. The plan IDs uniquely represent the order and nesting of
-these plans, using a list of sequence numbers.</p>
+        <p>Return the path of the plan.</p>
+<p>Each plan maintains a unique path that reflects its creation order and
+any nesting structure. When a plan spawns additional plans, the
+resulting hierarchy is captured in the <code>plan_path</code> attribute as a
+sequence of numbers.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
     <table>
       <thead>
         <tr>
-          <th>Type</th>
+<th>Name</th>          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td>
+<td><code>tuple</code></td>            <td>
                   <code><span title="typing.Tuple">Tuple</span>[int, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The list of plan IDs for this plan.</p>
+                <p>A tuple representing the plan path for this plan.</p>
               </div>
             </td>
           </tr>
