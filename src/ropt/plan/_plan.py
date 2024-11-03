@@ -111,26 +111,27 @@ class Plan:
         optimizer_context: OptimizerContext,
         plugin_manager: Optional[PluginManager] = None,
         parent: Optional[Plan] = None,
-        plan_id: Optional[Tuple[int, ...]] = None,
+        plan_path: Optional[Tuple[int, ...]] = None,
     ) -> None:
         """Initialize a plan object.
 
         This method initializes a plan using a `PlanConfig` object and an
         `OptimizationContext` object. An optional `plugin_manager` argument
-        allows the specification of custom plugins for result handlers and step
-        objects within the plan. If omitted, only plugins installed through
+        allows for the specification of custom plugins for result handlers and
+        step objects within the plan. If omitted, only plugins installed through
         Python's standard entry points are used.
 
-        Plans can spawn additional plans within their workflow, and any spawned
-        plan receives a reference to the original plan via the `parent`
+        Plans can spawn additional plans within their workflow, with each
+        spawned plan receiving a reference to its parent plan via the `parent`
         argument.
 
-        Each plan is assigned a unique integer sequence number at creation,
-        which is stored as a tuple of sequence numbers reflecting plan nesting.
-        When spawning a child plan with the [`spawn`][ropt.plan.Plan.spawn]
-        method, the new plan receives an incremented sequence number at the
-        beginning. This creates an ordered sequence of IDs that uniquely
-        reflects the hierarchy and order of spawned plans.
+        Plan hierarchies are tracked using the `plan_path` attribute. A directly
+        created plan has `plan_path == ()`, an empty tuple. When a plan spawns a
+        new plan with the [`spawn`][ropt.plan.Plan.spawn] method, the child
+        receives an incremental index appended to its parent's `plan_path`,
+        forming a unique sequence that reflects both the order of creation and
+        nesting. This structure enables efficient tracing across both sequential
+        and nested plan workflows.
 
         Args:
             config:            The configuration for the optimizer.
@@ -140,13 +141,13 @@ class Plan:
                                result handler plugins.
             parent:            Optional reference to the parent plan that
                                spawned this plan.
-            plan_id:           A list of plan IDs reflecting the plan hierarchy.
+            plan_path:         The path of the plan, reflecting its hierarchy.
         """
         self._plan_config = config
         self._optimizer_context = optimizer_context
         self._vars: Dict[str, Any] = {}
-        self._plan_ids: Tuple[int, ...] = (0,) if plan_id is None else plan_id
-        self._plan_ids = (*self._plan_ids, -1)
+        self._plan_path: Tuple[int, ...] = () if plan_path is None else plan_path
+        self._spawn_id: int = -1
 
         self._plugin_manager = (
             PluginManager() if plugin_manager is None else plugin_manager
@@ -159,11 +160,11 @@ class Plan:
             if var in self._vars:
                 msg = f"Plan variable already exists: `{var}`"
                 raise AttributeError(msg)
-            if var == "plan_id":
+            if var == "plan_path":
                 msg = f"Plan variable overrides a builtin variable: {var}"
                 raise AttributeError(msg)
             self._set_item(var, None)
-        self._set_item("plan_id", list(self.plan_id))
+        self._set_item("plan_path", list(self.plan_path))
         self._steps = self.create_steps(config.steps)
         self._handlers: List[ResultHandler] = [
             self._plugin_manager.get_plugin("plan", method=config.run).create(
@@ -217,7 +218,7 @@ class Plan:
         return self._aborted
 
     @property
-    def plan_id(self) -> Tuple[int, ...]:
+    def plan_path(self) -> Tuple[int, ...]:
         """Return the list of plan IDs.
 
         Plans can spawn other plans sequentially, in parallel, or as nested
@@ -227,7 +228,7 @@ class Plan:
         Returns:
             The list of plan IDs for this plan.
         """
-        return self._plan_ids[:-1]
+        return self._plan_path
 
     def create_steps(self, step_configs: List[PlanStepConfig]) -> List[PlanStep]:
         """Instantiate step objects from step configurations.
@@ -310,13 +311,13 @@ class Plan:
         Returns:
             A new plan object configured with the provided configuration.
         """
-        self._plan_ids = (*self._plan_ids[:-1], self._plan_ids[-1] + 1)
+        self._spawn_id += 1
         return Plan(
             config,
             optimizer_context=self._optimizer_context,
             plugin_manager=self._plugin_manager,
             parent=self,
-            plan_id=self._plan_ids,
+            plan_path=(*self._plan_path, self._spawn_id),
         )
 
     def eval(self, value: Any) -> Any:  # noqa: ANN401
@@ -364,8 +365,8 @@ class Plan:
         Args:
             event: The event object to emit.
         """
-        if not event.plan_id:
-            event.plan_id = self.plan_id
+        if not event.plan_path:
+            event.plan_path = self.plan_path
         for handler in self._handlers:
             event = handler.handle_event(event)
         if self._parent is None:

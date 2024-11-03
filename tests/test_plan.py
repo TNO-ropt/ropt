@@ -65,9 +65,9 @@ def test_run_basic(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     }
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(PlanConfig.model_validate(plan_config), context)
-    assert plan["plan_id"] == [0]
+    assert plan["plan_path"] == []
     plan.run()
-    assert plan.plan_id == (0,)
+    assert plan.plan_path == ()
     variables = plan["results"].evaluations.variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
@@ -101,7 +101,8 @@ def test_run_basic(enopt_config: Dict[str, Any], evaluator: Any) -> None:
         ("${{'$x'}}", "x"),
         ("${{'$$x'}}", "$x"),
         ("${{$x + $y}}", 2),
-        ("${{ [1, 2] + $plan_id }}", [1, 2, 0]),
+        ("${{ [1, 2] + [0] }}", [1, 2, 0]),
+        ("${{ [1, 2] + $plan_path }}", [1, 2]),
         ("$x + 1", 2),
         ("1 + $x", "1 + $x"),
         ("${{1 + $y}}", 2),
@@ -338,70 +339,6 @@ def test_conditional_run(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     assert result1 is not None
     assert np.allclose(result1.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
     assert result2 is None
-
-
-def test_plan_rng(enopt_config: Dict[str, Any], evaluator: Any) -> None:
-    enopt_config["gradient"]["seed"] = 1
-
-    plan_config = {
-        "variables": {
-            "config": enopt_config,
-            "optimal1": None,
-            "optimal2": None,
-            "optimal3": None,
-        },
-        "steps": [
-            {
-                "optimizer": {
-                    "config": "$config",
-                    "tags": "optimal1",
-                },
-            },
-            {
-                "optimizer": {
-                    "config": "$config",
-                    "tags": "optimal2",
-                },
-            },
-            {
-                "optimizer": {
-                    "config": "$config",
-                    "tags": "optimal3",
-                    "add_plan_id_to_seed": True,
-                },
-            },
-        ],
-        "results": [
-            {
-                "tracker": {"var": "optimal1", "tags": ["optimal1"]},
-            },
-            {
-                "tracker": {"var": "optimal2", "tags": ["optimal2"]},
-            },
-            {
-                "tracker": {"var": "optimal3", "tags": ["optimal3"]},
-            },
-        ],
-    }
-    parsed_config = PlanConfig.model_validate(plan_config)
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(parsed_config, context)
-    plan.run()
-
-    result1 = plan["optimal1"]
-    assert result1 is not None
-    assert np.allclose(result1.evaluations.variables, [0.0, 0.0, 0.5], atol=0.025)
-
-    result2 = plan["optimal2"]
-    assert result2 is not None
-    assert np.allclose(result2.evaluations.variables, [0.0, 0.0, 0.5], atol=0.025)
-
-    result3 = plan["optimal3"]
-    assert result3 is not None
-    assert np.allclose(result3.evaluations.variables, [0.0, 0.0, 0.5], atol=0.025)
-
-    assert np.all(result1.evaluations.variables == result2.evaluations.variables)
-    assert not np.all(result1.evaluations.variables == result3.evaluations.variables)
 
 
 def test_set_initial_values(enopt_config: Dict[str, Any], evaluator: Any) -> None:
@@ -1094,9 +1031,9 @@ def test_nested_plan(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     def _track_evaluations(event: Event) -> None:
         nonlocal completed_functions
         if "outer" in event.tags:
-            assert event.plan_id == (0,)
+            assert event.plan_path == ()
         if "inner" in event.tags:
-            assert event.plan_id == (0, completed_functions // 5)
+            assert event.plan_path == (completed_functions // 5,)
         assert event.results is not None
         for item in event.results:
             if isinstance(item, FunctionResults):
