@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import sys
-from itertools import chain
+from itertools import chain, count
 from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
     Dict,
+    Iterator,
     List,
     Optional,
     Tuple,
@@ -153,6 +154,7 @@ class Plan:
         self._vars: Dict[str, Any] = {}
         self._plan_path: Tuple[int, ...] = () if plan_path is None else plan_path
         self._spawn_id: int = -1
+        self._result_id_iter = count()
 
         self._plugin_manager = (
             PluginManager() if plugin_manager is None else plugin_manager
@@ -235,6 +237,19 @@ class Plan:
             tuple: A tuple representing the plan path for this plan.
         """
         return self._plan_path
+
+    @property
+    def result_id_iterator(self) -> Iterator[int]:
+        """Return the iterator for result IDs.
+
+        This iterator generates consecutive unique IDs for results produced by
+        steps within the plan, ensuring each result can be distinctly
+        identified.
+
+        Returns:
+            Iterator: An iterator that yields unique result IDs.
+        """
+        return self._result_id_iter
 
     def create_steps(self, step_configs: List[PlanStepConfig]) -> List[PlanStep]:
         """Instantiate step objects from step configurations.
