@@ -689,9 +689,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.plan_id" class="md-nav__link">
+  <a href="#ropt.plan.Plan.plan_path" class="md-nav__link">
     <span class="md-ellipsis">
-      plan_id
+      plan_path
     </span>
   </a>
   
@@ -1481,9 +1481,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.plan_id" class="md-nav__link">
+  <a href="#ropt.plan.Plan.plan_path" class="md-nav__link">
     <span class="md-ellipsis">
-      plan_id
+      plan_path
     </span>
   </a>
   
@@ -1842,8 +1842,8 @@ straightforward plans involving a single optimization.</p>
 
 
 
-<h4 id="ropt.plan.Plan.plan_id" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">plan_id</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span></code>
+<h4 id="ropt.plan.Plan.plan_path" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">plan_path</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -1983,7 +1983,7 @@ state and functionality for executing the optimization plan.</p>
 
 
 <h4 id="ropt.plan.Plan.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">optimizer_context</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plan_id</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">optimizer_context</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plan_path</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
@@ -1993,18 +1993,19 @@ state and functionality for executing the optimization plan.</p>
         <p>Initialize a plan object.</p>
 <p>This method initializes a plan using a <code>PlanConfig</code> object and an
 <code>OptimizationContext</code> object. An optional <code>plugin_manager</code> argument
-allows the specification of custom plugins for result handlers and step
-objects within the plan. If omitted, only plugins installed through
+allows for the specification of custom plugins for result handlers and
+step objects within the plan. If omitted, only plugins installed through
 Python's standard entry points are used.</p>
-<p>Plans can spawn additional plans within their workflow, and any spawned
-plan receives a reference to the original plan via the <code>parent</code>
+<p>Plans can spawn additional plans within their workflow, with each
+spawned plan receiving a reference to its parent plan via the <code>parent</code>
 argument.</p>
-<p>Each plan is assigned a unique integer sequence number at creation,
-which is stored as a tuple of sequence numbers reflecting plan nesting.
-When spawning a child plan with the <a class="autorefs autorefs-internal" href="#ropt.plan.Plan.spawn"><code>spawn</code></a>
-method, the new plan receives an incremented sequence number at the
-beginning. This creates an ordered sequence of IDs that uniquely
-reflects the hierarchy and order of spawned plans.</p>
+<p>Plan hierarchies are tracked using the <code>plan_path</code> attribute. A directly
+created plan has <code>plan_path == ()</code>, an empty tuple. When a plan spawns a
+new plan with the <a class="autorefs autorefs-internal" href="#ropt.plan.Plan.spawn"><code>spawn</code></a> method, the child
+receives an incremental index appended to its parent's <code>plan_path</code>,
+forming a unique sequence that reflects both the order of creation and
+nesting. This structure enables efficient tracing across both sequential
+and nested plan workflows.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2078,13 +2079,13 @@ reflects the hierarchy and order of spawned plans.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>plan_id</code></td>
+            <td><code>plan_path</code></td>
             <td>
                   <code><span title="typing.Optional">Optional</span>[<span title="typing.Tuple">Tuple</span>[int, ...]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A list of plan IDs reflecting the plan hierarchy.</p>
+                <p>The path of the plan, reflecting its hierarchy.</p>
               </div>
             </td>
             <td>
@@ -3296,7 +3297,7 @@ enumeration for more details.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plan.Event.plan_id">plan_id</span></code></td>
+            <td><code><span title="ropt.plan.Event.plan_path">plan_path</span></code></td>
             <td>
                   <code><span title="typing.Tuple">Tuple</span>[int, ...]</code>
             </td>
