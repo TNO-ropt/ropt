@@ -22,20 +22,20 @@ state is provided through an [`OptimizerContext`][ropt.plan.OptimizerContext]
 object, which is supplied when creating the plan.
 
 Setting up and executing a plan object for simple optimization cases can be
-complex. The [`OptimizationPlanRunner`][ropt.plan.OptimizationPlanRunner] class
-simplifies this process by providing a convenient way to build and execute
-straightforward plans involving a single optimization.
+complex. The [`BasicOptimizer`][ropt.plan.BasicOptimizer] class simplifies this
+process by providing a convenient way to build and execute straightforward plans
+involving a single optimization.
 """
 
+from ._basic_optimizer import BasicOptimizer
 from ._events import Event
 from ._expr import ExpressionEvaluator
 from ._plan import OptimizerContext, Plan
-from ._run import OptimizationPlanRunner
 
 __all__ = [
+    "BasicOptimizer",
     "Event",
     "ExpressionEvaluator",
-    "OptimizationPlanRunner",
     "OptimizerContext",
     "Plan",
 ]

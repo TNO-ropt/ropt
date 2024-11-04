@@ -14,7 +14,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.plan import OptimizationPlanRunner
+from ropt.plan import BasicOptimizer
 
 
 def rosenbrock(
@@ -32,7 +32,7 @@ CONFIG = {                                                            # (4)!
     "gradient": {"perturbation_magnitudes": 1e-5}                     # (5)!
 }
 
-optimum = OptimizationPlanRunner(CONFIG, rosenbrock).run().results    # (6)!
+optimum = BasicOptimizer(CONFIG, rosenbrock).run().results            # (6)!
 
 print(optimum.evaluations.variables, optimum.functions.weighted_objective)
 ```
@@ -51,8 +51,8 @@ print(optimum.evaluations.variables, optimum.functions.weighted_objective)
    values and perturbation magnitudes.
 5. Set perturbation magnitudes to a small value for accurate gradient
    estimation.
-6. Make an [`OptimizationPlanRunner`][ropt.plan.OptimizationPlanRunner]
-   plan, run it, and retrieve the results.
+6. Make an [`BasicOptimizer`][ropt.plan.BasicOptimizer] plan, run it, and
+   retrieve the results.
 
 Running this will print the estimated optimal variables and the corresponding
 function value:
@@ -61,7 +61,7 @@ function value:
 [1.00117794 1.0023715 ] 1.4078103983185034e-06
 ```
 
-This example uses the [OptimizationPlanRunner][ropt.plan.OptimizationPlanRunner]
-class which provides a simplified interface for running optimizations. More
-complex optimization workflows can be implemented using the [plan][ropt.plan]
+This example uses the [BasicOptimizer][ropt.plan.BasicOptimizer] class which
+provides a simplified interface for running optimizations. More complex
+optimization workflows can be implemented using the [plan][ropt.plan]
 functionality.

@@ -13,7 +13,7 @@ from parsl.app.app import python_app
 
 from ropt.evaluator import EvaluatorContext
 from ropt.evaluator.parsl import ParslEvaluator, State, Task
-from ropt.plan import OptimizationPlanRunner
+from ropt.plan import BasicOptimizer
 
 
 @dataclass
@@ -96,7 +96,7 @@ def test_parsl(enopt_config: Any, test_functions: Any, tmp_path: Any) -> None:
     with ParslEvaluator(
         function=partial(parsl_function, functions=test_functions)
     ) as evaluator:
-        variables = OptimizationPlanRunner(enopt_config, evaluator).run().variables
+        variables = BasicOptimizer(enopt_config, evaluator).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -108,7 +108,7 @@ def test_parsl_dummy_htex(
     with ParslEvaluator(
         function=partial(parsl_function, functions=test_functions)
     ).with_htex(provider=None) as evaluator:
-        variables = OptimizationPlanRunner(enopt_config, evaluator).run().variables
+        variables = BasicOptimizer(enopt_config, evaluator).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -122,7 +122,7 @@ def test_parsl_monitor(
     ).with_monitor(
         parsl_monitor,
     ) as evaluator:
-        variables = OptimizationPlanRunner(enopt_config, evaluator).run().variables
+        variables = BasicOptimizer(enopt_config, evaluator).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
     captured = capsys.readouterr()
@@ -139,7 +139,7 @@ def test_parsl_exception(
         parsl_monitor,
     )
     with evaluator:
-        variables = OptimizationPlanRunner(enopt_config, evaluator).run().variables
+        variables = BasicOptimizer(enopt_config, evaluator).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
     captured = capsys.readouterr()
@@ -152,4 +152,4 @@ def test_parsl_no_with(enopt_config: Any, test_functions: Any, tmp_path: Any) ->
         function=partial(parsl_function, functions=test_functions, fail_index=2),
     )
     with pytest.raises(RuntimeError):
-        OptimizationPlanRunner(enopt_config, evaluator).run()
+        BasicOptimizer(enopt_config, evaluator).run()

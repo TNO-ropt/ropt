@@ -6,7 +6,7 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt.enums import ConstraintType, EventType
-from ropt.plan import Event, OptimizationPlanRunner
+from ropt.plan import BasicOptimizer, Event
 from ropt.plugins.realization_filter.default import (
     _get_cvar_weights_from_percentile,
     _sort_and_select,
@@ -124,9 +124,7 @@ def test_sort_filter_on_objectives(
 
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations
 
-    variables = (
-        OptimizationPlanRunner(enopt_config, evaluator(functions)).run().variables
-    )
+    variables = BasicOptimizer(enopt_config, evaluator(functions)).run().variables
     assert variables is not None
     assert not np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -144,7 +142,7 @@ def test_sort_filter_on_objectives(
 
     result_list: List[Results] = []
     results = (
-        OptimizationPlanRunner(
+        BasicOptimizer(
             enopt_config,
             evaluator(functions),
         )
@@ -206,7 +204,7 @@ def test_sort_filter_on_objectives_with_constraints(
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: List[Results] = []
     results = (
-        OptimizationPlanRunner(
+        BasicOptimizer(
             enopt_config,
             evaluator(functions),
         )
@@ -275,7 +273,7 @@ def test_sort_filter_on_constraints(
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: List[Results] = []
     results = (
-        OptimizationPlanRunner(
+        BasicOptimizer(
             enopt_config,
             evaluator(functions),
         )
@@ -354,7 +352,7 @@ def test_sort_filter_mixed(  # noqa: C901
 
     result_list: List[Results] = []
     results = (
-        OptimizationPlanRunner(enopt_config, evaluator(functions))
+        BasicOptimizer(enopt_config, evaluator(functions))
         .add_observer(EventType.FINISHED_EVALUATION, _add_objective)
         .run()
         .results
@@ -392,7 +390,7 @@ def test_sort_filter_mixed(  # noqa: C901
 
     result_list = []
     results = (
-        OptimizationPlanRunner(enopt_config, evaluator(functions))
+        BasicOptimizer(enopt_config, evaluator(functions))
         .add_observer(EventType.FINISHED_EVALUATION, _add_objective)
         .run()
         .results
@@ -435,9 +433,7 @@ def test_cvar_filter_on_objectives(
 
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations
 
-    variables = (
-        OptimizationPlanRunner(enopt_config, evaluator(functions)).run().variables
-    )
+    variables = BasicOptimizer(enopt_config, evaluator(functions)).run().variables
     assert variables is not None
     assert not np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -453,7 +449,7 @@ def test_cvar_filter_on_objectives(
     enopt_config["objective_functions"]["realization_filters"] = [0, 0]
     result_list: List[Results] = []
     results = (
-        OptimizationPlanRunner(
+        BasicOptimizer(
             enopt_config,
             evaluator(functions),
         )
@@ -514,7 +510,7 @@ def test_cvar_filter_on_objectives_with_constraints(
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: List[Results] = []
     results = (
-        OptimizationPlanRunner(
+        BasicOptimizer(
             enopt_config,
             evaluator(functions),
         )
@@ -582,7 +578,7 @@ def test_cvar_filter_on_constraints(
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: List[Results] = []
     results = (
-        OptimizationPlanRunner(
+        BasicOptimizer(
             enopt_config,
             evaluator(functions),
         )
@@ -660,7 +656,7 @@ def test_cvar_filter_mixed(  # noqa: C901
 
     result_list: List[Results] = []
     results = (
-        OptimizationPlanRunner(enopt_config, evaluator(functions))
+        BasicOptimizer(enopt_config, evaluator(functions))
         .add_observer(EventType.FINISHED_EVALUATION, _add_objective)
         .run()
         .results
@@ -697,7 +693,7 @@ def test_cvar_filter_mixed(  # noqa: C901
 
     result_list = []
     results = (
-        OptimizationPlanRunner(enopt_config, evaluator(functions))
+        BasicOptimizer(enopt_config, evaluator(functions))
         .add_observer(EventType.FINISHED_EVALUATION, _add_objective)
         .run()
         .results

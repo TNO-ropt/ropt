@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from ropt.enums import EventType, OptimizerExitCode
-from ropt.plan import Event, OptimizationPlanRunner
+from ropt.plan import BasicOptimizer, Event
 from ropt.results import FunctionResults
 
 pytestmark = [pytest.mark.slow]
@@ -31,7 +31,7 @@ def enopt_config_fixture() -> Dict[str, Any]:
 
 
 def test_external_run(enopt_config: Any, evaluator: Any) -> None:
-    variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
+    variables = BasicOptimizer(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, [0, 0, 0.5], atol=0.02)
 
@@ -47,7 +47,7 @@ def test_external_max_functions_exceeded(enopt_config: Any, evaluator: Any) -> N
 
     max_functions = 2
     enopt_config["optimizer"]["max_functions"] = max_functions
-    optimizer = OptimizationPlanRunner(enopt_config, evaluator()).add_observer(
+    optimizer = BasicOptimizer(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, track_results
     )
     optimizer.run()
@@ -62,7 +62,7 @@ def test_external_failed_realizations(enopt_config: Any, evaluator: Any) -> None
         assert event.results[0].functions is None
 
     functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
-    optimizer = OptimizationPlanRunner(enopt_config, evaluator(functions)).add_observer(
+    optimizer = BasicOptimizer(enopt_config, evaluator(functions)).add_observer(
         EventType.FINISHED_EVALUATION, _observer
     )
     optimizer.run()
@@ -80,7 +80,7 @@ def test_external_user_abort(enopt_config: Any, evaluator: Any) -> None:
         if event.results[0].result_id == 1:
             optimizer.abort_optimization()
 
-    optimizer = OptimizationPlanRunner(enopt_config, evaluator()).add_observer(
+    optimizer = BasicOptimizer(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, _observer
     )
     optimizer.run()
@@ -95,4 +95,4 @@ def test_external_error(enopt_config: Any, evaluator: Any) -> None:
         RuntimeError,
         match="External optimizer error: could not convert string to float: 'foo'",
     ):
-        OptimizationPlanRunner(enopt_config, evaluator()).run()
+        BasicOptimizer(enopt_config, evaluator()).run()

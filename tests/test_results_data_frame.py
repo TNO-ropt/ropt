@@ -5,7 +5,7 @@ import pytest
 
 from ropt.config.enopt import EnOptConfig
 from ropt.enums import EventType
-from ropt.plan import Event, OptimizationPlanRunner
+from ropt.plan import BasicOptimizer, Event
 from ropt.report import ResultsDataFrame
 
 # Requires pandas:
@@ -42,7 +42,7 @@ def _handle_results(event: Event, reporter: ResultsDataFrame) -> None:
 def test_dataframe_results_no_results(enopt_config: Any, evaluator: Any) -> None:
     config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsDataFrame(set())
-    OptimizationPlanRunner(config, evaluator()).add_observer(
+    BasicOptimizer(config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION,
         partial(_handle_results, reporter=reporter),
     ).run()
@@ -57,7 +57,7 @@ def test_dataframe_results_function_results(enopt_config: Any, evaluator: Any) -
             "evaluations.variables",
         },
     )
-    OptimizationPlanRunner(config, evaluator()).add_observer(
+    BasicOptimizer(config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION,
         partial(_handle_results, reporter=reporter),
     ).run()
@@ -79,7 +79,7 @@ def test_dataframe_results_function_results_formatted_names(
             "evaluations.variables",
         },
     )
-    OptimizationPlanRunner(config, evaluator()).add_observer(
+    BasicOptimizer(config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION,
         partial(_handle_results, reporter=reporter),
     ).run()
@@ -100,7 +100,7 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
         },
         table_type="gradients",
     )
-    OptimizationPlanRunner(config, evaluator()).add_observer(
+    BasicOptimizer(config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION,
         partial(_handle_results, reporter=reporter),
     ).run()
@@ -128,7 +128,7 @@ def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
             item.metadata["foo"] = {"bar": 1}
         reporter.add_results(EnOptConfig.model_validate(enopt_config), event.results)
 
-    OptimizationPlanRunner(enopt_config, evaluator()).add_observer(
+    BasicOptimizer(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, even_handler
     ).run()
 

@@ -1,2 +1,2 @@
-::: ropt.plan.OptimizationPlanRunner
+::: ropt.plan.BasicOptimizer
 

@@ -12,7 +12,7 @@ from numpy.typing import NDArray
 
 from ropt.enums import EventType
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.plan import Event, OptimizationPlanRunner
+from ropt.plan import BasicOptimizer, Event
 from ropt.results import FunctionResults
 
 DIM = 5
@@ -72,7 +72,7 @@ def run_optimization(config: Dict[str, Any]) -> FunctionResults:
         The optimal results.
     """
     optimal_result = (
-        OptimizationPlanRunner(config, rosenbrock)
+        BasicOptimizer(config, rosenbrock)
         .add_observer(EventType.FINISHED_EVALUATION, report)
         .run()
         .results

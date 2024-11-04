@@ -49,13 +49,13 @@ class _Results:
     exit_code: OptimizerExitCode = OptimizerExitCode.UNKNOWN
 
 
-class OptimizationPlanRunner:
+class BasicOptimizer:
     """A class for running optimization plans.
 
-    `OptimizationPlanRunner` objects are designed for use cases where the
-    optimization workflow comprises a single optimization run. Using this object
-    can be more convenient than defining and running an optimization plan
-    directly in such cases.
+    `BasicOptimizer` objects are designed for use cases where the optimization
+    workflow comprises a single optimization run. Using this object can be more
+    convenient than defining and running an optimization plan directly in such
+    cases.
 
     This class provides the following features:
 
@@ -72,7 +72,7 @@ class OptimizationPlanRunner:
         *,
         constraint_tolerance: float = 1e-10,
     ) -> None:
-        """Initialize an `OptimizationPlanRunner` object.
+        """Initialize an `BasicOptimizer` object.
 
         An optimization configuration and an evaluation object must be provided,
         as they define the optimization to perform.
@@ -151,7 +151,7 @@ class OptimizationPlanRunner:
             plugins:     A dictionary mapping plugin names to plugin objects.
 
         Returns:
-            The `OptimizationPlanRunner` instance, allowing for method chaining.
+            The `BasicOptimizer` instance, allowing for method chaining.
         """
         if self._plugin_manager is None:
             self._plugin_manager = PluginManager()
@@ -172,7 +172,7 @@ class OptimizationPlanRunner:
             function:   The callable to invoke when the event is emitted.
 
         Returns:
-            The `OptimizationPlanRunner` instance, allowing for method chaining.
+            The `BasicOptimizer` instance, allowing for method chaining.
         """
         self._observers.append((event_type, function))
         return self
@@ -187,7 +187,7 @@ class OptimizationPlanRunner:
             metadata: The dictionary containing metadata to add to each result.
 
         Returns:
-            The `OptimizationPlanRunner` instance, allowing for method chaining.
+            The `BasicOptimizer` instance, allowing for method chaining.
         """
         for key, value in metadata.items():
             if value is None:
@@ -221,7 +221,7 @@ class OptimizationPlanRunner:
                             problem rather than the default minimization.
 
         Returns:
-            The `OptimizationPlanRunner` instance, allowing for method chaining.
+            The `BasicOptimizer` instance, allowing for method chaining.
         """
         self._handlers.append(
             {
@@ -242,7 +242,7 @@ class OptimizationPlanRunner:
         """Run the optimization.
 
         Returns:
-            The `OptimizationPlanRunner` instance, allowing for method chaining.
+            The `BasicOptimizer` instance, allowing for method chaining.
         """
         plan = Plan(
             PlanConfig.model_validate(

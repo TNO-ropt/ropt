@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from ropt.enums import EventType
-from ropt.plan import Event, OptimizationPlanRunner
+from ropt.plan import BasicOptimizer, Event
 from ropt.plugins.sampler.scipy import _SUPPORTED_METHODS
 from ropt.results import GradientResults
 
@@ -37,7 +37,7 @@ def test_scipy_samplers_unconstrained(
     enopt_config: Any, method: str, evaluator: Any
 ) -> None:
     enopt_config["samplers"] = [{"method": method}]
-    variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
+    variables = BasicOptimizer(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -48,7 +48,7 @@ def test_scipy_indexed_sampler(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["gradient"]["samplers"] = [0, -1, 0]
     enopt_config["variables"]["initial_values"][1] = 0.1
 
-    variables = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
+    variables = BasicOptimizer(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert pytest.approx(variables[0]) != 0.0
     assert pytest.approx(variables[1]) == 0.1
@@ -70,7 +70,7 @@ def test_scipy_samplers_shared(enopt_config: Any, method: str, evaluator: Any) -
 
     enopt_config["samplers"][0]["shared"] = False
     variables1 = (
-        OptimizationPlanRunner(enopt_config, evaluator())
+        BasicOptimizer(enopt_config, evaluator())
         .add_observer(EventType.FINISHED_EVALUATION, partial(_observer, tag="result1"))
         .run()
         .variables
@@ -79,7 +79,7 @@ def test_scipy_samplers_shared(enopt_config: Any, method: str, evaluator: Any) -
 
     enopt_config["samplers"][0]["shared"] = True
     variables2 = (
-        OptimizationPlanRunner(enopt_config, evaluator())
+        BasicOptimizer(enopt_config, evaluator())
         .add_observer(EventType.FINISHED_EVALUATION, partial(_observer, tag="result2"))
         .run()
         .variables

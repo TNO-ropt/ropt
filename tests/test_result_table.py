@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 import pytest
 
 from ropt.config.enopt import EnOptConfig
-from ropt.plan import OptimizationPlanRunner
+from ropt.plan import BasicOptimizer
 
 # Requires pandas:
 pd = pytest.importorskip("pandas")
@@ -36,7 +36,7 @@ def test_tabular_report_no_results(
     enopt_config: Any, evaluator: Any, tmp_path: Path
 ) -> None:
     path = tmp_path / "results.txt"
-    OptimizationPlanRunner(enopt_config, evaluator()).add_table(
+    BasicOptimizer(enopt_config, evaluator()).add_table(
         {}, path=tmp_path / "results.txt"
     ).run()
     assert not path.exists()
@@ -47,7 +47,7 @@ def test_tabular_report_results(
 ) -> None:
     path = tmp_path / "results.txt"
     config = EnOptConfig.model_validate(enopt_config)
-    OptimizationPlanRunner(config, evaluator()).add_table(
+    BasicOptimizer(config, evaluator()).add_table(
         {
             "result_id": "eval-ID",
             "evaluations.variables": "Variables",
@@ -76,7 +76,7 @@ def test_tabular_report_data_frames_results_formatted_names(
     path = tmp_path / "results.txt"
     enopt_config["variables"]["names"] = [("a", 1), ("a", 2), ("a", 3)]
     config = EnOptConfig.model_validate(enopt_config)
-    OptimizationPlanRunner(config, evaluator()).add_table(
+    BasicOptimizer(config, evaluator()).add_table(
         {
             "result_id": "eval-ID",
             "evaluations.variables": "Variables",
@@ -98,7 +98,7 @@ def test_tabular_report_data_frames_gradients(
     path = tmp_path / "gradients.txt"
     enopt_config["variables"]["names"] = [("a", 1), ("a", 2), ("a", 3)]
     config = EnOptConfig.model_validate(enopt_config)
-    OptimizationPlanRunner(config, evaluator()).add_table(
+    BasicOptimizer(config, evaluator()).add_table(
         {
             "result_id": "eval-ID",
             "gradients.weighted_objective": "Total Objective",
@@ -127,7 +127,7 @@ def test_tabular_report_data_frames_min_header_len(
     path = tmp_path / "results.txt"
     enopt_config["variables"]["names"] = [("a", 1), ("a", 2), ("a", 3)]
     config = EnOptConfig.model_validate(enopt_config)
-    OptimizationPlanRunner(config, evaluator()).add_table(
+    BasicOptimizer(config, evaluator()).add_table(
         {
             "result_id": "eval-ID",
             "evaluations.variables": "Variables",

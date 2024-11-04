@@ -15,7 +15,7 @@ from numpy.typing import NDArray
 
 from ropt.enums import EventType
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.plan import Event, OptimizationPlanRunner
+from ropt.plan import BasicOptimizer, Event
 from ropt.results import FunctionResults
 
 DIM = 5
@@ -90,7 +90,7 @@ def run_optimization(config: Dict[str, Any]) -> FunctionResults:
     b = rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=realizations)
 
     optimal_result = (
-        OptimizationPlanRunner(CONFIG, partial(rosenbrock, a=a, b=b))
+        BasicOptimizer(CONFIG, partial(rosenbrock, a=a, b=b))
         .add_observer(EventType.FINISHED_EVALUATION, report)
         .run()
         .results

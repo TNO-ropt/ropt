@@ -10,7 +10,7 @@ from numpy.random import Generator, default_rng
 from ropt.config.enopt import EnOptConfig
 from ropt.ensemble_evaluator._gradient import _perturb_variables
 from ropt.exceptions import ConfigError
-from ropt.plan import OptimizationPlanRunner
+from ropt.plan import BasicOptimizer
 from ropt.plugins.sampler.base import Sampler, SamplerPlugin
 
 if TYPE_CHECKING:
@@ -156,7 +156,7 @@ def test_sampler_order(enopt_config: Any, evaluator: Any) -> None:
         {"method": "norm"},
         {"method": "uniform"},
     ]
-    variables1 = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
+    variables1 = BasicOptimizer(enopt_config, evaluator()).run().variables
     assert variables1 is not None
     assert np.allclose(variables1, [0, 0, 0.5], atol=0.025)
 
@@ -166,7 +166,7 @@ def test_sampler_order(enopt_config: Any, evaluator: Any) -> None:
         {"method": "norm"},
     ]
     enopt_config["gradient"]["samplers"] = [1, 1, 0]
-    variables2 = OptimizationPlanRunner(enopt_config, evaluator()).run().variables
+    variables2 = BasicOptimizer(enopt_config, evaluator()).run().variables
     assert variables2 is not None
     assert np.allclose(variables2, [0, 0, 0.5], atol=0.025)
 
@@ -175,10 +175,10 @@ def test_sampler_order(enopt_config: Any, evaluator: Any) -> None:
 
 def test_sampler_plugin(enopt_config: Any, evaluator: Any) -> None:
     with pytest.raises(ConfigError, match="Method not found: test"):
-        OptimizationPlanRunner(enopt_config, evaluator()).run()
+        BasicOptimizer(enopt_config, evaluator()).run()
 
     variables1 = (
-        OptimizationPlanRunner(enopt_config, evaluator())
+        BasicOptimizer(enopt_config, evaluator())
         .add_plugins("sampler", {"mocked": MockedSamplerPlugin()})
         .run()
         .variables
