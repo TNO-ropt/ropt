@@ -112,7 +112,7 @@ class DefaultEvaluatorStep(PlanStep):
         ensemble_evaluator = EnsembleEvaluator(
             self._enopt_config,
             self.plan.optimizer_context.evaluator,
-            self.plan.plan_path,
+            self.plan.plan_id,
             self.plan.result_id_iterator,
             self.plan.plugin_manager,
         )

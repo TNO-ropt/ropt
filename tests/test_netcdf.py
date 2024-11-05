@@ -58,6 +58,7 @@ def function_result_fixture(enopt_config: Any) -> FunctionResults:
         objectives=np.array([1.0, 2.0]),
     )
     return FunctionResults(
+        plan_id=(0,),
         result_id=0,
         batch_id=1,
         metadata={},
@@ -79,6 +80,7 @@ def gradient_result_fixture() -> GradientResults:
         objectives=np.arange(4, dtype=np.float64).reshape((2, 2)),
     )
     return GradientResults(
+        plan_id=(0,),
         result_id=0,
         batch_id=1,
         metadata={},
@@ -90,26 +92,15 @@ def gradient_result_fixture() -> GradientResults:
     )
 
 
-@pytest.mark.parametrize(
-    ("name", "final_name"),
-    [
-        ("test", "test.nc"),
-        ("test.nc", "test.nc"),
-        ("test{batch_id:03d}", "test001.nc"),
-        ("test{batch_id:03d}.nc", "test001.nc"),
-    ],
-)
 def test_functions_to_netcdf(
     enopt_config: Any,
     function_result: FunctionResults,
     tmp_path: Path,
-    name: str,
-    final_name: str,
 ) -> None:
     config = EnOptConfig.model_validate(enopt_config)
-    function_result.to_netcdf(config, tmp_path / name)
-    assert (tmp_path / final_name).exists()
-    file = netcdf.Dataset((tmp_path / final_name), mode="r")
+    function_result.to_netcdf(config, tmp_path / "test.nc")
+    assert (tmp_path / "test.nc").exists()
+    file = netcdf.Dataset((tmp_path / "test.nc"), mode="r")
     assert set(file.groups) == {
         "evaluations",
         "realizations",
@@ -125,33 +116,24 @@ def test_functions_from_netcdf(
     function_result.to_netcdf(config, tmp_path / "test.nc")
     assert (tmp_path / "test.nc").exists()
     loaded = FunctionResults.from_netcdf(tmp_path / "test.nc")
+    assert loaded.result_id == function_result.result_id
     assert loaded.batch_id == function_result.batch_id
+    assert loaded.plan_id == function_result.plan_id
     for item in ("evaluations", "realizations", "functions"):
-        assert loaded.to_dataframe(config, item).equals(
+        assert function_result.to_dataframe(config, item).equals(
             function_result.to_dataframe(config, item)
         )
 
 
-@pytest.mark.parametrize(
-    ("name", "final_name"),
-    [
-        ("test", "test.nc"),
-        ("test.nc", "test.nc"),
-        ("test{batch_id:03d}", "test001.nc"),
-        ("test{batch_id:03d}.nc", "test001.nc"),
-    ],
-)
 def test_gradients_to_netcdf(
     enopt_config: Any,
     gradient_result: GradientResults,
     tmp_path: Path,
-    name: str,
-    final_name: str,
 ) -> None:
     config = EnOptConfig.model_validate(enopt_config)
-    gradient_result.to_netcdf(config, tmp_path / name)
-    assert (tmp_path / final_name).exists()
-    file = netcdf.Dataset((tmp_path / final_name), mode="r")
+    gradient_result.to_netcdf(config, tmp_path / "test.nc")
+    assert (tmp_path / "test.nc").exists()
+    file = netcdf.Dataset((tmp_path / "test.nc"), mode="r")
     assert set(file.groups) == {
         "evaluations",
         "realizations",

@@ -31,6 +31,7 @@ if TYPE_CHECKING:
 def _to_dataset(  # noqa: PLR0913
     config: EnOptConfig,
     result_field: ResultField,
+    plan_id: Tuple[int, ...],
     result_id: Union[int, Tuple[int, ...]],
     batch_id: Optional[int],
     metadata: Dict[str, Any],
@@ -41,6 +42,7 @@ def _to_dataset(  # noqa: PLR0913
     arrays = {field: _to_data_array(config, result_field, field) for field in select}
     arrays = {field: array for field, array in arrays.items() if array is not None}
     attrs: Dict[str, Any] = {}
+    attrs["plan_id"] = plan_id
     attrs["result_id"] = result_id
     if batch_id is not None:
         attrs["batch_id"] = batch_id
@@ -94,18 +96,14 @@ def _from_dataset(dataset: xarray.Dataset) -> Dict[str, Any]:
 
 
 def _to_netcdf(results: Results, config: EnOptConfig, filename: Path) -> None:
-    filename = filename.with_name(
-        filename.name.format(result_id=results.result_id, batch_id=results.batch_id),
-    )
-    if filename.suffix != ".nc":
-        filename = filename.with_suffix(".nc")
     mode: Literal["w", "a"] = "w"
     metadata: Dict[str, Any] = {
-        "result_id": results.result_id,
+        "plan_id": json.dumps(results.plan_id),
+        "result_id": json.dumps(results.result_id),
         "metadata": json.dumps(results.metadata),
     }
     if results.batch_id is not None:
-        metadata["batch_id"] = results.batch_id
+        metadata["batch_id"] = json.dumps(results.batch_id)
     for result_field in fields(results):
         if is_dataclass(getattr(results, result_field.name)):
             dataset = results.to_dataset(config, result_field.name)
@@ -121,7 +119,9 @@ def _from_netcdf(filename: Path, result_type: Type[TypeResults]) -> Dict[str, An
     if filename.suffix != ".nc":
         filename = filename.with_suffix(".nc")
     result: Dict[str, Any] = xarray.open_dataset(filename, group="__metadata__").attrs
-    result["metadata"] = json.loads(result["metadata"])
+    result = {key: json.loads(value) for key, value in result.items()}
+    if "plan_id" in result:
+        result["plan_id"] = tuple(result["plan_id"])
     for result_field in fields(result_type):
         # Load all fields, skipping those already loaded from the metadata:
         if result_field.name not in result:

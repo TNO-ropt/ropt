@@ -117,7 +117,7 @@ class Plan:
         optimizer_context: OptimizerContext,
         plugin_manager: Optional[PluginManager] = None,
         parent: Optional[Plan] = None,
-        plan_path: Optional[Tuple[int, ...]] = None,
+        plan_id: Optional[Tuple[int, ...]] = None,
     ) -> None:
         """Initialize a plan object.
 
@@ -131,10 +131,10 @@ class Plan:
         spawned plan receiving a reference to its parent plan via the `parent`
         argument.
 
-        Plan hierarchies are tracked using the `plan_path` attribute. A directly
-        created plan has `plan_path == ()`, an empty tuple. When a plan spawns a
-        new plan with the [`spawn`][ropt.plan.Plan.spawn] method, the child
-        receives an incremental index appended to its parent's `plan_path`,
+        Plan hierarchies are tracked using the `plan_id` attribute, a tuple of
+        integers. A directly created plan has `plan_id == (0,)`. When a plan
+        spawns a new plan with the [`spawn`][ropt.plan.Plan.spawn] method, the
+        child receives an incremental index appended to its parent's `plan_id`,
         forming a unique sequence that reflects both the order of creation and
         nesting. This structure enables efficient tracing across both sequential
         and nested plan workflows.
@@ -147,12 +147,12 @@ class Plan:
                                result handler plugins.
             parent:            Optional reference to the parent plan that
                                spawned this plan.
-            plan_path:         The path of the plan, reflecting its hierarchy.
+            plan_id:           The ID of the plan, reflecting its hierarchy.
         """
         self._plan_config = config
         self._optimizer_context = optimizer_context
         self._vars: Dict[str, Any] = {}
-        self._plan_path: Tuple[int, ...] = () if plan_path is None else plan_path
+        self._plan_id: Tuple[int, ...] = (0,) if plan_id is None else plan_id
         self._spawn_id: int = -1
         self._result_id_iter = count()
 
@@ -167,11 +167,11 @@ class Plan:
             if var in self._vars:
                 msg = f"Plan variable already exists: `{var}`"
                 raise AttributeError(msg)
-            if var == "plan_path":
+            if var == "plan_id":
                 msg = f"Plan variable overrides a builtin variable: {var}"
                 raise AttributeError(msg)
             self._set_item(var, None)
-        self._set_item("plan_path", list(self.plan_path))
+        self._set_item("plan_id", list(self.plan_id))
         self._steps = self.create_steps(config.steps)
         self._handlers: List[ResultHandler] = [
             self._plugin_manager.get_plugin("plan", method=config.run).create(
@@ -225,18 +225,18 @@ class Plan:
         return self._aborted
 
     @property
-    def plan_path(self) -> Tuple[int, ...]:
-        """Return the path of the plan.
+    def plan_id(self) -> Tuple[int, ...]:
+        """Return the ID of the plan.
 
-        Each plan maintains a unique path that reflects its creation order and
-        any nesting structure. When a plan spawns additional plans, the
-        resulting hierarchy is captured in the `plan_path` attribute as a
-        sequence of numbers.
+        Each plan has a unique ID, stored as a tuple of integers, which reflects
+        both its creation order and any nesting structure within the plan
+        hierarchy. When a plan spawns additional plans, this hierarchy is
+        encoded in the `plan_id` attribute as a sequential tuple.
 
         Returns:
-            tuple: A tuple representing the plan path for this plan.
+            tuple: The unique tuple-based ID for this plan.
         """
-        return self._plan_path
+        return self._plan_id
 
     @property
     def result_id_iterator(self) -> Iterator[int]:
@@ -338,7 +338,7 @@ class Plan:
             optimizer_context=self._optimizer_context,
             plugin_manager=self._plugin_manager,
             parent=self,
-            plan_path=(*self._plan_path, self._spawn_id),
+            plan_id=(*self._plan_id, self._spawn_id),
         )
 
     def eval(self, value: Any) -> Any:  # noqa: ANN401
@@ -386,8 +386,8 @@ class Plan:
         Args:
             event: The event object to emit.
         """
-        if not event.plan_path:
-            event.plan_path = self.plan_path
+        if not event.plan_id:
+            event.plan_id = self.plan_id
         for handler in self._handlers:
             event = handler.handle_event(event)
         if self._parent is None:

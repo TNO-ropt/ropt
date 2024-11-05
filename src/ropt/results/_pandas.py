@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 def _to_dataframe(  # noqa: PLR0913
     config: EnOptConfig,
     result_field: ResultField,
+    plan_id: Tuple[int, ...],
     result_id: Union[int, Tuple[int, ...]],
     batch_id: Optional[int],
     select: Optional[Iterable[str]],
@@ -27,7 +28,7 @@ def _to_dataframe(  # noqa: PLR0913
         unstack = []
     joined_frame = pd.DataFrame()
     for field in select:
-        series = _to_series(config, result_field, result_id, batch_id, field)
+        series = _to_series(config, result_field, plan_id, result_id, batch_id, field)
         if series is not None:
             frame = series.to_frame()
             for axis in unstack:
@@ -41,9 +42,10 @@ def _to_dataframe(  # noqa: PLR0913
     return joined_frame
 
 
-def _to_series(
+def _to_series(  # noqa: PLR0913
     config: EnOptConfig,
     result_field: ResultField,
+    plan_id: Tuple[int, ...],
     result_id: Union[int, Tuple[int, ...]],
     batch_id: Optional[int],
     field: str,
@@ -62,8 +64,8 @@ def _to_series(
         for idx, index in enumerate(indices)
     ]
     series: pd.Series[Any]
-    index: Tuple[Any, ...] = (result_id, 0 if batch_id is None else batch_id)
-    index_names = ["result_id", "batch_id"]
+    index: Tuple[Any, ...] = (plan_id, result_id, 0 if batch_id is None else batch_id)
+    index_names = ["plan_id", "result_id", "batch_id"]
     if indices:
         multi_index = pd.MultiIndex.from_product(
             indices, names=(axis.value for axis in axes)

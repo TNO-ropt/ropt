@@ -48,6 +48,7 @@ def function_result_fixture(enopt_config: Any) -> FunctionResults:
         objectives=np.array([1.0, 2.0]),
     )
     return FunctionResults(
+        plan_id=(0,),
         result_id=0,
         batch_id=1,
         metadata={"foo": "bar"},

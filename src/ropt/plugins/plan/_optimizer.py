@@ -138,7 +138,7 @@ class DefaultOptimizerStep(PlanStep):
             tags:                  Tags to add to the emitted events.
             initial_values:        The initial values for the optimizer.
             exit_code_var:         Name of the variable to store the exit code.
-            add_plan_path_to_seed: If `True`, appends the plan ID to the config seed.
+            add_plan_id_to_seed: If `True`, appends the plan ID to the config seed.
             nested_optimization:   Optional nested optimization plan configuration.
         """
 
@@ -146,7 +146,7 @@ class DefaultOptimizerStep(PlanStep):
         tags: ItemOrSet[str] = set()
         initial_values: Optional[Union[str, Array1D]] = None
         exit_code_var: Optional[str] = None
-        add_plan_path_to_seed: bool = False
+        add_plan_id_to_seed: bool = False
         nested_optimization: Optional[DefaultOptimizerStep.NestedPlanConfig] = None
 
         model_config = ConfigDict(
@@ -179,9 +179,9 @@ class DefaultOptimizerStep(PlanStep):
             raise TypeError(msg)
         self._enopt_config = EnOptConfig.model_validate(config)
 
-        if self._with.add_plan_path_to_seed:
+        if self._with.add_plan_id_to_seed:
             self._enopt_config.gradient.seed = (
-                *self.plan.plan_path,
+                *self.plan.plan_id,
                 *self._enopt_config.gradient.seed,
             )
 
@@ -196,7 +196,7 @@ class DefaultOptimizerStep(PlanStep):
         ensemble_evaluator = EnsembleEvaluator(
             self._enopt_config,
             self.plan.optimizer_context.evaluator,
-            self.plan.plan_path,
+            self.plan.plan_id,
             self.plan.result_id_iterator,
             self.plan.plugin_manager,
         )
