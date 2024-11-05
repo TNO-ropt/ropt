@@ -365,10 +365,14 @@ def test_plan_rng(enopt_config: Dict[str, Any], evaluator: Any) -> None:
                 },
             },
             {
+                "set": {
+                    "config['gradient']['seed']": "$plan_id +  [$config['gradient']['seed']]"
+                }
+            },
+            {
                 "optimizer": {
                     "config": "$config",
                     "tags": "optimal3",
-                    "add_plan_id_to_seed": True,
                 },
             },
         ],

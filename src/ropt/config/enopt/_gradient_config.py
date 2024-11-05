@@ -107,6 +107,17 @@ class GradientConfig(BaseModel):
         seed:                     The seed for the random number generator passed to each sampler.
         merge_realizations:       If all realizations should be merged for the final
                                   gradient calculation (default: `False`).
+
+    Note: The seed for samples
+        The seed controls consistency in results across repeated runs within the
+        same plan, as long as the seed remains unchanged. To obtain unique
+        results for each optimization run, the seed should be modified. The
+        `numpy` manual suggests converting the seed to a tuple and pre-pending
+        one or more unique integers.
+
+        A suitable approach is to use the unique plan ID of the optimizer as the
+        pre-pended value, which ensures reproducibility across nested and
+        parallel plan evaluations.
     """
 
     number_of_perturbations: PositiveInt = DEFAULT_NUMBER_OF_PERTURBATIONS
