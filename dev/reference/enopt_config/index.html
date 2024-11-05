@@ -3019,6 +3019,18 @@ gradient.</p>
     </table>
 
 
+<details class="note" open>
+  <summary>The seed for samples</summary>
+  <p>The seed controls consistency in results across repeated runs within the
+same plan, as long as the seed remains unchanged. To obtain unique
+results for each optimization run, the seed should be modified. The
+<code>numpy</code> manual suggests converting the seed to a tuple and pre-pending
+one or more unique integers.</p>
+<p>A suitable approach is to use the unique plan ID of the optimizer as the
+pre-pended value, which ensures reproducibility across nested and
+parallel plan evaluations.</p>
+</details>
+
 
 
   <div class="doc doc-children">

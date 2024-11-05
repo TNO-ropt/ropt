@@ -1932,15 +1932,6 @@ variable where the <a class="autorefs autorefs-internal" href="../enums/#ropt.en
 stored, which the optimizer returns upon completion.</p>
 <p>The <code>tags</code> field allows optional labels to be attached to each result,
 assisting result handlers in filtering relevant results.</p>
-<p>Some gradient-based optimizers use stochastic methods to approximate
-gradients. The optimizer's configuration includes a seed for the random
-number generator to ensure consistent results across repeated runs
-within the same plan, provided the seed remains fixed. If unique results
-are desired for each optimization, the <code>add_plan_seed</code> attribute can be
-set to <code>True</code>, which modifies the configuration seed by incorporating
-the optimizer's unique plan ID, as recommended in the <code>numpy</code> manual.
-This approach maintains reproducibility across nested and parallel plan
-evaluations.</p>
 <p>The <code>nested_optimization_plan</code> is parsed as a <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep.NestedPlanConfig"><code>NestedPlanConfig</code></a> to
 define an optional nested optimization procedure.</p>
 
@@ -1996,17 +1987,6 @@ define an optional nested optimization procedure.</p>
             <td>
               <div class="doc-md-description">
                 <p>Name of the variable to store the exit code.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith.add_plan_id_to_seed">add_plan_id_to_seed</span></code></td>
-            <td>
-                  <code>bool</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If <code>True</code>, appends the plan ID to the config seed.</p>
               </div>
             </td>
           </tr>
