@@ -7,8 +7,10 @@ from typing import Any, Dict, Optional, Tuple
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
+from ropt.config.utils import ImmutableBaseModel
 
-class ScriptOptimizerConfig(BaseModel):
+
+class ScriptOptimizerConfig(ImmutableBaseModel):
     """Configuration of a ScriptOptimizer object.
 
     This configuration class defines a number of parameters that determine how
@@ -50,10 +52,12 @@ class ScriptOptimizerConfig(BaseModel):
 
     @model_validator(mode="after")
     def _after_validator(self) -> ScriptOptimizerConfig:
+        self._mutable()
         self.work_dir = Path(self.work_dir).resolve()
         self.job_dir = self.work_dir if self.job_dir is None else self.job_dir
         if not self.job_dir.is_absolute():
             self.job_dir = self.work_dir / self.job_dir
+        self._immutable()
         return self
 
 

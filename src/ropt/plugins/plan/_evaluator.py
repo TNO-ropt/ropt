@@ -81,6 +81,7 @@ class DefaultEvaluatorStep(PlanStep):
             extra="forbid",
             validate_default=True,
             arbitrary_types_allowed=True,
+            frozen=True,
         )
 
     def __init__(self, config: PlanStepConfig, plan: Plan) -> None:

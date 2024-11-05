@@ -78,6 +78,7 @@ class DefaultSetStep(PlanStep):
     model_config = ConfigDict(
         extra="forbid",
         validate_default=True,
+        frozen=True,
     )
 
     def __init__(self, config: PlanStepConfig, plan: Plan) -> None:

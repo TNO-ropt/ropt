@@ -7,9 +7,9 @@ from copy import deepcopy
 from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import ConfigDict, model_validator
 
-from ropt.config.utils import immutable_array
+from ropt.config.utils import ImmutableBaseModel, immutable_array
 from ropt.enums import PerturbationType
 
 from ._function_transform_config import FunctionTransformConfig
@@ -29,7 +29,7 @@ else:
     from typing_extensions import Self
 
 
-class EnOptConfig(BaseModel):
+class EnOptConfig(ImmutableBaseModel):
     """The primary configuration class for a single optimization step.
 
     The fields of the `EnOptConfig` class are nested configuration classes that
@@ -102,6 +102,7 @@ class EnOptConfig(BaseModel):
 
     @model_validator(mode="after")
     def _linear_constraints(self) -> Self:
+        self._mutable()
         if self.linear_constraints is not None:
             variable_count = self.variables.initial_values.size
             if (
@@ -130,10 +131,13 @@ class EnOptConfig(BaseModel):
                 self.linear_constraints = LinearConstraintsConfig.model_construct(
                     **values,
                 )
+        self._immutable()
         return self
 
     @model_validator(mode="after")
     def _gradient(self) -> Self:
+        self._mutable()
+
         variables = self.variables
         variable_count = variables.initial_values.size
         magnitudes = self.gradient.perturbation_magnitudes
@@ -187,10 +191,15 @@ class EnOptConfig(BaseModel):
             scaled = types == PerturbationType.SCALED
             magnitudes = np.where(scaled, magnitudes / variables.scales, magnitudes)
 
-        self.gradient.perturbation_magnitudes = magnitudes
-        self.gradient.boundary_types = boundary_types
-        self.gradient.perturbation_types = types
+        self.gradient = self.gradient.model_copy(
+            update={
+                "perturbation_magnitudes": magnitudes,
+                "boundary_types": boundary_types,
+                "perturbation_types": types,
+            }
+        )
 
+        self._immutable()
         return self
 
     @model_validator(mode="before")

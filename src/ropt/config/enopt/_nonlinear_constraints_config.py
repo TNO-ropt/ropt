@@ -6,9 +6,14 @@ import sys
 from typing import Optional
 
 import numpy as np
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import ConfigDict, model_validator
 
-from ropt.config.utils import broadcast_1d_array, broadcast_arrays, check_enum_values
+from ropt.config.utils import (
+    ImmutableBaseModel,
+    broadcast_1d_array,
+    broadcast_arrays,
+    check_enum_values,
+)
 from ropt.config.validated_types import (  # noqa: TCH001
     Array1D,
     Array1DBool,
@@ -24,7 +29,7 @@ else:
     from typing_extensions import Self
 
 
-class NonlinearConstraintsConfig(BaseModel):
+class NonlinearConstraintsConfig(ImmutableBaseModel):
     r"""The configuration class for non-linear constraints.
 
     This class defines non-linear constraints configured by the
@@ -108,6 +113,7 @@ class NonlinearConstraintsConfig(BaseModel):
     def _broadcast_and_check(
         self,
     ) -> Self:
+        self._mutable()
         if self.names is not None:
             size = len(self.names)
             for name in ("rhs_values", "scales", "auto_scale"):
@@ -119,4 +125,5 @@ class NonlinearConstraintsConfig(BaseModel):
 
         check_enum_values(self.types, ConstraintType)
         self.types = broadcast_1d_array(self.types, "types", self.rhs_values.size)
+        self._immutable()
         return self

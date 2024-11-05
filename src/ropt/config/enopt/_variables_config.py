@@ -7,9 +7,10 @@ from itertools import zip_longest
 from typing import Optional, Tuple, Union
 
 import numpy as np
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, model_validator
 
 from ropt.config.utils import (
+    ImmutableBaseModel,
     broadcast_1d_array,
     broadcast_arrays,
     check_enum_values,
@@ -29,7 +30,7 @@ else:
     from typing_extensions import Self
 
 
-class VariablesConfig(BaseModel):
+class VariablesConfig(ImmutableBaseModel):
     r"""The configuration class for variables.
 
     This configuration class, configured by the `variables` field in an
@@ -111,6 +112,8 @@ class VariablesConfig(BaseModel):
 
     @model_validator(mode="after")
     def _broadcast_and_scale(self) -> Self:
+        self._mutable()
+
         if self.names is not None:
             size = len(self.names)
             self.initial_values = broadcast_1d_array(
@@ -151,6 +154,8 @@ class VariablesConfig(BaseModel):
             self.types = broadcast_1d_array(
                 self.types, "types", self.initial_values.size
             )
+
+        self._immutable()
 
         return self
 

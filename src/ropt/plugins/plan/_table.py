@@ -76,6 +76,7 @@ class DefaultTableHandler(ResultHandler):
         model_config = ConfigDict(
             extra="forbid",
             validate_default=True,
+            frozen=True,
         )
 
     def __init__(self, config: ResultHandlerConfig, plan: Plan) -> None:

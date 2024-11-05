@@ -88,6 +88,7 @@ class PlanStepConfig(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         validate_default=True,
+        frozen=True,
     )
 
     @model_validator(mode="before")
@@ -165,6 +166,7 @@ class ResultHandlerConfig(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         validate_default=True,
+        frozen=True,
     )
 
     @model_validator(mode="before")
@@ -228,4 +230,5 @@ class PlanConfig(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         validate_default=True,
+        frozen=True,
     )

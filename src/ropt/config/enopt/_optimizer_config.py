@@ -7,12 +7,13 @@ from pathlib import Path  # noqa: TCH003
 from typing import Any, Dict, List, Optional, Union
 
 from pydantic import (
-    BaseModel,
     ConfigDict,
     NonNegativeFloat,
     PositiveInt,
     model_validator,
 )
+
+from ropt.config.utils import ImmutableBaseModel
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -20,7 +21,7 @@ else:
     from typing_extensions import Self
 
 
-class OptimizerConfig(BaseModel):
+class OptimizerConfig(ImmutableBaseModel):
     """The configuration class for optimizers used in the optimization.
 
     This class defines the configuration for optimizers, configured by the
@@ -91,8 +92,10 @@ class OptimizerConfig(BaseModel):
 
     @model_validator(mode="after")
     def _method(self) -> Self:
+        self._mutable()
         plugin, sep, method = self.method.rpartition("/")
         if (sep == "/") and (plugin == "" or method) == "":
             msg = f"malformed method specification: `{self.method}`"
             raise ValueError(msg)
+        self._mutable()
         return self

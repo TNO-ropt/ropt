@@ -6,9 +6,14 @@ import sys
 from typing import Optional
 
 import numpy as np
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import ConfigDict, model_validator
 
-from ropt.config.utils import broadcast_1d_array, broadcast_arrays, normalize
+from ropt.config.utils import (
+    ImmutableBaseModel,
+    broadcast_1d_array,
+    broadcast_arrays,
+    normalize,
+)
 from ropt.config.validated_types import (  # noqa: TCH001
     Array1D,
     Array1DBool,
@@ -22,7 +27,7 @@ else:
     from typing_extensions import Self
 
 
-class ObjectiveFunctionsConfig(BaseModel):
+class ObjectiveFunctionsConfig(ImmutableBaseModel):
     """The configuration class for objective functions.
 
     This configuration class defines objective functions configured by the
@@ -97,6 +102,7 @@ class ObjectiveFunctionsConfig(BaseModel):
 
     @model_validator(mode="after")
     def _broadcast_and_normalize(self) -> Self:
+        self._mutable()
         if self.names is not None:
             size = len(self.names)
             for name in ("scales", "auto_scale", "weights"):
@@ -107,4 +113,5 @@ class ObjectiveFunctionsConfig(BaseModel):
             )
 
         self.weights = normalize(self.weights)
+        self._immutable()
         return self

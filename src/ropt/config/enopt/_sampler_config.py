@@ -49,4 +49,5 @@ class SamplerConfig(BaseModel):
         str_min_length=1,
         str_strip_whitespace=True,
         validate_default=True,
+        frozen=True,
     )

@@ -11,6 +11,7 @@ from typing import Any, Optional, Sequence, Set, Tuple, Type, TypeVar, Union, ca
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
+from pydantic import BaseModel
 
 
 def normalize(array: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -170,3 +171,37 @@ def _convert_tuple(value: Union[T, Sequence[T]]) -> Tuple[T, ...]:
     if isinstance(value, str):
         return (cast(T, value),)
     return tuple(value) if isinstance(value, AbstractSequence) else (value,)
+
+
+class ImmutableBaseModel(BaseModel):
+    """Base model for immutable classes.
+
+    This model serves as an alternative to frozen Pydantic classes. It is
+    particularly useful when post-initialization validators are required, as
+    these validators may not function properly with frozen Pydantic classes.
+    """
+
+    _is_immutable: bool
+
+    def _immutable(self) -> None:
+        self._is_immutable = True
+
+    def _mutable(self) -> None:
+        self._is_immutable = False
+
+    def __setattr__(self, name: str, value: Any) -> None:  # noqa: ANN401
+        """Attribute setter method.
+
+        This method sets an attribute if the object is not immutable.
+
+        Args:
+            name:  The name of the attribute to set.
+            value: The value to assign to the attribute.
+
+        Raises:
+            AttributeError: Raised if the object is immutable and cannot be modified.
+        """
+        if name != "_is_immutable" and self._is_immutable:
+            msg = f"{self.__class__.__name__} is immutable"
+            raise AttributeError(msg)
+        super().__setattr__(name, value)

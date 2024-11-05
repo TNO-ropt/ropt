@@ -101,6 +101,13 @@ class DefaultOptimizerStep(PlanStep):
         plan: PlanConfig
         extra_inputs: ItemOrTuple[Any] = ()
 
+        model_config = ConfigDict(
+            extra="forbid",
+            validate_default=True,
+            arbitrary_types_allowed=True,
+            frozen=True,
+        )
+
     class DefaultOptimizerStepWith(BaseModel):
         """Parameters used by the default optimizer step.
 
@@ -141,6 +148,7 @@ class DefaultOptimizerStep(PlanStep):
             extra="forbid",
             validate_default=True,
             arbitrary_types_allowed=True,
+            frozen=True,
         )
 
     def __init__(self, config: PlanStepConfig, plan: Plan) -> None:

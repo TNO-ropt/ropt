@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import sys
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import ConfigDict, model_validator
 
-from ropt.config.utils import broadcast_1d_array, check_enum_values
+from ropt.config.utils import ImmutableBaseModel, broadcast_1d_array, check_enum_values
 from ropt.config.validated_types import Array1D, Array2D, ArrayEnum  # noqa: TCH001
 from ropt.enums import ConstraintType
 
@@ -16,7 +16,7 @@ else:
     from typing_extensions import Self
 
 
-class LinearConstraintsConfig(BaseModel):
+class LinearConstraintsConfig(ImmutableBaseModel):
     r"""The configuration class for linear constraints.
 
     This class defines linear constraints configured by the `linear_constraints`
@@ -82,8 +82,10 @@ class LinearConstraintsConfig(BaseModel):
 
     @model_validator(mode="after")
     def _broadcast_and_check(self) -> Self:
+        self._mutable()
         size = 0 if self.coefficients is None else self.coefficients.shape[0]
         self.rhs_values = broadcast_1d_array(self.rhs_values, "rhs_values", size)
         check_enum_values(self.types, ConstraintType)
         self.types = broadcast_1d_array(self.types, "types", size)
+        self._immutable()
         return self

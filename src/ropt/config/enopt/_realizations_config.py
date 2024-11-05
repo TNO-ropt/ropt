@@ -6,9 +6,9 @@ import sys
 from typing import Optional
 
 import numpy as np
-from pydantic import BaseModel, ConfigDict, NonNegativeInt, model_validator
+from pydantic import ConfigDict, NonNegativeInt, model_validator
 
-from ropt.config.utils import broadcast_1d_array, normalize
+from ropt.config.utils import ImmutableBaseModel, broadcast_1d_array, normalize
 from ropt.config.validated_types import Array1D, UniqueNames  # noqa: TCH001
 
 if sys.version_info >= (3, 11):
@@ -17,7 +17,7 @@ else:
     from typing_extensions import Self
 
 
-class RealizationsConfig(BaseModel):
+class RealizationsConfig(ImmutableBaseModel):
     """The configuration class for realizations.
 
     This class defines realizations configured by the `realizations` field in an
@@ -75,16 +75,15 @@ class RealizationsConfig(BaseModel):
 
     @model_validator(mode="after")
     def _broadcast_normalize_and_check(self) -> Self:
+        self._mutable()
         if self.names:
             size = len(self.names)
             self.weights = broadcast_1d_array(self.weights, "weights", size)
-
         self.weights = normalize(self.weights)
-
         if (
             self.realization_min_success is None
             or self.realization_min_success > self.weights.size
         ):
             self.realization_min_success = self.weights.size
-
+        self._immutable()
         return self

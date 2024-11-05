@@ -55,6 +55,7 @@ class DefaultMetadataHandler(ResultHandler):
             extra="forbid",
             validate_default=True,
             arbitrary_types_allowed=True,
+            frozen=True,
         )
 
     def __init__(self, config: ResultHandlerConfig, plan: Plan) -> None:

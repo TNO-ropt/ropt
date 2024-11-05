@@ -6,9 +6,9 @@ import sys
 from typing import Optional
 
 import numpy as np
-from pydantic import BaseModel, ConfigDict, PositiveInt, model_validator
+from pydantic import ConfigDict, PositiveInt, model_validator
 
-from ropt.config.utils import check_enum_values
+from ropt.config.utils import ImmutableBaseModel, check_enum_values
 from ropt.config.validated_types import (  # noqa: TCH001
     Array1D,
     Array1DInt,
@@ -31,7 +31,7 @@ else:
     from typing_extensions import Self
 
 
-class GradientConfig(BaseModel):
+class GradientConfig(ImmutableBaseModel):
     """The configuration class for gradient calculations.
 
     This class defines the configuration for gradient calculations, configured
@@ -137,11 +137,13 @@ class GradientConfig(BaseModel):
 
     @model_validator(mode="after")
     def _check_perturbation_min_success(self) -> Self:
+        self._mutable()
         if (
             self.perturbation_min_success is None
             or self.perturbation_min_success > self.number_of_perturbations
         ):
             self.perturbation_min_success = self.number_of_perturbations
+        self._immutable()
         return self
 
     @model_validator(mode="after")
