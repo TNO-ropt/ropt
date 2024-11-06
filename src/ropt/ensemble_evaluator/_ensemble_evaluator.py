@@ -26,9 +26,14 @@ from ._evaluator_results import (
     _get_function_results,
     _get_gradient_results,
 )
-from ._function import _calculate_transformed_functions, _calculate_weighted_function
+from ._function import (
+    _calculate_transformed_constraints,
+    _calculate_transformed_objectives,
+    _calculate_weighted_function,
+)
 from ._gradient import (
-    _calculate_transformed_gradients,
+    _calculate_transformed_constraint_gradients,
+    _calculate_transformed_objective_gradients,
     _calculate_weighted_gradient,
     _perturb_variables,
 )
@@ -121,6 +126,9 @@ class EnsembleEvaluator:
         # Only functions:
         if compute_functions and not compute_gradients:
             return self._calculate_functions(variables)
+
+        # Parallel evaluation is not supported for gradient-based optimizers:
+        assert variables.ndim == 1
 
         # Only a gradient, and there is a cached function value:
         if (
@@ -255,7 +263,7 @@ class EnsembleEvaluator:
         variable_indices: Optional[NDArray[np.intc]],
     ) -> Tuple[GradientResults]:
         perturbed_variables = _perturb_variables(
-            variables, self._config.variables, self._config.gradient, self._samplers
+            self._config, variables, self._samplers
         )
 
         # No functions are computed in this case, instead they must have been
@@ -339,7 +347,7 @@ class EnsembleEvaluator:
         variable_indices: Optional[NDArray[np.intc]],
     ) -> Tuple[FunctionResults, GradientResults]:
         perturbed_variables = _perturb_variables(
-            variables, self._config.variables, self._config.gradient, self._samplers
+            self._config, variables, self._samplers
         )
         active_objectives, active_constraints = _get_active_realizations(self._config)
         f_eval_results, g_eval_results = _get_function_and_gradient_results(
@@ -477,24 +485,20 @@ class EnsembleEvaluator:
                 constraints.fill(np.nan)
             weighted_objective = np.array(np.nan)
         else:
-            objectives = _calculate_transformed_functions(
+            objectives = _calculate_transformed_objectives(
                 self._config,
                 self._function_transforms,
                 objectives,
                 objective_weights,
                 failed_realizations,
             )
-            if constraints is not None:
-                constraints = _calculate_transformed_functions(
-                    self._config,
-                    self._function_transforms,
-                    constraints,
-                    constraint_weights,
-                    failed_realizations,
-                    constraints=True,
-                )
-            else:
-                constraints = None
+            constraints = _calculate_transformed_constraints(
+                self._config,
+                self._function_transforms,
+                constraints,
+                constraint_weights,
+                failed_realizations,
+            )
 
             weighted_objective = _calculate_weighted_function(
                 objectives,
@@ -534,7 +538,7 @@ class EnsembleEvaluator:
             perturbed_variables = perturbed_variables[..., variable_indices]
 
         assert perturbed_objectives is not None
-        objective_gradients = _calculate_transformed_gradients(
+        objective_gradients = _calculate_transformed_objective_gradients(
             self._config,
             self._function_transforms,
             variables,
@@ -544,21 +548,16 @@ class EnsembleEvaluator:
             objective_weights,
             failed_realizations,
         )
-        if perturbed_constraints is not None:
-            assert constraints is not None
-            constraint_gradients = _calculate_transformed_gradients(
-                self._config,
-                self._function_transforms,
-                variables,
-                constraints,
-                perturbed_variables,
-                perturbed_constraints,
-                constraint_weights,
-                failed_realizations,
-                constraints=True,
-            )
-        else:
-            constraint_gradients = None
+        constraint_gradients = _calculate_transformed_constraint_gradients(
+            self._config,
+            self._function_transforms,
+            variables,
+            constraints,
+            perturbed_variables,
+            perturbed_constraints,
+            constraint_weights,
+            failed_realizations,
+        )
 
         weighted_objective_gradient = _calculate_weighted_gradient(
             objective_gradients,

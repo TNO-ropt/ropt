@@ -163,35 +163,21 @@ class EnsembleOptimizer:
         # Run any nested steps, when this improves the objective, this may
         # change the fixed variables and the current optimal result:
         if self._nested_optimizer is not None:
-            # The dimension of variables can be 2 when the optimizer supports
-            # parallel evaluation, but in that case the first dimension has
-            # length 1, since nested optimization does not support parallel
-            # evaluation.
-            nested_results, aborted = self._nested_optimizer(
-                variables[0, ...] if variables.ndim > 1 else variables
-            )
+            # Nested optimization does not support parallel # evaluation:
+            assert variables.ndim == 1
+            nested_results, aborted = self._nested_optimizer(variables)
             if aborted:
                 raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
             if nested_results is None:
                 raise OptimizationAborted(
                     exit_code=OptimizerExitCode.NESTED_OPTIMIZER_FAILED
                 )
-            new_variables = (
+            variables = (
                 nested_results.evaluations.variables
                 if nested_results.evaluations.scaled_variables is None
                 else nested_results.evaluations.scaled_variables
-            ).copy()
-            # The fixed variables are a single 1D vector, but the variables
-            # vector may be 2D when used with an optimizer that supports
-            # parallel evaluation. Since parallel evaluation is currently not
-            # supported when nesting is used, the size of the first dimension
-            # will then be one, which we just squeeze.
-            self._fixed_variables = new_variables
-            variables = (
-                np.expand_dims(new_variables, axis=0)
-                if variables.ndim > 1
-                else new_variables
-            ).copy()
+            )
+            self._fixed_variables = variables.copy()
 
         results = self._run_evaluations(
             variables,

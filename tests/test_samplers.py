@@ -107,10 +107,9 @@ def test_sampler_simple(enopt_config: Any) -> None:
     sampler = MockedSampler(config, 0, None, rng)
 
     perturbed_variables = _perturb_variables(
-        variables=np.array([0.0, 0.0, 0.0]),
-        variables_config=config.variables,
-        gradient_config=config.gradient,
-        samplers=[sampler],
+        config,
+        np.array([0.0, 0.0, 0.0]),
+        [sampler],
     )
     assert np.allclose(perturbed_variables, 0.01 * np.eye(3))
 
@@ -123,10 +122,9 @@ def test_sampler_use_options(enopt_config: Any) -> None:
     sampler = MockedSampler(config, 0, None, rng)
 
     perturbed_variables = _perturb_variables(
-        variables=np.array([0.0, 0.0, 0.0]),
-        variables_config=config.variables,
-        gradient_config=config.gradient,
-        samplers=[sampler],
+        config,
+        np.array([0.0, 0.0, 0.0]),
+        [sampler],
     )
     assert np.allclose(perturbed_variables, np.eye(3))
 
@@ -142,10 +140,9 @@ def test_sampler_indexed(enopt_config: Any) -> None:
     sampler2 = MockedSampler(config, 1, np.array([1, 2]), rng)
 
     perturbed_variables = _perturb_variables(
-        variables=np.array([0.0, 0.0, 0.0]),
-        variables_config=config.variables,
-        gradient_config=config.gradient,
-        samplers=[sampler1, sampler2],
+        config,
+        np.array([0.0, 0.0, 0.0]),
+        [sampler1, sampler2],
     )
     assert np.allclose(perturbed_variables[0, ...], np.diag([0.01, -0.01, -0.01]))
 

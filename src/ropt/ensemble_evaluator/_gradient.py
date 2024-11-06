@@ -3,7 +3,7 @@ from typing import List, Optional
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.config.enopt import EnOptConfig, GradientConfig, VariablesConfig
+from ropt.config.enopt import EnOptConfig
 from ropt.enums import BoundaryType
 from ropt.plugins.function_transform.base import FunctionTransform
 from ropt.plugins.sampler.base import Sampler
@@ -64,22 +64,21 @@ def _invert_linear_equations(
 
 
 def _perturb_variables(
+    config: EnOptConfig,
     variables: NDArray[np.float64],
-    variables_config: VariablesConfig,
-    gradient_config: GradientConfig,
     samplers: List[Sampler],
 ) -> NDArray[np.float64]:
-    if gradient_config.samplers is None:
+    if config.gradient.samplers is None:
         samples = samplers[0].generate_samples()
     else:
         # The results should be independent of the order of the samplers,
         # reordering would affect the random numbers they are based on. We
         # obtain a consistent order by running multiple samplers in the order
-        # that they appear in the gradient_config.samplers array:
+        # that they appear in the config.gradient.samplers array:
         unique, indices = np.unique(
             np.compress(
-                gradient_config.samplers >= 0,
-                gradient_config.samplers,
+                config.gradient.samplers >= 0,
+                config.gradient.samplers,
             ),
             return_index=True,
         )
@@ -88,10 +87,10 @@ def _perturb_variables(
         for sampler_idx in sampler_indices[1:]:
             samples += samplers[sampler_idx].generate_samples()
     return _apply_bounds(
-        variables + gradient_config.perturbation_magnitudes * samples,
-        variables_config.lower_bounds,
-        variables_config.upper_bounds,
-        gradient_config.boundary_types,
+        variables + config.gradient.perturbation_magnitudes * samples,
+        config.variables.lower_bounds,
+        config.variables.upper_bounds,
+        config.gradient.boundary_types,
     )
 
 
@@ -151,8 +150,45 @@ def _calculate_gradient(  # noqa: PLR0913
     return transform.calculate_gradient(functions, gradients, weights)
 
 
-# : disable=too-many-arguments,too-many-locals
 def _calculate_transformed_gradients(  # noqa: PLR0913
+    config: EnOptConfig,
+    function_transforms: List[FunctionTransform],
+    transform_indices: Optional[Optional[NDArray[np.intc]]],
+    variables: NDArray[np.float64],
+    functions: NDArray[np.float64],
+    perturbed_variables: NDArray[np.float64],
+    perturbed_functions: NDArray[np.float64],
+    realization_weights: Optional[NDArray[np.float64]],
+    failed_realizations: NDArray[np.bool_],
+) -> NDArray[np.float64]:
+    gradients = np.zeros((functions.shape[-1], variables.shape[-1]), dtype=np.float64)
+    delta_variables = perturbed_variables - np.expand_dims(variables, axis=1)
+    delta_functions = perturbed_functions - np.expand_dims(functions, axis=1)
+
+    if transform_indices is None:
+        transform_indices = np.zeros(functions.shape[1], dtype=np.intc)
+
+    for transform_idx, transform in enumerate(function_transforms):
+        mask = transform_indices == transform_idx
+        for idx in np.where(mask)[0]:
+            gradients[idx, ...] = _calculate_gradient(
+                functions[..., idx],
+                delta_variables,
+                delta_functions[..., idx],
+                failed_realizations,
+                (
+                    config.realizations.weights
+                    if realization_weights is None
+                    else realization_weights[idx, ...]
+                ),
+                transform,
+                merge_realizations=config.gradient.merge_realizations,
+            )
+
+    return gradients
+
+
+def _calculate_transformed_objective_gradients(  # noqa: PLR0913
     config: EnOptConfig,
     function_transforms: List[FunctionTransform],
     variables: NDArray[np.float64],
@@ -161,63 +197,45 @@ def _calculate_transformed_gradients(  # noqa: PLR0913
     perturbed_functions: NDArray[np.float64],
     realization_weights: Optional[NDArray[np.float64]],
     failed_realizations: NDArray[np.bool_],
-    *,
-    constraints: bool = False,
 ) -> NDArray[np.float64]:
-    gradients = np.zeros((functions.shape[-1], variables.shape[-1]), dtype=np.float64)
-    delta_variables = perturbed_variables - np.expand_dims(variables, axis=1)
-    delta_functions = perturbed_functions - np.expand_dims(functions, axis=1)
-
-    if constraints:
-        assert config.nonlinear_constraints is not None
-        transform_indices = config.nonlinear_constraints.function_transforms
-    else:
-        transform_indices = config.objective_functions.function_transforms
-
-    if transform_indices is None:
-        transform_indices = np.zeros(functions.shape[1], dtype=np.intc)
-
-    for transform_idx, transform in enumerate(function_transforms):
-        _add_transformed_gradients(
-            config,
-            transform,
-            delta_variables,
-            functions,
-            delta_functions,
-            realization_weights,
-            failed_realizations,
-            transform_indices == transform_idx,
-            gradients,
-        )
-
-    return gradients
+    return _calculate_transformed_gradients(
+        config,
+        function_transforms,
+        config.objective_functions.function_transforms,
+        variables,
+        functions,
+        perturbed_variables,
+        perturbed_functions,
+        realization_weights,
+        failed_realizations,
+    )
 
 
-def _add_transformed_gradients(  # noqa: PLR0913
+def _calculate_transformed_constraint_gradients(  # noqa: PLR0913
     config: EnOptConfig,
-    transform: FunctionTransform,
-    delta_variables: NDArray[np.float64],
-    functions: NDArray[np.float64],
-    delta_functions: NDArray[np.float64],
+    function_transforms: List[FunctionTransform],
+    variables: NDArray[np.float64],
+    constraints: Optional[NDArray[np.float64]],
+    perturbed_variables: NDArray[np.float64],
+    perturbed_constaints: Optional[NDArray[np.float64]],
     realization_weights: Optional[NDArray[np.float64]],
     failed_realizations: NDArray[np.bool_],
-    mask: NDArray[np.bool_],
-    gradients: NDArray[np.float64],
-) -> None:
-    for idx in np.where(mask)[0]:
-        gradients[idx, ...] = _calculate_gradient(
-            functions[..., idx],
-            delta_variables,
-            delta_functions[..., idx],
-            failed_realizations,
-            (
-                config.realizations.weights
-                if realization_weights is None
-                else realization_weights[idx, ...]
-            ),
-            transform,
-            merge_realizations=config.gradient.merge_realizations,
-        )
+) -> Optional[NDArray[np.float64]]:
+    if constraints is None:
+        return None
+    assert perturbed_constaints is not None
+    assert config.nonlinear_constraints is not None
+    return _calculate_transformed_gradients(
+        config,
+        function_transforms,
+        config.nonlinear_constraints.function_transforms,
+        variables,
+        constraints,
+        perturbed_variables,
+        perturbed_constaints,
+        realization_weights,
+        failed_realizations,
+    )
 
 
 def _calculate_weighted_gradient(
