@@ -3162,10 +3162,8 @@ that these functions cannot override the evaluator's built-in functions.</p>
 </li>
 <li>
 <p>Strings in <code>[[ ... ]]</code> are treated as templates. Within these,
-   substrings marked by <code>&lt;&lt;...&gt;&gt;</code> are evaluated and substituted.
-   Expressions within <code>&lt;&lt;...&gt;&gt;</code> can contain variable and function
-   references starting with <code>$</code>, which are evaluated according to the
-   above rules.</p>
+   substrings delimited by <code>&lt;&lt;...&gt;&gt;</code> are evaluated as if enclosed in
+   <code>$(...)</code> and the result substituted for the <code>&lt;&lt;...&gt;&gt;</code> substring.</p>
 </li>
 </ol>
 
