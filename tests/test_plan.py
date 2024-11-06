@@ -82,51 +82,53 @@ def test_run_basic(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     [
         ("", ""),
         (" ", ""),
-        ("${{1}}", 1),
-        ("${{'1'}}", "1"),
-        ("${{'${{1}}'}}", "${{1}}"),
-        (" ${{-1}} ", -1),
-        ("${{not 1}}", False),
-        ("${{True and False}}", False),
-        ("${{True or False}}", True),
-        ("${{1 + 1}}", 2),
-        ("${{2**3}}", 8),
-        ("${{3 % 2}}", 1),
-        ("${{3 // 2}}", 1),
-        ("${{2.5 + (2 + 3) / 2}}", 5),
-        ("${{1 < 2}}", True),
-        ("${{1 < 23}}", True),
-        ("${{1 < 2 > 3}}", False),
-        ("${{$x}}", 1),
-        ("${{'$x'}}", "x"),
-        ("${{'$$x'}}", "$x"),
-        ("${{$x + $y}}", 2),
-        ("${{ [1, 2] + [0] }}", [1, 2, 0]),
-        ("${{ [1, 2] + $plan_id }}", [1, 2, 0]),
-        ("$x + 1", 2),
+        ("$(1)", 1),
+        ("$('1')", "1"),
+        (" $(-1) ", -1),
+        ("$(not 1)", False),
+        ("$(True and False)", False),
+        ("$(True or False)", True),
+        ("$(1 + 1)", 2),
+        ("$(2**3)", 8),
+        ("$(3 % 2)", 1),
+        ("$(3 // 2)", 1),
+        ("$(2.5 + (2 + 3) / 2)", 5),
+        ("$(1 < 2)", True),
+        ("$(1 < 23)", True),
+        ("$(1 < 2 > 3)", False),
+        ("$(x)", 1),
+        ("$('x')", "x"),
+        ("$('$x')", "$x"),
+        ("$(x + y)", 2),
+        ("$( [1, 2] + [0] )", [1, 2, 0]),
+        ("$( [1, 2] + plan_id )", [1, 2, 0]),
+        ("$( x + 1 )", 2),
+        ("$( max(x + 1, 2) )", 2),
+        ("$max(x + 1, 2)", 2),
         ("1 + $x", "1 + $x"),
-        ("${{1 + $y}}", 2),
-        ("${{ {'a': {'b': 1}} }}", {"a": {"b": 1}}),
+        ("$(1 + y)", 2),
+        ("$( {'a': {'b': 1}} )", {"a": {"b": 1}}),
         ("$dummy", None),
+        ("$(dummy)", None),
         ("$$dummy", "$dummy"),
-        ("${{[1, 2]}}", [1, 2]),
-        ("${{[$dummy, 2]}}", [None, 2]),
-        ("${{max (1, 2)}}", 2),
-        ("${{max ($x, 2)}}", 2),
-        ("${{$max ($x, 2)}}", 2),
-        ("$max($x, 2)", 2),
-        ("$incr($x)", 2),
-        ("${{$incr($x)}}", 2),
-        ("$[[1]]", "1"),
-        ("$[[[1]]]", "[1]"),
-        ("$[[${{ $x }}]]", "1"),
-        ("$[[ ${{not 1}} ]]", " False "),
-        ("$[[${{True and False}}]]", "False"),
-        ("$[[a ${{ 1 }} b]]", "a 1 b"),
-        ("$[[a ${{ 1 + 1 }} b]]", "a 2 b"),
-        ("$[[${{ {'a': {'b': 1}} }}]]", "{'a': {'b': 1}}"),
+        ("$([1, 2])", [1, 2]),
+        ("$([dummy, 2])", [None, 2]),
+        ("$(max (1, 2))", 2),
+        ("$(max (x, 2))", 2),
+        ("$max (x, 2)", 2),
+        ("$(incr(x))", 2),
+        ("$incr(x)", 2),
+        ("$incr(incr(x) + 1)", 4),
+        ("[[1]]", "1"),
+        ("[[[1]]]", "[1]"),
+        ("[[<< x >>]]", "1"),
+        ("[[ <<not 1>> ]]", " False "),
+        ("[[<<True and False>>]]", "False"),
+        ("[[a << 1 >> b]]", "a 1 b"),
+        ("[[a << 1 + 1 >> b]]", "a 2 b"),
+        ("[[<< {'a': {'b': 1}} >>]]", "{'a': {'b': 1}}"),
         (
-            "$[[${{ {'a': {$i: 1}} }} - ${{ {'a': {'b': $x}} }}]]",
+            "[[<<  {'a': {i: 1}}  >> - << {'a': {'b': x}} >>]]",
             "{'a': {'b': 1}} - {'a': {'b': 1}}",
         ),
     ],
@@ -153,13 +155,16 @@ def test_eval_expr(evaluator: Any, expr: str, expected: Any) -> None:
 @pytest.mark.parametrize(
     ("expr", "message", "exception"),
     [
-        ("${{1 + * 1}}", "invalid syntax", SyntaxError),
+        ("$(1 + * 1)", "invalid syntax", SyntaxError),
         ("$z", "Unknown plan variable: `z`", AttributeError),
-        ("$[[a ${{ 1 + 1 ${{ 1 }} }} b]]", "unmatched '}'", SyntaxError),
-        ("$[[${{ 1 + * 1 }}]]", "invalid syntax", SyntaxError),
-        ("${{ foo() }}", "Unknown plan function: `foo`", AttributeError),
-        ("${{ $foo() }}", "Unknown plan function: `foo`", AttributeError),
-        ("${{ incr(1) }}", "Unknown plan function: `incr`", AttributeError),
+        ("[[<< $(1 + * 1) >>]]", "invalid syntax", SyntaxError),
+        ("[[<< $(1 + 1) )]]", re.escape("Missing, or too many, `>>`"), SyntaxError),
+        (
+            "[[<< $(1 + 1) >> >>]]",
+            re.escape("Missing, or too many, `>>`"),
+            SyntaxError,
+        ),
+        ("$(foo())", "Unknown plan function: `foo`", AttributeError),
     ],
 )
 def test_eval_exception(
@@ -183,7 +188,6 @@ def test_eval_attribute(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     plan_config: Dict[str, Any] = {
         "variables": {
             "config": enopt_config,
-            "dummy": None,
             "results": None,
         },
         "steps": [
@@ -204,15 +208,18 @@ def test_eval_attribute(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     plan.run()
     assert isinstance(plan.eval("$results"), Results)
     assert plan.eval("$results.result_id") >= 0
+    assert plan.eval("$(results.result_id)") >= 0
+    assert plan.eval("$results.plan_id[0]") == 0
+    assert plan.eval("$(results.plan_id[0])") == 0
 
 
 @pytest.mark.parametrize(
     ("variables", "expr", "check", "expected"),
     [
         ({"x": None}, {"x": 1}, "x", 1),
-        ({"x": None, "y": None}, [{"x": 1}, {"y": "${{$x + 1}}"}], "y", 2),
-        ({"x": {"a": 1}, "i": "a"}, {"x[$i]": 2}, "x", {"a": 2}),
-        ({"x": {"a": {10: {}}}}, {"x['a'][10]": 1}, "x", {"a": {10: 1}}),
+        ({"x": None, "y": None}, [{"x": 1}, {"y": "$(x + 1)"}], "y", 2),
+        ({"x": {"a": 1}, "i": "a"}, {"x[i]": 2}, "x", {"a": 2}),
+        ({"x": {"a": {10: {}}}, "i": 5}, {"x['a'][i + 5]": 1}, "x", {"a": {10: 1}}),
     ],
 )
 def test_set_step(
@@ -296,7 +303,27 @@ def test_set_keys_exception(evaluator: Any) -> None:
         plan.run()
 
 
-def test_conditional_run(enopt_config: Dict[str, Any], evaluator: Any) -> None:
+def test_set_keys_value_exception(evaluator: Any) -> None:
+    plan_config: Dict[str, Any] = {
+        "variables": {
+            "y": {"a": None},
+        },
+        "steps": [
+            {"set": {"y['a']": "$foo(1)"}},
+        ],
+    }
+    parsed_config = PlanConfig.model_validate(plan_config)
+    context = OptimizerContext(evaluator=evaluator())
+    plan = Plan(parsed_config, context)
+    with pytest.raises(AttributeError, match=re.escape("Unknown plan function: `foo`")):
+        plan.run()
+
+
+@pytest.mark.parametrize("expr1", ["$(1 > 0)", "1 > 0"])
+@pytest.mark.parametrize("expr2", ["$(x < 0)", "x < 0"])
+def test_conditional_run(
+    enopt_config: Dict[str, Any], evaluator: Any, expr1: str, expr2: str
+) -> None:
     plan_config = {
         "variables": {
             "config": enopt_config,
@@ -310,11 +337,11 @@ def test_conditional_run(enopt_config: Dict[str, Any], evaluator: Any) -> None:
                     "config": "$config",
                     "tags": "optimal1",
                 },
-                "if": "${{1 > 0}}",
+                "if": expr1,
             },
             {"set": {"x": 1}},
             {
-                "if": "$x < 0",
+                "if": expr2,
                 "optimizer": {
                     "config": "$config",
                     "tags": "optimal2",
@@ -366,7 +393,7 @@ def test_plan_rng(enopt_config: Dict[str, Any], evaluator: Any) -> None:
             },
             {
                 "set": {
-                    "config['gradient']['seed']": "$plan_id +  [$config['gradient']['seed']]"
+                    "config['gradient']['seed']": "$(plan_id + [config['gradient']['seed']])"
                 }
             },
             {
@@ -934,7 +961,7 @@ def test_repeat_metadata(enopt_config: Dict[str, Any], evaluator: Any) -> None:
         "restart": "$counter",
         "foo": 1,
         "bar": "string",
-        "complex": "$[[string ${{ 1 + 1 }} ${{ $counter }}]]",
+        "complex": "[[string <<1 + 1>> <<counter>>]]",
     }
 
     plan_config = {

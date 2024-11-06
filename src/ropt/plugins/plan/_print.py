@@ -19,11 +19,10 @@ class DefaultPrintStep(PlanStep):
     The print step is used to display messages on the console, using Python's
     `print` function. The message to be printed must be a string evaluated by
     the [`eval`][ropt.plan.Plan.eval] method of the executing
-    [`Plan`][ropt.plan.Plan] object. The message should be enclosed in `$[[ ... ]]`
-    delimiters; if these delimiters are missing, they are implicitly added around the
-    message. This format allows for optional interpolation of embedded expressions,
-    starting with `$` (for variable references) or delimited by `${{ ... }}`
-    (for evaluating expressions within the message).
+    [`Plan`][ropt.plan.Plan] object. The message should be enclosed in `[[...]]`
+    delimiters; if these delimiters are missing, they are implicitly added
+    around the message. This format allows for optional interpolation of
+    embedded expressions, delimited by `${ ... $}`.
 
     The print step uses the [`DefaultPrintStepWith`]
     [ropt.plugins.plan._print.DefaultPrintStep.DefaultPrintStepWith]
@@ -58,8 +57,8 @@ class DefaultPrintStep(PlanStep):
         super().__init__(config, plan)
         _with = self.DefaultPrintStepWith.model_validate(config.with_)
         self._message = _with.message.strip()
-        if not (self._message.startswith("$[[") and self._message.endswith("]]")):
-            self._message = "$[[" + self._message + "]]"
+        if not (self._message.startswith("[[") and self._message.endswith("]]")):
+            self._message = "[[" + self._message + "]]"
 
     def run(self) -> None:
         """Run the print step."""

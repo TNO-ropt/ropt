@@ -37,9 +37,10 @@ class PlanStepConfig(BaseModel):
         steps. Refer to the method's documentation for more information on
         supported expressions.
 
-        While mathematical expressions often need to be enclosed within
-        `${{ ... }}` delimiters in a plan configuration string, this is
-        optional for expressions passed via the `if_` attribute.
+        While mathematical expressions are generally evaluated using the
+        `$eval()` function, this is optional for expressions passed via the
+        `if_` attribute. For instance, `$eval(x > 0)` and `x > 0` are equivalent
+        values for the `if_` attribute.
 
     Info: Alternative specification of the step config.
         The standard format for defining a step configuration follows the

@@ -344,26 +344,17 @@ class Plan:
     def eval(self, value: Any) -> Any:  # noqa: ANN401
         """Evaluate the provided value as an expression.
 
-        Evaluates an expression and returns the result based on the following
-        rules:
-
-        1. Non-string values are returned unchanged.
-        2. Strings starting with `$$` will return the string with one `$`
-           removed.
-        3. Strings starting with `$` are evaluated as expressions, primarily
-           intended to replace variable references with their values.
-        4. Strings enclosed in `${{ ... }}` are evaluated as mathematical
-           expressions, possibly embedding plan variable and plan function
-           references prefixed by `$`.
-        5. Strings enclosed in `$[[ ... ]]` are treated as templates: `$`
-           prefixes or `${{ ... }}` expressions within the string are evaluated
-           and interpolated.
+        If the value is not a string, it is returned unchanged, otherwise it is
+        evaluated as an expression. Refer to the
+        [`eval`][ropt.plan.ExpressionEvaluator.eval] method of the
+        [`ExpressionEvaluator`][ropt.plan.ExpressionEvaluator] class for more
+        details.
 
         Args:
             value: The expression to evaluate, as a string or any other type.
 
         Returns:
-            The evaluated result, which may vary in type depending on the evaluation context.
+            The evaluated result, which may vary in type depending on the context.
         """
         return (
             self._optimizer_context.expr.eval(value, self._vars)
@@ -400,8 +391,8 @@ class Plan:
             stripped = config.if_.strip()
             return (
                 bool(self.eval(stripped))
-                if stripped.startswith("${{") and stripped.endswith("}}")
-                else bool(self.eval("${{" + stripped + "}}"))
+                if stripped.startswith("$(") and stripped.endswith(")")
+                else bool(self.eval("$(" + stripped + ")"))
             )
         return True
 

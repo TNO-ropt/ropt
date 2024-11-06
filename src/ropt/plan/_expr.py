@@ -45,11 +45,11 @@ _BUILTIN_FUNCTIONS: Final[Dict[str, Callable[..., Any]]] = {
 
 class _ReplaceFields(ast.NodeTransformer):
     def __init__(
-        self, variables: Dict[str, Any], functions: Dict[str, Callable[..., Any]]
+        self, variables: Mapping[str, Any], functions: Dict[str, Callable[..., Any]]
     ) -> None:
         self.values: Dict[str, Any] = {}
         self._variables = variables
-        self._functions = set(functions.keys()) | set(_BUILTIN_FUNCTIONS.keys())
+        self._functions = set(functions.keys())
 
     def visit_Name(self, node: ast.Name) -> ast.AST:  # noqa: N802
         if node.id in self._variables:
@@ -59,6 +59,9 @@ class _ReplaceFields(ast.NodeTransformer):
                 return self.generic_visit(node)
             msg = f"Error in expression: the type of `{node.id}` is not supported"
             raise TypeError(msg)
+        if node.id not in self._functions:
+            msg = f"Unknown plan variable: `{node.id}`"
+            raise AttributeError(msg)
         return self.generic_visit(node)
 
     def visit_Call(self, node: ast.Call) -> ast.AST:  # noqa: N802
@@ -88,11 +91,13 @@ class ExpressionEvaluator:
             ValueError: Raised if any provided function overrides a built-in.
         """
         self._functions = copy.deepcopy(_BUILTIN_FUNCTIONS)
+        self._functions["_eval"] = self._eval_function
         if functions is not None:
-            for key, value in functions.items():
-                if key in _BUILTIN_FUNCTIONS:
+            for key in functions:
+                if key in self._functions:
                     msg = f"cannot override builtin: `{key}`"
                     raise ValueError(msg)
+            for key, value in functions.items():
                 self._functions[key] = value
 
     def eval(
@@ -100,67 +105,75 @@ class ExpressionEvaluator:
         expr: str,
         variables: Mapping[str, Any],
     ) -> Any:  # noqa: ANN401
-        """Evaluate an expression string, given a dictionary of variable values.
+        """Evaluate an expression string with provided variable values.
 
         The `expr` string may take one of the following forms:
 
-        1. Strings enclosed in `${{ ... }}` are evaluated as mathematical
-           expressions. Within the expression, variables may be referred to
-           using the `$name` format, and functions added to the evaluator may be
-           called using the `$function()` format.
-        2. Strings enclosed in `$[[ ... ]]` are treated as templates: `$`
-           prefixes or `${{ ... }}` expressions within the string are evaluated
-           and interpolated as above.
-        3. Strings starting with `$` that do not match one of the previous rules
-           are evaluated as mathematical expressions. This requires that the
-           string starts with a variable or function reference.
+        1. Strings enclosed in `$(...)` are evaluated as expressions, that may
+           contain variables references and nested calls to functions. Functions
+           must be built-in to the expression evaluator, or have been added to
+           the evaluator object when it was constructed.
 
-        Variables may be referenced in `$name` format. This includes indexing
-        using the `[]` operator and attribute access using the `.` operator,
-        when appropriate. Multiple `[]` and `.` operators are allowed to an
-        arbitrary depth, if supported by the variable. For example, the
-        expression `$var['foo'].bar[0]` is valid if `var` contains a dict-like
-        value with a `foo` entry that has a `bar` attribute containing a list.
+        2. Strings of the form `$name(...)` are evaluated as function calls. The
+           contents between the `()` brackets may be an expression that is
+           evaluated before passing the result to the function. An expression
+           of the form `$name(...)` is equivalent to an expression evaluation of
+           the form `$(name(...))`.
 
-        Info: Supported operators
-            A subset of Python operators is supported, including common
-            mathematical, boolean, and comparison operators.
+        3. Strings starting with `$name`, where name is not a function, i.e. not
+           of the form `$name(...)`, are evaluated as variable references. This
+           syntax supports nested indexing via `[]` and attribute access with
+           `.`. For example, `$var['foo'].bar[0]` is valid if `var` contains a
+           compatible structure like a dictionary. Indices within `[]` may
+           themselves be expressions that refer to other variables and
+           functions. An expression of the form `$name...` is equivalent to an
+           expression evaluation of the form `$(name...), where `...` can be any
+           combination of indexing and attribute access.
 
-        Info: Supported literal types
-            Literal types in expressions reflect corresponding Python types.
-            Supported literal types include `int`, `float`, `bool`, and `str`.
-            Lists (`[ ... ]`) and dictionaries (`{ ... }`) may also be
-            constructed and arbitrarily nested, with support for containing
-            references to variables and calls to supported functions.
+        4. Strings in `[[ ... ]]` are treated as templates. Within these,
+           substrings delimited by `<<...>>` are evaluated as if enclosed in
+           `$(...)` and the result substituted for the `<<...>>` substring.
 
-        Info: Supported variable types
-            Allowed variable types within expressions include numbers, strings,
-            `numpy` arrays, dicts, lists, [`Results`][ropt.results.Results], and
-            [`EnOptConfig`][ropt.config.enopt.EnOptConfig] objects.
+        Info: Supported features
+            - A subset of Python operators is supported, covering standard
+              mathematical, boolean, and comparison operations.
 
-        Info: Built-in functions
-            Functions added at initialization must be prefixed by `$` within
-            expressions. However, an exception exists for certain built-in
-            functions, where this is optional. For example, the `max` function
-            can be called as `$max()` or as `max()` within expressions.
+            - Literals include `int`, `float`, `bool`, and `str`. Nested lists
+              (`[...]`) and dictionaries (`{...}`) are supported and can reference
+              variables or call functions within their content.
 
-            The following built-in functions are supported: `abs`, `bool`,
-            `divmod`, `float`, `int`, `max`, `min`, `pow`, `range`, `round`, and
-            `sum`, which map to their corresponding Python built-ins.
+            - Allowed types within expressions include numbers, strings, `numpy`
+              arrays, dicts, lists, [`Results`][ropt.results.Results], and
+              [`EnOptConfig`][ropt.config.enopt.EnOptConfig] objects.
+
+            - Supported built-ins include: `abs`, `bool`, `divmod`, `float`,
+              `int`, `max`, `min`, `pow`, `range`, `round`, and `sum`.
+
+        Note: Implicit use of `$(...)` and `[[...]]`
+            Where appropriate, the `$(...)` and `[[...]]` delimiters might be
+            implicit in some cases.
+
+            For instance, plan steps support an `if` attribute in their
+            configuration allowing for conditional execution. This can be
+            specified using the `$(...)` syntax, but this is optional. For
+            example, instead of `"if": "${x > 0}"`, `"if": "x > 0"` may be used.
+            (See [`PlanStepConfig`][ropt.config.plan.PlanStepConfig]).
+
+            Similarly, the [`print`][ropt.plugins.plan._print.DefaultPrintStep]
+            step is an example where the `[[...]]` delimiters are optional. This
+            step prints a message that will be evaluated, thereby substituting
+            any occurrences of `<<...>>`. However, the use of surrounding
+            `[[...]]` delimiters in the message attribute of the step
+            configuration is optional, and they will be implicitly added if not
+            present.
 
         Args:
-            expr:      The expression to evaluate.
+            expr:      The expression to evaluate as a string.
             variables: A dictionary of variable values.
 
         Returns:
-            The result of the evaluated expression.
+            The evaluated result.
         """
-
-        def _substitute(matched: re.Match[str]) -> str:
-            return str(
-                self.eval(matched.string[matched.start() : matched.end()], variables)
-            )
-
         for variable in variables:
             if variable in self._functions:
                 msg = f"conflicting variable/function names: `{variable}`"
@@ -169,15 +182,30 @@ class ExpressionEvaluator:
         expr = expr.strip()
         if expr.startswith("$$"):
             return expr.replace("$$", "$", 1)
-        if expr.startswith("${{") and expr.endswith("}}"):
-            return self._eval_expr(expr[3:-2].strip(), variables)
-        if expr.startswith("$[[") and expr.endswith("]]"):
-            parts = expr[3:-2].split("${{")
-            parts[1:] = ["${{" + part for part in parts[1:]]
-            return "".join(re.sub(r"\${{(.*)}}", _substitute, part) for part in parts)
+        if expr.startswith("[[") and expr.endswith("]]"):
+            return self._eval_parts(expr, variables)
+        if expr.startswith("$("):
+            return self._eval_expr("_eval" + expr[1:], variables)
         if expr.startswith("$"):
-            return self._eval_expr(expr, variables)
+            self._check_variable_or_function(expr[1:])
+            return self._eval_expr(expr[1:], variables)
         return expr
+
+    def _eval_parts(self, expr: str, variables: Mapping[str, Any]) -> Any:  # noqa: ANN401
+        def _substitute(matched: re.Match[str]) -> str:
+            parts = matched.string[matched.start() : matched.end()].partition(">>")
+            return str(self._eval_expr(parts[0][2:], variables)) + parts[2]
+
+        parts = expr[2:-2].split("<<")
+        for part in parts[1:]:
+            if part.count(">>") != 1:
+                msg = "Missing, or too many, `>>` in [[ ... ]] expression"
+                raise SyntaxError(msg)
+        parts[1:] = ["<<" + part for part in parts[1:]]
+        return "".join(re.sub(r"<<(.*)>>", _substitute, part) for part in parts)
+
+    def _eval_function(self, value: Any) -> Any:  # noqa: ANN401
+        return value
 
     def _is_valid(self, node: ast.AST) -> bool:  # noqa: C901, PLR0911
         if isinstance(node, ast.Constant):
@@ -217,39 +245,16 @@ class ExpressionEvaluator:
         if isinstance(node, ast.Call):
             return (
                 isinstance(node.func, ast.Name)
-                and all(isinstance(arg, (ast.Name, ast.Constant)) for arg in node.args)
+                and all(self._is_valid(arg) for arg in node.args)
                 and not node.keywords
             )
         return bool(isinstance(node, ast.Name))
 
     def _eval_expr(self, expr: str, variables: Mapping[str, Any]) -> Any:  # noqa: ANN401
-        # find all functions and variables:
-        found_functions: Dict[str, Callable[..., Any]] = {}
-        for word in re.findall(r"(?<=\$)\b(\w+)\b\s*\(", expr):
-            if word in self._functions:
-                found_functions[word] = self._functions[word]
-            else:
-                msg = f"Unknown plan function: `{word}`"
-                raise AttributeError(msg)
-        found_variables: Dict[str, Any] = {}
-        for word in re.findall(r"(?<=\$)\b\w+\b", expr):
-            if word in variables:
-                found_variables[word] = variables[word]
-            elif word not in self._functions:
-                msg = f"Unknown plan variable: `{word}`"
-                raise AttributeError(msg)
-
-        def _substitute(matched: re.Match[str]) -> str:
-            value = matched.string[matched.start() : matched.end()]
-            if value[1:] in self._functions or value[1:] in variables:
-                return value[1:]
-            return value
-
-        # Parse the string:
-        stripped = re.sub(r"(\$\b\w+\b)", _substitute, expr)
+        stripped = expr.strip()
         tree = ast.parse(stripped, mode="eval")
         if self._is_valid(tree.body):
-            replacer = _ReplaceFields(found_variables, found_functions)
+            replacer = _ReplaceFields(variables, self._functions)
             tree = ast.fix_missing_locations(replacer.visit(tree))
             return eval(  # noqa: S307
                 compile(tree, "", mode="eval"),
@@ -259,3 +264,27 @@ class ExpressionEvaluator:
 
         msg = "invalid expression"
         raise SyntaxError(msg)
+
+    def _is_valid_variable_or_function(self, node: ast.AST) -> bool:
+        if isinstance(node, ast.Subscript):
+            return self._is_valid(node.slice)
+        if isinstance(node, ast.Index):
+            return self._is_valid(node.value)  # type: ignore[attr-defined]
+        if isinstance(node, ast.Attribute):
+            if isinstance(node.value, ast.Attribute):
+                return self._is_valid(node.value)
+            return bool(isinstance(node.value, ast.Name))
+        if isinstance(node, ast.Call):
+            return (
+                isinstance(node.func, ast.Name)
+                and all(self._is_valid(arg) for arg in node.args)
+                and not node.keywords
+            )
+        return bool(isinstance(node, ast.Name))
+
+    def _check_variable_or_function(self, expr: str) -> Any:  # noqa: ANN401
+        stripped = expr.strip()
+        tree = ast.parse(stripped, mode="eval")
+        if not self._is_valid_variable_or_function(tree.body):
+            msg = "invalid variable or function"
+            raise SyntaxError(msg)

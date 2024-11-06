@@ -115,7 +115,7 @@ class DefaultSetStep(PlanStep):
                 self._names.append(name)
                 self._keys.append(
                     [
-                        key[1:] if key.startswith(".") else "${{" + key[1:-1] + "}}"
+                        key[1:] if key.startswith(".") else "$(" + key[1:-1] + ")"
                         for key in keys
                     ]
                 )
@@ -126,29 +126,30 @@ class DefaultSetStep(PlanStep):
         for target_string, name, keys, value in zip(
             self._targets, self._names, self._keys, self._values
         ):
+            evaluated_value = copy.deepcopy(self._plan.eval(value))
             if not keys:
-                self._plan[name] = copy.deepcopy(self._plan.eval(value))
+                self._plan[name] = evaluated_value
             else:
                 target = self._plan[name]
                 try:
                     for key in keys[:-1]:
                         target = self._get_target(target, key)
-                    self._set_target(target, keys[-1], value)
+                    self._set_target(target, keys[-1], evaluated_value)
                 except (AttributeError, KeyError):
                     msg = f"Invalid attribute access: {target_string}"
                     raise AttributeError(msg) from None
 
     def _get_target(self, target: Any, key: str) -> Any:  # noqa: ANN401
-        if key.startswith("${{"):
+        if key.startswith("$("):
             if not isinstance(target, (MutableMapping, MutableSequence)):
                 raise KeyError
             return target[self._plan.eval(key)]
         return getattr(target, key)
 
     def _set_target(self, target: Any, key: str, value: Any) -> None:  # noqa: ANN401
-        if key.startswith("${{"):
+        if key.startswith("$("):
             if not isinstance(target, (MutableMapping, MutableSequence)):
                 raise KeyError
-            target[self._plan.eval(key)] = copy.deepcopy(self._plan.eval(value))
+            target[self._plan.eval(key)] = value
         else:
-            setattr(target, key, copy.deepcopy(self._plan.eval(value)))
+            setattr(target, key, value)
