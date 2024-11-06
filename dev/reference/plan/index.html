@@ -2439,21 +2439,11 @@ current plan.</p>
     <div class="doc doc-contents ">
 
         <p>Evaluate the provided value as an expression.</p>
-<p>Evaluates an expression and returns the result based on the following
-rules:</p>
-<ol>
-<li>Non-string values are returned unchanged.</li>
-<li>Strings starting with <code>$$</code> will return the string with one <code>$</code>
-   removed.</li>
-<li>Strings starting with <code>$</code> are evaluated as expressions, primarily
-   intended to replace variable references with their values.</li>
-<li>Strings enclosed in <code>${{ ... }}</code> are evaluated as mathematical
-   expressions, possibly embedding plan variable and plan function
-   references prefixed by <code>$</code>.</li>
-<li>Strings enclosed in <code>$[[ ... ]]</code> are treated as templates: <code>$</code>
-   prefixes or <code>${{ ... }}</code> expressions within the string are evaluated
-   and interpolated.</li>
-</ol>
+<p>If the value is not a string, it is returned unchanged, otherwise it is
+evaluated as an expression. Refer to the
+<a class="autorefs autorefs-internal" href="#ropt.plan.ExpressionEvaluator.eval"><code>eval</code></a> method of the
+<a class="autorefs autorefs-internal" href="#ropt.plan.ExpressionEvaluator"><code>ExpressionEvaluator</code></a> class for more
+details.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2500,7 +2490,7 @@ rules:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The evaluated result, which may vary in type depending on the evaluation context.</p>
+                <p>The evaluated result, which may vary in type depending on the context.</p>
               </div>
             </td>
           </tr>
@@ -3143,59 +3133,83 @@ that these functions cannot override the evaluator's built-in functions.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Evaluate an expression string, given a dictionary of variable values.</p>
+        <p>Evaluate an expression string with provided variable values.</p>
 <p>The <code>expr</code> string may take one of the following forms:</p>
 <ol>
-<li>Strings enclosed in <code>${{ ... }}</code> are evaluated as mathematical
-   expressions. Within the expression, variables may be referred to
-   using the <code>$name</code> format, and functions added to the evaluator may be
-   called using the <code>$function()</code> format.</li>
-<li>Strings enclosed in <code>$[[ ... ]]</code> are treated as templates: <code>$</code>
-   prefixes or <code>${{ ... }}</code> expressions within the string are evaluated
-   and interpolated as above.</li>
-<li>Strings starting with <code>$</code> that do not match one of the previous rules
-   are evaluated as mathematical expressions. This requires that the
-   string starts with a variable or function reference.</li>
+<li>
+<p>Strings enclosed in <code>$(...)</code> are evaluated as expressions, that may
+   contain variables references and nested calls to functions. Functions
+   must be built-in to the expression evaluator, or have been added to
+   the evaluator object when it was constructed.</p>
+</li>
+<li>
+<p>Strings of the form <code>$name(...)</code> are evaluated as function calls. The
+   contents between the <code>()</code> brackets may be an expression that is
+   evaluated before passing the result to the function. An expression
+   of the form <code>$name(...)</code> is equivalent to an expression evaluation of
+   the form <code>$(name(...))</code>.</p>
+</li>
+<li>
+<p>Strings starting with <code>$name</code>, where name is not a function, i.e. not
+   of the form <code>$name(...)</code>, are evaluated as variable references. This
+   syntax supports nested indexing via <code>[]</code> and attribute access with
+   <code>.</code>. For example, <code>$var['foo'].bar[0]</code> is valid if <code>var</code> contains a
+   compatible structure like a dictionary. Indices within <code>[]</code> may
+   themselves be expressions that refer to other variables and
+   functions. An expression of the form <code>$name...</code> is equivalent to an
+   expression evaluation of the form <code>$(name...), where</code>...` can be any
+   combination of indexing and attribute access.</p>
+</li>
+<li>
+<p>Strings in <code>[[ ... ]]</code> are treated as templates. Within these,
+   substrings marked by <code>&lt;&lt;...&gt;&gt;</code> are evaluated and substituted.
+   Expressions within <code>&lt;&lt;...&gt;&gt;</code> can contain variable and function
+   references starting with <code>$</code>, which are evaluated according to the
+   above rules.</p>
+</li>
 </ol>
-<p>Variables may be referenced in <code>$name</code> format. This includes indexing
-using the <code>[]</code> operator and attribute access using the <code>.</code> operator,
-when appropriate. Multiple <code>[]</code> and <code>.</code> operators are allowed to an
-arbitrary depth, if supported by the variable. For example, the
-expression <code>$var['foo'].bar[0]</code> is valid if <code>var</code> contains a dict-like
-value with a <code>foo</code> entry that has a <code>bar</code> attribute containing a list.</p>
 
 
 <details class="info" open>
-  <summary>Supported operators</summary>
-  <p>A subset of Python operators is supported, including common
-mathematical, boolean, and comparison operators.</p>
+  <summary>Supported features</summary>
+  <ul>
+<li>
+<p>A subset of Python operators is supported, covering standard
+  mathematical, boolean, and comparison operations.</p>
+</li>
+<li>
+<p>Literals include <code>int</code>, <code>float</code>, <code>bool</code>, and <code>str</code>. Nested lists
+  (<code>[...]</code>) and dictionaries (<code>{...}</code>) are supported and can reference
+  variables or call functions within their content.</p>
+</li>
+<li>
+<p>Allowed types within expressions include numbers, strings, <code>numpy</code>
+  arrays, dicts, lists, <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a>, and
+  <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> objects.</p>
+</li>
+<li>
+<p>Supported built-ins include: <code>abs</code>, <code>bool</code>, <code>divmod</code>, <code>float</code>,
+  <code>int</code>, <code>max</code>, <code>min</code>, <code>pow</code>, <code>range</code>, <code>round</code>, and <code>sum</code>.</p>
+</li>
+</ul>
 </details>
 
-<details class="info" open>
-  <summary>Supported literal types</summary>
-  <p>Literal types in expressions reflect corresponding Python types.
-Supported literal types include <code>int</code>, <code>float</code>, <code>bool</code>, and <code>str</code>.
-Lists (<code>[ ... ]</code>) and dictionaries (<code>{ ... }</code>) may also be
-constructed and arbitrarily nested, with support for containing
-references to variables and calls to supported functions.</p>
-</details>
-
-<details class="info" open>
-  <summary>Supported variable types</summary>
-  <p>Allowed variable types within expressions include numbers, strings,
-<code>numpy</code> arrays, dicts, lists, <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a>, and
-<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> objects.</p>
-</details>
-
-<details class="info" open>
-  <summary>Built-in functions</summary>
-  <p>Functions added at initialization must be prefixed by <code>$</code> within
-expressions. However, an exception exists for certain built-in
-functions, where this is optional. For example, the <code>max</code> function
-can be called as <code>$max()</code> or as <code>max()</code> within expressions.</p>
-<p>The following built-in functions are supported: <code>abs</code>, <code>bool</code>,
-<code>divmod</code>, <code>float</code>, <code>int</code>, <code>max</code>, <code>min</code>, <code>pow</code>, <code>range</code>, <code>round</code>, and
-<code>sum</code>, which map to their corresponding Python built-ins.</p>
+<details class="note" open>
+  <summary>Implicit use of <code>$(...)</code> and <code>[[...]]</code></summary>
+  <p>Where appropriate, the <code>$(...)</code> and <code>[[...]]</code> delimiters might be
+implicit in some cases.</p>
+<p>For instance, plan steps support an <code>if</code> attribute in their
+configuration allowing for conditional execution. This can be
+specified using the <code>$(...)</code> syntax, but this is optional. For
+example, instead of <code>"if": "${x &gt; 0}"</code>, <code>"if": "x &gt; 0"</code> may be used.
+(See <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanStepConfig"><code>PlanStepConfig</code></a>).</p>
+<p>Similarly, the <a class="autorefs autorefs-internal" href="../default_plan_plugin/#ropt.plugins.plan._print.DefaultPrintStep"><code>print</code></a>
+step is an example where the <code>[[...]]</code> delimiters are optional. This
+step prints a message that will be evaluated, thereby substituting
+any occurrences of <code>&lt;&lt;...&gt;&gt;</code>. However, the use of surrounding
+<code>[[...]]</code> delimiters in the message attribute of the step
+configuration is optional, and they will be implicitly added if not
+present.</p>
 </details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3216,7 +3230,7 @@ can be called as <code>$max()</code> or as <code>max()</code> within expressions
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The expression to evaluate.</p>
+                <p>The expression to evaluate as a string.</p>
               </div>
             </td>
             <td>
@@ -3256,7 +3270,7 @@ can be called as <code>$max()</code> or as <code>max()</code> within expressions
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The result of the evaluated expression.</p>
+                <p>The evaluated result.</p>
               </div>
             </td>
           </tr>

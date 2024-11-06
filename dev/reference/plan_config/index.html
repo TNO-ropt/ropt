@@ -1507,9 +1507,10 @@ underscore).</p>
 <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan.eval"><code>eval</code></a> method of the plan object executing the
 steps. Refer to the method's documentation for more information on
 supported expressions.</p>
-<p>While mathematical expressions often need to be enclosed within
-<code>${{ ... }}</code> delimiters in a plan configuration string, this is
-optional for expressions passed via the <code>if_</code> attribute.</p>
+<p>While mathematical expressions are generally evaluated using the
+<code>$eval()</code> function, this is optional for expressions passed via the
+<code>if_</code> attribute. For instance, <code>$eval(x &gt; 0)</code> and <code>x &gt; 0</code> are equivalent
+values for the <code>if_</code> attribute.</p>
 </details>
 
 <details class="info" open>
