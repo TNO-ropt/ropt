@@ -1873,8 +1873,8 @@ providing the axis types to unstack via the <code>unstack</code> argument.</p>
   <summary>The data frame index</summary>
   <p>As noted above, the index of the resulting data frame may be a
 multi-index constructed from axis indices or labels. In addition,
-the <code>result_id</code> field, and the <code>batch_id</code> (if not None), are also
-prepended to the index of the resulting frame. This has the
+the <code>plan_id</code>, <code>result_id</code>, and the <code>batch_id</code> (if not None) fields,
+are also prepended to the index of the resulting frame. This has the
 beneficial effect that the data frames exported from multiple
 results can be concatenated and identified in the frame by result ID
 and/or batch ID.</p>
@@ -2037,10 +2037,10 @@ multi-dimensional array, which is exported directly as an xarray data
 array. Using the axis types found in the metadata, the exporter will add
 coordinate labels constructed from the corresponding names found in the
 optimizer configuration (if available).</p>
-<p>The result ID and the batch ID (if not None) are added to the attributes
-of the dataset, using the <code>result_id</code> and <code>batch_id</code> keys. If metadata
-is present in the results, and the <code>add_metadata</code> flag is set, it is
-also added under the <code>metadata</code> key.</p>
+<p>The plan ID, result ID, and the batch ID (if not None) are added to the
+attributes of the dataset, using the <code>plan_id</code>, <code>result_id</code> and
+<code>batch_id</code> keys. If metadata is present in the results, and the
+<code>add_metadata</code> flag is set, it is also added under the <code>metadata</code> key.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
