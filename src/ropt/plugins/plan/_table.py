@@ -1,4 +1,4 @@
-"""This module defines the abstract base class for optimization steps."""
+"""This module implements the default table handler."""
 
 from __future__ import annotations
 

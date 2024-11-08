@@ -1,4 +1,4 @@
-"""This module implements the default optimizer step."""
+"""This module implements the default repeat step."""
 
 from __future__ import annotations
 

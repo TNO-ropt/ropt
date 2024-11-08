@@ -1,4 +1,4 @@
-"""This module implements the default setvar step."""
+"""This module implements the default meta data handler."""
 
 from __future__ import annotations
 
