@@ -1167,21 +1167,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="utils">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.utils.update_dict" class="md-nav__link">
-    <span class="md-ellipsis">
-      update_dict
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -1225,6 +1210,30 @@
   <a href="#ropt.utils.scaling.scale_constraints" class="md-nav__link">
     <span class="md-ellipsis">
       scale_constraints
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.utils.misc" class="md-nav__link">
+    <span class="md-ellipsis">
+      misc
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="misc">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.utils.misc.format_tuple" class="md-nav__link">
+    <span class="md-ellipsis">
+      format_tuple
     </span>
   </a>
   
@@ -1462,21 +1471,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="utils">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.utils.update_dict" class="md-nav__link">
-    <span class="md-ellipsis">
-      update_dict
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -1520,6 +1514,30 @@
   <a href="#ropt.utils.scaling.scale_constraints" class="md-nav__link">
     <span class="md-ellipsis">
       scale_constraints
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.utils.misc" class="md-nav__link">
+    <span class="md-ellipsis">
+      misc
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="misc">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.utils.misc.format_tuple" class="md-nav__link">
+    <span class="md-ellipsis">
+      format_tuple
     </span>
   </a>
   
@@ -1755,89 +1773,6 @@
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.utils.update_dict" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">update_dict</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span></code>
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Recursively update a dictionary.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>mapping</code></td>
-            <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The dictionary to update.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>values</code></td>
-            <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The values to be updated or added.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The updated dictionary.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
 
 
 
@@ -2319,6 +2254,129 @@ argument.</p>
             <td>
               <div class="doc-md-description">
                 <p>The scaled constraints or <code>None</code> if no scaling was applied.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="ropt.utils.misc" class="doc doc-heading">
+            <code>ropt.utils.misc</code>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Miscellaneous utilities.</p>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.utils.misc.format_tuple" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">format_tuple</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">delimiters</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Format a tuple of strings into a single string.</p>
+<p>This function converts a tuple into a single string by joining the tuple
+items with specified delimiters. The <code>delimiters</code> argument can contain
+multiple characters, each of which will be used in turn to separate the
+items in <code>name</code>. If fewer delimiters are provided than needed, the final
+delimiter is reused for any remaining items. If <code>delimiters</code> is not
+specified, <code>:</code> is used by default.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>values</code></td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[str, <span title="typing.Tuple">Tuple</span>[<span title="typing.Any">Any</span>, ...]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The tuple of strings to format.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>delimiters</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The delimiters to use, applied sequentially.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;:&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The formatted string.</p>
               </div>
             </td>
           </tr>

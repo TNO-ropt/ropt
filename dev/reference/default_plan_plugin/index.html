@@ -2936,11 +2936,19 @@ may contain one or more replacement strings  for
 the following variables, which will be substituted with the
 corresponding value of the result objects:</p>
 <ul>
+<li><code>plan_id</code>: Replace with a formatted <code>plan_id</code> field of the result object.</li>
 <li><code>result_id</code>: Replace with the <code>result_id</code> field of the result object.</li>
 <li><code>batch_id</code>: Replace with the <code>batch_id</code> field of the result object.</li>
 </ul>
 <p>For example the following string will construct file names using the
 result ID padded with zeros: "output_directory/result{result_id:03d}.nc".</p>
+<p>Since the <code>plan_id</code> field of a results objects is a tuple, it needs to
+formatted before substitution. This is done by joining them using
+delimiters from the <code>delimiters</code> attribute. The <code>delimiters</code> argument
+can contain multiple characters, each of which will be used in turn to
+separate the items in <code>name</code>. If fewer delimiters are provided than
+needed, the final delimiter is reused for any remaining items. If
+<code>delimiters</code> is not specified, <code>-</code> is used by default.</p>
 <p>The <code>tags</code> field allows optional labels to be attached to each result,
 assisting result handlers in filtering relevant results.</p>
 <p>Currently the output is stored in netCDf format. A <code>.nc</code> extension is added
@@ -2976,6 +2984,17 @@ to the file name if not present already.</p>
             <td>
               <div class="doc-md-description">
                 <p>Tags to filter the sources to track.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.plan._save.DefaultSaveHandler.DefaultSaveHandlerWith.delimiters">delimiters</span></code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The delimiters to use to format plan_id values, applied sequentially.</p>
               </div>
             </td>
           </tr>
