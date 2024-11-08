@@ -2932,13 +2932,13 @@ handler in a plan configuration.</p>
 
         <p>Parameters for the save handler.</p>
 <p>The <code>path</code> field specifies the output path, including the file name. It
-may contain one or more replacement strings  for
-the following variables, which will be substituted with the
-corresponding value of the result objects:</p>
+may contain one or more replacement strings for the following variables,
+which will be substituted with the corresponding value of the result
+objects:</p>
 <ul>
-<li><code>plan_id</code>: Replace with a formatted <code>plan_id</code> field of the result object.</li>
+<li><code>plan_id</code>:   Replace with a formatted <code>plan_id</code> field of the result object.</li>
 <li><code>result_id</code>: Replace with the <code>result_id</code> field of the result object.</li>
-<li><code>batch_id</code>: Replace with the <code>batch_id</code> field of the result object.</li>
+<li><code>batch_id</code>:  Replace with the <code>batch_id</code> field of the result object.</li>
 </ul>
 <p>For example the following string will construct file names using the
 result ID padded with zeros: "output_directory/result{result_id:03d}.nc".</p>
