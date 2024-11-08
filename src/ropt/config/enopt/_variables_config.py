@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 import sys
-from itertools import zip_longest
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 import numpy as np
 from pydantic import ConfigDict, Field, model_validator
@@ -23,6 +22,7 @@ from ropt.config.validated_types import (  # noqa: TCH001
     UniqueNames,
 )
 from ropt.enums import VariableType
+from ropt.utils.misc import format_tuple
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -177,18 +177,4 @@ class VariablesConfig(ImmutableBaseModel):
         if self.names is None:
             return None
 
-        def _format_name(name: Union[str, Tuple[str, ...]], delimiters: str) -> str:
-            if isinstance(name, tuple):
-                if not delimiters:
-                    return "".join(str(item) for item in name)
-                truncated_delimiters = delimiters[: len(name) - 1]
-                return name[0] + "".join(
-                    str(item)
-                    for item_tuple in zip_longest(
-                        truncated_delimiters, name[1:], fillvalue=delimiters[-1]
-                    )
-                    for item in item_tuple
-                )
-            return str(name)
-
-        return tuple(_format_name(name, self.delimiters) for name in self.names)
+        return tuple(format_tuple(name, self.delimiters) for name in self.names)

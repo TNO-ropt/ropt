@@ -26,6 +26,10 @@
     options:
         members: [DefaultMetadataHandlerWith]
 
+::: ropt.plugins.plan._save.DefaultSaveHandler
+    options:
+        members: [DefaultSaveHandlerWith]
+
 ::: ropt.plugins.plan._table.DefaultTableHandler
     options:
         members: [DefaultTableHandlerWith]

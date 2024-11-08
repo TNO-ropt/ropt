@@ -17,6 +17,7 @@ from ._metadata import DefaultMetadataHandler
 from ._optimizer import DefaultOptimizerStep
 from ._print import DefaultPrintStep
 from ._repeat import DefaultRepeatStep
+from ._save import DefaultSaveHandler
 from ._set import DefaultSetStep
 from ._table import DefaultTableHandler
 from ._tracker import DefaultTrackerHandler
@@ -32,6 +33,7 @@ _STEP_OBJECTS: Final[Dict[str, Type[PlanStep]]] = {
 
 _RESULT_HANDLER_OBJECTS: Final[Dict[str, Type[ResultHandler]]] = {
     "metadata": DefaultMetadataHandler,
+    "save": DefaultSaveHandler,
     "table": DefaultTableHandler,
     "tracker": DefaultTrackerHandler,
 }
