@@ -409,6 +409,11 @@ class EnsembleEvaluator:
                 constraint_weights=constraint_weights,
             ),
             functions=functions,
+            bound_constraints=BoundConstraints.create(self._config, evaluations),
+            linear_constraints=LinearConstraints.create(self._config, evaluations),
+            nonlinear_constraints=NonlinearConstraints.create(
+                self._config, functions, self._constraint_auto_scales
+            ),
         )
 
         assert self._config.gradient.perturbation_min_success is not None
