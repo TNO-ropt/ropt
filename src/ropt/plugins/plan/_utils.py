@@ -101,3 +101,17 @@ def _update_optimal_result(
                 optimal_result = new_optimal_result
                 return_result = new_optimal_result
     return return_result
+
+
+def _get_all_results(
+    results: Tuple[Results, ...], constraint_tolerance: Optional[float]
+) -> Tuple[FunctionResults, ...]:
+    return tuple(
+        item
+        for item in results
+        if (
+            isinstance(item, FunctionResults)
+            and item.functions is not None
+            and _check_constraints(item, constraint_tolerance)
+        )
+    )

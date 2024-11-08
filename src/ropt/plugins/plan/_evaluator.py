@@ -49,15 +49,16 @@ class DefaultEvaluatorStep(PlanStep):
     class DefaultEvaluatorStepWith(BaseModel):
         """Parameters used by the default evaluator step.
 
-        The [`DefaultEvaluatorStep`][ropt.plugins.plan._evaluator.DefaultEvaluatorStep]
+        The
+        [`DefaultEvaluatorStep`][ropt.plugins.plan._evaluator.DefaultEvaluatorStep]
         requires an optimizer configuration; the `tags` and `values` parameters
         are optional. The configuration  object must be an
         [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object, or a dictionary
         that can be parsed into such an object. If no `values` are provided, the
-        initial values specified
-        by the optimizer configuration are used. If `values` is given, it may be
-        a single vector or a two-dimensional array. In the latter case, each row
-        of the matrix is treated as a separate set of values to be evaluated.
+        initial values specified by the optimizer configuration are used. If
+        `values` is given, it may be a single vector or a two-dimensional array.
+        In the latter case, each row of the matrix is treated as a separate set
+        of values to be evaluated.
 
         The `tags` field allows optional labels to be attached to each result,
         which can assist result handlers in filtering relevant results.

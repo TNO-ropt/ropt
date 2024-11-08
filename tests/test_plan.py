@@ -1037,24 +1037,13 @@ def test_evaluator_step(enopt_config: Dict[str, Any], evaluator: Any) -> None:
 
 
 def test_evaluator_step_multi(enopt_config: Dict[str, Any], evaluator: Any) -> None:
-    completed: List[float] = []
-
-    def _track_evaluations(event: Event) -> None:
-        nonlocal completed
-        assert event.results is not None
-        completed += [
-            item.functions.weighted_objective.item()
-            for item in event.results
-            if isinstance(item, FunctionResults) and item.functions is not None
-        ]
-
     enopt_config["optimizer"]["speculative"] = True
     enopt_config["optimizer"]["max_functions"] = 4
 
     plan_config = {
         "variables": {
             "config": enopt_config,
-            "optimum": None,
+            "results": None,
         },
         "steps": [
             {
@@ -1066,19 +1055,18 @@ def test_evaluator_step_multi(enopt_config: Dict[str, Any], evaluator: Any) -> N
             },
         ],
         "results": [
-            {"tracker": {"var": "optimum", "tags": "opt"}},
+            {"tracker": {"var": "results", "type": "all", "tags": "opt"}},
         ],
     }
 
     parsed_config = PlanConfig.model_validate(plan_config)
-    context = OptimizerContext(evaluator=evaluator()).add_observer(
-        EventType.FINISHED_EVALUATOR_STEP, _track_evaluations
-    )
+    context = OptimizerContext(evaluator=evaluator())
     plan = Plan(parsed_config, context)
     plan.run()
-
-    assert len(completed) == 2
-    assert np.allclose(completed, [1.66, 1.75])
+    values = [
+        results.functions.weighted_objective.item() for results in plan["results"]
+    ]
+    assert np.allclose(values, [1.66, 1.75])
 
 
 def test_exit_code(enopt_config: Dict[str, Any], evaluator: Any) -> None:

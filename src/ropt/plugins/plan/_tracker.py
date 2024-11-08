@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 from copy import deepcopy
-from typing import TYPE_CHECKING, Literal, Optional
+from typing import TYPE_CHECKING, Literal, Optional, Tuple, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -12,7 +12,7 @@ from ropt.config.validated_types import ItemOrSet  # noqa: TCH001
 from ropt.enums import EventType
 from ropt.plugins.plan.base import ResultHandler
 
-from ._utils import _get_last_result, _update_optimal_result
+from ._utils import _get_all_results, _get_last_result, _update_optimal_result
 
 if sys.version_info >= (3, 11):
     pass
@@ -23,6 +23,7 @@ else:
 if TYPE_CHECKING:
     from ropt.config.plan import ResultHandlerConfig
     from ropt.plan import Event, Plan
+    from ropt.results import FunctionResults
 
 
 class DefaultTrackerHandler(ResultHandler):
@@ -46,11 +47,12 @@ class DefaultTrackerHandler(ResultHandler):
     class DefaultTrackerHandlerWith(BaseModel):
         """Parameters for the tracker results handler.
 
-        The tracker stores the tracked result in the variable specified by the
+        The tracker stores the tracked results in the variable specified by the
         `var` field. The `type` parameter determines which result is tracked:
 
         - `"best"`: Tracks the best result added.
         - `"last"`: Tracks the last result added.
+        - `"all"`:  Store a tuple with all results.
 
         If `constraint_tolerance` is set, results that exceed this tolerance on
         constraint values are not tracked.
@@ -61,13 +63,13 @@ class DefaultTrackerHandler(ResultHandler):
         Attributes:
             var:                  The name of the variable to store the tracked result.
             tags:                 Tags to filter the sources to track.
-            type:                 Specifies the type of result to store (`"best"` or `"last"`).
+            type:                 Specifies the type of result to store.
             constraint_tolerance: An optional constraint tolerance level.
         """
 
         var: str
         tags: ItemOrSet[str]
-        type_: Literal["best", "last"] = Field(default="best", alias="type")
+        type_: Literal["best", "last", "all"] = Field(default="best", alias="type")
         constraint_tolerance: Optional[float] = 1e-10
 
         model_config = ConfigDict(
@@ -105,8 +107,14 @@ class DefaultTrackerHandler(ResultHandler):
             and event.results is not None
             and (event.tags & self._with.tags)
         ):
+            results: Union[Optional[FunctionResults], Tuple[FunctionResults, ...]]
             results = None
-            if self._with.type_ == "best":
+            if self._with.type_ == "all":
+                results = _get_all_results(
+                    event.results, self._with.constraint_tolerance
+                )
+                self.plan[self._with.var] = deepcopy(results)
+            elif self._with.type_ == "best":
                 results = _update_optimal_result(
                     self.plan[self._with.var],
                     event.results,
