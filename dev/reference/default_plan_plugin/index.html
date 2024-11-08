@@ -2396,11 +2396,14 @@ scaling is handled internally.</p>
 
 
         <p>The default pickle step.</p>
-<p>The pickle step is used to save plan variables to a pickle file. It step
-uses the <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._pickle.DefaultPickleStep.DefaultPickleStepWith"><code>DefaultPickleStepWith</code></a>
+<p>The pickle step saves specified plan variables to a pickle file by
+constructing a dictionary that maps each variable name to its value.
+This dictionary is then serialized and saved as a pickle file.</p>
+<p>The pickle step uses the
+<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._pickle.DefaultPickleStep.DefaultPickleStepWith"><code>DefaultPickleStepWith</code></a>
 configuration class to parse the <code>with</code> field of the
-<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanStepConfig"><code>PlanStepConfig</code></a> used to specify this
-step in a plan configuration.</p>
+<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanStepConfig"><code>PlanStepConfig</code></a>, which defines the
+settings for this step in a plan configuration.</p>
 
 
 
@@ -2431,6 +2434,9 @@ step in a plan configuration.</p>
 
 
         <p>Parameters used by the pickle step.</p>
+<p>This configuration specifies the variables to be saved by the pickle
+step and the file path for the saved pickle file. Directories in the
+path will be created if they do not already exist.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2450,7 +2456,7 @@ step in a plan configuration.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The variables to save.</p>
+                <p>List of variable names to save to the pickle file.</p>
               </div>
             </td>
           </tr>
@@ -2461,7 +2467,7 @@ step in a plan configuration.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The path to save to.</p>
+                <p>File path where the pickle file will be stored.</p>
               </div>
             </td>
           </tr>
