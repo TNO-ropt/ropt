@@ -14,6 +14,10 @@
     options:
         members: [DefaultEvaluatorStepWith]
 
+::: ropt.plugins.plan._pickle.DefaultPickleStep
+    options:
+        members: [DefaultPickleStepWith]
+
 ::: ropt.plugins.plan._print.DefaultPrintStep
     options:
         members: [DefaultPrintStepWith]

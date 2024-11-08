@@ -15,6 +15,7 @@ from ropt.plugins.plan.base import (
 from ._evaluator import DefaultEvaluatorStep
 from ._metadata import DefaultMetadataHandler
 from ._optimizer import DefaultOptimizerStep
+from ._pickle import DefaultPickleStep
 from ._print import DefaultPrintStep
 from ._repeat import DefaultRepeatStep
 from ._save import DefaultSaveHandler
@@ -26,6 +27,7 @@ from .base import PlanPlugin
 _STEP_OBJECTS: Final[Dict[str, Type[PlanStep]]] = {
     "evaluator": DefaultEvaluatorStep,
     "optimizer": DefaultOptimizerStep,
+    "pickle": DefaultPickleStep,
     "print": DefaultPrintStep,
     "repeat": DefaultRepeatStep,
     "set": DefaultSetStep,
