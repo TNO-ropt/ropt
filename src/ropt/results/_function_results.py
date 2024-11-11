@@ -99,5 +99,11 @@ class FunctionResults(Results):
             key: _types[key](**_from_dataset(value)) if key in _types else value
             for key, value in results.items()
         }
-        kwargs.update({key: None for key in _types if key not in results})
+        kwargs.update(
+            {
+                key: None
+                for key in set(_types.keys()) | {"batch_id"}
+                if key not in results
+            }
+        )
         return cls(**kwargs)

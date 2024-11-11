@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Sequence
+from typing import TYPE_CHECKING, Any, Sequence, Union
 
 from pydantic import BaseModel, ConfigDict
 
@@ -33,7 +33,7 @@ class DefaultSaveHandler(ResultHandler):
 
     This handler tracks the [`Results`][ropt.results.Results] objects that it
     receives saves them. It uses the [`DefaultSaveHandlerWith`]
-    [ropt.plugins.plan._save.DefaultSaveHandler.DefaultSaveHandlerWith]
+    [ropt.plugins.plan._save_results.DefaultSaveHandler.DefaultSaveHandlerWith]
     configuration class to parse the `with` field of the
     [`ResultHandler`][ropt.config.plan.ResultHandlerConfig] used to specify this
     handler in a plan configuration.
@@ -43,9 +43,9 @@ class DefaultSaveHandler(ResultHandler):
         """Parameters for the save handler.
 
         The `path` field specifies the output path, including the file name. It
-        may contain one or more replacement strings for the following variables,
-        which will be substituted with the corresponding value of the result
-        objects:
+        may be a `Path` object, or a string. In the latter case, it may contain
+        one or more replacement strings for the following variables, which will
+        be substituted with the corresponding value of the result objects:
 
         - `plan_id`:   Replace with a formatted `plan_id` field of the result object.
         - `result_id`: Replace with the `result_id` field of the result object.
@@ -74,7 +74,7 @@ class DefaultSaveHandler(ResultHandler):
             delimiters: The delimiters to use to format plan_id values, applied sequentially.
         """
 
-        path: str
+        path: Union[str, Path]
         tags: ItemOrSet[str]
         delimiters: str = "-"
 
@@ -113,15 +113,20 @@ class DefaultSaveHandler(ResultHandler):
             and (event.tags & self._with.tags)
         ):
             for results in event.results:
-                path = Path(
-                    self.plan.eval(
-                        self._with.path.format(
-                            plan_id=_Formatter(results.plan_id, self._with.delimiters),
-                            result_id=results.result_id,
-                            batch_id=results.batch_id,
+                if isinstance(self._with.path, Path):
+                    path = self._with.path
+                else:
+                    path = Path(
+                        self.plan.eval(
+                            self._with.path.format(
+                                plan_id=_Formatter(
+                                    results.plan_id, self._with.delimiters
+                                ),
+                                result_id=results.result_id,
+                                batch_id=results.batch_id,
+                            )
                         )
                     )
-                )
                 if path.parent.exists() and not path.parent.is_dir():
                     msg = f"Not a directory to store results: {path.parent}"
                     raise RuntimeError(msg)

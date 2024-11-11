@@ -13,12 +13,13 @@ from ropt.plugins.plan.base import (
 )
 
 from ._evaluator import DefaultEvaluatorStep
+from ._load_vars import DefaultLoadStep
 from ._metadata import DefaultMetadataHandler
 from ._optimizer import DefaultOptimizerStep
-from ._pickle import DefaultPickleStep
 from ._print import DefaultPrintStep
 from ._repeat import DefaultRepeatStep
-from ._save import DefaultSaveHandler
+from ._save_results import DefaultSaveHandler
+from ._save_vars import DefaultSaveStep
 from ._set import DefaultSetStep
 from ._table import DefaultTableHandler
 from ._tracker import DefaultTrackerHandler
@@ -26,8 +27,9 @@ from .base import PlanPlugin
 
 _STEP_OBJECTS: Final[Dict[str, Type[PlanStep]]] = {
     "evaluator": DefaultEvaluatorStep,
+    "load": DefaultLoadStep,
     "optimizer": DefaultOptimizerStep,
-    "pickle": DefaultPickleStep,
+    "save": DefaultSaveStep,
     "print": DefaultPrintStep,
     "repeat": DefaultRepeatStep,
     "set": DefaultSetStep,
@@ -48,11 +50,15 @@ class DefaultPlanPlugin(PlanPlugin):
 
     `Steps`:
     : - A step that modifies one or more variables
-        ([`optimizer`][ropt.plugins.plan._set.DefaultSetStep]).
+        ([`set`][ropt.plugins.plan._set.DefaultSetStep]).
+    : - A step that loads variables from a file
+        ([`load`][ropt.plugins.plan._load_vars.DefaultLoadStep]).
+    : - A step that saves variables to a file
+        ([`save`][ropt.plugins.plan._save_vars.DefaultSaveStep]).
     : - A step that performs a single ensemble evaluation
         ([`evaluator`][ropt.plugins.plan._evaluator.DefaultEvaluatorStep]).
-    : - A step that performs a single ensemble evaluation
-        ([`evaluator`][ropt.plugins.plan._evaluator.DefaultEvaluatorStep]).
+    : - A step that runs an optimization
+        ([`optimizer`][ropt.plugins.plan._optimizer.DefaultOptimizerStep]).
     : - A step that prints a message to the console
         ([`print`][ropt.plugins.plan._print.DefaultPrintStep]).
     : - A step that repeats a number of steps
@@ -61,10 +67,12 @@ class DefaultPlanPlugin(PlanPlugin):
     `Result Handlers`:
     : - A handler that adds metadata to results
         ([`metadata`][ropt.plugins.plan._metadata.DefaultMetadataHandler]).
-    : - A handler that generates and saves tables of results
-        ([`table`][ropt.plugins.plan._table.DefaultTableHandler]).
     : - A handler that tracks optimal results
         ([`tracker`][ropt.plugins.plan._tracker.DefaultTrackerHandler]).
+    : - A handler that generates and saves tables of results
+        ([`table`][ropt.plugins.plan._table.DefaultTableHandler]).
+    : - A handler that saves results to netCDF files
+        ([`save`][ropt.plugins.plan._save_results.DefaultSaveHandler]).
     """
 
     @singledispatchmethod

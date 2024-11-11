@@ -1001,18 +1001,18 @@ def test_evaluator_step(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     plan_config: Dict[str, Any] = {
         "variables": {
             "config": enopt_config,
-            "optimum": None,
+            "result": None,
         },
         "steps": [
             {
                 "evaluator": {
                     "config": "$config",
-                    "tags": "opt",
+                    "tags": "eval",
                 },
             },
         ],
         "results": [
-            {"tracker": {"var": "optimum", "tags": "opt"}},
+            {"tracker": {"var": "result", "tags": "eval"}},
         ],
     }
 
@@ -1021,9 +1021,9 @@ def test_evaluator_step(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     plan = Plan(parsed_config, context)
     plan.run()
 
-    assert plan["optimum"] is not None
-    assert plan["optimum"].functions is not None
-    assert np.allclose(plan["optimum"].functions.weighted_objective, 1.66)
+    assert plan["result"] is not None
+    assert plan["result"].functions is not None
+    assert np.allclose(plan["result"].functions.weighted_objective, 1.66)
 
     plan_config["steps"][0]["evaluator"]["values"] = [0, 0, 0]
     parsed_config = PlanConfig.model_validate(plan_config)
@@ -1031,9 +1031,9 @@ def test_evaluator_step(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     plan = Plan(parsed_config, context)
     plan.run()
 
-    assert plan["optimum"] is not None
-    assert plan["optimum"].functions is not None
-    assert np.allclose(plan["optimum"].functions.weighted_objective, 1.75)
+    assert plan["result"] is not None
+    assert plan["result"].functions is not None
+    assert np.allclose(plan["result"].functions.weighted_objective, 1.75)
 
 
 def test_evaluator_step_multi(enopt_config: Dict[str, Any], evaluator: Any) -> None:
@@ -1050,12 +1050,12 @@ def test_evaluator_step_multi(enopt_config: Dict[str, Any], evaluator: Any) -> N
                 "evaluator": {
                     "config": "$config",
                     "values": [[0, 0, 0.1], [0, 0, 0]],
-                    "tags": "opt",
+                    "tags": "eval",
                 },
             },
         ],
         "results": [
-            {"tracker": {"var": "results", "type": "all", "tags": "opt"}},
+            {"tracker": {"var": "results", "type": "all", "tags": "eval"}},
         ],
     }
 
@@ -1357,3 +1357,73 @@ def test_table_handler(
     assert path2.exists()
 
     assert filecmp.cmp(path1, path2)
+
+
+@pytest.mark.parametrize("file_format", ["json", "pickle"])
+def test_save_step(evaluator: Any, file_format: str, tmp_path: Path) -> None:
+    path = tmp_path / "vars"
+    plan_config = {
+        "variables": {
+            "x": 1,
+            "y": 2,
+        },
+        "steps": [
+            {
+                "save": {"vars": ["x", "y"], "path": path, "format": file_format},
+            },
+            {
+                "set": {"x": None, "y": None},
+            },
+            {
+                "load": {"vars": ["x", "y"], "path": path, "format": file_format},
+            },
+        ],
+    }
+
+    context = OptimizerContext(evaluator=evaluator())
+    plan = Plan(PlanConfig.model_validate(plan_config), context)
+    plan.run()
+
+    assert path.exists()
+    assert plan["x"] == 1
+    assert plan["y"] == 2
+
+
+def test_save_results_step(
+    enopt_config: Dict[str, Any], evaluator: Any, tmp_path: Path
+) -> None:
+    path = tmp_path / "results"
+    plan_config: Dict[str, Any] = {
+        "variables": {
+            "config": enopt_config,
+            "result": None,
+        },
+        "steps": [
+            {
+                "evaluator": {
+                    "config": "$config",
+                    "tags": "eval",
+                },
+            },
+        ],
+        "results": [
+            {"tracker": {"var": "result", "tags": "eval", "type": "last"}},
+            {"save": {"path": path, "tags": "eval"}},
+        ],
+    }
+
+    parsed_config = PlanConfig.model_validate(plan_config)
+    context = OptimizerContext(evaluator=evaluator())
+    plan = Plan(parsed_config, context)
+    plan.run()
+
+    assert plan["result"] is not None
+    assert plan["result"].functions is not None
+    assert np.allclose(plan["result"].functions.weighted_objective, 1.66)
+
+    assert path.with_suffix(".nc").exists()
+
+    results = FunctionResults.from_netcdf(path.with_suffix(".nc"))
+    assert isinstance(results, FunctionResults)
+    assert results.functions is not None
+    assert np.allclose(results.functions.weighted_objective, 1.66)

@@ -6,17 +6,21 @@
     options:
         members: [DefaultSetStepWith]
 
-::: ropt.plugins.plan._optimizer.DefaultOptimizerStep
+::: ropt.plugins.plan._load_vars.DefaultLoadStep
     options:
-        members: [DefaultOptimizerStepWith, NestedPlanConfig]
+        members: [DefaultLoadStepWith]
+
+::: ropt.plugins.plan._save_vars.DefaultSaveStep
+    options:
+        members: [DefaultSaveStepWith]
 
 ::: ropt.plugins.plan._evaluator.DefaultEvaluatorStep
     options:
         members: [DefaultEvaluatorStepWith]
 
-::: ropt.plugins.plan._pickle.DefaultPickleStep
+::: ropt.plugins.plan._optimizer.DefaultOptimizerStep
     options:
-        members: [DefaultPickleStepWith]
+        members: [DefaultOptimizerStepWith, NestedPlanConfig]
 
 ::: ropt.plugins.plan._print.DefaultPrintStep
     options:
@@ -30,14 +34,14 @@
     options:
         members: [DefaultMetadataHandlerWith]
 
-::: ropt.plugins.plan._save.DefaultSaveHandler
+::: ropt.plugins.plan._tracker.DefaultTrackerHandler
     options:
-        members: [DefaultSaveHandlerWith]
+        members: [DefaultTrackerHandlerWith]
 
 ::: ropt.plugins.plan._table.DefaultTableHandler
     options:
         members: [DefaultTableHandlerWith]
 
-::: ropt.plugins.plan._tracker.DefaultTrackerHandler
+::: ropt.plugins.plan._save_results.DefaultSaveHandler
     options:
-        members: [DefaultTrackerHandlerWith]
+        members: [DefaultSaveHandlerWith]
