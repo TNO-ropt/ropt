@@ -163,8 +163,12 @@ class EnsembleOptimizer:
         # Run any nested steps, when this improves the objective, this may
         # change the fixed variables and the current optimal result:
         if self._nested_optimizer is not None:
-            # Nested optimization does not support parallel # evaluation:
-            assert variables.ndim == 1
+            # Nested optimization does not support parallel evaluation:
+            if variables.ndim > 1:
+                if variables.shape[0] > 1:
+                    msg = "Nested optimization does not support parallel evaluation."
+                    raise RuntimeError(msg)
+                variables = variables[0, ...]
             nested_results, aborted = self._nested_optimizer(variables)
             if aborted:
                 raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
