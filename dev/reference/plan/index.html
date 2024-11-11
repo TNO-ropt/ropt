@@ -707,15 +707,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.plugin_manager" class="md-nav__link">
-    <span class="md-ellipsis">
-      plugin_manager
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.optimizer_context" class="md-nav__link">
     <span class="md-ellipsis">
       optimizer_context
@@ -884,6 +875,15 @@
   <a href="#ropt.plan.ExpressionEvaluator.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.ExpressionEvaluator.add_functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_functions
     </span>
   </a>
   
@@ -1508,15 +1508,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.plugin_manager" class="md-nav__link">
-    <span class="md-ellipsis">
-      plugin_manager
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.optimizer_context" class="md-nav__link">
     <span class="md-ellipsis">
       optimizer_context
@@ -1685,6 +1676,15 @@
   <a href="#ropt.plan.ExpressionEvaluator.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.ExpressionEvaluator.add_functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_functions
     </span>
   </a>
   
@@ -1955,52 +1955,6 @@ identified.</p>
 
 
 
-<h4 id="ropt.plan.Plan.plugin_manager" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">plugin_manager</span><span class="p">:</span> <span class="n">PluginManager</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the plugin manager associated with the plan.</p>
-<p>This method retrieves the plugin manager that is used to manage plugins
-for the plan's steps and result handlers.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The plugin manager instance used by the plan.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
 <h4 id="ropt.plan.Plan.optimizer_context" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">optimizer_context</span><span class="p">:</span> <span class="n">OptimizerContext</span></code>
 
@@ -2049,7 +2003,7 @@ state and functionality for executing the optimization plan.</p>
 
 
 <h4 id="ropt.plan.Plan.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">optimizer_context</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plan_id</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">optimizer_context</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plan_id</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
@@ -2112,21 +2066,6 @@ and nested plan workflows.</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>plugin_manager</code></td>
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional custom plugin manager for step and
-               result handler plugins.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -2789,6 +2728,7 @@ all steps in an optimization plan. This currently includes the following:</p>
 <li>An <a class="autorefs autorefs-internal" href="../evaluator/#ropt.evaluator.Evaluator"><code>Evaluator</code></a> callable for evaluating
   functions.</li>
 <li>An expression evaluator object for processing expressions.</li>
+<li>A plugin manager to retrieve plugins used by the plan and optimizers.</li>
 <li>Event callbacks that are triggered in response to specific events,
   executed after the plan has processed them.</li>
 </ul>
@@ -2810,7 +2750,7 @@ all steps in an optimization plan. This currently includes the following:</p>
 
 
 <h4 id="ropt.plan.OptimizerContext.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">evaluator</span><span class="p">,</span> <span class="n">expr</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">evaluator</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
@@ -2849,14 +2789,13 @@ evaluator for processing plan-specific expressions.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code>expr</code></td>
+            <td><code>plugin_manager</code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.plan._expr.ExpressionEvaluator" href="#ropt.plan.ExpressionEvaluator">ExpressionEvaluator</a>]</code>
+                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional expression evaluator for handling
-       expressions within plan steps.</p>
+                <p>Optional plugin manager.</p>
               </div>
             </td>
             <td>
@@ -3054,7 +2993,7 @@ type of event passed as an argument.</p>
 
 
 <h4 id="ropt.plan.ExpressionEvaluator.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">functions</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">()</span></code>
 
 </h4>
 
@@ -3062,9 +3001,46 @@ type of event passed as an argument.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize the expression evaluator.</p>
-<p>The <code>functions</code> argument allows adding a dictionary of functions that
-can be called within the expression using the <code>$name()</code> format. Note
-that these functions cannot override the evaluator's built-in functions.</p>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>ValueError</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Raised if any provided function overrides a built-in.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plan.ExpressionEvaluator.add_functions" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">add_functions</span><span class="p">(</span><span class="n">functions</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Add functions to the evaluator.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3085,11 +3061,11 @@ that these functions cannot override the evaluator's built-in functions.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional dictionary of additional functions to add.</p>
+                <p>A dictionary of functions to add.</p>
               </div>
             </td>
             <td>
-                  <code>None</code>
+                <em>required</em>
             </td>
           </tr>
       </tbody>
@@ -3111,7 +3087,7 @@ that these functions cannot override the evaluator's built-in functions.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Raised if any provided function overrides a built-in.</p>
+                <p>If a function already exists.</p>
               </div>
             </td>
           </tr>

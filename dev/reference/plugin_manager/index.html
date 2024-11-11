@@ -889,6 +889,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.PluginManager.plugin_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      plugin_data
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1357,6 +1366,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.PluginManager.plugin_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      plugin_data
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1776,6 +1794,83 @@ form "<em>plugin-name/method-name</em>", <code>True</code> will be returned if t
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plugins.PluginManager.plugin_data" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">plugin_data</span><span class="p">(</span><span class="n">plugin_type</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return optional data for all plugins of a given type.</p>
+<p>This generator will retrieve the <code>data</code> property of each plugin of the
+requested type. If it exists, a tuple consisting of the plugin name and
+of the plugin data is returned.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>plugin_type</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plugins._manager.PluginType" href="#ropt.plugins.PluginType">PluginType</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Type of the plugins to inquire.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Yields:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Tuple">Tuple</span>[str, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>plugin name and plugin data.</p>
+              </div>
             </td>
           </tr>
       </tbody>
