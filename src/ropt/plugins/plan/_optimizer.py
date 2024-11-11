@@ -188,13 +188,13 @@ class DefaultOptimizerStep(PlanStep):
             self.plan.optimizer_context.evaluator,
             self.plan.plan_id,
             self.plan.result_id_iterator,
-            self.plan.plugin_manager,
+            self.plan.optimizer_context.plugin_manager,
         )
 
         ensemble_optimizer = EnsembleOptimizer(
             enopt_config=self._enopt_config,
             ensemble_evaluator=ensemble_evaluator,
-            plugin_manager=self.plan.plugin_manager,
+            plugin_manager=self.plan.optimizer_context.plugin_manager,
             nested_optimizer=(
                 self._run_nested_plan
                 if self._with.nested_optimization is not None

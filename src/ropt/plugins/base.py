@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict
+from typing import Any, Dict
 
 
 class Plugin(ABC):
@@ -38,11 +38,11 @@ class Plugin(ABC):
         """
 
     @property
-    def data(self) -> Dict[str, Callable[..., Any]]:
-        """Return plan functions implemented by the plugin.
+    def data(self) -> Dict[str, Any]:
+        """Return plan data.
 
         This can be used to store plugin specific data. The
-        [`plugin_data`][ropt.plugins.PluginManager.plugin_data] method of
+        [`plugin_data`][ropt.plugins.PluginManager.plugin_data] property of
         [`PluginManager`][ropt.plugins.PluginManager] objects, accesses this
         property to yield plugin specific data.
 
@@ -60,4 +60,3 @@ class Plugin(ABC):
             A dictionary mapping function names to callables.
         """
         return {}
-

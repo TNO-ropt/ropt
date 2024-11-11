@@ -21,15 +21,26 @@ if TYPE_CHECKING:
 
 
 class PlanPlugin(Plugin):
-    """The abstract base class for plan plugins.
+    """Abstract base class for plan plugins.
 
-    Plan steps and result handlers are implemented through plugins that must derive
-    from this base class. Plugins can be built-in, installed via a plugin mechanism,
-    or loaded dynamically. During execution of an optimization plan, the
-    required optimizer plugin will be located via the
-    [`PluginManager`][ropt.plugins.PluginManager] and used to create
-    [`PlanStep`][ropt.plugins.plan.base.PlanStep] or [`ResultHandler`][ropt.plugins.plan.base.ResultHandler] objects via its
-    `create` function.
+    This base class serves as the foundation for all plugins used in an
+    optimization plan, including plan steps and result handlers. Any plugin
+    derived from this class can be built-in, installed via a plugin mechanism,
+    or dynamically loaded. During the execution of an optimization plan, the
+    required plugin is located through the
+    [`PluginManager`][ropt.plugins.PluginManager], which then uses the plugin's
+    `create` function to instantiate either a
+    [`PlanStep`][ropt.plugins.plan.base.PlanStep] or a
+    [`ResultHandler`][ropt.plugins.plan.base.ResultHandler] as needed.
+
+    Note: Plan functions
+        A plan plugin can also provide functions to be used by the plan`s
+        expression evaluators. To achieve this, the plugin should override the
+        `data` property of the [`PlanPlugin`][ropt.plugins.plan.base.PlanPlugin]
+        class. This overridden `data` property should return a dictionary
+        containing a `"functions"` key. The value associated with this key must
+        be a dictionary that maps function names to callables, which are
+        subsequently added to the expression evaluators.
     """
 
     @abstractmethod

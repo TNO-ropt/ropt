@@ -7,10 +7,7 @@ from typing import Dict, Final, Type, Union
 
 from ropt.config.plan import PlanStepConfig, ResultHandlerConfig
 from ropt.plan import Plan
-from ropt.plugins.plan.base import (
-    PlanStep,
-    ResultHandler,
-)
+from ropt.plugins.plan.base import PlanStep, ResultHandler
 
 from ._evaluator import DefaultEvaluatorStep
 from ._load_vars import DefaultLoadStep

@@ -75,27 +75,28 @@ class _ReplaceFields(ast.NodeTransformer):
 class ExpressionEvaluator:
     """A class for evaluating mathematical expressions in strings."""
 
-    def __init__(
-        self, functions: Optional[Dict[str, Callable[..., Any]]] = None
-    ) -> None:
+    def __init__(self) -> None:
         """Initialize the expression evaluator.
-
-        The `functions` argument allows adding a dictionary of functions that
-        can be called within the expression using the `$name()` format. Note
-        that these functions cannot override the evaluator's built-in functions.
-
-        Args:
-            functions: Optional dictionary of additional functions to add.
 
         Raises:
             ValueError: Raised if any provided function overrides a built-in.
         """
         self._functions = copy.deepcopy(_BUILTIN_FUNCTIONS)
         self._functions["_eval"] = self._eval_function
+
+    def add_functions(self, functions: Optional[Dict[str, Callable[..., Any]]]) -> None:
+        """Add functions to the evaluator.
+
+        Args:
+            functions: A dictionary of functions to add.
+
+        Raises:
+            ValueError: If a function already exists.
+        """
         if functions is not None:
             for key in functions:
                 if key in self._functions:
-                    msg = f"cannot override builtin: `{key}`"
+                    msg = f"cannot override existing function: `{key}`"
                     raise ValueError(msg)
             for key, value in functions.items():
                 self._functions[key] = value

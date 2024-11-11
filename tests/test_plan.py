@@ -13,7 +13,6 @@ from ropt.enums import EventType, OptimizerExitCode
 from ropt.plan import (
     BasicOptimizer,
     Event,
-    ExpressionEvaluator,
     OptimizerContext,
     Plan,
 )
@@ -143,9 +142,8 @@ def test_eval_expr(evaluator: Any, expr: str, expected: Any) -> None:
         },
     }
     parsed_config = PlanConfig.model_validate(plan_config)
-    context = OptimizerContext(
-        evaluator=evaluator(), expr=ExpressionEvaluator({"incr": lambda x: x + 1})
-    )
+    context = OptimizerContext(evaluator=evaluator())
+    context.expr.add_functions({"incr": lambda x: x + 1})
     plan = Plan(parsed_config, context)
     plan.run()
 
@@ -175,9 +173,8 @@ def test_eval_exception(
 ) -> None:
     plan_config: Dict[str, Any] = {}
     parsed_config = PlanConfig.model_validate(plan_config)
-    context = OptimizerContext(
-        evaluator=evaluator(), expr=ExpressionEvaluator({"incr": lambda x: x + 1})
-    )
+    context = OptimizerContext(evaluator=evaluator())
+    context.expr.add_functions({"incr": lambda x: x + 1})
     plan = Plan(parsed_config, context)
     plan.run()
     with pytest.raises(exception, match=message):  # type: ignore[call-overload]

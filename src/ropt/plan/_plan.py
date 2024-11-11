@@ -41,6 +41,7 @@ class OptimizerContext:
     - An [`Evaluator`][ropt.evaluator.Evaluator] callable for evaluating
       functions.
     - An expression evaluator object for processing expressions.
+    - A plugin manager to retrieve plugins used by the plan and optimizers.
     - Event callbacks that are triggered in response to specific events,
       executed after the plan has processed them.
     """
@@ -48,7 +49,7 @@ class OptimizerContext:
     def __init__(
         self,
         evaluator: Evaluator,
-        expr: Optional[ExpressionEvaluator] = None,
+        plugin_manager: Optional[PluginManager] = None,
     ) -> None:
         """Initialize the optimization context.
 
@@ -57,15 +58,20 @@ class OptimizerContext:
         evaluator for processing plan-specific expressions.
 
         Args:
-            evaluator: A callable used to evaluate functions within the plan.
-            expr:      An optional expression evaluator for handling
-                       expressions within plan steps.
+            evaluator:      A callable used to evaluate functions within the plan.
+            plugin_manager: Optional plugin manager.
         """
         self.evaluator = evaluator
-        self.expr = ExpressionEvaluator() if expr is None else expr
+        self.expr = ExpressionEvaluator()
+        self.plugin_manager = (
+            PluginManager() if plugin_manager is None else plugin_manager
+        )
         self._subscribers: Dict[EventType, List[Callable[[Event], None]]] = {
             event: [] for event in EventType
         }
+
+        for _, funcs in self.plugin_manager.plugin_data("plan"):
+            self.expr.add_functions(funcs.get("functions", {}))
 
     def add_observer(
         self,
@@ -115,7 +121,6 @@ class Plan:
         self,
         config: PlanConfig,
         optimizer_context: OptimizerContext,
-        plugin_manager: Optional[PluginManager] = None,
         parent: Optional[Plan] = None,
         plan_id: Optional[Tuple[int, ...]] = None,
     ) -> None:
@@ -143,8 +148,6 @@ class Plan:
             config:            The configuration for the optimizer.
             optimizer_context: The context in which the plan will execute,
                                providing shared resources across steps.
-            plugin_manager:    Optional custom plugin manager for step and
-                               result handler plugins.
             parent:            Optional reference to the parent plan that
                                spawned this plan.
             plan_id:           The ID of the plan, reflecting its hierarchy.
@@ -156,9 +159,6 @@ class Plan:
         self._spawn_id: int = -1
         self._result_id_iter = count()
 
-        self._plugin_manager = (
-            PluginManager() if plugin_manager is None else plugin_manager
-        )
         for var in chain(
             self._plan_config.inputs,
             self._plan_config.outputs,
@@ -174,9 +174,9 @@ class Plan:
         self._set_item("plan_id", list(self.plan_id))
         self._steps = self.create_steps(config.steps)
         self._handlers: List[ResultHandler] = [
-            self._plugin_manager.get_plugin("plan", method=config.run).create(
-                config, self
-            )
+            self._optimizer_context.plugin_manager.get_plugin(
+                "plan", method=config.run
+            ).create(config, self)
             for config in config.results
         ]
         self._aborted = False
@@ -265,9 +265,9 @@ class Plan:
             List of configured step objects ready for execution in the plan.
         """
         return [
-            self._plugin_manager.get_plugin("plan", method=step_config.run).create(
-                step_config, self
-            )
+            self._optimizer_context.plugin_manager.get_plugin(
+                "plan", method=step_config.run
+            ).create(step_config, self)
             for step_config in step_configs
         ]
 
@@ -289,18 +289,6 @@ class Plan:
                 task.run()
             if self._aborted:
                 break
-
-    @property
-    def plugin_manager(self) -> PluginManager:
-        """Return the plugin manager associated with the plan.
-
-        This method retrieves the plugin manager that is used to manage plugins
-        for the plan's steps and result handlers.
-
-        Returns:
-            The plugin manager instance used by the plan.
-        """
-        return self._plugin_manager
 
     @property
     def optimizer_context(self) -> OptimizerContext:
@@ -336,7 +324,6 @@ class Plan:
         return Plan(
             config,
             optimizer_context=self._optimizer_context,
-            plugin_manager=self._plugin_manager,
             parent=self,
             plan_id=(*self._plan_id, self._spawn_id),
         )

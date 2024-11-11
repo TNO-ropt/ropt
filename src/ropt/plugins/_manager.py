@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 from functools import lru_cache
-from typing import TYPE_CHECKING, Any, Dict, Final, Literal
+from typing import TYPE_CHECKING, Any, Dict, Final, Generator, Literal
 
 from ropt.exceptions import ConfigError
 
@@ -15,6 +15,8 @@ from .realization_filter.base import RealizationFilterPlugin
 from .sampler.base import SamplerPlugin
 
 if TYPE_CHECKING:
+    from typing import Tuple
+
     from ropt.plugins.base import Plugin
 
 if sys.version_info >= (3, 10):
@@ -143,6 +145,26 @@ class PluginManager:
         except ConfigError:
             return False
         return True
+
+    def plugin_data(
+        self, plugin_type: PluginType
+    ) -> Generator[Tuple[str, Any], None, None]:
+        """Generate optional data for all plugins of a specified type.
+
+        This generator retrieves the `data` property from each plugin that
+        matches the specified `plugin_type`. If the plugin has data, it yields a
+        tuple containing the plugin's name and its associated data.
+
+        Args:
+            plugin_type: The type of plugins to query for data.
+
+        Yields:
+            A tuple of the plugin name and its data.
+        """
+        for plugin_name, plugin in self._plugins[plugin_type].items():
+            data = getattr(plugin, "data", None)
+            if data is not None:
+                yield plugin_name, data
 
 
 @lru_cache  # Without the cache, repeated calls are very slow

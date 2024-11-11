@@ -116,7 +116,7 @@ class DefaultEvaluatorStep(PlanStep):
             self.plan.optimizer_context.evaluator,
             self.plan.plan_id,
             self.plan.result_id_iterator,
-            self.plan.plugin_manager,
+            self.plan.optimizer_context.plugin_manager,
         )
 
         variables = self._get_variables(self._enopt_config)

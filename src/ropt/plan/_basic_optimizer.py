@@ -21,7 +21,6 @@ from typing import (
 from ropt.config.plan import PlanConfig
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
-from ropt.plugins import PluginManager
 
 from ._plan import OptimizerContext, Plan
 
@@ -82,7 +81,6 @@ class BasicOptimizer:
             evaluator:            The evaluator object used to evaluate functions.
             constraint_tolerance: The tolerance level used to detect constraint violations.
         """
-        self._plugin_manager: Optional[PluginManager] = None
         self._optimizer_context = OptimizerContext(evaluator=evaluator)
         self._observers: List[Tuple[EventType, Callable[[Event], None]]] = []
         self._metadata: Dict[str, Any] = {}
@@ -153,9 +151,7 @@ class BasicOptimizer:
         Returns:
             The `BasicOptimizer` instance, allowing for method chaining.
         """
-        if self._plugin_manager is None:
-            self._plugin_manager = PluginManager()
-        self._plugin_manager.add_plugins(plugin_type, plugins)
+        self._optimizer_context.plugin_manager.add_plugins(plugin_type, plugins)
         return self
 
     def add_observer(
@@ -253,7 +249,6 @@ class BasicOptimizer:
                 }
             ),
             self._optimizer_context,
-            plugin_manager=self._plugin_manager,
         )
         for event_type, function in self._observers:
             self._optimizer_context.add_observer(event_type, function)
