@@ -35,12 +35,12 @@ class PlanPlugin(Plugin):
 
     Note: Plan functions
         A plan plugin can also provide functions to be used by the plan`s
-        expression evaluators. To achieve this, the plugin should override the
+        expression evaluator. To achieve this, the plugin should override the
         `data` property of the [`PlanPlugin`][ropt.plugins.plan.base.PlanPlugin]
         class. This overridden `data` property should return a dictionary
         containing a `"functions"` key. The value associated with this key must
         be a dictionary that maps function names to callables, which are
-        subsequently added to the expression evaluators.
+        subsequently added to the expression evaluator.
     """
 
     @abstractmethod

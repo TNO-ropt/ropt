@@ -151,6 +151,25 @@ def test_eval_expr(evaluator: Any, expr: str, expected: Any) -> None:
 
 
 @pytest.mark.parametrize(
+    ("expr", "expected"),
+    [
+        ("$mkdict(keys, [3, 4])", {"a": 3, "b": 4}),
+    ],
+)
+def test_eval_expr_functions(evaluator: Any, expr: str, expected: Any) -> None:
+    plan_config: Dict[str, Any] = {
+        "variables": {
+            "keys": ["a", "b"],
+        },
+    }
+    parsed_config = PlanConfig.model_validate(plan_config)
+    context = OptimizerContext(evaluator=evaluator())
+    plan = Plan(parsed_config, context)
+    plan.run()
+    assert plan.eval(expr) == expected
+
+
+@pytest.mark.parametrize(
     ("expr", "message", "exception"),
     [
         ("$(1 + * 1)", "invalid syntax", SyntaxError),
