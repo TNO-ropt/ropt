@@ -931,6 +931,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.Plugin.data" class="md-nav__link">
+    <span class="md-ellipsis">
+      data
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1408,6 +1417,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.Plugin.data" class="md-nav__link">
+    <span class="md-ellipsis">
+      data
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1819,10 +1837,10 @@ form "<em>plugin-name/method-name</em>", <code>True</code> will be returned if t
 
     <div class="doc doc-contents ">
 
-        <p>Return optional data for all plugins of a given type.</p>
-<p>This generator will retrieve the <code>data</code> property of each plugin of the
-requested type. If it exists, a tuple consisting of the plugin name and
-of the plugin data is returned.</p>
+        <p>Generate optional data for all plugins of a specified type.</p>
+<p>This generator retrieves the <code>data</code> property from each plugin that
+matches the specified <code>plugin_type</code>. If the plugin has data, it yields a
+tuple containing the plugin's name and its associated data.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1843,7 +1861,7 @@ of the plugin data is returned.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Type of the plugins to inquire.</p>
+                <p>The type of plugins to query for data.</p>
               </div>
             </td>
             <td>
@@ -1869,7 +1887,7 @@ of the plugin data is returned.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>plugin name and plugin data.</p>
+                <p>A tuple of the plugin name and its data.</p>
               </div>
             </td>
           </tr>
@@ -1967,6 +1985,10 @@ of the plugin data is returned.</p>
     <div class="doc doc-contents ">
 
         <p>Check wether a given method is supported.</p>
+<p>This method is used by the
+<a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager.is_supported"><code>is_supported</code></a> method
+of <a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager"><code>PluginManager</code></a> objects, to
+check whether a given method is supported.</p>
 <p>If the <code>explicit</code> flag is set, then the method was explicitly requested
 for this plugin. If not, the caller does not know which plugin contains
 the requested method and is checking whether this plugin supports a
@@ -2040,6 +2062,68 @@ this argument can be ignored.</p>
       </tbody>
     </table>
 
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.plugins.Plugin.data" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return plan functions implemented by the plugin.</p>
+<p>This can be used to store plugin specific data. The
+<a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager.plugin_data"><code>plugin_data</code></a> property of
+<a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager"><code>PluginManager</code></a> objects, accesses this
+property to yield plugin specific data.</p>
+<p>The content and usage of this data depends on the concrete type of the
+plugin. For example <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.PlanPlugin"><code>PlanPlugin</code></a>
+overload this method to return a dictionary to contain a <code>"functions"</code>
+key. When constructing a
+<a class="autorefs autorefs-internal" href="../plan/#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a> object for use by
+optimization plans, this is used to inquire all plan plugins for
+functions that should be added to the
+<a class="autorefs autorefs-internal" href="../plan/#ropt.plan.ExpressionEvaluator"><code>ExpressionEvaluator</code></a> object that the
+plan uses to evaluate expressions.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Callable">Callable</span>[..., <span title="typing.Any">Any</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary mapping function names to callables.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
     </div>
 
 </div>

@@ -2023,13 +2023,14 @@ set is important, it is recommended to use a list.</p>
 
 
         <p>The default load step.</p>
-<p>The load step loads specified plan variables to a file by loading a file
-that is de-serialized to dict that maps each variable name to its value</p>
-<p>The load step uses the
+<p>The load step retrieves specified plan variables from a file by
+deserializing it into a dictionary that maps each variable name to its
+corresponding value.</p>
+<p>This step uses the
 <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._load_vars.DefaultLoadStep.DefaultLoadStepWith"><code>DefaultLoadStep</code></a>
 configuration class to parse the <code>with</code> field of the
 <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanStepConfig"><code>PlanStepConfig</code></a>, which defines the
-settings for this step in a plan configuration.</p>
+settings for this step within a plan configuration.</p>
 
 
 
@@ -2062,7 +2063,7 @@ settings for this step in a plan configuration.</p>
         <p>Parameters used by the load step.</p>
 <p>This configuration specifies the variables to be loaded by the load step
 and the file path for the file to load.</p>
-<p>The <code>format</code> option specifies the file format. Currently the following
+<p>The <code>format</code> option specifies the file format. Currently, the following
 formats are supported:</p>
 <ul>
 <li><code>json</code>:   Load the variables as a dict from a JSON file.</li>
@@ -2165,13 +2166,13 @@ formats are supported:</p>
         <p>The default save step.</p>
 <p>The save step saves specified plan variables to a file by
 constructing a dictionary that maps each variable name to its value.
-This dictionary is then serialized and saved in the format provided
-by the format string.</p>
-<p>The save step uses the
+This dictionary is then serialized and saved in the specified file
+format.</p>
+<p>This step uses the
 <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._save_vars.DefaultSaveStep.DefaultSaveStepWith"><code>DefaultSaveStepWith</code></a>
 configuration class to parse the <code>with</code> field of the
-<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanStepConfig"><code>PlanStepConfig</code></a>, which defines the
-settings for this step in a plan configuration.</p>
+<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanStepConfig"><code>PlanStepConfig</code></a>. The configuration
+specifies the settings for this step in a plan setup.</p>
 
 
 
@@ -2201,15 +2202,15 @@ settings for this step in a plan configuration.</p>
               Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
 
 
-        <p>Parameters used by the save step.</p>
-<p>This configuration specifies the variables to be saved by the save step
-and the file path for the saved file. Directories in the path will be
-created if they do not already exist.</p>
-<p>The <code>format</code> option specifies the file format to used. Currently the
-following formats are supported:</p>
+        <p>Configuration parameters for the save step.</p>
+<p>This configuration defines which plan variables are saved by the save
+step and specifies the file path for storing the output. If the path
+includes directories that do not yet exist, they will be created.</p>
+<p>The <code>format</code> option defines the file format for saving the data.
+Supported formats are:</p>
 <ul>
-<li><code>json</code>:   Store the variables as a dict in a JSON file.</li>
-<li><code>pickle</code>: Store the variables as a dict to a pickle file.</li>
+<li><code>json</code>:   Saves the variables as a dictionary in JSON format.</li>
+<li><code>pickle</code>: Saves the variables as a dictionary in a pickle file.</li>
 </ul>
 
 
@@ -2230,7 +2231,7 @@ following formats are supported:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>List of variable names to save to the output file.</p>
+                <p>List of variable names to save to the specified output file.</p>
               </div>
             </td>
           </tr>
@@ -2241,7 +2242,7 @@ following formats are supported:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>File path where the output file will be stored.</p>
+                <p>The file path where the output will be stored.</p>
               </div>
             </td>
           </tr>
@@ -2252,7 +2253,7 @@ following formats are supported:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The file format used for saving.</p>
+                <p>The format used for file storage, determining the serialization method.</p>
               </div>
             </td>
           </tr>
