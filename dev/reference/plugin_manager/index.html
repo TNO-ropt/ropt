@@ -2076,7 +2076,7 @@ this argument can be ignored.</p>
 
 
 <h4 id="ropt.plugins.Plugin.data" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span></code>
+            <code class="highlight language-python"><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -2087,7 +2087,7 @@ this argument can be ignored.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return plan functions implemented by the plugin.</p>
+        <p>Return plan data.</p>
 <p>This can be used to store plugin specific data. The
 <a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager.plugin_data"><code>plugin_data</code></a> property of
 <a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager"><code>PluginManager</code></a> objects, accesses this
@@ -2114,7 +2114,7 @@ plan uses to evaluate expressions.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Callable">Callable</span>[..., <span title="typing.Any">Any</span>]]</code>
+                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">

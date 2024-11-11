@@ -1289,6 +1289,30 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.ExpressionFunctions" class="md-nav__link">
+    <span class="md-ellipsis">
+      ExpressionFunctions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ExpressionFunctions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.ExpressionFunctions.mkdict" class="md-nav__link">
+    <span class="md-ellipsis">
+      mkdict
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1756,6 +1780,30 @@
   <a href="#ropt.plugins.plan._save_results.DefaultSaveHandler.DefaultSaveHandlerWith" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultSaveHandlerWith
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.ExpressionFunctions" class="md-nav__link">
+    <span class="md-ellipsis">
+      ExpressionFunctions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ExpressionFunctions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.ExpressionFunctions.mkdict" class="md-nav__link">
+    <span class="md-ellipsis">
+      mkdict
     </span>
   </a>
   
@@ -3589,6 +3637,133 @@ to the file name if not present already.</p>
 
 </div>
 
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.plan.default.ExpressionFunctions" class="doc doc-heading">
+            <code>ropt.plugins.plan.default.ExpressionFunctions</code>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+
+        <p>This class provides functions for the expression evaluator.</p>
+<p>The methods in this class are returned by the <code>data</code> property of the
+<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.default.DefaultPlanPlugin"><code>DefaultPlanPlugin</code></a> class and
+added to the expression evaluator used during execution of plans.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.plan.default.ExpressionFunctions.mkdict" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">mkdict</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Create a dictionary from lists of keys and values.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>keys</code></td>
+            <td>
+                  <code><span title="typing.Sequence">Sequence</span>[<span title="typing.Hashable">Hashable</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The keys of the dictionary.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>values</code></td>
+            <td>
+                  <code><span title="typing.Sequence">Sequence</span>[<span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The values of the dictionary.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[<span title="typing.Hashable">Hashable</span>, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary constructed from keys and values.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
 
 
 
