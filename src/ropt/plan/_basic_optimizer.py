@@ -22,7 +22,8 @@ from ropt.config.plan import PlanConfig
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
 
-from ._plan import OptimizerContext, Plan
+from ._context import OptimizerContext
+from ._plan import Plan
 
 if TYPE_CHECKING:
     import numpy as np
@@ -31,8 +32,6 @@ if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
     from ropt.evaluator import Evaluator
     from ropt.plan import Event
-    from ropt.plugins._manager import PluginType
-    from ropt.plugins.base import Plugin
     from ropt.results import FunctionResults
 
 if sys.version_info >= (3, 11):
@@ -137,22 +136,6 @@ class BasicOptimizer:
             The exit code of the optimization run.
         """
         return self._results.exit_code
-
-    def add_plugins(self, plugin_type: PluginType, plugins: Dict[str, Plugin]) -> Self:
-        """Add plugins.
-
-        By default, plugins are installed via Python's entry point mechanism.
-        This method allows you to install additional plugins.
-
-        Args:
-            plugin_type: The type of plugin to install.
-            plugins:     A dictionary mapping plugin names to plugin objects.
-
-        Returns:
-            The `BasicOptimizer` instance, allowing for method chaining.
-        """
-        self._optimizer_context.plugin_manager.add_plugins(plugin_type, plugins)
-        return self
 
     def add_observer(
         self, event_type: EventType, function: Callable[[Event], None]

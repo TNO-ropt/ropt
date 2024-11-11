@@ -28,9 +28,10 @@ involving a single optimization.
 """
 
 from ._basic_optimizer import BasicOptimizer
+from ._context import OptimizerContext
 from ._events import Event
 from ._expr import ExpressionEvaluator
-from ._plan import OptimizerContext, Plan
+from ._plan import Plan
 
 __all__ = [
     "BasicOptimizer",
