@@ -3,12 +3,17 @@
 from __future__ import annotations
 
 import sys
+from typing import TYPE_CHECKING
 
+import numpy as np
 from pydantic import ConfigDict, model_validator
 
 from ropt.config.utils import ImmutableBaseModel, broadcast_1d_array, check_enum_values
 from ropt.config.validated_types import Array1D, Array2D, ArrayEnum  # noqa: TCH001
 from ropt.enums import ConstraintType
+
+if TYPE_CHECKING:
+    from ropt.config.enopt import VariablesConfig
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -88,4 +93,47 @@ class LinearConstraintsConfig(ImmutableBaseModel):
         check_enum_values(self.types, ConstraintType)
         self.types = broadcast_1d_array(self.types, "types", size)
         self._immutable()
+        return self
+
+    def apply_transformation(
+        self, variables: VariablesConfig
+    ) -> LinearConstraintsConfig:
+        """Transform linear constraints with variable offsets and scales.
+
+        If offsets and/or scales are specified in the variables configuration,
+        the linear constraints need adjustment to maintain their validity after
+        variable transformation. This method returns a new linear constraints
+        configuration with these adjustments applied.
+
+        Args:
+            variables: A variables configuration object specifying.
+
+        Returns:
+            A modified configuration if transformations are applied; otherwise, self.
+        """
+        variable_count = variables.initial_values.size
+        if (
+            self.coefficients.shape[0] > 0
+            and self.coefficients.shape[1] != variable_count
+        ):
+            msg = f"the coefficients matrix should have {variable_count} columns"
+            raise ValueError(msg)
+
+        # Correct the linear system of input constraints for scaling:
+        if variables.offsets is not None or variables.scales is not None:
+            coefficients = self.coefficients
+            rhs_values = self.rhs_values
+            if variables.offsets is not None:
+                rhs_values = rhs_values - np.matmul(coefficients, variables.offsets)
+            if variables.scales is not None:
+                coefficients = coefficients * variables.scales
+            values = self.model_dump(round_trip=True)
+            values.update(
+                coefficients=coefficients,
+                rhs_values=rhs_values,
+                types=self.types,
+            )
+            return LinearConstraintsConfig.model_construct(
+                **values,
+            )
         return self

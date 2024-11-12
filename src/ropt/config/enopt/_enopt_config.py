@@ -6,15 +6,13 @@ import sys
 from copy import deepcopy
 from typing import Any, Dict, Optional, Tuple
 
-import numpy as np
 from pydantic import ConfigDict, model_validator
 
-from ropt.config.utils import ImmutableBaseModel, immutable_array
-from ropt.enums import PerturbationType
+from ropt.config.utils import ImmutableBaseModel
 
 from ._function_transform_config import FunctionTransformConfig
 from ._gradient_config import GradientConfig
-from ._linear_constraints_config import LinearConstraintsConfig
+from ._linear_constraints_config import LinearConstraintsConfig  # noqa: TCH001
 from ._nonlinear_constraints_config import NonlinearConstraintsConfig  # noqa: TCH001
 from ._objective_functions_config import ObjectiveFunctionsConfig
 from ._optimizer_config import OptimizerConfig
@@ -102,103 +100,18 @@ class EnOptConfig(ImmutableBaseModel):
 
     @model_validator(mode="after")
     def _linear_constraints(self) -> Self:
-        self._mutable()
         if self.linear_constraints is not None:
-            variable_count = self.variables.initial_values.size
-            if (
-                self.linear_constraints.coefficients.shape[0] > 0
-                and self.linear_constraints.coefficients.shape[1] != variable_count
-            ):
-                msg = f"the coefficients matrix should have {variable_count} columns"
-                raise ValueError(msg)
-
-            # Correct the linear system of input constraints for scaling:
-            offsets = self.variables.offsets
-            scales = self.variables.scales
-            if offsets is not None or scales is not None:
-                coefficients = self.linear_constraints.coefficients
-                rhs_values = self.linear_constraints.rhs_values
-                if offsets is not None:
-                    rhs_values = rhs_values - np.matmul(coefficients, offsets)
-                if scales is not None:
-                    coefficients = coefficients * scales
-                values = self.linear_constraints.model_dump(round_trip=True)
-                values.update(
-                    coefficients=coefficients,
-                    rhs_values=rhs_values,
-                    types=self.linear_constraints.types,
-                )
-                self.linear_constraints = LinearConstraintsConfig.model_construct(
-                    **values,
-                )
-        self._immutable()
+            self._mutable()
+            self.linear_constraints = self.linear_constraints.apply_transformation(
+                self.variables
+            )
+            self._immutable()
         return self
 
     @model_validator(mode="after")
     def _gradient(self) -> Self:
         self._mutable()
-
-        variables = self.variables
-        variable_count = variables.initial_values.size
-        magnitudes = self.gradient.perturbation_magnitudes
-        boundary_types = self.gradient.boundary_types
-        types = self.gradient.perturbation_types
-
-        try:
-            magnitudes = np.broadcast_to(magnitudes, (variable_count,))
-        except ValueError as err:
-            msg = (
-                "the perturbation magnitudes cannot be broadcasted "
-                f"to a length of {variable_count}"
-            )
-            raise ValueError(msg) from err
-
-        if boundary_types.size == 1:
-            boundary_types = np.broadcast_to(
-                immutable_array(boundary_types),
-                (variable_count,),
-            )
-        elif boundary_types.size == variable_count:
-            boundary_types = immutable_array(boundary_types)
-        else:
-            msg = f"perturbation boundary_types must have {variable_count} items"
-            raise ValueError(msg)
-
-        if types.size == 1:
-            types = np.broadcast_to(immutable_array(types), (variable_count,))
-        elif types.size == variable_count:
-            types = immutable_array(types)
-        else:
-            msg = f"perturbation types must have {variable_count} items"
-            raise ValueError(msg)
-
-        relative = types == PerturbationType.RELATIVE
-        if not np.all(
-            np.logical_and(
-                np.isfinite(variables.lower_bounds[relative]),
-                np.isfinite(variables.lower_bounds[relative]),
-            ),
-        ):
-            msg = "The variable bounds must be finite to use relative perturbations"
-            raise ValueError(msg)
-        magnitudes = np.where(
-            relative,
-            (variables.upper_bounds - variables.lower_bounds) * magnitudes,
-            magnitudes,
-        )
-
-        if variables.scales is not None:
-            scaled = types == PerturbationType.SCALED
-            magnitudes = np.where(scaled, magnitudes / variables.scales, magnitudes)
-
-        self.gradient = self.gradient.model_copy(
-            update={
-                "perturbation_magnitudes": magnitudes,
-                "boundary_types": boundary_types,
-                "perturbation_types": types,
-            }
-        )
-
+        self.gradient = self.gradient.fix_perturbations(self.variables)
         self._immutable()
         return self
 

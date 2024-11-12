@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 import sys
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 import numpy as np
 from pydantic import ConfigDict, PositiveInt, model_validator
 
-from ropt.config.utils import ImmutableBaseModel, check_enum_values
+from ropt.config.utils import ImmutableBaseModel, check_enum_values, immutable_array
 from ropt.config.validated_types import (  # noqa: TCH001
     Array1D,
     Array1DInt,
@@ -24,6 +24,9 @@ from .constants import (
     DEFAULT_PERTURBATION_TYPE,
     DEFAULT_SEED,
 )
+
+if TYPE_CHECKING:
+    from ropt.config.enopt import VariablesConfig
 
 if sys.version_info >= (3, 11):
     from typing import Self
@@ -151,3 +154,79 @@ class GradientConfig(ImmutableBaseModel):
         check_enum_values(self.perturbation_types, PerturbationType)
         check_enum_values(self.boundary_types, BoundaryType)
         return self
+
+    def fix_perturbations(self, variables: VariablesConfig) -> GradientConfig:
+        """Adjust the gradient perturbation configuration.
+
+        This method modifies the gradient's perturbation settings to account for
+        variable bounds and scaling factors, as defined in the `variables`
+        configuration. If bounds are set on the variables or if variable scaling
+        is applied, the perturbations in the gradient configuration may need
+        adjustment to reflect these constraints. This method returns an updated
+        copy of the gradient configuration with the necessary modifications.
+
+        Args:
+            variables: The configuration of variables.
+
+        Returns:
+            A modified gradient configuration with applied bounds and scaling.
+        """
+        variable_count = variables.initial_values.size
+        magnitudes = self.perturbation_magnitudes
+        boundary_types = self.boundary_types
+        types = self.perturbation_types
+
+        try:
+            magnitudes = np.broadcast_to(magnitudes, (variable_count,))
+        except ValueError as err:
+            msg = (
+                "the perturbation magnitudes cannot be broadcasted "
+                f"to a length of {variable_count}"
+            )
+            raise ValueError(msg) from err
+
+        if boundary_types.size == 1:
+            boundary_types = np.broadcast_to(
+                immutable_array(boundary_types),
+                (variable_count,),
+            )
+        elif boundary_types.size == variable_count:
+            boundary_types = immutable_array(boundary_types)
+        else:
+            msg = f"perturbation boundary_types must have {variable_count} items"
+            raise ValueError(msg)
+
+        if types.size == 1:
+            types = np.broadcast_to(immutable_array(types), (variable_count,))
+        elif types.size == variable_count:
+            types = immutable_array(types)
+        else:
+            msg = f"perturbation types must have {variable_count} items"
+            raise ValueError(msg)
+
+        relative = types == PerturbationType.RELATIVE
+        if not np.all(
+            np.logical_and(
+                np.isfinite(variables.lower_bounds[relative]),
+                np.isfinite(variables.lower_bounds[relative]),
+            ),
+        ):
+            msg = "The variable bounds must be finite to use relative perturbations"
+            raise ValueError(msg)
+        magnitudes = np.where(
+            relative,
+            (variables.upper_bounds - variables.lower_bounds) * magnitudes,
+            magnitudes,
+        )
+
+        if variables.scales is not None:
+            scaled = types == PerturbationType.SCALED
+            magnitudes = np.where(scaled, magnitudes / variables.scales, magnitudes)
+
+        return self.model_copy(
+            update={
+                "perturbation_magnitudes": magnitudes,
+                "boundary_types": boundary_types,
+                "perturbation_types": types,
+            }
+        )
