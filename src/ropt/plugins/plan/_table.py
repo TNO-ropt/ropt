@@ -80,7 +80,7 @@ class DefaultTableHandler(ResultHandler):
         )
 
     def __init__(self, config: ResultHandlerConfig, plan: Plan) -> None:
-        """Initialize a default tracker results handler object.
+        """Initialize a default table results handler object.
 
         Args:
             config: The configuration of the step.

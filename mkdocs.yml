@@ -102,6 +102,7 @@ nav:
           - "SciPy Sampler Plugin": reference/scipy_sampler_plugin.md
           - "Default Realization Filter Plugin": reference/default_realization_filter_plugin.md
           - "Default Function Transform Plugin": reference/default_function_transform_plugin.md
+          - "External Optimizer Plugin": reference/external_optimizer_plugin.md
       - "Enumerations": reference/enums.md
       - "Exceptions": reference/exceptions.md
       - "Utilities": reference/utilities.md

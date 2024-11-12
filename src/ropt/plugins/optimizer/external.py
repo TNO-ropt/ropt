@@ -37,12 +37,25 @@ _PROCESS_TIMEOUT: Final = 10
 
 
 class ExternalOptimizer(Optimizer):
-    """Plugin class for optimization via an external process.
+    """Plugin class for optimization using an external process.
 
-    This class implements optimizing via an external process that runs the
-    optimization. The external process communicates with this class via pipes
-    to request function evaluations and report the optimizers state and possible
+    This class enables optimization via an external process, which performs the
+    optimization independently and communicates with this class over pipes to
+    request function evaluations, report optimizer states, and handle any
     errors.
+
+    Typically, the optimizer is specified within an
+    [`OptimizerConfig`][ropt.config.enopt.OptimizerConfig] via the `method`
+    field, which either provides the algorithm name directly or follows the form
+    `plugin-name/method-name`. In the first case, `ropt` searches among all
+    available optimizer plugins to find the specified method. In the second
+    case, it checks if the plugin identified by `plugin-name` contains
+    `method-name` and, if so, uses it. Both of these are not supported by the
+    external optimizer class. Instead, it requires that the `method` field
+    includes both the plugin and method names in the format
+    `external/plugin-name/method-name` or `external/method-name`. This ensures
+    the external optimizer can identify and launch the specified optimization
+    method `method-name` and launch it as an external process.
     """
 
     def __init__(

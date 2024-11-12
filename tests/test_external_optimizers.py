@@ -17,7 +17,7 @@ def enopt_config_fixture() -> Dict[str, Any]:
             "initial_values": [0.0, 0.0, 0.1],
         },
         "optimizer": {
-            "method": "external/scipy/slsqp",
+            "method": "external/slsqp",
             "tolerance": 1e-4,
             "max_iterations": 50,
         },
