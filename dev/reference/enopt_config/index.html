@@ -649,6 +649,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="LinearConstraintsConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.LinearConstraintsConfig.apply_transformation" class="md-nav__link">
+    <span class="md-ellipsis">
+      apply_transformation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -684,6 +699,21 @@
       GradientConfig
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="GradientConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.GradientConfig.fix_perturbations" class="md-nav__link">
+    <span class="md-ellipsis">
+      fix_perturbations
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1450,6 +1480,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="LinearConstraintsConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.LinearConstraintsConfig.apply_transformation" class="md-nav__link">
+    <span class="md-ellipsis">
+      apply_transformation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -1485,6 +1530,21 @@
       GradientConfig
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="GradientConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.GradientConfig.fix_perturbations" class="md-nav__link">
+    <span class="md-ellipsis">
+      fix_perturbations
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -2353,6 +2413,84 @@ difference between the equations and right-hand side to a tolerance.</p>
 
 
 
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.config.enopt.LinearConstraintsConfig.apply_transformation" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">apply_transformation</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Transform linear constraints with variable offsets and scales.</p>
+<p>If offsets and/or scales are specified in the variables configuration,
+the linear constraints need adjustment to maintain their validity after
+variable transformation. This method returns a new linear constraints
+configuration with these adjustments applied.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>variables</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.VariablesConfig" href="#ropt.config.enopt.VariablesConfig">VariablesConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A variables configuration object specifying.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt._linear_constraints_config.LinearConstraintsConfig" href="#ropt.config.enopt.LinearConstraintsConfig">LinearConstraintsConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A modified configuration if transformations are applied; otherwise, self.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+
   </div>
 
     </div>
@@ -3035,6 +3173,86 @@ parallel plan evaluations.</p>
 
   <div class="doc doc-children">
 
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.config.enopt.GradientConfig.fix_perturbations" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">fix_perturbations</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Adjust the gradient perturbation configuration.</p>
+<p>This method modifies the gradient's perturbation settings to account for
+variable bounds and scaling factors, as defined in the <code>variables</code>
+configuration. If bounds are set on the variables or if variable scaling
+is applied, the perturbations in the gradient configuration may need
+adjustment to reflect these constraints. This method returns an updated
+copy of the gradient configuration with the necessary modifications.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>variables</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.VariablesConfig" href="#ropt.config.enopt.VariablesConfig">VariablesConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration of variables.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt._gradient_config.GradientConfig" href="#ropt.config.enopt.GradientConfig">GradientConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A modified gradient configuration with applied bounds and scaling.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
 
 
 
