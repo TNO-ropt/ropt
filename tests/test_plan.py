@@ -229,6 +229,14 @@ def test_eval_attribute(enopt_config: Dict[str, Any], evaluator: Any) -> None:
     assert plan.eval("$(results.plan_id[0])") == 0
 
 
+def test_context_variables(evaluator: Any) -> None:
+    plan_config: Dict[str, Any] = {}
+    parsed_config = PlanConfig.model_validate(plan_config)
+    context = OptimizerContext(evaluator=evaluator(), variables={"a": 1})
+    plan = Plan(parsed_config, context)
+    assert plan["a"] == 1
+
+
 @pytest.mark.parametrize(
     ("variables", "expr", "check", "expected"),
     [

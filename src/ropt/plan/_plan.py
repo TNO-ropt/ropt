@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+from copy import deepcopy
 from itertools import chain, count
 from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Tuple
 
@@ -32,10 +33,11 @@ class Plan:
         """Initialize a plan object.
 
         This method initializes a plan using a `PlanConfig` object and an
-        `OptimizationContext` object. An optional `plugin_manager` argument
-        allows for the specification of custom plugins for result handlers and
-        step objects within the plan. If omitted, only plugins installed through
-        Python's standard entry points are used.
+        [`OptimizerContext`][ropt.plan.OptimizerContext] object. An optional
+        [`plugin_manager`][ropt.plugins.PluginManager] argument allows for the
+        specification of custom plugins for result handlers and step objects
+        within the plan. If omitted, only plugins installed through Python's
+        standard entry points are used.
 
         Plans can spawn additional plans within their workflow, with each
         spawned plan receiving a reference to its parent plan via the `parent`
@@ -49,6 +51,11 @@ class Plan:
         nesting. This structure enables efficient tracing across both sequential
         and nested plan workflows.
 
+        If the `optimizer_context` objects has variables defined, these are
+        copied into the plan and available under the name they were added to the
+        context. These variables can then be modified, but when spawning new
+        plans, the new plan will have the original values for these variables.
+
         Args:
             config:            The configuration for the optimizer.
             optimizer_context: The context in which the plan will execute,
@@ -59,11 +66,12 @@ class Plan:
         """
         self._plan_config = config
         self._optimizer_context = optimizer_context
-        self._vars: Dict[str, Any] = {}
+        self._vars: Dict[str, Any] = deepcopy(optimizer_context.variables)
         self._plan_id: Tuple[int, ...] = (0,) if plan_id is None else plan_id
         self._spawn_id: int = -1
         self._result_id_iter = count()
 
+        self._set_item("plan_id", list(self.plan_id))
         for var in chain(
             self._plan_config.inputs,
             self._plan_config.outputs,
@@ -76,7 +84,6 @@ class Plan:
                 msg = f"Plan variable overrides a builtin variable: {var}"
                 raise AttributeError(msg)
             self._set_item(var, None)
-        self._set_item("plan_id", list(self.plan_id))
         self._steps = self.create_steps(config.steps)
         self._handlers: List[ResultHandler] = [
             self._optimizer_context.plugin_manager.get_plugin(

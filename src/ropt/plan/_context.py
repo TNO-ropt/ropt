@@ -5,6 +5,7 @@ from __future__ import annotations
 import sys
 from typing import (
     TYPE_CHECKING,
+    Any,
     Callable,
     Dict,
     List,
@@ -38,12 +39,15 @@ class OptimizerContext:
     - A plugin manager to retrieve plugins used by the plan and optimizers.
     - Event callbacks that are triggered in response to specific events,
       executed after the plan has processed them.
+    - Variables with a constant value that are copied into each plan created
+      with the context.
     """
 
     def __init__(
         self,
         evaluator: Evaluator,
         plugin_manager: Optional[PluginManager] = None,
+        variables: Optional[Dict[str, Any]] = None,
     ) -> None:
         """Initialize the optimization context.
 
@@ -54,6 +58,7 @@ class OptimizerContext:
         Args:
             evaluator:      A callable used to evaluate functions within the plan.
             plugin_manager: Optional plugin manager.
+            variables:      Optional constant plan variable definitions.
         """
         self.evaluator = evaluator
         self.expr = ExpressionEvaluator()
@@ -67,6 +72,7 @@ class OptimizerContext:
         self._subscribers: Dict[EventType, List[Callable[[Event], None]]] = {
             event: [] for event in EventType
         }
+        self.variables = {} if variables is None else variables
 
     def add_observer(
         self,
