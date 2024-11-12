@@ -29,6 +29,37 @@ class DefaultPrintStep(PlanStep):
     configuration class to parse the `with` field of the
     [`PlanStepConfig`][ropt.config.plan.PlanStepConfig] used to specify this step
     in a plan configuration.
+
+    Note: Shorthand configuration
+        With this step it is possible to configure the message in shorthand notation.
+        Instead of
+
+        ```python
+        {
+            "run": "print",
+            "with": {
+                "message": "Hello World!",
+            }
+        }
+        ```
+
+        or
+
+        ```python
+        {
+            "print": {
+                "message": "Hello World!",
+            }
+        }
+        ```
+
+        You can use:
+
+        ```python
+        {
+            "print":  "Hello World!",
+        }
+        ```
     """
 
     class DefaultPrintStepWith(BaseModel):
@@ -55,8 +86,11 @@ class DefaultPrintStep(PlanStep):
             plan:   The plan that runs this step.
         """
         super().__init__(config, plan)
-        _with = self.DefaultPrintStepWith.model_validate(config.with_)
-        self._message = _with.message.strip()
+        if isinstance(config.with_, str):
+            self._message = config.with_.strip()
+        else:
+            _with = self.DefaultPrintStepWith.model_validate(config.with_)
+            self._message = _with.message.strip()
         if not (self._message.startswith("[[") and self._message.endswith("]]")):
             self._message = "[[" + self._message + "]]"
 

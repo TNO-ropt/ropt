@@ -49,13 +49,12 @@ class PlanStepConfig(BaseModel):
 
         ```python
         {
-            "run": "step_name",
+            "run": "optimizer",
             "with": {
-                "parameter1": ...,
-                "parameter2": ...,
-                ...
+                "config": "$opt_config",
+                "tags": "opt",
             }
-            "if": "... optional expression ..."
+            "if": "x > 0"
         }
         ```
 
@@ -65,14 +64,25 @@ class PlanStepConfig(BaseModel):
 
         ```python
         {
-            "step_name": {
-                "parameter1": ...,
-                "parameter2": ...,
-                ...
+            "optimizer": {
+                "config": "$opt_config",
+                "tags": "opt",
             }
-            "if": "... optional expression ..."
+            "if": "x > 0"
+        }
+
+        For very simple steps that have only a single configuration field, this may
+        even be simpler by just providing the value, like this:
+
+        ```python
+        {
+            "print": "hello world!",
         }
         ```
+
+        However, whereas first short-hand approach is generic and works for all
+        steps, this last form may or may not be implemented the step. Consult
+        the step documentation to make sure it works.
 
     Attributes:
         run:   Specifies the code that runs the step.
@@ -133,11 +143,10 @@ class ResultHandlerConfig(BaseModel):
 
         ```python
         {
-            "run": "handler_name",
+            "run": "tracker,
             "with": {
-                "parameter1": ...,
-                "parameter2": ...,
-                ...
+                "var": "result",
+                "tags": "opt",
             }
         }
         ```
@@ -148,10 +157,9 @@ class ResultHandlerConfig(BaseModel):
 
         ```python
         {
-            "handler_name": {
-                "parameter1": ...,
-                "parameter2": ...,
-                ...
+            "tracker": {
+                "var": "result",
+                "tags": "opt",
             }
         }
         ```
