@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict
 
 
 class Plugin(ABC):
@@ -36,27 +35,3 @@ class Plugin(ABC):
         Returns:
             True if the method is supported.
         """
-
-    @property
-    def data(self) -> Dict[str, Any]:
-        """Return plan data.
-
-        This can be used to store plugin specific data. The
-        [`plugin_data`][ropt.plugins.PluginManager.plugin_data] property of
-        [`PluginManager`][ropt.plugins.PluginManager] objects, accesses this
-        property to yield plugin specific data.
-
-        The content and usage of this data depends on the concrete type of the
-        plugin. For example [`PlanPlugin`][ropt.plugins.plan.base.PlanPlugin]
-        overload this method to return a dictionary to contain a `"functions"`
-        key. When constructing a
-        [`OptimizerContext`][ropt.plan.OptimizerContext] object for use by
-        optimization plans, this is used to inquire all plan plugins for
-        functions that should be added to the
-        [`ExpressionEvaluator`][ropt.plan.ExpressionEvaluator] object that the
-        plan uses to evaluate expressions.
-
-        Returns:
-            A dictionary mapping function names to callables.
-        """
-        return {}

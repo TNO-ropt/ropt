@@ -11,7 +11,7 @@ plan objects.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Any, Dict, Union
 
 from ropt.plugins.base import Plugin
 
@@ -36,11 +36,10 @@ class PlanPlugin(Plugin):
     Note: Plan functions
         A plan plugin can also provide functions to be used by the plan`s
         expression evaluator. To achieve this, the plugin should override the
-        `data` property of the [`PlanPlugin`][ropt.plugins.plan.base.PlanPlugin]
-        class. This overridden `data` property should return a dictionary
-        containing a `"functions"` key. The value associated with this key must
-        be a dictionary that maps function names to callables, which are
-        subsequently added to the expression evaluator.
+        `functions` property of the
+        [`PlanPlugin`][ropt.plugins.plan.base.PlanPlugin] class. This property
+        should return a dictionary that maps function names to callables, which
+        are subsequently added to the expression evaluator.
     """
 
     @abstractmethod
@@ -59,6 +58,15 @@ class PlanPlugin(Plugin):
             config:  The configuration for the plan object.
             context: The context in which the plan operates.
         """
+
+    @property
+    def functions(self) -> Dict[str, Any]:
+        """Return plan functions implemented by the plugin.
+
+        Returns:
+            The functions.
+        """
+        return {}
 
 
 class PlanStep(ABC):

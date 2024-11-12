@@ -146,25 +146,19 @@ class PluginManager:
             return False
         return True
 
-    def plugin_data(
+    def plugins(
         self, plugin_type: PluginType
-    ) -> Generator[Tuple[str, Any], None, None]:
-        """Generate optional data for all plugins of a specified type.
-
-        This generator retrieves the `data` property from each plugin that
-        matches the specified `plugin_type`. If the plugin has data, it yields a
-        tuple containing the plugin's name and its associated data.
+    ) -> Generator[Tuple[str, Plugin], None, None]:
+        """Generate a sequence of all plugins of a specified type.
 
         Args:
-            plugin_type: The type of plugins to query for data.
+            plugin_type: The type of plugins to return.
 
         Yields:
-            A tuple of the plugin name and its data.
+            A tuple of the plugin name and object.
         """
         for plugin_name, plugin in self._plugins[plugin_type].items():
-            data = getattr(plugin, "data", None)
-            if data is not None:
-                yield plugin_name, data
+            yield plugin_name, plugin
 
 
 @lru_cache  # Without the cache, repeated calls are very slow

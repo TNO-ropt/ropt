@@ -60,8 +60,10 @@ class OptimizerContext:
         self.plugin_manager = (
             PluginManager() if plugin_manager is None else plugin_manager
         )
-        for _, plan_data in self.plugin_manager.plugin_data("plan"):
-            self.expr.add_functions(plan_data.get("functions", {}))
+        for _, plugin in self.plugin_manager.plugins("plan"):
+            functions = getattr(plugin, "functions", None)
+            if functions is not None:
+                self.expr.add_functions(functions)
         self._subscribers: Dict[EventType, List[Callable[[Event], None]]] = {
             event: [] for event in EventType
         }

@@ -122,10 +122,10 @@ class DefaultPlanPlugin(PlanPlugin):
         )
 
     @property
-    def data(self) -> Dict[str, Any]:
+    def functions(self) -> Dict[str, Any]:
         """Return plan functions implemented by the plugin.
 
         Returns:
             The functions.
         """
-        return {"functions": {"mkdict": ExpressionFunctions.mkdict}}
+        return {"mkdict": ExpressionFunctions.mkdict}
