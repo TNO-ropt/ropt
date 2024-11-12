@@ -2033,10 +2033,11 @@ state and functionality for executing the optimization plan.</p>
 
         <p>Initialize a plan object.</p>
 <p>This method initializes a plan using a <code>PlanConfig</code> object and an
-<code>OptimizationContext</code> object. An optional <code>plugin_manager</code> argument
-allows for the specification of custom plugins for result handlers and
-step objects within the plan. If omitted, only plugins installed through
-Python's standard entry points are used.</p>
+<a class="autorefs autorefs-internal" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a> object. An optional
+<a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>plugin_manager</code></a> argument allows for the
+specification of custom plugins for result handlers and step objects
+within the plan. If omitted, only plugins installed through Python's
+standard entry points are used.</p>
 <p>Plans can spawn additional plans within their workflow, with each
 spawned plan receiving a reference to its parent plan via the <code>parent</code>
 argument.</p>
@@ -2047,6 +2048,10 @@ child receives an incremental index appended to its parent's <code>plan_id</code
 forming a unique sequence that reflects both the order of creation and
 nesting. This structure enables efficient tracing across both sequential
 and nested plan workflows.</p>
+<p>If the <code>optimizer_context</code> objects has variables defined, these are
+copied into the plan and available under the name they were added to the
+context. These variables can then be modified, but when spawning new
+plans, the new plan will have the original values for these variables.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2752,6 +2757,8 @@ all steps in an optimization plan. This currently includes the following:</p>
 <li>A plugin manager to retrieve plugins used by the plan and optimizers.</li>
 <li>Event callbacks that are triggered in response to specific events,
   executed after the plan has processed them.</li>
+<li>Variables with a constant value that are copied into each plan created
+  with the context.</li>
 </ul>
 
 
@@ -2771,7 +2778,7 @@ all steps in an optimization plan. This currently includes the following:</p>
 
 
 <h4 id="ropt.plan.OptimizerContext.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">evaluator</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">evaluator</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
@@ -2817,6 +2824,20 @@ evaluator for processing plan-specific expressions.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional plugin manager.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>variables</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional constant plan variable definitions.</p>
               </div>
             </td>
             <td>
