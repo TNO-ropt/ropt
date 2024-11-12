@@ -2095,11 +2095,10 @@ required plugin is located through the
 <details class="note" open>
   <summary>Plan functions</summary>
   <p>A plan plugin can also provide functions to be used by the plan<code>s
-expression evaluator. To achieve this, the plugin should override the</code>data<code>property of the [</code>PlanPlugin<code>][ropt.plugins.plan.base.PlanPlugin]
-class. This overridden</code>data<code>property should return a dictionary
-containing a</code>"functions"` key. The value associated with this key must
-be a dictionary that maps function names to callables, which are
-subsequently added to the expression evaluator.</p>
+expression evaluator. To achieve this, the plugin should override the</code>functions<code>property of the
+[</code>PlanPlugin`][ropt.plugins.plan.base.PlanPlugin] class. This property
+should return a dictionary that maps function names to callables, which
+are subsequently added to the expression evaluator.</p>
 </details>
 
 
