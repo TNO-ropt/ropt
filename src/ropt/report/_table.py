@@ -68,7 +68,7 @@ class ResultsTable(ResultsDataFrame):
 
         Args:
             columns:        Mapping of column names for the results table.
-            path:           Optional location of the result file.
+            path:           Path of the result file.
             table_type:     Type of the table.
             min_header_len: Minimal number of header lines.
 
@@ -81,6 +81,14 @@ class ResultsTable(ResultsDataFrame):
             raise NotImplementedError(msg)
 
         super().__init__(set(columns), table_type=table_type)
+
+        if path.parent.exists():
+            if not path.parent.is_dir():
+                msg = f"Cannot write table to: {path}"
+                raise RuntimeError(msg)
+        else:
+            path.parent.mkdir(parents=True, exist_ok=True)
+
         self._columns = columns
         self._path = path
         self._min_header_len = min_header_len
