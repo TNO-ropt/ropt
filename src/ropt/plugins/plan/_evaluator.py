@@ -150,6 +150,12 @@ class DefaultEvaluatorStep(PlanStep):
     def _get_variables(self, config: EnOptConfig) -> NDArray[np.float64]:
         if self._with.values is not None:  # noqa: PD011
             parsed_variables = self.plan.eval(self._with.values)
+            if isinstance(parsed_variables, FunctionResults):
+                return (
+                    parsed_variables.evaluations.variables
+                    if parsed_variables.evaluations.scaled_variables is None
+                    else parsed_variables.evaluations.scaled_variables
+                )
             if isinstance(parsed_variables, np.ndarray):
                 scaled_variables = scale_variables(config, parsed_variables, axis=-1)
                 return (
