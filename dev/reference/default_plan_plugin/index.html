@@ -1041,7 +1041,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._load_vars.DefaultLoadStep" class="md-nav__link">
+  <a href="#ropt.plugins.plan._load_data.DefaultLoadStep" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultLoadStep
     </span>
@@ -1051,7 +1051,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._load_vars.DefaultLoadStep.DefaultLoadStepWith" class="md-nav__link">
+  <a href="#ropt.plugins.plan._load_data.DefaultLoadStep.DefaultLoadStepWith" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultLoadStepWith
     </span>
@@ -1065,7 +1065,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._save_vars.DefaultSaveStep" class="md-nav__link">
+  <a href="#ropt.plugins.plan._save_data.DefaultSaveStep" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultSaveStep
     </span>
@@ -1075,7 +1075,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._save_vars.DefaultSaveStep.DefaultSaveStepWith" class="md-nav__link">
+  <a href="#ropt.plugins.plan._save_data.DefaultSaveStep.DefaultSaveStepWith" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultSaveStepWith
     </span>
@@ -1563,7 +1563,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._load_vars.DefaultLoadStep" class="md-nav__link">
+  <a href="#ropt.plugins.plan._load_data.DefaultLoadStep" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultLoadStep
     </span>
@@ -1573,7 +1573,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._load_vars.DefaultLoadStep.DefaultLoadStepWith" class="md-nav__link">
+  <a href="#ropt.plugins.plan._load_data.DefaultLoadStep.DefaultLoadStepWith" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultLoadStepWith
     </span>
@@ -1587,7 +1587,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._save_vars.DefaultSaveStep" class="md-nav__link">
+  <a href="#ropt.plugins.plan._save_data.DefaultSaveStep" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultSaveStep
     </span>
@@ -1597,7 +1597,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._save_vars.DefaultSaveStep.DefaultSaveStepWith" class="md-nav__link">
+  <a href="#ropt.plugins.plan._save_data.DefaultSaveStep.DefaultSaveStepWith" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultSaveStepWith
     </span>
@@ -1883,14 +1883,14 @@
 </dd>
 <dd>
 <ul>
-<li>A step that loads variables from a file
-(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._load_vars.DefaultLoadStep"><code>load</code></a>).</li>
+<li>A step that loads data from a file
+(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._load_data.DefaultLoadStep"><code>load</code></a>).</li>
 </ul>
 </dd>
 <dd>
 <ul>
-<li>A step that saves variables to a file
-(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._save_vars.DefaultSaveStep"><code>save</code></a>).</li>
+<li>A step that saves data to a file
+(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._save_data.DefaultSaveStep"><code>save</code></a>).</li>
 </ul>
 </dd>
 <dd>
@@ -2079,8 +2079,8 @@ set is important, it is recommended to use a list.</p>
 
 
 
-<h2 id="ropt.plugins.plan._load_vars.DefaultLoadStep" class="doc doc-heading">
-            <code>ropt.plugins.plan._load_vars.DefaultLoadStep</code>
+<h2 id="ropt.plugins.plan._load_data.DefaultLoadStep" class="doc doc-heading">
+            <code>ropt.plugins.plan._load_data.DefaultLoadStep</code>
 
 
 </h2>
@@ -2092,11 +2092,9 @@ set is important, it is recommended to use a list.</p>
 
 
         <p>The default load step.</p>
-<p>The load step retrieves specified plan variables from a file by
-deserializing it into a dictionary that maps each variable name to its
-corresponding value.</p>
+<p>The load step loads data from a file and deserializes it into a variable.</p>
 <p>This step uses the
-<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._load_vars.DefaultLoadStep.DefaultLoadStepWith"><code>DefaultLoadStep</code></a>
+<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._load_data.DefaultLoadStep.DefaultLoadStepWith"><code>DefaultLoadStep</code></a>
 configuration class to parse the <code>with</code> field of the
 <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanStepConfig"><code>PlanStepConfig</code></a>, which defines the
 settings for this step within a plan configuration.</p>
@@ -2117,7 +2115,7 @@ settings for this step within a plan configuration.</p>
 
 
 
-<h3 id="ropt.plugins.plan._load_vars.DefaultLoadStep.DefaultLoadStepWith" class="doc doc-heading">
+<h3 id="ropt.plugins.plan._load_data.DefaultLoadStep.DefaultLoadStepWith" class="doc doc-heading">
             <code>DefaultLoadStepWith</code>
 
 
@@ -2130,13 +2128,13 @@ settings for this step within a plan configuration.</p>
 
 
         <p>Parameters used by the load step.</p>
-<p>This configuration specifies the variables to be loaded by the load step
-and the file path for the file to load.</p>
+<p>This configuration specifies the name of the variable to store the
+result and the file path for the file to load.</p>
 <p>The <code>format</code> option specifies the file format. Currently, the following
 formats are supported:</p>
 <ul>
-<li><code>json</code>:   Load the variables as a dict from a JSON file.</li>
-<li><code>pickle</code>: Load the variables as a dict from a pickle file.</li>
+<li><code>json</code>:   Load the data from a JSON file.</li>
+<li><code>pickle</code>: Load the data from a pickle file.</li>
 </ul>
 
 
@@ -2151,18 +2149,18 @@ formats are supported:</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._load_vars.DefaultLoadStep.DefaultLoadStepWith.vars">vars</span></code></td>
+            <td><code><span title="ropt.plugins.plan._load_data.DefaultLoadStep.DefaultLoadStepWith.var">var</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.ItemOrTuple" href="../utilities/#ropt.config.validated_types.ItemOrTuple">ItemOrTuple</a>[str]</code>
+                  <code>str</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>List of variable names to load to the output file.</p>
+                <p>Name of the variable to store the result.</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._load_vars.DefaultLoadStep.DefaultLoadStepWith.path">path</span></code></td>
+            <td><code><span title="ropt.plugins.plan._load_data.DefaultLoadStep.DefaultLoadStepWith.path">path</span></code></td>
             <td>
                   <code><span title="typing.Union">Union</span>[str, <span title="pathlib.Path">Path</span>]</code>
             </td>
@@ -2173,7 +2171,7 @@ formats are supported:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._load_vars.DefaultLoadStep.DefaultLoadStepWith.format">format</span></code></td>
+            <td><code><span title="ropt.plugins.plan._load_data.DefaultLoadStep.DefaultLoadStepWith.format">format</span></code></td>
             <td>
                   <code><span title="typing.Literal">Literal</span>[&#39;json&#39;, &#39;pickle&#39;]</code>
             </td>
@@ -2220,8 +2218,8 @@ formats are supported:</p>
 
 
 
-<h2 id="ropt.plugins.plan._save_vars.DefaultSaveStep" class="doc doc-heading">
-            <code>ropt.plugins.plan._save_vars.DefaultSaveStep</code>
+<h2 id="ropt.plugins.plan._save_data.DefaultSaveStep" class="doc doc-heading">
+            <code>ropt.plugins.plan._save_data.DefaultSaveStep</code>
 
 
 </h2>
@@ -2233,12 +2231,9 @@ formats are supported:</p>
 
 
         <p>The default save step.</p>
-<p>The save step saves specified plan variables to a file by
-constructing a dictionary that maps each variable name to its value.
-This dictionary is then serialized and saved in the specified file
-format.</p>
+<p>The save step saves data to a file using the specified format.</p>
 <p>This step uses the
-<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._save_vars.DefaultSaveStep.DefaultSaveStepWith"><code>DefaultSaveStepWith</code></a>
+<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._save_data.DefaultSaveStep.DefaultSaveStepWith"><code>DefaultSaveStepWith</code></a>
 configuration class to parse the <code>with</code> field of the
 <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanStepConfig"><code>PlanStepConfig</code></a>. The configuration
 specifies the settings for this step in a plan setup.</p>
@@ -2259,7 +2254,7 @@ specifies the settings for this step in a plan setup.</p>
 
 
 
-<h3 id="ropt.plugins.plan._save_vars.DefaultSaveStep.DefaultSaveStepWith" class="doc doc-heading">
+<h3 id="ropt.plugins.plan._save_data.DefaultSaveStep.DefaultSaveStepWith" class="doc doc-heading">
             <code>DefaultSaveStepWith</code>
 
 
@@ -2272,14 +2267,14 @@ specifies the settings for this step in a plan setup.</p>
 
 
         <p>Configuration parameters for the save step.</p>
-<p>This configuration defines which plan variables are saved by the save
-step and specifies the file path for storing the output. If the path
-includes directories that do not yet exist, they will be created.</p>
+<p>This configuration defines what data is saved by and specifies the file
+path for storing the output. If the path includes directories that do
+not yet exist, they will be created.</p>
 <p>The <code>format</code> option defines the file format for saving the data.
 Supported formats are:</p>
 <ul>
-<li><code>json</code>:   Saves the variables as a dictionary in JSON format.</li>
-<li><code>pickle</code>: Saves the variables as a dictionary in a pickle file.</li>
+<li><code>json</code>:   Saves the data in JSON format.</li>
+<li><code>pickle</code>: Saves the data in a pickle file.</li>
 </ul>
 
 
@@ -2294,18 +2289,18 @@ Supported formats are:</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._save_vars.DefaultSaveStep.DefaultSaveStepWith.vars">vars</span></code></td>
+            <td><code><span title="ropt.plugins.plan._save_data.DefaultSaveStep.DefaultSaveStepWith.data">data</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.ItemOrTuple" href="../utilities/#ropt.config.validated_types.ItemOrTuple">ItemOrTuple</a>[str]</code>
+                  <code><span title="typing.Any">Any</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>List of variable names to save to the specified output file.</p>
+                <p>The data to save.</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._save_vars.DefaultSaveStep.DefaultSaveStepWith.path">path</span></code></td>
+            <td><code><span title="ropt.plugins.plan._save_data.DefaultSaveStep.DefaultSaveStepWith.path">path</span></code></td>
             <td>
                   <code><span title="typing.Union">Union</span>[str, <span title="pathlib.Path">Path</span>]</code>
             </td>
@@ -2316,7 +2311,7 @@ Supported formats are:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._save_vars.DefaultSaveStep.DefaultSaveStepWith.format">format</span></code></td>
+            <td><code><span title="ropt.plugins.plan._save_data.DefaultSaveStep.DefaultSaveStepWith.format">format</span></code></td>
             <td>
                   <code><span title="typing.Literal">Literal</span>[&#39;json&#39;, &#39;pickle&#39;]</code>
             </td>
