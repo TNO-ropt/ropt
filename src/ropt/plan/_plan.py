@@ -234,25 +234,37 @@ class Plan:
             plan_id=(*self._plan_id, self._spawn_id),
         )
 
-    def eval(self, value: Any) -> Any:  # noqa: ANN401
-        """Evaluate the provided value as an expression.
+    def eval(self, expr: Any) -> Any:  # noqa: ANN401
+        """Evaluate the provided expression.
 
-        If the value is not a string, it is returned unchanged, otherwise it is
-        evaluated as an expression. Refer to the
+        If the input is a string, it is evaluated as an expression. Refer to the
         [`eval`][ropt.plan.ExpressionEvaluator.eval] method of the
         [`ExpressionEvaluator`][ropt.plan.ExpressionEvaluator] class for more
         details.
 
+        If the input is a list, tuple or a dictionary, the eval method is
+        recursively called on all values it contains, replacing any strings that
+        are expressions with the results.
+
+        If the input is not a string, list, tuple, or dictionary it is returned
+        unchanged.
+
         Args:
-            value: The expression to evaluate, as a string or any other type.
+            expr: The expression to evaluate, as a string or any other type.
 
         Returns:
             The evaluated result, which may vary in type depending on the context.
         """
+        if isinstance(expr, dict):
+            return {key: self.eval(value) for key, value in expr.items()}
+        if isinstance(expr, list):
+            return [self.eval(item) for item in expr]
+        if isinstance(expr, tuple):
+            return tuple(self.eval(item) for item in expr)
         return (
-            self._optimizer_context.expr.eval(value, self._vars)
-            if isinstance(value, str)
-            else value
+            self._optimizer_context.expr.eval(expr, self._vars)
+            if isinstance(expr, str)
+            else expr
         )
 
     def emit_event(self, event: Event) -> None:

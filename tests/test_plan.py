@@ -130,6 +130,10 @@ def test_run_basic(enopt_config: Dict[str, Any], evaluator: Any) -> None:
             "[[<<  {'a': {i: 1}}  >> - << {'a': {'b': x}} >>]]",
             "{'a': {'b': 1}} - {'a': {'b': 1}}",
         ),
+        (["$(1 + 1)"], [2]),
+        (("$(1 + 1)",), (2,)),
+        ({1: "$(1 + 1)"}, {1: 2}),
+        ([("$(1 + 1)",), {1: "$(1 + 1)"}], [(2,), {1: 2}]),
     ],
 )
 def test_eval_expr(evaluator: Any, expr: str, expected: Any) -> None:
