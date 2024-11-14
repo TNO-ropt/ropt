@@ -6,11 +6,11 @@
     options:
         members: [DefaultSetStepWith]
 
-::: ropt.plugins.plan._load_vars.DefaultLoadStep
+::: ropt.plugins.plan._load_data.DefaultLoadStep
     options:
         members: [DefaultLoadStepWith]
 
-::: ropt.plugins.plan._save_vars.DefaultSaveStep
+::: ropt.plugins.plan._save_data.DefaultSaveStep
     options:
         members: [DefaultSaveStepWith]
 

@@ -11,13 +11,13 @@ from ropt.plugins.plan.base import PlanStep, ResultHandler
 
 from ._evaluator import DefaultEvaluatorStep
 from ._functions import ExpressionFunctions
-from ._load_vars import DefaultLoadStep
+from ._load_data import DefaultLoadStep
 from ._metadata import DefaultMetadataHandler
 from ._optimizer import DefaultOptimizerStep
 from ._print import DefaultPrintStep
 from ._repeat import DefaultRepeatStep
+from ._save_data import DefaultSaveStep
 from ._save_results import DefaultSaveHandler
-from ._save_vars import DefaultSaveStep
 from ._set import DefaultSetStep
 from ._table import DefaultTableHandler
 from ._tracker import DefaultTrackerHandler
@@ -49,10 +49,10 @@ class DefaultPlanPlugin(PlanPlugin):
     `Steps`:
     : - A step that modifies one or more variables
         ([`set`][ropt.plugins.plan._set.DefaultSetStep]).
-    : - A step that loads variables from a file
-        ([`load`][ropt.plugins.plan._load_vars.DefaultLoadStep]).
-    : - A step that saves variables to a file
-        ([`save`][ropt.plugins.plan._save_vars.DefaultSaveStep]).
+    : - A step that loads data from a file
+        ([`load`][ropt.plugins.plan._load_data.DefaultLoadStep]).
+    : - A step that saves data to a file
+        ([`save`][ropt.plugins.plan._save_data.DefaultSaveStep]).
     : - A step that performs a single ensemble evaluation
         ([`evaluator`][ropt.plugins.plan._evaluator.DefaultEvaluatorStep]).
     : - A step that runs an optimization

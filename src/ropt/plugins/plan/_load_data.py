@@ -9,7 +9,6 @@ from typing import TYPE_CHECKING, Literal, Union
 
 from pydantic import BaseModel, ConfigDict
 
-from ropt.config.validated_types import ItemOrTuple  # noqa: TCH001
 from ropt.plugins.plan.base import PlanStep
 
 if TYPE_CHECKING:
@@ -20,12 +19,10 @@ if TYPE_CHECKING:
 class DefaultLoadStep(PlanStep):
     """The default load step.
 
-    The load step retrieves specified plan variables from a file by
-    deserializing it into a dictionary that maps each variable name to its
-    corresponding value.
+    The load step loads data from a file and deserializes it into a variable.
 
     This step uses the
-    [`DefaultLoadStep`][ropt.plugins.plan._load_vars.DefaultLoadStep.DefaultLoadStepWith]
+    [`DefaultLoadStep`][ropt.plugins.plan._load_data.DefaultLoadStep.DefaultLoadStepWith]
     configuration class to parse the `with` field of the
     [`PlanStepConfig`][ropt.config.plan.PlanStepConfig], which defines the
     settings for this step within a plan configuration.
@@ -34,22 +31,22 @@ class DefaultLoadStep(PlanStep):
     class DefaultLoadStepWith(BaseModel):
         """Parameters used by the load step.
 
-        This configuration specifies the variables to be loaded by the load step
-        and the file path for the file to load.
+        This configuration specifies the name of the variable to store the
+        result and the file path for the file to load.
 
         The `format` option specifies the file format. Currently, the following
         formats are supported:
 
-        - `json`:   Load the variables as a dict from a JSON file.
-        - `pickle`: Load the variables as a dict from a pickle file.
+        - `json`:   Load the data from a JSON file.
+        - `pickle`: Load the data from a pickle file.
 
         Attributes:
-            vars:   List of variable names to load to the output file.
+            var:    Name of the variable to store the result.
             path:   File path to load.
             format: The format of the file.
         """
 
-        vars: ItemOrTuple[str]
+        var: str
         path: Union[str, Path]
         format: Literal["json", "pickle"] = "json"
 
@@ -69,10 +66,9 @@ class DefaultLoadStep(PlanStep):
         """
         super().__init__(config, plan)
         self._with = self.DefaultLoadStepWith.model_validate(config.with_)
-        for name in self._with.vars:
-            if name not in self.plan:
-                msg = f"Plan variable does not exist: {name}"
-                raise ValueError(msg)
+        if self._with.var not in self.plan:
+            msg = f"Plan variable does not exist: {self._with.var}"
+            raise ValueError(msg)
         if self._with.format not in {"json", "pickle"}:
             msg = f"data format not supported: {self._with.format}"
             raise ValueError(msg)
@@ -84,15 +80,9 @@ class DefaultLoadStep(PlanStep):
             msg = f"The file does not exist: {path}"
             raise RuntimeError(msg)
 
-        data = {}
         if self._with.format == "json":
             with path.open("r", encoding="utf-8") as file_obj:
-                data = json.load(file_obj)
+                self.plan[self._with.var] = json.load(file_obj)
         elif self._with.format == "pickle":
             with path.open("rb") as file_obj:
-                data = pickle.load(file_obj)  # noqa: S301
-        for name in self._with.vars:
-            if name not in data:
-                msg = f"Missing data for variable `{name}` in file: {path}"
-                raise RuntimeError(msg)
-            self._plan[name] = data[name]
+                self.plan[self._with.var] = pickle.load(file_obj)  # noqa: S301

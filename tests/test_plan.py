@@ -1394,16 +1394,14 @@ def test_save_step(evaluator: Any, file_format: str, tmp_path: Path) -> None:
         "variables": {
             "x": 1,
             "y": 2,
+            "z": None,
         },
         "steps": [
             {
-                "save": {"vars": ["x", "y"], "path": path, "format": file_format},
+                "save": {"data": ["$x", "$y"], "path": path, "format": file_format},
             },
             {
-                "set": {"x": None, "y": None},
-            },
-            {
-                "load": {"vars": ["x", "y"], "path": path, "format": file_format},
+                "load": {"var": "z", "path": path, "format": file_format},
             },
         ],
     }
@@ -1413,8 +1411,7 @@ def test_save_step(evaluator: Any, file_format: str, tmp_path: Path) -> None:
     plan.run()
 
     assert path.exists()
-    assert plan["x"] == 1
-    assert plan["y"] == 2
+    assert plan["z"] == [1, 2]
 
 
 def test_save_results_step(

@@ -5,11 +5,10 @@ from __future__ import annotations
 import json
 import pickle
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal, Union
+from typing import TYPE_CHECKING, Any, Literal, Union
 
 from pydantic import BaseModel, ConfigDict
 
-from ropt.config.validated_types import ItemOrTuple  # noqa: TCH001
 from ropt.plugins.plan.base import PlanStep
 
 if TYPE_CHECKING:
@@ -20,13 +19,10 @@ if TYPE_CHECKING:
 class DefaultSaveStep(PlanStep):
     """The default save step.
 
-    The save step saves specified plan variables to a file by
-    constructing a dictionary that maps each variable name to its value.
-    This dictionary is then serialized and saved in the specified file
-    format.
+    The save step saves data to a file using the specified format.
 
     This step uses the
-    [`DefaultSaveStepWith`][ropt.plugins.plan._save_vars.DefaultSaveStep.DefaultSaveStepWith]
+    [`DefaultSaveStepWith`][ropt.plugins.plan._save_data.DefaultSaveStep.DefaultSaveStepWith]
     configuration class to parse the `with` field of the
     [`PlanStepConfig`][ropt.config.plan.PlanStepConfig]. The configuration
     specifies the settings for this step in a plan setup.
@@ -35,23 +31,23 @@ class DefaultSaveStep(PlanStep):
     class DefaultSaveStepWith(BaseModel):
         """Configuration parameters for the save step.
 
-        This configuration defines which plan variables are saved by the save
-        step and specifies the file path for storing the output. If the path
-        includes directories that do not yet exist, they will be created.
+        This configuration defines what data is saved by and specifies the file
+        path for storing the output. If the path includes directories that do
+        not yet exist, they will be created.
 
         The `format` option defines the file format for saving the data.
         Supported formats are:
 
-        - `json`:   Saves the variables as a dictionary in JSON format.
-        - `pickle`: Saves the variables as a dictionary in a pickle file.
+        - `json`:   Saves the data in JSON format.
+        - `pickle`: Saves the data in a pickle file.
 
         Attributes:
-            vars:   List of variable names to save to the specified output file.
+            data:   The data to save.
             path:   The file path where the output will be stored.
             format: The format used for file storage, determining the serialization method.
         """
 
-        vars: ItemOrTuple[str]
+        data: Any
         path: Union[str, Path]
         format: Literal["json", "pickle"] = "json"
 
@@ -71,10 +67,6 @@ class DefaultSaveStep(PlanStep):
         """
         super().__init__(config, plan)
         self._with = self.DefaultSaveStepWith.model_validate(config.with_)
-        for name in self._with.vars:
-            if name not in self.plan:
-                msg = f"Plan variable does not exist: {name}"
-                raise ValueError(msg)
         if self._with.format not in {"json", "pickle"}:
             msg = f"data format not supported: {self._with.format}"
             raise ValueError(msg)
@@ -88,7 +80,7 @@ class DefaultSaveStep(PlanStep):
         if not path.parent.exists():
             path.parent.mkdir(parents=True, exist_ok=True)
 
-        data = {name: self.plan[name] for name in self._with.vars}
+        data = self.plan.eval(self._with.data)
         if self._with.format == "json":
             with path.open("w", encoding="utf-8") as file_obj:
                 json.dump(data, file_obj)
