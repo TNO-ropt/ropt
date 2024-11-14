@@ -3183,9 +3183,9 @@ type of event passed as an argument.</p>
    combination of indexing and attribute access.</p>
 </li>
 <li>
-<p>Strings in <code>[[ ... ]]</code> are treated as templates. Within these,
-   substrings delimited by <code>&lt;&lt;...&gt;&gt;</code> are evaluated as if enclosed in
-   <code>$(...)</code> and the result substituted for the <code>&lt;&lt;...&gt;&gt;</code> substring.</p>
+<p>Strings in @(...) are treated as templates. Within these, substrings
+   delimited by <code>&lt;&lt;...&gt;&gt;</code> are evaluated as if enclosed in <code>$(...)</code> and
+   the result substituted for the <code>&lt;&lt;...&gt;&gt;</code> substring.</p>
 </li>
 </ol>
 
@@ -3209,14 +3209,14 @@ type of event passed as an argument.</p>
 </li>
 <li>
 <p>Supported built-ins include: <code>abs</code>, <code>bool</code>, <code>divmod</code>, <code>float</code>,
-  <code>int</code>, <code>max</code>, <code>min</code>, <code>pow</code>, <code>range</code>, <code>round</code>, and <code>sum</code>.</p>
+  <code>int</code>, <code>max</code>, <code>min</code>, <code>pow</code>, <code>range</code>, <code>round</code>, <code>sum</code>, <code>str</code>.</p>
 </li>
 </ul>
 </details>
 
 <details class="note" open>
-  <summary>Implicit use of <code>$(...)</code> and <code>[[...]]</code></summary>
-  <p>Where appropriate, the <code>$(...)</code> and <code>[[...]]</code> delimiters might be
+  <summary>Implicit use of <code>$(...)</code> and <code>@(...)</code></summary>
+  <p>Where appropriate, the <code>$(...)</code> and <code>@(...)</code> delimiters might be
 implicit in some cases.</p>
 <p>For instance, plan steps support an <code>if</code> attribute in their
 configuration allowing for conditional execution. This can be
@@ -3224,10 +3224,10 @@ specified using the <code>$(...)</code> syntax, but this is optional. For
 example, instead of <code>"if": "${x &gt; 0}"</code>, <code>"if": "x &gt; 0"</code> may be used.
 (See <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanStepConfig"><code>PlanStepConfig</code></a>).</p>
 <p>Similarly, the <a class="autorefs autorefs-internal" href="../default_plan_plugin/#ropt.plugins.plan._print.DefaultPrintStep"><code>print</code></a>
-step is an example where the <code>[[...]]</code> delimiters are optional. This
+step is an example where the <code>@(...)</code> delimiters are optional. This
 step prints a message that will be evaluated, thereby substituting
 any occurrences of <code>&lt;&lt;...&gt;&gt;</code>. However, the use of surrounding
-<code>[[...]]</code> delimiters in the message attribute of the step
+<code>@(...)</code> delimiters in the message attribute of the step
 configuration is optional, and they will be implicitly added if not
 present.</p>
 </details>
