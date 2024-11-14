@@ -2404,11 +2404,15 @@ current plan.</p>
     <div class="doc doc-contents ">
 
         <p>Evaluate the provided expression.</p>
-<p>If the value is not a string, it is returned unchanged, otherwise it is
-evaluated as an expression. Refer to the
+<p>If the input is a string, it is evaluated as an expression. Refer to the
 <a class="autorefs autorefs-internal" href="#ropt.plan.ExpressionEvaluator.eval"><code>eval</code></a> method of the
 <a class="autorefs autorefs-internal" href="#ropt.plan.ExpressionEvaluator"><code>ExpressionEvaluator</code></a> class for more
 details.</p>
+<p>If the input is a list, tuple or a dictionary, the eval method is
+recursively called on all values it contains, replacing any strings that
+are expressions with the results.</p>
+<p>If the input is not a string, list, tuple, or dictionary it is returned
+unchanged.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
