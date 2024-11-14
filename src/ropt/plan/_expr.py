@@ -40,6 +40,7 @@ _BUILTIN_FUNCTIONS: Final[Dict[str, Callable[..., Any]]] = {
     "range": range,
     "round": round,
     "sum": sum,
+    "str": str,
 }
 
 
@@ -131,9 +132,9 @@ class ExpressionEvaluator:
            expression evaluation of the form `$(name...), where `...` can be any
            combination of indexing and attribute access.
 
-        4. Strings in `[[ ... ]]` are treated as templates. Within these,
-           substrings delimited by `<<...>>` are evaluated as if enclosed in
-           `$(...)` and the result substituted for the `<<...>>` substring.
+        4. Strings in @(...) are treated as templates. Within these, substrings
+           delimited by `<<...>>` are evaluated as if enclosed in `$(...)` and
+           the result substituted for the `<<...>>` substring.
 
         Info: Supported features
             - A subset of Python operators is supported, covering standard
@@ -148,10 +149,10 @@ class ExpressionEvaluator:
               [`EnOptConfig`][ropt.config.enopt.EnOptConfig] objects.
 
             - Supported built-ins include: `abs`, `bool`, `divmod`, `float`,
-              `int`, `max`, `min`, `pow`, `range`, `round`, and `sum`.
+              `int`, `max`, `min`, `pow`, `range`, `round`, `sum`, `str`.
 
-        Note: Implicit use of `$(...)` and `[[...]]`
-            Where appropriate, the `$(...)` and `[[...]]` delimiters might be
+        Note: Implicit use of `$(...)` and `@(...)`
+            Where appropriate, the `$(...)` and `@(...)` delimiters might be
             implicit in some cases.
 
             For instance, plan steps support an `if` attribute in their
@@ -161,10 +162,10 @@ class ExpressionEvaluator:
             (See [`PlanStepConfig`][ropt.config.plan.PlanStepConfig]).
 
             Similarly, the [`print`][ropt.plugins.plan._print.DefaultPrintStep]
-            step is an example where the `[[...]]` delimiters are optional. This
+            step is an example where the `@(...)` delimiters are optional. This
             step prints a message that will be evaluated, thereby substituting
             any occurrences of `<<...>>`. However, the use of surrounding
-            `[[...]]` delimiters in the message attribute of the step
+            `@(...)` delimiters in the message attribute of the step
             configuration is optional, and they will be implicitly added if not
             present.
 
@@ -183,8 +184,8 @@ class ExpressionEvaluator:
         expr = expr.strip()
         if expr.startswith("$$"):
             return expr.replace("$$", "$", 1)
-        if expr.startswith("[[") and expr.endswith("]]"):
-            return self._eval_parts(expr, variables)
+        if expr.startswith("@(") and expr.endswith(")"):
+            return self._eval_parts(expr[2:-1], variables)
         if expr.startswith("$("):
             return self._eval_expr("_eval" + expr[1:], variables)
         if expr.startswith("$"):
@@ -197,10 +198,10 @@ class ExpressionEvaluator:
             parts = matched.string[matched.start() : matched.end()].partition(">>")
             return str(self._eval_expr(parts[0][2:], variables)) + parts[2]
 
-        parts = expr[2:-2].split("<<")
+        parts = expr.split("<<")
         for part in parts[1:]:
             if part.count(">>") != 1:
-                msg = "Missing, or too many, `>>` in [[ ... ]] expression"
+                msg = "Missing, or too many, `>>` in @() expression"
                 raise SyntaxError(msg)
         parts[1:] = ["<<" + part for part in parts[1:]]
         return "".join(re.sub(r"<<(.*)>>", _substitute, part) for part in parts)
