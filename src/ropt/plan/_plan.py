@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import sys
 from copy import deepcopy
 from itertools import chain, count
 from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Tuple
@@ -13,11 +12,6 @@ if TYPE_CHECKING:
     from ropt.plugins.plan.base import PlanStep, ResultHandler
 
     from ._context import OptimizerContext
-
-if sys.version_info >= (3, 11):
-    pass
-else:
-    pass
 
 
 class Plan:

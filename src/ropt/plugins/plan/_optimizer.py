@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import sys
 from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, Union
 
 import numpy as np
@@ -18,11 +17,6 @@ from ropt.plan import Event, Plan
 from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
 from ropt.utils.scaling import scale_variables
-
-if sys.version_info >= (3, 11):
-    pass
-else:
-    pass
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray

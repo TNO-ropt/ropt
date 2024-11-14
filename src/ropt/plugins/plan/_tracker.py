@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import sys
 from copy import deepcopy
 from typing import TYPE_CHECKING, Literal, Optional, Tuple, Union
 
@@ -13,12 +12,6 @@ from ropt.enums import EventType
 from ropt.plugins.plan.base import ResultHandler
 
 from ._utils import _get_all_results, _get_last_result, _update_optimal_result
-
-if sys.version_info >= (3, 11):
-    pass
-else:
-    pass
-
 
 if TYPE_CHECKING:
     from ropt.config.plan import ResultHandlerConfig

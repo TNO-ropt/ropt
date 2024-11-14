@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path  # noqa: TCH003
 from typing import TYPE_CHECKING, Dict, Literal, Optional
 
@@ -13,12 +12,6 @@ from ropt.enums import EventType
 from ropt.plugins.plan.base import ResultHandler
 from ropt.report import ResultsTable
 from ropt.results import convert_to_maximize
-
-if sys.version_info >= (3, 11):
-    pass
-else:
-    pass
-
 
 if TYPE_CHECKING:
     from ropt.config.plan import ResultHandlerConfig
