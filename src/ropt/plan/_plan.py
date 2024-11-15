@@ -293,12 +293,7 @@ class Plan:
 
     def _check_condition(self, config: PlanStepConfig) -> bool:
         if config.if_ is not None:
-            stripped = config.if_.strip()
-            return (
-                bool(self.eval(stripped))
-                if stripped.startswith("$(") and stripped.endswith(")")
-                else bool(self.eval("$(" + stripped + ")"))
-            )
+            return bool(self.eval(config.if_.strip()))
         return True
 
     def __getitem__(self, name: str) -> Any:  # noqa: ANN401
