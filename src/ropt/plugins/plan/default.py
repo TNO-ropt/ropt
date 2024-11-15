@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 from functools import singledispatchmethod
-from typing import Any, Dict, Final, Type, Union
+from typing import Dict, Final, Type, Union
 
 from ropt.config.plan import PlanStepConfig, ResultHandlerConfig
 from ropt.plan import Plan
 from ropt.plugins.plan.base import PlanStep, ResultHandler
 
 from ._evaluator import DefaultEvaluatorStep
-from ._functions import ExpressionFunctions
 from ._load_data import DefaultLoadStep
 from ._metadata import DefaultMetadataHandler
 from ._optimizer import DefaultOptimizerStep
@@ -120,12 +119,3 @@ class DefaultPlanPlugin(PlanPlugin):
         return (method.lower() in _RESULT_HANDLER_OBJECTS) or (
             method.lower() in _STEP_OBJECTS
         )
-
-    @property
-    def functions(self) -> Dict[str, Any]:
-        """Return plan functions implemented by the plugin.
-
-        Returns:
-            The functions.
-        """
-        return {"mkdict": ExpressionFunctions.mkdict}

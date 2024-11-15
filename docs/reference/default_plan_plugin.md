@@ -45,5 +45,3 @@
 ::: ropt.plugins.plan._save_results.DefaultSaveHandler
     options:
         members: [DefaultSaveHandlerWith]
-
-::: ropt.plugins.plan.default.ExpressionFunctions
