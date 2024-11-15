@@ -3224,12 +3224,16 @@ though it may be clearer to prefix variables with <code>$</code>, for example:
 <li>Literal types supported: <code>int</code>, <code>float</code>, <code>bool</code>, and <code>str</code>. Nested
   lists (<code>[...]</code>) and dictionaries (<code>{...}</code>) are supported and can
   reference variables or call functions within them.</li>
-<li>Allowed types in expressions include numbers, strings, <code>numpy</code>
-  arrays, dicts, lists, <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a>, and
+<li>Allowed types in expressions include numbers, strings, dicts,
+  lists, <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a>, and
   <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> objects.</li>
 <li>Built-in functions include: <code>abs</code>, <code>bool</code>, <code>divmod</code>, <code>float</code>,
   <code>int</code>, <code>max</code>, <code>min</code>, <code>pow</code>, <code>range</code>, <code>round</code>, <code>sum</code>, <code>str</code>.</li>
 </ul>
+<p>Plan variables may contain objects of any type. However, to be used
+in an expression, they should contain a value of a supported type or
+be convertible to a supported type before evaluation. In particular,
+<code>numpy</code> arrays are converted to lists when encountered in an expression.</p>
 </details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
