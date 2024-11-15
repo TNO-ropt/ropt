@@ -170,6 +170,24 @@ def test_eval_expr(evaluator: Any, expr: str, expected: Any) -> None:
     assert plan.eval(expr) == expected
 
 
+def test_eval_return_type(evaluator: Any) -> None:
+    plan_config: Dict[str, Any] = {
+        "variables": {
+            "x": np.array([1, 2]),
+            "y": None,
+        },
+        "steps": [
+            {"set": {"y": "$x"}},
+        ],
+    }
+    parsed_config = PlanConfig.model_validate(plan_config)
+    context = OptimizerContext(evaluator=evaluator())
+    context.expr.add_functions({"incr": lambda x: x + 1})
+    plan = Plan(parsed_config, context)
+    plan.run()
+    assert isinstance(plan["y"], list)
+
+
 @pytest.mark.parametrize(
     ("expr", "expected"),
     [

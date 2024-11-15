@@ -22,7 +22,6 @@ _CMP_OPS: Final = (ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE)
 _SUPPORTED_VARIABLE_TYPES: Final = (
     Number,
     str,
-    np.ndarray,
     Dict,
     List,
     Results,
@@ -55,6 +54,8 @@ class _ReplaceFields(ast.NodeTransformer):
     def visit_Name(self, node: ast.Name) -> ast.AST:  # noqa: N802
         if node.id in self._variables:
             value = self._variables[node.id]
+            if isinstance(value, np.ndarray):
+                value = value.tolist()
             if value is None or isinstance(value, _SUPPORTED_VARIABLE_TYPES):
                 self.values[node.id] = value
                 return self.generic_visit(node)
@@ -170,11 +171,16 @@ class ExpressionEvaluator:
             - Literal types supported: `int`, `float`, `bool`, and `str`. Nested
               lists (`[...]`) and dictionaries (`{...}`) are supported and can
               reference variables or call functions within them.
-            - Allowed types in expressions include numbers, strings, `numpy`
-              arrays, dicts, lists, [`Results`][ropt.results.Results], and
+            - Allowed types in expressions include numbers, strings, dicts,
+              lists, [`Results`][ropt.results.Results], and
               [`EnOptConfig`][ropt.config.enopt.EnOptConfig] objects.
             - Built-in functions include: `abs`, `bool`, `divmod`, `float`,
               `int`, `max`, `min`, `pow`, `range`, `round`, `sum`, `str`.
+
+            Plan variables may contain objects of any type. However, to be used
+            in an expression, they should contain a value of a supported type or
+            be convertible to a supported type before evaluation. In particular,
+            `numpy` arrays are converted to lists when encountered in an expression.
 
         Args:
             expr:      The expression to evaluate, provided as a string.

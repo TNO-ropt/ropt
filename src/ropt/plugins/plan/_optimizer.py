@@ -284,7 +284,8 @@ class DefaultOptimizerStep(PlanStep):
                     if parsed_variables.evaluations.scaled_variables is None
                     else parsed_variables.evaluations.scaled_variables
                 )
-            if isinstance(parsed_variables, np.ndarray):
+            if isinstance(parsed_variables, (np.ndarray, list)):
+                parsed_variables = np.array(parsed_variables)
                 scaled_variables = scale_variables(config, parsed_variables, axis=-1)
                 return (
                     parsed_variables if scaled_variables is None else scaled_variables
