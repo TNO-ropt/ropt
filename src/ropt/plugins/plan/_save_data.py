@@ -7,6 +7,7 @@ import pickle
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal, Union
 
+import numpy as np
 from pydantic import BaseModel, ConfigDict
 
 from ropt.plugins.plan.base import PlanStep
@@ -14,6 +15,13 @@ from ropt.plugins.plan.base import PlanStep
 if TYPE_CHECKING:
     from ropt.config.plan import PlanStepConfig
     from ropt.plan import Plan
+
+
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj: Any) -> Any:  # noqa: ANN401
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super().default(obj)
 
 
 class DefaultSaveStep(PlanStep):
@@ -83,7 +91,7 @@ class DefaultSaveStep(PlanStep):
         data = self.plan.eval(self._with.data)
         if self._with.format == "json":
             with path.open("w", encoding="utf-8") as file_obj:
-                json.dump(data, file_obj)
+                json.dump(data, file_obj, cls=NumpyEncoder)
         elif self._with.format == "pickle":
             with path.open("wb") as file_obj:
                 pickle.dump(data, file_obj)
