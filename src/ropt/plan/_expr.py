@@ -13,17 +13,17 @@ import numpy as np
 from ropt.config.enopt import EnOptConfig
 from ropt.results import Results
 
-_VALID_TYPES: Final = (int, float, bool, str)
+_SUPPORTED_CONSTANTS: Final = (int, float, bool, str)
 _UNARY_OPS: Final = (ast.UAdd, ast.USub, ast.Not)
 _BIN_OPS: Final = (ast.Add, ast.Sub, ast.Div, ast.FloorDiv, ast.Mult, ast.Mod, ast.Pow)
 _BOOL_OPS: Final = (ast.Or, ast.And)
 _CMP_OPS: Final = (ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE)
-
 _SUPPORTED_VARIABLE_TYPES: Final = (
     Number,
     str,
     Dict,
     List,
+    np.ndarray,
     Results,
     EnOptConfig,
 )
@@ -42,36 +42,8 @@ _BUILTIN_FUNCTIONS: Final[Dict[str, Callable[..., Any]]] = {
     "str": str,
 }
 
-
-class _ReplaceFields(ast.NodeTransformer):
-    def __init__(
-        self, variables: Mapping[str, Any], functions: Dict[str, Callable[..., Any]]
-    ) -> None:
-        self.values: Dict[str, Any] = {}
-        self._variables = variables
-        self._functions = set(functions.keys())
-
-    def visit_Name(self, node: ast.Name) -> ast.AST:  # noqa: N802
-        if node.id in self._variables:
-            value = self._variables[node.id]
-            if isinstance(value, np.ndarray):
-                value = value.tolist()
-            if value is None or isinstance(value, _SUPPORTED_VARIABLE_TYPES):
-                self.values[node.id] = value
-                return self.generic_visit(node)
-            msg = f"Error in expression: the type of `{node.id}` is not supported"
-            raise TypeError(msg)
-        if node.id not in self._functions:
-            msg = f"Unknown plan variable: `{node.id}`"
-            raise AttributeError(msg)
-        return self.generic_visit(node)
-
-    def visit_Call(self, node: ast.Call) -> ast.AST:  # noqa: N802
-        assert isinstance(node.func, ast.Name)
-        if node.func.id not in self._functions:
-            msg = f"Unknown plan function: `{node.func.id}`"
-            raise AttributeError(msg)
-        return self.generic_visit(node)
+# A random string used to mark identifiers in expresions:
+_PLAN_IDENTIFIER_: Final[str] = "_HHsvLb3BzRHh1JE_"
 
 
 class ExpressionEvaluator:
@@ -84,7 +56,6 @@ class ExpressionEvaluator:
             ValueError: Raised if any provided function overrides a built-in.
         """
         self._functions = copy.deepcopy(_BUILTIN_FUNCTIONS)
-        self._functions["_eval"] = self._eval_function
 
     def add_functions(self, functions: Optional[Dict[str, Callable[..., Any]]]) -> None:
         """Add functions to the evaluator.
@@ -116,54 +87,33 @@ class ExpressionEvaluator:
            templates. The content of each `<<...>>` instance is evaluated as an
            expression, and the result replaces the `<<...>>` substring.
 
-        2. Strings containing a single `$` character, or enclosed in `<<...>>`,
-           are evaluated as expressions. Then, singular `$` characters are
-           removed and sequences of two or more `$` characters are shortened by
-           one. The remaining string is then evaluated as a Python expression
-           with limited functionality. These expressions can access the
-           variables passed through the `variables` parameter, a set of built-in
+        2. Strings containing single `$` characters, or enclosed in `$(...)`,
+           are evaluated as expressions. Variables and function calls must be
+           prefixed by a `$` character. Expressions can access the variables
+           passed through the `variables` parameter, a set of built-in
            functions, and any additional functions added using the
            [`add_functions`][ropt.plan.ExpressionEvaluator.add_functions]
            method.
 
+        Tip: Expressions only containing literals
+            If an expression has no variables or expressions, you need to enclose
+            it in `$(...)` delimiters, like so: `$(1 + 1)`.
+
         Tip: String Interpolation with `<<...>>`:
             Use the `<<...>>` notation when the overall result should be a
-            string. Expressions within `<<...>>` do not require `$` signs,
-            though it may be clearer to prefix variables with `$`, for example:
-            `<<$x + 1>>`
+            string. Expressions within `<<...>>` do not require `$(...)` delimiters:
+            `"<<1 + 1>>"` will evaluate to `"2"`, but variables and function calls must
+            still be prefixed with `$`, for example `"<<$x + 1>>"`.
 
-        Recommended Practices:
-            - Prefix variables with `$` for clarity.
-            - Optionally prefix function calls with `$`, in particular if the function
-              is not a Python built-in function.
-            - Enclose expressions without variables or functions in `$(...)`.
+        Examples of valid expressions, assuming `x == 1` and `y ==2`:
 
-        Examples of valid expressions:
-        ```python
-        $(1 + 1)
-        $x
-        $x + 1
-        $x + $y
-        1 + $x
-        $max(1, $x)
-        ```
-
-        Omitting some `$` signs is valid, and may enhance clarity:
-        ```python
-        $max(1, x)
-        max(1, $x)
-        ```
-
-        Less recommended, but still valid:
-        ```python
-        $1 + 1
-        $(x)
-        $1 + $x
-        $1 + x
-        $(x + 1)
-        $($x + 1)
-        $x + y
-        ```
+        | Expression    | Result |
+        | ------------- | ------ |
+        | `$(1 + 1)`    | 2      |
+        | `$x`          | 1      |
+        | `$x + 1`      | 2      |
+        | `$x + $y`     | 3      |
+        | `$max(1, $y)` | 2      |
 
         Info: Supported Features**:
             - Supported Python operators include standard mathematical, boolean,
@@ -172,7 +122,7 @@ class ExpressionEvaluator:
               lists (`[...]`) and dictionaries (`{...}`) are supported and can
               reference variables or call functions within them.
             - Allowed types in expressions include numbers, strings, dicts,
-              lists, [`Results`][ropt.results.Results], and
+              lists, `numpy` arrays, [`Results`][ropt.results.Results], and
               [`EnOptConfig`][ropt.config.enopt.EnOptConfig] objects.
             - Built-in functions include: `abs`, `bool`, `divmod`, `float`,
               `int`, `max`, `min`, `pow`, `range`, `round`, `sum`, `str`.
@@ -201,10 +151,29 @@ class ExpressionEvaluator:
             return self._eval_expr(expr, variables)
         return re.sub(r"\${2,}", lambda m: "$" * (len(m.group()) - 1), expr)
 
+    def _eval_expr(self, expr: str, variables: Mapping[str, Any]) -> Any:  # noqa: ANN401
+        if expr.startswith("$(") and expr.endswith(")"):
+            return self._eval_expr(expr[2:-1].strip(), variables)
+        expr = re.sub(r"\$(?=[a-zA-Z_][a-zA-Z0-9_]*)", _PLAN_IDENTIFIER_, expr)
+        expr = re.sub(r"\${2,}", lambda m: "$" * (len(m.group()) - 1), expr).strip()
+        if not expr:
+            return ""
+        tree = ast.parse(expr, mode="eval")
+        if self._is_expression(tree.body):
+            transformer = _ExpressionNodeTransformer(variables, self._functions)
+            tree = ast.fix_missing_locations(transformer.visit(tree))
+            return eval(  # noqa: S307
+                compile(tree, "", mode="eval"),
+                {"__builtins__": self._functions},
+                transformer.values,
+            )
+        msg = "invalid expression"
+        raise SyntaxError(msg)
+
     def _eval_parts(self, expr: str, variables: Mapping[str, Any]) -> Any:  # noqa: ANN401
         def _substitute(matched: re.Match[str]) -> str:
             parts = matched.string[matched.start() : matched.end()].partition(">>")
-            return str(self._eval_expr(parts[0][2:], variables)) + parts[2]
+            return str(self._eval_expr(parts[0][2:].strip(), variables)) + parts[2]
 
         parts = []
         prefix = ""
@@ -217,91 +186,98 @@ class ExpressionEvaluator:
                 prefix = ""
         return "".join(re.sub(r"<<(.*)>>", _substitute, part) for part in parts)
 
-    def _eval_function(self, value: Any) -> Any:  # noqa: ANN401
-        return value
-
-    def _is_valid(self, node: ast.AST) -> bool:  # noqa: C901, PLR0911
-        if isinstance(node, ast.Constant):
-            return node.value is None or type(node.value) in _VALID_TYPES
-        if isinstance(node, ast.UnaryOp):
-            return isinstance(node.op, _UNARY_OPS) and self._is_valid(node.operand)
-        if isinstance(node, ast.BinOp):
-            return (
-                isinstance(node.op, _BIN_OPS)
-                and self._is_valid(node.left)
-                and self._is_valid(node.right)
-            )
-        if isinstance(node, ast.BoolOp):
-            return (
-                isinstance(node.op, _BOOL_OPS)
-                and all(self._is_valid(value) for value in node.values)  # noqa: PD011
-            )
-        if isinstance(node, ast.Compare):
-            return all(isinstance(op, _CMP_OPS) for op in node.ops) and all(
-                self._is_valid(value) for value in node.comparators
-            )
-        if isinstance(node, ast.List):
-            return all(self._is_valid(item) for item in node.elts)
-        if isinstance(node, ast.Dict):
-            return (
-                all(item is None or self._is_valid(item) for item in node.keys)
-                and all(self._is_valid(item) for item in node.values)  # noqa: PD011
-            )
+    def _is_expression(  # noqa: C901, PLR0911, PLR0912
+        self, node: ast.AST, *, include_ops: bool = True, include_literals: bool = True
+    ) -> bool:
+        if include_literals:
+            if isinstance(node, ast.Constant):
+                return node.value is None or type(node.value) in _SUPPORTED_CONSTANTS
+            if isinstance(node, ast.List):
+                return all(self._is_expression(item) for item in node.elts)
+            if isinstance(node, ast.Dict):
+                return (
+                    all(
+                        item is not None and self._is_expression(item)
+                        for item in node.keys
+                    )
+                    and all(self._is_expression(item) for item in node.values)  # noqa: PD011
+                )
+        if include_ops:
+            if isinstance(node, ast.UnaryOp):
+                return isinstance(node.op, _UNARY_OPS) and self._is_expression(
+                    node.operand
+                )
+            if isinstance(node, ast.BinOp):
+                return (
+                    isinstance(node.op, _BIN_OPS)
+                    and self._is_expression(node.left)
+                    and self._is_expression(node.right)
+                )
+            if isinstance(node, ast.BoolOp):
+                return (
+                    isinstance(node.op, _BOOL_OPS)
+                    and all(self._is_expression(value) for value in node.values)  # noqa: PD011
+                )
+            if isinstance(node, ast.Compare):
+                return all(isinstance(op, _CMP_OPS) for op in node.ops) and all(
+                    self._is_expression(value) for value in node.comparators
+                )
         if isinstance(node, ast.Subscript):
-            return self._is_valid(node.slice)
+            return (
+                isinstance(node.value, (ast.Name, ast.Attribute, ast.Subscript))
+                and isinstance(node.ctx, ast.Load)
+                and self._is_expression(node.slice)
+            )
         if isinstance(node, ast.Index):
-            return self._is_valid(node.value)  # type: ignore[attr-defined]
+            return self._is_expression(node.value)  # type: ignore[attr-defined]
         if isinstance(node, ast.Attribute):
             if isinstance(node.value, ast.Attribute):
-                return self._is_valid(node.value)
-            return bool(isinstance(node.value, ast.Name))
+                return self._is_expression(node.value)
+            return bool(
+                isinstance(node.value, ast.Name) and isinstance(node.ctx, ast.Load)
+            )
         if isinstance(node, ast.Call):
             return (
                 isinstance(node.func, ast.Name)
-                and all(self._is_valid(arg) for arg in node.args)
+                and all(self._is_expression(arg) for arg in node.args)
                 and not node.keywords
             )
-        return bool(isinstance(node, ast.Name))
+        return bool(isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load))
 
-    def _eval_expr(self, expr: str, variables: Mapping[str, Any]) -> Any:  # noqa: ANN401
-        stripped = re.sub(r"(?<!\$)\$(?!\$)", "", expr)
-        stripped = re.sub(
-            r"\${2,}", lambda m: "$" * (len(m.group()) - 1), stripped
-        ).strip()
-        if not stripped:
-            return ""
-        tree = ast.parse(stripped, mode="eval")
-        if self._is_valid(tree.body):
-            replacer = _ReplaceFields(variables, self._functions)
-            tree = ast.fix_missing_locations(replacer.visit(tree))
-            return eval(  # noqa: S307
-                compile(tree, "", mode="eval"),
-                {"__builtins__": self._functions},
-                replacer.values,
-            )
-        msg = "invalid expression"
-        raise SyntaxError(msg)
 
-    def _is_valid_variable_or_function(self, node: ast.AST) -> bool:
-        if isinstance(node, ast.Subscript):
-            return self._is_valid(node.slice)
-        if isinstance(node, ast.Index):
-            return self._is_valid(node.value)  # type: ignore[attr-defined]
-        if isinstance(node, ast.Attribute):
-            if isinstance(node.value, ast.Attribute):
-                return self._is_valid(node.value)
-            return bool(isinstance(node.value, ast.Name))
-        if isinstance(node, ast.Call):
-            return (
-                isinstance(node.func, ast.Name)
-                and all(self._is_valid(arg) for arg in node.args)
-                and not node.keywords
-            )
-        return bool(isinstance(node, ast.Name))
+class _ExpressionNodeTransformer(ast.NodeTransformer):
+    def __init__(
+        self,
+        variables: Mapping[str, Any],
+        functions: Dict[str, Callable[..., Any]],
+    ) -> None:
+        self.values: Dict[str, Any] = {}
+        self._variables = variables
+        self._functions = set(functions.keys())
 
-    def _check_variable_or_function(self, expr: str) -> Any:  # noqa: ANN401
-        stripped = expr.strip()
-        tree = ast.parse(stripped, mode="eval")
-        if not self._is_valid_variable_or_function(tree.body):
-            msg = "invalid variable or function"
+    def visit_Name(self, node: ast.Name) -> ast.AST:  # noqa: N802
+        if node.id.startswith(_PLAN_IDENTIFIER_):
+            name = node.id.removeprefix(_PLAN_IDENTIFIER_)
+        else:
+            msg = f"Invalid expression element: {node.id}."
+            if node.id in self._variables or node.id in self._functions:
+                msg += " Missing `$`?"
             raise SyntaxError(msg)
+        if name in self._variables:
+            value = self._variables[name]
+            if value is None or isinstance(value, _SUPPORTED_VARIABLE_TYPES):
+                self.values[name] = value
+                node.id = name
+            else:
+                msg = f"Error in expression: the type of `{name}` is not supported"
+                raise TypeError(msg)
+        elif name not in self._functions:
+            msg = f"Unknown plan variable or function: `${name}`"
+            raise NameError(msg)
+        node.id = name
+        return self.generic_visit(node)
+
+    def visit_Constant(self, node: ast.Constant) -> ast.AST:  # noqa: N802
+        if isinstance(node.value, str):
+            node.value = node.value.removeprefix(_PLAN_IDENTIFIER_)
+        return node

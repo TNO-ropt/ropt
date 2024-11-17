@@ -293,7 +293,7 @@ class Plan:
 
     def _check_condition(self, config: PlanStepConfig) -> bool:
         if config.if_ is not None:
-            return bool(self.eval(config.if_.strip()))
+            return bool(self.eval(config.if_))
         return True
 
     def __getitem__(self, name: str) -> Any:  # noqa: ANN401
