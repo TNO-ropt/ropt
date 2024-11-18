@@ -274,7 +274,7 @@ class EnsembleOptimizer:
             and not self._allow_nan
         )
         for result in results:
-            assert isinstance(result, (FunctionResults, GradientResults))
+            assert isinstance(result, FunctionResults | GradientResults)
             if (
                 (isinstance(result, FunctionResults) and result.functions is None)
                 or (isinstance(result, GradientResults) and result.gradients is None)

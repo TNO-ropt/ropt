@@ -139,14 +139,14 @@ class DefaultSetStep(PlanStep):
 
     def _get_target(self, target: Any, key: str) -> Any:  # noqa: ANN401
         if key.startswith("$("):
-            if not isinstance(target, (MutableMapping, MutableSequence)):
+            if not isinstance(target, MutableMapping | MutableSequence):
                 raise KeyError
             return target[self._plan.eval(key)]
         return getattr(target, key)
 
     def _set_target(self, target: Any, key: str, value: Any) -> None:  # noqa: ANN401
         if key.startswith("$("):
-            if not isinstance(target, (MutableMapping, MutableSequence)):
+            if not isinstance(target, MutableMapping | MutableSequence):
                 raise KeyError
             target[self._plan.eval(key)] = value
         else:

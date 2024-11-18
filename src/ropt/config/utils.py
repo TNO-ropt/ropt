@@ -164,7 +164,7 @@ T = TypeVar("T")
 def _convert_set(value: T | Set[T] | Sequence[T]) -> Set[T]:
     if isinstance(value, str):
         return {cast(T, value)}
-    return set(value) if isinstance(value, (AbstractSequence, AbstractSet)) else {value}
+    return set(value) if isinstance(value, AbstractSequence | AbstractSet) else {value}
 
 
 def _convert_tuple(value: T | Sequence[T]) -> tuple[T, ...]:

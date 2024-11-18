@@ -99,7 +99,7 @@ class DefaultEvaluatorStep(PlanStep):
     def run(self) -> None:
         """Run the evaluator step."""
         config = self.plan.eval(self._with.config)
-        if not isinstance(config, (dict, EnOptConfig)):
+        if not isinstance(config, dict | EnOptConfig):
             msg = "No valid EnOpt configuration provided"
             raise TypeError(msg)
         self._enopt_config = EnOptConfig.model_validate(config)
@@ -156,7 +156,7 @@ class DefaultEvaluatorStep(PlanStep):
                     if parsed_variables.evaluations.scaled_variables is None
                     else parsed_variables.evaluations.scaled_variables
                 )
-            if isinstance(parsed_variables, (np.ndarray, list)):
+            if isinstance(parsed_variables, np.ndarray | list):
                 parsed_variables = np.array(parsed_variables)
                 scaled_variables = scale_variables(config, parsed_variables, axis=-1)
                 return (

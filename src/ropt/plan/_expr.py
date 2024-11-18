@@ -224,7 +224,7 @@ class ExpressionEvaluator:
                 )
         if isinstance(node, ast.Subscript):
             return (
-                isinstance(node.value, (ast.Name, ast.Attribute, ast.Subscript))
+                isinstance(node.value, ast.Name | ast.Attribute | ast.Subscript)
                 and isinstance(node.ctx, ast.Load)
                 and self._is_expression(node.slice)
             )
