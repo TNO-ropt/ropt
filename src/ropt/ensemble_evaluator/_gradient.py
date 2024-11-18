@@ -1,5 +1,3 @@
-from typing import Optional
-
 import numpy as np
 from numpy.typing import NDArray
 
@@ -153,12 +151,12 @@ def _calculate_gradient(  # noqa: PLR0913
 def _calculate_transformed_gradients(  # noqa: PLR0913
     config: EnOptConfig,
     function_transforms: list[FunctionTransform],
-    transform_indices: Optional[Optional[NDArray[np.intc]]],
+    transform_indices: NDArray[np.intc] | None,
     variables: NDArray[np.float64],
     functions: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
     perturbed_functions: NDArray[np.float64],
-    realization_weights: Optional[NDArray[np.float64]],
+    realization_weights: NDArray[np.float64] | None,
     failed_realizations: NDArray[np.bool_],
 ) -> NDArray[np.float64]:
     gradients = np.zeros((functions.shape[-1], variables.shape[-1]), dtype=np.float64)
@@ -195,7 +193,7 @@ def _calculate_transformed_objective_gradients(  # noqa: PLR0913
     functions: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
     perturbed_functions: NDArray[np.float64],
-    realization_weights: Optional[NDArray[np.float64]],
+    realization_weights: NDArray[np.float64] | None,
     failed_realizations: NDArray[np.bool_],
 ) -> NDArray[np.float64]:
     return _calculate_transformed_gradients(
@@ -215,12 +213,12 @@ def _calculate_transformed_constraint_gradients(  # noqa: PLR0913
     config: EnOptConfig,
     function_transforms: list[FunctionTransform],
     variables: NDArray[np.float64],
-    constraints: Optional[NDArray[np.float64]],
+    constraints: NDArray[np.float64] | None,
     perturbed_variables: NDArray[np.float64],
-    perturbed_constaints: Optional[NDArray[np.float64]],
-    realization_weights: Optional[NDArray[np.float64]],
+    perturbed_constaints: NDArray[np.float64] | None,
+    realization_weights: NDArray[np.float64] | None,
     failed_realizations: NDArray[np.bool_],
-) -> Optional[NDArray[np.float64]]:
+) -> NDArray[np.float64] | None:
     if constraints is None:
         return None
     assert perturbed_constaints is not None

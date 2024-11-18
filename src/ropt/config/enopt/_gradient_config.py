@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Self
+from typing import TYPE_CHECKING, Self
 
 import numpy as np
 from pydantic import ConfigDict, PositiveInt, model_validator
@@ -118,11 +118,11 @@ class GradientConfig(ImmutableBaseModel):
     """
 
     number_of_perturbations: PositiveInt = DEFAULT_NUMBER_OF_PERTURBATIONS
-    perturbation_min_success: Optional[PositiveInt] = None
+    perturbation_min_success: PositiveInt | None = None
     perturbation_magnitudes: Array1D = np.array(DEFAULT_PERTURBATION_MAGNITUDE)
     perturbation_types: ArrayEnum = np.array(DEFAULT_PERTURBATION_TYPE)
     boundary_types: ArrayEnum = np.array(DEFAULT_PERTURBATION_BOUNDARY_TYPE)
-    samplers: Optional[Array1DInt] = None
+    samplers: Array1DInt | None = None
     seed: ItemOrTuple[int] = (DEFAULT_SEED,)
     merge_realizations: bool = False
 

@@ -2,16 +2,14 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
 import numpy as np
 
 from ropt.results import FunctionResults, Results
 
 
 def _get_new_optimal_result(
-    optimal_result: Optional[FunctionResults], results: FunctionResults
-) -> Optional[FunctionResults]:
+    optimal_result: FunctionResults | None, results: FunctionResults
+) -> FunctionResults | None:
     if optimal_result is None:
         return results
     assert optimal_result.functions is not None
@@ -43,7 +41,7 @@ def _check_bound_constraints(
 
 
 def _check_constraints(
-    results: FunctionResults, constraint_tolerance: Optional[float]
+    results: FunctionResults, constraint_tolerance: float | None
 ) -> bool:
     if constraint_tolerance is None:
         return True
@@ -68,8 +66,8 @@ def _check_constraints(
 
 
 def _get_last_result(
-    results: tuple[Results, ...], constraint_tolerance: Optional[float]
-) -> Optional[FunctionResults]:
+    results: tuple[Results, ...], constraint_tolerance: float | None
+) -> FunctionResults | None:
     return next(
         (
             item
@@ -85,11 +83,11 @@ def _get_last_result(
 
 
 def _update_optimal_result(
-    optimal_result: Optional[FunctionResults],
+    optimal_result: FunctionResults | None,
     results: tuple[Results, ...],
-    constraint_tolerance: Optional[float],
-) -> Optional[FunctionResults]:
-    return_result: Optional[FunctionResults] = None
+    constraint_tolerance: float | None,
+) -> FunctionResults | None:
+    return_result: FunctionResults | None = None
     for item in results:
         if (
             isinstance(item, FunctionResults)
@@ -104,7 +102,7 @@ def _update_optimal_result(
 
 
 def _get_all_results(
-    results: tuple[Results, ...], constraint_tolerance: Optional[float]
+    results: tuple[Results, ...], constraint_tolerance: float | None
 ) -> tuple[FunctionResults, ...]:
     return tuple(
         item

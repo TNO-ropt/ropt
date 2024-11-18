@@ -8,7 +8,6 @@ from typing import (
     Any,
     Iterable,
     Literal,
-    Optional,
     Type,
 )
 
@@ -30,9 +29,9 @@ def _to_dataset(  # noqa: PLR0913
     result_field: ResultField,
     plan_id: tuple[int, ...],
     result_id: int | tuple[int, ...],
-    batch_id: Optional[int],
+    batch_id: int | None,
     metadata: dict[str, Any],
-    select: Optional[Iterable[str]],
+    select: Iterable[str] | None,
 ) -> xarray.Dataset:
     if select is None:
         select = (field.name for field in fields(result_field))
@@ -50,7 +49,7 @@ def _to_dataset(  # noqa: PLR0913
 
 def _to_data_array(
     config: EnOptConfig, result_field: ResultField, field: str
-) -> Optional[xarray.DataArray]:
+) -> xarray.DataArray | None:
     try:
         data = getattr(result_field, field)
     except AttributeError as exc:
@@ -71,7 +70,7 @@ def _to_data_array(
     )
 
 
-def _get_index(config: EnOptConfig, axis: ResultAxisName) -> Optional[tuple[Any, ...]]:
+def _get_index(config: EnOptConfig, axis: ResultAxisName) -> tuple[Any, ...] | None:
     if axis == ResultAxisName.VARIABLE:
         return (
             None

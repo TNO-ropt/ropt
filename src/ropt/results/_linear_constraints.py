@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import numpy as np  # noqa: TCH002
 
@@ -38,13 +38,13 @@ class LinearConstraints(ResultField):
         violations: Violations of the linear constraints.
     """
 
-    values: Optional[NDArray[np.float64]] = field(
+    values: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.LINEAR_CONSTRAINT,),
         },
     )
-    violations: Optional[NDArray[np.float64]] = field(
+    violations: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.LINEAR_CONSTRAINT,),
@@ -62,7 +62,7 @@ class LinearConstraints(ResultField):
     @classmethod
     def create(
         cls, config: EnOptConfig, evaluations: FunctionEvaluations
-    ) -> Optional[LinearConstraints]:
+    ) -> LinearConstraints | None:
         """Add constraint information.
 
         This factory function creates a `LinearConstraints` object with the

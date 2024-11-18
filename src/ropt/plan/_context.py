@@ -6,7 +6,6 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
-    Optional,
     Self,
 )
 
@@ -39,8 +38,8 @@ class OptimizerContext:
     def __init__(
         self,
         evaluator: Evaluator,
-        plugin_manager: Optional[PluginManager] = None,
-        variables: Optional[dict[str, Any]] = None,
+        plugin_manager: PluginManager | None = None,
+        variables: dict[str, Any] | None = None,
     ) -> None:
         """Initialize the optimization context.
 

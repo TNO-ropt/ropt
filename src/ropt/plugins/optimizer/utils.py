@@ -5,7 +5,7 @@ linear constraints, and to retrieve the list of supported optimizers.
 """
 
 from pathlib import Path
-from typing import Optional, Set
+from typing import Set
 
 import numpy as np
 from numpy.typing import NDArray
@@ -204,9 +204,9 @@ def _validate_nonlinear_constraints(
 
 def create_output_path(
     base_name: str,
-    base_dir: Optional[Path] = None,
-    name: Optional[str] = None,
-    suffix: Optional[str] = None,
+    base_dir: Path | None = None,
+    name: str | None = None,
+    suffix: str | None = None,
 ) -> Path:
     """Create an output path name.
 

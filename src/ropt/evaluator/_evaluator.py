@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional, Protocol
+from typing import Protocol
 
 import numpy as np
 from numpy.typing import NDArray
@@ -47,17 +47,17 @@ class EvaluatorContext:
 
     config: EnOptConfig
     realizations: NDArray[np.intc]
-    active_objectives: Optional[NDArray[np.bool_]] = None
-    active_constraints: Optional[NDArray[np.bool_]] = None
-    active: Optional[NDArray[np.bool_]] = field(init=False)
+    active_objectives: NDArray[np.bool_] | None = None
+    active_constraints: NDArray[np.bool_] | None = None
+    active: NDArray[np.bool_] | None = field(init=False)
 
     def __post_init__(self) -> None:
-        active_objectives: Optional[NDArray[np.bool_]] = (
+        active_objectives: NDArray[np.bool_] | None = (
             None
             if self.active_objectives is None
             else np.logical_or.reduce(self.active_objectives, axis=0)
         )
-        active_constraints: Optional[NDArray[np.bool_]] = (
+        active_constraints: NDArray[np.bool_] | None = (
             None
             if self.active_constraints is None
             else np.logical_or.reduce(self.active_constraints, axis=0)
@@ -99,9 +99,9 @@ class EvaluatorResult:
     """
 
     objectives: NDArray[np.float64]
-    constraints: Optional[NDArray[np.float64]] = None
-    batch_id: Optional[int] = None
-    evaluation_ids: Optional[NDArray[np.intc]] = None
+    constraints: NDArray[np.float64] | None = None
+    batch_id: int | None = None
+    evaluation_ids: NDArray[np.intc] | None = None
 
 
 class Evaluator(Protocol):

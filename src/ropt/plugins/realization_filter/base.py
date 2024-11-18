@@ -10,7 +10,7 @@ abstract base class may be installed as a plugin.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from ropt.plugins.base import Plugin
 
@@ -37,7 +37,7 @@ class RealizationFilter(ABC):
     def get_realization_weights(
         self,
         objectives: NDArray[np.float64],
-        constraints: Optional[NDArray[np.float64]],
+        constraints: NDArray[np.float64] | None,
     ) -> NDArray[np.float64]:
         """Return the updated weights of the realizations.
 

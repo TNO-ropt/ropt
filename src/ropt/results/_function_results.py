@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from importlib.util import find_spec
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Final, Optional, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Final, Type, TypeVar
 
 from ._bound_constraints import BoundConstraints
 from ._function_evaluations import FunctionEvaluations
@@ -51,10 +51,10 @@ class FunctionResults(Results):
 
     evaluations: FunctionEvaluations
     realizations: Realizations
-    functions: Optional[Functions]
-    bound_constraints: Optional[BoundConstraints] = None
-    linear_constraints: Optional[LinearConstraints] = None
-    nonlinear_constraints: Optional[NonlinearConstraints] = None
+    functions: Functions | None
+    bound_constraints: BoundConstraints | None = None
+    linear_constraints: LinearConstraints | None = None
+    nonlinear_constraints: NonlinearConstraints | None = None
 
     @classmethod
     def from_netcdf(cls, filename: str | Path) -> Results:

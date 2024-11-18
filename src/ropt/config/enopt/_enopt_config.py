@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import Any, Optional, Self
+from typing import Any, Self
 
 from pydantic import ConfigDict, model_validator
 
@@ -75,8 +75,8 @@ class EnOptConfig(ImmutableBaseModel):
 
     variables: VariablesConfig
     objective_functions: ObjectiveFunctionsConfig = ObjectiveFunctionsConfig()
-    linear_constraints: Optional[LinearConstraintsConfig] = None
-    nonlinear_constraints: Optional[NonlinearConstraintsConfig] = None
+    linear_constraints: LinearConstraintsConfig | None = None
+    nonlinear_constraints: NonlinearConstraintsConfig | None = None
     realizations: RealizationsConfig = RealizationsConfig()
     optimizer: OptimizerConfig = OptimizerConfig()
     gradient: GradientConfig = GradientConfig()
@@ -85,7 +85,7 @@ class EnOptConfig(ImmutableBaseModel):
         FunctionTransformConfig(),
     )
     samplers: tuple[SamplerConfig, ...] = (SamplerConfig(),)
-    original_inputs: Optional[dict[str, Any]] = None
+    original_inputs: dict[str, Any] | None = None
 
     model_config = ConfigDict(
         extra="forbid",

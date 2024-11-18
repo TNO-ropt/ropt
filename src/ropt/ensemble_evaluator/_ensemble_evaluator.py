@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterator, Optional
+from typing import TYPE_CHECKING, Iterator
 
 import numpy as np
 from numpy.random import default_rng
@@ -86,12 +86,12 @@ class EnsembleEvaluator:
         self._function_transforms = self._init_function_transforms(plugin_manager)
         rng = default_rng(config.gradient.seed)
         self._samplers = self._init_samplers(rng, plugin_manager)
-        self._cache_for_gradient: Optional[FunctionResults] = None
-        self._objective_auto_scales: Optional[NDArray[np.float64]] = None
-        self._constraint_auto_scales: Optional[NDArray[np.float64]] = None
+        self._cache_for_gradient: FunctionResults | None = None
+        self._objective_auto_scales: NDArray[np.float64] | None = None
+        self._constraint_auto_scales: NDArray[np.float64] | None = None
 
     @property
-    def constraint_auto_scales(self) -> Optional[NDArray[np.float64]]:
+    def constraint_auto_scales(self) -> NDArray[np.float64] | None:
         """Return optional auto-calculated scales for constraints.
 
         Returns:
@@ -260,7 +260,7 @@ class EnsembleEvaluator:
     def _calculate_gradients(
         self,
         variables: NDArray[np.float64],
-        variable_indices: Optional[NDArray[np.intc]],
+        variable_indices: NDArray[np.intc] | None,
     ) -> tuple[GradientResults]:
         perturbed_variables = _perturb_variables(
             self._config, variables, self._samplers
@@ -344,7 +344,7 @@ class EnsembleEvaluator:
     def _calculate_both(
         self,
         variables: NDArray[np.float64],
-        variable_indices: Optional[NDArray[np.intc]],
+        variable_indices: NDArray[np.intc] | None,
     ) -> tuple[FunctionResults, GradientResults]:
         perturbed_variables = _perturb_variables(
             self._config, variables, self._samplers
@@ -470,9 +470,9 @@ class EnsembleEvaluator:
     def _compute_functions(
         self,
         objectives: NDArray[np.float64],
-        constraints: Optional[NDArray[np.float64]],
-        objective_weights: Optional[NDArray[np.float64]],
-        constraint_weights: Optional[NDArray[np.float64]],
+        constraints: NDArray[np.float64] | None,
+        objective_weights: NDArray[np.float64] | None,
+        constraint_weights: NDArray[np.float64] | None,
         failed_realizations: NDArray[np.bool_],
     ) -> Functions:
         # Individual objective and constraint functions are calculated from the
@@ -523,14 +523,14 @@ class EnsembleEvaluator:
     def _compute_gradients(  # noqa: PLR0913
         self,
         variables: NDArray[np.float64],
-        variable_indices: Optional[NDArray[np.intc]],
+        variable_indices: NDArray[np.intc] | None,
         perturbed_variables: NDArray[np.float64],
         objectives: NDArray[np.float64],
-        constraints: Optional[NDArray[np.float64]],
+        constraints: NDArray[np.float64] | None,
         perturbed_objectives: NDArray[np.float64],
-        perturbed_constraints: Optional[NDArray[np.float64]],
-        objective_weights: Optional[NDArray[np.float64]],
-        constraint_weights: Optional[NDArray[np.float64]],
+        perturbed_constraints: NDArray[np.float64] | None,
+        objective_weights: NDArray[np.float64] | None,
+        constraint_weights: NDArray[np.float64] | None,
         failed_realizations: NDArray[np.bool_],
     ) -> Gradients:
         if variable_indices is not None:
@@ -588,7 +588,7 @@ class EnsembleEvaluator:
     def _expand_gradients(
         self,
         gradients: NDArray[np.float64],
-        variable_indices: Optional[NDArray[np.intc]],
+        variable_indices: NDArray[np.intc] | None,
     ) -> NDArray[np.float64]:
         if variable_indices is None:
             return gradients
@@ -599,9 +599,9 @@ class EnsembleEvaluator:
 
     def _calculate_filtered_realization_weights(
         self, evaluator_results: _FunctionEvaluatorResults
-    ) -> tuple[Optional[NDArray[np.float64]], Optional[NDArray[np.float64]]]:
-        objective_weights: Optional[NDArray[np.float64]] = None
-        constraint_weights: Optional[NDArray[np.float64]] = None
+    ) -> tuple[NDArray[np.float64] | None, NDArray[np.float64] | None]:
+        objective_weights: NDArray[np.float64] | None = None
+        constraint_weights: NDArray[np.float64] | None = None
 
         objectives = evaluator_results.objectives
         assert objectives is not None
@@ -661,14 +661,14 @@ class EnsembleEvaluator:
         return objective_weights, constraint_weights
 
     def _get_objective_scales(
-        self, auto_scales: Optional[NDArray[np.float64]]
+        self, auto_scales: NDArray[np.float64] | None
     ) -> NDArray[np.float64]:
         if auto_scales is None:
             return self._config.objective_functions.scales
         return self._config.objective_functions.scales * auto_scales
 
     def _get_constraint_scales(
-        self, auto_scales: Optional[NDArray[np.float64]]
+        self, auto_scales: NDArray[np.float64] | None
     ) -> NDArray[np.float64]:
         assert self._config.nonlinear_constraints is not None
         if auto_scales is None:
@@ -713,9 +713,9 @@ class EnsembleEvaluator:
 
 def _get_indices(
     idx: int,
-    gradient_indices: Optional[NDArray[np.intc]],
-    variable_indices: Optional[NDArray[np.intc]],
-) -> Optional[NDArray[np.intc]]:
+    gradient_indices: NDArray[np.intc] | None,
+    variable_indices: NDArray[np.intc] | None,
+) -> NDArray[np.intc] | None:
     if gradient_indices is None:
         return variable_indices
     if variable_indices is None:

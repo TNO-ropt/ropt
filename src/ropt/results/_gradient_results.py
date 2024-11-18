@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from importlib.util import find_spec
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Final, Optional, Type, TypeVar
+from typing import TYPE_CHECKING, Any, Final, Type, TypeVar
 
 from ._gradient_evaluations import GradientEvaluations
 from ._gradients import Gradients
@@ -44,7 +44,7 @@ class GradientResults(Results):
 
     evaluations: GradientEvaluations
     realizations: Realizations
-    gradients: Optional[Gradients]
+    gradients: Gradients | None
 
     @classmethod
     def from_netcdf(cls: Type[TypeResults], filename: str | Path) -> TypeResults:

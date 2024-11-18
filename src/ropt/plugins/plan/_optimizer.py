@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict
@@ -134,9 +134,9 @@ class DefaultOptimizerStep(PlanStep):
 
         config: str
         tags: ItemOrSet[str] = set()
-        initial_values: Optional[str | Array1D] = None
-        exit_code_var: Optional[str] = None
-        nested_optimization: Optional[DefaultOptimizerStep.NestedPlanConfig] = None
+        initial_values: str | Array1D | None = None
+        exit_code_var: str | None = None
+        nested_optimization: DefaultOptimizerStep.NestedPlanConfig | None = None
 
         model_config = ConfigDict(
             extra="forbid",
@@ -222,7 +222,7 @@ class DefaultOptimizerStep(PlanStep):
         if exit_code == OptimizerExitCode.USER_ABORT:
             self.plan.abort()
 
-    def _signal_evaluation(self, results: Optional[tuple[Results, ...]] = None) -> None:
+    def _signal_evaluation(self, results: tuple[Results, ...] | None = None) -> None:
         """Called before and after the optimizer finishes an evaluation.
 
         Before the evaluation starts, this method is called with the `results`
@@ -252,7 +252,7 @@ class DefaultOptimizerStep(PlanStep):
 
     def _run_nested_plan(
         self, variables: NDArray[np.float64]
-    ) -> tuple[Optional[FunctionResults], bool]:
+    ) -> tuple[FunctionResults | None, bool]:
         """Run a  nested plan.
 
         Args:

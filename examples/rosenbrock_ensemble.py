@@ -7,7 +7,7 @@ write a minimal configuration and how to run and monitor the optimization.
 
 import sys
 from functools import partial
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 from numpy.random import default_rng
@@ -105,7 +105,7 @@ def run_optimization(config: dict[str, Any]) -> FunctionResults:
     return optimal_result
 
 
-def main(argv: Optional[list[str]] = None) -> None:
+def main(argv: list[str] | None = None) -> None:
     """Run the example and check the result.
 
     Args:

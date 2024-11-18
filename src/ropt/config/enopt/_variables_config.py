@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Optional, Self
+from typing import Self
 
 import numpy as np
 from pydantic import ConfigDict, Field, model_validator
@@ -88,14 +88,14 @@ class VariablesConfig(ImmutableBaseModel):
         delimiters:     Delimiters used to construct names from tuples.
     """
 
-    names: Optional[UniqueNames] = None
-    types: Optional[ArrayEnum] = None
+    names: UniqueNames | None = None
+    types: ArrayEnum | None = None
     initial_values: Array1D = np.array(0.0)
     lower_bounds: Array1D = np.array(-np.inf)
     upper_bounds: Array1D = np.array(np.inf)
-    offsets: Optional[Array1D] = None
-    scales: Optional[Array1D] = None
-    indices: Optional[ArrayIndices] = None
+    offsets: Array1D | None = None
+    scales: Array1D | None = None
+    indices: ArrayIndices | None = None
     delimiters: str = Field(":", min_length=0)
 
     model_config = ConfigDict(
@@ -153,7 +153,7 @@ class VariablesConfig(ImmutableBaseModel):
 
         return self
 
-    def get_formatted_names(self) -> Optional[tuple[str, ...]]:
+    def get_formatted_names(self) -> tuple[str, ...] | None:
         """Return string representations of the variable names.
 
         This method converts the variable names to a tuple of strings. Each name

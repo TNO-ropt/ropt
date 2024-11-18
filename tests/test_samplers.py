@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pytest
@@ -48,7 +48,7 @@ class MockedSampler(Sampler):
         self,
         enopt_config: EnOptConfig,
         sampler_index: int,
-        variable_indices: Optional[NDArray[np.intc]],
+        variable_indices: NDArray[np.intc] | None,
         _: Generator,
     ) -> None:
         self._config = enopt_config
@@ -90,7 +90,7 @@ class MockedSamplerPlugin(SamplerPlugin):
         self,
         enopt_config: EnOptConfig,
         sampler_index: int,
-        variable_indices: Optional[NDArray[np.intc]],
+        variable_indices: NDArray[np.intc] | None,
         rng: Generator,
     ) -> MockedSampler:
         return MockedSampler(enopt_config, sampler_index, variable_indices, rng)

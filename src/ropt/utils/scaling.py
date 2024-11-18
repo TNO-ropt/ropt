@@ -1,7 +1,5 @@
 """Functions for scaling variables and functions."""
 
-from typing import Optional
-
 import numpy as np
 from numpy.typing import NDArray
 
@@ -10,7 +8,7 @@ from ropt.config.enopt import EnOptConfig
 
 def scale_variables(
     config: EnOptConfig, variables: NDArray[np.float64], axis: int
-) -> Optional[NDArray[np.float64]]:
+) -> NDArray[np.float64] | None:
     """Scale variables.
 
     Given an ensemble optimizer configuration object and a vector of variables,
@@ -44,7 +42,7 @@ def scale_back_variables(
     axis: int,
     *,
     correct_offsets: bool = True,
-) -> Optional[NDArray[np.float64]]:
+) -> NDArray[np.float64] | None:
     """Scale back variables.
 
     Given an ensemble optimizer configuration object and a vector of scaled
@@ -78,9 +76,9 @@ def scale_back_variables(
 def scale_objectives(
     config: EnOptConfig,
     objectives: NDArray[np.float64],
-    scales: Optional[NDArray[np.float64]],
+    scales: NDArray[np.float64] | None,
     axis: int,
-) -> Optional[NDArray[np.float64]]:
+) -> NDArray[np.float64] | None:
     """Scale objective function values.
 
     Given an ensemble optimizer configuration object, this function scales the
@@ -112,10 +110,10 @@ def scale_objectives(
 
 def scale_constraints(
     config: EnOptConfig,
-    constraints: Optional[NDArray[np.float64]],
-    scales: Optional[NDArray[np.float64]],
+    constraints: NDArray[np.float64] | None,
+    scales: NDArray[np.float64] | None,
     axis: int,
-) -> Optional[NDArray[np.float64]]:
+) -> NDArray[np.float64] | None:
     """Scale constraint function values.
 
     Given an ensemble optimizer configuration object, this function scales the

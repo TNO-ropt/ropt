@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import fields
-from typing import TYPE_CHECKING, Any, Iterable, Optional, cast
+from typing import TYPE_CHECKING, Any, Iterable, cast
 
 import pandas as pd
 
@@ -18,9 +18,9 @@ def _to_dataframe(  # noqa: PLR0913
     result_field: ResultField,
     plan_id: tuple[int, ...],
     result_id: int | tuple[int, ...],
-    batch_id: Optional[int],
-    select: Optional[Iterable[str]],
-    unstack: Optional[Iterable[ResultAxisName]],
+    batch_id: int | None,
+    select: Iterable[str] | None,
+    unstack: Iterable[ResultAxisName] | None,
 ) -> pd.DataFrame:
     if select is None:
         select = (field.name for field in fields(result_field))
@@ -47,9 +47,9 @@ def _to_series(  # noqa: PLR0913
     result_field: ResultField,
     plan_id: tuple[int, ...],
     result_id: int | tuple[int, ...],
-    batch_id: Optional[int],
+    batch_id: int | None,
     field: str,
-) -> Optional[pd.Series[Any]]:
+) -> pd.Series[Any] | None:
     try:
         data = getattr(result_field, field)
     except AttributeError as exc:

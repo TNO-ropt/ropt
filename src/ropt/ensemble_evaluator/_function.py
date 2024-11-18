@@ -1,5 +1,3 @@
-from typing import Optional
-
 import numpy as np
 from numpy.typing import NDArray
 
@@ -10,9 +8,9 @@ from ropt.plugins.function_transform.base import FunctionTransform
 def _calculate_transformed_functions(  # noqa: PLR0913
     config: EnOptConfig,
     function_transforms: list[FunctionTransform],
-    transform_indices: Optional[NDArray[np.intc]],
+    transform_indices: NDArray[np.intc] | None,
     functions: NDArray[np.float64],
-    realization_weights: Optional[NDArray[np.float64]],
+    realization_weights: NDArray[np.float64] | None,
     failed_realizations: NDArray[np.bool_],
 ) -> NDArray[np.float64]:
     result: NDArray[np.float64] = np.empty(functions.shape[-1], dtype=np.float64)
@@ -39,7 +37,7 @@ def _calculate_transformed_objectives(
     config: EnOptConfig,
     function_transforms: list[FunctionTransform],
     functions: NDArray[np.float64],
-    realization_weights: Optional[NDArray[np.float64]],
+    realization_weights: NDArray[np.float64] | None,
     failed_realizations: NDArray[np.bool_],
 ) -> NDArray[np.float64]:
     return _calculate_transformed_functions(
@@ -55,10 +53,10 @@ def _calculate_transformed_objectives(
 def _calculate_transformed_constraints(
     config: EnOptConfig,
     function_transforms: list[FunctionTransform],
-    constraints: Optional[NDArray[np.float64]],
-    realization_weights: Optional[NDArray[np.float64]],
+    constraints: NDArray[np.float64] | None,
+    realization_weights: NDArray[np.float64] | None,
     failed_realizations: NDArray[np.bool_],
-) -> Optional[NDArray[np.float64]]:
+) -> NDArray[np.float64] | None:
     if constraints is None:
         return None
     assert config.nonlinear_constraints is not None

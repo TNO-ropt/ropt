@@ -1,6 +1,6 @@
 """This plugin contains realization filters that are installed by default."""
 
-from typing import Annotated, Optional, Tuple, cast
+from typing import Annotated, Tuple, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -190,7 +190,7 @@ class DefaultRealizationFilter(RealizationFilter):
     def get_realization_weights(  # D107
         self,
         objectives: NDArray[np.float64],
-        constraints: Optional[NDArray[np.float64]],
+        constraints: NDArray[np.float64] | None,
     ) -> NDArray[np.float64]:
         """Return the updated weights of the realizations.
 
@@ -346,7 +346,7 @@ def _get_cvar_weights_from_percentile(
     return weights
 
 
-def _get_index(item: str | int, names: Optional[Tuple[str, ...]]) -> int:
+def _get_index(item: str | int, names: Tuple[str, ...] | None) -> int:
     if names is None:
         if isinstance(item, str):
             msg = "functions and constraints with no names must be referred to by index"
@@ -360,7 +360,7 @@ def _get_index(item: str | int, names: Optional[Tuple[str, ...]]) -> int:
 
 
 def _get_indices(
-    items: list[str | int], names: Optional[Tuple[str, ...]]
+    items: list[str | int], names: Tuple[str, ...] | None
 ) -> Tuple[int, ...]:
     return tuple(_get_index(item, names) for item in items)
 

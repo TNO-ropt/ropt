@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from ropt.enums import ResultAxisName
 
@@ -38,7 +38,7 @@ class Realizations(ResultField):
             "__axes__": (ResultAxisName.REALIZATION,),
         },
     )
-    objective_weights: Optional[NDArray[np.float64]] = field(
+    objective_weights: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (
@@ -47,7 +47,7 @@ class Realizations(ResultField):
             ),
         },
     )
-    constraint_weights: Optional[NDArray[np.float64]] = field(
+    constraint_weights: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (

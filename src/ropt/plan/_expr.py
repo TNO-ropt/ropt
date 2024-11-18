@@ -6,7 +6,7 @@ import ast
 import copy
 import re
 from numbers import Number
-from typing import Any, Callable, Dict, Final, List, Mapping, Optional
+from typing import Any, Callable, Dict, Final, List, Mapping
 
 import numpy as np
 
@@ -57,7 +57,7 @@ class ExpressionEvaluator:
         """
         self._functions = copy.deepcopy(_BUILTIN_FUNCTIONS)
 
-    def add_functions(self, functions: Optional[dict[str, Callable[..., Any]]]) -> None:
+    def add_functions(self, functions: dict[str, Callable[..., Any]] | None) -> None:
         """Add functions to the evaluator.
 
         Args:

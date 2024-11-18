@@ -13,7 +13,7 @@ import sys
 import time
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import TYPE_CHECKING, Any, Final, Optional, Self
+from typing import TYPE_CHECKING, Any, Final, Self
 
 import numpy as np
 
@@ -64,7 +64,7 @@ class ExternalOptimizer(Optimizer):
         """
         self._config = config
         self._optimizer_callback = optimizer_callback
-        self._process_pid: Optional[int] = None
+        self._process_pid: int | None = None
 
         optimizer: Optimizer = (
             PluginManager()
@@ -98,8 +98,8 @@ class ExternalOptimizer(Optimizer):
                     msg = "The plugin runner binary was not found"
                     raise ConfigError(msg) from exc
 
-                answer: Optional[str | list[Any] | dict[str, Any]] = None
-                exception: Optional[BaseException] = None
+                answer: str | list[Any] | dict[str, Any] | None = None
+                exception: BaseException | None = None
 
                 while process.poll() is None:
                     if answer is None:
@@ -149,7 +149,7 @@ class ExternalOptimizer(Optimizer):
 
     def _handle_request(
         self, comm: _JSONPipeCommunicator, initial_values: NDArray[np.float64]
-    ) -> Optional[str | list[Any] | dict[str, Any]]:
+    ) -> str | list[Any] | dict[str, Any] | None:
         request = comm.read()
 
         if request == "config":
@@ -301,7 +301,7 @@ class _JSONPipeCommunicator:
         self._timeout = timeout
 
         self._read_fd: int
-        self._write_fd: Optional[int]
+        self._write_fd: int | None
         self._selector: selectors.BaseSelector
 
         if not read_pipe.exists():
@@ -322,7 +322,7 @@ class _JSONPipeCommunicator:
         if self._write_fd is not None:
             os.close(self._write_fd)
 
-    def read(self) -> Optional[str | list[Any] | dict[str, Any]]:
+    def read(self) -> str | list[Any] | dict[str, Any] | None:
         events = self._selector.select(timeout=self._timeout)
         for _, mask in events:
             if mask & selectors.EVENT_READ:

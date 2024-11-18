@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Optional, Set
+from typing import TYPE_CHECKING, Set
 
 if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
@@ -34,7 +34,7 @@ class Event:
 
     event_type: EventType
     config: EnOptConfig
-    results: Optional[tuple[Results, ...]] = None
-    exit_code: Optional[OptimizerExitCode] = None
+    results: tuple[Results, ...] | None = None
+    exit_code: OptimizerExitCode | None = None
     tags: Set[str] = field(default_factory=set)
     plan_id: tuple[int, ...] = field(default_factory=tuple)

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import pytest
@@ -204,8 +204,8 @@ def test_constraint_auto_scale(
 def test_variables_scale(
     enopt_config: Any,
     evaluator: Any,
-    offsets: Optional[NDArray[np.float64]],
-    scales: Optional[NDArray[np.float64]],
+    offsets: NDArray[np.float64] | None,
+    scales: NDArray[np.float64] | None,
 ) -> None:
     initial_values = np.array(enopt_config["variables"]["initial_values"])
     lower_bounds = np.array([-2.0, -np.inf, -3.0])

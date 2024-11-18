@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import numpy as np  # noqa: TCH002
 
@@ -42,23 +42,23 @@ class NonlinearConstraints(ResultField):
         scaled_violations: Optional scaled violations of the nonlinear constraints.
     """
 
-    values: Optional[NDArray[np.float64]] = field(
+    values: NDArray[np.float64] | None = field(
         default=None,
         metadata={"__axes__": (ResultAxisName.NONLINEAR_CONSTRAINT,)},
     )
-    violations: Optional[NDArray[np.float64]] = field(
+    violations: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.NONLINEAR_CONSTRAINT,),
         },
     )
-    scaled_values: Optional[NDArray[np.float64]] = field(
+    scaled_values: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.NONLINEAR_CONSTRAINT,),
         },
     )
-    scaled_violations: Optional[NDArray[np.float64]] = field(
+    scaled_violations: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.NONLINEAR_CONSTRAINT,),
@@ -79,9 +79,9 @@ class NonlinearConstraints(ResultField):
     def create(
         cls,
         config: EnOptConfig,
-        functions: Optional[Functions],
-        constraint_auto_scales: Optional[Optional[NDArray[np.float64]]],
-    ) -> Optional[NonlinearConstraints]:
+        functions: Functions | None,
+        constraint_auto_scales: NDArray[np.float64] | None,
+    ) -> NonlinearConstraints | None:
         """Add constraint information.
 
         This factory function creates a `NonlinearConstraints` object with the
@@ -100,8 +100,8 @@ class NonlinearConstraints(ResultField):
             return None
 
         def _get_scaled(
-            unscaled: Optional[NDArray[np.float64]],
-        ) -> Optional[NDArray[np.float64]]:
+            unscaled: NDArray[np.float64] | None,
+        ) -> NDArray[np.float64] | None:
             if unscaled is not None:
                 assert config is not None
                 return utils.scaling.scale_constraints(

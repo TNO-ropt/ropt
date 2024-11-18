@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from itertools import chain, count
-from typing import TYPE_CHECKING, Any, Iterator, Optional
+from typing import TYPE_CHECKING, Any, Iterator
 
 if TYPE_CHECKING:
     from ropt.config.plan import PlanConfig, PlanStepConfig
@@ -21,8 +21,8 @@ class Plan:
         self,
         config: PlanConfig,
         optimizer_context: OptimizerContext,
-        parent: Optional[Plan] = None,
-        plan_id: Optional[tuple[int, ...]] = None,
+        parent: Plan | None = None,
+        plan_id: tuple[int, ...] | None = None,
     ) -> None:
         """Initialize a plan object.
 

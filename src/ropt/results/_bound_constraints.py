@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -47,49 +47,49 @@ class BoundConstraints(ResultField):
         scaled_upper_violations: Optional scaled upper bound violations.
     """
 
-    lower_values: Optional[NDArray[np.float64]] = field(
+    lower_values: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.VARIABLE,),
         },
     )
-    lower_violations: Optional[NDArray[np.float64]] = field(
+    lower_violations: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.VARIABLE,),
         },
     )
-    upper_values: Optional[NDArray[np.float64]] = field(
+    upper_values: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.VARIABLE,),
         },
     )
-    upper_violations: Optional[NDArray[np.float64]] = field(
+    upper_violations: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.VARIABLE,),
         },
     )
-    scaled_lower_values: Optional[NDArray[np.float64]] = field(
+    scaled_lower_values: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.VARIABLE,),
         },
     )
-    scaled_lower_violations: Optional[NDArray[np.float64]] = field(
+    scaled_lower_violations: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.VARIABLE,),
         },
     )
-    scaled_upper_values: Optional[NDArray[np.float64]] = field(
+    scaled_upper_values: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.VARIABLE,),
         },
     )
-    scaled_upper_violations: Optional[NDArray[np.float64]] = field(
+    scaled_upper_violations: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.VARIABLE,),
@@ -113,7 +113,7 @@ class BoundConstraints(ResultField):
     @classmethod
     def create(
         cls, config: EnOptConfig, evaluations: FunctionEvaluations
-    ) -> Optional[BoundConstraints]:
+    ) -> BoundConstraints | None:
         """Add constraint information.
 
         This factory function creates a `BoundConstraints` object with the
@@ -129,8 +129,8 @@ class BoundConstraints(ResultField):
         """
 
         def _get_unscaled(
-            scaled: Optional[NDArray[np.float64]],
-        ) -> Optional[NDArray[np.float64]]:
+            scaled: NDArray[np.float64] | None,
+        ) -> NDArray[np.float64] | None:
             unscaled = None
             if scaled is not None:
                 assert config is not None

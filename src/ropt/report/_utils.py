@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import fields
 from importlib.util import find_spec
-from typing import TYPE_CHECKING, Any, Final, Optional, Set
+from typing import TYPE_CHECKING, Any, Final, Set
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -48,7 +48,7 @@ def _add_metadata(
     return data_frame
 
 
-def _get_value(data: dict[str, Any], keys: list[str]) -> Optional[Any]:  # noqa: ANN401
+def _get_value(data: dict[str, Any], keys: list[str]) -> Any | None:  # noqa: ANN401
     for key in keys:
         if isinstance(data, dict):
             if key not in data:
@@ -59,9 +59,7 @@ def _get_value(data: dict[str, Any], keys: list[str]) -> Optional[Any]:  # noqa:
     return data
 
 
-def _write_table(
-    table: pd.DataFrame, path: Path, min_header_len: Optional[int]
-) -> None:
+def _write_table(table: pd.DataFrame, path: Path, min_header_len: int | None) -> None:
     if not table.empty:
         data = _align_column_names(table, min_header_len)
         table_data = {str(column): data[column] for column in data}
@@ -101,7 +99,7 @@ def _extract_columns(data_frame: pd.DataFrame, mapping: dict[str, str]) -> pd.Da
 
 
 def _align_column_names(
-    data_frame: pd.DataFrame, min_header_len: Optional[int]
+    data_frame: pd.DataFrame, min_header_len: int | None
 ) -> pd.DataFrame:
     max_lines = max(len(str(column).split("\n")) for column in data_frame.columns)
     if min_header_len is not None and max_lines < min_header_len:

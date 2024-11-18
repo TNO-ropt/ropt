@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from ropt import utils
 from ropt.enums import ResultAxisName
@@ -77,7 +77,7 @@ class GradientEvaluations(ResultField):
             ),
         },
     )
-    perturbed_constraints: Optional[NDArray[np.float64]] = field(
+    perturbed_constraints: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (
@@ -87,13 +87,13 @@ class GradientEvaluations(ResultField):
             ),
         },
     )
-    scaled_variables: Optional[NDArray[np.float64]] = field(
+    scaled_variables: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.VARIABLE,),
         },
     )
-    scaled_perturbed_variables: Optional[NDArray[np.float64]] = field(
+    scaled_perturbed_variables: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (
@@ -103,7 +103,7 @@ class GradientEvaluations(ResultField):
             ),
         },
     )
-    scaled_perturbed_objectives: Optional[NDArray[np.float64]] = field(
+    scaled_perturbed_objectives: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (
@@ -113,7 +113,7 @@ class GradientEvaluations(ResultField):
             ),
         },
     )
-    scaled_perturbed_constraints: Optional[NDArray[np.float64]] = field(
+    scaled_perturbed_constraints: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (
@@ -123,7 +123,7 @@ class GradientEvaluations(ResultField):
             ),
         },
     )
-    perturbed_evaluation_ids: Optional[NDArray[np.intc]] = field(
+    perturbed_evaluation_ids: NDArray[np.intc] | None = field(
         default=None,
         metadata={
             "__axes__": (
@@ -161,10 +161,10 @@ class GradientEvaluations(ResultField):
         variables: NDArray[np.float64],
         perturbed_variables: NDArray[np.float64],
         perturbed_objectives: NDArray[np.float64],
-        perturbed_constraints: Optional[NDArray[np.float64]] = None,
-        objective_auto_scales: Optional[NDArray[np.float64]] = None,
-        constraint_auto_scales: Optional[NDArray[np.float64]] = None,
-        perturbed_evaluation_ids: Optional[NDArray[np.intc]] = None,
+        perturbed_constraints: NDArray[np.float64] | None = None,
+        objective_auto_scales: NDArray[np.float64] | None = None,
+        constraint_auto_scales: NDArray[np.float64] | None = None,
+        perturbed_evaluation_ids: NDArray[np.intc] | None = None,
     ) -> GradientEvaluations:
         """Create a FunctionEvaluations object with the given information.
 

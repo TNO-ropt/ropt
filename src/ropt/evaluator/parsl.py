@@ -11,7 +11,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 from time import sleep
-from typing import TYPE_CHECKING, Any, Callable, Optional
+from typing import TYPE_CHECKING, Any, Callable
 
 import parsl
 from parsl.config import Config
@@ -58,9 +58,9 @@ class Task(ConcurrentTask):
         exception: Any exception that may have occurred,  None otherwise.
     """
 
-    future: Optional[AppFuture]
+    future: AppFuture | None
     state: State = State.UNKNOWN
-    exception: Optional[BaseException] = None
+    exception: BaseException | None = None
 
 
 class ParslEvaluator(ConcurrentEvaluator):
@@ -94,7 +94,7 @@ class ParslEvaluator(ConcurrentEvaluator):
         self._variables: NDArray[np.float64]
         self._jobs: dict[int, list[Task]] = {}
         self._function = function
-        self._monitor: Optional[Callable[..., Any]] = None
+        self._monitor: Callable[..., Any] | None = None
         self._executor: ThreadPoolExecutor | HighThroughputExecutor
         self._retries = 0
         self._worker_restart = 0
@@ -123,8 +123,8 @@ class ParslEvaluator(ConcurrentEvaluator):
 
     def with_htex(
         self,
-        provider: Optional[ExecutionProvider],
-        htex_kwargs: Optional[dict[str, Any]] = None,
+        provider: ExecutionProvider | None,
+        htex_kwargs: dict[str, Any] | None = None,
         retries: int = 0,
         worker_restart: int = 0,
     ) -> ParslEvaluator:
@@ -156,7 +156,7 @@ class ParslEvaluator(ConcurrentEvaluator):
         self._htex_kwargs = htex_kwargs
         return self
 
-    def with_monitor(self, monitor: Optional[Callable[..., Any]] = None) -> Self:
+    def with_monitor(self, monitor: Callable[..., Any] | None = None) -> Self:
         """Set the monitor callback.
 
         Args:
@@ -174,7 +174,7 @@ class ParslEvaluator(ConcurrentEvaluator):
         job_id: int,
         variables: NDArray[np.float64],
         context: EvaluatorContext,
-    ) -> Optional[ConcurrentTask]:
+    ) -> ConcurrentTask | None:
         """Launch the parsl task.
 
         See the [ropt.evaluator.ConcurrentEvaluator][] abstract base class.

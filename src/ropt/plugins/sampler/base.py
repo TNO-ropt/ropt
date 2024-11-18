@@ -9,7 +9,7 @@ installed as a plugin.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from ropt.plugins.base import Plugin
 
@@ -36,7 +36,7 @@ class Sampler(ABC):
         self,
         enopt_config: EnOptConfig,
         sampler_index: int,
-        variable_indices: Optional[NDArray[np.intc]],
+        variable_indices: NDArray[np.intc] | None,
         rng: Generator,
     ) -> None:
         """Initialize the sampler object.
@@ -99,7 +99,7 @@ class SamplerPlugin(Plugin):
         self,
         enopt_config: EnOptConfig,
         sampler_index: int,
-        variable_indices: Optional[NDArray[np.intc]],
+        variable_indices: NDArray[np.intc] | None,
         rng: Generator,
     ) -> Sampler:
         """Create a sampler.

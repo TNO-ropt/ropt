@@ -2,7 +2,7 @@
 
 import copy
 import warnings
-from typing import Any, Final, Optional, Set
+from typing import Any, Final, Set
 
 import numpy as np
 from numpy.random import Generator
@@ -73,7 +73,7 @@ class SciPySampler(Sampler):
         self,
         enopt_config: EnOptConfig,
         sampler_index: int,
-        variable_indices: Optional[NDArray[np.intc]],
+        variable_indices: NDArray[np.intc] | None,
         rng: Generator,
     ) -> None:
         """Initialize the sampler object.
@@ -202,7 +202,7 @@ class SciPySamplerPlugin(SamplerPlugin):
         self,
         enopt_config: EnOptConfig,
         sampler_index: int,
-        variable_indices: Optional[NDArray[np.intc]],
+        variable_indices: NDArray[np.intc] | None,
         rng: Generator,
     ) -> SciPySampler:
         """Initialize the sampler plugin.

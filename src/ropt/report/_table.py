@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterable, Literal, Optional
+from typing import TYPE_CHECKING, Iterable, Literal
 
 from ._data_frame import ResultsDataFrame
 from ._utils import _HAVE_PANDAS, _HAVE_TABULATE, _extract_columns, _write_table
@@ -31,7 +31,7 @@ class ResultsTable(ResultsDataFrame):
         path: Path,
         *,
         table_type: Literal["functions", "gradients"] = "functions",
-        min_header_len: Optional[int] = None,
+        min_header_len: int | None = None,
     ) -> None:
         """Initialize a results table.
 

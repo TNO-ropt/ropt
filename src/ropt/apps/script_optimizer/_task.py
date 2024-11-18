@@ -2,9 +2,6 @@
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import (
-    Optional,
-)
 
 import numpy as np
 from numpy.typing import NDArray
@@ -22,8 +19,8 @@ class ScriptTask(Task):
     constraint_paths: tuple[Path, ...] = field(default_factory=tuple)
     logged: bool = False
     realization: int = 0
-    _objectives: Optional[NDArray[np.float64]] = None
-    _constraints: Optional[NDArray[np.float64]] = None
+    _objectives: NDArray[np.float64] | None = None
+    _constraints: NDArray[np.float64] | None = None
 
     def _read_file(self, path: Path) -> float:
         try:
@@ -43,7 +40,7 @@ class ScriptTask(Task):
             for idx, path in enumerate(self.constraint_paths):
                 self._constraints[idx] = self._read_file(path)
 
-    def get_objectives(self) -> Optional[NDArray[np.float64]]:
+    def get_objectives(self) -> NDArray[np.float64] | None:
         """Get the objective values.
 
         Returns:
@@ -52,7 +49,7 @@ class ScriptTask(Task):
         self._read_results()
         return self._objectives
 
-    def get_constraints(self) -> Optional[NDArray[np.float64]]:
+    def get_constraints(self) -> NDArray[np.float64] | None:
         """Get the constraint values.
 
         Returns:

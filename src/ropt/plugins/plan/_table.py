@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path  # noqa: TCH003
-from typing import TYPE_CHECKING, Literal, Optional
+from typing import TYPE_CHECKING, Literal
 
 from pydantic import BaseModel, ConfigDict
 
@@ -63,7 +63,7 @@ class DefaultTableHandler(ResultHandler):
         columns: dict[str, str]
         path: Path
         table_type: Literal["functions", "gradients"] = "functions"
-        min_header_len: Optional[int] = None
+        min_header_len: int | None = None
         maximize: bool = False
 
         model_config = ConfigDict(

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path  # noqa: TCH003
-from typing import Any, Optional, Self
+from typing import Any, Self
 
 from pydantic import (
     ConfigDict,
@@ -68,14 +68,14 @@ class OptimizerConfig(ImmutableBaseModel):
     """
 
     method: str = "scipy/default"
-    max_iterations: Optional[PositiveInt] = None
-    max_functions: Optional[PositiveInt] = None
-    tolerance: Optional[NonNegativeFloat] = None
+    max_iterations: PositiveInt | None = None
+    max_functions: PositiveInt | None = None
+    tolerance: NonNegativeFloat | None = None
     speculative: bool = False
     split_evaluations: bool = False
     parallel: bool = False
-    output_dir: Optional[Path] = None
-    options: Optional[dict[str, Any] | list[str]] = None
+    output_dir: Path | None = None
+    options: dict[str, Any] | None | list[str] = None
 
     model_config = ConfigDict(
         extra="forbid",

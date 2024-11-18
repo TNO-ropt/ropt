@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Protocol
+from typing import TYPE_CHECKING, Protocol
 
 import numpy as np
 
@@ -27,7 +27,7 @@ class SignalEvaluationCallback(Protocol):
     handling or tracking of evaluation events.
     """
 
-    def __call__(self, results: Optional[tuple[Results, ...]] = None, /) -> None:
+    def __call__(self, results: tuple[Results, ...] | None = None, /) -> None:
         """Callback protocol for signaling the start and end of evaluations.
 
         When provided to an ensemble optimizer, this callback is invoked both
@@ -47,7 +47,7 @@ class NestedOptimizerCallback(Protocol):
 
     def __call__(
         self, variables: NDArray[np.float64], /
-    ) -> tuple[Optional[FunctionResults], bool]:
+    ) -> tuple[FunctionResults | None, bool]:
         """Callback protocol for executing a nested optimization.
 
         This function is called during each function evaluation within an
@@ -73,8 +73,8 @@ class EnsembleOptimizer:
         enopt_config: EnOptConfig,
         ensemble_evaluator: EnsembleEvaluator,
         plugin_manager: PluginManager,
-        signal_evaluation: Optional[SignalEvaluationCallback] = None,
-        nested_optimizer: Optional[NestedOptimizerCallback] = None,
+        signal_evaluation: SignalEvaluationCallback | None = None,
+        nested_optimizer: NestedOptimizerCallback | None = None,
     ) -> None:
         """Initialize the ensemble optimizer class.
 
@@ -287,7 +287,7 @@ class EnsembleOptimizer:
         return results
 
     @staticmethod
-    def _functions_from_results(functions: Optional[Functions]) -> NDArray[np.float64]:
+    def _functions_from_results(functions: Functions | None) -> NDArray[np.float64]:
         assert functions is not None
         return (
             np.array(functions.weighted_objective, ndmin=1)
@@ -297,7 +297,7 @@ class EnsembleOptimizer:
 
     @staticmethod
     def _gradients_from_results(
-        gradients: Optional[Gradients], variable_indices: Optional[NDArray[np.intc]]
+        gradients: Gradients | None, variable_indices: NDArray[np.intc] | None
     ) -> NDArray[np.float64]:
         assert gradients is not None
         weighted_objective_gradient = (
@@ -329,7 +329,7 @@ class EnsembleOptimizer:
 
     def _get_scale_parameters(
         self,
-    ) -> tuple[Optional[NDArray[np.float64]], Optional[NDArray[np.float64]]]:
+    ) -> tuple[NDArray[np.float64] | None, NDArray[np.float64] | None]:
         if self._enopt_config.nonlinear_constraints is not None:
             offsets = self._enopt_config.nonlinear_constraints.rhs_values
             scales = self._get_constraint_scales(self._enopt_config)
@@ -344,8 +344,8 @@ class EnsembleOptimizer:
     def _scale_constraints(
         self,
         functions: NDArray[np.float64],
-        scales: Optional[NDArray[np.float64]],
-        offsets: Optional[NDArray[np.float64]] = None,
+        scales: NDArray[np.float64] | None,
+        offsets: NDArray[np.float64] | None = None,
     ) -> NDArray[np.float64]:
         if functions.size > 1:
             if offsets is not None:

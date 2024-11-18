@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict
@@ -76,7 +76,7 @@ class DefaultEvaluatorStep(PlanStep):
 
         config: str
         tags: ItemOrSet[str] = set()
-        values: Optional[str | Array2D] = None
+        values: str | Array2D | None = None
 
         model_config = ConfigDict(
             extra="forbid",

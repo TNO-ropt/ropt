@@ -7,7 +7,7 @@ from collections import Counter
 from collections.abc import Sequence as AbstractSequence
 from collections.abc import Set as AbstractSet
 from enum import IntEnum
-from typing import Any, Optional, Sequence, Set, Type, TypeVar, cast
+from typing import Any, Sequence, Set, Type, TypeVar, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -104,39 +104,39 @@ def check_enum_values(value: NDArray[np.ubyte], enum_type: Type[IntEnum]) -> Non
         raise ValueError(msg)
 
 
-def _convert_1d_array(array: Optional[ArrayLike]) -> Optional[NDArray[np.float64]]:
+def _convert_1d_array(array: ArrayLike | None) -> NDArray[np.float64] | None:
     if array is None:
         return array
     return immutable_array(array, dtype=np.float64, ndmin=1)
 
 
-def _convert_1d_array_intc(array: Optional[ArrayLike]) -> Optional[NDArray[np.intc]]:
+def _convert_1d_array_intc(array: ArrayLike | None) -> NDArray[np.intc] | None:
     if array is None:
         return array
     return immutable_array(array, dtype=np.intc, ndmin=1)
 
 
 def _convert_1d_array_bool(
-    array: Optional["ArrayLike"],
-) -> Optional[NDArray[np.bool_]]:
+    array: ArrayLike | None,
+) -> NDArray[np.bool_] | None:
     if array is None:
         return array
     return immutable_array(array, dtype=np.bool_, ndmin=1)
 
 
-def _convert_2d_array(array: Optional[ArrayLike]) -> Optional[NDArray[np.float64]]:
+def _convert_2d_array(array: ArrayLike | None) -> NDArray[np.float64] | None:
     if array is None:
         return array
     return immutable_array(array, dtype=np.float64, ndmin=2)
 
 
-def _convert_enum_array(array: Optional[ArrayLike]) -> Optional[NDArray[np.ubyte]]:
+def _convert_enum_array(array: ArrayLike | None) -> NDArray[np.ubyte] | None:
     if array is None:
         return array
     return immutable_array(array, dtype=np.ubyte, ndmin=1)
 
 
-def _convert_indices(array: Optional[ArrayLike]) -> Optional[NDArray[np.intc]]:
+def _convert_indices(array: ArrayLike | None) -> NDArray[np.intc] | None:
     if array is None:
         return array
     return cast(
@@ -145,7 +145,7 @@ def _convert_indices(array: Optional[ArrayLike]) -> Optional[NDArray[np.intc]]:
     )
 
 
-def _check_duplicates(names: Optional[tuple[Any, ...]]) -> Optional[tuple[Any, ...]]:
+def _check_duplicates(names: tuple[Any, ...] | None) -> tuple[Any, ...] | None:
     if names is None:
         return None
     converted_names = tuple(

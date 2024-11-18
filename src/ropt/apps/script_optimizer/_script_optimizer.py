@@ -14,7 +14,6 @@ from typing import (
     Any,
     Callable,
     DefaultDict,
-    Optional,
     Self,
     Sequence,
     TextIO,
@@ -81,7 +80,7 @@ class ScriptOptimizer:
         self._plan_config = plan
         self._tasks = tasks
         self._status: dict[int, Any] = {}
-        self._optimal_result: Optional[FunctionResults] = None
+        self._optimal_result: FunctionResults | None = None
         self._observers: list[tuple[EventType, Callable[[Event], None]]] = []
 
     def _set_logger(self) -> None:
@@ -299,8 +298,8 @@ class ScriptOptimizer:
 
     def run(
         self,
-        provider: Optional[ExecutionProvider] = None,
-        evaluator_config: Optional[dict[str, Any] | ScriptEvaluatorConfig] = None,
+        provider: ExecutionProvider | None = None,
+        evaluator_config: dict[str, Any] | ScriptEvaluatorConfig | None = None,
     ) -> Plan:
         """Run the optimization."""
         cwd = Path.cwd()

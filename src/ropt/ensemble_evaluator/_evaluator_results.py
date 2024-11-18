@@ -1,6 +1,6 @@
 from dataclasses import InitVar, dataclass
 from itertools import zip_longest
-from typing import Generator, Optional
+from typing import Generator
 
 import numpy as np
 from numpy.typing import NDArray
@@ -11,10 +11,10 @@ from ropt.evaluator import Evaluator, EvaluatorContext
 
 @dataclass(slots=True)
 class _FunctionEvaluatorResults:
-    batch_id: Optional[int]
+    batch_id: int | None
     objectives: NDArray[np.float64]
-    constraints: Optional[NDArray[np.float64]]
-    evaluation_ids: Optional[NDArray[np.intc]]
+    constraints: NDArray[np.float64] | None
+    evaluation_ids: NDArray[np.intc] | None
 
     def __post_init__(self) -> None:
         self.objectives, self.constraints = _propagate_nan_values(
@@ -24,10 +24,10 @@ class _FunctionEvaluatorResults:
 
 @dataclass(slots=True)
 class _GradientEvaluatorResults:
-    batch_id: Optional[int]
+    batch_id: int | None
     perturbed_objectives: NDArray[np.float64]
-    perturbed_constraints: Optional[NDArray[np.float64]]
-    perturbed_evaluation_ids: Optional[NDArray[np.intc]]
+    perturbed_constraints: NDArray[np.float64] | None
+    perturbed_evaluation_ids: NDArray[np.intc] | None
     realization_count: InitVar[int]
     perturbation_count: InitVar[int]
 
@@ -52,8 +52,8 @@ class _GradientEvaluatorResults:
 
 def _propagate_nan_values(
     objective_results: NDArray[np.float64],
-    constraint_results: Optional[NDArray[np.float64]],
-) -> tuple[NDArray[np.float64], Optional[NDArray[np.float64]]]:
+    constraint_results: NDArray[np.float64] | None,
+) -> tuple[NDArray[np.float64], NDArray[np.float64] | None]:
     failures = None
     if objective_results is not None:
         failures = np.logical_or.reduce(np.isnan(objective_results), axis=-1)
@@ -77,9 +77,9 @@ def _propagate_nan_values(
 def _get_active_realizations(
     config: EnOptConfig,
     *,
-    objective_weights: Optional[NDArray[np.float64]] = None,
-    constraint_weights: Optional[NDArray[np.float64]] = None,
-) -> tuple[Optional[NDArray[np.bool_]], Optional[NDArray[np.bool_]]]:
+    objective_weights: NDArray[np.float64] | None = None,
+    constraint_weights: NDArray[np.float64] | None = None,
+) -> tuple[NDArray[np.bool_] | None, NDArray[np.bool_] | None]:
     if objective_weights is None:
         active_realizations = np.abs(config.realizations.weights) > 0
         if np.all(active_realizations):
@@ -111,8 +111,8 @@ def _get_function_results(
     config: EnOptConfig,
     evaluator: Evaluator,
     variables: NDArray[np.float64],
-    active_objectives: Optional[NDArray[np.bool_]],
-    active_constraints: Optional[NDArray[np.bool_]],
+    active_objectives: NDArray[np.bool_] | None,
+    active_constraints: NDArray[np.bool_] | None,
 ) -> Generator[tuple[int, _FunctionEvaluatorResults], None, None]:
     realization_num = config.realizations.weights.size
     context = EvaluatorContext(
@@ -157,8 +157,8 @@ def _get_gradient_results(
     config: EnOptConfig,
     evaluator: Evaluator,
     perturbed_variables: NDArray[np.float64],
-    active_objectives: Optional[NDArray[np.bool_]],
-    active_constraints: Optional[NDArray[np.bool_]],
+    active_objectives: NDArray[np.bool_] | None,
+    active_constraints: NDArray[np.bool_] | None,
 ) -> _GradientEvaluatorResults:
     realization_num = config.realizations.weights.size
     perturbation_num = config.gradient.number_of_perturbations
@@ -186,8 +186,8 @@ def _get_function_and_gradient_results(  # noqa: PLR0913
     evaluator: Evaluator,
     variables: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
-    active_objectives: Optional[NDArray[np.bool_]],
-    active_constraints: Optional[NDArray[np.bool_]],
+    active_objectives: NDArray[np.bool_] | None,
+    active_constraints: NDArray[np.bool_] | None,
 ) -> tuple[_FunctionEvaluatorResults, _GradientEvaluatorResults]:
     realization_num = config.realizations.weights.size
     perturbation_num = config.gradient.number_of_perturbations

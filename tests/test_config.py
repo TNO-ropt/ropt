@@ -1,5 +1,5 @@
 import copy
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 import numpy as np
 import pytest
@@ -617,7 +617,7 @@ def test_check_config_perturbations(enopt_config: Any) -> None:
 
 
 def test_check_config_min_success(enopt_config: Any) -> None:
-    def gen_config(pert_min: Optional[int], real_min: Optional[int]) -> dict[str, Any]:
+    def gen_config(pert_min: int | None, real_min: int | None) -> dict[str, Any]:
         config: dict[str, Any] = copy.deepcopy(enopt_config)
         config["realizations"] = {"weights": 4 * [1.0]}
         config["gradient"] = {}

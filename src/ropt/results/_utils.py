@@ -1,4 +1,4 @@
-from typing import Any, Optional, overload
+from typing import Any, overload
 
 import numpy as np
 from numpy.typing import NDArray
@@ -94,10 +94,10 @@ def _immutable_copy(data: NDArray[Any]) -> NDArray[Any]: ...
 
 
 @overload
-def _immutable_copy(data: Optional[NDArray[Any]]) -> Optional[NDArray[Any]]: ...
+def _immutable_copy(data: NDArray[Any] | None) -> NDArray[Any] | None: ...
 
 
-def _immutable_copy(data: Optional[NDArray[Any]]) -> Optional[NDArray[Any]]:
+def _immutable_copy(data: NDArray[Any] | None) -> NDArray[Any] | None:
     if data is not None:
         data = data.copy()
         data.setflags(write=False)

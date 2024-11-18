@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Optional, Self
+from typing import Self
 
 import numpy as np
 from pydantic import ConfigDict, model_validator
@@ -89,13 +89,13 @@ class NonlinearConstraintsConfig(ImmutableBaseModel):
         function_transforms: Optional function transform indices.
     """
 
-    names: Optional[UniqueNames] = None
+    names: UniqueNames | None = None
     rhs_values: Array1D
     scales: Array1D = np.array(1.0)
     auto_scale: Array1DBool = np.array([False])
     types: ArrayEnum
-    realization_filters: Optional[Array1DInt] = None
-    function_transforms: Optional[Array1DInt] = None
+    realization_filters: Array1DInt | None = None
+    function_transforms: Array1DInt | None = None
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, ConfigDict
 
@@ -44,7 +44,7 @@ class DefaultRepeatStep(PlanStep):
 
         iterations: int
         steps: list[PlanStepConfig]
-        var: Optional[str] = None
+        var: str | None = None
 
         model_config = ConfigDict(
             extra="forbid",

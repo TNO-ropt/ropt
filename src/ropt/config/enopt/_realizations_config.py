@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Optional, Self
+from typing import Self
 
 import numpy as np
 from pydantic import ConfigDict, NonNegativeInt, model_validator
@@ -57,9 +57,9 @@ class RealizationsConfig(ImmutableBaseModel):
                                  (default: equal to the number of realizations).
     """
 
-    names: Optional[UniqueNames] = None
+    names: UniqueNames | None = None
     weights: Array1D = np.array(1.0)
-    realization_min_success: Optional[NonNegativeInt] = None
+    realization_min_success: NonNegativeInt | None = None
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,

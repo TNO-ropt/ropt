@@ -5,7 +5,7 @@ pytest.importorskip("parsl")
 import os
 from dataclasses import dataclass
 from functools import partial
-from typing import Any, Callable, Optional, cast, no_type_check
+from typing import Any, Callable, cast, no_type_check
 
 import numpy as np
 from numpy.typing import NDArray
@@ -18,7 +18,7 @@ from ropt.plan import BasicOptimizer
 
 @dataclass(slots=True)
 class ParslTestTask(Task):
-    def get_objectives(self) -> Optional[NDArray[np.float64]]:
+    def get_objectives(self) -> NDArray[np.float64] | None:
         assert self.future is not None
         result = self.future.result()
         if result is None:

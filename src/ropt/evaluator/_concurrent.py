@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from dataclasses import dataclass
 from itertools import count
-from typing import Any, DefaultDict, Optional
+from typing import Any, DefaultDict
 
 import numpy as np
 from numpy.typing import NDArray
@@ -21,10 +21,10 @@ class ConcurrentTask(ABC):
     constraint values.
     """
 
-    future: Optional[Any]
+    future: Any | None
 
     @abstractmethod
-    def get_objectives(self) -> Optional[NDArray[np.float64]]:
+    def get_objectives(self) -> NDArray[np.float64] | None:
         """Return the objectives calculated by the task.
 
         This method is called only after the future is completed and if no
@@ -38,7 +38,7 @@ class ConcurrentTask(ABC):
             The calculated objectives.
         """
 
-    def get_constraints(self) -> Optional[NDArray[np.float64]]:
+    def get_constraints(self) -> NDArray[np.float64] | None:
         """Return the constraints calculated by the task, if available.
 
         This method is called only after the future is completed and if no
@@ -98,7 +98,7 @@ class ConcurrentEvaluator(ABC):
         self._batch_id = 0
         self._polling = polling
         self._max_submit = max_submit
-        self._cache: Optional[_Cache] = _Cache() if enable_cache else None
+        self._cache: _Cache | None = _Cache() if enable_cache else None
 
     @abstractmethod
     def launch(
@@ -107,7 +107,7 @@ class ConcurrentEvaluator(ABC):
         job_id: int,
         variables: NDArray[np.float64],
         context: EvaluatorContext,
-    ) -> Optional[ConcurrentTask]:
+    ) -> ConcurrentTask | None:
         """Launch an evaluation and return a future for each job.
 
         This method implements the process of launching a single function
@@ -216,8 +216,8 @@ class ConcurrentEvaluator(ABC):
         variables: NDArray[np.float64],
         context: EvaluatorContext,
         objectives: NDArray[np.float64],
-        constraints: Optional[NDArray[np.float64]],
-    ) -> Optional[NDArray[np.bool_]]:
+        constraints: NDArray[np.float64] | None,
+    ) -> NDArray[np.bool_] | None:
         if self._cache is None:
             return context.active
         active = (
@@ -243,9 +243,9 @@ class ConcurrentEvaluator(ABC):
         self,
         variables: NDArray[np.float64],
         context: EvaluatorContext,
-        active: Optional[NDArray[np.bool_]],
+        active: NDArray[np.bool_] | None,
         objectives: NDArray[np.float64],
-        constraints: Optional[NDArray[np.float64]],
+        constraints: NDArray[np.float64] | None,
     ) -> None:
         if self._cache is not None:
             assert active is not None
@@ -264,7 +264,7 @@ class ConcurrentEvaluator(ABC):
 
 def _init_results(
     variables: NDArray[np.float64], context: EvaluatorContext
-) -> tuple[NDArray[np.float64], Optional[NDArray[np.float64]]]:
+) -> tuple[NDArray[np.float64], NDArray[np.float64] | None]:
     objective_count = context.config.objective_functions.weights.size
     constraint_count = (
         0
@@ -307,7 +307,7 @@ class _Cache:
         real_id: int,
         control_values: NDArray[np.float64],
         objectives: NDArray[np.float64],
-        constraints: Optional[NDArray[np.float64]],
+        constraints: NDArray[np.float64] | None,
     ) -> None:
         cache_id = next(self._counter)
         self._keys[real_id].append((control_values[job_idx, :].copy(), cache_id))
@@ -315,9 +315,7 @@ class _Cache:
         if constraints is not None:
             self._constraints[cache_id] = constraints[job_idx, ...].copy()
 
-    def find_key(
-        self, real_id: int, control_vector: NDArray[np.float64]
-    ) -> Optional[int]:
+    def find_key(self, real_id: int, control_vector: NDArray[np.float64]) -> int | None:
         # Brute-force search, premature optimization is the root of all evil:
         for cached_vector, cache_id in self._keys.get(real_id, []):
             if np.allclose(

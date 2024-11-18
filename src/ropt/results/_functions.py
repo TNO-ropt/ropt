@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from ropt import utils
 from ropt.enums import ResultAxisName
@@ -46,19 +46,19 @@ class Functions(ResultField):
             "__axes__": (ResultAxisName.OBJECTIVE,),
         },
     )
-    constraints: Optional[NDArray[np.float64]] = field(
+    constraints: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.NONLINEAR_CONSTRAINT,),
         },
     )
-    scaled_objectives: Optional[NDArray[np.float64]] = field(
+    scaled_objectives: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.OBJECTIVE,),
         },
     )
-    scaled_constraints: Optional[NDArray[np.float64]] = field(
+    scaled_constraints: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.NONLINEAR_CONSTRAINT,),
@@ -82,9 +82,9 @@ class Functions(ResultField):
         config: EnOptConfig,
         weighted_objective: NDArray[np.float64],
         objectives: NDArray[np.float64],
-        constraints: Optional[NDArray[np.float64]] = None,
-        objective_auto_scales: Optional[NDArray[np.float64]] = None,
-        constraint_auto_scales: Optional[NDArray[np.float64]] = None,
+        constraints: NDArray[np.float64] | None = None,
+        objective_auto_scales: NDArray[np.float64] | None = None,
+        constraint_auto_scales: NDArray[np.float64] | None = None,
     ) -> Functions:
         """Create a Functions object with the given information.
 

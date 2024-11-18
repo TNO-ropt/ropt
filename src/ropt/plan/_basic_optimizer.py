@@ -10,7 +10,6 @@ from typing import (
     Callable,
     Literal,
     NoReturn,
-    Optional,
 )
 
 from ropt.config.plan import PlanConfig
@@ -34,8 +33,8 @@ from typing import Self
 
 @dataclass(slots=True)
 class _Results:
-    results: Optional[FunctionResults]
-    variables: Optional[NDArray[np.float64]]
+    results: FunctionResults | None
+    variables: NDArray[np.float64] | None
     exit_code: OptimizerExitCode = OptimizerExitCode.UNKNOWN
 
 
@@ -103,7 +102,7 @@ class BasicOptimizer:
         self._results: _Results
 
     @property
-    def results(self) -> Optional[FunctionResults]:
+    def results(self) -> FunctionResults | None:
         """Return the optimal result.
 
         Returns:
@@ -112,7 +111,7 @@ class BasicOptimizer:
         return self._results.results
 
     @property
-    def variables(self) -> Optional[NDArray[np.float64]]:
+    def variables(self) -> NDArray[np.float64] | None:
         """Return the optimal variables.
 
         Returns:
@@ -172,7 +171,7 @@ class BasicOptimizer:
         columns: dict[str, str],
         path: Path,
         table_type: Literal["functions", "gradients"] = "functions",
-        min_header_len: Optional[int] = None,
+        min_header_len: int | None = None,
         *,
         maximize: bool = False,
     ) -> Self:

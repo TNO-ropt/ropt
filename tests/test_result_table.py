@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import pytest
 
@@ -122,7 +122,7 @@ def test_tabular_report_data_frames_gradients(
 
 @pytest.mark.parametrize("min_header_len", [None, 4])
 def test_tabular_report_data_frames_min_header_len(
-    enopt_config: Any, evaluator: Any, tmp_path: Path, min_header_len: Optional[int]
+    enopt_config: Any, evaluator: Any, tmp_path: Path, min_header_len: int | None
 ) -> None:
     path = tmp_path / "results.txt"
     enopt_config["variables"]["names"] = [("a", 1), ("a", 2), ("a", 3)]

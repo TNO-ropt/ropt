@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -92,7 +92,7 @@ class PlanStepConfig(BaseModel):
 
     run: str
     with_: list[Any] | dict[str, Any] | str = Field(default_factory=dict, alias="with")
-    if_: Optional[str] = Field(default=None, alias="if")
+    if_: str | None = Field(default=None, alias="if")
 
     model_config = ConfigDict(
         extra="forbid",

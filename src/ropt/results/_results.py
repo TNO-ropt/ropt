@@ -9,7 +9,6 @@ from typing import (
     Any,
     Final,
     Iterable,
-    Optional,
     TypeVar,
 )
 
@@ -81,15 +80,15 @@ class Results(ABC):
 
     plan_id: tuple[int, ...]
     result_id: int | tuple[int, ...]
-    batch_id: Optional[int]
+    batch_id: int | None
     metadata: dict[str, Any]
 
     def to_dataframe(
         self,
         config: EnOptConfig,
         field_name: str,
-        select: Optional[Iterable[str]] = None,
-        unstack: Optional[Iterable[ResultAxisName]] = None,
+        select: Iterable[str] | None = None,
+        unstack: Iterable[ResultAxisName] | None = None,
     ) -> pd.DataFrame:
         """Export a field to a pandas dataframe.
 
@@ -155,7 +154,7 @@ class Results(ABC):
         self,
         config: EnOptConfig,
         field_name: str,
-        select: Optional[Iterable[str]] = None,
+        select: Iterable[str] | None = None,
         *,
         add_metadata: bool = False,
     ) -> xarray.Dataset:

@@ -11,7 +11,6 @@ from typing import (
     Callable,
     ClassVar,
     Final,
-    Optional,
     Set,
     TextIO,
 )
@@ -193,9 +192,9 @@ class SciPyOptimizer(Optimizer):
             self._config.optimizer.parallel and self._method == "differential_evolution"
         )
 
-        self._cached_variables: Optional[NDArray[np.float64]] = None
-        self._cached_function: Optional[NDArray[np.float64]] = None
-        self._cached_gradient: Optional[NDArray[np.float64]] = None
+        self._cached_variables: NDArray[np.float64] | None = None
+        self._cached_function: NDArray[np.float64] | None = None
+        self._cached_gradient: NDArray[np.float64] | None = None
         self._stdout: TextIO
 
     def start(self, initial_values: NDArray[np.float64]) -> None:
@@ -272,7 +271,7 @@ class SciPyOptimizer(Optimizer):
         """
         return self._parallel
 
-    def _initialize_bounds(self) -> Optional[Bounds]:
+    def _initialize_bounds(self) -> Bounds | None:
         if (
             np.isfinite(self._config.variables.lower_bounds).any()
             or np.isfinite(self._config.variables.upper_bounds).any()
@@ -461,7 +460,7 @@ class SciPyOptimizer(Optimizer):
 
     def _get_function_or_gradient(
         self, variables: NDArray[np.float64], *, get_function: bool, get_gradient: bool
-    ) -> tuple[Optional[NDArray[np.float64]], Optional[NDArray[np.float64]]]:
+    ) -> tuple[NDArray[np.float64] | None, NDArray[np.float64] | None]:
         if self._parallel and variables.ndim > 1:
             variables = variables.T
 
@@ -511,7 +510,7 @@ class SciPyOptimizer(Optimizer):
         *,
         compute_functions: bool,
         compute_gradients: bool,
-    ) -> tuple[Optional[NDArray[np.float64]], Optional[NDArray[np.float64]]]:
+    ) -> tuple[NDArray[np.float64] | None, NDArray[np.float64] | None]:
         new_function = None
         new_gradient = None
         if (

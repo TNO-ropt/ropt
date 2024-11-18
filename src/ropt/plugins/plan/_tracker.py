@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, Literal, Optional
+from typing import TYPE_CHECKING, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -63,7 +63,7 @@ class DefaultTrackerHandler(ResultHandler):
         var: str
         tags: ItemOrSet[str]
         type_: Literal["best", "last", "all"] = Field(default="best", alias="type")
-        constraint_tolerance: Optional[float] = 1e-10
+        constraint_tolerance: float | None = 1e-10
 
         model_config = ConfigDict(
             extra="forbid",
@@ -100,7 +100,7 @@ class DefaultTrackerHandler(ResultHandler):
             and event.results is not None
             and (event.tags & self._with.tags)
         ):
-            results: Optional[FunctionResults] | tuple[FunctionResults, ...]
+            results: FunctionResults | None | tuple[FunctionResults, ...]
             results = None
             match self._with.type_:
                 case "all":

@@ -1,6 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
-from typing import Any, Callable, Optional, cast
+from typing import Any, Callable, cast
 
 import numpy as np
 import pytest
@@ -50,7 +50,7 @@ def _run_functions(
 class TaskTestEvaluator(ConcurrentTask):
     future: Any
 
-    def get_objectives(self) -> Optional[NDArray[np.float64]]:
+    def get_objectives(self) -> NDArray[np.float64] | None:
         return cast(NDArray[np.float64], self.future.result())
 
 
@@ -71,7 +71,7 @@ class ConcurrentTestEvaluator(ConcurrentEvaluator):
         job_id: int,
         variables: NDArray[np.float64],
         context: EvaluatorContext,  # noqa: ARG002
-    ) -> Optional[ConcurrentTask]:
+    ) -> ConcurrentTask | None:
         if job_id == 0:
             self._tasks = {}
         task = TaskTestEvaluator(

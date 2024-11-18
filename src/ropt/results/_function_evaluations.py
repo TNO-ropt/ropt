@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from ropt import utils
 from ropt.enums import ResultAxisName
@@ -57,7 +57,7 @@ class FunctionEvaluations(ResultField):
             ),
         },
     )
-    constraints: Optional[NDArray[np.float64]] = field(
+    constraints: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (
@@ -66,13 +66,13 @@ class FunctionEvaluations(ResultField):
             ),
         },
     )
-    scaled_variables: Optional[NDArray[np.float64]] = field(
+    scaled_variables: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.VARIABLE,),
         },
     )
-    scaled_objectives: Optional[NDArray[np.float64]] = field(
+    scaled_objectives: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (
@@ -81,7 +81,7 @@ class FunctionEvaluations(ResultField):
             ),
         },
     )
-    scaled_constraints: Optional[NDArray[np.float64]] = field(
+    scaled_constraints: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (
@@ -90,7 +90,7 @@ class FunctionEvaluations(ResultField):
             ),
         },
     )
-    evaluation_ids: Optional[NDArray[np.intc]] = field(
+    evaluation_ids: NDArray[np.intc] | None = field(
         default=None,
         metadata={
             "__axes__": (ResultAxisName.REALIZATION,),
@@ -116,10 +116,10 @@ class FunctionEvaluations(ResultField):
         config: EnOptConfig,
         variables: NDArray[np.float64],
         objectives: NDArray[np.float64],
-        constraints: Optional[NDArray[np.float64]] = None,
-        objective_auto_scales: Optional[NDArray[np.float64]] = None,
-        constraint_auto_scales: Optional[NDArray[np.float64]] = None,
-        evaluation_ids: Optional[NDArray[np.intc]] = None,
+        constraints: NDArray[np.float64] | None = None,
+        objective_auto_scales: NDArray[np.float64] | None = None,
+        constraint_auto_scales: NDArray[np.float64] | None = None,
+        evaluation_ids: NDArray[np.intc] | None = None,
     ) -> FunctionEvaluations:
         """Create a FunctionEvaluations object with the given information.
 
