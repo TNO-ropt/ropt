@@ -5,7 +5,7 @@ pytest.importorskip("parsl")
 import os
 from dataclasses import dataclass
 from functools import partial
-from typing import Any, Callable, Dict, List, Optional, Tuple, cast, no_type_check
+from typing import Any, Callable, Optional, cast, no_type_check
 
 import numpy as np
 from numpy.typing import NDArray
@@ -27,7 +27,7 @@ class ParslTestTask(Task):
 
 
 @pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> Dict[str, Any]:
+def enopt_config_fixture() -> dict[str, Any]:
     return {
         "variables": {
             "initial_values": [0.0, 0.0, 0.1],
@@ -52,7 +52,7 @@ def enopt_config_fixture() -> Dict[str, Any]:
 @python_app
 @no_type_check
 def _run_functions(
-    functions: Tuple[Callable[..., Any], ...],
+    functions: tuple[Callable[..., Any], ...],
     variables: NDArray[np.float64],
     fail: bool = False,
 ) -> NDArray[np.float64]:
@@ -69,9 +69,9 @@ def parsl_function(
     idx: int,
     variables: NDArray[np.float64],
     context: EvaluatorContext,  # noqa: ARG001
-    functions: Tuple[Callable[..., Any], ...],
+    functions: tuple[Callable[..., Any], ...],
     fail_index: int = -1,
-) -> List[ParslTestTask]:
+) -> list[ParslTestTask]:
     return [
         ParslTestTask(
             future=_run_functions(functions, variables, fail=idx == fail_index)
@@ -79,7 +79,7 @@ def parsl_function(
     ]
 
 
-def parsl_monitor(batch_id: int, jobs: Dict[int, List[ParslTestTask]]) -> None:
+def parsl_monitor(batch_id: int, jobs: dict[int, list[ParslTestTask]]) -> None:
     for job_idx, tasks in jobs.items():
         for task_idx, task in enumerate(tasks):
             if task.state == State.FAILED:

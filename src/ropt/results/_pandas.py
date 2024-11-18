@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import fields
-from typing import TYPE_CHECKING, Any, Iterable, Optional, Tuple, Union, cast
+from typing import TYPE_CHECKING, Any, Iterable, Optional, cast
 
 import pandas as pd
 
@@ -16,8 +16,8 @@ if TYPE_CHECKING:
 def _to_dataframe(  # noqa: PLR0913
     config: EnOptConfig,
     result_field: ResultField,
-    plan_id: Tuple[int, ...],
-    result_id: Union[int, Tuple[int, ...]],
+    plan_id: tuple[int, ...],
+    result_id: int | tuple[int, ...],
     batch_id: Optional[int],
     select: Optional[Iterable[str]],
     unstack: Optional[Iterable[ResultAxisName]],
@@ -45,8 +45,8 @@ def _to_dataframe(  # noqa: PLR0913
 def _to_series(  # noqa: PLR0913
     config: EnOptConfig,
     result_field: ResultField,
-    plan_id: Tuple[int, ...],
-    result_id: Union[int, Tuple[int, ...]],
+    plan_id: tuple[int, ...],
+    result_id: int | tuple[int, ...],
     batch_id: Optional[int],
     field: str,
 ) -> Optional[pd.Series[Any]]:
@@ -64,7 +64,7 @@ def _to_series(  # noqa: PLR0913
         for idx, index in enumerate(indices)
     ]
     series: pd.Series[Any]
-    index: Tuple[Any, ...] = (plan_id, result_id, 0 if batch_id is None else batch_id)
+    index: tuple[Any, ...] = (plan_id, result_id, 0 if batch_id is None else batch_id)
     index_names = ["plan_id", "result_id", "batch_id"]
     if indices:
         multi_index = pd.MultiIndex.from_product(

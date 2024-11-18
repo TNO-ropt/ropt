@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import pickle
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal, Union
+from typing import TYPE_CHECKING, Literal
 
 from pydantic import BaseModel, ConfigDict
 
@@ -47,7 +47,7 @@ class DefaultLoadStep(PlanStep):
         """
 
         var: str
-        path: Union[str, Path]
+        path: str | Path
         format: Literal["json", "pickle"] = "json"
 
         model_config = ConfigDict(

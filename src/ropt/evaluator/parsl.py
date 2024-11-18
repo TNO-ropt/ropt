@@ -12,7 +12,7 @@ import sys
 from dataclasses import dataclass
 from enum import Enum
 from time import sleep
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Callable, Optional
 
 import parsl
 from parsl.config import Config
@@ -96,13 +96,13 @@ class ParslEvaluator(ConcurrentEvaluator):
 
         self._batch_id: int
         self._variables: NDArray[np.float64]
-        self._jobs: Dict[int, List[Task]] = {}
+        self._jobs: dict[int, list[Task]] = {}
         self._function = function
         self._monitor: Optional[Callable[..., Any]] = None
-        self._executor: Union[ThreadPoolExecutor, HighThroughputExecutor]
+        self._executor: ThreadPoolExecutor | HighThroughputExecutor
         self._retries = 0
         self._worker_restart = 0
-        self._htex_kwargs: Dict[str, Any] = {}
+        self._htex_kwargs: dict[str, Any] = {}
 
         parsl.clear()
 
@@ -128,7 +128,7 @@ class ParslEvaluator(ConcurrentEvaluator):
     def with_htex(
         self,
         provider: Optional[ExecutionProvider],
-        htex_kwargs: Optional[Dict[str, Any]] = None,
+        htex_kwargs: Optional[dict[str, Any]] = None,
         retries: int = 0,
         worker_restart: int = 0,
     ) -> ParslEvaluator:
@@ -203,7 +203,7 @@ class ParslEvaluator(ConcurrentEvaluator):
         if job_id == 0:
             self._jobs = {}
         self._batch_id = batch_id
-        job: List[Task] = self._function(batch_id, job_id, variables, context)
+        job: list[Task] = self._function(batch_id, job_id, variables, context)
         if job:
             self._jobs[job_id] = job
             return job[-1]

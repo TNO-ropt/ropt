@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path  # noqa: TCH003
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional
 
 from pydantic import (
     ConfigDict,
@@ -81,7 +81,7 @@ class OptimizerConfig(ImmutableBaseModel):
     split_evaluations: bool = False
     parallel: bool = False
     output_dir: Optional[Path] = None
-    options: Optional[Union[Dict[str, Any], List[str]]] = None
+    options: Optional[dict[str, Any] | list[str]] = None
 
     model_config = ConfigDict(
         extra="forbid",

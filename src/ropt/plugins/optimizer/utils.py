@@ -5,7 +5,7 @@ linear constraints, and to retrieve the list of supported optimizers.
 """
 
 from pathlib import Path
-from typing import Dict, Optional, Set
+from typing import Optional, Set
 
 import numpy as np
 from numpy.typing import NDArray
@@ -60,8 +60,8 @@ _MESSAGES = {
 def validate_supported_constraints(
     config: EnOptConfig,
     method: str,
-    supported_constraints: Dict[str, Set[str]],
-    required_constraints: Dict[str, Set[str]],
+    supported_constraints: dict[str, Set[str]],
+    required_constraints: dict[str, Set[str]],
 ) -> None:
     """Check if the requested optimization features are supported or required.
 
@@ -97,8 +97,8 @@ def validate_supported_constraints(
 def _check_constraint(
     constraint_type: str,
     method: str,
-    supported_constraints: Dict[str, Set[str]],
-    required_constraints: Dict[str, Set[str]],
+    supported_constraints: dict[str, Set[str]],
+    required_constraints: dict[str, Set[str]],
     *,
     have_constraint: bool,
 ) -> None:
@@ -120,8 +120,8 @@ def _check_constraint(
 def _validate_bounds(
     config: EnOptConfig,
     method: str,
-    supported_constraints: Dict[str, Set[str]],
-    required_constraints: Dict[str, Set[str]],
+    supported_constraints: dict[str, Set[str]],
+    required_constraints: dict[str, Set[str]],
 ) -> None:
     _check_constraint(
         "bounds",
@@ -138,8 +138,8 @@ def _validate_bounds(
 def _validate_linear_constraints(
     config: EnOptConfig,
     method: str,
-    supported_constraints: Dict[str, Set[str]],
-    required_constraints: Dict[str, Set[str]],
+    supported_constraints: dict[str, Set[str]],
+    required_constraints: dict[str, Set[str]],
 ) -> None:
     linear_constraints = config.linear_constraints
     if linear_constraints is None:
@@ -173,8 +173,8 @@ def _validate_linear_constraints(
 def _validate_nonlinear_constraints(
     config: EnOptConfig,
     method: str,
-    supported_constraints: Dict[str, Set[str]],
-    required_constraints: Dict[str, Set[str]],
+    supported_constraints: dict[str, Set[str]],
+    required_constraints: dict[str, Set[str]],
 ) -> None:
     nonlinear_constraints = config.nonlinear_constraints
     if nonlinear_constraints is None:

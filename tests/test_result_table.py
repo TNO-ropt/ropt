@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import pytest
 
@@ -11,7 +11,7 @@ pd = pytest.importorskip("pandas")
 
 
 @pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> Dict[str, Any]:
+def enopt_config_fixture() -> dict[str, Any]:
     return {
         "optimizer": {
             "tolerance": 1e-5,

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, Optional, cast
+from typing import TYPE_CHECKING, Any, Optional, cast
 
 import numpy as np
 import pytest
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> Dict[str, Any]:
+def enopt_config_fixture() -> dict[str, Any]:
     return {
         "optimizer": {
             "tolerance": 1e-5,

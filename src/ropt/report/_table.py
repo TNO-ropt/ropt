@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict, Iterable, Literal, Optional
+from typing import TYPE_CHECKING, Iterable, Literal, Optional
 
 from ._data_frame import ResultsDataFrame
 from ._utils import _HAVE_PANDAS, _HAVE_TABULATE, _extract_columns, _write_table
@@ -27,7 +27,7 @@ class ResultsTable(ResultsDataFrame):
 
     def __init__(
         self,
-        columns: Dict[str, str],
+        columns: dict[str, str],
         path: Path,
         *,
         table_type: Literal["functions", "gradients"] = "functions",

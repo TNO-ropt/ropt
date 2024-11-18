@@ -27,7 +27,7 @@ _SUPPORTED_VARIABLE_TYPES: Final = (
     Results,
     EnOptConfig,
 )
-_BUILTIN_FUNCTIONS: Final[Dict[str, Callable[..., Any]]] = {
+_BUILTIN_FUNCTIONS: Final[dict[str, Callable[..., Any]]] = {
     "abs": abs,
     "bool": bool,
     "divmod": divmod,
@@ -57,7 +57,7 @@ class ExpressionEvaluator:
         """
         self._functions = copy.deepcopy(_BUILTIN_FUNCTIONS)
 
-    def add_functions(self, functions: Optional[Dict[str, Callable[..., Any]]]) -> None:
+    def add_functions(self, functions: Optional[dict[str, Callable[..., Any]]]) -> None:
         """Add functions to the evaluator.
 
         Args:
@@ -249,9 +249,9 @@ class _ExpressionNodeTransformer(ast.NodeTransformer):
     def __init__(
         self,
         variables: Mapping[str, Any],
-        functions: Dict[str, Callable[..., Any]],
+        functions: dict[str, Callable[..., Any]],
     ) -> None:
-        self.values: Dict[str, Any] = {}
+        self.values: dict[str, Any] = {}
         self._variables = variables
         self._functions = set(functions.keys())
 

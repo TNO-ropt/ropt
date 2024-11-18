@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 import pytest
@@ -10,7 +10,7 @@ from ropt.plan import BasicOptimizer
 
 
 @pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> Dict[str, Any]:
+def enopt_config_fixture() -> dict[str, Any]:
     return {
         "optimizer": {
             "tolerance": 1e-4,

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from functools import singledispatchmethod
-from typing import Dict, Final, Type, Union
+from typing import Final, Type
 
 from ropt.config.plan import PlanStepConfig, ResultHandlerConfig
 from ropt.plan import Plan
@@ -22,7 +22,7 @@ from ._table import DefaultTableHandler
 from ._tracker import DefaultTrackerHandler
 from .base import PlanPlugin
 
-_STEP_OBJECTS: Final[Dict[str, Type[PlanStep]]] = {
+_STEP_OBJECTS: Final[dict[str, Type[PlanStep]]] = {
     "evaluator": DefaultEvaluatorStep,
     "load": DefaultLoadStep,
     "optimizer": DefaultOptimizerStep,
@@ -32,7 +32,7 @@ _STEP_OBJECTS: Final[Dict[str, Type[PlanStep]]] = {
     "set": DefaultSetStep,
 }
 
-_RESULT_HANDLER_OBJECTS: Final[Dict[str, Type[ResultHandler]]] = {
+_RESULT_HANDLER_OBJECTS: Final[dict[str, Type[ResultHandler]]] = {
     "metadata": DefaultMetadataHandler,
     "save": DefaultSaveHandler,
     "table": DefaultTableHandler,
@@ -74,10 +74,8 @@ class DefaultPlanPlugin(PlanPlugin):
 
     @singledispatchmethod
     def create(  # type: ignore[override]
-        self,
-        config: Union[PlanStepConfig, ResultHandlerConfig],
-        plan: Plan,
-    ) -> Union[ResultHandler, PlanStep]:
+        self, config: PlanStepConfig | ResultHandlerConfig, plan: Plan
+    ) -> ResultHandler | PlanStep:
         """Initialize the plan plugin.
 
         See the [ropt.plugins.plan.base.PlanPlugin][] abstract base class.

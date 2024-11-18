@@ -7,7 +7,7 @@ write a minimal configuration and how to run and monitor the optimization.
 
 import sys
 from functools import partial
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import numpy as np
 from numpy.random import default_rng
@@ -22,7 +22,7 @@ DIM = 5
 UNCERTAINTY = 0.1
 
 
-CONFIG: Dict[str, Any] = {
+CONFIG: dict[str, Any] = {
     "variables": {
         "initial_values": 2 * np.arange(DIM) / DIM + 0.5,
     },
@@ -74,7 +74,7 @@ def report(event: Event) -> None:
             print(f"  objective: {item.functions.weighted_objective}\n")
 
 
-def run_optimization(config: Dict[str, Any]) -> FunctionResults:
+def run_optimization(config: dict[str, Any]) -> FunctionResults:
     """Run the optimization.
 
     Args:
@@ -105,7 +105,7 @@ def run_optimization(config: Dict[str, Any]) -> FunctionResults:
     return optimal_result
 
 
-def main(argv: Optional[List[str]] = None) -> None:
+def main(argv: Optional[list[str]] = None) -> None:
     """Run the example and check the result.
 
     Args:

@@ -13,7 +13,7 @@ import sys
 import time
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import TYPE_CHECKING, Any, Dict, Final, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Final, Optional
 
 import numpy as np
 
@@ -103,7 +103,7 @@ class ExternalOptimizer(Optimizer):
                     msg = "The plugin runner binary was not found"
                     raise ConfigError(msg) from exc
 
-                answer: Optional[Union[str, List[Any], Dict[str, Any]]] = None
+                answer: Optional[str | list[Any] | dict[str, Any]] = None
                 exception: Optional[BaseException] = None
 
                 while process.poll() is None:
@@ -154,7 +154,7 @@ class ExternalOptimizer(Optimizer):
 
     def _handle_request(
         self, comm: _JSONPipeCommunicator, initial_values: NDArray[np.float64]
-    ) -> Optional[Union[str, List[Any], Dict[str, Any]]]:
+    ) -> Optional[str | list[Any] | dict[str, Any]]:
         request = comm.read()
 
         if request == "config":
@@ -241,7 +241,7 @@ class _PluginOptimizer:
         *,
         return_functions: bool,
         return_gradients: bool,
-    ) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         response = self._request(
             {
                 "evaluation": {
@@ -327,7 +327,7 @@ class _JSONPipeCommunicator:
         if self._write_fd is not None:
             os.close(self._write_fd)
 
-    def read(self) -> Optional[Union[str, List[Any], Dict[str, Any]]]:
+    def read(self) -> Optional[str | list[Any] | dict[str, Any]]:
         events = self._selector.select(timeout=self._timeout)
         for _, mask in events:
             if mask & selectors.EVENT_READ:
@@ -340,7 +340,7 @@ class _JSONPipeCommunicator:
                         buffer += line
         return None
 
-    def write(self, data: Union[str, List[Any], Dict[str, Any]]) -> bool:
+    def write(self, data: str | list[Any] | dict[str, Any]) -> bool:
         if self._write_fd is None:
             self._write_fd = os.open(self._write_pipe, os.O_WRONLY | os.O_NONBLOCK)
             self._selector.register(self._write_fd, selectors.EVENT_WRITE)

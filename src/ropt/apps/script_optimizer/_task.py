@@ -4,7 +4,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import (
     Optional,
-    Tuple,
 )
 
 import numpy as np
@@ -18,9 +17,9 @@ class ScriptTask(Task):
     """Task class for use by the ScriptBasedOptimizer class."""
 
     name: str = ""
-    job_labels: Tuple[str, ...] = field(default_factory=tuple)
-    objective_paths: Tuple[Path, ...] = field(default_factory=tuple)
-    constraint_paths: Tuple[Path, ...] = field(default_factory=tuple)
+    job_labels: tuple[str, ...] = field(default_factory=tuple)
+    objective_paths: tuple[Path, ...] = field(default_factory=tuple)
+    constraint_paths: tuple[Path, ...] = field(default_factory=tuple)
     logged: bool = False
     realization: int = 0
     _objectives: Optional[NDArray[np.float64]] = None

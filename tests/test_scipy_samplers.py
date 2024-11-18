@@ -1,5 +1,5 @@
 from functools import partial
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pytest
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> Dict[str, Any]:
+def enopt_config_fixture() -> dict[str, Any]:
     return {
         "variables": {
             "initial_values": [0.0, 0.0, 0.1],
@@ -60,7 +60,7 @@ def test_scipy_samplers_shared(enopt_config: Any, method: str, evaluator: Any) -
     enopt_config["realizations"] = {"weights": [1.0, 1.0]}
     enopt_config["samplers"] = [{"method": method}]
 
-    perturbations: Dict[str, NDArray[np.float64]] = {}
+    perturbations: dict[str, NDArray[np.float64]] = {}
 
     def _observer(event: Event, tag: str) -> None:
         assert event.results is not None

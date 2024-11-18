@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional, Protocol, Tuple
+from typing import TYPE_CHECKING, Optional, Protocol
 
 import numpy as np
 
@@ -27,7 +27,7 @@ class SignalEvaluationCallback(Protocol):
     handling or tracking of evaluation events.
     """
 
-    def __call__(self, results: Optional[Tuple[Results, ...]] = None, /) -> None:
+    def __call__(self, results: Optional[tuple[Results, ...]] = None, /) -> None:
         """Callback protocol for signaling the start and end of evaluations.
 
         When provided to an ensemble optimizer, this callback is invoked both
@@ -47,7 +47,7 @@ class NestedOptimizerCallback(Protocol):
 
     def __call__(
         self, variables: NDArray[np.float64], /
-    ) -> Tuple[Optional[FunctionResults], bool]:
+    ) -> tuple[Optional[FunctionResults], bool]:
         """Callback protocol for executing a nested optimization.
 
         This function is called during each function evaluation within an
@@ -153,7 +153,7 @@ class EnsembleOptimizer:
         *,
         return_functions: bool,
         return_gradients: bool,
-    ) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         assert return_functions or return_gradients
 
         self._check_stopping_criteria()
@@ -252,7 +252,7 @@ class EnsembleOptimizer:
         *,
         compute_functions: bool = False,
         compute_gradients: bool = False,
-    ) -> Tuple[Results, ...]:
+    ) -> tuple[Results, ...]:
         assert compute_functions or compute_gradients
         if self._signal_evaluation:
             self._signal_evaluation()
@@ -329,7 +329,7 @@ class EnsembleOptimizer:
 
     def _get_scale_parameters(
         self,
-    ) -> Tuple[Optional[NDArray[np.float64]], Optional[NDArray[np.float64]]]:
+    ) -> tuple[Optional[NDArray[np.float64]], Optional[NDArray[np.float64]]]:
         if self._enopt_config.nonlinear_constraints is not None:
             offsets = self._enopt_config.nonlinear_constraints.rhs_values
             scales = self._get_constraint_scales(self._enopt_config)

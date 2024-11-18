@@ -7,7 +7,7 @@ from collections import Counter
 from collections.abc import Sequence as AbstractSequence
 from collections.abc import Set as AbstractSet
 from enum import IntEnum
-from typing import Any, Optional, Sequence, Set, Tuple, Type, TypeVar, Union, cast
+from typing import Any, Optional, Sequence, Set, Type, TypeVar, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -51,7 +51,7 @@ def immutable_array(
     return array
 
 
-def broadcast_arrays(*args: Any) -> Tuple[NDArray[Any], ...]:  # noqa: ANN401
+def broadcast_arrays(*args: Any) -> tuple[NDArray[Any], ...]:  # noqa: ANN401
     """Broadcast a set of arrays to a common dimensionality and makes them immutable.
 
     Args:
@@ -145,7 +145,7 @@ def _convert_indices(array: Optional[ArrayLike]) -> Optional[NDArray[np.intc]]:
     )
 
 
-def _check_duplicates(names: Optional[Tuple[Any, ...]]) -> Optional[Tuple[Any, ...]]:
+def _check_duplicates(names: Optional[tuple[Any, ...]]) -> Optional[tuple[Any, ...]]:
     if names is None:
         return None
     converted_names = tuple(
@@ -161,13 +161,13 @@ def _check_duplicates(names: Optional[Tuple[Any, ...]]) -> Optional[Tuple[Any, .
 T = TypeVar("T")
 
 
-def _convert_set(value: Union[T, Set[T], Sequence[T]]) -> Set[T]:
+def _convert_set(value: T | Set[T] | Sequence[T]) -> Set[T]:
     if isinstance(value, str):
         return {cast(T, value)}
     return set(value) if isinstance(value, (AbstractSequence, AbstractSet)) else {value}
 
 
-def _convert_tuple(value: Union[T, Sequence[T]]) -> Tuple[T, ...]:
+def _convert_tuple(value: T | Sequence[T]) -> tuple[T, ...]:
     if isinstance(value, str):
         return (cast(T, value),)
     return tuple(value) if isinstance(value, AbstractSequence) else (value,)

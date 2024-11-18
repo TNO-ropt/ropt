@@ -1,10 +1,10 @@
 """Miscellaneous utilities."""
 
 from itertools import zip_longest
-from typing import Any, Tuple, Union
+from typing import Any
 
 
-def format_tuple(values: Union[str, Tuple[Any, ...]], delimiters: str = ":") -> str:
+def format_tuple(values: str | tuple[Any, ...], delimiters: str = ":") -> str:
     """Format a tuple of strings into a single string.
 
     This function converts a tuple into a single string by joining the tuple

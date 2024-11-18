@@ -4,7 +4,7 @@
 
 import json
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 from numpy.random import default_rng
@@ -18,7 +18,7 @@ from ropt.results import FunctionResults
 REALIZATIONS = 3
 
 
-ENOPT_CONFIG: Dict[str, Any] = {
+ENOPT_CONFIG: dict[str, Any] = {
     "variables": {
         "names": [("x", 1), ("y", 1)],
         "initial_values": [0.75, 1.25],

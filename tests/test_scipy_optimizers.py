@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 import numpy as np
 import pytest
@@ -19,7 +19,7 @@ from ropt.plugins.optimizer.scipy import (
 
 
 @pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> Dict[str, Any]:
+def enopt_config_fixture() -> dict[str, Any]:
     return {
         "variables": {
             "initial_values": [0.0, 0.0, 0.1],

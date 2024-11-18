@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 from copy import deepcopy
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Optional
 
 from pydantic import ConfigDict, model_validator
 
@@ -86,12 +86,12 @@ class EnOptConfig(ImmutableBaseModel):
     realizations: RealizationsConfig = RealizationsConfig()
     optimizer: OptimizerConfig = OptimizerConfig()
     gradient: GradientConfig = GradientConfig()
-    realization_filters: Tuple[RealizationFilterConfig, ...] = ()
-    function_transforms: Tuple[FunctionTransformConfig, ...] = (
+    realization_filters: tuple[RealizationFilterConfig, ...] = ()
+    function_transforms: tuple[FunctionTransformConfig, ...] = (
         FunctionTransformConfig(),
     )
-    samplers: Tuple[SamplerConfig, ...] = (SamplerConfig(),)
-    original_inputs: Optional[Dict[str, Any]] = None
+    samplers: tuple[SamplerConfig, ...] = (SamplerConfig(),)
+    original_inputs: Optional[dict[str, Any]] = None
 
     model_config = ConfigDict(
         extra="forbid",

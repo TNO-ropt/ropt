@@ -1,5 +1,5 @@
 from dataclasses import replace
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 import pytest
@@ -18,7 +18,7 @@ from ropt.results import (
 
 
 @pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> Dict[str, Any]:
+def enopt_config_fixture() -> dict[str, Any]:
     return {
         "variables": {
             "names": ["x", "y"],

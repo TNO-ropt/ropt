@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import sys
 from functools import cache
-from typing import TYPE_CHECKING, Any, Dict, Final, Generator, Literal
+from typing import TYPE_CHECKING, Any, Final, Generator, Literal
 
 from ropt.exceptions import ConfigError
 
@@ -15,8 +15,6 @@ from .realization_filter.base import RealizationFilterPlugin
 from .sampler.base import SamplerPlugin
 
 if TYPE_CHECKING:
-    from typing import Tuple
-
     from ropt.plugins.base import Plugin
 
 if sys.version_info >= (3, 10):
@@ -71,7 +69,7 @@ class PluginManager:
         Plugins can also be added dynamically using the `add_plugins` method.
         """
         # Built-in plugins, listed for all possible plugin types:
-        self._plugins: Dict[PluginType, Dict[str, Plugin]] = {
+        self._plugins: dict[PluginType, dict[str, Plugin]] = {
             "optimizer": {},
             "sampler": {},
             "realization_filter": {},
@@ -82,7 +80,7 @@ class PluginManager:
         for plugin_type in self._plugins:
             self.add_plugins(plugin_type, _from_entry_points(plugin_type))
 
-    def add_plugins(self, plugin_type: PluginType, plugins: Dict[str, Plugin]) -> None:
+    def add_plugins(self, plugin_type: PluginType, plugins: dict[str, Plugin]) -> None:
         """Add a plugin at runtime.
 
         This method adds one or more plugins of a specific type to the plugin
@@ -148,7 +146,7 @@ class PluginManager:
 
     def plugins(
         self, plugin_type: PluginType
-    ) -> Generator[Tuple[str, Plugin], None, None]:
+    ) -> Generator[tuple[str, Plugin], None, None]:
         """Generate a sequence of all plugins of a specified type.
 
         Args:
@@ -162,8 +160,8 @@ class PluginManager:
 
 
 @cache  # Without the cache, repeated calls are very slow
-def _from_entry_points(plugin_type: str) -> Dict[str, Plugin]:
-    plugins: Dict[str, Plugin] = {}
+def _from_entry_points(plugin_type: str) -> dict[str, Plugin]:
+    plugins: dict[str, Plugin] = {}
     for entry_point in entry_points().select(group=f"ropt.plugins.{plugin_type}"):
         plugin = entry_point.load()
         plugins[entry_point.name] = plugin()

@@ -2,7 +2,7 @@
 
 import copy
 import warnings
-from typing import Any, Dict, Final, Optional, Set, Tuple, Union
+from typing import Any, Final, Optional, Set
 
 import numpy as np
 from numpy.random import Generator
@@ -14,7 +14,7 @@ from ropt.config.enopt import EnOptConfig
 
 from .base import Sampler, SamplerPlugin
 
-_STATS_SAMPLERS: Final[Dict[str, Any]] = {
+_STATS_SAMPLERS: Final[dict[str, Any]] = {
     "uniform": uniform,
     "norm": norm,
     "truncnorm": truncnorm,
@@ -89,8 +89,8 @@ class SciPySampler(Sampler):
         if self._method == "default":
             self._method = "norm"
         self._rng = rng
-        self._sampler: Union[rv_continuous, QMCEngine]
-        self._options: Dict[str, Any]
+        self._sampler: rv_continuous | QMCEngine
+        self._options: dict[str, Any]
         if self._method not in _SUPPORTED_METHODS:
             msg = f"Method `{self._method}` is not implemented by the SciPy plugin"
             raise NotImplementedError(msg)
@@ -137,8 +137,8 @@ class SciPySampler(Sampler):
         return samples
 
     def _init_sampler(
-        self, options: Dict[str, Any]
-    ) -> Tuple[Union[rv_continuous, QMCEngine], Dict[str, Any]]:
+        self, options: dict[str, Any]
+    ) -> tuple[rv_continuous | QMCEngine, dict[str, Any]]:
         options = copy.deepcopy(options)
         if self._method in _STATS_SAMPLERS:
             self._set_options(options)
@@ -155,7 +155,7 @@ class SciPySampler(Sampler):
             raise NotImplementedError(msg)
         return sampler, options
 
-    def _set_options(self, options: Dict[str, Any]) -> None:
+    def _set_options(self, options: dict[str, Any]) -> None:
         parameters = {
             "uniform": {"loc": -1.0, "scale": 2.0},
             "truncnorm": {"a": -1.0, "b": 1.0},

@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from dataclasses import dataclass
 from itertools import count
-from typing import Any, DefaultDict, Dict, List, Optional, Tuple
+from typing import Any, DefaultDict, Optional
 
 import numpy as np
 from numpy.typing import NDArray
@@ -171,7 +171,7 @@ class ConcurrentEvaluator(ABC):
         )
 
         var_idx = 0
-        tasks: Dict[int, ConcurrentTask] = {}
+        tasks: dict[int, ConcurrentTask] = {}
 
         # Keep submitting and monitoring until all variables and tasks are done:
         while var_idx < variables.shape[0] or len(tasks) > 0:
@@ -255,7 +255,7 @@ class ConcurrentEvaluator(ABC):
                         job_idx, real_id, variables, objectives, constraints
                     )
 
-    def _get_realization_ids(self, context: EvaluatorContext) -> Tuple[Any, ...]:
+    def _get_realization_ids(self, context: EvaluatorContext) -> tuple[Any, ...]:
         names = context.config.realizations.names
         if names is None:
             names = tuple(range(context.config.realizations.weights.size))
@@ -264,7 +264,7 @@ class ConcurrentEvaluator(ABC):
 
 def _init_results(
     variables: NDArray[np.float64], context: EvaluatorContext
-) -> Tuple[NDArray[np.float64], Optional[NDArray[np.float64]]]:
+) -> tuple[NDArray[np.float64], Optional[NDArray[np.float64]]]:
     objective_count = context.config.objective_functions.weights.size
     constraint_count = (
         0
@@ -291,12 +291,12 @@ def _init_results(
 class _Cache:
     def __init__(self) -> None:
         # Stores the realization/controls key, together with an ID.
-        self._keys: DefaultDict[int, List[Tuple[NDArray[np.float64], int]]] = (
+        self._keys: DefaultDict[int, list[tuple[NDArray[np.float64], int]]] = (
             defaultdict(list)
         )
         # Store objectives and constraints by ID:
-        self._objectives: Dict[int, NDArray[np.float64]] = {}
-        self._constraints: Dict[int, NDArray[np.float64]] = {}
+        self._objectives: dict[int, NDArray[np.float64]] = {}
+        self._constraints: dict[int, NDArray[np.float64]] = {}
 
         # Generate unique ID's:
         self._counter = count()

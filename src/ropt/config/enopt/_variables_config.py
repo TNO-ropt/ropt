@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import sys
-from typing import Optional, Tuple
+from typing import Optional
 
 import numpy as np
 from pydantic import ConfigDict, Field, model_validator
@@ -159,7 +159,7 @@ class VariablesConfig(ImmutableBaseModel):
 
         return self
 
-    def get_formatted_names(self) -> Optional[Tuple[str, ...]]:
+    def get_formatted_names(self) -> Optional[tuple[str, ...]]:
         """Return string representations of the variable names.
 
         This method converts the variable names to a tuple of strings. Each name

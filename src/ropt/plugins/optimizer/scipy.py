@@ -10,14 +10,10 @@ from typing import (
     Any,
     Callable,
     ClassVar,
-    Dict,
     Final,
-    List,
     Optional,
     Set,
     TextIO,
-    Tuple,
-    Union,
 )
 
 import numpy as np
@@ -94,11 +90,7 @@ _NO_GRADIENT: Final = {
 
 _OUTPUT_FILE: Final = "optimizer_output"
 
-_ConstraintType = Union[
-    str,
-    Callable[..., float],
-    Callable[..., NDArray[np.float64]],
-]
+_ConstraintType = str | Callable[..., float] | Callable[..., NDArray[np.float64]]
 
 
 class SciPyOptimizer(Optimizer):
@@ -146,14 +138,14 @@ class SciPyOptimizer(Optimizer):
           trust-exact, and trust-krylov.
     """
 
-    _supported_constraints: ClassVar[Dict[str, Set[str]]] = {
+    _supported_constraints: ClassVar[dict[str, Set[str]]] = {
         "bounds": _CONSTRAINT_SUPPORT_BOUNDS,
         "linear:eq": _CONSTRAINT_SUPPORT_LINEAR_EQ,
         "linear:ineq": _CONSTRAINT_SUPPORT_LINEAR_INEQ,
         "nonlinear:eq": _CONSTRAINT_SUPPORT_NONLINEAR_EQ,
         "nonlinear:ineq": _CONSTRAINT_SUPPORT_NONLINEAR_INEQ,
     }
-    _required_constraints: ClassVar[Dict[str, Set[str]]] = {
+    _required_constraints: ClassVar[dict[str, Set[str]]] = {
         "bounds": _CONSTRAINT_REQUIRES_BOUNDS,
     }
 
@@ -182,10 +174,9 @@ class SciPyOptimizer(Optimizer):
         )
         self._bounds = self._initialize_bounds()
 
-        self._constraints: Union[
-            Tuple[LinearConstraint, ...],
-            List[Dict[str, _ConstraintType]],
-        ]
+        self._constraints: (
+            tuple[LinearConstraint, ...] | list[dict[str, _ConstraintType]]
+        )
 
         if self._method == "differential_evolution":
             self._constraints = (
@@ -223,7 +214,7 @@ class SciPyOptimizer(Optimizer):
             initial_values = np.take(initial_values, variable_indices, axis=-1)
 
         output_dir = self._config.optimizer.output_dir
-        output_file: Union[str, Path]
+        output_file: str | Path
         if output_dir is None:
             output_file = os.devnull
         else:
@@ -295,8 +286,8 @@ class SciPyOptimizer(Optimizer):
             return Bounds(lower_bounds, upper_bounds)
         return None
 
-    def _initialize_linear_constraints(self) -> List[Dict[str, _ConstraintType]]:
-        constraints: List[Dict[str, _ConstraintType]] = []
+    def _initialize_linear_constraints(self) -> list[dict[str, _ConstraintType]]:
+        constraints: list[dict[str, _ConstraintType]] = []
 
         linear_constraints_config = self._config.linear_constraints
         if linear_constraints_config is None:
@@ -351,7 +342,7 @@ class SciPyOptimizer(Optimizer):
 
         return constraints
 
-    def _initialize_linear_constraint_object(self) -> Tuple[LinearConstraint, ...]:
+    def _initialize_linear_constraint_object(self) -> tuple[LinearConstraint, ...]:
         linear_constraints_config = self._config.linear_constraints
         if linear_constraints_config is None:
             return ()
@@ -377,8 +368,8 @@ class SciPyOptimizer(Optimizer):
             ),
         )
 
-    def _initialize_nonlinear_constraints(self) -> List[Dict[str, _ConstraintType]]:
-        constraints: List[Dict[str, _ConstraintType]] = []
+    def _initialize_nonlinear_constraints(self) -> list[dict[str, _ConstraintType]]:
+        constraints: list[dict[str, _ConstraintType]] = []
 
         if self._config.nonlinear_constraints is None:
             return constraints
@@ -395,7 +386,7 @@ class SciPyOptimizer(Optimizer):
 
     def _initialize_nonlinear_constraint_object(
         self,
-    ) -> Tuple[NonlinearConstraint, ...]:
+    ) -> tuple[NonlinearConstraint, ...]:
         if self._config.nonlinear_constraints is None:
             return ()
 
@@ -470,7 +461,7 @@ class SciPyOptimizer(Optimizer):
 
     def _get_function_or_gradient(
         self, variables: NDArray[np.float64], *, get_function: bool, get_gradient: bool
-    ) -> Tuple[Optional[NDArray[np.float64]], Optional[NDArray[np.float64]]]:
+    ) -> tuple[Optional[NDArray[np.float64]], Optional[NDArray[np.float64]]]:
         if self._parallel and variables.ndim > 1:
             variables = variables.T
 
@@ -520,7 +511,7 @@ class SciPyOptimizer(Optimizer):
         *,
         compute_functions: bool,
         compute_gradients: bool,
-    ) -> Tuple[Optional[NDArray[np.float64]], Optional[NDArray[np.float64]]]:
+    ) -> tuple[Optional[NDArray[np.float64]], Optional[NDArray[np.float64]]]:
         new_function = None
         new_gradient = None
         if (
@@ -550,7 +541,7 @@ class SciPyOptimizer(Optimizer):
             new_function = np.where(np.isnan(new_function), np.inf, new_function)
         return new_function, new_gradient
 
-    def _parse_options(self) -> Dict[str, Any]:
+    def _parse_options(self) -> dict[str, Any]:
         if not isinstance(self._config.optimizer.options, dict):
             return {}
         options = copy.deepcopy(self._config.optimizer.options)

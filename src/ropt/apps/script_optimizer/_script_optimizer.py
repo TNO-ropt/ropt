@@ -15,13 +15,9 @@ from typing import (
     Any,
     Callable,
     DefaultDict,
-    Dict,
-    List,
     Optional,
     Sequence,
     TextIO,
-    Tuple,
-    Union,
     no_type_check,
 )
 
@@ -66,9 +62,9 @@ class ScriptOptimizer:
 
     def __init__(
         self,
-        config: Union[Dict[str, Any], ScriptOptimizerConfig],
-        plan: Dict[str, Any],
-        tasks: Dict[str, str],
+        config: dict[str, Any] | ScriptOptimizerConfig,
+        plan: dict[str, Any],
+        tasks: dict[str, str],
     ) -> None:
         """Initialize the optimizer.
 
@@ -89,9 +85,9 @@ class ScriptOptimizer:
         )
         self._plan_config = plan
         self._tasks = tasks
-        self._status: Dict[int, Any] = {}
+        self._status: dict[int, Any] = {}
         self._optimal_result: Optional[FunctionResults] = None
-        self._observers: List[Tuple[EventType, Callable[[Event], None]]] = []
+        self._observers: list[tuple[EventType, Callable[[Event], None]]] = []
 
     def _set_logger(self) -> None:
         self._logger = logging.getLogger("ScriptBasedOptimizer")
@@ -107,7 +103,7 @@ class ScriptOptimizer:
         job_idx: int,
         variables: NDArray[np.float64],
         context: EvaluatorContext,
-    ) -> List[ScriptTask]:
+    ) -> list[ScriptTask]:
         assert context.config.realizations.names is not None
         realization = context.config.realizations.names[context.realizations[job_idx]]
         if not isinstance(realization, int):
@@ -161,7 +157,7 @@ class ScriptOptimizer:
         with filename.open("w", encoding="utf-8") as file_obj:
             json.dump(var_dict, file_obj, indent=2)
 
-        tasks: List[ScriptTask] = []
+        tasks: list[ScriptTask] = []
         for task_name, script in self._tasks.items():
             substituted_script = Template(script).safe_substitute(
                 work_dir=self._config.work_dir, realization=realization
@@ -207,13 +203,13 @@ class ScriptOptimizer:
                 task.logged = True
 
     def _write_state_report(
-        self, batch_id: int, jobs: Dict[int, List[ScriptTask]]
+        self, batch_id: int, jobs: dict[int, list[ScriptTask]]
     ) -> None:
-        states: DefaultDict[str, Dict[int, State]] = defaultdict(dict)
+        states: DefaultDict[str, dict[int, State]] = defaultdict(dict)
         for job_idx, tasks in jobs.items():
             for task in tasks:
                 states[task.name][job_idx] = task.state
-        table: List[Dict[str, Any]] = []
+        table: list[dict[str, Any]] = []
         for name, task_states in states.items():
             job_name = name
             for state in State:
@@ -237,10 +233,10 @@ class ScriptOptimizer:
             file_obj.write(f"{table_str}\n")
 
     def _update_current_state(
-        self, batch_id: int, jobs: Dict[int, List[ScriptTask]]
+        self, batch_id: int, jobs: dict[int, list[ScriptTask]]
     ) -> None:
         # Update the current batch
-        states: DefaultDict[int, Dict[str, Any]] = defaultdict(dict)
+        states: DefaultDict[int, dict[str, Any]] = defaultdict(dict)
         for job_idx, tasks in jobs.items():
             for task in tasks:
                 states[job_idx][task.name] = {
@@ -278,7 +274,7 @@ class ScriptOptimizer:
         ) as file_obj:
             json.dump(states_json, file_obj, sort_keys=True, indent=4)
 
-    def _monitor(self, batch_id: int, jobs: Dict[int, List[ScriptTask]]) -> None:
+    def _monitor(self, batch_id: int, jobs: dict[int, list[ScriptTask]]) -> None:
         self._write_state_report(batch_id, jobs)
         self._update_current_state(batch_id, jobs)
         self._store_states()
@@ -307,7 +303,7 @@ class ScriptOptimizer:
     def run(
         self,
         provider: Optional[ExecutionProvider] = None,
-        evaluator_config: Optional[Union[Dict[str, Any], ScriptEvaluatorConfig]] = None,
+        evaluator_config: Optional[dict[str, Any] | ScriptEvaluatorConfig] = None,
     ) -> Plan:
         """Run the optimization."""
         cwd = Path.cwd()
@@ -353,7 +349,7 @@ class ScriptOptimizer:
 
 
 def _make_dict(
-    variables: NDArray[np.float64], names: Sequence[Tuple[str, ...]]
+    variables: NDArray[np.float64], names: Sequence[tuple[str, ...]]
 ) -> DefaultDict[str, Any]:
     def recursive_dict() -> DefaultDict[str, Any]:
         return defaultdict(recursive_dict)
@@ -368,7 +364,7 @@ def _make_dict(
     return var_dict
 
 
-def _format_list(values: List[int]) -> str:
+def _format_list(values: list[int]) -> str:
     grouped = (
         tuple(y for _, y in x)
         for _, x in groupby(enumerate(sorted(values)), lambda x: x[0] - x[1])

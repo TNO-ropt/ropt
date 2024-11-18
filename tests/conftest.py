@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from functools import partial
-from typing import Any, Callable, List, Sequence, Tuple
+from typing import Any, Callable, Sequence
 
 import numpy as np
 import pytest
@@ -35,7 +35,7 @@ class FunctionContext:
 def _function_runner(
     variables: NDArray[np.float64],
     evaluator_context: EvaluatorContext,
-    functions: List[_Function],
+    functions: list[_Function],
 ) -> EvaluatorResult:
     unscaled_variables = scale_back_variables(
         evaluator_context.config, variables, axis=-1
@@ -89,7 +89,7 @@ def _compute_distance_squared(
 
 
 @pytest.fixture(name="test_functions", scope="session")
-def fixture_test_functions() -> Tuple[_Function, _Function]:
+def fixture_test_functions() -> tuple[_Function, _Function]:
     return (
         partial(_compute_distance_squared, target=np.array([0.5, 0.5, 0.5])),
         partial(_compute_distance_squared, target=np.array([-1.5, -1.5, 0.5])),
@@ -97,8 +97,8 @@ def fixture_test_functions() -> Tuple[_Function, _Function]:
 
 
 @pytest.fixture(scope="session")
-def evaluator(test_functions: Any) -> Callable[[List[_Function]], Evaluator]:
-    def _evaluator(test_functions: List[_Function] = test_functions) -> Evaluator:
+def evaluator(test_functions: Any) -> Callable[[list[_Function]], Evaluator]:
+    def _evaluator(test_functions: list[_Function] = test_functions) -> Evaluator:
         return partial(_function_runner, functions=test_functions)
 
     return _evaluator

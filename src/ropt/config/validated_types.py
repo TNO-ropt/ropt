@@ -25,7 +25,7 @@ that single values are embedded in a set or tuple, respectively:
 """
 
 import sys
-from typing import Any, Set, Tuple, TypeVar
+from typing import Any, Set, TypeVar
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -67,7 +67,7 @@ if sys.version_info >= (3, 9):
     Array1DBool = Annotated[NDArray[np.bool_], BeforeValidator(_convert_1d_array_bool)]
     """Convert to an immutable 1D numpy array of boolean values."""
 
-    UniqueNames = Annotated[Tuple[Any, ...], AfterValidator(_check_duplicates)]
+    UniqueNames = Annotated[tuple[Any, ...], AfterValidator(_check_duplicates)]
     """Check for duplicates in a tuple, raising ValueError if duplicates are found."""
 
 else:
@@ -77,11 +77,11 @@ else:
     ArrayEnum = Annotated[ArrayLike, BeforeValidator(_convert_enum_array)]
     Array1DInt = Annotated[ArrayLike, BeforeValidator(_convert_1d_array_intc)]
     Array1DBool = Annotated[ArrayLike, BeforeValidator(_convert_1d_array_bool)]
-    UniqueNames = Annotated[Tuple[Any, ...], AfterValidator(_check_duplicates)]
+    UniqueNames = Annotated[tuple[Any, ...], AfterValidator(_check_duplicates)]
 
 T = TypeVar("T")
 ItemOrSet = Annotated[Set[T], BeforeValidator(_convert_set)]
 """Convert to single value to a set containing that value, passes sets unchanged."""
 
-ItemOrTuple = Annotated[Tuple[T, ...], BeforeValidator(_convert_tuple)]
+ItemOrTuple = Annotated[tuple[T, ...], BeforeValidator(_convert_tuple)]
 """Convert to single value to a tuple containing that value, passes sets unchanged."""

@@ -1,6 +1,6 @@
 """This module implements the default function transform plugin."""
 
-from typing import Final, Tuple
+from typing import Final
 
 import numpy as np
 from numpy.typing import NDArray
@@ -143,7 +143,7 @@ class DefaultFunctionTransform(FunctionTransform):
         self,
         functions: NDArray[np.float64],
         weights: NDArray[np.float64],
-    ) -> Tuple[float, NDArray[np.float64], NDArray[np.float64]]:
+    ) -> tuple[float, NDArray[np.float64], NDArray[np.float64]]:
         norm = float(np.count_nonzero(weights > 0))
         norm = norm / (norm - 1)
         mean = np.dot(functions, weights)

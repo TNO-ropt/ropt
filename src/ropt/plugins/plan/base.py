@@ -11,7 +11,7 @@ plan objects.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Dict, Union
+from typing import TYPE_CHECKING, Any
 
 from ropt.plugins.base import Plugin
 
@@ -45,9 +45,9 @@ class PlanPlugin(Plugin):
     @abstractmethod
     def create(
         self,
-        config: Union[ResultHandlerConfig, PlanStepConfig],
+        config: ResultHandlerConfig | PlanStepConfig,
         context: OptimizerContext,
-    ) -> Union[ResultHandler, PlanStep]:
+    ) -> ResultHandler | PlanStep:
         """Create a step or result handler.
 
         This factory function instantiates either a step or a result handler
@@ -60,7 +60,7 @@ class PlanPlugin(Plugin):
         """
 
     @property
-    def functions(self) -> Dict[str, Any]:
+    def functions(self) -> dict[str, Any]:
         """Return plan functions implemented by the plugin.
 
         Returns:

@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 import numpy as np
 from numpy.typing import NDArray
@@ -66,7 +66,7 @@ def _invert_linear_equations(
 def _perturb_variables(
     config: EnOptConfig,
     variables: NDArray[np.float64],
-    samplers: List[Sampler],
+    samplers: list[Sampler],
 ) -> NDArray[np.float64]:
     if config.gradient.samplers is None:
         samples = samplers[0].generate_samples()
@@ -152,7 +152,7 @@ def _calculate_gradient(  # noqa: PLR0913
 
 def _calculate_transformed_gradients(  # noqa: PLR0913
     config: EnOptConfig,
-    function_transforms: List[FunctionTransform],
+    function_transforms: list[FunctionTransform],
     transform_indices: Optional[Optional[NDArray[np.intc]]],
     variables: NDArray[np.float64],
     functions: NDArray[np.float64],
@@ -190,7 +190,7 @@ def _calculate_transformed_gradients(  # noqa: PLR0913
 
 def _calculate_transformed_objective_gradients(  # noqa: PLR0913
     config: EnOptConfig,
-    function_transforms: List[FunctionTransform],
+    function_transforms: list[FunctionTransform],
     variables: NDArray[np.float64],
     functions: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
@@ -213,7 +213,7 @@ def _calculate_transformed_objective_gradients(  # noqa: PLR0913
 
 def _calculate_transformed_constraint_gradients(  # noqa: PLR0913
     config: EnOptConfig,
-    function_transforms: List[FunctionTransform],
+    function_transforms: list[FunctionTransform],
     variables: NDArray[np.float64],
     constraints: Optional[NDArray[np.float64]],
     perturbed_variables: NDArray[np.float64],

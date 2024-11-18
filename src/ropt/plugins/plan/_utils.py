@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Optional, Tuple
+from typing import Optional
 
 import numpy as np
 
@@ -68,7 +68,7 @@ def _check_constraints(
 
 
 def _get_last_result(
-    results: Tuple[Results, ...], constraint_tolerance: Optional[float]
+    results: tuple[Results, ...], constraint_tolerance: Optional[float]
 ) -> Optional[FunctionResults]:
     return next(
         (
@@ -86,7 +86,7 @@ def _get_last_result(
 
 def _update_optimal_result(
     optimal_result: Optional[FunctionResults],
-    results: Tuple[Results, ...],
+    results: tuple[Results, ...],
     constraint_tolerance: Optional[float],
 ) -> Optional[FunctionResults]:
     return_result: Optional[FunctionResults] = None
@@ -104,8 +104,8 @@ def _update_optimal_result(
 
 
 def _get_all_results(
-    results: Tuple[Results, ...], constraint_tolerance: Optional[float]
-) -> Tuple[FunctionResults, ...]:
+    results: tuple[Results, ...], constraint_tolerance: Optional[float]
+) -> tuple[FunctionResults, ...]:
     return tuple(
         item
         for item in results

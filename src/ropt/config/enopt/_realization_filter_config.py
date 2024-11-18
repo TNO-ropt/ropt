@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
@@ -35,7 +35,7 @@ class RealizationFilterConfig(BaseModel):
     """
 
     method: str
-    options: Dict[str, Any] = {}
+    options: dict[str, Any] = {}
 
     model_config = ConfigDict(
         extra="forbid",

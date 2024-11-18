@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from importlib.util import find_spec
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, Final, Optional, Type, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Final, Optional, Type, TypeVar
 
 from ._bound_constraints import BoundConstraints
 from ._function_evaluations import FunctionEvaluations
@@ -57,7 +57,7 @@ class FunctionResults(Results):
     nonlinear_constraints: Optional[NonlinearConstraints] = None
 
     @classmethod
-    def from_netcdf(cls, filename: Union[str, Path]) -> Results:
+    def from_netcdf(cls, filename: str | Path) -> Results:
         """Read results from a netCDF4 file.
 
         Use of this method requires that the `xarray` and `netCDF4` modules are
@@ -85,7 +85,7 @@ class FunctionResults(Results):
             )
             raise NotImplementedError(msg)
 
-        _types: Dict[str, Type[ResultField]] = {
+        _types: dict[str, Type[ResultField]] = {
             "bound_constraints": BoundConstraints,
             "linear_constraints": LinearConstraints,
             "nonlinear_constraints": NonlinearConstraints,
@@ -95,7 +95,7 @@ class FunctionResults(Results):
         }
 
         results = _from_netcdf(Path(filename), cls)
-        kwargs: Dict[str, Any] = {
+        kwargs: dict[str, Any] = {
             key: _types[key](**_from_dataset(value)) if key in _types else value
             for key, value in results.items()
         }

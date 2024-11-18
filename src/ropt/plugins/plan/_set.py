@@ -5,7 +5,7 @@ from __future__ import annotations
 import copy
 import re
 from collections.abc import Mapping, MutableMapping, MutableSequence
-from typing import TYPE_CHECKING, Any, Dict, List, Tuple, Union
+from typing import TYPE_CHECKING, Any
 
 from pydantic import ConfigDict, RootModel
 
@@ -45,9 +45,7 @@ class DefaultSetStep(PlanStep):
         and the assignment order matters.
     """
 
-    class DefaultSetStepWith(
-        RootModel[Union[Dict[str, Any], Tuple[Dict[str, Any], ...]]]
-    ):
+    class DefaultSetStepWith(RootModel[dict[str, Any] | tuple[dict[str, Any], ...]]):
         """Configuration for a set step.
 
         A set step is used to change the value of one or more plan variables.
@@ -73,7 +71,7 @@ class DefaultSetStep(PlanStep):
             set is important, it is recommended to use a list.
         """
 
-    root: Union[Dict[str, Any], Tuple[Dict[str, Any], ...]]
+    root: dict[str, Any] | tuple[dict[str, Any], ...]
 
     model_config = ConfigDict(
         extra="forbid",
@@ -94,10 +92,10 @@ class DefaultSetStep(PlanStep):
             expr = (expr,)
 
         self._plan = plan
-        self._targets: List[Any] = []
-        self._names: List[str] = []
-        self._keys: List[List[str]] = []
-        self._values: List[Any] = []
+        self._targets: list[Any] = []
+        self._names: list[str] = []
+        self._keys: list[list[str]] = []
+        self._values: list[Any] = []
 
         for list_item in expr:
             if not isinstance(list_item, Mapping):

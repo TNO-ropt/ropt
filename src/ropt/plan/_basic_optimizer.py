@@ -9,13 +9,9 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
-    Dict,
-    List,
     Literal,
     NoReturn,
     Optional,
-    Tuple,
-    Union,
 )
 
 from ropt.config.plan import PlanConfig
@@ -65,7 +61,7 @@ class BasicOptimizer:
 
     def __init__(
         self,
-        enopt_config: Union[Dict[str, Any], EnOptConfig],
+        enopt_config: dict[str, Any] | EnOptConfig,
         evaluator: Evaluator,
         *,
         constraint_tolerance: float = 1e-10,
@@ -81,14 +77,14 @@ class BasicOptimizer:
             constraint_tolerance: The tolerance level used to detect constraint violations.
         """
         self._optimizer_context = OptimizerContext(evaluator=evaluator)
-        self._observers: List[Tuple[EventType, Callable[[Event], None]]] = []
-        self._metadata: Dict[str, Any] = {}
+        self._observers: list[tuple[EventType, Callable[[Event], None]]] = []
+        self._metadata: dict[str, Any] = {}
         self._variables = {
             "__config__": enopt_config,
             "__optimum_tracker__": None,
             "__exit_code__": OptimizerExitCode.UNKNOWN,
         }
-        self._steps: List[Dict[str, Any]] = [
+        self._steps: list[dict[str, Any]] = [
             {
                 "run": "optimizer",
                 "with": {
@@ -98,7 +94,7 @@ class BasicOptimizer:
                 },
             }
         ]
-        self._handlers: List[Dict[str, Any]] = [
+        self._handlers: list[dict[str, Any]] = [
             {
                 "run": "tracker",
                 "with": {
@@ -156,7 +152,7 @@ class BasicOptimizer:
         self._observers.append((event_type, function))
         return self
 
-    def add_metadata(self, metadata: Dict[str, Any]) -> Self:
+    def add_metadata(self, metadata: dict[str, Any]) -> Self:
         """Add metadata.
 
         Add a dictionary of metadata that will be attached to each result object
@@ -177,7 +173,7 @@ class BasicOptimizer:
 
     def add_table(
         self,
-        columns: Dict[str, str],
+        columns: dict[str, str],
         path: Path,
         table_type: Literal["functions", "gradients"] = "functions",
         min_header_len: Optional[int] = None,

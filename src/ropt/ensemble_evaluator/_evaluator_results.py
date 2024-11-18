@@ -1,6 +1,6 @@
 from dataclasses import InitVar, dataclass
 from itertools import zip_longest
-from typing import Generator, Optional, Tuple
+from typing import Generator, Optional
 
 import numpy as np
 from numpy.typing import NDArray
@@ -53,7 +53,7 @@ class _GradientEvaluatorResults:
 def _propagate_nan_values(
     objective_results: NDArray[np.float64],
     constraint_results: Optional[NDArray[np.float64]],
-) -> Tuple[NDArray[np.float64], Optional[NDArray[np.float64]]]:
+) -> tuple[NDArray[np.float64], Optional[NDArray[np.float64]]]:
     failures = None
     if objective_results is not None:
         failures = np.logical_or.reduce(np.isnan(objective_results), axis=-1)
@@ -79,7 +79,7 @@ def _get_active_realizations(
     *,
     objective_weights: Optional[NDArray[np.float64]] = None,
     constraint_weights: Optional[NDArray[np.float64]] = None,
-) -> Tuple[Optional[NDArray[np.bool_]], Optional[NDArray[np.bool_]]]:
+) -> tuple[Optional[NDArray[np.bool_]], Optional[NDArray[np.bool_]]]:
     if objective_weights is None:
         active_realizations = np.abs(config.realizations.weights) > 0
         if np.all(active_realizations):
@@ -113,7 +113,7 @@ def _get_function_results(
     variables: NDArray[np.float64],
     active_objectives: Optional[NDArray[np.bool_]],
     active_constraints: Optional[NDArray[np.bool_]],
-) -> Generator[Tuple[int, _FunctionEvaluatorResults], None, None]:
+) -> Generator[tuple[int, _FunctionEvaluatorResults], None, None]:
     realization_num = config.realizations.weights.size
     context = EvaluatorContext(
         config=config,
@@ -188,7 +188,7 @@ def _get_function_and_gradient_results(  # noqa: PLR0913
     perturbed_variables: NDArray[np.float64],
     active_objectives: Optional[NDArray[np.bool_]],
     active_constraints: Optional[NDArray[np.bool_]],
-) -> Tuple[_FunctionEvaluatorResults, _GradientEvaluatorResults]:
+) -> tuple[_FunctionEvaluatorResults, _GradientEvaluatorResults]:
     realization_num = config.realizations.weights.size
     perturbation_num = config.gradient.number_of_perturbations
     realizations = np.arange(realization_num)

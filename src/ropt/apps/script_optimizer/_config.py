@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Optional
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
@@ -42,7 +42,7 @@ class ScriptOptimizerConfig(ImmutableBaseModel):
 
     work_dir: Path
     job_dir: Optional[Path] = None
-    job_labels: Tuple[str, ...] = ("B{batch:04d}", "J{job:04d}")
+    job_labels: tuple[str, ...] = ("B{batch:04d}", "J{job:04d}")
     var_filename: Path = Path("variables")
 
     model_config = ConfigDict(
@@ -72,7 +72,7 @@ class ScriptEvaluatorConfig(BaseModel):
         max_submit:     Maximum number of variables to submit simultaneously.
     """
 
-    htex_kwargs: Optional[Dict[str, Any]] = None
+    htex_kwargs: Optional[dict[str, Any]] = None
     max_threads: int = 4
     worker_restart: int = 0
     polling: float = 0.1

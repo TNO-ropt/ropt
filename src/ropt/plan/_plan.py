@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from itertools import chain, count
-from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Iterator, Optional
 
 if TYPE_CHECKING:
     from ropt.config.plan import PlanConfig, PlanStepConfig
@@ -22,7 +22,7 @@ class Plan:
         config: PlanConfig,
         optimizer_context: OptimizerContext,
         parent: Optional[Plan] = None,
-        plan_id: Optional[Tuple[int, ...]] = None,
+        plan_id: Optional[tuple[int, ...]] = None,
     ) -> None:
         """Initialize a plan object.
 
@@ -60,8 +60,8 @@ class Plan:
         """
         self._plan_config = config
         self._optimizer_context = optimizer_context
-        self._vars: Dict[str, Any] = deepcopy(optimizer_context.variables)
-        self._plan_id: Tuple[int, ...] = (0,) if plan_id is None else plan_id
+        self._vars: dict[str, Any] = deepcopy(optimizer_context.variables)
+        self._plan_id: tuple[int, ...] = (0,) if plan_id is None else plan_id
         self._spawn_id: int = -1
         self._result_id_iter = count()
 
@@ -79,7 +79,7 @@ class Plan:
                 raise AttributeError(msg)
             self._set_item(var, None)
         self._steps = self.create_steps(config.steps)
-        self._handlers: List[ResultHandler] = [
+        self._handlers: list[ResultHandler] = [
             self._optimizer_context.plugin_manager.get_plugin(
                 "plan", method=config.run
             ).create(config, self)
@@ -88,7 +88,7 @@ class Plan:
         self._aborted = False
         self._parent = parent
 
-    def run(self, *args: Any) -> Tuple[Any, ...]:  # noqa: ANN401
+    def run(self, *args: Any) -> tuple[Any, ...]:  # noqa: ANN401
         """Run the Plan.
 
         This method accepts an arbitrary number of inputs that are stored in the
@@ -131,7 +131,7 @@ class Plan:
         return self._aborted
 
     @property
-    def plan_id(self) -> Tuple[int, ...]:
+    def plan_id(self) -> tuple[int, ...]:
         """Return the ID of the plan.
 
         Each plan has a unique ID, stored as a tuple of integers, which reflects
@@ -157,7 +157,7 @@ class Plan:
         """
         return self._result_id_iter
 
-    def create_steps(self, step_configs: List[PlanStepConfig]) -> List[PlanStep]:
+    def create_steps(self, step_configs: list[PlanStepConfig]) -> list[PlanStep]:
         """Instantiate step objects from step configurations.
 
         This method takes a list of step configuration objects and creates a
@@ -177,7 +177,7 @@ class Plan:
             for step_config in step_configs
         ]
 
-    def run_steps(self, steps: List[PlanStep]) -> None:
+    def run_steps(self, steps: list[PlanStep]) -> None:
         """Execute a list of steps in the plan.
 
         This method iterates through and executes a provided list of plan steps.

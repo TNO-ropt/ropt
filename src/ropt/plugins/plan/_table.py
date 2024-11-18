@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path  # noqa: TCH003
-from typing import TYPE_CHECKING, Dict, Literal, Optional
+from typing import TYPE_CHECKING, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict
 
@@ -60,7 +60,7 @@ class DefaultTableHandler(ResultHandler):
         """
 
         tags: ItemOrSet[str]
-        columns: Dict[str, str]
+        columns: dict[str, str]
         path: Path
         table_type: Literal["functions", "gradients"] = "functions"
         min_header_len: Optional[int] = None

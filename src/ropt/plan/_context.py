@@ -7,8 +7,6 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
-    Dict,
-    List,
     Optional,
 )
 
@@ -47,7 +45,7 @@ class OptimizerContext:
         self,
         evaluator: Evaluator,
         plugin_manager: Optional[PluginManager] = None,
-        variables: Optional[Dict[str, Any]] = None,
+        variables: Optional[dict[str, Any]] = None,
     ) -> None:
         """Initialize the optimization context.
 
@@ -69,7 +67,7 @@ class OptimizerContext:
             functions = getattr(plugin, "functions", None)
             if functions is not None:
                 self.expr.add_functions(functions)
-        self._subscribers: Dict[EventType, List[Callable[[Event], None]]] = {
+        self._subscribers: dict[EventType, list[Callable[[Event], None]]] = {
             event: [] for event in EventType
         }
         self.variables = {} if variables is None else variables

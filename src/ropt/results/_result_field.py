@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, fields
-from typing import TYPE_CHECKING, Tuple, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 if TYPE_CHECKING:
     from ropt.enums import ResultAxisName
@@ -15,7 +15,7 @@ class ResultField:
     """Base class for `Results` fields."""
 
     @classmethod
-    def get_axis_names(cls, name: str) -> Tuple[ResultAxisName, ...]:
+    def get_axis_names(cls, name: str) -> tuple[ResultAxisName, ...]:
         """Return the axis names of a field in the given field class or object.
 
         When used with the class or an instance of that class for one of the

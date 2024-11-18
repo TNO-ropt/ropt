@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import fields
 from importlib.util import find_spec
-from typing import TYPE_CHECKING, Any, Dict, Final, List, Optional, Set, Tuple, Union
+from typing import TYPE_CHECKING, Any, Final, Optional, Set
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -19,7 +19,7 @@ if _HAVE_TABULATE:
     from tabulate import tabulate
 
 
-def _get_select(results: Results, field_name: str, sub_fields: Set[str]) -> List[str]:
+def _get_select(results: Results, field_name: str, sub_fields: Set[str]) -> list[str]:
     results_field = getattr(results, field_name)
     return [
         name
@@ -28,9 +28,7 @@ def _get_select(results: Results, field_name: str, sub_fields: Set[str]) -> List
     ]
 
 
-def _add_prefix(
-    name: Union[Tuple[str, ...], str], prefix: str
-) -> Union[Tuple[str, ...], str]:
+def _add_prefix(name: tuple[str, ...] | str, prefix: str) -> tuple[str, ...] | str:
     return (
         (f"{prefix}.{name[0]}",) + name[1:]
         if isinstance(name, tuple)
@@ -50,7 +48,7 @@ def _add_metadata(
     return data_frame
 
 
-def _get_value(data: Dict[str, Any], keys: List[str]) -> Optional[Any]:  # noqa: ANN401
+def _get_value(data: dict[str, Any], keys: list[str]) -> Optional[Any]:  # noqa: ANN401
     for key in keys:
         if isinstance(data, dict):
             if key not in data:
@@ -72,7 +70,7 @@ def _write_table(
         )
 
 
-def _extract_columns(data_frame: pd.DataFrame, mapping: Dict[str, str]) -> pd.DataFrame:
+def _extract_columns(data_frame: pd.DataFrame, mapping: dict[str, str]) -> pd.DataFrame:
     # Columns need to be reordered to follow the ordering of the mapping keys.
     # Column names may be tuples, where the first element indicates column type
     # (e.g. `variable` or `objective`) and the rest variable or function names.

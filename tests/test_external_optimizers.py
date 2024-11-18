@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 import pytest
@@ -11,7 +11,7 @@ pytestmark = [pytest.mark.slow]
 
 
 @pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> Dict[str, Any]:
+def enopt_config_fixture() -> dict[str, Any]:
     return {
         "variables": {
             "initial_values": [0.0, 0.0, 0.1],

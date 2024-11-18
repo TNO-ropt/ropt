@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 import numpy as np
 from numpy.typing import NDArray
@@ -9,7 +9,7 @@ from ropt.plugins.function_transform.base import FunctionTransform
 
 def _calculate_transformed_functions(  # noqa: PLR0913
     config: EnOptConfig,
-    function_transforms: List[FunctionTransform],
+    function_transforms: list[FunctionTransform],
     transform_indices: Optional[NDArray[np.intc]],
     functions: NDArray[np.float64],
     realization_weights: Optional[NDArray[np.float64]],
@@ -37,7 +37,7 @@ def _calculate_transformed_functions(  # noqa: PLR0913
 
 def _calculate_transformed_objectives(
     config: EnOptConfig,
-    function_transforms: List[FunctionTransform],
+    function_transforms: list[FunctionTransform],
     functions: NDArray[np.float64],
     realization_weights: Optional[NDArray[np.float64]],
     failed_realizations: NDArray[np.bool_],
@@ -54,7 +54,7 @@ def _calculate_transformed_objectives(
 
 def _calculate_transformed_constraints(
     config: EnOptConfig,
-    function_transforms: List[FunctionTransform],
+    function_transforms: list[FunctionTransform],
     constraints: Optional[NDArray[np.float64]],
     realization_weights: Optional[NDArray[np.float64]],
     failed_realizations: NDArray[np.bool_],

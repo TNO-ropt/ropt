@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Iterator, List, Optional, Tuple
+from typing import TYPE_CHECKING, Iterator, Optional
 
 import numpy as np
 from numpy.random import default_rng
@@ -65,7 +65,7 @@ class EnsembleEvaluator:
         self,
         config: EnOptConfig,
         evaluator: Evaluator,
-        plan_id: Tuple[int, ...],
+        plan_id: tuple[int, ...],
         result_id_iter: Iterator[int],
         plugin_manager: PluginManager,
     ) -> None:
@@ -105,7 +105,7 @@ class EnsembleEvaluator:
         *,
         compute_functions: bool,
         compute_gradients: bool,
-    ) -> Tuple[Results, ...]:
+    ) -> tuple[Results, ...]:
         """Evaluate the given variable vectors.
 
         The `variables` argument may be a single vector of variables or a set
@@ -158,7 +158,7 @@ class EnsembleEvaluator:
 
     def _calculate_functions(
         self, variables: NDArray[np.float64]
-    ) -> Tuple[FunctionResults, ...]:
+    ) -> tuple[FunctionResults, ...]:
         if variables.ndim == 1:
             variables = variables[np.newaxis, :]
         active_objectives, active_constraints = _get_active_realizations(self._config)
@@ -261,7 +261,7 @@ class EnsembleEvaluator:
         self,
         variables: NDArray[np.float64],
         variable_indices: Optional[NDArray[np.intc]],
-    ) -> Tuple[GradientResults]:
+    ) -> tuple[GradientResults]:
         perturbed_variables = _perturb_variables(
             self._config, variables, self._samplers
         )
@@ -345,7 +345,7 @@ class EnsembleEvaluator:
         self,
         variables: NDArray[np.float64],
         variable_indices: Optional[NDArray[np.intc]],
-    ) -> Tuple[FunctionResults, GradientResults]:
+    ) -> tuple[FunctionResults, GradientResults]:
         perturbed_variables = _perturb_variables(
             self._config, variables, self._samplers
         )
@@ -599,7 +599,7 @@ class EnsembleEvaluator:
 
     def _calculate_filtered_realization_weights(
         self, evaluator_results: _FunctionEvaluatorResults
-    ) -> Tuple[Optional[NDArray[np.float64]], Optional[NDArray[np.float64]]]:
+    ) -> tuple[Optional[NDArray[np.float64]], Optional[NDArray[np.float64]]]:
         objective_weights: Optional[NDArray[np.float64]] = None
         constraint_weights: Optional[NDArray[np.float64]] = None
 
@@ -677,7 +677,7 @@ class EnsembleEvaluator:
 
     def _init_realization_filters(
         self, plugin_manager: PluginManager
-    ) -> List[RealizationFilter]:
+    ) -> list[RealizationFilter]:
         return [
             plugin_manager.get_plugin(
                 "realization_filter", method=filter_config.method
@@ -687,7 +687,7 @@ class EnsembleEvaluator:
 
     def _init_function_transforms(
         self, plugin_manager: PluginManager
-    ) -> List[FunctionTransform]:
+    ) -> list[FunctionTransform]:
         return [
             plugin_manager.get_plugin(
                 "function_transform", method=transform_config.method
@@ -697,8 +697,8 @@ class EnsembleEvaluator:
 
     def _init_samplers(
         self, rng: Generator, plugin_manager: PluginManager
-    ) -> List[Sampler]:
-        samplers: List[Sampler] = []
+    ) -> list[Sampler]:
+        samplers: list[Sampler] = []
         for idx, sampler_config in enumerate(self._config.samplers):
             variable_indices = _get_indices(
                 idx, self._config.gradient.samplers, self._config.variables.indices

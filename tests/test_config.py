@@ -1,5 +1,5 @@
 import copy
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Optional
 
 import numpy as np
 import pytest
@@ -17,7 +17,7 @@ from ropt.enums import BoundaryType, ConstraintType, PerturbationType, VariableT
 
 
 @pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> Dict[str, Any]:
+def enopt_config_fixture() -> dict[str, Any]:
     return {
         "variables": {
             "initial_values": np.array([1, 2]),
@@ -95,7 +95,7 @@ def test_check_variable_arrays() -> None:
 
 
 def test_check_variable_arrays_no_names() -> None:
-    config: Dict[str, Any] = {"initial_values": np.array([1, 2])}
+    config: dict[str, Any] = {"initial_values": np.array([1, 2])}
 
     for key in ["initial_values", "lower_bounds", "upper_bounds"]:
         config_copy = copy.deepcopy(config)
@@ -151,7 +151,7 @@ def test_check_variable_convert_array() -> None:
 
 
 def test_check_variable_arrays_types() -> None:
-    config: Dict[str, Any] = {"initial_values": np.array([1, 2])}
+    config: dict[str, Any] = {"initial_values": np.array([1, 2])}
     variables = VariablesConfig.model_validate(config)
     assert variables.types is None
 
@@ -167,7 +167,7 @@ def test_check_variable_arrays_types() -> None:
 
 
 def test_get_formatted_names() -> None:
-    config: Dict[str, Any] = {"initial_values": [0, 0]}
+    config: dict[str, Any] = {"initial_values": [0, 0]}
     variables = VariablesConfig.model_validate(config)
     joined = variables.get_formatted_names()
     assert joined is None
@@ -208,7 +208,7 @@ def test_get_formatted_names() -> None:
 
 
 def test_check_objective_function_arrays() -> None:
-    config: Dict[str, Any] = {"names": ["a", "b"]}
+    config: dict[str, Any] = {"names": ["a", "b"]}
 
     for key in ["scales", "weights"]:
         config_copy = copy.deepcopy(config)
@@ -248,7 +248,7 @@ def test_check_objective_function_arrays() -> None:
 
 
 def test_check_objective_function_arrays_no_names() -> None:
-    config: Dict[str, Any] = {"weights": [1, 1]}
+    config: dict[str, Any] = {"weights": [1, 1]}
 
     for key in ["scales", "weights"]:
         config_copy = copy.deepcopy(config)
@@ -276,7 +276,7 @@ def test_check_objective_function_arrays_no_names() -> None:
 
 
 def test_check_objective_function_convert_arrays() -> None:
-    config: Dict[str, Any] = {"names": ["a", "b"]}
+    config: dict[str, Any] = {"names": ["a", "b"]}
 
     for key in ["scales", "weights"]:
         config_copy = copy.deepcopy(config)
@@ -474,7 +474,7 @@ def test_check_realization_names() -> None:
 
 
 def test_check_realization_arrays() -> None:
-    config: Dict[str, Any] = {"names": ["a", "b"]}
+    config: dict[str, Any] = {"names": ["a", "b"]}
 
     for key in ["weights"]:
         config_copy = copy.deepcopy(config)
@@ -509,7 +509,7 @@ def test_check_realization_arrays() -> None:
 
 
 def test_check_realization_arrays_no_names() -> None:
-    config: Dict[str, Any] = {"weights": [1, 1]}
+    config: dict[str, Any] = {"weights": [1, 1]}
 
     for key in ["weights"]:
         config_copy = copy.deepcopy(config)
@@ -532,7 +532,7 @@ def test_check_realization_arrays_no_names() -> None:
 
 
 def test_check_realization_convert_arrays() -> None:
-    config: Dict[str, Any] = {"names": ["a", "b"]}
+    config: dict[str, Any] = {"names": ["a", "b"]}
 
     for key in ["weights"]:
         config_copy = copy.deepcopy(config)
@@ -617,8 +617,8 @@ def test_check_config_perturbations(enopt_config: Any) -> None:
 
 
 def test_check_config_min_success(enopt_config: Any) -> None:
-    def gen_config(pert_min: Optional[int], real_min: Optional[int]) -> Dict[str, Any]:
-        config: Dict[str, Any] = copy.deepcopy(enopt_config)
+    def gen_config(pert_min: Optional[int], real_min: Optional[int]) -> dict[str, Any]:
+        config: dict[str, Any] = copy.deepcopy(enopt_config)
         config["realizations"] = {"weights": 4 * [1.0]}
         config["gradient"] = {}
         if pert_min is not None:

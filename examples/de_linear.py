@@ -4,7 +4,7 @@ This example uses the differential evolution method to solve a discrete
 problem with a linear constraint.
 """
 
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
@@ -14,7 +14,7 @@ from ropt.evaluator import EvaluatorContext, EvaluatorResult
 from ropt.plan import BasicOptimizer, Event
 from ropt.results import FunctionResults
 
-CONFIG: Dict[str, Any] = {
+CONFIG: dict[str, Any] = {
     "variables": {
         "initial_values": 2 * [0.0],
         "lower_bounds": [0.0, 0.0],

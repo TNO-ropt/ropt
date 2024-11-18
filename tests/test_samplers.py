@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 import numpy as np
 import pytest
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> Dict[str, Any]:
+def enopt_config_fixture() -> dict[str, Any]:
     return {
         "optimizer": {
             "tolerance": 0.005,
@@ -115,7 +115,7 @@ def test_sampler_simple(enopt_config: Any) -> None:
 
 def test_sampler_use_options(enopt_config: Any) -> None:
     rng = default_rng(123)
-    samplers: List[Dict[str, Any]] = enopt_config["samplers"]
+    samplers: list[dict[str, Any]] = enopt_config["samplers"]
     samplers[0]["options"] = {"scale": 100.0}
     config = EnOptConfig.model_validate(enopt_config)
     sampler = MockedSampler(config, 0, None, rng)
@@ -130,7 +130,7 @@ def test_sampler_use_options(enopt_config: Any) -> None:
 
 def test_sampler_indexed(enopt_config: Any) -> None:
     rng = default_rng(123)
-    samplers: List[Dict[str, Any]] = enopt_config["samplers"]
+    samplers: list[dict[str, Any]] = enopt_config["samplers"]
     samplers.append(copy.deepcopy(samplers[0]))
     samplers[1]["options"] = {"scale": -1}
     enopt_config["gradient"]["samplers"] = [0, 1, 1]

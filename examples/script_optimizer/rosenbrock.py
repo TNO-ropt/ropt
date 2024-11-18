@@ -4,7 +4,6 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Tuple
 
 
 def rosenbrock(x: float, y: float, realization: int, coefficients_path: Path) -> float:
@@ -15,7 +14,7 @@ def rosenbrock(x: float, y: float, realization: int, coefficients_path: Path) ->
     return float((a - x) ** 2 + b * (y - x * x) ** 2)
 
 
-def _read_point(filename: Path) -> Tuple[float, float]:
+def _read_point(filename: Path) -> tuple[float, float]:
     with filename.open("r", encoding="utf-8") as f:
         variables = json.load(f)
     return variables["x"]["1"], variables["y"]["1"]

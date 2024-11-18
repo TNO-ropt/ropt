@@ -5,7 +5,7 @@ multi-dimensional Rosenbrock function. It shows how to write a minimal
 configuration and how to run and monitor the optimization.
 """
 
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
@@ -17,7 +17,7 @@ from ropt.results import FunctionResults
 
 DIM = 5
 
-CONFIG: Dict[str, Any] = {
+CONFIG: dict[str, Any] = {
     "variables": {
         "initial_values": 2 * np.arange(DIM) / DIM + 0.5,
     },
@@ -62,7 +62,7 @@ def report(event: Event) -> None:
             print(f"  objective: {item.functions.weighted_objective}\n")
 
 
-def run_optimization(config: Dict[str, Any]) -> FunctionResults:
+def run_optimization(config: dict[str, Any]) -> FunctionResults:
     """Run the optimization.
 
     Args:

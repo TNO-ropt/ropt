@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Protocol, Tuple
+from typing import TYPE_CHECKING, Protocol
 
 from ropt.plugins.base import Plugin
 
@@ -31,7 +31,7 @@ class OptimizerCallback(Protocol):
         *,
         return_functions: bool,
         return_gradients: bool,
-    ) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         """The signature of the optimizer callback.
 
         The optimizer callback expects a vector or matrix with variables to

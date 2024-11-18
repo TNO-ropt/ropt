@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, Literal, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -100,7 +100,7 @@ class DefaultTrackerHandler(ResultHandler):
             and event.results is not None
             and (event.tags & self._with.tags)
         ):
-            results: Union[Optional[FunctionResults], Tuple[FunctionResults, ...]]
+            results: Optional[FunctionResults] | tuple[FunctionResults, ...]
             results = None
             if self._with.type_ == "all":
                 results = _get_all_results(

@@ -1,6 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Optional, Tuple, cast
+from typing import Any, Callable, Optional, cast
 
 import numpy as np
 import pytest
@@ -11,7 +11,7 @@ from ropt.plan import BasicOptimizer
 
 
 @pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> Dict[str, Any]:
+def enopt_config_fixture() -> dict[str, Any]:
     return {
         "variables": {
             "initial_values": [0.0, 0.0, 0.1],
@@ -34,7 +34,7 @@ def enopt_config_fixture() -> Dict[str, Any]:
 
 
 def _run_functions(
-    functions: Tuple[Callable[..., Any], ...],
+    functions: tuple[Callable[..., Any], ...],
     variables: NDArray[np.float64],
     fail: bool,
 ) -> NDArray[np.float64]:
@@ -56,14 +56,14 @@ class TaskTestEvaluator(ConcurrentTask):
 
 class ConcurrentTestEvaluator(ConcurrentEvaluator):
     def __init__(
-        self, functions: Tuple[Callable[..., Any], ...], fail_index: int = -1
+        self, functions: tuple[Callable[..., Any], ...], fail_index: int = -1
     ) -> None:
         super().__init__(enable_cache=True, polling=0.0)
 
         self._executor = ThreadPoolExecutor(max_workers=4)
         self._functions = functions
         self._fail_index = fail_index
-        self._tasks: Dict[int, ConcurrentTask]
+        self._tasks: dict[int, ConcurrentTask]
 
     def launch(
         self,

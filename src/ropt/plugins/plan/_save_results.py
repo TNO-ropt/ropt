@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Sequence, Union
+from typing import TYPE_CHECKING, Any, Sequence
 
 from pydantic import BaseModel, ConfigDict
 
@@ -74,7 +74,7 @@ class DefaultSaveHandler(ResultHandler):
             delimiters: The delimiters to use to format plan_id values, applied sequentially.
         """
 
-        path: Union[str, Path]
+        path: str | Path
         tags: ItemOrSet[str]
         delimiters: str = "-"
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional
 
 from pydantic import BaseModel, ConfigDict
 
@@ -43,7 +43,7 @@ class DefaultRepeatStep(PlanStep):
         """
 
         iterations: int
-        steps: List[PlanStepConfig]
+        steps: list[PlanStepConfig]
         var: Optional[str] = None
 
         model_config = ConfigDict(

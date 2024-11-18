@@ -1,7 +1,7 @@
 """This plugin contains realization filters that are installed by default."""
 
 import sys
-from typing import List, Optional, Tuple, Union, cast
+from typing import Optional, Tuple, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -44,7 +44,7 @@ class SortObjectiveOptions(_ConfigBaseModel):
         last:  Index of the last realization to use.
     """
 
-    sort: List[Union[StrictStr, NonNegativeInt]]
+    sort: list[StrictStr | NonNegativeInt]
     first: NonNegativeInt
     last: NonNegativeInt
 
@@ -62,7 +62,7 @@ class SortConstraintOptions(_ConfigBaseModel):
         last:  Index of the last realization to use.
     """
 
-    sort: Union[StrictStr, NonNegativeInt]
+    sort: StrictStr | NonNegativeInt
     first: NonNegativeInt
     last: NonNegativeInt
 
@@ -86,7 +86,7 @@ class CVaRObjectiveOptions(_ConfigBaseModel):
         percentile: The CVaR percentile.
     """
 
-    sort: List[Union[StrictStr, NonNegativeInt]]
+    sort: list[StrictStr | NonNegativeInt]
     percentile: Annotated[float, Field(gt=0.0, le=1.0)] = 0.5
 
 
@@ -110,7 +110,7 @@ class CVaRConstraintOptions(_ConfigBaseModel):
         percentile: The CVaR percentile.
     """
 
-    sort: Union[StrictStr, NonNegativeInt]
+    sort: StrictStr | NonNegativeInt
     percentile: Annotated[float, Field(gt=0.0, le=1.0)] = 0.5
 
 
@@ -169,12 +169,12 @@ class DefaultRealizationFilter(RealizationFilter):
         """
         self._filter_config = enopt_config.realization_filters[filter_index]
         self._enopt_config = enopt_config
-        self._filter_options: Union[
-            SortObjectiveOptions,
-            SortConstraintOptions,
-            CVaRObjectiveOptions,
-            CVaRConstraintOptions,
-        ]
+        self._filter_options: (
+            SortObjectiveOptions
+            | SortConstraintOptions
+            | CVaRObjectiveOptions
+            | CVaRConstraintOptions
+        )
 
         _, _, self._method = self._filter_config.method.lower().rpartition("/")
         options = self._filter_config.options
@@ -224,8 +224,7 @@ class DefaultRealizationFilter(RealizationFilter):
         return weights
 
     def _check_range(
-        self,
-        options: Union[SortObjectiveOptions, SortConstraintOptions],
+        self, options: SortObjectiveOptions | SortConstraintOptions
     ) -> None:
         realizations = self._enopt_config.realizations.weights.size
         msg = f"Invalid range of realizations: [{options.first}, {options.last}]"
@@ -236,10 +235,7 @@ class DefaultRealizationFilter(RealizationFilter):
         if options.last < options.first:
             raise ConfigError(msg)
 
-    def _sort_objectives(
-        self,
-        objectives: NDArray[np.float64],
-    ) -> NDArray[np.float64]:
+    def _sort_objectives(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
         options = cast(SortObjectiveOptions, self._filter_options)
         objective_config = self._enopt_config.objective_functions
         failed_realizations = np.isnan(objectives[..., 0])
@@ -354,7 +350,7 @@ def _get_cvar_weights_from_percentile(
     return weights
 
 
-def _get_index(item: Union[str, int], names: Optional[Tuple[str, ...]]) -> int:
+def _get_index(item: str | int, names: Optional[Tuple[str, ...]]) -> int:
     if names is None:
         if isinstance(item, str):
             msg = "functions and constraints with no names must be referred to by index"
@@ -368,7 +364,7 @@ def _get_index(item: Union[str, int], names: Optional[Tuple[str, ...]]) -> int:
 
 
 def _get_indices(
-    items: List[Union[str, int]], names: Optional[Tuple[str, ...]]
+    items: list[str | int], names: Optional[Tuple[str, ...]]
 ) -> Tuple[int, ...]:
     return tuple(_get_index(item, names) for item in items)
 

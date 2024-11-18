@@ -6,13 +6,10 @@ from dataclasses import fields, is_dataclass
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
     Iterable,
     Literal,
     Optional,
-    Tuple,
     Type,
-    Union,
 )
 
 import xarray
@@ -31,17 +28,17 @@ if TYPE_CHECKING:
 def _to_dataset(  # noqa: PLR0913
     config: EnOptConfig,
     result_field: ResultField,
-    plan_id: Tuple[int, ...],
-    result_id: Union[int, Tuple[int, ...]],
+    plan_id: tuple[int, ...],
+    result_id: int | tuple[int, ...],
     batch_id: Optional[int],
-    metadata: Dict[str, Any],
+    metadata: dict[str, Any],
     select: Optional[Iterable[str]],
 ) -> xarray.Dataset:
     if select is None:
         select = (field.name for field in fields(result_field))
     arrays = {field: _to_data_array(config, result_field, field) for field in select}
     arrays = {field: array for field, array in arrays.items() if array is not None}
-    attrs: Dict[str, Any] = {}
+    attrs: dict[str, Any] = {}
     attrs["plan_id"] = plan_id
     attrs["result_id"] = result_id
     if batch_id is not None:
@@ -74,7 +71,7 @@ def _to_data_array(
     )
 
 
-def _get_index(config: EnOptConfig, axis: ResultAxisName) -> Optional[Tuple[Any, ...]]:
+def _get_index(config: EnOptConfig, axis: ResultAxisName) -> Optional[tuple[Any, ...]]:
     if axis == ResultAxisName.VARIABLE:
         return (
             None
@@ -91,13 +88,13 @@ def _get_index(config: EnOptConfig, axis: ResultAxisName) -> Optional[Tuple[Any,
     return None
 
 
-def _from_dataset(dataset: xarray.Dataset) -> Dict[str, Any]:
+def _from_dataset(dataset: xarray.Dataset) -> dict[str, Any]:
     return {str(name): data.to_numpy() for name, data in dataset.items()}
 
 
 def _to_netcdf(results: Results, config: EnOptConfig, filename: Path) -> None:
     mode: Literal["w", "a"] = "w"
-    metadata: Dict[str, Any] = {
+    metadata: dict[str, Any] = {
         "plan_id": json.dumps(results.plan_id),
         "result_id": json.dumps(results.result_id),
         "metadata": json.dumps(results.metadata),
@@ -115,10 +112,10 @@ def _to_netcdf(results: Results, config: EnOptConfig, filename: Path) -> None:
         )
 
 
-def _from_netcdf(filename: Path, result_type: Type[TypeResults]) -> Dict[str, Any]:
+def _from_netcdf(filename: Path, result_type: Type[TypeResults]) -> dict[str, Any]:
     if filename.suffix != ".nc":
         filename = filename.with_suffix(".nc")
-    result: Dict[str, Any] = xarray.open_dataset(filename, group="__metadata__").attrs
+    result: dict[str, Any] = xarray.open_dataset(filename, group="__metadata__").attrs
     result = {key: json.loads(value) for key, value in result.items()}
     if "plan_id" in result:
         result["plan_id"] = tuple(result["plan_id"])

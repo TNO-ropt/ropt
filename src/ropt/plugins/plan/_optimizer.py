@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Optional
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from ropt.config.plan import PlanStepConfig
     from ropt.results import Results
 
-MetaDataType = Dict[str, Union[int, float, bool, str]]
+MetaDataType = dict[str, int | float | bool | str]
 
 
 class DefaultOptimizerStep(PlanStep):
@@ -134,7 +134,7 @@ class DefaultOptimizerStep(PlanStep):
 
         config: str
         tags: ItemOrSet[str] = set()
-        initial_values: Optional[Union[str, Array1D]] = None
+        initial_values: Optional[str | Array1D] = None
         exit_code_var: Optional[str] = None
         nested_optimization: Optional[DefaultOptimizerStep.NestedPlanConfig] = None
 
@@ -222,7 +222,7 @@ class DefaultOptimizerStep(PlanStep):
         if exit_code == OptimizerExitCode.USER_ABORT:
             self.plan.abort()
 
-    def _signal_evaluation(self, results: Optional[Tuple[Results, ...]] = None) -> None:
+    def _signal_evaluation(self, results: Optional[tuple[Results, ...]] = None) -> None:
         """Called before and after the optimizer finishes an evaluation.
 
         Before the evaluation starts, this method is called with the `results`
@@ -252,7 +252,7 @@ class DefaultOptimizerStep(PlanStep):
 
     def _run_nested_plan(
         self, variables: NDArray[np.float64]
-    ) -> Tuple[Optional[FunctionResults], bool]:
+    ) -> tuple[Optional[FunctionResults], bool]:
         """Run a  nested plan.
 
         Args:

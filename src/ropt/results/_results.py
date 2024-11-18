@@ -7,13 +7,10 @@ from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
-    Dict,
     Final,
     Iterable,
     Optional,
-    Tuple,
     TypeVar,
-    Union,
 )
 
 if TYPE_CHECKING:
@@ -82,10 +79,10 @@ class Results(ABC):
         metadata:  The metadata.
     """
 
-    plan_id: Tuple[int, ...]
-    result_id: Union[int, Tuple[int, ...]]
+    plan_id: tuple[int, ...]
+    result_id: int | tuple[int, ...]
     batch_id: Optional[int]
-    metadata: Dict[str, Any]
+    metadata: dict[str, Any]
 
     def to_dataframe(
         self,
@@ -216,7 +213,7 @@ class Results(ABC):
             select,
         )
 
-    def to_netcdf(self, config: EnOptConfig, filename: Union[str, Path]) -> None:
+    def to_netcdf(self, config: EnOptConfig, filename: str | Path) -> None:
         """Write the results to a netCDF4 file.
 
         The fields of the result are converted to xarray datasets and each

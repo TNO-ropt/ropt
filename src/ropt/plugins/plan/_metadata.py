@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel, ConfigDict
 
@@ -48,7 +48,7 @@ class DefaultMetadataHandler(ResultHandler):
             tags: Optional tags specifying which result sources to modify.
         """
 
-        data: Dict[str, Any]
+        data: dict[str, Any]
         tags: ItemOrSet[str]
 
         model_config = ConfigDict(

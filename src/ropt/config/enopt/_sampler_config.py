@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
@@ -41,7 +41,7 @@ class SamplerConfig(BaseModel):
     """
 
     method: str = "scipy/default"
-    options: Dict[str, Any] = {}
+    options: dict[str, Any] = {}
     shared: bool = False
 
     model_config = ConfigDict(
