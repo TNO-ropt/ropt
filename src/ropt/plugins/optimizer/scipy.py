@@ -11,7 +11,6 @@ from typing import (
     Callable,
     ClassVar,
     Final,
-    Set,
     TextIO,
 )
 
@@ -35,7 +34,7 @@ from ropt.plugins.optimizer.utils import (
 
 from .base import Optimizer, OptimizerCallback, OptimizerPlugin
 
-_SUPPORTED_METHODS: Final[Set[str]] = {
+_SUPPORTED_METHODS: Final[set[str]] = {
     name.lower()
     for name in (
         "Nelder-Mead",
@@ -137,14 +136,14 @@ class SciPyOptimizer(Optimizer):
           trust-exact, and trust-krylov.
     """
 
-    _supported_constraints: ClassVar[dict[str, Set[str]]] = {
+    _supported_constraints: ClassVar[dict[str, set[str]]] = {
         "bounds": _CONSTRAINT_SUPPORT_BOUNDS,
         "linear:eq": _CONSTRAINT_SUPPORT_LINEAR_EQ,
         "linear:ineq": _CONSTRAINT_SUPPORT_LINEAR_INEQ,
         "nonlinear:eq": _CONSTRAINT_SUPPORT_NONLINEAR_EQ,
         "nonlinear:ineq": _CONSTRAINT_SUPPORT_NONLINEAR_INEQ,
     }
-    _required_constraints: ClassVar[dict[str, Set[str]]] = {
+    _required_constraints: ClassVar[dict[str, set[str]]] = {
         "bounds": _CONSTRAINT_REQUIRES_BOUNDS,
     }
 

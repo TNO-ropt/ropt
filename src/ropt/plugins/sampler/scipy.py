@@ -2,7 +2,7 @@
 
 import copy
 import warnings
-from typing import Any, Final, Set
+from typing import Any, Final
 
 import numpy as np
 from numpy.random import Generator
@@ -26,7 +26,7 @@ _QMC_ENGINES: Final = {
     "lhs": LatinHypercube,
 }
 
-_SUPPORTED_METHODS: Final[Set[str]] = set(_STATS_SAMPLERS.keys()) | set(
+_SUPPORTED_METHODS: Final[set[str]] = set(_STATS_SAMPLERS.keys()) | set(
     _QMC_ENGINES.keys()
 )
 

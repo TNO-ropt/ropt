@@ -24,7 +24,7 @@ that single values are embedded in a set or tuple, respectively:
 - [`ItemOrTuple[T]`][ropt.config.validated_types.ItemOrTuple]: Create a tuple of type `T`.
 """
 
-from typing import Annotated, Any, Set, TypeVar
+from typing import Annotated, Any, TypeVar
 
 import numpy as np
 from numpy.typing import NDArray
@@ -65,7 +65,7 @@ UniqueNames = Annotated[tuple[Any, ...], AfterValidator(_check_duplicates)]
 
 
 T = TypeVar("T")
-ItemOrSet = Annotated[Set[T], BeforeValidator(_convert_set)]
+ItemOrSet = Annotated[set[T], BeforeValidator(_convert_set)]
 """Convert to single value to a set containing that value, passes sets unchanged."""
 
 ItemOrTuple = Annotated[tuple[T, ...], BeforeValidator(_convert_tuple)]

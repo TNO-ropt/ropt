@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import fields
 from importlib.util import find_spec
-from typing import TYPE_CHECKING, Any, Final, Set
+from typing import TYPE_CHECKING, Any, Final
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -19,7 +19,7 @@ if _HAVE_TABULATE:
     from tabulate import tabulate
 
 
-def _get_select(results: Results, field_name: str, sub_fields: Set[str]) -> list[str]:
+def _get_select(results: Results, field_name: str, sub_fields: set[str]) -> list[str]:
     results_field = getattr(results, field_name)
     return [
         name
@@ -37,7 +37,7 @@ def _add_prefix(name: tuple[str, ...] | str, prefix: str) -> tuple[str, ...] | s
 
 
 def _add_metadata(
-    data_frame: pd.DataFrame, results: Results, sub_fields: Set[str]
+    data_frame: pd.DataFrame, results: Results, sub_fields: set[str]
 ) -> pd.DataFrame:
     for field in sub_fields:
         split_fields = field.split(".")

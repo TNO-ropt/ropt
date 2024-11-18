@@ -1,6 +1,6 @@
 """This plugin contains realization filters that are installed by default."""
 
-from typing import Annotated, Tuple, cast
+from typing import Annotated, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -346,7 +346,7 @@ def _get_cvar_weights_from_percentile(
     return weights
 
 
-def _get_index(item: str | int, names: Tuple[str, ...] | None) -> int:
+def _get_index(item: str | int, names: tuple[str, ...] | None) -> int:
     if names is None:
         if isinstance(item, str):
             msg = "functions and constraints with no names must be referred to by index"
@@ -360,8 +360,8 @@ def _get_index(item: str | int, names: Tuple[str, ...] | None) -> int:
 
 
 def _get_indices(
-    items: list[str | int], names: Tuple[str, ...] | None
-) -> Tuple[int, ...]:
+    items: list[str | int], names: tuple[str, ...] | None
+) -> tuple[int, ...]:
     return tuple(_get_index(item, names) for item in items)
 
 

@@ -7,7 +7,7 @@ from collections import Counter
 from collections.abc import Sequence as AbstractSequence
 from collections.abc import Set as AbstractSet
 from enum import IntEnum
-from typing import Any, Sequence, Set, Type, TypeVar, cast
+from typing import Any, Sequence, Type, TypeVar, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -161,7 +161,7 @@ def _check_duplicates(names: tuple[Any, ...] | None) -> tuple[Any, ...] | None:
 T = TypeVar("T")
 
 
-def _convert_set(value: T | Set[T] | Sequence[T]) -> Set[T]:
+def _convert_set(value: T | set[T] | Sequence[T]) -> set[T]:
     if isinstance(value, str):
         return {cast(T, value)}
     return set(value) if isinstance(value, AbstractSequence | AbstractSet) else {value}

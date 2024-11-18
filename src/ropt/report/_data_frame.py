@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import TYPE_CHECKING, Iterable, Literal, Set
+from typing import TYPE_CHECKING, Iterable, Literal
 
 from ropt.enums import ResultAxisName
 from ropt.results import FunctionResults, GradientResults
@@ -34,7 +34,7 @@ class ResultsDataFrame:
 
     def __init__(
         self,
-        fields: Set[str],
+        fields: set[str],
         *,
         table_type: Literal["functions", "gradients"] = "functions",
     ) -> None:
@@ -120,7 +120,7 @@ class ResultsDataFrame:
 
 
 def _get_function_results(
-    config: EnOptConfig, results: Results, sub_fields: Set[str]
+    config: EnOptConfig, results: Results, sub_fields: set[str]
 ) -> pd.DataFrame:
     if (
         not sub_fields
@@ -190,7 +190,7 @@ def _get_function_results(
 
 
 def _add_gradient_results(
-    config: EnOptConfig, results: Results, sub_fields: Set[str]
+    config: EnOptConfig, results: Results, sub_fields: set[str]
 ) -> pd.DataFrame:
     if (
         not sub_fields
