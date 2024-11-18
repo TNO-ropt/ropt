@@ -1483,7 +1483,7 @@ cases.</p>
 
 
 <h3 id="ropt.plan.BasicOptimizer.results" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">results</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">]</span></code>
+            <code class="highlight language-python"><span class="n">results</span><span class="p">:</span> <span class="n">FunctionResults</span> <span class="o">|</span> <span class="kc">None</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -1508,7 +1508,7 @@ cases.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.results.FunctionResults" href="../results/#ropt.results.FunctionResults">FunctionResults</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.results.FunctionResults" href="../results/#ropt.results.FunctionResults">FunctionResults</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1527,7 +1527,7 @@ cases.</p>
 
 
 <h3 id="ropt.plan.BasicOptimizer.variables" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">variables</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span></code>
+            <code class="highlight language-python"><span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -1552,7 +1552,7 @@ cases.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1939,7 +1939,7 @@ documentation for more details.</p>
                 <code>min_header_len</code>
             </td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[int]</code>
+                  <code>int | None</code>
             </td>
             <td>
               <div class="doc-md-description">

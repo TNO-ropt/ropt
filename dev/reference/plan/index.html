@@ -2113,7 +2113,7 @@ plans, the new plan will have the original values for these variables.</p>
                 <code>parent</code>
             </td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.plan._plan.Plan" href="#ropt.plan.Plan">Plan</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plan._plan.Plan" href="#ropt.plan.Plan">Plan</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2130,7 +2130,7 @@ plans, the new plan will have the original values for these variables.</p>
                 <code>plan_id</code>
             </td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[tuple[int, ...]]</code>
+                  <code>tuple[int, ...] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2868,7 +2868,7 @@ evaluator for processing plan-specific expressions.</p>
                 <code>plugin_manager</code>
             </td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2884,7 +2884,7 @@ evaluator for processing plan-specific expressions.</p>
                 <code>variables</code>
             </td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[dict[str, <span title="typing.Any">Any</span>]]</code>
+                  <code>dict[str, <span title="typing.Any">Any</span>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3163,7 +3163,7 @@ type of event passed as an argument.</p>
                 <code>functions</code>
             </td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[dict[str, <span title="typing.Callable">Callable</span>[..., <span title="typing.Any">Any</span>]]]</code>
+                  <code>dict[str, <span title="typing.Callable">Callable</span>[..., <span title="typing.Any">Any</span>]] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3443,7 +3443,7 @@ enumeration for more details.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plan.Event.results">results</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[tuple[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]]</code>
+                  <code>tuple[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3454,7 +3454,7 @@ enumeration for more details.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plan.Event.exit_code">exit_code</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.enums.OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.enums.OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">

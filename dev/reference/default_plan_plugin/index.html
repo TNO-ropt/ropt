@@ -2463,7 +2463,7 @@ scaling is handled internally.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith.values">values</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[str | <a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array2D" href="../utilities/#ropt.config.validated_types.Array2D">Array2D</a>]</code>
+                  <code>str | <a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array2D" href="../utilities/#ropt.config.validated_types.Array2D">Array2D</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2641,7 +2641,7 @@ define an optional nested optimization procedure.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.plan._optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith.initial_values">initial_values</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[str | <a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1D" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a>]</code>
+                  <code>str | <a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1D" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2652,7 +2652,7 @@ define an optional nested optimization procedure.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.plan._optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith.exit_code_var">exit_code_var</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[str]</code>
+                  <code>str | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2663,7 +2663,7 @@ define an optional nested optimization procedure.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.plan._optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith.nested_optimization">nested_optimization</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.plan._optimizer.DefaultOptimizerStep.NestedPlanConfig" href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep.NestedPlanConfig">NestedPlanConfig</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan._optimizer.DefaultOptimizerStep.NestedPlanConfig" href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep.NestedPlanConfig">NestedPlanConfig</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3056,7 +3056,7 @@ tracking.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.plan._repeat.DefaultRepeatStep.DefaultRepeatStepWith.var">var</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[str]</code>
+                  <code>str | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3364,7 +3364,7 @@ assisting result handlers in filtering relevant results.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.plan._tracker.DefaultTrackerHandler.DefaultTrackerHandlerWith.constraint_tolerance">constraint_tolerance</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[float]</code>
+                  <code>float | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3539,7 +3539,7 @@ which assists in filtering relevant results for the table.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.plan._table.DefaultTableHandler.DefaultTableHandlerWith.min_header_len">min_header_len</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[int]</code>
+                  <code>int | None</code>
             </td>
             <td>
               <div class="doc-md-description">

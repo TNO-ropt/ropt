@@ -1795,7 +1795,7 @@ used for all variables.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.linear_constraints">linear_constraints</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.config.enopt._linear_constraints_config.LinearConstraintsConfig" href="#ropt.config.enopt.LinearConstraintsConfig">LinearConstraintsConfig</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt._linear_constraints_config.LinearConstraintsConfig" href="#ropt.config.enopt.LinearConstraintsConfig">LinearConstraintsConfig</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1806,7 +1806,7 @@ used for all variables.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.nonlinear_constraints">nonlinear_constraints</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.config.enopt._nonlinear_constraints_config.NonlinearConstraintsConfig" href="#ropt.config.enopt.NonlinearConstraintsConfig">NonlinearConstraintsConfig</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt._nonlinear_constraints_config.NonlinearConstraintsConfig" href="#ropt.config.enopt.NonlinearConstraintsConfig">NonlinearConstraintsConfig</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1883,7 +1883,7 @@ used for all variables.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.original_inputs">original_inputs</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[dict[str, <span title="typing.Any">Any</span>]]</code>
+                  <code>dict[str, <span title="typing.Any">Any</span>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1997,7 +1997,7 @@ should change while others remain fixed.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.VariablesConfig.names">names</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.config.validated_types.UniqueNames" href="../utilities/#ropt.config.validated_types.UniqueNames">UniqueNames</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.UniqueNames" href="../utilities/#ropt.config.validated_types.UniqueNames">UniqueNames</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2008,7 +2008,7 @@ should change while others remain fixed.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.VariablesConfig.types">types</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.config.validated_types.ArrayEnum" href="../utilities/#ropt.config.validated_types.ArrayEnum">ArrayEnum</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.ArrayEnum" href="../utilities/#ropt.config.validated_types.ArrayEnum">ArrayEnum</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2052,7 +2052,7 @@ should change while others remain fixed.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.VariablesConfig.offsets">offsets</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1D" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1D" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2063,7 +2063,7 @@ should change while others remain fixed.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.VariablesConfig.scales">scales</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1D" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1D" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2074,7 +2074,7 @@ should change while others remain fixed.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.VariablesConfig.indices">indices</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.config.validated_types.ArrayIndices" href="../utilities/#ropt.config.validated_types.ArrayIndices">ArrayIndices</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.ArrayIndices" href="../utilities/#ropt.config.validated_types.ArrayIndices">ArrayIndices</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2145,7 +2145,7 @@ delimiter.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.Optional">Optional</span>[tuple[str, ...]]</code>
+                  <code>tuple[str, ...] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2251,7 +2251,7 @@ will still be calculated in the same way for practical purposes.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.names">names</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.config.validated_types.UniqueNames" href="../utilities/#ropt.config.validated_types.UniqueNames">UniqueNames</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.UniqueNames" href="../utilities/#ropt.config.validated_types.UniqueNames">UniqueNames</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2295,7 +2295,7 @@ will still be calculated in the same way for practical purposes.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.realization_filters">realization_filters</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1DInt" href="../utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1DInt" href="../utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2306,7 +2306,7 @@ will still be calculated in the same way for practical purposes.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.function_transforms">function_transforms</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1DInt" href="../utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1DInt" href="../utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2630,7 +2630,7 @@ will still be calculated in the same way for practical purposes.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.names">names</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.config.validated_types.UniqueNames" href="../utilities/#ropt.config.validated_types.UniqueNames">UniqueNames</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.UniqueNames" href="../utilities/#ropt.config.validated_types.UniqueNames">UniqueNames</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2686,7 +2686,7 @@ will still be calculated in the same way for practical purposes.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.realization_filters">realization_filters</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1DInt" href="../utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1DInt" href="../utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2697,7 +2697,7 @@ will still be calculated in the same way for practical purposes.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.function_transforms">function_transforms</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1DInt" href="../utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1DInt" href="../utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2796,7 +2796,7 @@ and will behave as if the value is set to one.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.RealizationsConfig.names">names</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.config.validated_types.UniqueNames" href="../utilities/#ropt.config.validated_types.UniqueNames">UniqueNames</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.UniqueNames" href="../utilities/#ropt.config.validated_types.UniqueNames">UniqueNames</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2818,7 +2818,7 @@ and will behave as if the value is set to one.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.RealizationsConfig.realization_min_success">realization_min_success</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="pydantic.NonNegativeInt">NonNegativeInt</span>]</code>
+                  <code><span title="pydantic.NonNegativeInt">NonNegativeInt</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2930,7 +2930,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.max_iterations">max_iterations</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="pydantic.PositiveInt">PositiveInt</span>]</code>
+                  <code><span title="pydantic.PositiveInt">PositiveInt</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2941,7 +2941,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.max_functions">max_functions</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="pydantic.PositiveInt">PositiveInt</span>]</code>
+                  <code><span title="pydantic.PositiveInt">PositiveInt</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2952,7 +2952,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.tolerance">tolerance</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="pydantic.NonNegativeFloat">NonNegativeFloat</span>]</code>
+                  <code><span title="pydantic.NonNegativeFloat">NonNegativeFloat</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2998,7 +2998,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.output_dir">output_dir</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="pathlib.Path">Path</span>]</code>
+                  <code><span title="pathlib.Path">Path</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3009,7 +3009,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.options">options</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[dict[str, <span title="typing.Any">Any</span>] | list[str]]</code>
+                  <code>dict[str, <span title="typing.Any">Any</span>] | None | list[str]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3131,7 +3131,7 @@ gradient.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.GradientConfig.perturbation_min_success">perturbation_min_success</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="pydantic.PositiveInt">PositiveInt</span>]</code>
+                  <code><span title="pydantic.PositiveInt">PositiveInt</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3185,7 +3185,7 @@ gradient.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.GradientConfig.samplers">samplers</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1DInt" href="../utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1DInt" href="../utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
