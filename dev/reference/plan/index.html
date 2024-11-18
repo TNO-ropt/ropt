@@ -3164,12 +3164,10 @@ type of event passed as an argument.</p>
    expression, and the result replaces the <code>&lt;&lt;...&gt;&gt;</code> substring.</p>
 </li>
 <li>
-<p>Strings containing a single <code>$</code> character, or enclosed in <code>&lt;&lt;...&gt;&gt;</code>,
-   are evaluated as expressions. Then, singular <code>$</code> characters are
-   removed and sequences of two or more <code>$</code> characters are shortened by
-   one. The remaining string is then evaluated as a Python expression
-   with limited functionality. These expressions can access the
-   variables passed through the <code>variables</code> parameter, a set of built-in
+<p>Strings containing single <code>$</code> characters, or enclosed in <code>$(...)</code>,
+   are evaluated as expressions. Variables and function calls must be
+   prefixed by a <code>$</code> character. Expressions can access the variables
+   passed through the <code>variables</code> parameter, a set of built-in
    functions, and any additional functions added using the
    <a class="autorefs autorefs-internal" href="#ropt.plan.ExpressionEvaluator.add_functions"><code>add_functions</code></a>
    method.</p>
@@ -3178,42 +3176,48 @@ type of event passed as an argument.</p>
 
 
 <details class="tip" open>
-  <summary>String Interpolation with <code>&lt;&lt;...&gt;&gt;</code>:</summary>
-  <p>Use the <code>&lt;&lt;...&gt;&gt;</code> notation when the overall result should be a
-string. Expressions within <code>&lt;&lt;...&gt;&gt;</code> do not require <code>$</code> signs,
-though it may be clearer to prefix variables with <code>$</code>, for example:
-<code>&lt;&lt;$x + 1&gt;&gt;</code></p>
+  <summary>Expressions only containing literals</summary>
+  <p>If an expression has no variables or expressions, you need to enclose
+it in <code>$(...)</code> delimiters, like so: <code>$(1 + 1)</code>.</p>
 </details>
 
-<details class="recommended-practices" open>
-  <summary>Recommended Practices</summary>
-  <ul>
-<li>Prefix variables with <code>$</code> for clarity.</li>
-<li>Optionally prefix function calls with <code>$</code>, in particular if the function
-  is not a Python built-in function.</li>
-<li>Enclose expressions without variables or functions in <code>$(...)</code>.</li>
-</ul>
-</details>        <p>Examples of valid expressions:
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="err">$</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="err">$</span><span class="n">x</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="err">$</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="err">$</span><span class="n">x</span> <span class="o">+</span> <span class="err">$</span><span class="n">y</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="mi">1</span> <span class="o">+</span> <span class="err">$</span><span class="n">x</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="err">$</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="err">$</span><span class="n">x</span><span class="p">)</span>
-</span></code></pre></div></p>
-<p>Omitting some <code>$</code> signs is valid, and may enhance clarity:
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="err">$</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="err">$</span><span class="n">x</span><span class="p">)</span>
-</span></code></pre></div></p>
-<p>Less recommended, but still valid:
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="err">$</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">1</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="err">$</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="err">$</span><span class="mi">1</span> <span class="o">+</span> <span class="err">$</span><span class="n">x</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="err">$</span><span class="mi">1</span> <span class="o">+</span> <span class="n">x</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="err">$</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="err">$</span><span class="p">(</span><span class="err">$</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="err">$</span><span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
-</span></code></pre></div></p>
+<details class="tip" open>
+  <summary>String Interpolation with <code>&lt;&lt;...&gt;&gt;</code>:</summary>
+  <p>Use the <code>&lt;&lt;...&gt;&gt;</code> notation when the overall result should be a
+string. Expressions within <code>&lt;&lt;...&gt;&gt;</code> do not require <code>$(...)</code> delimiters:
+<code>"&lt;&lt;1 + 1&gt;&gt;"</code> will evaluate to <code>"2"</code>, but variables and function calls must
+still be prefixed with <code>$</code>, for example <code>"&lt;&lt;$x + 1&gt;&gt;"</code>.</p>
+</details>        <p>Examples of valid expressions, assuming <code>x == 1</code> and <code>y ==2</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Expression</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>$(1 + 1)</code></td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>$x</code></td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>$x + 1</code></td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>$x + $y</code></td>
+<td>3</td>
+</tr>
+<tr>
+<td><code>$max(1, $y)</code></td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
 
 
 <details class="info" open>
@@ -3225,7 +3229,7 @@ though it may be clearer to prefix variables with <code>$</code>, for example:
   lists (<code>[...]</code>) and dictionaries (<code>{...}</code>) are supported and can
   reference variables or call functions within them.</li>
 <li>Allowed types in expressions include numbers, strings, dicts,
-  lists, <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a>, and
+  lists, <code>numpy</code> arrays, <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a>, and
   <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> objects.</li>
 <li>Built-in functions include: <code>abs</code>, <code>bool</code>, <code>divmod</code>, <code>float</code>,
   <code>int</code>, <code>max</code>, <code>min</code>, <code>pow</code>, <code>range</code>, <code>round</code>, <code>sum</code>, <code>str</code>.</li>
