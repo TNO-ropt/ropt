@@ -1993,7 +1993,7 @@ and the assignment order matters.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><span title="pydantic.RootModel">RootModel</span>[<span title="typing.Union">Union</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>], <span title="typing.Tuple">Tuple</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>], ...]]]</code></p>
+              Bases: <code><span title="pydantic.RootModel">RootModel</span>[dict[str, <span title="typing.Any">Any</span>] | tuple[dict[str, <span title="typing.Any">Any</span>], ...]]</code></p>
 
 
         <p>Configuration for a set step.</p>
@@ -2134,7 +2134,7 @@ formats are supported:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.plan._load_data.DefaultLoadStep.DefaultLoadStepWith.path">path</span></code></td>
             <td>
-                  <code><span title="typing.Union">Union</span>[str, <span title="pathlib.Path">Path</span>]</code>
+                  <code>str | <span title="pathlib.Path">Path</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2284,7 +2284,7 @@ Supported formats are:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.plan._save_data.DefaultSaveStep.DefaultSaveStepWith.path">path</span></code></td>
             <td>
-                  <code><span title="typing.Union">Union</span>[str, <span title="pathlib.Path">Path</span>]</code>
+                  <code>str | <span title="pathlib.Path">Path</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2463,7 +2463,7 @@ scaling is handled internally.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith.values">values</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[str, <a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array2D" href="../utilities/#ropt.config.validated_types.Array2D">Array2D</a>]]</code>
+                  <code><span title="typing.Optional">Optional</span>[str | <a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array2D" href="../utilities/#ropt.config.validated_types.Array2D">Array2D</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2641,7 +2641,7 @@ define an optional nested optimization procedure.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.plan._optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith.initial_values">initial_values</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[str, <a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1D" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a>]]</code>
+                  <code><span title="typing.Optional">Optional</span>[str | <a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1D" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3045,7 +3045,7 @@ tracking.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.plan._repeat.DefaultRepeatStep.DefaultRepeatStepWith.steps">steps</span></code></td>
             <td>
-                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.config.plan.PlanStepConfig" href="../plan_config/#ropt.config.plan.PlanStepConfig">PlanStepConfig</a>]</code>
+                  <code>list[<a class="autorefs autorefs-internal" title="ropt.config.plan.PlanStepConfig" href="../plan_config/#ropt.config.plan.PlanStepConfig">PlanStepConfig</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3185,7 +3185,7 @@ which can assist result handlers in filtering relevant results.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.plan._metadata.DefaultMetadataHandler.DefaultMetadataHandlerWith.data">data</span></code></td>
             <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+                  <code>dict[str, <span title="typing.Any">Any</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3506,7 +3506,7 @@ which assists in filtering relevant results for the table.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.plan._table.DefaultTableHandler.DefaultTableHandlerWith.columns">columns</span></code></td>
             <td>
-                  <code><span title="typing.Dict">Dict</span>[str, str]</code>
+                  <code>dict[str, str]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3691,7 +3691,7 @@ to the file name if not present already.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.plan._save_results.DefaultSaveHandler.DefaultSaveHandlerWith.path">path</span></code></td>
             <td>
-                  <code><span title="typing.Union">Union</span>[str, <span title="pathlib.Path">Path</span>]</code>
+                  <code>str | <span title="pathlib.Path">Path</span></code>
             </td>
             <td>
               <div class="doc-md-description">

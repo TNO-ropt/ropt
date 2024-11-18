@@ -820,21 +820,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="EvaluatorContext">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.evaluator.EvaluatorContext.active" class="md-nav__link">
-    <span class="md-ellipsis">
-      active
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -1534,21 +1519,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="EvaluatorContext">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.evaluator.EvaluatorContext.active" class="md-nav__link">
-    <span class="md-ellipsis">
-      active
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -1844,7 +1814,7 @@ functions.</p>
                 <code>plan_id</code>
             </td>
             <td>
-                  <code><span title="typing.Tuple">Tuple</span>[int, ...]</code>
+                  <code>tuple[int, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1986,7 +1956,7 @@ results are returned: functions, gradients, or both.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]</code>
+                  <code>tuple[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2316,6 +2286,17 @@ indicating the realizations requiring evaluation.</p>
               </div>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.evaluator.EvaluatorContext.active">active</span></code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Signifies which realizations are active.</p>
+              </div>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -2334,55 +2315,6 @@ indicating the realizations requiring evaluation.</p>
 
 
 
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h4 id="ropt.evaluator.EvaluatorContext.active" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">active</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">]]</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-cached"><code>cached</code></small>
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the set of active variable vectors.</p>
-<p>This property is useful for determining the realizations for which the
-objective and constraint functions need to be calculated. The index of
-each entry corresponds to the realization number and indicates whether
-the functions should be calculated.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A boolean array.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-    </div>
-
-</div>
 
 
 

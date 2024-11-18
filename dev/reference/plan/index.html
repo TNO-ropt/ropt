@@ -1892,7 +1892,7 @@ involving a single optimization.</p>
 
 
 <h4 id="ropt.plan.Plan.plan_id" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">plan_id</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span></code>
+            <code class="highlight language-python"><span class="n">plan_id</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
@@ -1921,7 +1921,7 @@ encoded in the <code>plan_id</code> attribute as a sequential tuple.</p>
       <tbody>
           <tr class="doc-section-item">
 <td><code>tuple</code></td>            <td>
-                  <code><span title="typing.Tuple">Tuple</span>[int, ...]</code>
+                  <code>tuple[int, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2130,7 +2130,7 @@ plans, the new plan will have the original values for these variables.</p>
                 <code>plan_id</code>
             </td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Tuple">Tuple</span>[int, ...]]</code>
+                  <code><span title="typing.Optional">Optional</span>[tuple[int, ...]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2223,7 +2223,7 @@ its respective configuration.</p>
                 <code>step_configs</code>
             </td>
             <td>
-                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.config.plan.PlanStepConfig" href="../plan_config/#ropt.config.plan.PlanStepConfig">PlanStepConfig</a>]</code>
+                  <code>list[<a class="autorefs autorefs-internal" title="ropt.config.plan.PlanStepConfig" href="../plan_config/#ropt.config.plan.PlanStepConfig">PlanStepConfig</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2249,7 +2249,7 @@ its respective configuration.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a>]</code>
+                  <code>list[<a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2297,7 +2297,7 @@ an aborted run.</p>
                 <code>steps</code>
             </td>
             <td>
-                  <code><span title="typing.List">List</span>[<a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a>]</code>
+                  <code>list[<a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2884,7 +2884,7 @@ evaluator for processing plan-specific expressions.</p>
                 <code>variables</code>
             </td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]]</code>
+                  <code><span title="typing.Optional">Optional</span>[dict[str, <span title="typing.Any">Any</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3163,7 +3163,7 @@ type of event passed as an argument.</p>
                 <code>functions</code>
             </td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Callable">Callable</span>[..., <span title="typing.Any">Any</span>]]]</code>
+                  <code><span title="typing.Optional">Optional</span>[dict[str, <span title="typing.Callable">Callable</span>[..., <span title="typing.Any">Any</span>]]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3443,7 +3443,7 @@ enumeration for more details.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plan.Event.results">results</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]]</code>
+                  <code><span title="typing.Optional">Optional</span>[tuple[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3476,7 +3476,7 @@ enumeration for more details.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plan.Event.plan_id">plan_id</span></code></td>
             <td>
-                  <code><span title="typing.Tuple">Tuple</span>[int, ...]</code>
+                  <code>tuple[int, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">

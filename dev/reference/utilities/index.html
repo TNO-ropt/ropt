@@ -2400,7 +2400,7 @@ specified, <code>:</code> is used by default.</p>
                 <code>values</code>
             </td>
             <td>
-                  <code><span title="typing.Union">Union</span>[str, <span title="typing.Tuple">Tuple</span>[<span title="typing.Any">Any</span>, ...]]</code>
+                  <code>str | tuple[<span title="typing.Any">Any</span>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2848,7 +2848,7 @@ these validators may not function properly with frozen Pydantic classes.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.Tuple">Tuple</span>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="typing.Any">Any</span>], ...]</code>
+                  <code>tuple[<span title="numpy.typing.NDArray">NDArray</span>[<span title="typing.Any">Any</span>], ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3246,7 +3246,7 @@ that single values are embedded in a set or tuple, respectively:</p>
 
 
 <h3 id="ropt.config.validated_types.UniqueNames" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">UniqueNames</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">AfterValidator</span><span class="p">(</span><span class="n">_check_duplicates</span><span class="p">)]</span></code>
+            <code class="highlight language-python"><span class="n">UniqueNames</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">AfterValidator</span><span class="p">(</span><span class="n">_check_duplicates</span><span class="p">)]</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
@@ -3288,7 +3288,7 @@ that single values are embedded in a set or tuple, respectively:</p>
 
 
 <h3 id="ropt.config.validated_types.ItemOrTuple" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">ItemOrTuple</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">BeforeValidator</span><span class="p">(</span><span class="n">_convert_tuple</span><span class="p">)]</span></code>
+            <code class="highlight language-python"><span class="n">ItemOrTuple</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">BeforeValidator</span><span class="p">(</span><span class="n">_convert_tuple</span><span class="p">)]</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>

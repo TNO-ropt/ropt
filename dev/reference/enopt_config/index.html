@@ -1850,7 +1850,7 @@ used for all variables.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.realization_filters">realization_filters</span></code></td>
             <td>
-                  <code><span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.config.enopt._realization_filter_config.RealizationFilterConfig" href="#ropt.config.enopt.RealizationFilterConfig">RealizationFilterConfig</a>, ...]</code>
+                  <code>tuple[<a class="autorefs autorefs-internal" title="ropt.config.enopt._realization_filter_config.RealizationFilterConfig" href="#ropt.config.enopt.RealizationFilterConfig">RealizationFilterConfig</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1861,7 +1861,7 @@ used for all variables.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.function_transforms">function_transforms</span></code></td>
             <td>
-                  <code><span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.config.enopt._function_transform_config.FunctionTransformConfig" href="#ropt.config.enopt.FunctionTransformConfig">FunctionTransformConfig</a>, ...]</code>
+                  <code>tuple[<a class="autorefs autorefs-internal" title="ropt.config.enopt._function_transform_config.FunctionTransformConfig" href="#ropt.config.enopt.FunctionTransformConfig">FunctionTransformConfig</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1872,7 +1872,7 @@ used for all variables.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.samplers">samplers</span></code></td>
             <td>
-                  <code><span title="typing.Tuple">Tuple</span>[<a class="autorefs autorefs-internal" title="ropt.config.enopt._sampler_config.SamplerConfig" href="#ropt.config.enopt.SamplerConfig">SamplerConfig</a>, ...]</code>
+                  <code>tuple[<a class="autorefs autorefs-internal" title="ropt.config.enopt._sampler_config.SamplerConfig" href="#ropt.config.enopt.SamplerConfig">SamplerConfig</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1883,7 +1883,7 @@ used for all variables.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.original_inputs">original_inputs</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]]</code>
+                  <code><span title="typing.Optional">Optional</span>[dict[str, <span title="typing.Any">Any</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2145,7 +2145,7 @@ delimiter.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Tuple">Tuple</span>[str, ...]]</code>
+                  <code><span title="typing.Optional">Optional</span>[tuple[str, ...]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3009,7 +3009,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.options">options</span></code></td>
             <td>
-                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Union">Union</span>[<span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>], <span title="typing.List">List</span>[str]]]</code>
+                  <code><span title="typing.Optional">Optional</span>[dict[str, <span title="typing.Any">Any</span>] | list[str]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3392,7 +3392,7 @@ interpretation of these options depends on the chosen method.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.FunctionTransformConfig.options">options</span></code></td>
             <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+                  <code>dict[str, <span title="typing.Any">Any</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3485,7 +3485,7 @@ method.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.RealizationFilterConfig.options">options</span></code></td>
             <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+                  <code>dict[str, <span title="typing.Any">Any</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3581,7 +3581,7 @@ directed to use the same set of perturbed values for each realization.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.SamplerConfig.options">options</span></code></td>
             <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+                  <code>dict[str, <span title="typing.Any">Any</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
