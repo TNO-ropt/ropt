@@ -281,18 +281,20 @@ class ScriptOptimizer:
 
     def _log_exit_code(self, event: Event) -> None:
         msg = ""
-        if event.exit_code == OptimizerExitCode.TOO_FEW_REALIZATIONS:
-            msg = "Too few successful realizations: optimization stopped."
-        elif event.exit_code == OptimizerExitCode.MAX_FUNCTIONS_REACHED:
-            msg = "Maximum number of functions reached: optimization stopped."
-        elif event.exit_code == OptimizerExitCode.USER_ABORT:
-            msg = "Optimization plan aborted by the user."
-        elif event.exit_code == OptimizerExitCode.OPTIMIZER_STEP_FINISHED:
-            msg = "Optimization finished normally."
-        if msg:
-            if event.tags is not None:
-                msg = f"Step tagged as `{event.tags}`: {msg}"
-            self._logger.info(msg)
+        match event.exit_code:
+            case OptimizerExitCode.TOO_FEW_REALIZATIONS:
+                msg = "Too few successful realizations: optimization stopped."
+            case OptimizerExitCode.MAX_FUNCTIONS_REACHED:
+                msg = "Maximum number of functions reached: optimization stopped."
+            case OptimizerExitCode.USER_ABORT:
+                msg = "Optimization plan aborted by the user."
+            case OptimizerExitCode.OPTIMIZER_STEP_FINISHED:
+                msg = "Optimization finished normally."
+            case _:
+                return
+        if event.tags is not None:
+            msg = f"Step tagged as `{event.tags}`: {msg}"
+        self._logger.info(msg)
 
     def add_observer(
         self, event_type: EventType, function: Callable[[Event], None]

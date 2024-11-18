@@ -89,9 +89,10 @@ class DefaultSaveStep(PlanStep):
             path.parent.mkdir(parents=True, exist_ok=True)
 
         data = self.plan.eval(self._with.data)
-        if self._with.format == "json":
-            with path.open("w", encoding="utf-8") as file_obj:
-                json.dump(data, file_obj, cls=NumpyEncoder)
-        elif self._with.format == "pickle":
-            with path.open("wb") as file_obj:
-                pickle.dump(data, file_obj)
+        match self._with.format:
+            case "json":
+                with path.open("w", encoding="utf-8") as file_obj:
+                    json.dump(data, file_obj, cls=NumpyEncoder)
+            case "pickle":
+                with path.open("wb") as file_obj:
+                    pickle.dump(data, file_obj)

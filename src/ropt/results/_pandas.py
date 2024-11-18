@@ -83,24 +83,27 @@ def _to_series(  # noqa: PLR0913
 
 def _get_index(config: EnOptConfig, axis: ResultAxisName) -> Iterable[Any]:
     result: Iterable[Any] = []
-    if axis == ResultAxisName.VARIABLE:
-        formatted_names = config.variables.get_formatted_names()
-        result = [] if formatted_names is None else formatted_names
-    elif axis == ResultAxisName.OBJECTIVE:
-        result = (
-            config.objective_functions.names
-            if config.objective_functions.names is not None
-            else []
-        )
-    elif axis == ResultAxisName.NONLINEAR_CONSTRAINT:
-        assert config.nonlinear_constraints is not None
-        result = (
-            config.nonlinear_constraints.names
-            if config.nonlinear_constraints.names is not None
-            else []
-        )
-    elif axis == ResultAxisName.REALIZATION:
-        result = (
-            config.realizations.names if config.realizations.names is not None else []
-        )
+    match axis:
+        case ResultAxisName.VARIABLE:
+            formatted_names = config.variables.get_formatted_names()
+            result = [] if formatted_names is None else formatted_names
+        case ResultAxisName.OBJECTIVE:
+            result = (
+                config.objective_functions.names
+                if config.objective_functions.names is not None
+                else []
+            )
+        case ResultAxisName.NONLINEAR_CONSTRAINT:
+            assert config.nonlinear_constraints is not None
+            result = (
+                config.nonlinear_constraints.names
+                if config.nonlinear_constraints.names is not None
+                else []
+            )
+        case ResultAxisName.REALIZATION:
+            result = (
+                config.realizations.names
+                if config.realizations.names is not None
+                else []
+            )
     return result

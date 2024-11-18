@@ -178,19 +178,20 @@ class DefaultRealizationFilter(RealizationFilter):
 
         _, _, self._method = self._filter_config.method.lower().rpartition("/")
         options = self._filter_config.options
-        if self._method == "sort-objective":
-            self._filter_options = SortObjectiveOptions.model_validate(options)
-            self._check_range(self._filter_options)
-        elif self._method == "sort-constraint":
-            self._filter_options = SortConstraintOptions.model_validate(options)
-            self._check_range(self._filter_options)
-        elif self._method == "cvar-objective":
-            self._filter_options = CVaRObjectiveOptions.model_validate(options)
-        elif self._method == "cvar-constraint":
-            self._filter_options = CVaRConstraintOptions.model_validate(options)
-        else:
-            msg = f"Realization filter not supported: {self._method}"
-            raise ConfigError(msg)
+        match self._method:
+            case "sort-objective":
+                self._filter_options = SortObjectiveOptions.model_validate(options)
+                self._check_range(self._filter_options)
+            case "sort-constraint":
+                self._filter_options = SortConstraintOptions.model_validate(options)
+                self._check_range(self._filter_options)
+            case "cvar-objective":
+                self._filter_options = CVaRObjectiveOptions.model_validate(options)
+            case "cvar-constraint":
+                self._filter_options = CVaRConstraintOptions.model_validate(options)
+            case _:
+                msg = f"Realization filter not supported: {self._method}"
+                raise ConfigError(msg)
 
     def get_realization_weights(  # D107
         self,
@@ -206,17 +207,18 @@ class DefaultRealizationFilter(RealizationFilter):
         # noqa
         """
         weights = self._enopt_config.realizations.weights
-        if self._method == "sort-objective":
-            weights = self._sort_objectives(objectives)
-        elif self._method == "sort-constraint" and constraints is not None:
-            weights = self._sort_constraint(constraints)
-        elif self._method == "cvar-objective":
-            weights = self._cvar_objectives(objectives)
-        elif self._method == "cvar-constraint" and constraints is not None:
-            weights = self._cvar_constraint(constraints)
-        else:
-            msg = f"Realization filter not supported: {self._method}"
-            raise ConfigError(msg)
+        match self._method:
+            case "sort-objective":
+                weights = self._sort_objectives(objectives)
+            case "sort-constraint" if constraints is not None:
+                weights = self._sort_constraint(constraints)
+            case "cvar-objective":
+                weights = self._cvar_objectives(objectives)
+            case "cvar-constraint" if constraints is not None:
+                weights = self._cvar_constraint(constraints)
+            case _:
+                msg = f"Realization filter not supported: {self._method}"
+                raise ConfigError(msg)
 
         if not np.any(weights > 0):
             raise OptimizationAborted(exit_code=OptimizerExitCode.TOO_FEW_REALIZATIONS)

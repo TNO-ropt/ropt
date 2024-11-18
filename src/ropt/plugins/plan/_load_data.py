@@ -80,9 +80,10 @@ class DefaultLoadStep(PlanStep):
             msg = f"The file does not exist: {path}"
             raise RuntimeError(msg)
 
-        if self._with.format == "json":
-            with path.open("r", encoding="utf-8") as file_obj:
-                self.plan[self._with.var] = json.load(file_obj)
-        elif self._with.format == "pickle":
-            with path.open("rb") as file_obj:
-                self.plan[self._with.var] = pickle.load(file_obj)  # noqa: S301
+        match self._with.format:
+            case "json":
+                with path.open("r", encoding="utf-8") as file_obj:
+                    self.plan[self._with.var] = json.load(file_obj)
+            case "pickle":
+                with path.open("rb") as file_obj:
+                    self.plan[self._with.var] = pickle.load(file_obj)  # noqa: S301

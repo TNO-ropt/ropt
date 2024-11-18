@@ -102,21 +102,22 @@ class DefaultTrackerHandler(ResultHandler):
         ):
             results: Optional[FunctionResults] | tuple[FunctionResults, ...]
             results = None
-            if self._with.type_ == "all":
-                results = _get_all_results(
-                    event.results, self._with.constraint_tolerance
-                )
-                self.plan[self._with.var] = deepcopy(results)
-            elif self._with.type_ == "best":
-                results = _update_optimal_result(
-                    self.plan[self._with.var],
-                    event.results,
-                    self._with.constraint_tolerance,
-                )
-            elif self._with.type_ == "last":
-                results = _get_last_result(
-                    event.results, self._with.constraint_tolerance
-                )
+            match self._with.type_:
+                case "all":
+                    results = _get_all_results(
+                        event.results, self._with.constraint_tolerance
+                    )
+                    self.plan[self._with.var] = deepcopy(results)
+                case "best":
+                    results = _update_optimal_result(
+                        self.plan[self._with.var],
+                        event.results,
+                        self._with.constraint_tolerance,
+                    )
+                case "last":
+                    results = _get_last_result(
+                        event.results, self._with.constraint_tolerance
+                    )
             if results is not None:
                 self.plan[self._with.var] = deepcopy(results)
         return event

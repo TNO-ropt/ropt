@@ -107,23 +107,24 @@ def evaluator(test_functions: Any) -> Callable[[list[_Function]], Evaluator]:
 @pytest.fixture(scope="session")
 def assert_equal_dicts() -> Callable[[Any, Any], None]:
     def _assert_equal_dicts(value1: Any, value2: Any) -> None:
-        if isinstance(value1, dict):
-            assert isinstance(value2, dict)
-            for key, item1 in value1.items():
-                assert key in value2
-                _assert_equal_dicts(item1, value2[key])
-        elif isinstance(value1, list):
-            assert isinstance(value2, list)
-            for item1, item2 in zip(value1, value2, strict=False):
-                _assert_equal_dicts(item1, item2)
-        elif isinstance(value1, tuple):
-            assert isinstance(value2, tuple)
-            for item1, item2 in zip(value1, value2, strict=False):
-                _assert_equal_dicts(item1, item2)
-        elif isinstance(value1, np.ndarray):
-            assert isinstance(value2, np.ndarray)
-            assert np.allclose(value1, value2)
-        else:
-            assert value1 == value2
+        match value1:
+            case dict():
+                assert isinstance(value2, dict)
+                for key, item1 in value1.items():
+                    assert key in value2
+                    _assert_equal_dicts(item1, value2[key])
+            case list():
+                assert isinstance(value2, list)
+                for item1, item2 in zip(value1, value2, strict=False):
+                    _assert_equal_dicts(item1, item2)
+            case tuple():
+                assert isinstance(value2, tuple)
+                for item1, item2 in zip(value1, value2, strict=False):
+                    _assert_equal_dicts(item1, item2)
+            case np.ndarray():
+                assert isinstance(value2, np.ndarray)
+                assert np.allclose(value1, value2)
+            case _:
+                assert value1 == value2
 
     return _assert_equal_dicts
