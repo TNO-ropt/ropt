@@ -2039,6 +2039,11 @@
 
 
 
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -2069,6 +2074,11 @@
 <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.VariablesConfig"><code>variables</code></a> section of the optimizer
 configuration. The optimization backends may make us of this information to
 modify their behavior accordingly.</p>
+
+
+
+
+
 
 
 
@@ -2155,6 +2165,11 @@ modify their behavior accordingly.</p>
 <p>Both linear and non-linear constraints may be less or equal (<span class="arithmatex">\(\le\)</span>), greater
 or equal (<span class="arithmatex">\(\ge\)</span>), or equal (<span class="arithmatex">\(=\)</span>). Internally, <span class="arithmatex">\(\le\)</span> or <span class="arithmatex">\(\ge\)</span> constraints may
 be converted to an opposite constraint, depending on the optimizer backend.</p>
+
+
+
+
+
 
 
 
@@ -2262,6 +2277,11 @@ be converted to an opposite constraint, depending on the optimizer backend.</p>
         <p>Enumerates the ways boundaries should be treated.</p>
 <p>When variables are perturbed their values may violate boundary constraints.
 This enumeration lists the ways these values can be modified to fix this.</p>
+
+
+
+
+
 
 
 
@@ -2389,6 +2409,11 @@ be modified before being added to the unperturbed variable.</p>
 
 
 
+
+
+
+
+
   <div class="doc doc-children">
 
 
@@ -2504,6 +2529,11 @@ the current configuration of the step that is executing. If the step has a
 name it is also added to the event. Additionally, depending on the event
 type, a tuple of result objects, an exit code  may be present. Refer to the
 documentation of the individual event types for details.</p>
+
+
+
+
+
 
 
 
@@ -2678,6 +2708,11 @@ documentation of the individual event types for details.</p>
 
 
         <p>Enumerates the reasons for terminating an optimization.</p>
+
+
+
+
+
 
 
 
@@ -2880,6 +2915,11 @@ enumeration. These can be retrieved by the
 attributes of a results object. They are used internally when exporting data
 to determine the type of the array axes, for instance to retrieve the names
 of the variables from the configuration.</p>
+
+
+
+
+
 
 
 
