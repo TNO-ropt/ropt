@@ -230,8 +230,11 @@ class SciPyOptimizer(Optimizer):
             output_file = create_output_path(_OUTPUT_FILE, output_dir, suffix=".txt")
 
         self._stdout = sys.stdout
-        with Path(output_file).open("a", encoding="utf-8") as output, redirect_stdout(
-            output,
+        with (
+            Path(output_file).open("a", encoding="utf-8") as output,
+            redirect_stdout(
+                output,
+            ),
         ):
             if self._method == "differential_evolution":
                 if self._parallel:

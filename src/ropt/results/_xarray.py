@@ -67,7 +67,7 @@ def _to_data_array(
         data,
         coords={
             axis.value: list(index)
-            for axis, index in zip(axes, indices)
+            for axis, index in zip(axes, indices, strict=False)
             if index is not None
         },
         dims=[axis.value for axis in axes],

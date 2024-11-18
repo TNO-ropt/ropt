@@ -108,7 +108,7 @@ class Plan:
         if len_args != len_inputs:
             msg = f"The number of inputs is incorrect: expected {len_inputs}, passed {len_args}"
             raise RuntimeError(msg)
-        for name, arg in zip(self._plan_config.inputs, args):
+        for name, arg in zip(self._plan_config.inputs, args, strict=False):
             self[name] = arg
         self.run_steps(self._steps)
         missing = [name for name in self._plan_config.outputs if name not in self]

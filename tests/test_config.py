@@ -629,7 +629,7 @@ def test_check_config_min_success(enopt_config: Any) -> None:
 
     pert_test_map = {None: 5, 1: 1, 4: 4, 7: 5}
     real_test_map = {None: 4, 1: 1, 3: 3, 7: 4}
-    test_space = zip(pert_test_map.keys(), real_test_map.keys())
+    test_space = zip(pert_test_map.keys(), real_test_map.keys(), strict=False)
     for pert_in, real_in in test_space:
         config = EnOptConfig.model_validate(gen_config(pert_in, real_in))
         assert pert_test_map[pert_in] == config.gradient.perturbation_min_success

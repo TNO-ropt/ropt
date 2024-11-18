@@ -114,11 +114,11 @@ def assert_equal_dicts() -> Callable[[Any, Any], None]:
                 _assert_equal_dicts(item1, value2[key])
         elif isinstance(value1, list):
             assert isinstance(value2, list)
-            for item1, item2 in zip(value1, value2):
+            for item1, item2 in zip(value1, value2, strict=False):
                 _assert_equal_dicts(item1, item2)
         elif isinstance(value1, tuple):
             assert isinstance(value2, tuple)
-            for item1, item2 in zip(value1, value2):
+            for item1, item2 in zip(value1, value2, strict=False):
                 _assert_equal_dicts(item1, item2)
         elif isinstance(value1, np.ndarray):
             assert isinstance(value2, np.ndarray)

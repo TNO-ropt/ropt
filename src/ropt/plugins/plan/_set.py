@@ -124,7 +124,7 @@ class DefaultSetStep(PlanStep):
     def run(self) -> None:
         """Run the set step."""
         for target_string, name, keys, value in zip(
-            self._targets, self._names, self._keys, self._values
+            self._targets, self._names, self._keys, self._values, strict=False
         ):
             evaluated_value = copy.deepcopy(self._plan.eval(value))
             if not keys:

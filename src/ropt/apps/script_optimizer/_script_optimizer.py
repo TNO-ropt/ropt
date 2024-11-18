@@ -321,18 +321,22 @@ class ScriptOptimizer:
 
         try:
             self._set_logger()
-            with ParslEvaluator(
-                self._function,
-                polling=evaluator_config.polling,
-                max_submit=evaluator_config.max_submit,
-                max_threads=evaluator_config.max_threads,
-            ).with_htex(
-                provider=provider,
-                htex_kwargs=evaluator_config.htex_kwargs,
-                worker_restart=evaluator_config.worker_restart,
-            ).with_monitor(
-                self._monitor,
-            ) as evaluator:
+            with (
+                ParslEvaluator(
+                    self._function,
+                    polling=evaluator_config.polling,
+                    max_submit=evaluator_config.max_submit,
+                    max_threads=evaluator_config.max_threads,
+                )
+                .with_htex(
+                    provider=provider,
+                    htex_kwargs=evaluator_config.htex_kwargs,
+                    worker_restart=evaluator_config.worker_restart,
+                )
+                .with_monitor(
+                    self._monitor,
+                ) as evaluator
+            ):
                 context = OptimizerContext(evaluator=evaluator)
                 config = PlanConfig.model_validate(self._plan_config)
                 plan = Plan(config, context)
