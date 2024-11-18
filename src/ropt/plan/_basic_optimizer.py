@@ -40,7 +40,7 @@ else:
     from typing_extensions import Self
 
 
-@dataclass
+@dataclass(slots=True)
 class _Results:
     results: Optional[FunctionResults]
     variables: Optional[NDArray[np.float64]]

@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
 
 
-@dataclass
+@dataclass(slots=True)
 class Gradients(ResultField):
     """This class stores the calculated objective and constraint gradients.
 

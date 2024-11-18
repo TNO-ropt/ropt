@@ -9,7 +9,7 @@ from ropt.config.enopt import EnOptConfig
 from ropt.evaluator import Evaluator, EvaluatorContext
 
 
-@dataclass
+@dataclass(slots=True)
 class _FunctionEvaluatorResults:
     batch_id: Optional[int]
     objectives: NDArray[np.float64]
@@ -22,7 +22,7 @@ class _FunctionEvaluatorResults:
         )
 
 
-@dataclass
+@dataclass(slots=True)
 class _GradientEvaluatorResults:
     batch_id: Optional[int]
     perturbed_objectives: NDArray[np.float64]

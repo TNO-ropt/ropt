@@ -47,7 +47,7 @@ class State(Enum):
     FAILED = "failed"
 
 
-@dataclass
+@dataclass(slots=True)
 class Task(ConcurrentTask):
     """Dataclass storing task future.
 

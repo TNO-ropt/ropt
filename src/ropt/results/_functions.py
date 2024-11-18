@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
 
 
-@dataclass
+@dataclass(slots=True)
 class Functions(ResultField):
     """Store the calculated objective and constraint functions.
 

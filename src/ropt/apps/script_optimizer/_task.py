@@ -13,7 +13,7 @@ from numpy.typing import NDArray
 from ropt.evaluator.parsl import Task
 
 
-@dataclass
+@dataclass(slots=True)
 class ScriptTask(Task):
     """Task class for use by the ScriptBasedOptimizer class."""
 

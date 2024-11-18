@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 TypeResultField = TypeVar("TypeResultField", bound="ResultField")
 
 
-@dataclass
+@dataclass(slots=True)
 class ResultField:
     """Base class for `Results` fields."""
 

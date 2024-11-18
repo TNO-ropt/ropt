@@ -25,7 +25,7 @@ if _HAVE_XARRAY and _HAVE_NETCDF:
 TypeResults = TypeVar("TypeResults", bound="Results")
 
 
-@dataclass
+@dataclass(slots=True)
 class GradientResults(Results):
     """The `GradientResults` class stores gradient related results.
 

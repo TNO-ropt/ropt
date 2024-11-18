@@ -11,7 +11,7 @@ from numpy.typing import NDArray
 from ._evaluator import EvaluatorContext, EvaluatorResult
 
 
-@dataclass
+@dataclass(slots=True)
 class ConcurrentTask(ABC):
     """Abstract data class for tasks in a concurrent evaluator.
 

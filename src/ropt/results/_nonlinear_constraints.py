@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from ._functions import Functions
 
 
-@dataclass
+@dataclass(slots=True)
 class NonlinearConstraints(ResultField):
     """This class stores constraint values and violations.
 

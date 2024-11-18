@@ -26,7 +26,7 @@ def pytest_collection_modifyitems(config: Any, items: Sequence[Any]) -> None:
                 item.add_marker(skip_slow)
 
 
-@dataclass
+@dataclass(slots=True)
 class FunctionContext:
     realization: int
     index: int

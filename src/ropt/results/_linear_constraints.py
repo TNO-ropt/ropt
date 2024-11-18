@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from ._function_evaluations import FunctionEvaluations
 
 
-@dataclass
+@dataclass(slots=True)
 class LinearConstraints(ResultField):
     """This class stores constraint values and violations.
 

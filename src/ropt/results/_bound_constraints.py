@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from ._function_evaluations import FunctionEvaluations
 
 
-@dataclass
+@dataclass(slots=True)
 class BoundConstraints(ResultField):
     """This class stores bound constraint values and violations.
 

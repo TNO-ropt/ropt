@@ -16,7 +16,7 @@ from ropt.evaluator.parsl import ParslEvaluator, State, Task
 from ropt.plan import BasicOptimizer
 
 
-@dataclass
+@dataclass(slots=True)
 class ParslTestTask(Task):
     def get_objectives(self) -> Optional[NDArray[np.float64]]:
         assert self.future is not None

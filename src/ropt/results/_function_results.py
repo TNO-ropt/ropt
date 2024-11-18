@@ -28,7 +28,7 @@ if _HAVE_XARRAY and _HAVE_NETCDF:
 TypeResults = TypeVar("TypeResults", bound="Results")
 
 
-@dataclass
+@dataclass(slots=True)
 class FunctionResults(Results):
     """The `FunctionResults` class stores function related results.
 

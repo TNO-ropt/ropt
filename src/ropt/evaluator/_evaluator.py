@@ -1,5 +1,4 @@
-from dataclasses import dataclass
-from functools import cached_property
+from dataclasses import dataclass, field
 from typing import Optional, Protocol
 
 import numpy as np
@@ -8,7 +7,7 @@ from numpy.typing import NDArray
 from ropt.config.enopt import EnOptConfig
 
 
-@dataclass
+@dataclass(slots=True)
 class EvaluatorContext:
     """Capture additional details for the function evaluator.
 
@@ -43,25 +42,16 @@ class EvaluatorContext:
                             essential for the optimizer.
         active_constraints: Signifies which constraint/realization evaluations are
                             essential for the optimizer.
+        active:             Signifies which realizations are active.
     """
 
     config: EnOptConfig
     realizations: NDArray[np.intc]
     active_objectives: Optional[NDArray[np.bool_]] = None
     active_constraints: Optional[NDArray[np.bool_]] = None
+    active: Optional[NDArray[np.bool_]] = field(init=False)
 
-    @cached_property
-    def active(self) -> Optional[NDArray[np.bool_]]:
-        """Return the set of active variable vectors.
-
-        This property is useful for determining the realizations for which the
-        objective and constraint functions need to be calculated. The index of
-        each entry corresponds to the realization number and indicates whether
-        the functions should be calculated.
-
-        Returns:
-            A boolean array.
-        """
+    def __post_init__(self) -> None:
         active_objectives: Optional[NDArray[np.bool_]] = (
             None
             if self.active_objectives is None
@@ -73,10 +63,11 @@ class EvaluatorContext:
             else np.logical_or.reduce(self.active_constraints, axis=0)
         )
         if active_constraints is None:
-            return active_objectives
-        if active_objectives is None:
-            return active_constraints
-        return np.logical_or(active_objectives, active_constraints)
+            self.active = active_objectives
+        elif active_objectives is None:
+            self.active = active_constraints
+        else:
+            self.active = np.logical_or(active_objectives, active_constraints)
 
 
 @dataclass

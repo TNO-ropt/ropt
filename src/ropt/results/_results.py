@@ -39,7 +39,7 @@ if _HAVE_XARRAY and _HAVE_NETCDF:
 TypeResults = TypeVar("TypeResults", bound="Results")
 
 
-@dataclass
+@dataclass(slots=True)
 class Results(ABC):
     """The `Results` class serves as an abstract base class for storing results.
 

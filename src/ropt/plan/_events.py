@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     from ropt.results import Results
 
 
-@dataclass
+@dataclass(slots=True)
 class Event:
     """The `Event` class stores optimization event data.
 

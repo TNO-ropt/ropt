@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
 
 
-@dataclass
+@dataclass(slots=True)
 class FunctionEvaluations(ResultField):
     """This class contains the results of evaluations for function calculation.
 

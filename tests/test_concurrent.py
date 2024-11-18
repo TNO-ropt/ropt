@@ -46,7 +46,7 @@ def _run_functions(
     return result
 
 
-@dataclass
+@dataclass(slots=True)
 class TaskTestEvaluator(ConcurrentTask):
     future: Any
 

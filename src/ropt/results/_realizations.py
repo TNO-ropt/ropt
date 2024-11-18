@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 
-@dataclass
+@dataclass(slots=True)
 class Realizations(ResultField):
     """This class stores information on the realizations.
 
