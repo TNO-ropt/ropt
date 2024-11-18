@@ -2,19 +2,13 @@
 
 from __future__ import annotations
 
-import sys
-from typing import Optional
+from typing import Optional, Self
 
 import numpy as np
 from pydantic import ConfigDict, NonNegativeInt, model_validator
 
 from ropt.config.utils import ImmutableBaseModel, broadcast_1d_array, normalize
 from ropt.config.validated_types import Array1D, UniqueNames  # noqa: TCH001
-
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
 
 
 class RealizationsConfig(ImmutableBaseModel):

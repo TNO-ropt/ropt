@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import sys
 from functools import cache
+from importlib.metadata import entry_points
 from typing import TYPE_CHECKING, Any, Final, Generator, Literal
 
 from ropt.exceptions import ConfigError
@@ -16,11 +16,6 @@ from .sampler.base import SamplerPlugin
 
 if TYPE_CHECKING:
     from ropt.plugins.base import Plugin
-
-if sys.version_info >= (3, 10):
-    from importlib.metadata import entry_points
-else:
-    from importlib_metadata import entry_points
 
 
 _PLUGIN_TYPES: Final = {

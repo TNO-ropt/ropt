@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-import sys
 from copy import deepcopy
-from typing import Any, Optional
+from typing import Any, Optional, Self
 
 from pydantic import ConfigDict, model_validator
 
@@ -20,11 +19,6 @@ from ._realization_filter_config import RealizationFilterConfig  # noqa: TCH001
 from ._realizations_config import RealizationsConfig
 from ._sampler_config import SamplerConfig
 from ._variables_config import VariablesConfig  # noqa: TCH001
-
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
 
 
 class EnOptConfig(ImmutableBaseModel):

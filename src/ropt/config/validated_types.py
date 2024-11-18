@@ -24,17 +24,11 @@ that single values are embedded in a set or tuple, respectively:
 - [`ItemOrTuple[T]`][ropt.config.validated_types.ItemOrTuple]: Create a tuple of type `T`.
 """
 
-import sys
-from typing import Any, Set, TypeVar
+from typing import Annotated, Any, Set, TypeVar
 
 import numpy as np
-from numpy.typing import ArrayLike, NDArray
+from numpy.typing import NDArray
 from pydantic import AfterValidator, BeforeValidator
-
-if sys.version_info >= (3, 9):
-    from typing import Annotated
-else:
-    from typing_extensions import Annotated
 
 from .utils import (
     _check_duplicates,
@@ -48,36 +42,27 @@ from .utils import (
     _convert_tuple,
 )
 
-if sys.version_info >= (3, 9):
-    Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
-    """Convert to an immutable 1D numpy array of floating point values."""
+Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
+"""Convert to an immutable 1D numpy array of floating point values."""
 
-    Array2D = Annotated[NDArray[np.float64], BeforeValidator(_convert_2d_array)]
-    """Convert to an immutable 2D numpy array of floating point values."""
+Array2D = Annotated[NDArray[np.float64], BeforeValidator(_convert_2d_array)]
+"""Convert to an immutable 2D numpy array of floating point values."""
 
-    ArrayIndices = Annotated[NDArray[np.intc], BeforeValidator(_convert_indices)]
-    """Convert to an immutable numpy array of indices."""
+ArrayIndices = Annotated[NDArray[np.intc], BeforeValidator(_convert_indices)]
+"""Convert to an immutable numpy array of indices."""
 
-    ArrayEnum = Annotated[NDArray[np.ubyte], BeforeValidator(_convert_enum_array)]
-    """Convert to an immutable numpy array of numerical enumeration values."""
+ArrayEnum = Annotated[NDArray[np.ubyte], BeforeValidator(_convert_enum_array)]
+"""Convert to an immutable numpy array of numerical enumeration values."""
 
-    Array1DInt = Annotated[NDArray[np.intc], BeforeValidator(_convert_1d_array_intc)]
-    """Convert to an immutable 1D numpy array of integer values."""
+Array1DInt = Annotated[NDArray[np.intc], BeforeValidator(_convert_1d_array_intc)]
+"""Convert to an immutable 1D numpy array of integer values."""
 
-    Array1DBool = Annotated[NDArray[np.bool_], BeforeValidator(_convert_1d_array_bool)]
-    """Convert to an immutable 1D numpy array of boolean values."""
+Array1DBool = Annotated[NDArray[np.bool_], BeforeValidator(_convert_1d_array_bool)]
+"""Convert to an immutable 1D numpy array of boolean values."""
 
-    UniqueNames = Annotated[tuple[Any, ...], AfterValidator(_check_duplicates)]
-    """Check for duplicates in a tuple, raising ValueError if duplicates are found."""
+UniqueNames = Annotated[tuple[Any, ...], AfterValidator(_check_duplicates)]
+"""Check for duplicates in a tuple, raising ValueError if duplicates are found."""
 
-else:
-    Array1D = Annotated[ArrayLike, BeforeValidator(_convert_1d_array)]
-    Array2D = Annotated[ArrayLike, BeforeValidator(_convert_2d_array)]
-    ArrayIndices = Annotated[ArrayLike, BeforeValidator(_convert_indices)]
-    ArrayEnum = Annotated[ArrayLike, BeforeValidator(_convert_enum_array)]
-    Array1DInt = Annotated[ArrayLike, BeforeValidator(_convert_1d_array_intc)]
-    Array1DBool = Annotated[ArrayLike, BeforeValidator(_convert_1d_array_bool)]
-    UniqueNames = Annotated[tuple[Any, ...], AfterValidator(_check_duplicates)]
 
 T = TypeVar("T")
 ItemOrSet = Annotated[Set[T], BeforeValidator(_convert_set)]

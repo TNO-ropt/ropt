@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path  # noqa: TCH003
-from typing import Any, Optional
+from typing import Any, Optional, Self
 
 from pydantic import (
     ConfigDict,
@@ -14,11 +13,6 @@ from pydantic import (
 )
 
 from ropt.config.utils import ImmutableBaseModel
-
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
 
 
 class OptimizerConfig(ImmutableBaseModel):

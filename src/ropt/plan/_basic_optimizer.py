@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import sys
 from dataclasses import dataclass
 from pathlib import Path  # noqa: TCH003
 from typing import (
@@ -30,10 +29,7 @@ if TYPE_CHECKING:
     from ropt.plan import Event
     from ropt.results import FunctionResults
 
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
+from typing import Self
 
 
 @dataclass(slots=True)

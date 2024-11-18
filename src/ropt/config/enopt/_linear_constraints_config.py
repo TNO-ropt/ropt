@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-import sys
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 import numpy as np
 from pydantic import ConfigDict, model_validator
@@ -14,11 +13,6 @@ from ropt.enums import ConstraintType
 
 if TYPE_CHECKING:
     from ropt.config.enopt import VariablesConfig
-
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
 
 
 class LinearConstraintsConfig(ImmutableBaseModel):

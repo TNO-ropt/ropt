@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import sys
 from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
     Optional,
+    Self,
 )
 
 from ropt.enums import EventType
@@ -18,11 +18,6 @@ from ._expr import ExpressionEvaluator
 if TYPE_CHECKING:
     from ropt.evaluator import Evaluator
     from ropt.plan import Event
-
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
 
 
 class OptimizerContext:

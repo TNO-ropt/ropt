@@ -1,7 +1,6 @@
 """This plugin contains realization filters that are installed by default."""
 
-import sys
-from typing import Optional, Tuple, cast
+from typing import Annotated, Optional, Tuple, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -12,11 +11,6 @@ from ropt.enums import ConstraintType, OptimizerExitCode
 from ropt.exceptions import ConfigError, OptimizationAborted
 
 from .base import RealizationFilter, RealizationFilterPlugin
-
-if sys.version_info >= (3, 9):
-    from typing import Annotated
-else:
-    from typing_extensions import Annotated
 
 
 class _ConfigBaseModel(BaseModel):

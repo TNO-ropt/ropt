@@ -3,7 +3,6 @@
 import json
 import logging
 import os
-import sys
 from collections import defaultdict
 from itertools import groupby
 from pathlib import Path
@@ -16,6 +15,7 @@ from typing import (
     Callable,
     DefaultDict,
     Optional,
+    Self,
     Sequence,
     TextIO,
     no_type_check,
@@ -39,11 +39,6 @@ from ._task import ScriptTask
 
 if TYPE_CHECKING:
     from ropt.results import FunctionResults
-
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
 
 
 @no_type_check

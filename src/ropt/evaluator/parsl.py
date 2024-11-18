@@ -8,7 +8,6 @@ range of compute resources.
 
 from __future__ import annotations
 
-import sys
 from dataclasses import dataclass
 from enum import Enum
 from time import sleep
@@ -30,10 +29,7 @@ if TYPE_CHECKING:
 
     from ._evaluator import EvaluatorContext
 
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
+from typing import Self
 
 
 class State(Enum):

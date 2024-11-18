@@ -13,7 +13,7 @@ import sys
 import time
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import TYPE_CHECKING, Any, Final, Optional
+from typing import TYPE_CHECKING, Any, Final, Optional, Self
 
 import numpy as np
 
@@ -26,11 +26,6 @@ from .base import Optimizer, OptimizerCallback, OptimizerPlugin
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-
-if sys.version_info >= (3, 11):
-    from typing import Self
-else:
-    from typing_extensions import Self
 
 _PLUGIN_BINARY: Final = "ropt_plugin_optimizer"
 _PROCESS_TIMEOUT: Final = 10
