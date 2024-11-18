@@ -228,8 +228,6 @@ class ExpressionEvaluator:
                 and isinstance(node.ctx, ast.Load)
                 and self._is_expression(node.slice)
             )
-        if isinstance(node, ast.Index):
-            return self._is_expression(node.value)  # type: ignore[attr-defined]
         if isinstance(node, ast.Attribute):
             if isinstance(node.value, ast.Attribute):
                 return self._is_expression(node.value)
