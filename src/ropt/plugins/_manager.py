@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import sys
-from functools import lru_cache
+from functools import cache
 from typing import TYPE_CHECKING, Any, Dict, Final, Generator, Literal
 
 from ropt.exceptions import ConfigError
@@ -161,7 +161,7 @@ class PluginManager:
             yield plugin_name, plugin
 
 
-@lru_cache  # Without the cache, repeated calls are very slow
+@cache  # Without the cache, repeated calls are very slow
 def _from_entry_points(plugin_type: str) -> Dict[str, Plugin]:
     plugins: Dict[str, Plugin] = {}
     for entry_point in entry_points().select(group=f"ropt.plugins.{plugin_type}"):
