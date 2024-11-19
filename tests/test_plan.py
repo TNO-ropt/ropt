@@ -82,7 +82,6 @@ def test_run_basic(enopt_config: dict[str, Any], evaluator: Any) -> None:
         ("", ""),
         (" ", ""),
         ("$(1)", 1),
-        ("$($(1))", 1),
         ("$('1')", "1"),
         (" $(-1) ", -1),
         ("$(not 1)", False),
@@ -104,15 +103,15 @@ def test_run_basic(enopt_config: dict[str, Any], evaluator: Any) -> None:
         ("$$x", "$x"),
         ("$( {'a': {'b': 1}} )", {"a": {"b": 1}}),
         ("[1, 2] + $plan_id", [1, 2, 0]),
-        ("$( $max($x + 1, 2) )", 2),
-        ("$max($x + 1, 2)", 2),
+        ("$( max($x + 1, 2) )", 2),
+        ("max($x + 1, 2)", 2),
         ("$dummy", None),
         ("$($dummy)", None),
         ("$$dummy", "$dummy"),
         ("[$dummy, 2]", [None, 2]),
-        ("$($incr($x))", 2),
-        ("$incr($x)", 2),
-        ("$incr($incr($x) + 1)", 4),
+        ("$(incr($x))", 2),
+        ("incr($x)", 2),
+        ("incr(incr($x) + 1)", 4),
         ("<< $x >>", "1"),
         ("<<1>>", "1"),
         ("<<$(1)>>", "1"),
@@ -141,7 +140,7 @@ def test_run_basic(enopt_config: dict[str, Any], evaluator: Any) -> None:
         ("$x + 1", 2),
         ("$x + $y", 2),
         ("1 + $x", 2),
-        ("$max(1, $x)", 1),
+        ("max(1, $x)", 1),
     ],
 )
 def test_eval_expr(evaluator: Any, expr: str, expected: Any) -> None:
@@ -166,14 +165,14 @@ def test_eval_expr(evaluator: Any, expr: str, expected: Any) -> None:
     ("expr", "message", "exception"),
     [
         ("$(1 + * 1)", "invalid syntax", SyntaxError),
-        ("$z", re.escape("Unknown plan variable or function: `$z`"), NameError),
+        ("$z", re.escape("Unknown variable: `$z`.\nIn: $z"), NameError),
         ("<< $(1 + * 1) >>", "invalid syntax", SyntaxError),
+        ("$(foo())", re.escape("Unknown function: `foo`.\nIn: $(foo())"), NameError),
         (
-            "$($foo())",
-            re.escape("Unknown plan variable or function: `$foo`"),
+            "$(max)",
+            re.escape("Invalid function use: `max`. Missing `()`?\nIn: $(max)"),
             NameError,
         ),
-        ("$foo()", re.escape("Unknown plan variable or function: `$foo`"), NameError),
     ],
 )
 def test_eval_exception(
@@ -325,14 +324,14 @@ def test_set_keys_value_exception(evaluator: Any) -> None:
             "y": {"a": None},
         },
         "steps": [
-            {"set": {"y['a']": "$foo(1)"}},
+            {"set": {"y['a']": "$(foo(1))"}},
         ],
     }
     parsed_config = PlanConfig.model_validate(plan_config)
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(parsed_config, context)
     with pytest.raises(
-        NameError, match=re.escape("Unknown plan variable or function: `$foo`")
+        NameError, match=re.escape("Unknown function: `foo`.\nIn: $(foo(1))")
     ):
         plan.run()
 

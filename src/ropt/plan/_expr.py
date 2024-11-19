@@ -42,7 +42,7 @@ _BUILTIN_FUNCTIONS: Final[dict[str, Callable[..., Any]]] = {
     "str": str,
 }
 
-# A random string used to mark identifiers in expresions:
+# A random string used to mark identifiers in expressions:
 _PLAN_IDENTIFIER_: Final[str] = "_HHsvLb3BzRHh1JE_"
 
 
@@ -88,32 +88,33 @@ class ExpressionEvaluator:
            expression, and the result replaces the `<<...>>` substring.
 
         2. Strings containing single `$` characters, or enclosed in `$(...)`,
-           are evaluated as expressions. Variables and function calls must be
-           prefixed by a `$` character. Expressions can access the variables
-           passed through the `variables` parameter, a set of built-in
-           functions, and any additional functions added using the
-           [`add_functions`][ropt.plan.ExpressionEvaluator.add_functions]
-           method.
+           are evaluated as expressions. Expressions can access the variables
+           passed through the `variables` parameter, by prefixing them in the
+           expression with a `$` sign. A set of built-in functions, and
+           additional functions added using the
+           [`add_functions`][ropt.plan.ExpressionEvaluator.add_functions] method
+           can also be used in an expression.
 
         Tip: Expressions only containing literals
-            If an expression has no variables or expressions, you need to enclose
-            it in `$(...)` delimiters, like so: `$(1 + 1)`.
+            If an expression has no variables, you need to enclose it in
+            `$(...)` delimiters, like so: `$(1 + 1)`, or `$(max(1, 2))`.
 
         Tip: String Interpolation with `<<...>>`:
             Use the `<<...>>` notation when the overall result should be a
-            string. Expressions within `<<...>>` do not require `$(...)` delimiters:
-            `"<<1 + 1>>"` will evaluate to `"2"`, but variables and function calls must
+            string. Expressions within `<<...>>` do not require `$(...)`
+            delimiters: `"<<1 + 1>>"` will evaluate to `"2"`, but variables must
             still be prefixed with `$`, for example `"<<$x + 1>>"`.
 
         Examples of valid expressions, assuming `x == 1` and `y ==2`:
 
-        | Expression    | Result |
-        | ------------- | ------ |
-        | `$(1 + 1)`    | 2      |
-        | `$x`          | 1      |
-        | `$x + 1`      | 2      |
-        | `$x + $y`     | 3      |
-        | `$max(1, $y)` | 2      |
+        | Expression     | Result |
+        | -------------- | ------ |
+        | `$(1 + 1)`     | 2      |
+        | `$(max(1, 2))` | 2      |
+        | `$x`           | 1      |
+        | `$x + 1`       | 2      |
+        | `$x + $y`      | 3      |
+        | `max(1, $y)`   | 2      |
 
         Info: Supported Features**:
             - Supported Python operators include standard mathematical, boolean,
@@ -129,8 +130,7 @@ class ExpressionEvaluator:
 
             Plan variables may contain objects of any type. However, to be used
             in an expression, they should contain a value of a supported type or
-            be convertible to a supported type before evaluation. In particular,
-            `numpy` arrays are converted to lists when encountered in an expression.
+            be convertible to a supported type before evaluation.
 
         Args:
             expr:      The expression to evaluate, provided as a string.
@@ -152,23 +152,26 @@ class ExpressionEvaluator:
         return re.sub(r"\${2,}", lambda m: "$" * (len(m.group()) - 1), expr)
 
     def _eval_expr(self, expr: str, variables: Mapping[str, Any]) -> Any:  # noqa: ANN401
-        if expr.startswith("$(") and expr.endswith(")"):
-            return self._eval_expr(expr[2:-1].strip(), variables)
-        expr = re.sub(r"\$(?=[a-zA-Z_][a-zA-Z0-9_]*)", _PLAN_IDENTIFIER_, expr)
-        expr = re.sub(r"\${2,}", lambda m: "$" * (len(m.group()) - 1), expr).strip()
-        if not expr:
-            return ""
-        tree = ast.parse(expr, mode="eval")
-        if self._is_expression(tree.body):
-            transformer = _ExpressionNodeTransformer(variables, self._functions)
-            tree = ast.fix_missing_locations(transformer.visit(tree))
-            return eval(  # noqa: S307
-                compile(tree, "", mode="eval"),
-                {"__builtins__": self._functions},
-                transformer.values,
-            )
-        msg = "invalid expression"
-        raise SyntaxError(msg)
+        original_expr = expr
+        try:
+            if expr.startswith("$(") and expr.endswith(")"):
+                expr = expr[2:-1].strip()
+            expr = re.sub(r"\$(?=[a-zA-Z_][a-zA-Z0-9_]*)", _PLAN_IDENTIFIER_, expr)
+            expr = re.sub(r"\${2,}", lambda m: "$" * (len(m.group()) - 1), expr).strip()
+            if not expr:
+                return ""
+            tree = ast.parse(expr, mode="eval")
+            if self._is_expression(tree.body):
+                transformer = _ExpressionNodeTransformer(variables, self._functions)
+                tree = ast.fix_missing_locations(transformer.visit(tree))
+                return eval(  # noqa: S307
+                    compile(tree, "", mode="eval"),
+                    {"__builtins__": self._functions},
+                    transformer.values,
+                )
+        except (SyntaxError, TypeError, NameError) as exc:
+            exc.add_note(f"In: {original_expr}")
+            raise
 
     def _eval_parts(self, expr: str, variables: Mapping[str, Any]) -> Any:  # noqa: ANN401
         def _substitute(matched: re.Match[str]) -> str:
@@ -186,61 +189,62 @@ class ExpressionEvaluator:
                 prefix = ""
         return "".join(re.sub(r"<<(.*)>>", _substitute, part) for part in parts)
 
-    def _is_expression(  # noqa: C901, PLR0911, PLR0912
-        self, node: ast.AST, *, include_ops: bool = True, include_literals: bool = True
+    def _is_expression(  # noqa: C901, PLR0912
+        self, node: ast.AST
     ) -> bool:
-        if include_literals:
-            if isinstance(node, ast.Constant):
-                return node.value is None or type(node.value) in _SUPPORTED_CONSTANTS
-            if isinstance(node, ast.List):
-                return all(self._is_expression(item) for item in node.elts)
-            if isinstance(node, ast.Dict):
-                return (
+        match node:
+            case ast.Constant():
+                result = node.value is None or type(node.value) in _SUPPORTED_CONSTANTS
+            case ast.List():
+                result = all(self._is_expression(item) for item in node.elts)
+            case ast.Dict():
+                result = (
                     all(
                         item is not None and self._is_expression(item)
                         for item in node.keys
                     )
                     and all(self._is_expression(item) for item in node.values)  # noqa: PD011
                 )
-        if include_ops:
-            if isinstance(node, ast.UnaryOp):
-                return isinstance(node.op, _UNARY_OPS) and self._is_expression(
+            case ast.UnaryOp():
+                result = isinstance(node.op, _UNARY_OPS) and self._is_expression(
                     node.operand
                 )
-            if isinstance(node, ast.BinOp):
-                return (
+            case ast.BinOp():
+                result = (
                     isinstance(node.op, _BIN_OPS)
                     and self._is_expression(node.left)
                     and self._is_expression(node.right)
                 )
-            if isinstance(node, ast.BoolOp):
-                return (
+            case ast.BoolOp():
+                result = (
                     isinstance(node.op, _BOOL_OPS)
                     and all(self._is_expression(value) for value in node.values)  # noqa: PD011
                 )
-            if isinstance(node, ast.Compare):
-                return all(isinstance(op, _CMP_OPS) for op in node.ops) and all(
+            case ast.Compare():
+                result = all(isinstance(op, _CMP_OPS) for op in node.ops) and all(
                     self._is_expression(value) for value in node.comparators
                 )
-        if isinstance(node, ast.Subscript):
-            return (
-                isinstance(node.value, ast.Name | ast.Attribute | ast.Subscript)
-                and isinstance(node.ctx, ast.Load)
-                and self._is_expression(node.slice)
-            )
-        if isinstance(node, ast.Attribute):
-            if isinstance(node.value, ast.Attribute):
-                return self._is_expression(node.value)
-            return bool(
-                isinstance(node.value, ast.Name) and isinstance(node.ctx, ast.Load)
-            )
-        if isinstance(node, ast.Call):
-            return (
-                isinstance(node.func, ast.Name)
-                and all(self._is_expression(arg) for arg in node.args)
-                and not node.keywords
-            )
-        return bool(isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load))
+            case ast.Subscript():
+                result = (
+                    isinstance(node.value, ast.Name | ast.Attribute | ast.Subscript)
+                    and isinstance(node.ctx, ast.Load)
+                    and self._is_expression(node.slice)
+                )
+            case ast.Attribute() if isinstance(node.value, ast.Attribute):
+                result = self._is_expression(node.value)
+            case ast.Attribute() if isinstance(node.value, ast.Name):
+                result = isinstance(node.ctx, ast.Load)
+            case ast.Call():
+                result = (
+                    isinstance(node.func, ast.Name)
+                    and all(self._is_expression(arg) for arg in node.args)
+                    and not node.keywords
+                )
+            case ast.Name():
+                result = isinstance(node.ctx, ast.Load)
+            case _:
+                result = False
+        return result
 
 
 class _ExpressionNodeTransformer(ast.NodeTransformer):
@@ -252,13 +256,20 @@ class _ExpressionNodeTransformer(ast.NodeTransformer):
         self.values: dict[str, Any] = {}
         self._variables = variables
         self._functions = set(functions.keys())
+        self._is_call = False
 
     def visit_Name(self, node: ast.Name) -> ast.AST:  # noqa: N802
+        if node.id in self._functions:
+            if self._is_call:
+                self._is_call = False
+                return self.generic_visit(node)
+            msg = f"Invalid function use: `{node.id}`. Missing `()`?"
+            raise NameError(msg)
         if node.id.startswith(_PLAN_IDENTIFIER_):
             name = node.id.removeprefix(_PLAN_IDENTIFIER_)
         else:
-            msg = f"Invalid expression element: {node.id}."
-            if node.id in self._variables or node.id in self._functions:
+            msg = f"Invalid element: {node.id}."
+            if node.id in self._variables:
                 msg += " Missing `$`?"
             raise SyntaxError(msg)
         if name in self._variables:
@@ -267,10 +278,10 @@ class _ExpressionNodeTransformer(ast.NodeTransformer):
                 self.values[name] = value
                 node.id = name
             else:
-                msg = f"Error in expression: the type of `{name}` is not supported"
+                msg = f"Data type of variable $`{name} not supported."
                 raise TypeError(msg)
-        elif name not in self._functions:
-            msg = f"Unknown plan variable or function: `${name}`"
+        else:
+            msg = f"Unknown variable: `${name}`."
             raise NameError(msg)
         node.id = name
         return self.generic_visit(node)
@@ -279,3 +290,15 @@ class _ExpressionNodeTransformer(ast.NodeTransformer):
         if isinstance(node.value, str):
             node.value = node.value.removeprefix(_PLAN_IDENTIFIER_)
         return node
+
+    def visit_Call(self, node: ast.Call) -> ast.AST:  # noqa: N802
+        assert isinstance(node.func, ast.Name)
+        assert not node.keywords
+        if (
+            not node.func.id.startswith(_PLAN_IDENTIFIER_)
+            and node.func.id not in self._functions
+        ):
+            msg = f"Unknown function: `{node.func.id}`."
+            raise NameError(msg)
+        self._is_call = True
+        return self.generic_visit(node)
