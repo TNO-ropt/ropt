@@ -14,7 +14,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.43">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.44">
     
     
       
@@ -1062,6 +1062,27 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../external_optimizer_plugin/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    External Optimizer Plugin
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1167,21 +1188,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="utils">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.utils.update_dict" class="md-nav__link">
-    <span class="md-ellipsis">
-      update_dict
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -1236,6 +1242,30 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ropt.utils.misc" class="md-nav__link">
+    <span class="md-ellipsis">
+      misc
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="misc">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.utils.misc.format_tuple" class="md-nav__link">
+    <span class="md-ellipsis">
+      format_tuple
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.config.utils" class="md-nav__link">
     <span class="md-ellipsis">
       utils
@@ -1244,6 +1274,30 @@
   
     <nav class="md-nav" aria-label="utils">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.utils.ImmutableBaseModel" class="md-nav__link">
+    <span class="md-ellipsis">
+      ImmutableBaseModel
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ImmutableBaseModel">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.utils.ImmutableBaseModel.__setattr__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __setattr__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#ropt.config.utils.normalize" class="md-nav__link">
@@ -1438,21 +1492,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="utils">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.utils.update_dict" class="md-nav__link">
-    <span class="md-ellipsis">
-      update_dict
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -1507,6 +1546,30 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ropt.utils.misc" class="md-nav__link">
+    <span class="md-ellipsis">
+      misc
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="misc">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.utils.misc.format_tuple" class="md-nav__link">
+    <span class="md-ellipsis">
+      format_tuple
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.config.utils" class="md-nav__link">
     <span class="md-ellipsis">
       utils
@@ -1515,6 +1578,30 @@
   
     <nav class="md-nav" aria-label="utils">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.utils.ImmutableBaseModel" class="md-nav__link">
+    <span class="md-ellipsis">
+      ImmutableBaseModel
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ImmutableBaseModel">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.utils.ImmutableBaseModel.__setattr__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __setattr__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#ropt.config.utils.normalize" class="md-nav__link">
@@ -1707,89 +1794,6 @@
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.utils.update_dict" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">update_dict</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span></code>
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Recursively update a dictionary.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code>mapping</code></td>
-            <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The dictionary to update.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>values</code></td>
-            <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The values to be updated or added.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The updated dictionary.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
 
 
 
@@ -2293,6 +2297,129 @@ argument.</p>
 
 
 
+<h2 id="ropt.utils.misc" class="doc doc-heading">
+            <code>ropt.utils.misc</code>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Miscellaneous utilities.</p>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.utils.misc.format_tuple" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">format_tuple</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">delimiters</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Format a tuple of strings into a single string.</p>
+<p>This function converts a tuple into a single string by joining the tuple
+items with specified delimiters. The <code>delimiters</code> argument can contain
+multiple characters, each of which will be used in turn to separate the
+items in <code>name</code>. If fewer delimiters are provided than needed, the final
+delimiter is reused for any remaining items. If <code>delimiters</code> is not
+specified, <code>:</code> is used by default.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>values</code></td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[str, <span title="typing.Tuple">Tuple</span>[<span title="typing.Any">Any</span>, ...]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The tuple of strings to format.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>delimiters</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The delimiters to use, applied sequentially.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;:&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The formatted string.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
 <h2 id="ropt.config.utils" class="doc doc-heading">
             <code>ropt.config.utils</code>
 
@@ -2314,6 +2441,132 @@ argument.</p>
 
 
 
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.utils.ImmutableBaseModel" class="doc doc-heading">
+            <code>ImmutableBaseModel</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+        <p>Base model for immutable classes.</p>
+<p>This model serves as an alternative to frozen Pydantic classes. It is
+particularly useful when post-initialization validators are required, as
+these validators may not function properly with frozen Pydantic classes.</p>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.config.utils.ImmutableBaseModel.__setattr__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__setattr__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Attribute setter method.</p>
+<p>This method sets an attribute if the object is not immutable.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the attribute to set.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>value</code></td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The value to assign to the attribute.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>AttributeError</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Raised if the object is immutable and cannot be modified.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 
 <div class="doc doc-object doc-function">

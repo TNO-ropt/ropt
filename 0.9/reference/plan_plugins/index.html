@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.43">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.44">
     
     
       
@@ -986,6 +986,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.PlanPlugin.functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      functions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.plugins.plan.base.PlanPlugin.create" class="md-nav__link">
     <span class="md-ellipsis">
       create
@@ -1250,6 +1259,27 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../external_optimizer_plugin/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    External Optimizer Plugin
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1482,6 +1512,15 @@
   
     <nav class="md-nav" aria-label="PlanPlugin">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.PlanPlugin.functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      functions
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#ropt.plugins.plan.base.PlanPlugin.create" class="md-nav__link">
@@ -2062,15 +2101,26 @@ handlers or to callbacks that react to the event.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.base.Plugin" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
 
 
-        <p>The abstract base class for plan plugins.</p>
-<p>Plan steps and result handlers are implemented through plugins that must derive
-from this base class. Plugins can be built-in, installed via a plugin mechanism,
-or loaded dynamically. During execution of an optimization plan, the
-required optimizer plugin will be located via the
-<a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> and used to create
-<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a> or <a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.ResultHandler"><code>ResultHandler</code></a> objects via its
-<code>create</code> function.</p>
+        <p>Abstract base class for plan plugins.</p>
+<p>This base class serves as the foundation for all plugins used in an
+optimization plan, including plan steps and result handlers. Any plugin
+derived from this class can be built-in, installed via a plugin mechanism,
+or dynamically loaded. During the execution of an optimization plan, the
+required plugin is located through the
+<a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>, which then uses the plugin's
+<code>create</code> function to instantiate either a
+<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a> or a
+<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.ResultHandler"><code>ResultHandler</code></a> as needed.</p>
 
+
+<details class="note" open>
+  <summary>Plan functions</summary>
+  <p>A plan plugin can also provide functions to be used by the plan<code>s
+expression evaluator. To achieve this, the plugin should override the</code>functions<code>property of the
+[</code>PlanPlugin`][ropt.plugins.plan.base.PlanPlugin] class. This property
+should return a dictionary that maps function names to callables, which
+are subsequently added to the expression evaluator.</p>
+</details>
 
 
 
@@ -2081,6 +2131,50 @@ required optimizer plugin will be located via the
 
 
 
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.plugins.plan.base.PlanPlugin.functions" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">functions</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return plan functions implemented by the plugin.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[str, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The functions.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+    </div>
+
+</div>
 
 
 
