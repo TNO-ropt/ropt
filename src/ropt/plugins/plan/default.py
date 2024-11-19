@@ -16,7 +16,6 @@ from ._optimizer import DefaultOptimizerStep
 from ._print import DefaultPrintStep
 from ._repeat import DefaultRepeatStep
 from ._save_data import DefaultSaveStep
-from ._save_results import DefaultSaveHandler
 from ._set import DefaultSetStep
 from ._table import DefaultTableHandler
 from ._tracker import DefaultTrackerHandler
@@ -34,7 +33,6 @@ _STEP_OBJECTS: Final[dict[str, Type[PlanStep]]] = {
 
 _RESULT_HANDLER_OBJECTS: Final[dict[str, Type[ResultHandler]]] = {
     "metadata": DefaultMetadataHandler,
-    "save": DefaultSaveHandler,
     "table": DefaultTableHandler,
     "tracker": DefaultTrackerHandler,
 }
@@ -68,8 +66,6 @@ class DefaultPlanPlugin(PlanPlugin):
         ([`tracker`][ropt.plugins.plan._tracker.DefaultTrackerHandler]).
     : - A handler that generates and saves tables of results
         ([`table`][ropt.plugins.plan._table.DefaultTableHandler]).
-    : - A handler that saves results to netCDF files
-        ([`save`][ropt.plugins.plan._save_results.DefaultSaveHandler]).
     """
 
     @singledispatchmethod

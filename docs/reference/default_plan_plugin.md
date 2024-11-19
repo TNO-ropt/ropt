@@ -41,7 +41,3 @@
 ::: ropt.plugins.plan._table.DefaultTableHandler
     options:
         members: [DefaultTableHandlerWith]
-
-::: ropt.plugins.plan._save_results.DefaultSaveHandler
-    options:
-        members: [DefaultSaveHandlerWith]
