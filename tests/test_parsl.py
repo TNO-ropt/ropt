@@ -1,8 +1,9 @@
+from pathlib import Path
+
 import pytest
 
 pytest.importorskip("parsl")
 
-import os
 from dataclasses import dataclass
 from functools import partial
 from typing import Any, Callable, cast, no_type_check
@@ -91,8 +92,10 @@ def parsl_monitor(batch_id: int, jobs: dict[int, list[ParslTestTask]]) -> None:
                 )
 
 
-def test_parsl(enopt_config: Any, test_functions: Any, tmp_path: Any) -> None:
-    os.chdir(tmp_path)
+def test_parsl(
+    enopt_config: Any, test_functions: Any, tmp_path: Path, monkeypatch: Any
+) -> None:
+    monkeypatch.chdir(tmp_path)
     with ParslEvaluator(
         function=partial(parsl_function, functions=test_functions)
     ) as evaluator:
@@ -102,9 +105,9 @@ def test_parsl(enopt_config: Any, test_functions: Any, tmp_path: Any) -> None:
 
 
 def test_parsl_dummy_htex(
-    enopt_config: Any, test_functions: Any, tmp_path: Any
+    enopt_config: Any, test_functions: Any, tmp_path: Path, monkeypatch: Any
 ) -> None:
-    os.chdir(tmp_path)
+    monkeypatch.chdir(tmp_path)
     with ParslEvaluator(
         function=partial(parsl_function, functions=test_functions)
     ).with_htex(provider=None) as evaluator:
@@ -114,9 +117,13 @@ def test_parsl_dummy_htex(
 
 
 def test_parsl_monitor(
-    enopt_config: Any, test_functions: Any, tmp_path: Any, capsys: Any
+    enopt_config: Any,
+    test_functions: Any,
+    tmp_path: Path,
+    monkeypatch: Any,
+    capsys: Any,
 ) -> None:
-    os.chdir(tmp_path)
+    monkeypatch.chdir(tmp_path)
     with ParslEvaluator(
         function=partial(parsl_function, functions=test_functions)
     ).with_monitor(
@@ -130,9 +137,13 @@ def test_parsl_monitor(
 
 
 def test_parsl_exception(
-    enopt_config: Any, test_functions: Any, tmp_path: Any, capsys: Any
+    enopt_config: Any,
+    test_functions: Any,
+    tmp_path: Path,
+    monkeypatch: Any,
+    capsys: Any,
 ) -> None:
-    os.chdir(tmp_path)
+    monkeypatch.chdir(tmp_path)
     evaluator = ParslEvaluator(
         function=partial(parsl_function, functions=test_functions, fail_index=2),
     ).with_monitor(
@@ -146,8 +157,10 @@ def test_parsl_exception(
     assert "error in job 2" in captured.out
 
 
-def test_parsl_no_with(enopt_config: Any, test_functions: Any, tmp_path: Any) -> None:
-    os.chdir(tmp_path)
+def test_parsl_no_with(
+    enopt_config: Any, test_functions: Any, tmp_path: Path, monkeypatch: Any
+) -> None:
+    monkeypatch.chdir(tmp_path)
     evaluator = ParslEvaluator(
         function=partial(parsl_function, functions=test_functions, fail_index=2),
     )
