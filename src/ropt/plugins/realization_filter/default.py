@@ -34,8 +34,8 @@ class SortObjectiveOptions(_ConfigBaseModel):
 
     Attributes:
         sort:  The indices of the objectives to sort.
-        first: Index of the first realization to use.
-        last:  Index of the last realization to use.
+        first: Index or name of the first realization to use.
+        last:  Index of name of the last realization to use.
     """
 
     sort: list[StrictStr | NonNegativeInt]
@@ -52,8 +52,8 @@ class SortConstraintOptions(_ConfigBaseModel):
 
     Attributes:
         sort:  The index of the constraint to sort.
-        first: Index of the first realization to use.
-        last:  Index of the last realization to use.
+        first: Index or name of the first realization to use.
+        last:  Index or name of the last realization to use.
     """
 
     sort: StrictStr | NonNegativeInt
@@ -76,7 +76,7 @@ class CVaRObjectiveOptions(_ConfigBaseModel):
     maximizing.
 
     Attributes:
-        sort:       The indices of the objectives to sort.
+        sort:       The indices or names of the objectives to sort.
         percentile: The CVaR percentile.
     """
 
@@ -100,7 +100,7 @@ class CVaRConstraintOptions(_ConfigBaseModel):
     - For EQ constraints, realizations with the largest absolute values are the worst
 
     Attributes:
-        sort:       The index of the constraint to sort.
+        sort:       The index or name of the constraint to sort.
         percentile: The CVaR percentile.
     """
 
