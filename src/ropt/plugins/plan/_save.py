@@ -30,7 +30,7 @@ class DefaultSaveStep(PlanStep):
     The save step saves data to a file using the specified format.
 
     This step uses the
-    [`DefaultSaveStepWith`][ropt.plugins.plan._save_data.DefaultSaveStep.DefaultSaveStepWith]
+    [`DefaultSaveStepWith`][ropt.plugins.plan._save.DefaultSaveStep.DefaultSaveStepWith]
     configuration class to parse the `with` field of the
     [`PlanStepConfig`][ropt.config.plan.PlanStepConfig]. The configuration
     specifies the settings for this step in a plan setup.

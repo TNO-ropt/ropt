@@ -15,7 +15,7 @@ from ._metadata import DefaultMetadataHandler
 from ._optimizer import DefaultOptimizerStep
 from ._print import DefaultPrintStep
 from ._repeat import DefaultRepeatStep
-from ._save_data import DefaultSaveStep
+from ._save import DefaultSaveStep
 from ._set import DefaultSetStep
 from ._table import DefaultTableHandler
 from ._tracker import DefaultTrackerHandler
@@ -49,7 +49,7 @@ class DefaultPlanPlugin(PlanPlugin):
     : - A step that loads data from a file
         ([`load`][ropt.plugins.plan._load_data.DefaultLoadStep]).
     : - A step that saves data to a file
-        ([`save`][ropt.plugins.plan._save_data.DefaultSaveStep]).
+        ([`save`][ropt.plugins.plan._save.DefaultSaveStep]).
     : - A step that performs a single ensemble evaluation
         ([`evaluator`][ropt.plugins.plan._evaluator.DefaultEvaluatorStep]).
     : - A step that runs an optimization

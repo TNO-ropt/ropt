@@ -10,7 +10,7 @@
     options:
         members: [DefaultLoadStepWith]
 
-::: ropt.plugins.plan._save_data.DefaultSaveStep
+::: ropt.plugins.plan._save.DefaultSaveStep
     options:
         members: [DefaultSaveStepWith]
 
