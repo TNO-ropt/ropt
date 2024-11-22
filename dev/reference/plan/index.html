@@ -3225,27 +3225,27 @@ type of event passed as an argument.</p>
 </li>
 <li>
 <p>Strings containing single <code>$</code> characters, or enclosed in <code>$(...)</code>,
-   are evaluated as expressions. Variables and function calls must be
-   prefixed by a <code>$</code> character. Expressions can access the variables
-   passed through the <code>variables</code> parameter, a set of built-in
-   functions, and any additional functions added using the
-   <a class="autorefs autorefs-internal" href="#ropt.plan.ExpressionEvaluator.add_functions"><code>add_functions</code></a>
-   method.</p>
+   are evaluated as expressions. Expressions can access the variables
+   passed through the <code>variables</code> parameter, by prefixing them in the
+   expression with a <code>$</code> sign. A set of built-in functions, and
+   additional functions added using the
+   <a class="autorefs autorefs-internal" href="#ropt.plan.ExpressionEvaluator.add_functions"><code>add_functions</code></a> method
+   can also be used in an expression.</p>
 </li>
 </ol>
 
 
 <details class="tip" open>
   <summary>Expressions only containing literals</summary>
-  <p>If an expression has no variables or expressions, you need to enclose
-it in <code>$(...)</code> delimiters, like so: <code>$(1 + 1)</code>.</p>
+  <p>If an expression has no variables, you need to enclose it in
+<code>$(...)</code> delimiters, like so: <code>$(1 + 1)</code>, or <code>$(max(1, 2))</code>.</p>
 </details>
 
 <details class="tip" open>
   <summary>String Interpolation with <code>&lt;&lt;...&gt;&gt;</code>:</summary>
   <p>Use the <code>&lt;&lt;...&gt;&gt;</code> notation when the overall result should be a
-string. Expressions within <code>&lt;&lt;...&gt;&gt;</code> do not require <code>$(...)</code> delimiters:
-<code>"&lt;&lt;1 + 1&gt;&gt;"</code> will evaluate to <code>"2"</code>, but variables and function calls must
+string. Expressions within <code>&lt;&lt;...&gt;&gt;</code> do not require <code>$(...)</code>
+delimiters: <code>"&lt;&lt;1 + 1&gt;&gt;"</code> will evaluate to <code>"2"</code>, but variables must
 still be prefixed with <code>$</code>, for example <code>"&lt;&lt;$x + 1&gt;&gt;"</code>.</p>
 </details>        <p>Examples of valid expressions, assuming <code>x == 1</code> and <code>y ==2</code>:</p>
 <table>
@@ -3261,6 +3261,10 @@ still be prefixed with <code>$</code>, for example <code>"&lt;&lt;$x + 1&gt;&gt;
 <td>2</td>
 </tr>
 <tr>
+<td><code>$(max(1, 2))</code></td>
+<td>2</td>
+</tr>
+<tr>
 <td><code>$x</code></td>
 <td>1</td>
 </tr>
@@ -3273,7 +3277,7 @@ still be prefixed with <code>$</code>, for example <code>"&lt;&lt;$x + 1&gt;&gt;
 <td>3</td>
 </tr>
 <tr>
-<td><code>$max(1, $y)</code></td>
+<td><code>max(1, $y)</code></td>
 <td>2</td>
 </tr>
 </tbody>
@@ -3296,8 +3300,7 @@ still be prefixed with <code>$</code>, for example <code>"&lt;&lt;$x + 1&gt;&gt;
 </ul>
 <p>Plan variables may contain objects of any type. However, to be used
 in an expression, they should contain a value of a supported type or
-be convertible to a supported type before evaluation. In particular,
-<code>numpy</code> arrays are converted to lists when encountered in an expression.</p>
+be convertible to a supported type before evaluation.</p>
 </details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
