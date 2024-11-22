@@ -607,6 +607,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="EnOptConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.EnOptConfig.get_names" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_names
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -1459,6 +1474,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="EnOptConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.enopt.EnOptConfig.get_names" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_names
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -1904,6 +1934,61 @@ used for all variables.</p>
 
   <div class="doc doc-children">
 
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.config.enopt.EnOptConfig.get_names" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_names</span><span class="p">()</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Retrieve all object names.</p>
+<p>This method constructs dictionary using the fields of a provided
+configuration object. The result may include the following
+key/value paris:</p>
+<ul>
+<li><code>variables</code>: A tuple of variable names.</li>
+<li><code>objective_functions</code>: A tuple of objective function names.</li>
+<li><code>nonlinear_constraints</code>: A tuple of non-linear constraint names.</li>
+<li><code>realizations</code>: A tuple of realization names.</li>
+</ul>
+<p>Each of these fields is optional and may not be present.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>dict[str, tuple[str, ...]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An dictionary populated with tuples of names.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
 
 
 
