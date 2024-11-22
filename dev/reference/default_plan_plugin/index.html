@@ -1265,30 +1265,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._save_results.DefaultSaveHandler" class="md-nav__link">
-    <span class="md-ellipsis">
-      DefaultSaveHandler
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DefaultSaveHandler">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._save_results.DefaultSaveHandler.DefaultSaveHandlerWith" class="md-nav__link">
-    <span class="md-ellipsis">
-      DefaultSaveHandlerWith
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1763,30 +1739,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._save_results.DefaultSaveHandler" class="md-nav__link">
-    <span class="md-ellipsis">
-      DefaultSaveHandler
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DefaultSaveHandler">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._save_results.DefaultSaveHandler.DefaultSaveHandlerWith" class="md-nav__link">
-    <span class="md-ellipsis">
-      DefaultSaveHandlerWith
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1886,12 +1838,6 @@
 <ul>
 <li>A handler that generates and saves tables of results
 (<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._table.DefaultTableHandler"><code>table</code></a>).</li>
-</ul>
-</dd>
-<dd>
-<ul>
-<li>A handler that saves results to netCDF files
-(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._save_results.DefaultSaveHandler"><code>save</code></a>).</li>
 </ul>
 </dd>
 </dl>
@@ -2257,8 +2203,17 @@ Supported formats are:</p>
 <ul>
 <li><code>json</code>:   Saves the data in JSON format.</li>
 <li><code>pickle</code>: Saves the data in a pickle file.</li>
+<li><code>netcdf</code>: Saves the data in a netcdf file).</li>
 </ul>
 
+
+<details class="info" open>
+  <summary>Limitations</summary>
+  <ul>
+<li>The <code>json</code> format only supports data that can be serialized to JSON.</li>
+<li>The <code>netcdf</code> format only supports <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a> objects.</li>
+</ul>
+</details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
     <table>
@@ -2295,7 +2250,7 @@ Supported formats are:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.plan._save_data.DefaultSaveStep.DefaultSaveStepWith.format">format</span></code></td>
             <td>
-                  <code><span title="typing.Literal">Literal</span>[&#39;json&#39;, &#39;pickle&#39;]</code>
+                  <code><span title="typing.Literal">Literal</span>[&#39;json&#39;, &#39;pickle&#39;, &#39;netcdf&#39;]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3556,176 +3511,6 @@ which assists in filtering relevant results for the table.</p>
               <div class="doc-md-description">
                 <p>If <code>True</code>, interprets results as a maximization
             problem rather than the default minimization.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ropt.plugins.plan._save_results.DefaultSaveHandler" class="doc doc-heading">
-            <code>ropt.plugins.plan._save_results.DefaultSaveHandler</code>
-
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.ResultHandler" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler">ResultHandler</a></code></p>
-
-
-        <p>The default save handler object.</p>
-<p>This handler tracks the <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a> objects that it
-receives saves them. It uses the <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._save_results.DefaultSaveHandler.DefaultSaveHandlerWith"><code>DefaultSaveHandlerWith</code></a>
-configuration class to parse the <code>with</code> field of the
-<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.ResultHandlerConfig"><code>ResultHandler</code></a> used to specify this
-handler in a plan configuration.</p>
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.plugins.plan._save_results.DefaultSaveHandler.DefaultSaveHandlerWith" class="doc doc-heading">
-            <code>DefaultSaveHandlerWith</code>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
-
-
-        <p>Parameters for the save handler.</p>
-<p>The <code>path</code> field specifies the output path, including the file name. It
-may be a <code>Path</code> object, or a string. In the latter case, it may contain
-one or more replacement strings for the following variables, which will
-be substituted with the corresponding value of the result objects:</p>
-<ul>
-<li><code>plan_id</code>:   Replace with a formatted <code>plan_id</code> field of the result object.</li>
-<li><code>result_id</code>: Replace with the <code>result_id</code> field of the result object.</li>
-<li><code>batch_id</code>:  Replace with the <code>batch_id</code> field of the result object.</li>
-</ul>
-<p>For example the following string will construct a file name using the
-result ID padded with zeros:
-"output_directory/result{result_id:03d}.nc".</p>
-
-
-<details class="tip" open>
-  <summary>Multiple output files</summary>
-  <p>The handler will save any results with the correct tag. The <code>result_id</code>
-substitution can be used to make sure that the filenames are unique and
-files are not overwritten.</p>
-</details>        <p>Since the <code>plan_id</code> field of a results objects is a tuple, it needs to
-formatted before substitution. This is done by joining them using
-delimiters from the <code>delimiters</code> attribute. The <code>delimiters</code> argument
-can contain multiple characters, each of which will be used in turn to
-separate the items in <code>name</code>. If fewer delimiters are provided than
-needed, the final delimiter is reused for any remaining items. If
-<code>delimiters</code> is not specified, <code>-</code> is used by default.</p>
-<p>The <code>tags</code> field allows optional labels to be attached to each result,
-assisting result handlers in filtering relevant results.</p>
-<p>Currently the output is stored in netCDf format. A <code>.nc</code> extension is added
-to the file name if not present already.</p>
-
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._save_results.DefaultSaveHandler.DefaultSaveHandlerWith.path">path</span></code></td>
-            <td>
-                  <code>str | <span title="pathlib.Path">Path</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The output file.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._save_results.DefaultSaveHandler.DefaultSaveHandlerWith.tags">tags</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.ItemOrSet" href="../utilities/#ropt.config.validated_types.ItemOrSet">ItemOrSet</a>[str]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Tags to filter the sources to track.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._save_results.DefaultSaveHandler.DefaultSaveHandlerWith.delimiters">delimiters</span></code></td>
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The delimiters to use to format plan_id values, applied sequentially.</p>
               </div>
             </td>
           </tr>

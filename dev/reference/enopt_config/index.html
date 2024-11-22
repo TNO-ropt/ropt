@@ -649,9 +649,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.config.enopt.ObjectiveFunctionsConfig" class="md-nav__link">
+  <a href="#ropt.config.enopt.ObjectivesConfig" class="md-nav__link">
     <span class="md-ellipsis">
-      ObjectiveFunctionsConfig
+      ObjectivesConfig
     </span>
   </a>
   
@@ -1516,9 +1516,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.config.enopt.ObjectiveFunctionsConfig" class="md-nav__link">
+  <a href="#ropt.config.enopt.ObjectivesConfig" class="md-nav__link">
     <span class="md-ellipsis">
-      ObjectiveFunctionsConfig
+      ObjectivesConfig
     </span>
   </a>
   
@@ -1812,9 +1812,9 @@ used for all variables.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.EnOptConfig.objective_functions">objective_functions</span></code></td>
+            <td><code><span title="ropt.config.enopt.EnOptConfig.objectives">objectives</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt._objective_functions_config.ObjectiveFunctionsConfig" href="#ropt.config.enopt.ObjectiveFunctionsConfig">ObjectiveFunctionsConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt._objectives_config.ObjectivesConfig" href="#ropt.config.enopt.ObjectivesConfig">ObjectivesConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1957,7 +1957,7 @@ configuration object. The result may include the following
 key/value paris:</p>
 <ul>
 <li><code>variables</code>: A tuple of variable names.</li>
-<li><code>objective_functions</code>: A tuple of objective function names.</li>
+<li><code>objectives</code>: A tuple of objective function names.</li>
 <li><code>nonlinear_constraints</code>: A tuple of non-linear constraint names.</li>
 <li><code>realizations</code>: A tuple of realization names.</li>
 </ul>
@@ -2263,8 +2263,8 @@ delimiter.</p>
 
 
 
-<h3 id="ropt.config.enopt.ObjectiveFunctionsConfig" class="doc doc-heading">
-            <code>ObjectiveFunctionsConfig</code>
+<h3 id="ropt.config.enopt.ObjectivesConfig" class="doc doc-heading">
+            <code>ObjectivesConfig</code>
 
 
 </h3>
@@ -2275,8 +2275,8 @@ delimiter.</p>
 
         <p>The configuration class for objective functions.</p>
 <p>This configuration class defines objective functions configured by the
-<code>objective_functions</code> field in an
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+<code>objectives</code> field in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>
+object.</p>
 <p><code>ropt</code> supports optimization over multiple objectives, which are summed after
 weighting with values passed via the <code>weights</code> field. This field is a
 <code>numpy</code> array, with a length equal to the number of objective functions. Its
@@ -2334,7 +2334,7 @@ will still be calculated in the same way for practical purposes.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.names">names</span></code></td>
+            <td><code><span title="ropt.config.enopt.ObjectivesConfig.names">names</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.UniqueNames" href="../utilities/#ropt.config.validated_types.UniqueNames">UniqueNames</a> | None</code>
             </td>
@@ -2345,7 +2345,7 @@ will still be calculated in the same way for practical purposes.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.weights">weights</span></code></td>
+            <td><code><span title="ropt.config.enopt.ObjectivesConfig.weights">weights</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1D" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a></code>
             </td>
@@ -2356,7 +2356,7 @@ will still be calculated in the same way for practical purposes.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.scales">scales</span></code></td>
+            <td><code><span title="ropt.config.enopt.ObjectivesConfig.scales">scales</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1D" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a></code>
             </td>
@@ -2367,7 +2367,7 @@ will still be calculated in the same way for practical purposes.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.auto_scale">auto_scale</span></code></td>
+            <td><code><span title="ropt.config.enopt.ObjectivesConfig.auto_scale">auto_scale</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1DBool" href="../utilities/#ropt.config.validated_types.Array1DBool">Array1DBool</a></code>
             </td>
@@ -2378,7 +2378,7 @@ will still be calculated in the same way for practical purposes.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.realization_filters">realization_filters</span></code></td>
+            <td><code><span title="ropt.config.enopt.ObjectivesConfig.realization_filters">realization_filters</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1DInt" href="../utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a> | None</code>
             </td>
@@ -2389,7 +2389,7 @@ will still be calculated in the same way for practical purposes.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.function_transforms">function_transforms</span></code></td>
+            <td><code><span title="ropt.config.enopt.ObjectivesConfig.function_transforms">function_transforms</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1DInt" href="../utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a> | None</code>
             </td>
