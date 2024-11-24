@@ -22,11 +22,11 @@ _HAVE_XARRAY: Final = find_spec("xarray") is not None
 _HAVE_NETCDF: Final = find_spec("netCDF4") is not None
 
 if TYPE_CHECKING and _HAVE_PANDAS:
-    import pandas as pd  # noqa: TCH002
+    import pandas as pd  # noqa: TC002
 if _HAVE_PANDAS:
     from ._pandas import _to_dataframe
 if TYPE_CHECKING and _HAVE_XARRAY:
-    import xarray  # noqa: TCH002
+    import xarray  # noqa: TC002
 if _HAVE_XARRAY:
     from ._xarray import _to_dataset
 if _HAVE_XARRAY and _HAVE_NETCDF:

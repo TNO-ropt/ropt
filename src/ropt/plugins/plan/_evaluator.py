@@ -8,7 +8,7 @@ import numpy as np
 from pydantic import BaseModel, ConfigDict
 
 from ropt.config.enopt import EnOptConfig
-from ropt.config.validated_types import Array2D, ItemOrSet  # noqa: TCH001
+from ropt.config.validated_types import Array2D, ItemOrSet  # noqa: TC001
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted

@@ -13,7 +13,7 @@ from ropt.config.utils import (
     broadcast_arrays,
     normalize,
 )
-from ropt.config.validated_types import (  # noqa: TCH001
+from ropt.config.validated_types import (  # noqa: TC001
     Array1D,
     Array1DBool,
     Array1DInt,

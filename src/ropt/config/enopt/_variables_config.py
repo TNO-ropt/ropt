@@ -14,7 +14,7 @@ from ropt.config.utils import (
     check_enum_values,
     immutable_array,
 )
-from ropt.config.validated_types import (  # noqa: TCH001
+from ropt.config.validated_types import (  # noqa: TC001
     Array1D,
     ArrayEnum,
     ArrayIndices,

@@ -74,7 +74,7 @@ __all__ = [
     "LinearConstraints",
     "NonlinearConstraints",
     "Realizations",
-    "Results",
     "ResultField",
+    "Results",
     "convert_to_maximize",
 ]

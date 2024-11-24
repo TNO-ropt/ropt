@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, ConfigDict
 
-from ropt.config.plan import PlanStepConfig  # noqa: TCH001
+from ropt.config.plan import PlanStepConfig  # noqa: TC001
 from ropt.plugins.plan.base import PlanStep
 
 if TYPE_CHECKING:

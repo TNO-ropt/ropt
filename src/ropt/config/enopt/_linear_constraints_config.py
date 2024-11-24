@@ -8,7 +8,7 @@ import numpy as np
 from pydantic import ConfigDict, model_validator
 
 from ropt.config.utils import ImmutableBaseModel, broadcast_1d_array, check_enum_values
-from ropt.config.validated_types import Array1D, Array2D, ArrayEnum  # noqa: TCH001
+from ropt.config.validated_types import Array1D, Array2D, ArrayEnum  # noqa: TC001
 from ropt.enums import ConstraintType
 
 if TYPE_CHECKING:

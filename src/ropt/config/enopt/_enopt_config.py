@@ -11,14 +11,14 @@ from ropt.config.utils import ImmutableBaseModel
 
 from ._function_transform_config import FunctionTransformConfig
 from ._gradient_config import GradientConfig
-from ._linear_constraints_config import LinearConstraintsConfig  # noqa: TCH001
-from ._nonlinear_constraints_config import NonlinearConstraintsConfig  # noqa: TCH001
+from ._linear_constraints_config import LinearConstraintsConfig  # noqa: TC001
+from ._nonlinear_constraints_config import NonlinearConstraintsConfig  # noqa: TC001
 from ._objective_functions_config import ObjectiveFunctionsConfig
 from ._optimizer_config import OptimizerConfig
-from ._realization_filter_config import RealizationFilterConfig  # noqa: TCH001
+from ._realization_filter_config import RealizationFilterConfig  # noqa: TC001
 from ._realizations_config import RealizationsConfig
 from ._sampler_config import SamplerConfig
-from ._variables_config import VariablesConfig  # noqa: TCH001
+from ._variables_config import VariablesConfig  # noqa: TC001
 
 
 class EnOptConfig(ImmutableBaseModel):

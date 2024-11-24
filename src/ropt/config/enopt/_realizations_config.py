@@ -8,7 +8,7 @@ import numpy as np
 from pydantic import ConfigDict, NonNegativeInt, model_validator
 
 from ropt.config.utils import ImmutableBaseModel, broadcast_1d_array, normalize
-from ropt.config.validated_types import Array1D, UniqueNames  # noqa: TCH001
+from ropt.config.validated_types import Array1D, UniqueNames  # noqa: TC001
 
 
 class RealizationsConfig(ImmutableBaseModel):

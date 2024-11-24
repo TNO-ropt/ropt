@@ -13,7 +13,7 @@ from ropt.config.utils import (
     broadcast_arrays,
     check_enum_values,
 )
-from ropt.config.validated_types import (  # noqa: TCH001
+from ropt.config.validated_types import (  # noqa: TC001
     Array1D,
     Array1DBool,
     Array1DInt,

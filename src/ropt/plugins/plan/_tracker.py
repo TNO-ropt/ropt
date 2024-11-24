@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from ropt.config.validated_types import ItemOrSet  # noqa: TCH001
+from ropt.config.validated_types import ItemOrSet  # noqa: TC001
 from ropt.enums import EventType
 from ropt.plugins.plan.base import ResultHandler
 

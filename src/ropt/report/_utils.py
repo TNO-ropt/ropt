@@ -13,7 +13,7 @@ _HAVE_PANDAS: Final = find_spec("pandas") is not None
 _HAVE_TABULATE: Final = find_spec("tabulate") is not None
 
 if TYPE_CHECKING and _HAVE_PANDAS:
-    import pandas as pd  # noqa: TCH002
+    import pandas as pd  # noqa: TC002
 
 if _HAVE_TABULATE:
     from tabulate import tabulate

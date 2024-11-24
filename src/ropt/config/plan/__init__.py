@@ -12,7 +12,7 @@ structure the steps and result handlers that define a complete workflow.
 from ._plan_config import PlanConfig, PlanStepConfig, ResultHandlerConfig
 
 __all__ = [
-    "ResultHandlerConfig",
-    "PlanStepConfig",
     "PlanConfig",
+    "PlanStepConfig",
+    "ResultHandlerConfig",
 ]
