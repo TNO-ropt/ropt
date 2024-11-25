@@ -2054,6 +2054,9 @@ formats are supported:</p>
 <li><code>json</code>:   Load the data from a JSON file.</li>
 <li><code>pickle</code>: Load the data from a pickle file.</li>
 </ul>
+<p>The <code>format</code> option is optional, if <code>None</code> or not provided (the
+default), the step will attempt to derive the data format from the
+extension of the input path.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2091,7 +2094,7 @@ formats are supported:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.plan._load_data.DefaultLoadStep.DefaultLoadStepWith.format">format</span></code></td>
             <td>
-                  <code><span title="typing.Literal">Literal</span>[&#39;json&#39;, &#39;pickle&#39;]</code>
+                  <code><span title="typing.Literal">Literal</span>[&#39;json&#39;, &#39;pickle&#39;] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2204,6 +2207,9 @@ Supported formats are:</p>
 <li><code>json</code>:   Saves the data in JSON format.</li>
 <li><code>pickle</code>: Saves the data in a pickle file.</li>
 </ul>
+<p>The <code>format</code> option is optional, if <code>None</code> or not provided (the
+default), the step will attempt to derive the data format from the
+extension of the output path.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2241,7 +2247,7 @@ Supported formats are:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.plan._save.DefaultSaveStep.DefaultSaveStepWith.format">format</span></code></td>
             <td>
-                  <code><span title="typing.Literal">Literal</span>[&#39;json&#39;, &#39;pickle&#39;]</code>
+                  <code><span title="typing.Literal">Literal</span>[&#39;json&#39;, &#39;pickle&#39;] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
