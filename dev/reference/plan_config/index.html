@@ -1389,8 +1389,8 @@ flow. Each section aligns with a distinct aspect of the optimization plan:</p>
 <dt><code>outputs</code></dt>
 <dd>Lists the names of plan variables whose final values will be returned as a
   tuple when the optimization completes and the <code>run</code> method finishes.</dd>
-<dt><code>bubble_results</code></dt>
-<dd>Lists the tags of results that should be bubbled up to the paren plan (if
+<dt><code>bubble_up</code></dt>
+<dd>Lists the tags of results that should be bubbled up to the parent plan (if
   present).</dd>
 <dt><code>variables</code></dt>
 <dd>Defines a dictionary of plan variable names and initial values, used
@@ -1440,7 +1440,7 @@ flow. Each section aligns with a distinct aspect of the optimization plan:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.plan.PlanConfig.bubble_results">bubble_results</span></code></td>
+            <td><code><span title="ropt.config.plan.PlanConfig.bubble_up">bubble_up</span></code></td>
             <td>
                   <code>set[str]</code>
             </td>
