@@ -102,8 +102,6 @@ class Plan:
         the plan variables that are specified in the `outputs` section of the
         plan [`configuration`][ropt.config.plan.PlanConfig] as a tuple.
         """
-        for var, value in self._plan_config.variables.items():
-            self[var] = self.eval(value)
         len_args = len(args)
         len_inputs = len(self._plan_config.inputs)
         if len_args != len_inputs:
@@ -111,6 +109,8 @@ class Plan:
             raise RuntimeError(msg)
         for name, arg in zip(self._plan_config.inputs, args, strict=False):
             self[name] = arg
+        for var, value in self._plan_config.variables.items():
+            self[var] = self.eval(value)
         self.run_steps(self._steps)
         missing = [name for name in self._plan_config.outputs if name not in self]
         if missing:
