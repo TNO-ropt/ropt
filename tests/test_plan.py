@@ -1402,3 +1402,30 @@ def test_save_step(evaluator: Any, file_format: str, tmp_path: Path) -> None:
 
     assert path.exists()
     assert plan["z"] == [1, 2]
+
+
+@pytest.mark.parametrize("file_format", ["json", "pickle"])
+def test_save_step_ext(evaluator: Any, file_format: str, tmp_path: Path) -> None:
+    path = tmp_path / f"vars.{file_format}"
+    plan_config = {
+        "variables": {
+            "x": 1,
+            "y": 2,
+            "z": None,
+        },
+        "steps": [
+            {
+                "save": {"data": ["$x", "$y"], "path": path},
+            },
+            {
+                "load": {"var": "z", "path": path},
+            },
+        ],
+    }
+
+    context = OptimizerContext(evaluator=evaluator())
+    plan = Plan(PlanConfig.model_validate(plan_config), context)
+    plan.run()
+
+    assert path.exists()
+    assert plan["z"] == [1, 2]

@@ -40,6 +40,10 @@ class DefaultLoadStep(PlanStep):
         - `json`:   Load the data from a JSON file.
         - `pickle`: Load the data from a pickle file.
 
+        The `format` option is optional, if `None` or not provided (the
+        default), the step will attempt to derive the data format from the
+        extension of the input path.
+
         Attributes:
             var:    Name of the variable to store the result.
             path:   File path to load.
@@ -48,7 +52,7 @@ class DefaultLoadStep(PlanStep):
 
         var: str
         path: str | Path
-        format: Literal["json", "pickle"] = "json"
+        format: Literal["json", "pickle"] | None = None
 
         model_config = ConfigDict(
             extra="forbid",
@@ -69,9 +73,8 @@ class DefaultLoadStep(PlanStep):
         if self._with.var not in self.plan:
             msg = f"Plan variable does not exist: {self._with.var}"
             raise ValueError(msg)
-        if self._with.format not in {"json", "pickle"}:
-            msg = f"data format not supported: {self._with.format}"
-            raise ValueError(msg)
+        if self._with.format is not None:
+            _check_format(self._with.format)
 
     def run(self) -> None:
         """Run the load step."""
@@ -80,10 +83,23 @@ class DefaultLoadStep(PlanStep):
             msg = f"The file does not exist: {path}"
             raise RuntimeError(msg)
 
-        match self._with.format:
+        file_format = path.suffix if self._with.format is None else self._with.format
+        match _check_format(file_format):
             case "json":
                 with path.open("r", encoding="utf-8") as file_obj:
                     self.plan[self._with.var] = json.load(file_obj)
             case "pickle":
                 with path.open("rb") as file_obj:
                     self.plan[self._with.var] = pickle.load(file_obj)  # noqa: S301
+
+
+def _check_format(file_format: str | None) -> str:
+    if file_format is None or not file_format:
+        msg = "No data format specified"
+        raise ValueError(msg)
+    if file_format.startswith("."):
+        file_format = file_format[1:]
+    if file_format not in {"json", "pickle"}:
+        msg = f"data format not supported: {file_format}"
+        raise ValueError(msg)
+    return file_format

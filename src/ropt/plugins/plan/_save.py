@@ -49,6 +49,10 @@ class DefaultSaveStep(PlanStep):
         - `json`:   Saves the data in JSON format.
         - `pickle`: Saves the data in a pickle file.
 
+        The `format` option is optional, if `None` or not provided (the
+        default), the step will attempt to derive the data format from the
+        extension of the output path.
+
         Attributes:
             data:   The data to save.
             path:   The file path where the output will be stored.
@@ -57,7 +61,7 @@ class DefaultSaveStep(PlanStep):
 
         data: Any
         path: str | Path
-        format: Literal["json", "pickle"] = "json"
+        format: Literal["json", "pickle"] | None = None
 
         model_config = ConfigDict(
             extra="forbid",
@@ -75,9 +79,8 @@ class DefaultSaveStep(PlanStep):
         """
         super().__init__(config, plan)
         self._with = self.DefaultSaveStepWith.model_validate(config.with_)
-        if self._with.format not in {"json", "pickle"}:
-            msg = f"data format not supported: {self._with.format}"
-            raise ValueError(msg)
+        if self._with.format is not None:
+            _check_format(self._with.format)
 
     def run(self) -> None:
         """Run the save step."""
@@ -89,10 +92,23 @@ class DefaultSaveStep(PlanStep):
             path.parent.mkdir(parents=True, exist_ok=True)
 
         data = self.plan.eval(self._with.data)
-        match self._with.format:
+        file_format = path.suffix if self._with.format is None else self._with.format
+        match _check_format(file_format):
             case "json":
                 with path.open("w", encoding="utf-8") as file_obj:
                     json.dump(data, file_obj, cls=NumpyEncoder)
             case "pickle":
                 with path.open("wb") as file_obj:
                     pickle.dump(data, file_obj)
+
+
+def _check_format(file_format: str | None) -> str:
+    if file_format is None or not file_format:
+        msg = "No data format specified"
+        raise ValueError(msg)
+    if file_format.startswith("."):
+        file_format = file_format[1:]
+    if file_format not in {"json", "pickle"}:
+        msg = f"data format not supported: {file_format}"
+        raise ValueError(msg)
+    return file_format
