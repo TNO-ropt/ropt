@@ -1149,6 +1149,7 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
     inner_config = {
         "inputs": ["initial", "config"],
         "outputs": ["nested_optimum"],
+        "bubble_up": ["inner"],
         "steps": [
             {
                 "optimizer": {
@@ -1224,6 +1225,7 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
     inner_config = {
         "inputs": ["initial"],
         "outputs": ["nested_optimum"],
+        "bubble_up": ["inner"],
         "variables": {
             "config": nested_config,
         },

@@ -205,6 +205,10 @@ class PlanConfig(BaseModel):
     : Lists the names of plan variables whose final values will be returned as a
       tuple when the optimization completes and the `run` method finishes.
 
+    `bubble_up`
+    : Lists the tags of results that should be bubbled up to the parent plan (if
+      present).
+
     `variables`
     : Defines a dictionary of plan variable names and initial values, used
       during plan execution.
@@ -223,6 +227,7 @@ class PlanConfig(BaseModel):
     Attributes:
         inputs:    List of input variable names.
         outputs:   List of output variable names.
+        bubble_up: List of tags denoting results that should be bubbled up.
         variables: Dictionary of variable names with initial values.
         steps:     List of steps defining plan actions.
         results:   List of result handler instances.
@@ -230,6 +235,7 @@ class PlanConfig(BaseModel):
 
     inputs: list[str] = []
     outputs: list[str] = []
+    bubble_up: set[str] = set()
     variables: dict[str, Any] = {}
     steps: list[PlanStepConfig] = []
     results: list[ResultHandlerConfig] = []

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import replace
 from itertools import chain, count
 from typing import TYPE_CHECKING, Any, Iterator
 
@@ -274,10 +275,12 @@ class Plan:
 
         1. All event handlers associated with the plan are invoked, which may
            modify the event.
-        2. All observer functions registered for the specified event type via
-           the `add_observer` method are called.
+        2. If the plan has no parent, all observer functions registered for the
+           specified event type via the `add_observer` method are called.
         3. If the plan was spawned from another plan, the `emit_event` method of
-           the parent plan is also called.
+           the parent plan is also called, but only if at least one of the tags
+           in the event is present in the `bubble_up` section of the plan
+           configuration.
 
         Args:
             event: The event object to emit.
@@ -289,7 +292,9 @@ class Plan:
         if self._parent is None:
             self._optimizer_context.call_observers(event)
         else:
-            self._parent.emit_event(event)
+            shared_tags = event.tags & self._plan_config.bubble_up
+            if shared_tags:
+                self._parent.emit_event(replace(event, tags=shared_tags))
 
     def _check_condition(self, config: PlanStepConfig) -> bool:
         if config.if_ is not None:
