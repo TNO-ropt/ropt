@@ -219,7 +219,7 @@ class PlanConfig(BaseModel):
       variables, and emitting events. Emitted events are processed by the
       handlers specified in the `results` section.
 
-    `results`
+    `handlers`
     : Specifies the event handlers that process events emitted by steps.
       Handlers receive events sequentially, with each handler passing events to
       the next in the chain.
@@ -230,7 +230,7 @@ class PlanConfig(BaseModel):
         bubble_up: List of tags denoting results that should be bubbled up.
         variables: Dictionary of variable names with initial values.
         steps:     List of steps defining plan actions.
-        results:   List of result handler instances.
+        handlers:  List of result handler instances.
     """
 
     inputs: list[str] = []
@@ -238,7 +238,7 @@ class PlanConfig(BaseModel):
     bubble_up: set[str] = set()
     variables: dict[str, Any] = {}
     steps: list[PlanStepConfig] = []
-    results: list[ResultHandlerConfig] = []
+    handlers: list[ResultHandlerConfig] = []
 
     model_config = ConfigDict(
         extra="forbid",

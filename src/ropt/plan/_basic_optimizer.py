@@ -219,7 +219,7 @@ class BasicOptimizer:
                 {
                     "variables": self._variables,
                     "steps": self._steps,
-                    "results": self._handlers,
+                    "handlers": self._handlers,
                 }
             ),
             self._optimizer_context,

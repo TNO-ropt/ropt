@@ -84,7 +84,7 @@ class Plan:
             self._optimizer_context.plugin_manager.get_plugin(
                 "plan", method=config.run
             ).create(config, self)
-            for config in config.results
+            for config in config.handlers
         ]
         self._aborted = False
         self._parent = parent
