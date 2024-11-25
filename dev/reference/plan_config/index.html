@@ -1400,7 +1400,7 @@ flow. Each section aligns with a distinct aspect of the optimization plan:</p>
   of actions, such as initiating an optimization, accessing or modifying
   variables, and emitting events. Emitted events are processed by the
   handlers specified in the <code>results</code> section.</dd>
-<dt><code>result_handlers</code></dt>
+<dt><code>handlers</code></dt>
 <dd>Specifies the event handlers that process events emitted by steps.
   Handlers receive events sequentially, with each handler passing events to
   the next in the chain.</dd>
@@ -1473,7 +1473,7 @@ flow. Each section aligns with a distinct aspect of the optimization plan:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.plan.PlanConfig.result_handlers">result_handlers</span></code></td>
+            <td><code><span title="ropt.config.plan.PlanConfig.handlers">handlers</span></code></td>
             <td>
                   <code>list[<a class="autorefs autorefs-internal" title="ropt.config.plan._plan_config.ResultHandlerConfig" href="#ropt.config.plan.ResultHandlerConfig">ResultHandlerConfig</a>]</code>
             </td>
