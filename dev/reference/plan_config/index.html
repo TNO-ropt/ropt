@@ -1389,6 +1389,9 @@ flow. Each section aligns with a distinct aspect of the optimization plan:</p>
 <dt><code>outputs</code></dt>
 <dd>Lists the names of plan variables whose final values will be returned as a
   tuple when the optimization completes and the <code>run</code> method finishes.</dd>
+<dt><code>forward</code></dt>
+<dd>Lists the tags of results that should be forward to the paren plan (if
+  present).</dd>
 <dt><code>variables</code></dt>
 <dd>Defines a dictionary of plan variable names and initial values, used
   during plan execution.</dd>
@@ -1433,6 +1436,17 @@ flow. Each section aligns with a distinct aspect of the optimization plan:</p>
             <td>
               <div class="doc-md-description">
                 <p>List of output variable names.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.plan.PlanConfig.forward">forward</span></code></td>
+            <td>
+                  <code>set[str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of tags denoting results that should be forwarded.</p>
               </div>
             </td>
           </tr>

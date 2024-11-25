@@ -2512,10 +2512,12 @@ unchanged.</p>
 <ol>
 <li>All event handlers associated with the plan are invoked, which may
    modify the event.</li>
-<li>All observer functions registered for the specified event type via
-   the <code>add_observer</code> method are called.</li>
+<li>If the plan has no parent, all observer functions registered for the
+   specified event type via the <code>add_observer</code> method are called.</li>
 <li>If the plan was spawned from another plan, the <code>emit_event</code> method of
-   the parent plan is also called.</li>
+   the parent plan is also called, but only if at least one of the tags
+   in the event is present in the <code>forward</code> section of the plan
+   configuration.</li>
 </ol>
 
 
