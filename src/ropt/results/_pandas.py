@@ -5,10 +5,11 @@ from typing import TYPE_CHECKING, Any, Iterable, cast
 
 import pandas as pd
 
-from ropt.enums import ResultAxis
+from ._utils import _get_axis_names
 
 if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
+    from ropt.enums import ResultAxis
 
     from ._result_field import ResultField
 
@@ -58,10 +59,9 @@ def _to_series(  # noqa: PLR0913
     if data is None:
         return None
     axes = result_field.get_axes(field)
-    indices = [_get_index(config, axis) for axis in axes]
     indices = [
-        index if index else pd.RangeIndex(data.shape[idx])
-        for idx, index in enumerate(indices)
+        pd.RangeIndex(data.shape[idx]) if index is None else index
+        for idx, index in enumerate(_get_axis_names(config, axis) for axis in axes)
     ]
     series: pd.Series[Any]
     index: tuple[Any, ...] = (plan_id, result_id, 0 if batch_id is None else batch_id)
@@ -79,29 +79,3 @@ def _to_series(  # noqa: PLR0913
             name=field,
         )
     return series
-
-
-def _get_index(config: EnOptConfig, axis: ResultAxis) -> Iterable[Any]:
-    result: Iterable[Any] = []
-    match axis:
-        case ResultAxis.VARIABLE:
-            formatted_names = config.variables.get_formatted_names()
-            result = [] if formatted_names is None else formatted_names
-        case ResultAxis.OBJECTIVE:
-            result = (
-                config.objectives.names if config.objectives.names is not None else []
-            )
-        case ResultAxis.NONLINEAR_CONSTRAINT:
-            assert config.nonlinear_constraints is not None
-            result = (
-                config.nonlinear_constraints.names
-                if config.nonlinear_constraints.names is not None
-                else []
-            )
-        case ResultAxis.REALIZATION:
-            result = (
-                config.realizations.names
-                if config.realizations.names is not None
-                else []
-            )
-    return result

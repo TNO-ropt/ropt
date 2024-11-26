@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from ropt.config.enopt import EnOptConfig
-from ropt.enums import ConstraintType
+from ropt.enums import ConstraintType, ResultAxis
 from ropt.results import (
     BoundConstraints,
     FunctionEvaluations,
@@ -209,3 +209,13 @@ def test_nonlinear_constraint_results(
     assert constraints.violations is not None
     assert np.allclose(constraints.values, [1.0, 0.0, -1.0])
     assert np.allclose(constraints.violations, [1.0, 0.0, 1.0])
+
+
+@pytest.mark.parametrize("axis", [ResultAxis.OBJECTIVE, None])
+def test_to_dict(
+    enopt_config: Any, function_result: FunctionResults, axis: ResultAxis
+) -> None:
+    config = EnOptConfig.model_validate(enopt_config)
+    objectives = function_result.evaluations.to_dict(config, "objectives", axis=axis)
+    assert np.all(np.equal(objectives["f1"], [0.0, 2.0, 4.0]))
+    assert np.all(np.equal(objectives["f2"], [1.0, 3.0, 5.0]))
