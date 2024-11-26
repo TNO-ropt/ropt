@@ -22,7 +22,7 @@ def enopt_config_fixture() -> dict[str, Any]:
         "variables": {
             "initial_values": np.array([1, 2]),
         },
-        "objective_functions": {
+        "objectives": {
             "weights": [1.0],
         },
         "optimizer": {
@@ -213,21 +213,21 @@ def test_check_objective_function_arrays() -> None:
     for key in ["scales", "weights"]:
         config_copy = copy.deepcopy(config)
 
-        objective_functions = ObjectiveFunctionsConfig.model_validate(config_copy)
-        assert getattr(objective_functions, key).ndim == 1
-        assert len(getattr(objective_functions, key)) == 2
+        objectives = ObjectiveFunctionsConfig.model_validate(config_copy)
+        assert getattr(objectives, key).ndim == 1
+        assert len(getattr(objectives, key)) == 2
         with pytest.raises(ValueError):  # noqa: PT011
-            getattr(objective_functions, key)[0] = 0
+            getattr(objectives, key)[0] = 0
 
         config_copy[key] = np.array(0.0)
-        objective_functions = ObjectiveFunctionsConfig.model_validate(config)
-        assert getattr(objective_functions, key).ndim == 1
-        assert len(getattr(objective_functions, key)) == 2
+        objectives = ObjectiveFunctionsConfig.model_validate(config)
+        assert getattr(objectives, key).ndim == 1
+        assert len(getattr(objectives, key)) == 2
 
         config_copy[key] = np.array([0.0])
-        objective_functions = ObjectiveFunctionsConfig.model_validate(config)
-        assert getattr(objective_functions, key).ndim == 1
-        assert len(getattr(objective_functions, key)) == 2
+        objectives = ObjectiveFunctionsConfig.model_validate(config)
+        assert getattr(objectives, key).ndim == 1
+        assert len(getattr(objectives, key)) == 2
 
         config_copy[key] = np.array([0.0, 0.0, 0.0])
         with pytest.raises(
@@ -243,8 +243,8 @@ def test_check_objective_function_arrays() -> None:
 
     config_copy = copy.deepcopy(config)
     config_copy["weights"] = np.array([1.0, 1.0])
-    objective_functions = ObjectiveFunctionsConfig.model_validate(config_copy)
-    assert objective_functions.weights.sum() == 1.0
+    objectives = ObjectiveFunctionsConfig.model_validate(config_copy)
+    assert objectives.weights.sum() == 1.0
 
 
 def test_check_objective_function_arrays_no_names() -> None:
@@ -253,26 +253,26 @@ def test_check_objective_function_arrays_no_names() -> None:
     for key in ["scales", "weights"]:
         config_copy = copy.deepcopy(config)
 
-        objective_functions = ObjectiveFunctionsConfig.model_validate(config_copy)
-        assert getattr(objective_functions, key).ndim == 1
-        assert len(getattr(objective_functions, key)) == 2
+        objectives = ObjectiveFunctionsConfig.model_validate(config_copy)
+        assert getattr(objectives, key).ndim == 1
+        assert len(getattr(objectives, key)) == 2
         with pytest.raises(ValueError):  # noqa: PT011
-            getattr(objective_functions, key)[0] = 0
+            getattr(objectives, key)[0] = 0
 
         config_copy[key] = np.array(0.0)
-        objective_functions = ObjectiveFunctionsConfig.model_validate(config)
-        assert getattr(objective_functions, key).ndim == 1
-        assert len(getattr(objective_functions, key)) == 2
+        objectives = ObjectiveFunctionsConfig.model_validate(config)
+        assert getattr(objectives, key).ndim == 1
+        assert len(getattr(objectives, key)) == 2
 
         config_copy[key] = np.array([0.0])
-        objective_functions = ObjectiveFunctionsConfig.model_validate(config)
-        assert getattr(objective_functions, key).ndim == 1
-        assert len(getattr(objective_functions, key)) == 2
+        objectives = ObjectiveFunctionsConfig.model_validate(config)
+        assert getattr(objectives, key).ndim == 1
+        assert len(getattr(objectives, key)) == 2
 
     config_copy = copy.deepcopy(config)
     config_copy["weights"] = np.array([1.0, 1.0])
-    objective_functions = ObjectiveFunctionsConfig.model_validate(config_copy)
-    assert objective_functions.weights.sum() == 1.0
+    objectives = ObjectiveFunctionsConfig.model_validate(config_copy)
+    assert objectives.weights.sum() == 1.0
 
 
 def test_check_objective_function_convert_arrays() -> None:
@@ -281,19 +281,19 @@ def test_check_objective_function_convert_arrays() -> None:
     for key in ["scales", "weights"]:
         config_copy = copy.deepcopy(config)
 
-        objective_functions = ObjectiveFunctionsConfig.model_validate(config_copy)
-        assert getattr(objective_functions, key).ndim == 1
-        assert len(getattr(objective_functions, key)) == 2
+        objectives = ObjectiveFunctionsConfig.model_validate(config_copy)
+        assert getattr(objectives, key).ndim == 1
+        assert len(getattr(objectives, key)) == 2
 
         config_copy[key] = 0.0
-        objective_functions = ObjectiveFunctionsConfig.model_validate(config)
-        assert getattr(objective_functions, key).ndim == 1
-        assert len(getattr(objective_functions, key)) == 2
+        objectives = ObjectiveFunctionsConfig.model_validate(config)
+        assert getattr(objectives, key).ndim == 1
+        assert len(getattr(objectives, key)) == 2
 
         config_copy[key] = [0.0]
-        objective_functions = ObjectiveFunctionsConfig.model_validate(config)
-        assert getattr(objective_functions, key).ndim == 1
-        assert len(getattr(objective_functions, key)) == 2
+        objectives = ObjectiveFunctionsConfig.model_validate(config)
+        assert getattr(objectives, key).ndim == 1
+        assert len(getattr(objectives, key)) == 2
 
         config_copy[key] = [0.0, 0.0, 0.0]
         with pytest.raises(
@@ -309,8 +309,8 @@ def test_check_objective_function_convert_arrays() -> None:
 
     config_copy = copy.deepcopy(config)
     config_copy["weights"] = [1.0, 1.0]
-    objective_functions = ObjectiveFunctionsConfig.model_validate(config_copy)
-    assert objective_functions.weights.sum() == 1.0
+    objectives = ObjectiveFunctionsConfig.model_validate(config_copy)
+    assert objectives.weights.sum() == 1.0
 
 
 def test_check_linear_constraints() -> None:

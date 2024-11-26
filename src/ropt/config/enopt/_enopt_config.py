@@ -61,7 +61,7 @@ class EnOptConfig(ImmutableBaseModel):
 
     Attributes:
         variables:             Configuration of the variables.
-        objective_functions:   Configuration of the objective functions.
+        objectives:            Configuration of the objective functions.
         linear_constraints:    Configuration of linear constraints.
         nonlinear_constraints: Configuration of non-linear constraints.
         realizations:          Configuration of the realizations.
@@ -74,7 +74,7 @@ class EnOptConfig(ImmutableBaseModel):
     """
 
     variables: VariablesConfig
-    objective_functions: ObjectiveFunctionsConfig = ObjectiveFunctionsConfig()
+    objectives: ObjectiveFunctionsConfig = ObjectiveFunctionsConfig()
     linear_constraints: LinearConstraintsConfig | None = None
     nonlinear_constraints: NonlinearConstraintsConfig | None = None
     realizations: RealizationsConfig = RealizationsConfig()

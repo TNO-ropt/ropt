@@ -24,7 +24,7 @@ def enopt_config_fixture() -> dict[str, Any]:
             "names": ["x", "y"],
             "initial_values": [0.0, 0.0],
         },
-        "objective_functions": {
+        "objectives": {
             "names": ["f1", "f2"],
             "weights": [0.75, 0.25],
         },
@@ -73,7 +73,7 @@ def test_scaling_evaluations_functions(
     enopt_config: Any, function_result: FunctionResults
 ) -> None:
     enopt_config["variables"]["scales"] = [2.0, 2.0]
-    enopt_config["objective_functions"]["scales"] = [2.0, 2.0]
+    enopt_config["objectives"]["scales"] = [2.0, 2.0]
     config = EnOptConfig.model_validate(enopt_config)
     evaluations = FunctionEvaluations.create(
         config=config,
@@ -90,14 +90,14 @@ def test_scaling_evaluations_functions(
     assert function_result.evaluations.scaled_objectives is not None
     assert np.allclose(
         function_result.evaluations.scaled_objectives,
-        function_result.evaluations.objectives / config.objective_functions.scales,
+        function_result.evaluations.objectives / config.objectives.scales,
     )
 
 
 def test_scaling_evaluations_functions_auto(
     enopt_config: Any, function_result: FunctionResults
 ) -> None:
-    enopt_config["objective_functions"]["scales"] = [2.0, 2.0]
+    enopt_config["objectives"]["scales"] = [2.0, 2.0]
     config = EnOptConfig.model_validate(enopt_config)
     objective_auto_scales = np.array([3.0, 3.0])
     evaluations = FunctionEvaluations.create(
@@ -111,13 +111,13 @@ def test_scaling_evaluations_functions_auto(
     assert np.allclose(
         function_result.evaluations.scaled_objectives,
         function_result.evaluations.objectives
-        / config.objective_functions.scales
+        / config.objectives.scales
         / objective_auto_scales,
     )
 
 
 def test_scaling_functions(enopt_config: Any, function_result: FunctionResults) -> None:
-    enopt_config["objective_functions"]["scales"] = [2.0, 2.0]
+    enopt_config["objectives"]["scales"] = [2.0, 2.0]
     config = EnOptConfig.model_validate(enopt_config)
     functions = Functions.create(
         config=config,
@@ -129,14 +129,14 @@ def test_scaling_functions(enopt_config: Any, function_result: FunctionResults) 
     assert function_result.functions.scaled_objectives is not None
     assert np.allclose(
         function_result.functions.scaled_objectives,
-        function_result.functions.objectives / config.objective_functions.scales,
+        function_result.functions.objectives / config.objectives.scales,
     )
 
 
 def test_scaling_functions_auto(
     enopt_config: Any, function_result: FunctionResults
 ) -> None:
-    enopt_config["objective_functions"]["scales"] = [2.0, 2.0]
+    enopt_config["objectives"]["scales"] = [2.0, 2.0]
     config = EnOptConfig.model_validate(enopt_config)
     objective_auto_scales = np.array([3.0, 3.0])
     functions = Functions.create(
@@ -151,7 +151,7 @@ def test_scaling_functions_auto(
     assert np.allclose(
         function_result.functions.scaled_objectives,
         function_result.functions.objectives
-        / config.objective_functions.scales
+        / config.objectives.scales
         / objective_auto_scales,
     )
 

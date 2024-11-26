@@ -16,7 +16,7 @@ def enopt_config_fixture() -> dict[str, Any]:
             "tolerance": 1e-4,
             "max_functions": 10,
         },
-        "objective_functions": {
+        "objectives": {
             "weights": [0.75, 0.25],
         },
         "gradient": {
@@ -37,8 +37,8 @@ def test_stddev_function_transform_merge_error(
     test_functions = test_functions + test_functions
 
     enopt_config["gradient"]["merge_realizations"] = True
-    enopt_config["objective_functions"]["weights"].extend([0.75, 0.25])
-    enopt_config["objective_functions"]["function_transforms"] = [0, 0, 1, 1]
+    enopt_config["objectives"]["weights"].extend([0.75, 0.25])
+    enopt_config["objectives"]["function_transforms"] = [0, 0, 1, 1]
     enopt_config["function_transforms"] = [{"method": "mean"}, {"method": "stddev"}]
     with pytest.raises(
         ConfigError,
@@ -56,8 +56,8 @@ def test_mean_stddev_function_transform(
     # Add dummy functions, these will be transformed using stddev.
     test_functions = test_functions + test_functions
 
-    enopt_config["objective_functions"]["weights"].extend([0.75, 0.25])
-    enopt_config["objective_functions"]["function_transforms"] = [0, 0, 1, 1]
+    enopt_config["objectives"]["weights"].extend([0.75, 0.25])
+    enopt_config["objectives"]["function_transforms"] = [0, 0, 1, 1]
     enopt_config["function_transforms"] = [{"method": "mean"}, {"method": "stddev"}]
     variables = BasicOptimizer(enopt_config, evaluator(test_functions)).run().variables
     assert variables is not None

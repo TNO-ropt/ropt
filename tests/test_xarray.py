@@ -16,7 +16,7 @@ def enopt_config_fixture() -> dict[str, Any]:
             "names": ["x", "y"],
             "initial_values": [0.0, 0.0],
         },
-        "objective_functions": {
+        "objectives": {
             "names": ["f1", "f2"],
             "weights": [0.75, 0.25],
         },
@@ -71,7 +71,7 @@ def test_to_dataset(enopt_config: Any, function_result: FunctionResults) -> None
         == config.variables.get_formatted_names()
     )
     assert tuple(dataset.coords["realization"].values) == config.realizations.names
-    assert tuple(dataset.coords["objective"].values) == config.objective_functions.names
+    assert tuple(dataset.coords["objective"].values) == config.objectives.names
 
 
 @pytest.mark.parametrize("add_metadata", [True, False])

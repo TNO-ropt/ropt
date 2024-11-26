@@ -265,7 +265,7 @@ class ConcurrentEvaluator(ABC):
 def _init_results(
     variables: NDArray[np.float64], context: EvaluatorContext
 ) -> tuple[NDArray[np.float64], NDArray[np.float64] | None]:
-    objective_count = context.config.objective_functions.weights.size
+    objective_count = context.config.objectives.weights.size
     constraint_count = (
         0
         if context.config.nonlinear_constraints is None

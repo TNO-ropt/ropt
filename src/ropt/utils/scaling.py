@@ -99,7 +99,7 @@ def scale_objectives(
     Returns:
         The scaled objectives or `None` if no scaling was applied.
     """
-    total_scales = config.objective_functions.scales
+    total_scales = config.objectives.scales
     if scales is not None:
         total_scales = total_scales * scales
     if np.allclose(total_scales, 1.0, rtol=0.0, atol=1e-10):

@@ -26,7 +26,7 @@ def enopt_config_fixture() -> dict[str, Any]:
         "variables": {
             "initial_values": [0.0, 0.0, 0.1],
         },
-        "objective_functions": {
+        "objectives": {
             "weights": [0.75, 0.25],
         },
         "gradient": {
@@ -139,24 +139,24 @@ def test_objective_auto_scale(
     config = EnOptConfig.model_validate(enopt_config)
     init1 = test_functions[1](config.variables.initial_values, None)
 
-    enopt_config["objective_functions"]["scales"] = [1.0, init1]
-    enopt_config["objective_functions"]["auto_scale"] = False
+    enopt_config["objectives"]["scales"] = [1.0, init1]
+    enopt_config["objectives"]["auto_scale"] = False
     manual_result = BasicOptimizer(enopt_config, evaluator()).run().variables
     assert manual_result is not None
 
-    enopt_config["objective_functions"]["scales"] = [1.0, 1.0]
-    enopt_config["objective_functions"]["auto_scale"] = [False, True]
+    enopt_config["objectives"]["scales"] = [1.0, 1.0]
+    enopt_config["objectives"]["auto_scale"] = [False, True]
     variables = BasicOptimizer(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, manual_result)
 
-    enopt_config["objective_functions"]["scales"] = [1.0, 2.0 * init1]
-    enopt_config["objective_functions"]["auto_scale"] = False
+    enopt_config["objectives"]["scales"] = [1.0, 2.0 * init1]
+    enopt_config["objectives"]["auto_scale"] = False
     manual_result = BasicOptimizer(enopt_config, evaluator()).run().variables
     assert manual_result is not None
 
-    enopt_config["objective_functions"]["scales"] = [1.0, 2.0]
-    enopt_config["objective_functions"]["auto_scale"] = [False, True]
+    enopt_config["objectives"]["scales"] = [1.0, 2.0]
+    enopt_config["objectives"]["auto_scale"] = [False, True]
     variables = BasicOptimizer(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, manual_result)

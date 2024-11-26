@@ -187,7 +187,7 @@ class EnsembleEvaluator:
         if self._objective_auto_scales is None:
             self._objective_auto_scales = _compute_auto_scales(
                 f_eval_results.objectives,
-                self._config.objective_functions.auto_scale,
+                self._config.objectives.auto_scale,
                 self._config.realizations.weights,
             )
         if (
@@ -479,7 +479,7 @@ class EnsembleEvaluator:
         # realizations using one or more function transforms:
         if np.all(failed_realizations):
             objectives = np.empty(
-                self._config.objective_functions.weights.size, dtype=np.float64
+                self._config.objectives.weights.size, dtype=np.float64
             )
             objectives.fill(np.nan)
             if constraints is not None:
@@ -507,7 +507,7 @@ class EnsembleEvaluator:
 
             weighted_objective = _calculate_weighted_function(
                 objectives,
-                self._config.objective_functions.weights,
+                self._config.objectives.weights,
                 self._get_objective_scales(self._objective_auto_scales),
             )
 
@@ -566,7 +566,7 @@ class EnsembleEvaluator:
 
         weighted_objective_gradient = _calculate_weighted_gradient(
             objective_gradients,
-            self._config.objective_functions.weights,
+            self._config.objectives.weights,
             self._get_objective_scales(self._objective_auto_scales),
         )
 
@@ -617,7 +617,7 @@ class EnsembleEvaluator:
             scales = self._get_constraint_scales(self._constraint_auto_scales)
             constraints = (constraints - rhs_values) / scales
 
-        objective_filters = self._config.objective_functions.realization_filters
+        objective_filters = self._config.objectives.realization_filters
         constraint_filters = (
             None
             if self._config.nonlinear_constraints is None
@@ -643,7 +643,7 @@ class EnsembleEvaluator:
                 if objective_weights is None:
                     objective_weights = np.ones(
                         (
-                            self._config.objective_functions.weights.size,
+                            self._config.objectives.weights.size,
                             self._config.realizations.weights.size,
                         ),
                     )
@@ -664,8 +664,8 @@ class EnsembleEvaluator:
         self, auto_scales: NDArray[np.float64] | None
     ) -> NDArray[np.float64]:
         if auto_scales is None:
-            return self._config.objective_functions.scales
-        return self._config.objective_functions.scales * auto_scales
+            return self._config.objectives.scales
+        return self._config.objectives.scales * auto_scales
 
     def _get_constraint_scales(
         self, auto_scales: NDArray[np.float64] | None

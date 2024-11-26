@@ -233,9 +233,9 @@ class DefaultRealizationFilter(RealizationFilter):
 
     def _sort_objectives(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
         options = cast(SortObjectiveOptions, self._filter_options)
-        objective_config = self._enopt_config.objective_functions
+        objective_config = self._enopt_config.objectives
         failed_realizations = np.isnan(objectives[..., 0])
-        sort = _get_indices(options.sort, self._enopt_config.objective_functions.names)
+        sort = _get_indices(options.sort, self._enopt_config.objectives.names)
         objectives = np.nan_to_num(objectives[..., sort])
         if objective_config.weights.size > 1:
             objectives = np.dot(objectives, objective_config.weights[sort])
@@ -273,9 +273,9 @@ class DefaultRealizationFilter(RealizationFilter):
         objectives: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         options = cast(CVaRObjectiveOptions, self._filter_options)
-        objective_config = self._enopt_config.objective_functions
+        objective_config = self._enopt_config.objectives
         failed_realizations = np.isnan(objectives[..., 0])
-        sort = _get_indices(options.sort, self._enopt_config.objective_functions.names)
+        sort = _get_indices(options.sort, self._enopt_config.objectives.names)
         objectives = np.nan_to_num(objectives[..., sort])
         if objective_config.weights.size > 1:
             objectives = np.dot(objectives, objective_config.weights[sort])

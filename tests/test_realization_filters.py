@@ -21,7 +21,7 @@ def enopt_config_fixture() -> dict[str, Any]:
             "speculative": True,
             "max_functions": 10,
         },
-        "objective_functions": {
+        "objectives": {
             "names": ["f1", "f2"],
             "weights": [0.75, 0.25],
         },
@@ -138,7 +138,7 @@ def test_sort_filter_on_objectives(
             },
         },
     ]
-    enopt_config["objective_functions"]["realization_filters"] = [0, 0]
+    enopt_config["objectives"]["realization_filters"] = [0, 0]
 
     result_list: list[Results] = []
     results = (
@@ -200,7 +200,7 @@ def test_sort_filter_on_objectives_with_constraints(
             },
         },
     ]
-    enopt_config["objective_functions"]["realization_filters"] = [0, 0]
+    enopt_config["objectives"]["realization_filters"] = [0, 0]
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
     results = (
@@ -269,7 +269,7 @@ def test_sort_filter_on_constraints(
             },
         },
     ]
-    enopt_config["objective_functions"]["realization_filters"] = [0, 0]
+    enopt_config["objectives"]["realization_filters"] = [0, 0]
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
     results = (
@@ -323,8 +323,8 @@ def test_sort_filter_mixed(  # noqa: C901
         partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
     ]
 
-    enopt_config["objective_functions"]["weights"] = [0.75, 0.25, 0.75, 0.25]
-    enopt_config["objective_functions"]["names"] = ["f1", "f2", "f3", "f4"]
+    enopt_config["objectives"]["weights"] = [0.75, 0.25, 0.75, 0.25]
+    enopt_config["objectives"]["names"] = ["f1", "f2", "f3", "f4"]
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations
 
     objective_values: list[NDArray[np.float64]] = []
@@ -348,7 +348,7 @@ def test_sort_filter_mixed(  # noqa: C901
             },
         },
     ]
-    enopt_config["objective_functions"]["realization_filters"] = [0, 0, 0, 0]
+    enopt_config["objectives"]["realization_filters"] = [0, 0, 0, 0]
 
     result_list: list[Results] = []
     results = (
@@ -386,7 +386,7 @@ def test_sort_filter_mixed(  # noqa: C901
             },
         },
     ]
-    enopt_config["objective_functions"]["realization_filters"] = [0, 0, -1, -1]
+    enopt_config["objectives"]["realization_filters"] = [0, 0, -1, -1]
 
     result_list = []
     results = (
@@ -446,7 +446,7 @@ def test_cvar_filter_on_objectives(
             },
         },
     ]
-    enopt_config["objective_functions"]["realization_filters"] = [0, 0]
+    enopt_config["objectives"]["realization_filters"] = [0, 0]
     result_list: list[Results] = []
     results = (
         BasicOptimizer(
@@ -506,7 +506,7 @@ def test_cvar_filter_on_objectives_with_constraints(
             },
         },
     ]
-    enopt_config["objective_functions"]["realization_filters"] = [0, 0]
+    enopt_config["objectives"]["realization_filters"] = [0, 0]
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
     results = (
@@ -574,7 +574,7 @@ def test_cvar_filter_on_constraints(
             },
         },
     ]
-    enopt_config["objective_functions"]["realization_filters"] = [0, 0]
+    enopt_config["objectives"]["realization_filters"] = [0, 0]
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
     results = (
@@ -629,8 +629,8 @@ def test_cvar_filter_mixed(  # noqa: C901
     ]
 
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations
-    enopt_config["objective_functions"]["weights"] = [0.75, 0.25, 0.75, 0.25]
-    enopt_config["objective_functions"]["names"] = ["f1", "f2", "f3", "f4"]
+    enopt_config["objectives"]["weights"] = [0.75, 0.25, 0.75, 0.25]
+    enopt_config["objectives"]["names"] = ["f1", "f2", "f3", "f4"]
 
     objective_values: list[NDArray[np.float64]] = []
 
@@ -652,7 +652,7 @@ def test_cvar_filter_mixed(  # noqa: C901
             },
         },
     ]
-    enopt_config["objective_functions"]["realization_filters"] = [0, 0, 0, 0]
+    enopt_config["objectives"]["realization_filters"] = [0, 0, 0, 0]
 
     result_list: list[Results] = []
     results = (
@@ -689,7 +689,7 @@ def test_cvar_filter_mixed(  # noqa: C901
             },
         },
     ]
-    enopt_config["objective_functions"]["realization_filters"] = [0, 0, -1, -1]
+    enopt_config["objectives"]["realization_filters"] = [0, 0, -1, -1]
 
     result_list = []
     results = (

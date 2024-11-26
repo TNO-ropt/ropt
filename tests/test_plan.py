@@ -36,7 +36,7 @@ def enopt_config_fixture() -> dict[str, Any]:
         "variables": {
             "initial_values": [0.0, 0.0, 0.1],
         },
-        "objective_functions": {
+        "objectives": {
             "weights": [0.75, 0.25],
         },
         "gradient": {

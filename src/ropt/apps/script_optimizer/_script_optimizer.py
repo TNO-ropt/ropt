@@ -111,9 +111,9 @@ class ScriptOptimizer:
         assert self._config.job_dir is not None
         path = self._config.job_dir / Path(*job_labels)
 
-        assert context.config.objective_functions.names is not None
+        assert context.config.objectives.names is not None
         objective_paths = tuple(
-            path / str(name) for name in context.config.objective_functions.names
+            path / str(name) for name in context.config.objectives.names
         )
 
         if context.config.nonlinear_constraints is not None:

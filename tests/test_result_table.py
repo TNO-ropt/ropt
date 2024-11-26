@@ -23,7 +23,7 @@ def enopt_config_fixture() -> dict[str, Any]:
             "upper_bounds": 1.0,
             "lower_bounds": -1.0,
         },
-        "objective_functions": {
+        "objectives": {
             "weights": [0.75, 0.25],
         },
         "gradient": {

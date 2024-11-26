@@ -25,8 +25,8 @@ class ObjectiveFunctionsConfig(ImmutableBaseModel):
     """The configuration class for objective functions.
 
     This configuration class defines objective functions configured by the
-    `objective_functions` field in an
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
+    `objectives` field in an [`EnOptConfig`][ropt.config.enopt.EnOptConfig]
+    object.
 
     `ropt` supports optimization over multiple objectives, which are summed after
     weighting with values passed via the `weights` field. This field is a

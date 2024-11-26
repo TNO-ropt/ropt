@@ -43,7 +43,7 @@ def _calculate_transformed_objectives(
     return _calculate_transformed_functions(
         config,
         function_transforms,
-        config.objective_functions.function_transforms,
+        config.objectives.function_transforms,
         functions,
         realization_weights,
         failed_realizations,

@@ -19,7 +19,7 @@ def enopt_config_fixture() -> dict[str, Any]:
         "optimizer": {
             "tolerance": 1e-5,
         },
-        "objective_functions": {
+        "objectives": {
             "weights": [0.75, 0.25],
         },
         "realizations": {

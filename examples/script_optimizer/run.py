@@ -28,7 +28,7 @@ ENOPT_CONFIG: dict[str, Any] = {
         "max_functions": 20,
         "speculative": True,
     },
-    "objective_functions": {
+    "objectives": {
         "names": ["rosenbrock"],
     },
     "realizations": {

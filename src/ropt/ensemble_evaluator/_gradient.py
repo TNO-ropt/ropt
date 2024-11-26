@@ -199,7 +199,7 @@ def _calculate_transformed_objective_gradients(  # noqa: PLR0913
     return _calculate_transformed_gradients(
         config,
         function_transforms,
-        config.objective_functions.function_transforms,
+        config.objectives.function_transforms,
         variables,
         functions,
         perturbed_variables,

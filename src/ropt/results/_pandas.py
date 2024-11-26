@@ -89,9 +89,7 @@ def _get_index(config: EnOptConfig, axis: ResultAxisName) -> Iterable[Any]:
             result = [] if formatted_names is None else formatted_names
         case ResultAxisName.OBJECTIVE:
             result = (
-                config.objective_functions.names
-                if config.objective_functions.names is not None
-                else []
+                config.objectives.names if config.objectives.names is not None else []
             )
         case ResultAxisName.NONLINEAR_CONSTRAINT:
             assert config.nonlinear_constraints is not None

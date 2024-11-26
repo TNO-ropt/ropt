@@ -42,7 +42,7 @@ def _function_runner(
     )
     if unscaled_variables is not None:
         variables = unscaled_variables
-    objective_count = evaluator_context.config.objective_functions.weights.size
+    objective_count = evaluator_context.config.objectives.weights.size
     constraint_count = (
         0
         if evaluator_context.config.nonlinear_constraints is None

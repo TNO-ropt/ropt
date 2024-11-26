@@ -86,7 +86,7 @@ def _get_active_realizations(
             return None, None
         active_objectives = np.broadcast_to(
             active_realizations,
-            (config.objective_functions.weights.size, active_realizations.size),
+            (config.objectives.weights.size, active_realizations.size),
         )
         active_constraints = (
             None

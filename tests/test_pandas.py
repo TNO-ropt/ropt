@@ -26,7 +26,7 @@ def enopt_config_fixture() -> dict[str, Any]:
             "names": ["x", "y"],
             "initial_values": [0.0, 0.0],
         },
-        "objective_functions": {
+        "objectives": {
             "names": ["f1", "f2"],
             "weights": [0.75, 0.25],
         },

@@ -78,7 +78,7 @@ def _get_index(config: EnOptConfig, axis: ResultAxisName) -> tuple[Any, ...] | N
             else config.variables.get_formatted_names()
         )
     if axis == ResultAxisName.OBJECTIVE:
-        return config.objective_functions.names
+        return config.objectives.names
     if axis == ResultAxisName.NONLINEAR_CONSTRAINT:
         assert config.nonlinear_constraints is not None
         return config.nonlinear_constraints.names
