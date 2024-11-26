@@ -806,9 +806,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.results.ResultField.get_axis_names" class="md-nav__link">
+  <a href="#ropt.results.ResultField.get_axes" class="md-nav__link">
     <span class="md-ellipsis">
-      get_axis_names
+      get_axes
     </span>
   </a>
   
@@ -1496,9 +1496,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.results.ResultField.get_axis_names" class="md-nav__link">
+  <a href="#ropt.results.ResultField.get_axes" class="md-nav__link">
     <span class="md-ellipsis">
-      get_axis_names
+      get_axes
     </span>
   </a>
   
@@ -1704,13 +1704,12 @@ to the realization numbers.</p>
 <p>To facilitate exporting and reporting results, the identity of the axes in such
 multi-dimensional arrays is stored in metadata associated with the corresponding
 field. These fields derive from the <a class="autorefs autorefs-internal" href="#ropt.results.ResultField"><code>ResultField</code></a>
-class, which includes a
-<a class="autorefs autorefs-internal" href="#ropt.results.ResultField.get_axis_names"><code>get_axis_names</code></a> class method to
-retrieve the names. For example, for the <code>objectives</code> field, this method
-retrieves the axis names:</p>
+class, which includes a <a class="autorefs autorefs-internal" href="#ropt.results.ResultField.get_axes"><code>get_axes</code></a> class
+method to retrieve the axes. For example, for the <code>objectives</code> field, this
+method retrieves the axes:</p>
 <div class="language-py highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">ropt.results</span> <span class="kn">import</span> <span class="n">FunctionEvaluations</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">FunctionEvaluations</span><span class="o">.</span><span class="n">get_axis_names</span><span class="p">(</span><span class="s2">&quot;objectives&quot;</span><span class="p">)</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">(</span><span class="o">&lt;</span><span class="n">ResultAxisName</span><span class="o">.</span><span class="n">REALIZATION</span><span class="p">:</span> <span class="s1">&#39;realization&#39;</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">ResultAxisName</span><span class="o">.</span><span class="n">OBJECTIVE</span><span class="p">:</span> <span class="s1">&#39;objective&#39;</span><span class="o">&gt;</span><span class="p">)</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">FunctionEvaluations</span><span class="o">.</span><span class="n">get_axes</span><span class="p">(</span><span class="s2">&quot;objectives&quot;</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">(</span><span class="o">&lt;</span><span class="n">ResultAxis</span><span class="o">.</span><span class="n">REALIZATION</span><span class="p">:</span> <span class="s1">&#39;realization&#39;</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">ResultAxis</span><span class="o">.</span><span class="n">OBJECTIVE</span><span class="p">:</span> <span class="s1">&#39;objective&#39;</span><span class="o">&gt;</span><span class="p">)</span>
 </span></code></pre></div>
 <p>Using this metadata, the exporting or reporting code can refer to the optimizer
 configuration to associate realization and objective names with any entry in the
@@ -1975,7 +1974,7 @@ result ID and/or batch ID.</p>
                 <code>unstack</code>
             </td>
             <td>
-                  <code><span title="typing.Iterable">Iterable</span>[<a class="autorefs autorefs-internal" title="ropt.enums.ResultAxisName" href="../enums/#ropt.enums.ResultAxisName">ResultAxisName</a>] | None</code>
+                  <code><span title="typing.Iterable">Iterable</span>[<a class="autorefs autorefs-internal" title="ropt.enums.ResultAxis" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2382,8 +2381,8 @@ are installed.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.results.ResultField.get_axis_names" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">get_axis_names</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></code>
+<h4 id="ropt.results.ResultField.get_axes" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_axes</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
@@ -2394,10 +2393,10 @@ are installed.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the axis names of a field in the given field class or object.</p>
+        <p>Return the axes of a field in the given field class or object.</p>
 <p>When used with the class or an instance of that class for one of the
-fields of a <code>Results</code> object, retrieve the names of the axes of the
-stored <code>numpy</code> array from the metadata and return them.</p>
+fields of a <code>Results</code> object, retrieve the axes of the stored <code>numpy</code>
+array from the metadata and return them.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2465,7 +2464,7 @@ stored <code>numpy</code> array from the metadata and return them.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code>tuple[<a class="autorefs autorefs-internal" title="ropt.enums.ResultAxisName" href="../enums/#ropt.enums.ResultAxisName">ResultAxisName</a>, ...]</code>
+                  <code>tuple[<a class="autorefs autorefs-internal" title="ropt.enums.ResultAxis" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">

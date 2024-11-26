@@ -1782,7 +1782,7 @@ used for all variables.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.EnOptConfig.objective_functions">objective_functions</span></code></td>
+            <td><code><span title="ropt.config.enopt.EnOptConfig.objectives">objectives</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.config.enopt._objective_functions_config.ObjectiveFunctionsConfig" href="#ropt.config.enopt.ObjectiveFunctionsConfig">ObjectiveFunctionsConfig</a></code>
             </td>
@@ -2190,8 +2190,8 @@ delimiter.</p>
 
         <p>The configuration class for objective functions.</p>
 <p>This configuration class defines objective functions configured by the
-<code>objective_functions</code> field in an
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+<code>objectives</code> field in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>
+object.</p>
 <p><code>ropt</code> supports optimization over multiple objectives, which are summed after
 weighting with values passed via the <code>weights</code> field. This field is a
 <code>numpy</code> array, with a length equal to the number of objective functions. Its
