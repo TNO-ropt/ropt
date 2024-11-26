@@ -1794,6 +1794,7 @@ multiple columns.</p>
    generic information, the nature of which depends on the steps producing
    them. They are expected to be primitive values not interpreted by the
    optimization code but can be exported and reported.</li>
+<li>The config object that was used to generate the result.</li>
 </ol>
 <p>The <code>Results</code> class is an abstract base class that is not intended to be
 instantiated by itself. Most data of interest will be stored in additional
@@ -1870,6 +1871,17 @@ classes:</p>
               </div>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.Results.config">config</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The config object used while generating the result.</p>
+              </div>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -1895,7 +1907,7 @@ classes:</p>
 
 
 <h4 id="ropt.results.Results.to_dataframe" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">to_dataframe</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">unstack</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">to_dataframe</span><span class="p">(</span><span class="n">field_name</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">unstack</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
@@ -1939,22 +1951,6 @@ result ID and/or batch ID.</p>
         </tr>
       </thead>
       <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>config</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The ensemble optimizer configuration object.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
           <tr class="doc-section-item">
             <td>
                 <code>field_name</code>
@@ -2075,7 +2071,7 @@ result ID and/or batch ID.</p>
 
 
 <h4 id="ropt.results.Results.to_dataset" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">to_dataset</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">add_metadata</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">to_dataset</span><span class="p">(</span><span class="n">field_name</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">add_metadata</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 </h4>
 
@@ -2110,22 +2106,6 @@ attributes of the dataset, using the <code>plan_id</code>, <code>result_id</code
         </tr>
       </thead>
       <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>config</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The ensemble optimizer configuration object.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
           <tr class="doc-section-item">
             <td>
                 <code>field_name</code>
@@ -2246,7 +2226,7 @@ attributes of the dataset, using the <code>plan_id</code>, <code>result_id</code
 
 
 <h4 id="ropt.results.Results.to_netcdf" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">to_netcdf</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">to_netcdf</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></code>
 
 </h4>
 
@@ -2282,22 +2262,6 @@ correct class, its type must be known.</p>
         </tr>
       </thead>
       <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>config</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The configuration used to run the optimization.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
           <tr class="doc-section-item">
             <td>
                 <code>filename</code>
