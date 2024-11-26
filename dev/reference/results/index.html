@@ -814,6 +814,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.results.ResultField.to_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_dict
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1499,6 +1508,15 @@
   <a href="#ropt.results.ResultField.get_axes" class="md-nav__link">
     <span class="md-ellipsis">
       get_axes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.results.ResultField.to_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_dict
     </span>
   </a>
   
@@ -2469,6 +2487,120 @@ array from the metadata and return them.</p>
             <td>
               <div class="doc-md-description">
                 <p>A tuple listing the names of the axes.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.results.ResultField.to_dict" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">to_dict</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Convert a field of ResultsField to a dictionary.</p>
+<p>The keys of the output correspond to the indices of the axis of the
+field given by <code>axis</code>. The values are a slice of the field value at each
+index. If the given <code>config</code> object contains the names of the objects
+stored along the axis, these are used as keys in the output dictionary
+rather than the numerical indices.</p>
+<p>If <code>axis</code> is <code>None</code> (the default), a default is chosen using the following logic:</p>
+<ol>
+<li>If the field has a <code>ResultAxis.OBJECTIVE</code> axis, is used.</li>
+<li>If the field has a <code>ResultAxis.NONLINEAR_CONSTRAINT</code> axis, it is used.</li>
+<li>Otherwise, use the last axis.</li>
+</ol>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>config</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration object.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>name</code>
+            </td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Name of the field to export.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>axis</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.enums.ResultAxis" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Axis to use as the keys.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>dict[str | int, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The field converted to a dictionary.</p>
               </div>
             </td>
           </tr>
