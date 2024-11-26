@@ -10,7 +10,6 @@ from ._utils import _HAVE_PANDAS, _HAVE_TABULATE, _extract_columns, _write_table
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from ropt.config.enopt import EnOptConfig
     from ropt.results import Results
 
     if _HAVE_PANDAS:
@@ -93,20 +92,19 @@ class ResultsTable(ResultsDataFrame):
         self._path = path
         self._min_header_len = min_header_len
 
-    def add_results(self, config: EnOptConfig, results: Iterable[Results]) -> bool:
+    def add_results(self, results: Iterable[Results]) -> bool:
         """Add results to the table.
 
         This method can be called directly from any observers connected to
         events that produce results.
 
         Args:
-            config:  The configuration of the optimizer generating the results.
             results: The results to add.
 
         Returns:
             True if a result was added, else False
         """
-        if super().add_results(config, results):
+        if super().add_results(results):
             frame = self._frame.reset_index()
             table = _extract_columns(frame, mapping=self._columns)
             _write_table(table, self._path, self._min_header_len)

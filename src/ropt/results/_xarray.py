@@ -13,12 +13,12 @@ from typing import (
 
 import xarray
 
+from ropt.config.enopt import EnOptConfig
+
 from ._utils import _get_axis_names
 
 if TYPE_CHECKING:
     from pathlib import Path
-
-    from ropt.config.enopt import EnOptConfig
 
     from ._result_field import ResultField
     from ._results import Results, TypeResults
@@ -74,18 +74,19 @@ def _from_dataset(dataset: xarray.Dataset) -> dict[str, Any]:
     return {str(name): data.to_numpy() for name, data in dataset.items()}
 
 
-def _to_netcdf(results: Results, config: EnOptConfig, filename: Path) -> None:
+def _to_netcdf(results: Results, filename: Path) -> None:
     mode: Literal["w", "a"] = "w"
     metadata: dict[str, Any] = {
         "plan_id": json.dumps(results.plan_id),
         "result_id": json.dumps(results.result_id),
         "metadata": json.dumps(results.metadata),
+        "config": json.dumps(results.config.original_inputs),
     }
     if results.batch_id is not None:
         metadata["batch_id"] = json.dumps(results.batch_id)
     for result_field in fields(results):
         if is_dataclass(getattr(results, result_field.name)):
-            dataset = results.to_dataset(config, result_field.name)
+            dataset = results.to_dataset(result_field.name)
             dataset.to_netcdf(filename, mode=mode, group=result_field.name)
             mode = "a"
     if filename.exists():
@@ -101,6 +102,8 @@ def _from_netcdf(filename: Path, result_type: Type[TypeResults]) -> dict[str, An
     result = {key: json.loads(value) for key, value in result.items()}
     if "plan_id" in result:
         result["plan_id"] = tuple(result["plan_id"])
+    if "config" in result:
+        result["config"] = EnOptConfig.model_validate(result["config"])
     for result_field in fields(result_type):
         # Load all fields, skipping those already loaded from the metadata:
         if result_field.name not in result:

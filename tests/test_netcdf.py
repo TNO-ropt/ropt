@@ -62,6 +62,7 @@ def function_result_fixture(enopt_config: Any) -> FunctionResults:
         result_id=0,
         batch_id=1,
         metadata={},
+        config=config,
         evaluations=evaluations,
         realizations=realizations,
         functions=functions,
@@ -69,7 +70,8 @@ def function_result_fixture(enopt_config: Any) -> FunctionResults:
 
 
 @pytest.fixture(name="gradient_result")
-def gradient_result_fixture() -> GradientResults:
+def gradient_result_fixture(enopt_config: Any) -> GradientResults:
+    config = EnOptConfig.model_validate(enopt_config)
     evaluations = GradientEvaluations(
         variables=np.array([1.0, 2.0]),
         perturbed_variables=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
@@ -84,6 +86,7 @@ def gradient_result_fixture() -> GradientResults:
         result_id=0,
         batch_id=1,
         metadata={},
+        config=config,
         evaluations=evaluations,
         realizations=Realizations(
             failed_realizations=np.zeros(3, dtype=np.bool_),
@@ -92,13 +95,8 @@ def gradient_result_fixture() -> GradientResults:
     )
 
 
-def test_functions_to_netcdf(
-    enopt_config: Any,
-    function_result: FunctionResults,
-    tmp_path: Path,
-) -> None:
-    config = EnOptConfig.model_validate(enopt_config)
-    function_result.to_netcdf(config, tmp_path / "test.nc")
+def test_functions_to_netcdf(function_result: FunctionResults, tmp_path: Path) -> None:
+    function_result.to_netcdf(tmp_path / "test.nc")
     assert (tmp_path / "test.nc").exists()
     file = netcdf.Dataset((tmp_path / "test.nc"), mode="r")
     assert set(file.groups) == {
@@ -110,28 +108,20 @@ def test_functions_to_netcdf(
 
 
 def test_functions_from_netcdf(
-    enopt_config: Any, function_result: FunctionResults, tmp_path: Path
+    function_result: FunctionResults, tmp_path: Path
 ) -> None:
-    config = EnOptConfig.model_validate(enopt_config)
-    function_result.to_netcdf(config, tmp_path / "test.nc")
+    function_result.to_netcdf(tmp_path / "test.nc")
     assert (tmp_path / "test.nc").exists()
     loaded = FunctionResults.from_netcdf(tmp_path / "test.nc")
     assert loaded.result_id == function_result.result_id
     assert loaded.batch_id == function_result.batch_id
     assert loaded.plan_id == function_result.plan_id
     for item in ("evaluations", "realizations", "functions"):
-        assert function_result.to_dataframe(config, item).equals(
-            function_result.to_dataframe(config, item)
-        )
+        assert loaded.to_dataframe(item).equals(function_result.to_dataframe(item))
 
 
-def test_gradients_to_netcdf(
-    enopt_config: Any,
-    gradient_result: GradientResults,
-    tmp_path: Path,
-) -> None:
-    config = EnOptConfig.model_validate(enopt_config)
-    gradient_result.to_netcdf(config, tmp_path / "test.nc")
+def test_gradients_to_netcdf(gradient_result: GradientResults, tmp_path: Path) -> None:
+    gradient_result.to_netcdf(tmp_path / "test.nc")
     assert (tmp_path / "test.nc").exists()
     file = netcdf.Dataset((tmp_path / "test.nc"), mode="r")
     assert set(file.groups) == {
@@ -143,25 +133,19 @@ def test_gradients_to_netcdf(
 
 
 def test_gradients_from_netcdf(
-    enopt_config: Any, gradient_result: GradientResults, tmp_path: Path
+    gradient_result: GradientResults, tmp_path: Path
 ) -> None:
-    config = EnOptConfig.model_validate(enopt_config)
-    gradient_result.to_netcdf(config, tmp_path / "test.nc")
+    gradient_result.to_netcdf(tmp_path / "test.nc")
     assert (tmp_path / "test.nc").exists()
     loaded = GradientResults.from_netcdf(tmp_path / "test.nc")
     assert loaded.batch_id == gradient_result.batch_id
     for item in ("evaluations", "gradients"):
-        assert loaded.to_dataframe(config, item).equals(
-            gradient_result.to_dataframe(config, item)
-        )
+        assert loaded.to_dataframe(item).equals(gradient_result.to_dataframe(item))
 
 
-def test_netcdf_metadata(
-    enopt_config: Any, function_result: FunctionResults, tmp_path: Path
-) -> None:
-    config = EnOptConfig.model_validate(enopt_config)
+def test_netcdf_metadata(function_result: FunctionResults, tmp_path: Path) -> None:
     function_result.metadata = {"foo": 1}
-    function_result.to_netcdf(config, tmp_path / "test.nc")
+    function_result.to_netcdf(tmp_path / "test.nc")
     assert (tmp_path / "test.nc").exists()
     loaded = FunctionResults.from_netcdf(tmp_path / "test.nc")
     assert loaded.metadata == {"foo": 1}

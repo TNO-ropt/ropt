@@ -11,7 +11,6 @@ from ropt.results import FunctionResults, GradientResults
 from ._utils import _HAVE_PANDAS, _add_metadata, _add_prefix, _get_select
 
 if TYPE_CHECKING:
-    from ropt.config.enopt import EnOptConfig
     from ropt.results import Results
 
 if _HAVE_PANDAS:
@@ -74,14 +73,13 @@ class ResultsDataFrame:
         self._table_type = table_type
         self._frame = pd.DataFrame()
 
-    def add_results(self, config: EnOptConfig, results: Iterable[Results]) -> bool:
+    def add_results(self, results: Iterable[Results]) -> bool:
         """Add results to the table.
 
         This method can be called directly from any observers connected to
         events that produce results.
 
         Args:
-            config:  The configuration of the optimizer generating the results.
             results: The results to add.
 
         Returns:
@@ -94,13 +92,13 @@ class ResultsDataFrame:
                 and isinstance(item, FunctionResults)
                 and item.functions is not None
             ):
-                frame = _get_function_results(config, item, self._fields)
+                frame = _get_function_results(item, self._fields)
             elif (
                 self._table_type == "gradients"
                 and isinstance(item, GradientResults)
                 and item.gradients is not None
             ):
-                frame = _add_gradient_results(config, item, self._fields)
+                frame = _add_gradient_results(item, self._fields)
             else:
                 continue
             if not frame.empty:
@@ -119,9 +117,7 @@ class ResultsDataFrame:
         return self._frame
 
 
-def _get_function_results(
-    config: EnOptConfig, results: Results, sub_fields: set[str]
-) -> pd.DataFrame:
+def _get_function_results(results: Results, sub_fields: set[str]) -> pd.DataFrame:
     if (
         not sub_fields
         or not isinstance(results, FunctionResults)
@@ -130,7 +126,6 @@ def _get_function_results(
         return pd.DataFrame()
 
     functions = results.to_dataframe(
-        config,
         "functions",
         select=_get_select(results, "functions", sub_fields),
         unstack=[ResultAxis.OBJECTIVE, ResultAxis.NONLINEAR_CONSTRAINT],
@@ -140,7 +135,6 @@ def _get_function_results(
         pd.DataFrame()
         if results.bound_constraints is None
         else results.to_dataframe(
-            config,
             "bound_constraints",
             select=_get_select(results, "bound_constraints", sub_fields),
             unstack=[ResultAxis.VARIABLE],
@@ -151,7 +145,6 @@ def _get_function_results(
         pd.DataFrame()
         if results.linear_constraints is None
         else results.to_dataframe(
-            config,
             "linear_constraints",
             select=_get_select(results, "linear_constraints", sub_fields),
             unstack=[ResultAxis.LINEAR_CONSTRAINT],
@@ -162,7 +155,6 @@ def _get_function_results(
         pd.DataFrame()
         if results.nonlinear_constraints is None
         else results.to_dataframe(
-            config,
             "nonlinear_constraints",
             select=_get_select(results, "nonlinear_constraints", sub_fields),
             unstack=[ResultAxis.NONLINEAR_CONSTRAINT],
@@ -170,7 +162,6 @@ def _get_function_results(
     )
 
     evaluations = results.to_dataframe(
-        config,
         "evaluations",
         select=_get_select(results, "evaluations", sub_fields),
         unstack=[
@@ -189,9 +180,7 @@ def _get_function_results(
     )
 
 
-def _add_gradient_results(
-    config: EnOptConfig, results: Results, sub_fields: set[str]
-) -> pd.DataFrame:
+def _add_gradient_results(results: Results, sub_fields: set[str]) -> pd.DataFrame:
     if (
         not sub_fields
         or not isinstance(results, GradientResults)
@@ -200,7 +189,6 @@ def _add_gradient_results(
         return pd.DataFrame()
 
     gradients = results.to_dataframe(
-        config,
         "gradients",
         select=_get_select(results, "gradients", sub_fields),
         unstack=[
@@ -211,7 +199,6 @@ def _add_gradient_results(
     ).rename(columns=partial(_add_prefix, prefix="gradients"))
 
     evaluations = results.to_dataframe(
-        config,
         "evaluations",
         select=_get_select(results, "evaluations", sub_fields),
         unstack=[

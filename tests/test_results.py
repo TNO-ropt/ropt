@@ -58,6 +58,7 @@ def function_result_fixture(enopt_config: Any) -> FunctionResults:
         result_id=0,
         batch_id=1,
         metadata={},
+        config=config,
         evaluations=evaluations,
         realizations=realizations,
         functions=functions,

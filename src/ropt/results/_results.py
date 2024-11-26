@@ -51,6 +51,7 @@ class Results(ABC):
        generic information, the nature of which depends on the steps producing
        them. They are expected to be primitive values not interpreted by the
        optimization code but can be exported and reported.
+    5. The config object that was used to generate the result.
 
     The `Results` class is an abstract base class that is not intended to be
     instantiated by itself. Most data of interest will be stored in additional
@@ -76,16 +77,17 @@ class Results(ABC):
         result_id: The ID of the function/gradient evaluation.
         batch_id:  The ID of the evaluation batch that contains the result.
         metadata:  The metadata.
+        config:    The config object used while generating the result.
     """
 
     plan_id: tuple[int, ...]
     result_id: int | tuple[int, ...]
     batch_id: int | None
     metadata: dict[str, Any]
+    config: EnOptConfig
 
     def to_dataframe(
         self,
-        config: EnOptConfig,
         field_name: str,
         select: Iterable[str] | None = None,
         unstack: Iterable[ResultAxis] | None = None,
@@ -116,7 +118,6 @@ class Results(ABC):
             result ID and/or batch ID.
 
         Args:
-            config:     The ensemble optimizer configuration object.
             field_name: The field to export.
             select:     Select the sub-fields to export, by default all fields.
             unstack:    Select axes to unstack, by default none.
@@ -141,7 +142,7 @@ class Results(ABC):
             raise AttributeError(msg)
 
         return _to_dataframe(
-            config,
+            self.config,
             result_field,
             self.plan_id,
             self.result_id,
@@ -152,7 +153,6 @@ class Results(ABC):
 
     def to_dataset(
         self,
-        config: EnOptConfig,
         field_name: str,
         select: Iterable[str] | None = None,
         *,
@@ -178,7 +178,6 @@ class Results(ABC):
         `add_metadata` flag is set, it is also added under the `metadata` key.
 
         Args:
-            config:       The ensemble optimizer configuration object.
             field_name:   The field to export.
             select:       Select the fields to export; by default, all fields.
             add_metadata: If true, add the metadata as a field in the dataset attrs.
@@ -203,7 +202,7 @@ class Results(ABC):
             raise AttributeError(msg)
 
         return _to_dataset(
-            config,
+            self.config,
             result_field,
             self.plan_id,
             self.result_id,
@@ -212,7 +211,7 @@ class Results(ABC):
             select,
         )
 
-    def to_netcdf(self, config: EnOptConfig, filename: str | Path) -> None:
+    def to_netcdf(self, filename: str | Path) -> None:
         """Write the results to a netCDF4 file.
 
         The fields of the result are converted to xarray datasets and each
@@ -230,7 +229,6 @@ class Results(ABC):
             correct class, its type must be known.
 
         Args:
-            config:   The configuration used to run the optimization.
             filename: The name of the file to write.
 
         Raises:
@@ -247,4 +245,4 @@ class Results(ABC):
                 "to use Results.to_netcdf"
             )
             raise NotImplementedError(msg)
-        _to_netcdf(self, config, Path(filename))
+        _to_netcdf(self, Path(filename))

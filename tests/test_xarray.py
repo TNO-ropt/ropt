@@ -52,6 +52,7 @@ def function_result_fixture(enopt_config: Any) -> FunctionResults:
         result_id=0,
         batch_id=1,
         metadata={"foo": "bar"},
+        config=config,
         evaluations=evaluations,
         realizations=realizations,
         functions=functions,
@@ -60,7 +61,7 @@ def function_result_fixture(enopt_config: Any) -> FunctionResults:
 
 def test_to_dataset(enopt_config: Any, function_result: FunctionResults) -> None:
     config = EnOptConfig.model_validate(enopt_config)
-    dataset = function_result.to_dataset(config, "evaluations")
+    dataset = function_result.to_dataset("evaluations")
     for field in dataset:
         assert np.all(
             dataset[field].to_numpy()
@@ -76,12 +77,9 @@ def test_to_dataset(enopt_config: Any, function_result: FunctionResults) -> None
 
 @pytest.mark.parametrize("add_metadata", [True, False])
 def test_to_dataset_with_attrs(
-    enopt_config: Any, function_result: FunctionResults, add_metadata: bool
+    function_result: FunctionResults, add_metadata: bool
 ) -> None:
-    config = EnOptConfig.model_validate(enopt_config)
-    dataset = function_result.to_dataset(
-        config, "evaluations", add_metadata=add_metadata
-    )
+    dataset = function_result.to_dataset("evaluations", add_metadata=add_metadata)
     assert dataset.attrs["result_id"] == 0
     assert dataset.attrs["batch_id"] == 1
     if add_metadata:
@@ -95,5 +93,6 @@ def test_to_dataset_formatter(
 ) -> None:
     enopt_config["variables"]["names"] = [("x", 0), ("x", 1)]
     config = EnOptConfig.model_validate(enopt_config)
-    dataset = function_result.to_dataset(config, "evaluations", select=["variables"])
+    function_result.config = config
+    dataset = function_result.to_dataset("evaluations", select=["variables"])
     assert dataset.coords["variable-axis"].to_numpy().tolist() == ["x:0", "x:1"]

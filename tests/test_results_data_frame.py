@@ -36,7 +36,7 @@ def enopt_config_fixture() -> dict[str, Any]:
 
 def _handle_results(event: Event, reporter: ResultsDataFrame) -> None:
     assert event.results is not None
-    reporter.add_results(event.config, event.results)
+    reporter.add_results(event.results)
 
 
 def test_dataframe_results_no_results(enopt_config: Any, evaluator: Any) -> None:
@@ -126,7 +126,7 @@ def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
         assert event.results is not None
         for item in event.results:
             item.metadata["foo"] = {"bar": 1}
-        reporter.add_results(EnOptConfig.model_validate(enopt_config), event.results)
+        reporter.add_results(event.results)
 
     BasicOptimizer(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, even_handler

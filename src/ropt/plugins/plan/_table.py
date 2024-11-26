@@ -107,7 +107,6 @@ class DefaultTableHandler(ResultHandler):
             and (event.tags & self._with.tags)
         ):
             self._table.add_results(
-                event.config,
                 (
                     (convert_to_maximize(item) for item in event.results)
                     if self._with.maximize
