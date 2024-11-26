@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np  # noqa: TC002
 
-from ropt.enums import ResultAxisName
+from ropt.enums import ResultAxis
 
 from ._result_field import ResultField
 from ._utils import (
@@ -41,13 +41,13 @@ class LinearConstraints(ResultField):
     values: NDArray[np.float64] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxisName.LINEAR_CONSTRAINT,),
+            "__axes__": (ResultAxis.LINEAR_CONSTRAINT,),
         },
     )
     violations: NDArray[np.float64] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxisName.LINEAR_CONSTRAINT,),
+            "__axes__": (ResultAxis.LINEAR_CONSTRAINT,),
         },
     )
 

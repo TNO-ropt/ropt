@@ -165,15 +165,15 @@ class OptimizerExitCode(IntEnum):
     """Returned when an evaluation step terminates normally."""
 
 
-class ResultAxisName(Enum):
-    """Enumerates the possible axis names in a Results data object.
+class ResultAxis(Enum):
+    """Enumerates the possible axes in a Results data object.
 
     Result objects (see [`Results`][ropt.results.Results]) contain
     multidimensional arrays where the axes represent particular quantities, for
     instance variables, function objects, or realization numbers. The result
     objects contain metadata that identify the axes by values of this
     enumeration. These can be retrieved by the
-    [`get_axis_names`][ropt.results.ResultField.get_axis_names] method of the
+    [`get_axes`][ropt.results.ResultField.get_axes] method of the
     attributes of a results object. They are used internally when exporting data
     to determine the type of the array axes, for instance to retrieve the names
     of the variables from the configuration.

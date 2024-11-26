@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 import numpy as np  # noqa: TC002
 
 from ropt import utils
-from ropt.enums import ResultAxisName
+from ropt.enums import ResultAxis
 
 from ._result_field import ResultField
 from ._utils import (
@@ -44,24 +44,24 @@ class NonlinearConstraints(ResultField):
 
     values: NDArray[np.float64] | None = field(
         default=None,
-        metadata={"__axes__": (ResultAxisName.NONLINEAR_CONSTRAINT,)},
+        metadata={"__axes__": (ResultAxis.NONLINEAR_CONSTRAINT,)},
     )
     violations: NDArray[np.float64] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxisName.NONLINEAR_CONSTRAINT,),
+            "__axes__": (ResultAxis.NONLINEAR_CONSTRAINT,),
         },
     )
     scaled_values: NDArray[np.float64] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxisName.NONLINEAR_CONSTRAINT,),
+            "__axes__": (ResultAxis.NONLINEAR_CONSTRAINT,),
         },
     )
     scaled_violations: NDArray[np.float64] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxisName.NONLINEAR_CONSTRAINT,),
+            "__axes__": (ResultAxis.NONLINEAR_CONSTRAINT,),
         },
     )
 

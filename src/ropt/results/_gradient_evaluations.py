@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from ropt import utils
-from ropt.enums import ResultAxisName
+from ropt.enums import ResultAxis
 
 from ._result_field import ResultField
 from ._utils import _immutable_copy
@@ -56,24 +56,24 @@ class GradientEvaluations(ResultField):
 
     variables: NDArray[np.float64] = field(
         metadata={
-            "__axes__": (ResultAxisName.VARIABLE,),
+            "__axes__": (ResultAxis.VARIABLE,),
         },
     )
     perturbed_variables: NDArray[np.float64] = field(
         metadata={
             "__axes__": (
-                ResultAxisName.REALIZATION,
-                ResultAxisName.PERTURBATION,
-                ResultAxisName.VARIABLE,
+                ResultAxis.REALIZATION,
+                ResultAxis.PERTURBATION,
+                ResultAxis.VARIABLE,
             ),
         },
     )
     perturbed_objectives: NDArray[np.float64] = field(
         metadata={
             "__axes__": (
-                ResultAxisName.REALIZATION,
-                ResultAxisName.PERTURBATION,
-                ResultAxisName.OBJECTIVE,
+                ResultAxis.REALIZATION,
+                ResultAxis.PERTURBATION,
+                ResultAxis.OBJECTIVE,
             ),
         },
     )
@@ -81,25 +81,25 @@ class GradientEvaluations(ResultField):
         default=None,
         metadata={
             "__axes__": (
-                ResultAxisName.REALIZATION,
-                ResultAxisName.PERTURBATION,
-                ResultAxisName.NONLINEAR_CONSTRAINT,
+                ResultAxis.REALIZATION,
+                ResultAxis.PERTURBATION,
+                ResultAxis.NONLINEAR_CONSTRAINT,
             ),
         },
     )
     scaled_variables: NDArray[np.float64] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxisName.VARIABLE,),
+            "__axes__": (ResultAxis.VARIABLE,),
         },
     )
     scaled_perturbed_variables: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (
-                ResultAxisName.REALIZATION,
-                ResultAxisName.PERTURBATION,
-                ResultAxisName.VARIABLE,
+                ResultAxis.REALIZATION,
+                ResultAxis.PERTURBATION,
+                ResultAxis.VARIABLE,
             ),
         },
     )
@@ -107,9 +107,9 @@ class GradientEvaluations(ResultField):
         default=None,
         metadata={
             "__axes__": (
-                ResultAxisName.REALIZATION,
-                ResultAxisName.PERTURBATION,
-                ResultAxisName.OBJECTIVE,
+                ResultAxis.REALIZATION,
+                ResultAxis.PERTURBATION,
+                ResultAxis.OBJECTIVE,
             ),
         },
     )
@@ -117,9 +117,9 @@ class GradientEvaluations(ResultField):
         default=None,
         metadata={
             "__axes__": (
-                ResultAxisName.REALIZATION,
-                ResultAxisName.PERTURBATION,
-                ResultAxisName.NONLINEAR_CONSTRAINT,
+                ResultAxis.REALIZATION,
+                ResultAxis.PERTURBATION,
+                ResultAxis.NONLINEAR_CONSTRAINT,
             ),
         },
     )
@@ -127,8 +127,8 @@ class GradientEvaluations(ResultField):
         default=None,
         metadata={
             "__axes__": (
-                ResultAxisName.REALIZATION,
-                ResultAxisName.PERTURBATION,
+                ResultAxis.REALIZATION,
+                ResultAxis.PERTURBATION,
             ),
         },
     )

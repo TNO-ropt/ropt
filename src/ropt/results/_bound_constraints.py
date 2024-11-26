@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from ropt import utils
-from ropt.enums import ResultAxisName
+from ropt.enums import ResultAxis
 
 from ._result_field import ResultField
 from ._utils import (
@@ -50,49 +50,49 @@ class BoundConstraints(ResultField):
     lower_values: NDArray[np.float64] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxisName.VARIABLE,),
+            "__axes__": (ResultAxis.VARIABLE,),
         },
     )
     lower_violations: NDArray[np.float64] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxisName.VARIABLE,),
+            "__axes__": (ResultAxis.VARIABLE,),
         },
     )
     upper_values: NDArray[np.float64] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxisName.VARIABLE,),
+            "__axes__": (ResultAxis.VARIABLE,),
         },
     )
     upper_violations: NDArray[np.float64] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxisName.VARIABLE,),
+            "__axes__": (ResultAxis.VARIABLE,),
         },
     )
     scaled_lower_values: NDArray[np.float64] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxisName.VARIABLE,),
+            "__axes__": (ResultAxis.VARIABLE,),
         },
     )
     scaled_lower_violations: NDArray[np.float64] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxisName.VARIABLE,),
+            "__axes__": (ResultAxis.VARIABLE,),
         },
     )
     scaled_upper_values: NDArray[np.float64] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxisName.VARIABLE,),
+            "__axes__": (ResultAxis.VARIABLE,),
         },
     )
     scaled_upper_violations: NDArray[np.float64] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxisName.VARIABLE,),
+            "__axes__": (ResultAxis.VARIABLE,),
         },
     )
 

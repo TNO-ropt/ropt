@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
-from ropt.enums import ResultAxisName
+from ropt.enums import ResultAxis
 
 from ._result_field import ResultField
 from ._utils import _immutable_copy
@@ -35,15 +35,15 @@ class Realizations(ResultField):
 
     failed_realizations: NDArray[np.bool_] = field(
         metadata={
-            "__axes__": (ResultAxisName.REALIZATION,),
+            "__axes__": (ResultAxis.REALIZATION,),
         },
     )
     objective_weights: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (
-                ResultAxisName.OBJECTIVE,
-                ResultAxisName.REALIZATION,
+                ResultAxis.OBJECTIVE,
+                ResultAxis.REALIZATION,
             ),
         },
     )
@@ -51,8 +51,8 @@ class Realizations(ResultField):
         default=None,
         metadata={
             "__axes__": (
-                ResultAxisName.NONLINEAR_CONSTRAINT,
-                ResultAxisName.REALIZATION,
+                ResultAxis.NONLINEAR_CONSTRAINT,
+                ResultAxis.REALIZATION,
             ),
         },
     )

@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from ropt.config.enopt import EnOptConfig
-from ropt.enums import ResultAxisName
+from ropt.enums import ResultAxis
 from ropt.results import (
     FunctionEvaluations,
     FunctionResults,
@@ -156,7 +156,7 @@ def test_to_dataframe_unstack(
         config,
         "evaluations",
         select=["perturbed_variables"],
-        unstack=[ResultAxisName.REALIZATION, ResultAxisName.VARIABLE],
+        unstack=[ResultAxis.REALIZATION, ResultAxis.VARIABLE],
     )
     assert frame.index.names == ["plan_id", "result_id", "batch_id", "perturbation"]
     assert list(frame.columns.values) == [
@@ -178,7 +178,7 @@ def test_to_dataframe_unstack2(
         config,
         "gradients",
         select=["objectives", "weighted_objective"],
-        unstack=[ResultAxisName.OBJECTIVE, ResultAxisName.VARIABLE],
+        unstack=[ResultAxis.OBJECTIVE, ResultAxis.VARIABLE],
     )
     assert list(frame.columns.values) == [
         ("objectives", "f1", "x"),
@@ -198,7 +198,7 @@ def test_to_dataframe_unstack_only_variable(
         config,
         "evaluations",
         select=["perturbed_objectives", "perturbed_variables"],
-        unstack=[ResultAxisName.VARIABLE],
+        unstack=[ResultAxis.VARIABLE],
     )
     assert frame.index.names == [
         "plan_id",

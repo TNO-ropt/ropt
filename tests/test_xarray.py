@@ -67,11 +67,11 @@ def test_to_dataset(enopt_config: Any, function_result: FunctionResults) -> None
             == getattr(function_result.evaluations, str(field)),
         )
     assert (
-        tuple(dataset.coords["variable"].values)
+        tuple(dataset.coords["variable-axis"].values)
         == config.variables.get_formatted_names()
     )
-    assert tuple(dataset.coords["realization"].values) == config.realizations.names
-    assert tuple(dataset.coords["objective"].values) == config.objectives.names
+    assert tuple(dataset.coords["realization-axis"].values) == config.realizations.names
+    assert tuple(dataset.coords["objective-axis"].values) == config.objectives.names
 
 
 @pytest.mark.parametrize("add_metadata", [True, False])
@@ -96,4 +96,4 @@ def test_to_dataset_formatter(
     enopt_config["variables"]["names"] = [("x", 0), ("x", 1)]
     config = EnOptConfig.model_validate(enopt_config)
     dataset = function_result.to_dataset(config, "evaluations", select=["variables"])
-    assert dataset.coords["variable"].to_numpy().tolist() == ["x:0", "x:1"]
+    assert dataset.coords["variable-axis"].to_numpy().tolist() == ["x:0", "x:1"]

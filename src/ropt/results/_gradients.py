@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from ropt import utils
-from ropt.enums import ResultAxisName
+from ropt.enums import ResultAxis
 
 from ._result_field import ResultField
 from ._utils import _immutable_copy
@@ -39,13 +39,13 @@ class Gradients(ResultField):
     """
 
     weighted_objective: NDArray[np.float64] = field(
-        metadata={"__axes__": (ResultAxisName.VARIABLE,)},
+        metadata={"__axes__": (ResultAxis.VARIABLE,)},
     )
     objectives: NDArray[np.float64] = field(
         metadata={
             "__axes__": (
-                ResultAxisName.OBJECTIVE,
-                ResultAxisName.VARIABLE,
+                ResultAxis.OBJECTIVE,
+                ResultAxis.VARIABLE,
             ),
         },
     )
@@ -53,8 +53,8 @@ class Gradients(ResultField):
         default=None,
         metadata={
             "__axes__": (
-                ResultAxisName.NONLINEAR_CONSTRAINT,
-                ResultAxisName.VARIABLE,
+                ResultAxis.NONLINEAR_CONSTRAINT,
+                ResultAxis.VARIABLE,
             ),
         },
     )
@@ -62,8 +62,8 @@ class Gradients(ResultField):
         default=None,
         metadata={
             "__axes__": (
-                ResultAxisName.OBJECTIVE,
-                ResultAxisName.VARIABLE,
+                ResultAxis.OBJECTIVE,
+                ResultAxis.VARIABLE,
             ),
         },
     )
@@ -71,8 +71,8 @@ class Gradients(ResultField):
         default=None,
         metadata={
             "__axes__": (
-                ResultAxisName.NONLINEAR_CONSTRAINT,
-                ResultAxisName.VARIABLE,
+                ResultAxis.NONLINEAR_CONSTRAINT,
+                ResultAxis.VARIABLE,
             ),
         },
     )

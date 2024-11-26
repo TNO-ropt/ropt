@@ -66,7 +66,7 @@ def function_result_fixture(enopt_config: Any) -> FunctionResults:
 
 def test_get_axis_names_error(function_result: FunctionResults) -> None:
     with pytest.raises(ValueError, match="Unknown field name: foo"):
-        function_result.evaluations.get_axis_names("foo")
+        function_result.evaluations.get_axes("foo")
 
 
 def test_scaling_evaluations_functions(

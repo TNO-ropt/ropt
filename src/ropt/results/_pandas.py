@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any, Iterable, cast
 
 import pandas as pd
 
-from ropt.enums import ResultAxisName
+from ropt.enums import ResultAxis
 
 if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
@@ -20,7 +20,7 @@ def _to_dataframe(  # noqa: PLR0913
     result_id: int | tuple[int, ...],
     batch_id: int | None,
     select: Iterable[str] | None,
-    unstack: Iterable[ResultAxisName] | None,
+    unstack: Iterable[ResultAxis] | None,
 ) -> pd.DataFrame:
     if select is None:
         select = (field.name for field in fields(result_field))
@@ -57,7 +57,7 @@ def _to_series(  # noqa: PLR0913
         raise ValueError(msg) from exc
     if data is None:
         return None
-    axes = result_field.get_axis_names(field)
+    axes = result_field.get_axes(field)
     indices = [_get_index(config, axis) for axis in axes]
     indices = [
         index if index else pd.RangeIndex(data.shape[idx])
@@ -81,24 +81,24 @@ def _to_series(  # noqa: PLR0913
     return series
 
 
-def _get_index(config: EnOptConfig, axis: ResultAxisName) -> Iterable[Any]:
+def _get_index(config: EnOptConfig, axis: ResultAxis) -> Iterable[Any]:
     result: Iterable[Any] = []
     match axis:
-        case ResultAxisName.VARIABLE:
+        case ResultAxis.VARIABLE:
             formatted_names = config.variables.get_formatted_names()
             result = [] if formatted_names is None else formatted_names
-        case ResultAxisName.OBJECTIVE:
+        case ResultAxis.OBJECTIVE:
             result = (
                 config.objectives.names if config.objectives.names is not None else []
             )
-        case ResultAxisName.NONLINEAR_CONSTRAINT:
+        case ResultAxis.NONLINEAR_CONSTRAINT:
             assert config.nonlinear_constraints is not None
             result = (
                 config.nonlinear_constraints.names
                 if config.nonlinear_constraints.names is not None
                 else []
             )
-        case ResultAxisName.REALIZATION:
+        case ResultAxis.REALIZATION:
             result = (
                 config.realizations.names
                 if config.realizations.names is not None

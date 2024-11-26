@@ -30,15 +30,14 @@ to the realization numbers.
 To facilitate exporting and reporting results, the identity of the axes in such
 multi-dimensional arrays is stored in metadata associated with the corresponding
 field. These fields derive from the [`ResultField`][ropt.results.ResultField]
-class, which includes a
-[`get_axis_names`][ropt.results.ResultField.get_axis_names] class method to
-retrieve the names. For example, for the `objectives` field, this method
-retrieves the axis names:
+class, which includes a [`get_axes`][ropt.results.ResultField.get_axes] class
+method to retrieve the axes. For example, for the `objectives` field, this
+method retrieves the axes:
 
 ```py
 >>> from ropt.results import FunctionEvaluations
->>> FunctionEvaluations.get_axis_names("objectives")
-(<ResultAxisName.REALIZATION: 'realization'>, <ResultAxisName.OBJECTIVE: 'objective'>)
+>>> FunctionEvaluations.get_axes("objectives")
+(<ResultAxis.REALIZATION: 'realization'>, <ResultAxis.OBJECTIVE: 'objective'>)
 ```
 
 Using this metadata, the exporting or reporting code can refer to the optimizer

@@ -13,7 +13,7 @@ from typing import (
 
 import xarray
 
-from ropt.enums import ResultAxisName
+from ropt.enums import ResultAxis
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -57,32 +57,32 @@ def _to_data_array(
         raise AttributeError(msg) from exc
     if data is None:
         return None
-    axes = result_field.get_axis_names(field)
+    axes = result_field.get_axes(field)
     indices = [_get_index(config, axis) for axis in axes]
     return xarray.DataArray(
         data,
         coords={
-            axis.value: list(index)
+            f"{axis.value}-axis": list(index)
             for axis, index in zip(axes, indices, strict=False)
             if index is not None
         },
-        dims=[axis.value for axis in axes],
+        dims=[f"{axis.value}-axis" for axis in axes],
     )
 
 
-def _get_index(config: EnOptConfig, axis: ResultAxisName) -> tuple[Any, ...] | None:
-    if axis == ResultAxisName.VARIABLE:
+def _get_index(config: EnOptConfig, axis: ResultAxis) -> tuple[Any, ...] | None:
+    if axis == ResultAxis.VARIABLE:
         return (
             None
             if config.variables.names is None
             else config.variables.get_formatted_names()
         )
-    if axis == ResultAxisName.OBJECTIVE:
+    if axis == ResultAxis.OBJECTIVE:
         return config.objectives.names
-    if axis == ResultAxisName.NONLINEAR_CONSTRAINT:
+    if axis == ResultAxis.NONLINEAR_CONSTRAINT:
         assert config.nonlinear_constraints is not None
         return config.nonlinear_constraints.names
-    if axis == ResultAxisName.REALIZATION:
+    if axis == ResultAxis.REALIZATION:
         return config.realizations.names
     return None
 

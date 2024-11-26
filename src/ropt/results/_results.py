@@ -14,7 +14,7 @@ from typing import (
 
 if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
-    from ropt.enums import ResultAxisName
+    from ropt.enums import ResultAxis
 
 
 _HAVE_PANDAS: Final = find_spec("pandas") is not None
@@ -88,7 +88,7 @@ class Results(ABC):
         config: EnOptConfig,
         field_name: str,
         select: Iterable[str] | None = None,
-        unstack: Iterable[ResultAxisName] | None = None,
+        unstack: Iterable[ResultAxis] | None = None,
     ) -> pd.DataFrame:
         """Export a field to a pandas dataframe.
 

@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from ropt import utils
-from ropt.enums import ResultAxisName
+from ropt.enums import ResultAxis
 
 from ._result_field import ResultField
 from ._utils import _immutable_copy
@@ -46,14 +46,14 @@ class FunctionEvaluations(ResultField):
 
     variables: NDArray[np.float64] = field(
         metadata={
-            "__axes__": (ResultAxisName.VARIABLE,),
+            "__axes__": (ResultAxis.VARIABLE,),
         },
     )
     objectives: NDArray[np.float64] = field(
         metadata={
             "__axes__": (
-                ResultAxisName.REALIZATION,
-                ResultAxisName.OBJECTIVE,
+                ResultAxis.REALIZATION,
+                ResultAxis.OBJECTIVE,
             ),
         },
     )
@@ -61,23 +61,23 @@ class FunctionEvaluations(ResultField):
         default=None,
         metadata={
             "__axes__": (
-                ResultAxisName.REALIZATION,
-                ResultAxisName.NONLINEAR_CONSTRAINT,
+                ResultAxis.REALIZATION,
+                ResultAxis.NONLINEAR_CONSTRAINT,
             ),
         },
     )
     scaled_variables: NDArray[np.float64] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxisName.VARIABLE,),
+            "__axes__": (ResultAxis.VARIABLE,),
         },
     )
     scaled_objectives: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (
-                ResultAxisName.REALIZATION,
-                ResultAxisName.OBJECTIVE,
+                ResultAxis.REALIZATION,
+                ResultAxis.OBJECTIVE,
             ),
         },
     )
@@ -85,15 +85,15 @@ class FunctionEvaluations(ResultField):
         default=None,
         metadata={
             "__axes__": (
-                ResultAxisName.REALIZATION,
-                ResultAxisName.NONLINEAR_CONSTRAINT,
+                ResultAxis.REALIZATION,
+                ResultAxis.NONLINEAR_CONSTRAINT,
             ),
         },
     )
     evaluation_ids: NDArray[np.intc] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxisName.REALIZATION,),
+            "__axes__": (ResultAxis.REALIZATION,),
         },
     )
 

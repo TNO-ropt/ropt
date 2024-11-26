@@ -4,7 +4,7 @@ from dataclasses import dataclass, fields
 from typing import TYPE_CHECKING, TypeVar
 
 if TYPE_CHECKING:
-    from ropt.enums import ResultAxisName
+    from ropt.enums import ResultAxis
 
 
 TypeResultField = TypeVar("TypeResultField", bound="ResultField")
@@ -15,12 +15,12 @@ class ResultField:
     """Base class for `Results` fields."""
 
     @classmethod
-    def get_axis_names(cls, name: str) -> tuple[ResultAxisName, ...]:
-        """Return the axis names of a field in the given field class or object.
+    def get_axes(cls, name: str) -> tuple[ResultAxis, ...]:
+        """Return the axes of a field in the given field class or object.
 
         When used with the class or an instance of that class for one of the
-        fields of a `Results` object, retrieve the names of the axes of the
-        stored `numpy` array from the metadata and return them.
+        fields of a `Results` object, retrieve the axes of the stored `numpy`
+        array from the metadata and return them.
 
         Args:
             name: The name of the sub-field in the instance or class.

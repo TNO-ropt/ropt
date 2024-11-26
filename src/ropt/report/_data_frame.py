@@ -5,7 +5,7 @@ from __future__ import annotations
 from functools import partial
 from typing import TYPE_CHECKING, Iterable, Literal
 
-from ropt.enums import ResultAxisName
+from ropt.enums import ResultAxis
 from ropt.results import FunctionResults, GradientResults
 
 from ._utils import _HAVE_PANDAS, _add_metadata, _add_prefix, _get_select
@@ -133,7 +133,7 @@ def _get_function_results(
         config,
         "functions",
         select=_get_select(results, "functions", sub_fields),
-        unstack=[ResultAxisName.OBJECTIVE, ResultAxisName.NONLINEAR_CONSTRAINT],
+        unstack=[ResultAxis.OBJECTIVE, ResultAxis.NONLINEAR_CONSTRAINT],
     ).rename(columns=partial(_add_prefix, prefix="functions"))
 
     bound_constraints = (
@@ -143,7 +143,7 @@ def _get_function_results(
             config,
             "bound_constraints",
             select=_get_select(results, "bound_constraints", sub_fields),
-            unstack=[ResultAxisName.VARIABLE],
+            unstack=[ResultAxis.VARIABLE],
         ).rename(columns=partial(_add_prefix, prefix="bound_constraints"))
     )
 
@@ -154,7 +154,7 @@ def _get_function_results(
             config,
             "linear_constraints",
             select=_get_select(results, "linear_constraints", sub_fields),
-            unstack=[ResultAxisName.LINEAR_CONSTRAINT],
+            unstack=[ResultAxis.LINEAR_CONSTRAINT],
         ).rename(columns=partial(_add_prefix, prefix="linear_constraints"))
     )
 
@@ -165,7 +165,7 @@ def _get_function_results(
             config,
             "nonlinear_constraints",
             select=_get_select(results, "nonlinear_constraints", sub_fields),
-            unstack=[ResultAxisName.NONLINEAR_CONSTRAINT],
+            unstack=[ResultAxis.NONLINEAR_CONSTRAINT],
         ).rename(columns=partial(_add_prefix, prefix="nonlinear_constraints"))
     )
 
@@ -174,9 +174,9 @@ def _get_function_results(
         "evaluations",
         select=_get_select(results, "evaluations", sub_fields),
         unstack=[
-            ResultAxisName.VARIABLE,
-            ResultAxisName.OBJECTIVE,
-            ResultAxisName.NONLINEAR_CONSTRAINT,
+            ResultAxis.VARIABLE,
+            ResultAxis.OBJECTIVE,
+            ResultAxis.NONLINEAR_CONSTRAINT,
         ],
     ).rename(columns=partial(_add_prefix, prefix="evaluations"))
 
@@ -204,9 +204,9 @@ def _add_gradient_results(
         "gradients",
         select=_get_select(results, "gradients", sub_fields),
         unstack=[
-            ResultAxisName.OBJECTIVE,
-            ResultAxisName.NONLINEAR_CONSTRAINT,
-            ResultAxisName.VARIABLE,
+            ResultAxis.OBJECTIVE,
+            ResultAxis.NONLINEAR_CONSTRAINT,
+            ResultAxis.VARIABLE,
         ],
     ).rename(columns=partial(_add_prefix, prefix="gradients"))
 
@@ -215,9 +215,9 @@ def _add_gradient_results(
         "evaluations",
         select=_get_select(results, "evaluations", sub_fields),
         unstack=[
-            ResultAxisName.VARIABLE,
-            ResultAxisName.OBJECTIVE,
-            ResultAxisName.NONLINEAR_CONSTRAINT,
+            ResultAxis.VARIABLE,
+            ResultAxis.OBJECTIVE,
+            ResultAxis.NONLINEAR_CONSTRAINT,
         ],
     ).rename(columns=partial(_add_prefix, prefix="evaluations"))
 

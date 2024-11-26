@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from ropt import utils
-from ropt.enums import ResultAxisName
+from ropt.enums import ResultAxis
 
 from ._result_field import ResultField
 from ._utils import _immutable_copy
@@ -43,25 +43,25 @@ class Functions(ResultField):
     )
     objectives: NDArray[np.float64] = field(
         metadata={
-            "__axes__": (ResultAxisName.OBJECTIVE,),
+            "__axes__": (ResultAxis.OBJECTIVE,),
         },
     )
     constraints: NDArray[np.float64] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxisName.NONLINEAR_CONSTRAINT,),
+            "__axes__": (ResultAxis.NONLINEAR_CONSTRAINT,),
         },
     )
     scaled_objectives: NDArray[np.float64] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxisName.OBJECTIVE,),
+            "__axes__": (ResultAxis.OBJECTIVE,),
         },
     )
     scaled_constraints: NDArray[np.float64] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxisName.NONLINEAR_CONSTRAINT,),
+            "__axes__": (ResultAxis.NONLINEAR_CONSTRAINT,),
         },
     )
 
