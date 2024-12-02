@@ -16,7 +16,6 @@ from typing import (
     DefaultDict,
     Self,
     Sequence,
-    TextIO,
     no_type_check,
 )
 
@@ -43,10 +42,10 @@ if TYPE_CHECKING:
 @no_type_check
 @bash_app()
 def run_script(
-    _: Any,  # noqa: ANN401
+    _0: Any,  # noqa: ANN401
     script: str,
-    stdout: TextIO,  # noqa: ARG001
-    stderr: TextIO,  # noqa: ARG001
+    *_1: Any,  # noqa: ANN401
+    **_2: Any,  # noqa: ANN401
 ) -> str:
     return script
 
