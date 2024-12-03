@@ -6,7 +6,7 @@ import ast
 import copy
 import re
 from numbers import Number
-from typing import Any, Callable, Dict, Final, List, Mapping
+from typing import Any, Callable, Final, Mapping
 
 import numpy as np
 
@@ -21,8 +21,8 @@ _CMP_OPS: Final = (ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE)
 _SUPPORTED_VARIABLE_TYPES: Final = (
     Number,
     str,
-    Dict,
-    List,
+    dict,
+    list,
     np.ndarray,
     Results,
     EnOptConfig,
