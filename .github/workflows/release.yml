@@ -22,9 +22,10 @@ jobs:
       with:
         python-version: "3.11"
     - name: Install uv
-      uses: astral-sh/setup-uv@v2
+      uses: astral-sh/setup-uv@v4
       with:
         enable-cache: true
+        cache-dependency-glob: "**/pyproject.toml"
     - name: Build and deploy
       run: uv build
     - name: Publish package
@@ -41,9 +42,10 @@ jobs:
       with:
         python-version: "3.11"
     - name: Install uv
-      uses: astral-sh/setup-uv@v2
+      uses: astral-sh/setup-uv@v4
       with:
         enable-cache: true
+        cache-dependency-glob: "**/pyproject.toml"
     - name: Initialize deployment
       id: docs
       run: |
