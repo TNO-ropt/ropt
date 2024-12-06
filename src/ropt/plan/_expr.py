@@ -198,13 +198,9 @@ class ExpressionEvaluator:
             case ast.List():
                 result = all(self._is_expression(item) for item in node.elts)
             case ast.Dict():
-                result = (
-                    all(
-                        item is not None and self._is_expression(item)
-                        for item in node.keys
-                    )
-                    and all(self._is_expression(item) for item in node.values)  # noqa: PD011
-                )
+                result = all(
+                    item is not None and self._is_expression(item) for item in node.keys
+                ) and all(self._is_expression(item) for item in node.values)
             case ast.UnaryOp():
                 result = isinstance(node.op, _UNARY_OPS) and self._is_expression(
                     node.operand
@@ -216,9 +212,8 @@ class ExpressionEvaluator:
                     and self._is_expression(node.right)
                 )
             case ast.BoolOp():
-                result = (
-                    isinstance(node.op, _BOOL_OPS)
-                    and all(self._is_expression(value) for value in node.values)  # noqa: PD011
+                result = isinstance(node.op, _BOOL_OPS) and all(
+                    self._is_expression(value) for value in node.values
                 )
             case ast.Compare():
                 result = all(isinstance(op, _CMP_OPS) for op in node.ops) and all(
