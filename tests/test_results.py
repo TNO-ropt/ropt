@@ -188,7 +188,7 @@ def test_linear_constraint_results(
     assert function_result.functions is not None
     constraints = LinearConstraints.create(config, function_result.evaluations)
     assert constraints is not None
-    assert constraints.values is not None  # noqa: PD011
+    assert constraints.values is not None
     assert constraints.violations is not None
     assert np.allclose(constraints.values, [1.0, 1.0])
     assert np.allclose(constraints.violations, [1.0, 0.0])
@@ -206,7 +206,7 @@ def test_nonlinear_constraint_results(
     function_result.functions.constraints = np.array([1.0, 1.0, -1.0])
     constraints = NonlinearConstraints.create(config, function_result.functions, None)
     assert constraints is not None
-    assert constraints.values is not None  # noqa: PD011
+    assert constraints.values is not None
     assert constraints.violations is not None
     assert np.allclose(constraints.values, [1.0, 0.0, -1.0])
     assert np.allclose(constraints.violations, [1.0, 0.0, 1.0])

@@ -148,7 +148,7 @@ class DefaultEvaluatorStep(PlanStep):
             self.plan.abort()
 
     def _get_variables(self, config: EnOptConfig) -> NDArray[np.float64]:
-        if self._with.values is not None:  # noqa: PD011
+        if self._with.values is not None:
             parsed_variables = self.plan.eval(self._with.values)
             if isinstance(parsed_variables, FunctionResults):
                 return (
@@ -163,6 +163,6 @@ class DefaultEvaluatorStep(PlanStep):
                     parsed_variables if scaled_variables is None else scaled_variables
                 )
             if parsed_variables is not None:
-                msg = f"`{self._with.values} does not contain variables."  # noqa: PD011
+                msg = f"`{self._with.values} does not contain variables."
                 raise ValueError(msg)
         return self._enopt_config.variables.initial_values
