@@ -27,7 +27,12 @@ class SignalEvaluationCallback(Protocol):
     handling or tracking of evaluation events.
     """
 
-    def __call__(self, results: tuple[Results, ...] | None = None, /) -> None:
+    def __call__(
+        self,
+        results: tuple[Results, ...] | None = None,
+        *,
+        exit_code: OptimizerExitCode | None = None,
+    ) -> None:
         """Callback protocol for signaling the start and end of evaluations.
 
         When provided to an ensemble optimizer, this callback is invoked both
@@ -37,8 +42,9 @@ class SignalEvaluationCallback(Protocol):
         output.
 
         Args:
-            results: The results produced by the evaluation, or `None` if the
-                     evaluation has not yet completed.
+            results:   The results produced by the evaluation, or `None` if the
+                       evaluation has not yet completed.
+            exit_code: An exit code if that may be set if the evaluation completed.
         """
 
 
@@ -261,8 +267,6 @@ class EnsembleOptimizer:
             compute_functions=compute_functions,
             compute_gradients=compute_gradients,
         )
-        if self._signal_evaluation:
-            self._signal_evaluation(results)
 
         # If the configuration allows for zero successful realizations, there
         # will always be results. However, they may all be equal to `np.nan`. If
@@ -273,6 +277,7 @@ class EnsembleOptimizer:
             self._enopt_config.realizations.realization_min_success < 1
             and not self._allow_nan
         )
+        exit_code: OptimizerExitCode | None = None
         for result in results:
             assert isinstance(result, FunctionResults | GradientResults)
             if (
@@ -280,9 +285,14 @@ class EnsembleOptimizer:
                 or (isinstance(result, GradientResults) and result.gradients is None)
                 or (check_failures and np.all(result.realizations.failed_realizations))
             ):
-                raise OptimizationAborted(
-                    exit_code=OptimizerExitCode.TOO_FEW_REALIZATIONS
-                )
+                exit_code = OptimizerExitCode.TOO_FEW_REALIZATIONS
+                break
+
+        if self._signal_evaluation:
+            self._signal_evaluation(results, exit_code=exit_code)
+
+        if exit_code is not None:
+            raise OptimizationAborted(exit_code=exit_code)
 
         return results
 

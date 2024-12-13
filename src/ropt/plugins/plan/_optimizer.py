@@ -222,7 +222,12 @@ class DefaultOptimizerStep(PlanStep):
         if exit_code == OptimizerExitCode.USER_ABORT:
             self.plan.abort()
 
-    def _signal_evaluation(self, results: tuple[Results, ...] | None = None) -> None:
+    def _signal_evaluation(
+        self,
+        results: tuple[Results, ...] | None = None,
+        *,
+        exit_code: OptimizerExitCode | None = None,
+    ) -> None:
         """Called before and after the optimizer finishes an evaluation.
 
         Before the evaluation starts, this method is called with the `results`
@@ -231,6 +236,7 @@ class DefaultOptimizerStep(PlanStep):
 
         Args:
             results: The results produced by the evaluation.
+            exit_code: An exit code if that may be set if the evaluation completed.
         """
         if results is None:
             self.plan.emit_event(
@@ -247,6 +253,7 @@ class DefaultOptimizerStep(PlanStep):
                     config=self._enopt_config,
                     results=results,
                     tags=self._with.tags,
+                    exit_code=exit_code,
                 )
             )
 
