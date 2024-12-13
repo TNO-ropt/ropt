@@ -361,6 +361,24 @@ class EnsembleEvaluator:
             active_constraints,
         )
 
+        # Autoscaling is done by finding the weighted mean of the realizations:
+        if self._objective_auto_scales is None:
+            self._objective_auto_scales = _compute_auto_scales(
+                f_eval_results.objectives,
+                self._config.objectives.auto_scale,
+                self._config.realizations.weights,
+            )
+        if (
+            f_eval_results.constraints is not None
+            and self._constraint_auto_scales is None
+        ):
+            assert self._config.nonlinear_constraints is not None
+            self._constraint_auto_scales = _compute_auto_scales(
+                f_eval_results.constraints,
+                self._config.nonlinear_constraints.auto_scale,
+                self._config.realizations.weights,
+            )
+
         evaluations = FunctionEvaluations.create(
             config=self._config,
             objective_auto_scales=self._objective_auto_scales,

@@ -133,9 +133,11 @@ def test_single_perturbation(enopt_config: Any, evaluator: Any) -> None:
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
+@pytest.mark.parametrize("speculative", [True, False])
 def test_objective_auto_scale(
-    enopt_config: Any, evaluator: Any, test_functions: Any
+    enopt_config: Any, evaluator: Any, test_functions: Any, speculative: bool
 ) -> None:
+    enopt_config["optimizer"]["speculative"] = speculative
     config = EnOptConfig.model_validate(enopt_config)
     init1 = test_functions[1](config.variables.initial_values, None)
 
@@ -162,9 +164,11 @@ def test_objective_auto_scale(
     assert np.allclose(variables, manual_result)
 
 
+@pytest.mark.parametrize("speculative", [True, False])
 def test_constraint_auto_scale(
-    enopt_config: Any, evaluator: Any, test_functions: Any
+    enopt_config: Any, evaluator: Any, test_functions: Any, speculative: bool
 ) -> None:
+    enopt_config["optimizer"]["speculative"] = speculative
     enopt_config["nonlinear_constraints"] = {
         "rhs_values": 0.4,
         "types": ConstraintType.GE,
