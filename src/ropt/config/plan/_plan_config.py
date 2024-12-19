@@ -91,7 +91,7 @@ class PlanStepConfig(BaseModel):
     """
 
     run: str
-    with_: list[Any] | dict[str, Any] | str = Field(default_factory=dict, alias="with")
+    with_: list[Any] | dict[str, Any] | str = Field(default_factory=dict, alias="with")  # type: ignore[arg-type]
     if_: str | None = Field(default=None, alias="if")
 
     model_config = ConfigDict(
@@ -168,7 +168,7 @@ class ResultHandlerConfig(BaseModel):
     """
 
     run: str
-    with_: Any = Field(default_factory=dict, alias="with")
+    with_: Any = Field(default_factory=dict, alias="with")  # type: ignore[arg-type]
 
     model_config = ConfigDict(
         extra="forbid",
