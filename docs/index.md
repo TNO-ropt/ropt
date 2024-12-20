@@ -52,6 +52,3 @@ optimization problems:
   [`pandas`](https://pandas.pydata.org/) data frames or
   [`xarray`](https://xarray.dev/) data sets, and saving in the `netCDF` format
   using the [`netCDF4`](https://unidata.github.io/netcdf4-python/) module.
-- Optional support for running function evaluations on distributed resources,
-  such as HPC clusters, via the [`Parsl`](https://parsl-project.org/) library
-  for parallel scripting.

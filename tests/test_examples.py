@@ -1,9 +1,6 @@
 import importlib
-import shutil
 from pathlib import Path
 from typing import Any
-
-import pytest
 
 
 def _load_from_file(name: str, sub_path: str | None = None) -> Any:
@@ -46,19 +43,4 @@ def test_differential_evolution_linear(tmp_path: Path, monkeypatch: Any) -> None
 def test_differential_evolution_nonlinear(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.chdir(tmp_path)
     module = _load_from_file("de_nonlinear")
-    module.main()
-
-
-@pytest.mark.slow
-@pytest.mark.filterwarnings("ignore::pytest.PytestUnraisableExceptionWarning")
-def test_script_optimizer(tmp_path: Path, monkeypatch: Any) -> None:
-    monkeypatch.chdir(tmp_path)
-    module = _load_from_file("run", sub_path="script_optimizer")
-    shutil.copyfile(
-        Path(__file__).parent.parent
-        / "examples"
-        / "script_optimizer"
-        / "rosenbrock.py",
-        tmp_path / "rosenbrock.py",
-    )
     module.main()
