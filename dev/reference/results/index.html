@@ -772,24 +772,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.results.Results.to_dataset" class="md-nav__link">
-    <span class="md-ellipsis">
-      to_dataset
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.results.Results.to_netcdf" class="md-nav__link">
-    <span class="md-ellipsis">
-      to_netcdf
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -834,21 +816,6 @@
       FunctionResults
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="FunctionResults">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.results.FunctionResults.from_netcdf" class="md-nav__link">
-    <span class="md-ellipsis">
-      from_netcdf
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -912,21 +879,6 @@
       GradientResults
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="GradientResults">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.results.GradientResults.from_netcdf" class="md-nav__link">
-    <span class="md-ellipsis">
-      from_netcdf
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1471,24 +1423,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.results.Results.to_dataset" class="md-nav__link">
-    <span class="md-ellipsis">
-      to_dataset
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.results.Results.to_netcdf" class="md-nav__link">
-    <span class="md-ellipsis">
-      to_netcdf
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1533,21 +1467,6 @@
       FunctionResults
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="FunctionResults">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.results.FunctionResults.from_netcdf" class="md-nav__link">
-    <span class="md-ellipsis">
-      from_netcdf
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1611,21 +1530,6 @@
       GradientResults
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="GradientResults">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.results.GradientResults.from_netcdf" class="md-nav__link">
-    <span class="md-ellipsis">
-      from_netcdf
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1707,11 +1611,7 @@ for function and gradient evaluations, respectively.</p>
 <li><strong>Objective and Constraint Scaling</strong>: Objective and constraint function values
   may also have scaling factors, with scaled values stored as necessary.</li>
 <li><strong>Data Export Methods</strong>: Functions are provided to export results to
-  <a href="https://pandas.pydata.org/"><code>pandas</code></a> DataFrames or
-  <a href="https://xarray.dev/"><code>xarray</code></a> datasets.</li>
-<li><strong>NetCDF Support</strong>: Methods for reading and writing netCDF version 4 files
-  using the <a href="https://unidata.github.io/netcdf4-python/"><code>netcdf4</code></a> Python
-  package are included.</li>
+  <a href="https://pandas.pydata.org/"><code>pandas</code></a> DataFrames.</li>
 </ul>
 <p>Much of the data stored in the result objects is multi-dimensional. For example,
 the <code>objectives</code> field, which is part of the nested
@@ -1808,12 +1708,6 @@ classes:</p>
 <li>The <a class="autorefs autorefs-internal" href="#ropt.results.Results.to_dataframe"><code>to_dataframe</code></a> method can be
    used to export the contents, or a sub-set, of a single field to a
    <a href="https://pandas.pydata.org/"><code>pandas</code></a> data frame.</li>
-<li>The <a class="autorefs autorefs-internal" href="#ropt.results.Results.to_dataset"><code>to_dataset</code></a> method can be used to
-   export the contents, or a sub-set, of a single field to an
-   <a href="https://xarray.dev/"><code>xarray</code></a> data set.</li>
-<li>The <a class="autorefs autorefs-internal" href="#ropt.results.Results.to_netcdf"><code>to_netcdf</code></a> method can be used to
-   export the entire results object to a
-   <a href="https://www.unidata.ucar.edu/software/netcdf/"><code>netCDF</code></a> file.</li>
 </ol>
 
 
@@ -2062,253 +1956,6 @@ result ID and/or batch ID.</p>
 <details class="warning" open>
   <summary>Warning</summary>
   <p>This function is only available if <code>pandas</code> is installed.</p>
-</details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.results.Results.to_dataset" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">to_dataset</span><span class="p">(</span><span class="n">field_name</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">add_metadata</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Export a field to an xarray dataset.</p>
-<p>The function exports the values of a single field to an xarray dataset.
-The field to export is selected by the <code>field_name</code> argument. In
-general, such a field is another object with multiple sub-fields. By
-default, these are all exported as data arrays in the xarray dataset,
-but a subset can be selected using the <code>select</code> argument.</p>
-<p>Any of the sub-fields in the field that is exported may be a
-multi-dimensional array, which is exported directly as an xarray data
-array. Using the axis types found in the metadata, the exporter will add
-coordinate labels constructed from the corresponding names found in the
-optimizer configuration (if available).</p>
-<p>The plan ID, result ID, and the batch ID (if not None) are added to the
-attributes of the dataset, using the <code>plan_id</code>, <code>result_id</code> and
-<code>batch_id</code> keys. If metadata is present in the results, and the
-<code>add_metadata</code> flag is set, it is also added under the <code>metadata</code> key.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>field_name</code>
-            </td>
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The field to export.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>select</code>
-            </td>
-            <td>
-                  <code><span title="typing.Iterable">Iterable</span>[str] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Select the fields to export; by default, all fields.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>add_metadata</code>
-            </td>
-            <td>
-                  <code>bool</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If true, add the metadata as a field in the dataset attrs.</p>
-              </div>
-            </td>
-            <td>
-                  <code>False</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code>NotImplementedError</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the <code>xarray</code> module is not installed.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code>ValueError</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the field name is incorrect.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="xarray.Dataset">Dataset</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>An xarray dataset containing the results.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<details class="warning" open>
-  <summary>Warning</summary>
-  <p>This function is only available if <code>xarray</code> is installed.</p>
-</details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.results.Results.to_netcdf" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">to_netcdf</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Write the results to a netCDF4 file.</p>
-<p>The fields of the result are converted to xarray datasets and each
-stored as a group in a netCDF4 file, using the name of the field as the
-group name. In addition, a special <code>__metadata__</code> group is added that
-contains the result ID, the batch ID (if not None), and a JSON dump of
-the metadata.</p>
-
-
-<details class="info" open>
-  <summary>Reading results from a netCDF4 file</summary>
-  <p>The results may be read back using the <code>from_netcdf</code> class method of
-either <a class="autorefs autorefs-internal" href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> or
-<a class="autorefs autorefs-internal" href="#ropt.results.GradientResults"><code>GradientResults</code></a>. Currently, no
-information is written about whether the results were function or
-gradient results. Therefore, to read back the result with the
-correct class, its type must be known.</p>
-</details>
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>filename</code>
-            </td>
-            <td>
-                  <code>str | <span title="pathlib.Path">Path</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The name of the file to write.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code>NotImplementedError</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the <code>xarray</code> or the <code>netCDF4</code> module is not installed.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<details class="warning" open>
-  <summary>Warning</summary>
-  <p>Use of this method requires that the <code>xarray</code> and <code>netCDF4</code> modules
-are installed.</p>
 </details>
     </div>
 
@@ -2710,113 +2357,6 @@ rather than the numerical indices.</p>
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.results.FunctionResults.from_netcdf" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">from_netcdf</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
-  </span>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Read results from a netCDF4 file.</p>
-<p>Use of this method requires that the <code>xarray</code> and <code>netCDF4</code> modules are
-installed.</p>
-<p>The filename is assumed to have an ".nc" extension, which will be added
-if not present.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>filename</code>
-            </td>
-            <td>
-                  <code>str | <span title="pathlib.Path">Path</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The name or path of the file to read.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code>NotImplementedError</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the xarray or the netCDF4 module is not installed.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.results._results.Results" href="#ropt.results.Results">Results</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The loaded result.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<details class="warning" open>
-  <summary>Warning</summary>
-  <p>This function is only available if <code>xarray</code> and <code>netCDF4</code> are installed.</p>
-</details>
-    </div>
-
-</div>
 
 
 
@@ -3661,113 +3201,6 @@ versions of the objective or constraint values are stored.</p>
 
 
 
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.results.GradientResults.from_netcdf" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">from_netcdf</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
-  </span>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Read results from a netCDF4 file.</p>
-<p>Use of this method requires that the <code>xarray</code> and <code>netCDF4</code> modules are
-installed.</p>
-<p>The filename is assumed to have an ".nc" extension, which will be added
-if not present.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>filename</code>
-            </td>
-            <td>
-                  <code>str | <span title="pathlib.Path">Path</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The name or path of the file to read.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code>NotImplementedError</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the xarray or the netCDF4 module is not installed.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="ropt.results._gradient_results.TypeResults">TypeResults</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The loaded result.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<details class="warning" open>
-  <summary>Warning</summary>
-  <p>This function is only available if <code>xarray</code> and <code>netCDF4</code> are installed.</p>
-</details>
-    </div>
-
-</div>
 
 
 
