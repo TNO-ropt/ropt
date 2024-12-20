@@ -14,11 +14,7 @@ These classes are nested `dataclasses` with several added features:
 - **Objective and Constraint Scaling**: Objective and constraint function values
   may also have scaling factors, with scaled values stored as necessary.
 - **Data Export Methods**: Functions are provided to export results to
-  [`pandas`](https://pandas.pydata.org/) DataFrames or
-  [`xarray`](https://xarray.dev/) datasets.
-- **NetCDF Support**: Methods for reading and writing netCDF version 4 files
-  using the [`netcdf4`](https://unidata.github.io/netcdf4-python/) Python
-  package are included.
+  [`pandas`](https://pandas.pydata.org/) DataFrames.
 
 Much of the data stored in the result objects is multi-dimensional. For example,
 the `objectives` field, which is part of the nested

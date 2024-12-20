@@ -49,6 +49,4 @@ optimization problems:
   optimization process.
 - Support for generating formatted tables of the results.
 - Optional support for exporting results as
-  [`pandas`](https://pandas.pydata.org/) data frames or
-  [`xarray`](https://xarray.dev/) data sets, and saving in the `netCDF` format
-  using the [`netCDF4`](https://unidata.github.io/netcdf4-python/) module.
+  [`pandas`](https://pandas.pydata.org/) data frames.

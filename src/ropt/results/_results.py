@@ -3,7 +3,6 @@ from __future__ import annotations
 from abc import ABC
 from dataclasses import dataclass
 from importlib.util import find_spec
-from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -18,19 +17,11 @@ if TYPE_CHECKING:
 
 
 _HAVE_PANDAS: Final = find_spec("pandas") is not None
-_HAVE_XARRAY: Final = find_spec("xarray") is not None
-_HAVE_NETCDF: Final = find_spec("netCDF4") is not None
 
 if TYPE_CHECKING and _HAVE_PANDAS:
     import pandas as pd  # noqa: TC002
 if _HAVE_PANDAS:
     from ._pandas import _to_dataframe
-if TYPE_CHECKING and _HAVE_XARRAY:
-    import xarray  # noqa: TC002
-if _HAVE_XARRAY:
-    from ._xarray import _to_dataset
-if _HAVE_XARRAY and _HAVE_NETCDF:
-    from ._xarray import _to_netcdf
 
 TypeResults = TypeVar("TypeResults", bound="Results")
 
@@ -65,12 +56,6 @@ class Results(ABC):
     1. The [`to_dataframe`][ropt.results.Results.to_dataframe] method can be
        used to export the contents, or a sub-set, of a single field to a
        [`pandas`](https://pandas.pydata.org/) data frame.
-    2. The [`to_dataset`][ropt.results.Results.to_dataset] method can be used to
-       export the contents, or a sub-set, of a single field to an
-       [`xarray`](https://xarray.dev/) data set.
-    2. The [`to_netcdf`][ropt.results.Results.to_netcdf] method can be used to
-       export the entire results object to a
-       [`netCDF`](https://www.unidata.ucar.edu/software/netcdf/) file.
 
     Attributes:
         plan_id:   The plan ID.
@@ -150,99 +135,3 @@ class Results(ABC):
             select,
             unstack,
         )
-
-    def to_dataset(
-        self,
-        field_name: str,
-        select: Iterable[str] | None = None,
-        *,
-        add_metadata: bool = False,
-    ) -> xarray.Dataset:
-        """Export a field to an xarray dataset.
-
-        The function exports the values of a single field to an xarray dataset.
-        The field to export is selected by the `field_name` argument. In
-        general, such a field is another object with multiple sub-fields. By
-        default, these are all exported as data arrays in the xarray dataset,
-        but a subset can be selected using the `select` argument.
-
-        Any of the sub-fields in the field that is exported may be a
-        multi-dimensional array, which is exported directly as an xarray data
-        array. Using the axis types found in the metadata, the exporter will add
-        coordinate labels constructed from the corresponding names found in the
-        optimizer configuration (if available).
-
-        The plan ID, result ID, and the batch ID (if not None) are added to the
-        attributes of the dataset, using the `plan_id`, `result_id` and
-        `batch_id` keys. If metadata is present in the results, and the
-        `add_metadata` flag is set, it is also added under the `metadata` key.
-
-        Args:
-            field_name:   The field to export.
-            select:       Select the fields to export; by default, all fields.
-            add_metadata: If true, add the metadata as a field in the dataset attrs.
-
-        Raises:
-            NotImplementedError: If the `xarray` module is not installed.
-            ValueError:          If the field name is incorrect.
-
-        Returns:
-            An xarray dataset containing the results.
-
-        Warning:
-            This function is only available if `xarray` is installed.
-        """
-        if not _HAVE_XARRAY:
-            msg = "The xarray module must be installed to use to_dataset"
-            raise NotImplementedError(msg)
-
-        result_field = getattr(self, field_name, None)
-        if result_field is None:
-            msg = f"Invalid result field: {field_name}"
-            raise AttributeError(msg)
-
-        return _to_dataset(
-            self.config,
-            result_field,
-            self.plan_id,
-            self.result_id,
-            self.batch_id,
-            self.metadata if add_metadata else {},
-            select,
-        )
-
-    def to_netcdf(self, filename: str | Path) -> None:
-        """Write the results to a netCDF4 file.
-
-        The fields of the result are converted to xarray datasets and each
-        stored as a group in a netCDF4 file, using the name of the field as the
-        group name. In addition, a special `__metadata__` group is added that
-        contains the result ID, the batch ID (if not None), and a JSON dump of
-        the metadata.
-
-        Info: Reading results from a netCDF4 file
-            The results may be read back using the `from_netcdf` class method of
-            either [`FunctionResults`][ropt.results.FunctionResults] or
-            [`GradientResults`][ropt.results.GradientResults]. Currently, no
-            information is written about whether the results were function or
-            gradient results. Therefore, to read back the result with the
-            correct class, its type must be known.
-
-        Args:
-            filename: The name of the file to write.
-
-        Raises:
-            NotImplementedError:
-                If the `xarray` or the `netCDF4` module is not installed.
-
-        Warning:
-            Use of this method requires that the `xarray` and `netCDF4` modules
-            are installed.
-        """
-        if not _HAVE_XARRAY or not _HAVE_NETCDF:
-            msg = (
-                "The xarray and netCDF4 modules must be installed "
-                "to use Results.to_netcdf"
-            )
-            raise NotImplementedError(msg)
-        _to_netcdf(self, Path(filename))

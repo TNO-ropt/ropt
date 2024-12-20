@@ -23,18 +23,9 @@ From PyPI:
 pip install ropt
 ```
 
-The following optional-dependencies can be installed to enable extra functionality:
-
-- `pandas`   : Enables support for `pandas` export and tabular output.
-- `xarray`   : Enables support for xarray and writing netCDF files.
-
-Install with:
+To eables support for `pandas` export and tabular output, you can install the `pandas` dependency:
 ```bash
-pip install ropt[<dep>]
-```
-where \<dep\> is one of the optional dependencies listed above. To install all:
-```bash
-pip install ropt[pandas,xarray]
+pip install ropt[pandas]
 ```
 
 

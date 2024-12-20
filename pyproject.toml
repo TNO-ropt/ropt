@@ -32,7 +32,6 @@ dependencies = [
 
 [project.optional-dependencies]
 pandas = ["pandas", "tabulate"]
-xarray = ["xarray", "netcdf4"]
 
 [project.entry-points."ropt.plugins.optimizer"]
 scipy = "ropt.plugins.optimizer.scipy:SciPyOptimizerPlugin"
