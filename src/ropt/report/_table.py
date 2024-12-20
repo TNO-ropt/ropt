@@ -12,9 +12,6 @@ if TYPE_CHECKING:
 
     from ropt.results import Results
 
-    if _HAVE_PANDAS:
-        pass
-
 
 class ResultsTable(ResultsDataFrame):
     """Generate files containing tables of optimization results.

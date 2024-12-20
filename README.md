@@ -25,9 +25,9 @@ pip install ropt
 
 The following optional-dependencies can be installed to enable extra functionality:
 
-- `pandas` : Enables support for `pandas` export and tabular output.
-- `xarray` : Enables support for xarray and writing netCDF files.
-- `parsl`  : Enables the parsl-based evaluator functionality.
+- `pandas`   : Enables support for `pandas` export and tabular output.
+- `xarray`   : Enables support for xarray and writing netCDF files.
+- `parsl`    : Enables the parsl-based evaluator functionality.
 
 Install with:
 ```bash
