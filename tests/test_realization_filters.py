@@ -22,7 +22,6 @@ def enopt_config_fixture() -> dict[str, Any]:
             "max_functions": 10,
         },
         "objectives": {
-            "names": ["f1", "f2"],
             "weights": [0.75, 0.25],
         },
         "gradient": {
@@ -132,7 +131,7 @@ def test_sort_filter_on_objectives(
         {
             "method": "sort-objective",
             "options": {
-                "sort": ["f1"],
+                "sort": [0],
                 "first": 3,
                 "last": 4,
             },
@@ -255,7 +254,6 @@ def test_sort_filter_on_constraints(
 
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations
     enopt_config["nonlinear_constraints"] = {
-        "names": ["c1"],
         "rhs_values": 0.4,
         "types": [ConstraintType.LE],
     }
@@ -263,7 +261,7 @@ def test_sort_filter_on_constraints(
         {
             "method": "sort-constraint",
             "options": {
-                "sort": "c1",
+                "sort": 0,
                 "first": 3,
                 "last": 4,
             },
@@ -324,7 +322,6 @@ def test_sort_filter_mixed(  # noqa: C901
     ]
 
     enopt_config["objectives"]["weights"] = [0.75, 0.25, 0.75, 0.25]
-    enopt_config["objectives"]["names"] = ["f1", "f2", "f3", "f4"]
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations
 
     objective_values: list[NDArray[np.float64]] = []
@@ -342,7 +339,7 @@ def test_sort_filter_mixed(  # noqa: C901
         {
             "method": "sort-objective",
             "options": {
-                "sort": ["f1"],
+                "sort": [0],
                 "first": 3,
                 "last": 4,
             },
@@ -630,7 +627,6 @@ def test_cvar_filter_mixed(  # noqa: C901
 
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations
     enopt_config["objectives"]["weights"] = [0.75, 0.25, 0.75, 0.25]
-    enopt_config["objectives"]["names"] = ["f1", "f2", "f3", "f4"]
 
     objective_values: list[NDArray[np.float64]] = []
 
@@ -647,7 +643,7 @@ def test_cvar_filter_mixed(  # noqa: C901
         {
             "method": "cvar-objective",
             "options": {
-                "sort": ["f1"],
+                "sort": [0],
                 "percentile": 0.4,
             },
         },

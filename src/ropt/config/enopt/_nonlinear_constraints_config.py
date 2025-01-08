@@ -7,12 +7,7 @@ from typing import Self
 import numpy as np
 from pydantic import ConfigDict, model_validator
 
-from ropt.config.utils import (
-    ImmutableBaseModel,
-    broadcast_1d_array,
-    broadcast_arrays,
-    check_enum_values,
-)
+from ropt.config.utils import ImmutableBaseModel, broadcast_1d_array, check_enum_values
 from ropt.config.validated_types import (  # noqa: TC001
     Array1D,
     Array1DBool,
@@ -35,12 +30,8 @@ class NonlinearConstraintsConfig(ImmutableBaseModel):
     field, which is a `numpy` array with a length equal to the number of
     constraint functions, provides the right-hand-side values.
 
-    The `names` field is optional. If given, the number of constraint functions
-    is set equal to its length. The `rhs_values` array will then be broadcasted
-    to the number of constraint functions. For example, if `names = ["c1",
-    "c2"]` and `rhs_values = 0.0`, the optimizer assumes two constraint
-    functions and stores `rhs_values = [0.0, 0.0]`. If `names` is not set, the
-    number of constraints is determined by the length of `rhs_values`.
+    The `names` field is optional, if provided, its length should be equal to the
+    number of constraints.
 
     The `scales` field contains scaling values for the constraints. These values
     scale the constraint function values to a desired order of magnitude. Each
@@ -108,15 +99,10 @@ class NonlinearConstraintsConfig(ImmutableBaseModel):
         self,
     ) -> Self:
         self._mutable()
-        if self.names is not None:
-            size = len(self.names)
-            for name in ("rhs_values", "scales", "auto_scale"):
-                setattr(self, name, broadcast_1d_array(getattr(self, name), name, size))
-        else:
-            self.rhs_values, self.scales, self.auto_scale = broadcast_arrays(
-                self.rhs_values, self.scales, self.auto_scale
-            )
-
+        self.scales = broadcast_1d_array(self.scales, "scales", self.rhs_values.size)
+        self.auto_scale = broadcast_1d_array(
+            self.auto_scale, "auto_scale", self.rhs_values.size
+        )
         check_enum_values(self.types, ConstraintType)
         self.types = broadcast_1d_array(self.types, "types", self.rhs_values.size)
         self._immutable()

@@ -3,6 +3,7 @@ from typing import Any, Callable
 
 import numpy as np
 import pytest
+from pydantic import ValidationError
 
 from ropt.config.enopt import (
     EnOptConfig,
@@ -60,7 +61,7 @@ def test_check_variable_names() -> None:
 
 
 def test_check_variable_arrays() -> None:
-    config = {"names": ["a", "b"], "initial_values": np.array([1, 2])}
+    config = {"initial_values": np.array([1, 2]), "lower_bounds": np.array([0.0, 0.0])}
 
     for key in ["initial_values", "lower_bounds", "upper_bounds"]:
         config_copy = copy.deepcopy(config)
@@ -82,20 +83,12 @@ def test_check_variable_arrays() -> None:
         assert len(getattr(variables, key)) == 2
 
         config_copy[key] = np.array([0.0, 0.0, 0.0])
-        with pytest.raises(
-            ValueError, match=f"{key} cannot be broadcasted to a length of 2"
-        ):
-            VariablesConfig.model_validate(config_copy)
-
-        config_copy[key] = np.array([[0.0], [0.0]])
-        with pytest.raises(
-            ValueError, match=f"{key} cannot be broadcasted to a length of 2"
-        ):
+        with pytest.raises(ValidationError):
             VariablesConfig.model_validate(config_copy)
 
 
-def test_check_variable_arrays_no_names() -> None:
-    config: dict[str, Any] = {"initial_values": np.array([1, 2])}
+def test_check_variable_convert_array() -> None:
+    config: dict[str, Any] = {"initial_values": [1, 2], "lower_bounds": [0, 0]}
 
     for key in ["initial_values", "lower_bounds", "upper_bounds"]:
         config_copy = copy.deepcopy(config)
@@ -106,47 +99,18 @@ def test_check_variable_arrays_no_names() -> None:
         with pytest.raises(ValueError):  # noqa: PT011
             getattr(variables, key)[0] = 0
 
-        config_copy[key] = np.array(0.0)
+        config_copy[key] = 0
         variables = VariablesConfig.model_validate(config)
         assert getattr(variables, key).ndim == 1
         assert len(getattr(variables, key)) == 2
 
-        config_copy[key] = np.array([0.0])
+        config_copy[key] = [0]
         variables = VariablesConfig.model_validate(config)
         assert getattr(variables, key).ndim == 1
         assert len(getattr(variables, key)) == 2
 
-
-def test_check_variable_convert_array() -> None:
-    config = {"names": ["a", "b"], "initial_values": [1, 2]}
-
-    for key in ["initial_values", "lower_bounds", "upper_bounds"]:
-        config_copy = copy.deepcopy(config)
-
-        variables = VariablesConfig.model_validate(config_copy)
-        assert getattr(variables, key).ndim == 1
-        assert len(getattr(variables, key)) == 2
-
-        config_copy[key] = 0.0
-        variables = VariablesConfig.model_validate(config)
-        assert getattr(variables, key).ndim == 1
-        assert len(getattr(variables, key)) == 2
-
-        config_copy[key] = [0.0]
-        variables = VariablesConfig.model_validate(config)
-        assert getattr(variables, key).ndim == 1
-        assert len(getattr(variables, key)) == 2
-
-        config_copy[key] = [0.0, 0.0, 0.0]
-        with pytest.raises(
-            ValueError, match=f"{key} cannot be broadcasted to a length of 2"
-        ):
-            VariablesConfig.model_validate(config_copy)
-
-        config_copy[key] = [[0.0], [0.0]]
-        with pytest.raises(
-            ValueError, match=f"{key} cannot be broadcasted to a length of 2"
-        ):
+        config_copy[key] = [0, 0, 0]
+        with pytest.raises(ValidationError):
             VariablesConfig.model_validate(config_copy)
 
 
@@ -208,7 +172,10 @@ def test_get_formatted_names() -> None:
 
 
 def test_check_objective_function_arrays() -> None:
-    config: dict[str, Any] = {"names": ["a", "b"]}
+    config: dict[str, Any] = {
+        "weights": np.array([1.0, 1.0]),
+        "scales": np.array([1.0, 1.0]),
+    }
 
     for key in ["scales", "weights"]:
         config_copy = copy.deepcopy(config)
@@ -230,53 +197,14 @@ def test_check_objective_function_arrays() -> None:
         assert len(getattr(objectives, key)) == 2
 
         config_copy[key] = np.array([0.0, 0.0, 0.0])
-        with pytest.raises(
-            ValueError, match=f"{key} cannot be broadcasted to a length of 2"
-        ):
+        with pytest.raises(ValidationError):
             ObjectiveFunctionsConfig.model_validate(config_copy)
 
-        config_copy[key] = np.array([[0.0], [0.0]])
-        with pytest.raises(
-            ValueError, match=f"{key} cannot be broadcasted to a length of 2"
-        ):
-            ObjectiveFunctionsConfig.model_validate(config_copy)
-
-    config_copy = copy.deepcopy(config)
-    config_copy["weights"] = np.array([1.0, 1.0])
-    objectives = ObjectiveFunctionsConfig.model_validate(config_copy)
-    assert objectives.weights.sum() == 1.0
-
-
-def test_check_objective_function_arrays_no_names() -> None:
-    config: dict[str, Any] = {"weights": [1, 1]}
-
-    for key in ["scales", "weights"]:
-        config_copy = copy.deepcopy(config)
-
-        objectives = ObjectiveFunctionsConfig.model_validate(config_copy)
-        assert getattr(objectives, key).ndim == 1
-        assert len(getattr(objectives, key)) == 2
-        with pytest.raises(ValueError):  # noqa: PT011
-            getattr(objectives, key)[0] = 0
-
-        config_copy[key] = np.array(0.0)
-        objectives = ObjectiveFunctionsConfig.model_validate(config)
-        assert getattr(objectives, key).ndim == 1
-        assert len(getattr(objectives, key)) == 2
-
-        config_copy[key] = np.array([0.0])
-        objectives = ObjectiveFunctionsConfig.model_validate(config)
-        assert getattr(objectives, key).ndim == 1
-        assert len(getattr(objectives, key)) == 2
-
-    config_copy = copy.deepcopy(config)
-    config_copy["weights"] = np.array([1.0, 1.0])
-    objectives = ObjectiveFunctionsConfig.model_validate(config_copy)
-    assert objectives.weights.sum() == 1.0
+        assert objectives.weights.sum() == 1.0
 
 
 def test_check_objective_function_convert_arrays() -> None:
-    config: dict[str, Any] = {"names": ["a", "b"]}
+    config: dict[str, Any] = {"weights": [1, 1], "scales": [1, 1]}
 
     for key in ["scales", "weights"]:
         config_copy = copy.deepcopy(config)
@@ -285,32 +213,21 @@ def test_check_objective_function_convert_arrays() -> None:
         assert getattr(objectives, key).ndim == 1
         assert len(getattr(objectives, key)) == 2
 
-        config_copy[key] = 0.0
+        config_copy[key] = 1.0
         objectives = ObjectiveFunctionsConfig.model_validate(config)
         assert getattr(objectives, key).ndim == 1
         assert len(getattr(objectives, key)) == 2
 
-        config_copy[key] = [0.0]
+        config_copy[key] = [1.0]
         objectives = ObjectiveFunctionsConfig.model_validate(config)
         assert getattr(objectives, key).ndim == 1
         assert len(getattr(objectives, key)) == 2
 
-        config_copy[key] = [0.0, 0.0, 0.0]
-        with pytest.raises(
-            ValueError, match=f"{key} cannot be broadcasted to a length of 2"
-        ):
+        config_copy[key] = [1.0, 1.0, 1.0]
+        with pytest.raises(ValidationError):
             ObjectiveFunctionsConfig.model_validate(config_copy)
 
-        config_copy[key] = [[0.0], [0.0]]
-        with pytest.raises(
-            ValueError, match=f"{key} cannot be broadcasted to a length of 2"
-        ):
-            ObjectiveFunctionsConfig.model_validate(config_copy)
-
-    config_copy = copy.deepcopy(config)
-    config_copy["weights"] = [1.0, 1.0]
-    objectives = ObjectiveFunctionsConfig.model_validate(config_copy)
-    assert objectives.weights.sum() == 1.0
+        assert objectives.weights.sum() == 1.0
 
 
 def test_check_linear_constraints() -> None:
@@ -363,7 +280,6 @@ def test_check_linear_constraints_vector_shapes() -> None:
 
 def test_check_nonlinear_constraint_arrays() -> None:
     config = {
-        "names": ["a", "b"],
         "types": [ConstraintType.EQ, ConstraintType.LE],
         "rhs_values": np.array([1.0, 1.0]),
     }
@@ -388,49 +304,12 @@ def test_check_nonlinear_constraint_arrays() -> None:
         assert len(getattr(nonlinear_constraints, key)) == 2
 
         config_copy[key] = np.array([1.0, 1.0, 1.0])
-        with pytest.raises(
-            ValueError,
-            match=f"{key} cannot be broadcasted to a length of 2",
-        ):
+        with pytest.raises(ValidationError):
             NonlinearConstraintsConfig.model_validate(config_copy)
-
-        config_copy[key] = np.array([[1.0], [1.0]])
-        with pytest.raises(
-            ValueError,
-            match=f"{key} cannot be broadcasted to a length of 2",
-        ):
-            NonlinearConstraintsConfig.model_validate(config_copy)
-
-
-def test_check_nonlinear_constraint_arrays_no_names() -> None:
-    config = {
-        "types": [ConstraintType.EQ, ConstraintType.LE],
-        "rhs_values": np.array([1.0, 1.0]),
-    }
-
-    for key in ["rhs_values", "scales"]:
-        config_copy = copy.deepcopy(config)
-
-        nonlinear_constraints = NonlinearConstraintsConfig.model_validate(config_copy)
-        assert getattr(nonlinear_constraints, key).ndim == 1
-        assert len(getattr(nonlinear_constraints, key)) == 2
-        with pytest.raises(ValueError):  # noqa: PT011
-            getattr(nonlinear_constraints, key)[0] = 0
-
-        config_copy[key] = np.array(1.0)
-        nonlinear_constraints = NonlinearConstraintsConfig.model_validate(config)
-        assert getattr(nonlinear_constraints, key).ndim == 1
-        assert len(getattr(nonlinear_constraints, key)) == 2
-
-        config_copy[key] = np.array([1.0])
-        nonlinear_constraints = NonlinearConstraintsConfig.model_validate(config)
-        assert getattr(nonlinear_constraints, key).ndim == 1
-        assert len(getattr(nonlinear_constraints, key)) == 2
 
 
 def test_check_nonlinear_constraint_convert_arrays() -> None:
     config = {
-        "names": ["a", "b"],
         "types": [ConstraintType.EQ, ConstraintType.LE],
         "rhs_values": [1.0, 1.0],
     }
@@ -453,15 +332,7 @@ def test_check_nonlinear_constraint_convert_arrays() -> None:
         assert len(getattr(nonlinear_constraints, key)) == 2
 
         config_copy[key] = [1.0, 1.0, 1.0]
-        with pytest.raises(
-            ValueError, match=f"{key} cannot be broadcasted to a length of 2"
-        ):
-            NonlinearConstraintsConfig.model_validate(config_copy)
-
-        config_copy[key] = [[1.0], [1.0]]
-        with pytest.raises(
-            ValueError, match=f"{key} cannot be broadcasted to a length of 2"
-        ):
+        with pytest.raises(ValidationError):
             NonlinearConstraintsConfig.model_validate(config_copy)
 
 
@@ -474,94 +345,51 @@ def test_check_realization_names() -> None:
 
 
 def test_check_realization_arrays() -> None:
-    config: dict[str, Any] = {"names": ["a", "b"]}
+    config: dict[str, Any] = {"weights": np.array([1.0, 1.0])}
 
-    for key in ["weights"]:
-        config_copy = copy.deepcopy(config)
+    realizations = RealizationsConfig.model_validate(config)
+    assert realizations.weights.ndim == 1
+    assert len(realizations.weights) == 2
+    with pytest.raises(ValueError):  # noqa: PT011
+        realizations.weights[0] = 0
 
-        realizations = RealizationsConfig.model_validate(config_copy)
-        assert getattr(realizations, key).ndim == 1
-        assert len(getattr(realizations, key)) == 2
-        with pytest.raises(ValueError):  # noqa: PT011
-            getattr(realizations, key)[0] = 0
+    config["weights"] = np.array(1.0)
+    realizations = RealizationsConfig.model_validate(config)
+    assert realizations.weights.ndim == 1
+    assert len(realizations.weights) == 1
 
-        config_copy[key] = np.array(0.0)
-        realizations = RealizationsConfig.model_validate(config)
-        assert getattr(realizations, key).ndim == 1
-        assert len(getattr(realizations, key)) == 2
+    config["weights"] = np.array([1.0])
+    realizations = RealizationsConfig.model_validate(config)
+    assert realizations.weights.ndim == 1
+    assert len(realizations.weights) == 1
 
-        config_copy[key] = np.array([0.0])
-        realizations = RealizationsConfig.model_validate(config)
-        assert getattr(realizations, key).ndim == 1
-        assert len(getattr(realizations, key)) == 2
-
-        config_copy[key] = np.array([0.0, 0.0, 0.0])
-        with pytest.raises(
-            ValueError, match=f"{key} cannot be broadcasted to a length of 2"
-        ):
-            RealizationsConfig.model_validate(config_copy)
-
-        config_copy[key] = np.array([[0.0], [0.0]])
-        with pytest.raises(
-            ValueError, match=f"{key} cannot be broadcasted to a length of 2"
-        ):
-            RealizationsConfig.model_validate(config_copy)
-
-
-def test_check_realization_arrays_no_names() -> None:
-    config: dict[str, Any] = {"weights": [1, 1]}
-
-    for key in ["weights"]:
-        config_copy = copy.deepcopy(config)
-
-        realizations = RealizationsConfig.model_validate(config_copy)
-        assert getattr(realizations, key).ndim == 1
-        assert len(getattr(realizations, key)) == 2
-        with pytest.raises(ValueError):  # noqa: PT011
-            getattr(realizations, key)[0] = 0
-
-        config_copy[key] = np.array(0.0)
-        realizations = RealizationsConfig.model_validate(config)
-        assert getattr(realizations, key).ndim == 1
-        assert len(getattr(realizations, key)) == 2
-
-        config_copy[key] = np.array([0.0])
-        realizations = RealizationsConfig.model_validate(config)
-        assert getattr(realizations, key).ndim == 1
-        assert len(getattr(realizations, key)) == 2
+    config["weights"] = np.array([0.0, 0.0, 0.0])
+    with pytest.raises(ValidationError):
+        RealizationsConfig.model_validate(config)
 
 
 def test_check_realization_convert_arrays() -> None:
-    config: dict[str, Any] = {"names": ["a", "b"]}
+    config: dict[str, Any] = {"weights": [1, 1]}
 
-    for key in ["weights"]:
-        config_copy = copy.deepcopy(config)
+    realizations = RealizationsConfig.model_validate(config)
+    assert realizations.weights.ndim == 1
+    assert len(realizations.weights) == 2
+    with pytest.raises(ValueError):  # noqa: PT011
+        realizations.weights[0] = 0
 
-        realizations = RealizationsConfig.model_validate(config_copy)
-        assert getattr(realizations, key).ndim == 1
-        assert len(getattr(realizations, key)) == 2
+    config["weights"] = 1.0
+    realizations = RealizationsConfig.model_validate(config)
+    assert realizations.weights.ndim == 1
+    assert len(realizations.weights) == 1
 
-        config_copy[key] = 0.0
-        realizations = RealizationsConfig.model_validate(config)
-        assert getattr(realizations, key).ndim == 1
-        assert len(getattr(realizations, key)) == 2
+    config["weights"] = [1.0]
+    realizations = RealizationsConfig.model_validate(config)
+    assert realizations.weights.ndim == 1
+    assert len(realizations.weights) == 1
 
-        config_copy[key] = [0.0]
-        realizations = RealizationsConfig.model_validate(config)
-        assert getattr(realizations, key).ndim == 1
-        assert len(getattr(realizations, key)) == 2
-
-        config_copy[key] = [0.0, 0.0, 0.0]
-        with pytest.raises(
-            ValueError, match=f"{key} cannot be broadcasted to a length of 2"
-        ):
-            RealizationsConfig.model_validate(config_copy)
-
-        config_copy[key] = [[0.0], [0.0]]
-        with pytest.raises(
-            ValueError, match=f"{key} cannot be broadcasted to a length of 2"
-        ):
-            RealizationsConfig.model_validate(config_copy)
+    config["weights"] = [0.0, 0.0, 0.0]
+    with pytest.raises(ValidationError):
+        RealizationsConfig.model_validate(config)
 
 
 def test_check_perturbations() -> None:

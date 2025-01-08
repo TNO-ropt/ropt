@@ -10,7 +10,6 @@ from pydantic import ConfigDict, Field, model_validator
 from ropt.config.utils import (
     ImmutableBaseModel,
     broadcast_1d_array,
-    broadcast_arrays,
     check_enum_values,
     immutable_array,
 )
@@ -32,18 +31,16 @@ class VariablesConfig(ImmutableBaseModel):
     aspects of the variables: the initial values and the bounds. These are given
     by the `initial_values`, `lower_bounds`, and `upper_bounds` fields, which
     are [`numpy`](https://numpy.org) arrays. Initial values must be provided,
-    while bounds are set to $-\infty$ and $+\infty$ by default. The
-    `lower_bounds` and `upper_bounds` fields may contain `numpy.nan` values,
+    and its length determines the number of variables. The lower and upper
+    bounds, are broadcasted to the number of variables, and are set to
+    $-\infty$ and $+\infty$ by default. They may contain `numpy.nan` values,
     indicating that corresponding variables have no lower or upper bounds,
     respectively. These values are converted to `numpy.inf` values with an
     appropriate sign.
 
     The `names` field is optional since variable names are not strictly needed
-    by the optimizer. However, if the `names` field is given, it determines the
-    number of variables, and the `initial_values`, `lower_bounds`, and
-    `upper_bounds` fields are broadcasted accordingly. If `names` is not
-    provided, these fields are broadcasted to each other, and their final size
-    determines the number of variables.
+    by the optimizer. If given, the lenght of this field must be equal to the number
+    of variables.
 
     Info: Variable Names
         `ropt` does not use the names itself, and names can be of arbitrary
@@ -108,25 +105,12 @@ class VariablesConfig(ImmutableBaseModel):
     def _broadcast_and_scale(self) -> Self:
         self._mutable()
 
-        if self.names is not None:
-            size = len(self.names)
-            self.initial_values = broadcast_1d_array(
-                self.initial_values, "initial_values", size
-            )
-            self.lower_bounds = broadcast_1d_array(
-                self.lower_bounds, "lower_bounds", size
-            )
-            self.upper_bounds = broadcast_1d_array(
-                self.upper_bounds, "upper_bounds", size
-            )
-        else:
-            (
-                self.initial_values,
-                self.lower_bounds,
-                self.upper_bounds,
-            ) = broadcast_arrays(
-                self.initial_values, self.lower_bounds, self.upper_bounds
-            )
+        self.lower_bounds = broadcast_1d_array(
+            self.lower_bounds, "lower_bounds", self.initial_values.size
+        )
+        self.upper_bounds = broadcast_1d_array(
+            self.upper_bounds, "upper_bounds", self.initial_values.size
+        )
 
         if self.offsets is not None:
             self.offsets = broadcast_1d_array(

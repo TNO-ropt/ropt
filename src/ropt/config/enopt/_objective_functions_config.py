@@ -7,12 +7,7 @@ from typing import Self
 import numpy as np
 from pydantic import ConfigDict, model_validator
 
-from ropt.config.utils import (
-    ImmutableBaseModel,
-    broadcast_1d_array,
-    broadcast_arrays,
-    normalize,
-)
+from ropt.config.utils import ImmutableBaseModel, broadcast_1d_array, normalize
 from ropt.config.validated_types import (  # noqa: TC001
     Array1D,
     Array1DBool,
@@ -30,16 +25,12 @@ class ObjectiveFunctionsConfig(ImmutableBaseModel):
 
     `ropt` supports optimization over multiple objectives, which are summed after
     weighting with values passed via the `weights` field. This field is a
-    `numpy` array, with a length equal to the number of objective functions. Its
-    values will be normalized to have a sum equal to 1. For example, when
+    `numpy` array, with a length that determines the number of objective functions.
+    Its values will be normalized to have a sum equal to 1. For example, when
     `weights` is set to `[1, 1]`, the stored values will be `[0.5, 0.5]`.
 
-    The `names` field is optional. If given, the number of objective functions
-    is set equal to its length. The `weights` array will then be broadcasted to
-    the number of objective values. For example, if `names = ["f1", "f2"]` and
-    `weights = 1.0`, the optimizer assumes two objective functions weighted by
-    `[0.5, 0.5]`. If `names` is not set, the number of objectives is determined
-    by the length of `weights`.
+    The `names` field is optional. If given, its length must be equal to the
+    number of objective functions.
 
     The `scales` field contains scaling values for the objectives. These values
     are used to scale the objective function values to a desired order of
@@ -97,15 +88,10 @@ class ObjectiveFunctionsConfig(ImmutableBaseModel):
     @model_validator(mode="after")
     def _broadcast_and_normalize(self) -> Self:
         self._mutable()
-        if self.names is not None:
-            size = len(self.names)
-            for name in ("scales", "auto_scale", "weights"):
-                setattr(self, name, broadcast_1d_array(getattr(self, name), name, size))
-        else:
-            self.scales, self.auto_scale, self.weights = broadcast_arrays(
-                self.scales, self.auto_scale, self.weights
-            )
-
+        self.scales = broadcast_1d_array(self.scales, "scales", self.weights.size)
+        self.auto_scale = broadcast_1d_array(
+            self.auto_scale, "auto_scale", self.weights.size
+        )
         self.weights = normalize(self.weights)
         self._immutable()
         return self

@@ -4,7 +4,7 @@ from typing import Annotated, cast
 
 import numpy as np
 from numpy.typing import NDArray
-from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt, StrictStr
+from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt
 
 from ropt.config.enopt import EnOptConfig
 from ropt.enums import ConstraintType, OptimizerExitCode
@@ -38,7 +38,7 @@ class SortObjectiveOptions(_ConfigBaseModel):
         last:  Index of name of the last realization to use.
     """
 
-    sort: list[StrictStr | NonNegativeInt]
+    sort: list[NonNegativeInt]
     first: NonNegativeInt
     last: NonNegativeInt
 
@@ -56,7 +56,7 @@ class SortConstraintOptions(_ConfigBaseModel):
         last:  Index or name of the last realization to use.
     """
 
-    sort: StrictStr | NonNegativeInt
+    sort: NonNegativeInt
     first: NonNegativeInt
     last: NonNegativeInt
 
@@ -76,11 +76,11 @@ class CVaRObjectiveOptions(_ConfigBaseModel):
     maximizing.
 
     Attributes:
-        sort:       The indices or names of the objectives to sort.
+        sort:       The indices of the objectives to sort.
         percentile: The CVaR percentile.
     """
 
-    sort: list[StrictStr | NonNegativeInt]
+    sort: list[NonNegativeInt]
     percentile: Annotated[float, Field(gt=0.0, le=1.0)] = 0.5
 
 
@@ -100,11 +100,11 @@ class CVaRConstraintOptions(_ConfigBaseModel):
     - For EQ constraints, realizations with the largest absolute values are the worst
 
     Attributes:
-        sort:       The index or name of the constraint to sort.
+        sort:       The index of the constraint to sort.
         percentile: The CVaR percentile.
     """
 
-    sort: StrictStr | NonNegativeInt
+    sort: NonNegativeInt
     percentile: Annotated[float, Field(gt=0.0, le=1.0)] = 0.5
 
 
@@ -235,10 +235,9 @@ class DefaultRealizationFilter(RealizationFilter):
         options = cast(SortObjectiveOptions, self._filter_options)
         objective_config = self._enopt_config.objectives
         failed_realizations = np.isnan(objectives[..., 0])
-        sort = _get_indices(options.sort, self._enopt_config.objectives.names)
-        objectives = np.nan_to_num(objectives[..., sort])
+        objectives = np.nan_to_num(objectives[..., options.sort])
         if objective_config.weights.size > 1:
-            objectives = np.dot(objectives, objective_config.weights[sort])
+            objectives = np.dot(objectives, objective_config.weights[options.sort])
         objectives = objectives.flatten()
         return _sort_and_select(
             objectives,
@@ -254,12 +253,7 @@ class DefaultRealizationFilter(RealizationFilter):
     ) -> NDArray[np.float64]:
         options = cast(SortConstraintOptions, self._filter_options)
         failed_realizations = np.isnan(constraints[..., 0])
-        constraint_config = self._enopt_config.nonlinear_constraints
-        sort = _get_index(
-            options.sort,
-            constraint_config.names if constraint_config is not None else None,
-        )
-        constraints = np.nan_to_num(constraints[..., sort])
+        constraints = np.nan_to_num(constraints[..., options.sort])
         return _sort_and_select(
             constraints,
             self._enopt_config.realizations.weights,
@@ -275,10 +269,9 @@ class DefaultRealizationFilter(RealizationFilter):
         options = cast(CVaRObjectiveOptions, self._filter_options)
         objective_config = self._enopt_config.objectives
         failed_realizations = np.isnan(objectives[..., 0])
-        sort = _get_indices(options.sort, self._enopt_config.objectives.names)
-        objectives = np.nan_to_num(objectives[..., sort])
+        objectives = np.nan_to_num(objectives[..., options.sort])
         if objective_config.weights.size > 1:
-            objectives = np.dot(objectives, objective_config.weights[sort])
+            objectives = np.dot(objectives, objective_config.weights[options.sort])
         objectives = -objectives.flatten()
         return _get_cvar_weights_from_percentile(
             objectives, failed_realizations, options.percentile
@@ -290,14 +283,9 @@ class DefaultRealizationFilter(RealizationFilter):
     ) -> NDArray[np.float64]:
         options = cast(CVaRConstraintOptions, self._filter_options)
         failed_realizations = np.isnan(constraints[..., 0])
-        constraint_config = self._enopt_config.nonlinear_constraints
-        sort = _get_index(
-            options.sort,
-            constraint_config.names if constraint_config is not None else None,
-        )
-        constraints = np.nan_to_num(constraints[..., sort])
+        constraints = np.nan_to_num(constraints[..., options.sort])
         assert self._enopt_config.nonlinear_constraints is not None
-        constraint_type = self._enopt_config.nonlinear_constraints.types[sort]
+        constraint_type = self._enopt_config.nonlinear_constraints.types[options.sort]
         if constraint_type == ConstraintType.LE:
             constraints = -constraints
         if constraint_type == ConstraintType.EQ:
@@ -344,25 +332,6 @@ def _get_cvar_weights_from_percentile(
     if n_var < indices.size:
         weights[indices[n_var]] = p_var
     return weights
-
-
-def _get_index(item: str | int, names: tuple[str, ...] | None) -> int:
-    if names is None:
-        if isinstance(item, str):
-            msg = "functions and constraints with no names must be referred to by index"
-            raise ValueError(msg)
-        return item
-    try:
-        return names.index(item) if isinstance(item, str) else item
-    except ValueError as exc:
-        msg = f"Function or constraint does not exist: {item}"
-        raise ValueError(msg) from exc
-
-
-def _get_indices(
-    items: list[str | int], names: tuple[str, ...] | None
-) -> tuple[int, ...]:
-    return tuple(_get_index(item, names) for item in items)
 
 
 class DefaultRealizationFilterPlugin(RealizationFilterPlugin):

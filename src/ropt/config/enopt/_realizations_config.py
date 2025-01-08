@@ -7,7 +7,7 @@ from typing import Self
 import numpy as np
 from pydantic import ConfigDict, NonNegativeInt, model_validator
 
-from ropt.config.utils import ImmutableBaseModel, broadcast_1d_array, normalize
+from ropt.config.utils import ImmutableBaseModel, normalize
 from ropt.config.validated_types import Array1D, UniqueNames  # noqa: TC001
 
 
@@ -23,17 +23,13 @@ class RealizationsConfig(ImmutableBaseModel):
     function or gradient. Usually, this will be a (weighted) sum, but other ways
     of combining realizations are possible.
 
-    The `weights` field is a `numpy` array, with a length equal to the number of
-    realizations. Its values will be normalized to have a sum equal to 1. For
+    The `weights` field is a `numpy` array, with a length that determines the number
+    of realizations. Its values will be normalized to have a sum equal to 1. For
     example, when `weights` is set to `[1, 1]`, the stored values will be `[0.5,
     0.5]`.
 
-    The `names` field is optional. If given, the number of realizations is set
-    equal to its length. The `weights` array will then be broadcasted to the
-    number of objective values. For example, if `names = ["r1", "r2"]` and
-    `weights = 1.0`, the optimizer assumes two realizations weighted by `[0.5,
-    0.5]`. If `names` is not set, the number of realizations is determined by
-    the length of `weights`.
+    The `names` field is optional. If given, its length must be equal to the
+    number of realizations.
 
     If during the calculation of the function values for each realization one or
     more values are missing, for instance due to failure of a complex
@@ -70,9 +66,6 @@ class RealizationsConfig(ImmutableBaseModel):
     @model_validator(mode="after")
     def _broadcast_normalize_and_check(self) -> Self:
         self._mutable()
-        if self.names:
-            size = len(self.names)
-            self.weights = broadcast_1d_array(self.weights, "weights", size)
         self.weights = normalize(self.weights)
         if (
             self.realization_min_success is None
