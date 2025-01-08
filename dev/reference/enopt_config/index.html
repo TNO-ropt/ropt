@@ -1939,17 +1939,15 @@ used for all variables.</p>
 aspects of the variables: the initial values and the bounds. These are given
 by the <code>initial_values</code>, <code>lower_bounds</code>, and <code>upper_bounds</code> fields, which
 are <a href="https://numpy.org"><code>numpy</code></a> arrays. Initial values must be provided,
-while bounds are set to <span class="arithmatex">\(-\infty\)</span> and <span class="arithmatex">\(+\infty\)</span> by default. The
-<code>lower_bounds</code> and <code>upper_bounds</code> fields may contain <code>numpy.nan</code> values,
+and its length determines the number of variables. The lower and upper
+bounds, are broadcasted to the number of variables, and are set to
+<span class="arithmatex">\(-\infty\)</span> and <span class="arithmatex">\(+\infty\)</span> by default. They may contain <code>numpy.nan</code> values,
 indicating that corresponding variables have no lower or upper bounds,
 respectively. These values are converted to <code>numpy.inf</code> values with an
 appropriate sign.</p>
 <p>The <code>names</code> field is optional since variable names are not strictly needed
-by the optimizer. However, if the <code>names</code> field is given, it determines the
-number of variables, and the <code>initial_values</code>, <code>lower_bounds</code>, and
-<code>upper_bounds</code> fields are broadcasted accordingly. If <code>names</code> is not
-provided, these fields are broadcasted to each other, and their final size
-determines the number of variables.</p>
+by the optimizer. If given, the lenght of this field must be equal to the number
+of variables.</p>
 
 
 <details class="info" open>
@@ -2194,15 +2192,11 @@ delimiter.</p>
 object.</p>
 <p><code>ropt</code> supports optimization over multiple objectives, which are summed after
 weighting with values passed via the <code>weights</code> field. This field is a
-<code>numpy</code> array, with a length equal to the number of objective functions. Its
-values will be normalized to have a sum equal to 1. For example, when
+<code>numpy</code> array, with a length that determines the number of objective functions.
+Its values will be normalized to have a sum equal to 1. For example, when
 <code>weights</code> is set to <code>[1, 1]</code>, the stored values will be <code>[0.5, 0.5]</code>.</p>
-<p>The <code>names</code> field is optional. If given, the number of objective functions
-is set equal to its length. The <code>weights</code> array will then be broadcasted to
-the number of objective values. For example, if <code>names = ["f1", "f2"]</code> and
-<code>weights = 1.0</code>, the optimizer assumes two objective functions weighted by
-<code>[0.5, 0.5]</code>. If <code>names</code> is not set, the number of objectives is determined
-by the length of <code>weights</code>.</p>
+<p>The <code>names</code> field is optional. If given, its length must be equal to the
+number of objective functions.</p>
 <p>The <code>scales</code> field contains scaling values for the objectives. These values
 are used to scale the objective function values to a desired order of
 magnitude. Each time new objective function values are obtained during
@@ -2572,12 +2566,8 @@ configuration with these adjustments applied.</p>
 a right-hand-side value, either for equality or inequality. The <code>rhs_values</code>
 field, which is a <code>numpy</code> array with a length equal to the number of
 constraint functions, provides the right-hand-side values.</p>
-<p>The <code>names</code> field is optional. If given, the number of constraint functions
-is set equal to its length. The <code>rhs_values</code> array will then be broadcasted
-to the number of constraint functions. For example, if <code>names = ["c1",
-"c2"]</code> and <code>rhs_values = 0.0</code>, the optimizer assumes two constraint
-functions and stores <code>rhs_values = [0.0, 0.0]</code>. If <code>names</code> is not set, the
-number of constraints is determined by the length of <code>rhs_values</code>.</p>
+<p>The <code>names</code> field is optional, if provided, its length should be equal to the
+number of constraints.</p>
 <p>The <code>scales</code> field contains scaling values for the constraints. These values
 scale the constraint function values to a desired order of magnitude. Each
 time new constraint function values are obtained during optimization, they
@@ -2755,16 +2745,12 @@ the optimizer requests a function value or a gradient, the functions and
 gradients are calculated for each realization and combined into a single
 function or gradient. Usually, this will be a (weighted) sum, but other ways
 of combining realizations are possible.</p>
-<p>The <code>weights</code> field is a <code>numpy</code> array, with a length equal to the number of
-realizations. Its values will be normalized to have a sum equal to 1. For
+<p>The <code>weights</code> field is a <code>numpy</code> array, with a length that determines the number
+of realizations. Its values will be normalized to have a sum equal to 1. For
 example, when <code>weights</code> is set to <code>[1, 1]</code>, the stored values will be <code>[0.5,
 0.5]</code>.</p>
-<p>The <code>names</code> field is optional. If given, the number of realizations is set
-equal to its length. The <code>weights</code> array will then be broadcasted to the
-number of objective values. For example, if <code>names = ["r1", "r2"]</code> and
-<code>weights = 1.0</code>, the optimizer assumes two realizations weighted by <code>[0.5,
-0.5]</code>. If <code>names</code> is not set, the number of realizations is determined by
-the length of <code>weights</code>.</p>
+<p>The <code>names</code> field is optional. If given, its length must be equal to the
+number of realizations.</p>
 <p>If during the calculation of the function values for each realization one or
 more values are missing, for instance due to failure of a complex
 simulation, the total function and gradient values can still be calculated
