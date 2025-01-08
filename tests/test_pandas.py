@@ -93,10 +93,13 @@ def gradient_result_fixture(enopt_config: Any) -> GradientResults:
     )
 
 
-def test__to_series(enopt_config: Any, gradient_result: GradientResults) -> None:
-    config = EnOptConfig.model_validate(enopt_config)
+def test__to_series(gradient_result: GradientResults) -> None:
+    names = {
+        ResultAxis.VARIABLE: ("v1", "v2"),
+        ResultAxis.REALIZATION: ("ra", "rb", "rc"),
+    }
     series = _to_series(
-        config, gradient_result.evaluations, (0,), 0, 1, "perturbed_variables"
+        gradient_result.evaluations, (0,), 0, 1, "perturbed_variables", names
     )
     assert series is not None
     assert len(series) == gradient_result.evaluations.perturbed_variables.size
@@ -108,11 +111,9 @@ def test__to_series(enopt_config: Any, gradient_result: GradientResults) -> None
         "perturbation",
         "variable",
     ]
-    assert config.variables.names is not None
-    assert config.realizations.names is not None
-    for v_idx, var in enumerate(config.variables.names):
-        for r_idx, real in enumerate(config.realizations.names):
-            for pert in range(config.gradient.number_of_perturbations):
+    for v_idx, var in enumerate(names[ResultAxis.VARIABLE]):
+        for r_idx, real in enumerate(names[ResultAxis.REALIZATION]):
+            for pert in range(gradient_result.evaluations.perturbed_variables.shape[1]):
                 assert (
                     series.loc[((0,), 0, 1, real, pert, var)]
                     == gradient_result.evaluations.perturbed_variables[
@@ -124,17 +125,29 @@ def test__to_series(enopt_config: Any, gradient_result: GradientResults) -> None
 
 
 def test_to_dataframe(gradient_result: GradientResults) -> None:
-    frame = gradient_result.to_dataframe("evaluations")
+    names = {
+        ResultAxis.VARIABLE: ("v1", "v2"),
+        ResultAxis.REALIZATION: ("ra", "rb", "rc"),
+        ResultAxis.OBJECTIVE: ("fa", "fb"),
+    }
+    frame = gradient_result.to_dataframe("evaluations", names=names)
     assert len(frame) == gradient_result.evaluations.perturbed_variables.size * 2
-    assert set(frame.index.names) == {
+    assert frame.index.names == [
         "plan_id",
         "result_id",
         "batch_id",
+        "variable",
         "realization",
         "perturbation",
-        "variable",
         "objective",
-    }
+    ]
+    idx = 0
+    for var in names[ResultAxis.VARIABLE]:
+        for real in names[ResultAxis.REALIZATION]:
+            for pert in range(gradient_result.evaluations.perturbed_variables.shape[1]):
+                for fnc in names[ResultAxis.OBJECTIVE]:
+                    assert frame.index[idx] == ((0,), 0, 1, var, real, pert, fnc)
+                    idx += 1
 
 
 def test_to_dataframe_formatter(

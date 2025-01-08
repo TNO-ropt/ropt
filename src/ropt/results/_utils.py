@@ -4,7 +4,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.config.enopt import EnOptConfig
-from ropt.enums import ConstraintType, ResultAxis
+from ropt.enums import ConstraintType
 
 
 def _get_lower_bound_constraint_values(
@@ -102,17 +102,3 @@ def _immutable_copy(data: NDArray[Any] | None) -> NDArray[Any] | None:
         data = data.copy()
         data.setflags(write=False)
     return data
-
-
-def _get_axis_names(config: EnOptConfig, axis: ResultAxis) -> tuple[str, ...] | None:
-    match axis:
-        case ResultAxis.VARIABLE:
-            return config.variables.get_formatted_names()
-        case ResultAxis.OBJECTIVE:
-            return config.objectives.names
-        case ResultAxis.NONLINEAR_CONSTRAINT:
-            assert config.nonlinear_constraints is not None
-            return config.nonlinear_constraints.names
-        case ResultAxis.REALIZATION:
-            return config.realizations.names
-    return None

@@ -5,23 +5,20 @@ from typing import TYPE_CHECKING, Any, Iterable, cast
 
 import pandas as pd
 
-from ._utils import _get_axis_names
-
 if TYPE_CHECKING:
-    from ropt.config.enopt import EnOptConfig
     from ropt.enums import ResultAxis
 
     from ._result_field import ResultField
 
 
 def _to_dataframe(  # noqa: PLR0913
-    config: EnOptConfig,
     result_field: ResultField,
     plan_id: tuple[int, ...],
     result_id: int | tuple[int, ...],
     batch_id: int | None,
     select: Iterable[str] | None,
     unstack: Iterable[ResultAxis] | None,
+    names: dict[ResultAxis, tuple[str, ...]] | None = None,
 ) -> pd.DataFrame:
     if select is None:
         select = (field.name for field in fields(result_field))
@@ -29,7 +26,7 @@ def _to_dataframe(  # noqa: PLR0913
         unstack = []
     joined_frame = pd.DataFrame()
     for field in select:
-        series = _to_series(config, result_field, plan_id, result_id, batch_id, field)
+        series = _to_series(result_field, plan_id, result_id, batch_id, field, names)
         if series is not None:
             frame = series.to_frame()
             for axis in unstack:
@@ -44,12 +41,12 @@ def _to_dataframe(  # noqa: PLR0913
 
 
 def _to_series(  # noqa: PLR0913
-    config: EnOptConfig,
     result_field: ResultField,
     plan_id: tuple[int, ...],
     result_id: int | tuple[int, ...],
     batch_id: int | None,
     field: str,
+    names: dict[ResultAxis, tuple[str, ...]] | None = None,
 ) -> pd.Series[Any] | None:
     try:
         data = getattr(result_field, field)
@@ -59,9 +56,11 @@ def _to_series(  # noqa: PLR0913
     if data is None:
         return None
     axes = result_field.get_axes(field)
+    if names is None:
+        names = {}
     indices = [
         pd.RangeIndex(data.shape[idx]) if index is None else index
-        for idx, index in enumerate(_get_axis_names(config, axis) for axis in axes)
+        for idx, index in enumerate(names.get(axis, None) for axis in axes)
     ]
     series: pd.Series[Any]
     index: tuple[Any, ...] = (plan_id, result_id, 0 if batch_id is None else batch_id)

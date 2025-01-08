@@ -65,11 +65,6 @@ def function_result_fixture(enopt_config: Any) -> FunctionResults:
     )
 
 
-def test_get_axis_names_error(function_result: FunctionResults) -> None:
-    with pytest.raises(ValueError, match="Unknown field name: foo"):
-        function_result.evaluations.get_axes("foo")
-
-
 def test_scaling_evaluations_functions(
     enopt_config: Any, function_result: FunctionResults
 ) -> None:
@@ -213,10 +208,10 @@ def test_nonlinear_constraint_results(
 
 
 @pytest.mark.parametrize("axis", [ResultAxis.OBJECTIVE, None])
-def test_to_dict(
-    enopt_config: Any, function_result: FunctionResults, axis: ResultAxis
-) -> None:
-    config = EnOptConfig.model_validate(enopt_config)
-    objectives = function_result.evaluations.to_dict(config, "objectives", axis=axis)
+def test_to_dict(function_result: FunctionResults, axis: ResultAxis) -> None:
+    names: dict[ResultAxis, tuple[str, ...]] = {ResultAxis.OBJECTIVE: ("f1", "f2")}
+    objectives = function_result.evaluations.to_dict(
+        "objectives", axis=axis, names=names
+    )
     assert np.all(np.equal(objectives["f1"], [0.0, 2.0, 4.0]))
     assert np.all(np.equal(objectives["f2"], [1.0, 3.0, 5.0]))

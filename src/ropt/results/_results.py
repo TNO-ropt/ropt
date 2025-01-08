@@ -11,9 +11,10 @@ from typing import (
     TypeVar,
 )
 
+from ropt.enums import ResultAxis
+
 if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
-    from ropt.enums import ResultAxis
 
 
 _HAVE_PANDAS: Final = find_spec("pandas") is not None
@@ -76,6 +77,7 @@ class Results(ABC):
         field_name: str,
         select: Iterable[str] | None = None,
         unstack: Iterable[ResultAxis] | None = None,
+        names: dict[ResultAxis, tuple[str, ...]] | None = None,
     ) -> pd.DataFrame:
         """Export a field to a pandas dataframe.
 
@@ -88,10 +90,10 @@ class Results(ABC):
         Any of the sub-fields in the field that is exported may be a
         multi-dimensional array, which is exported in a stacked manner. Using
         the axis types found in the metadata, the exporter will construct a
-        multi-index labeled with the corresponding names found in the optimizer
-        configuration (if available, otherwise numerical indices are used). Such
-        multi-indices can optionally be unstacked into multiple columns by
-        providing the axis types to unstack via the `unstack` argument.
+        multi-index labeled with the corresponding names provided via the
+        `names` argument. If `names` is `None`, numerical indices are used.
+        Such multi-indices can optionally be unstacked into multiple columns
+        by providing the axis types to unstack via the `unstack` argument.
 
         Info: The data frame index
             As noted above, the index of the resulting data frame may be a
@@ -106,6 +108,7 @@ class Results(ABC):
             field_name: The field to export.
             select:     Select the sub-fields to export, by default all fields.
             unstack:    Select axes to unstack, by default none.
+            names:      A dictionary mapping axis types to names.
 
         Raises:
             NotImplementedError: If the pandas module is not installed.
@@ -126,12 +129,28 @@ class Results(ABC):
             msg = f"Invalid result field: {field_name}"
             raise AttributeError(msg)
 
+        if names is None:
+            names = {
+                key: value
+                for key, value in {
+                    ResultAxis.VARIABLE: self.config.variables.get_formatted_names(),
+                    ResultAxis.OBJECTIVE: self.config.objectives.names,
+                    ResultAxis.NONLINEAR_CONSTRAINT: (
+                        self.config.nonlinear_constraints.names
+                        if self.config.nonlinear_constraints is not None
+                        else None
+                    ),
+                    ResultAxis.REALIZATION: self.config.realizations.names,
+                }.items()
+                if value is not None
+            }
+
         return _to_dataframe(
-            self.config,
             result_field,
             self.plan_id,
             self.result_id,
             self.batch_id,
             select,
             unstack,
+            names,
         )
