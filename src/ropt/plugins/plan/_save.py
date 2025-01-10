@@ -106,8 +106,7 @@ def _check_format(file_format: str | None) -> str:
     if file_format is None or not file_format:
         msg = "No data format specified"
         raise ValueError(msg)
-    if file_format.startswith("."):
-        file_format = file_format[1:]
+    file_format = file_format.removeprefix(".")
     if file_format not in {"json", "pickle"}:
         msg = f"data format not supported: {file_format}"
         raise ValueError(msg)
