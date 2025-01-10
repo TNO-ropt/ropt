@@ -4,7 +4,7 @@ from typing import Any
 import pytest
 
 from ropt.config.enopt import EnOptConfig
-from ropt.enums import EventType
+from ropt.enums import EventType, ResultAxis
 from ropt.plan import BasicOptimizer, Event
 from ropt.report import ResultsDataFrame
 
@@ -34,9 +34,17 @@ def enopt_config_fixture() -> dict[str, Any]:
     }
 
 
-def _handle_results(event: Event, reporter: ResultsDataFrame) -> None:
+def _handle_results(
+    event: Event,
+    reporter: ResultsDataFrame,
+    variable_names: tuple[str, ...] | None = None,
+) -> None:
     assert event.results is not None
-    reporter.add_results(event.results)
+    names: dict[ResultAxis, tuple[str, ...] | None] | None = (
+        None if variable_names is None else {ResultAxis.VARIABLE: variable_names}
+    )
+    for item in event.results:
+        reporter.add_results(item, names=names)
 
 
 def test_dataframe_results_no_results(enopt_config: Any, evaluator: Any) -> None:
@@ -71,7 +79,6 @@ def test_dataframe_results_function_results(enopt_config: Any, evaluator: Any) -
 def test_dataframe_results_function_results_formatted_names(
     enopt_config: Any, evaluator: Any
 ) -> None:
-    enopt_config["variables"]["names"] = [("a", 1), ("a", 2), ("a", 3)]
     config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsDataFrame(
         {
@@ -81,7 +88,11 @@ def test_dataframe_results_function_results_formatted_names(
     )
     BasicOptimizer(config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION,
-        partial(_handle_results, reporter=reporter),
+        partial(
+            _handle_results,
+            reporter=reporter,
+            variable_names=tuple(f"a:{idx}" for idx in range(1, 4)),
+        ),
     ).run()
 
     assert len(reporter.frame) == 3
@@ -91,7 +102,6 @@ def test_dataframe_results_function_results_formatted_names(
 
 
 def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -> None:
-    enopt_config["variables"]["names"] = [("a", 1), ("a", 2), ("a", 3)]
     config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsDataFrame(
         {
@@ -102,7 +112,11 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
     )
     BasicOptimizer(config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION,
-        partial(_handle_results, reporter=reporter),
+        partial(
+            _handle_results,
+            reporter=reporter,
+            variable_names=tuple(f"a:{idx}" for idx in range(1, 4)),
+        ),
     ).run()
 
     assert len(reporter.frame) == 3
@@ -126,7 +140,8 @@ def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
         assert event.results is not None
         for item in event.results:
             item.metadata["foo"] = {"bar": 1}
-        reporter.add_results(event.results)
+        for item in event.results:
+            reporter.add_results(item)
 
     BasicOptimizer(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, even_handler

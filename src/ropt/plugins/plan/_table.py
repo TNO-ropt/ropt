@@ -106,11 +106,11 @@ class DefaultTableHandler(ResultHandler):
             and event.results is not None
             and (event.tags & self._with.tags)
         ):
-            self._table.add_results(
-                (
-                    (convert_to_maximize(item) for item in event.results)
-                    if self._with.maximize
-                    else event.results
-                ),
-            )
+            added = False
+            for item in event.results:
+                added = added or self._table.add_results(
+                    convert_to_maximize(item) if self._with.maximize else item,
+                )
+            if added:
+                self._table.save()
         return event

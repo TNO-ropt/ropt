@@ -94,7 +94,7 @@ def gradient_result_fixture(enopt_config: Any) -> GradientResults:
 
 
 def test__to_series(gradient_result: GradientResults) -> None:
-    names = {
+    names: dict[ResultAxis, Any] = {
         ResultAxis.VARIABLE: ("v1", "v2"),
         ResultAxis.REALIZATION: ("ra", "rb", "rc"),
     }
@@ -125,7 +125,7 @@ def test__to_series(gradient_result: GradientResults) -> None:
 
 
 def test_to_dataframe(gradient_result: GradientResults) -> None:
-    names = {
+    names: dict[ResultAxis, Any] = {
         ResultAxis.VARIABLE: ("v1", "v2"),
         ResultAxis.REALIZATION: ("ra", "rb", "rc"),
         ResultAxis.OBJECTIVE: ("fa", "fb"),
@@ -155,8 +155,12 @@ def test_to_dataframe_formatter(
 ) -> None:
     enopt_config["variables"]["names"] = [("x", 0), ("x", 1)]
     config = EnOptConfig.model_validate(enopt_config)
-    function_result.config = config
-    frame = function_result.to_dataframe("evaluations", select=["variables"])
+    names: dict[ResultAxis, Any] = {
+        ResultAxis.VARIABLE: config.variables.get_formatted_names()
+    }
+    frame = function_result.to_dataframe(
+        "evaluations", select=["variables"], names=names
+    )
     assert (
         tuple(frame.index.get_level_values("variable"))
         == config.variables.get_formatted_names()
@@ -164,11 +168,19 @@ def test_to_dataframe_formatter(
     assert list(frame.index.get_level_values("variable")) == ["x:0", "x:1"]
 
 
-def test_to_dataframe_unstack(gradient_result: GradientResults) -> None:
+def test_to_dataframe_unstack(
+    enopt_config: Any, gradient_result: GradientResults
+) -> None:
+    config = EnOptConfig.model_validate(enopt_config)
+    names: dict[ResultAxis, Any] = {
+        ResultAxis.VARIABLE: config.variables.get_formatted_names(),
+        ResultAxis.REALIZATION: config.realizations.names,
+    }
     frame = gradient_result.to_dataframe(
         "evaluations",
         select=["perturbed_variables"],
         unstack=[ResultAxis.REALIZATION, ResultAxis.VARIABLE],
+        names=names,
     )
     assert frame.index.names == ["plan_id", "result_id", "batch_id", "perturbation"]
     assert list(frame.columns.values) == [
@@ -181,12 +193,21 @@ def test_to_dataframe_unstack(gradient_result: GradientResults) -> None:
     ]
 
 
-def test_to_dataframe_unstack2(gradient_result: GradientResults) -> None:
+def test_to_dataframe_unstack2(
+    enopt_config: Any, gradient_result: GradientResults
+) -> None:
+    config = EnOptConfig.model_validate(enopt_config)
+    names: dict[ResultAxis, Any] = {
+        ResultAxis.VARIABLE: config.variables.get_formatted_names(),
+        ResultAxis.REALIZATION: config.realizations.names,
+        ResultAxis.OBJECTIVE: config.objectives.names,
+    }
     assert gradient_result.gradients is not None
     frame = gradient_result.to_dataframe(
         "gradients",
         select=["objectives", "weighted_objective"],
         unstack=[ResultAxis.OBJECTIVE, ResultAxis.VARIABLE],
+        names=names,
     )
     assert list(frame.columns.values) == [
         ("objectives", "f1", "x"),
@@ -198,11 +219,19 @@ def test_to_dataframe_unstack2(gradient_result: GradientResults) -> None:
     ]
 
 
-def test_to_dataframe_unstack_only_variable(gradient_result: GradientResults) -> None:
+def test_to_dataframe_unstack_only_variable(
+    enopt_config: Any, gradient_result: GradientResults
+) -> None:
+    config = EnOptConfig.model_validate(enopt_config)
+    names: dict[ResultAxis, Any] = {
+        ResultAxis.VARIABLE: config.variables.get_formatted_names(),
+        ResultAxis.REALIZATION: config.realizations.names,
+    }
     frame = gradient_result.to_dataframe(
         "evaluations",
         select=["perturbed_objectives", "perturbed_variables"],
         unstack=[ResultAxis.VARIABLE],
+        names=names,
     )
     assert frame.index.names == [
         "plan_id",

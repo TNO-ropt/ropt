@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import partial
 from pathlib import Path  # noqa: TC003
 from typing import (
     TYPE_CHECKING,
@@ -12,9 +13,12 @@ from typing import (
     NoReturn,
 )
 
+from ropt.config.enopt import EnOptConfig
 from ropt.config.plan import PlanConfig
-from ropt.enums import EventType, OptimizerExitCode
+from ropt.enums import EventType, OptimizerExitCode, ResultAxis
 from ropt.exceptions import OptimizationAborted
+from ropt.report import ResultsTable
+from ropt.results import convert_to_maximize
 
 from ._context import OptimizerContext
 from ._plan import Plan
@@ -23,7 +27,6 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
-    from ropt.config.enopt import EnOptConfig
     from ropt.evaluator import Evaluator
     from ropt.plan import Event
     from ropt.results import FunctionResults
@@ -71,11 +74,11 @@ class BasicOptimizer:
             evaluator:            The evaluator object used to evaluate functions.
             constraint_tolerance: The tolerance level used to detect constraint violations.
         """
+        config = EnOptConfig.model_validate(enopt_config)
         self._optimizer_context = OptimizerContext(evaluator=evaluator)
         self._observers: list[tuple[EventType, Callable[[Event], None]]] = []
-        self._metadata: dict[str, Any] = {}
         self._variables = {
-            "__config__": enopt_config,
+            "__config__": config,
             "__optimum_tracker__": None,
             "__exit_code__": OptimizerExitCode.UNKNOWN,
         }
@@ -100,6 +103,16 @@ class BasicOptimizer:
             },
         ]
         self._results: _Results
+        self._names = {
+            ResultAxis.VARIABLE: config.variables.get_formatted_names(),
+            ResultAxis.OBJECTIVE: config.objectives.names,
+            ResultAxis.NONLINEAR_CONSTRAINT: (
+                config.nonlinear_constraints.names
+                if config.nonlinear_constraints is not None
+                else None
+            ),
+            ResultAxis.REALIZATION: config.realizations.names,
+        }
 
     @property
     def results(self) -> FunctionResults | None:
@@ -147,25 +160,6 @@ class BasicOptimizer:
         self._observers.append((event_type, function))
         return self
 
-    def add_metadata(self, metadata: dict[str, Any]) -> Self:
-        """Add metadata.
-
-        Add a dictionary of metadata that will be attached to each result object
-        generated during optimization.
-
-        Args:
-            metadata: The dictionary containing metadata to add to each result.
-
-        Returns:
-            The `BasicOptimizer` instance, allowing for method chaining.
-        """
-        for key, value in metadata.items():
-            if value is None:
-                del self._metadata[key]
-            else:
-                self._metadata[key] = value
-        return self
-
     def add_table(
         self,
         columns: dict[str, str],
@@ -177,7 +171,7 @@ class BasicOptimizer:
     ) -> Self:
         """Add a table of results.
 
-        This method instructs the runner to generate a table summarizing the
+        This method instructs the optimizer to generate a table summarizing the
         results of the optimization. This is implemented via a
         [`ResultsTable`][ropt.report.ResultsTable] object. Refer to its
         documentation for more details.
@@ -193,18 +187,12 @@ class BasicOptimizer:
         Returns:
             The `BasicOptimizer` instance, allowing for method chaining.
         """
-        self._handlers.append(
-            {
-                "run": "table",
-                "with": {
-                    "tags": "__optimizer_tag__",
-                    "columns": columns,
-                    "path": path,
-                    "table_type": table_type,
-                    "min_header_len": min_header_len,
-                    "maximize": maximize,
-                },
-            }
+        table = ResultsTable(
+            columns, path, table_type=table_type, min_header_len=min_header_len
+        )
+        self.add_observer(
+            EventType.FINISHED_EVALUATION,
+            partial(self._handle_report_event, table=table, maximize=maximize),
         )
         return self
 
@@ -246,3 +234,20 @@ class BasicOptimizer:
         the current function evaluation.
         """
         raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
+
+    def _handle_report_event(
+        self, event: Event, *, table: ResultsTable, maximize: bool
+    ) -> None:
+        if (
+            event.event_type == EventType.FINISHED_EVALUATION
+            and event.results is not None
+            and ("__optimizer_tag__" in event.tags)
+        ):
+            added = False
+            for item in event.results:
+                if table.add_results(
+                    convert_to_maximize(item) if maximize else item, names=self._names
+                ):
+                    added = True
+            if added:
+                table.save()

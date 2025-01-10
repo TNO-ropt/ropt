@@ -11,10 +11,9 @@ from typing import (
     TypeVar,
 )
 
-from ropt.enums import ResultAxis
-
 if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
+    from ropt.enums import ResultAxis
 
 
 _HAVE_PANDAS: Final = find_spec("pandas") is not None
@@ -77,7 +76,7 @@ class Results(ABC):
         field_name: str,
         select: Iterable[str] | None = None,
         unstack: Iterable[ResultAxis] | None = None,
-        names: dict[ResultAxis, tuple[str, ...]] | None = None,
+        names: dict[ResultAxis, tuple[str, ...] | None] | None = None,
     ) -> pd.DataFrame:
         """Export a field to a pandas dataframe.
 
@@ -128,22 +127,6 @@ class Results(ABC):
         if result_field is None:
             msg = f"Invalid result field: {field_name}"
             raise AttributeError(msg)
-
-        if names is None:
-            names = {
-                key: value
-                for key, value in {
-                    ResultAxis.VARIABLE: self.config.variables.get_formatted_names(),
-                    ResultAxis.OBJECTIVE: self.config.objectives.names,
-                    ResultAxis.NONLINEAR_CONSTRAINT: (
-                        self.config.nonlinear_constraints.names
-                        if self.config.nonlinear_constraints is not None
-                        else None
-                    ),
-                    ResultAxis.REALIZATION: self.config.realizations.names,
-                }.items()
-                if value is not None
-            }
 
         return _to_dataframe(
             result_field,

@@ -1308,7 +1308,12 @@ def test_table(enopt_config: dict[str, Any], evaluator: Any, tmp_path: Path) -> 
 
     def handle_results(event: Event) -> None:
         assert event.results is not None
-        table.add_results(event.results)
+        added = False
+        for item in event.results:
+            if isinstance(item, FunctionResults) and table.add_results(item):
+                added = True
+        if added:
+            table.save()
 
     context = OptimizerContext(evaluator=evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, handle_results

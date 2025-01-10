@@ -2,13 +2,18 @@
 
 from __future__ import annotations
 
+from dataclasses import fields
 from functools import partial
-from typing import TYPE_CHECKING, Iterable, Literal
+from importlib.util import find_spec
+from typing import TYPE_CHECKING, Any, Final, Literal
 
 from ropt.enums import ResultAxis
 from ropt.results import FunctionResults, GradientResults
 
-from ._utils import _HAVE_PANDAS, _add_metadata, _add_prefix, _get_select
+if TYPE_CHECKING:
+    from ropt.results import Results
+
+_HAVE_PANDAS: Final = find_spec("pandas") is not None
 
 if TYPE_CHECKING:
     from ropt.results import Results
@@ -26,7 +31,7 @@ class ResultsDataFrame:
 
     New results can be added to the stored DataFrame as they become available
     using the `add_results` method. The content of the DataFrame is taken from the
-    fields of the [`Results`][ropt.results.Results] objects passed during each call
+    fields of the [`Results`][ropt.results.Results] object passed during each call
     to `add_results`. The updated table can be retrieved at any time via the
     [`frame`][ropt.report.ResultsDataFrame.frame] property.
     """
@@ -51,11 +56,10 @@ class ResultsDataFrame:
         Note that many fields may, in fact, generate multiple columns in the
         resulting data frame. For instance, when specifying
         `evaluations.variables`, a column will be generated for each variable.
-        If available, names specified in the optimizer configuration, such as
-        variable names, will be used as column labels. Because the exported fields
-        may be multi-dimensional with names defined along each axis, for instance,
-        realizations and objectives, which both can be named, the final name may
-        consist of a tuple of names.
+        If available, variable names, will be used as column labels. Because
+        the exported fields may be multi-dimensional with names defined along
+        each axis, for instance, realizations and objectives, which both
+        can be named, the final name may consist of a tuple of names.
 
         The `table_type` argument is used to determine which type of results
         should be reported: either function evaluation results (`functions`) or
@@ -73,39 +77,50 @@ class ResultsDataFrame:
         self._table_type = table_type
         self._frame = pd.DataFrame()
 
-    def add_results(self, results: Iterable[Results]) -> bool:
-        """Add results to the table.
+    def add_results(
+        self,
+        results: Results,
+        names: dict[ResultAxis, tuple[str, ...] | None] | None = None,
+    ) -> bool:
+        """Add a results object to the table.
 
         This method can be called directly from any observers connected to
         events that produce results.
 
+        The `names` argument is an optional dictionary that maps axis types to
+        names, that are used to label the multi-index columns in the resulting
+        data frame. If not provided, numerical indices are used.
+
         Args:
             results: The results to add.
+            names:   A dictionary mapping axis types to names.
 
         Returns:
             True if a result was added, else False
         """
-        added = False
-        for item in results:
-            if (
-                self._table_type == "functions"
-                and isinstance(item, FunctionResults)
-                and item.functions is not None
-            ):
-                frame = _get_function_results(item, self._fields)
-            elif (
-                self._table_type == "gradients"
-                and isinstance(item, GradientResults)
-                and item.gradients is not None
-            ):
-                frame = _add_gradient_results(item, self._fields)
-            else:
-                continue
-            if not frame.empty:
-                frame = _add_metadata(frame, item, self._fields)
-                self._frame = pd.concat([self._frame, frame])
-                added = True
-        return added
+        if not isinstance(results, (FunctionResults, GradientResults)):
+            msg = "ResultsDataFrame.add_results() requires FunctionResults or GradientResults"
+            raise TypeError(msg)
+
+        frame: pd.DataFrame | None = None
+        if (
+            self._table_type == "functions"
+            and isinstance(results, FunctionResults)
+            and results.functions is not None
+        ):
+            frame = _get_function_results(results, self._fields, names)
+        elif (
+            self._table_type == "gradients"
+            and isinstance(results, GradientResults)
+            and results.gradients is not None
+        ):
+            frame = _get_gradient_results(results, self._fields, names)
+        if frame is not None:
+            frame = _add_metadata(frame, results, self._fields)
+            self._frame = pd.concat([self._frame, frame])
+            return True
+
+        return False
 
     @property
     def frame(self) -> pd.DataFrame:
@@ -117,7 +132,11 @@ class ResultsDataFrame:
         return self._frame
 
 
-def _get_function_results(results: Results, sub_fields: set[str]) -> pd.DataFrame:
+def _get_function_results(
+    results: Results,
+    sub_fields: set[str],
+    names: dict[ResultAxis, tuple[str, ...] | None] | None,
+) -> pd.DataFrame:
     if (
         not sub_fields
         or not isinstance(results, FunctionResults)
@@ -129,6 +148,7 @@ def _get_function_results(results: Results, sub_fields: set[str]) -> pd.DataFram
         "functions",
         select=_get_select(results, "functions", sub_fields),
         unstack=[ResultAxis.OBJECTIVE, ResultAxis.NONLINEAR_CONSTRAINT],
+        names=names,
     ).rename(columns=partial(_add_prefix, prefix="functions"))
 
     bound_constraints = (
@@ -138,6 +158,7 @@ def _get_function_results(results: Results, sub_fields: set[str]) -> pd.DataFram
             "bound_constraints",
             select=_get_select(results, "bound_constraints", sub_fields),
             unstack=[ResultAxis.VARIABLE],
+            names=names,
         ).rename(columns=partial(_add_prefix, prefix="bound_constraints"))
     )
 
@@ -148,6 +169,7 @@ def _get_function_results(results: Results, sub_fields: set[str]) -> pd.DataFram
             "linear_constraints",
             select=_get_select(results, "linear_constraints", sub_fields),
             unstack=[ResultAxis.LINEAR_CONSTRAINT],
+            names=names,
         ).rename(columns=partial(_add_prefix, prefix="linear_constraints"))
     )
 
@@ -158,6 +180,7 @@ def _get_function_results(results: Results, sub_fields: set[str]) -> pd.DataFram
             "nonlinear_constraints",
             select=_get_select(results, "nonlinear_constraints", sub_fields),
             unstack=[ResultAxis.NONLINEAR_CONSTRAINT],
+            names=names,
         ).rename(columns=partial(_add_prefix, prefix="nonlinear_constraints"))
     )
 
@@ -169,6 +192,7 @@ def _get_function_results(results: Results, sub_fields: set[str]) -> pd.DataFram
             ResultAxis.OBJECTIVE,
             ResultAxis.NONLINEAR_CONSTRAINT,
         ],
+        names=names,
     ).rename(columns=partial(_add_prefix, prefix="evaluations"))
 
     return _join_frames(
@@ -180,7 +204,11 @@ def _get_function_results(results: Results, sub_fields: set[str]) -> pd.DataFram
     )
 
 
-def _add_gradient_results(results: Results, sub_fields: set[str]) -> pd.DataFrame:
+def _get_gradient_results(
+    results: Results,
+    sub_fields: set[str],
+    names: dict[ResultAxis, tuple[str, ...] | None] | None,
+) -> pd.DataFrame:
     if (
         not sub_fields
         or not isinstance(results, GradientResults)
@@ -196,6 +224,7 @@ def _add_gradient_results(results: Results, sub_fields: set[str]) -> pd.DataFram
             ResultAxis.NONLINEAR_CONSTRAINT,
             ResultAxis.VARIABLE,
         ],
+        names=names,
     ).rename(columns=partial(_add_prefix, prefix="gradients"))
 
     evaluations = results.to_dataframe(
@@ -206,6 +235,7 @@ def _add_gradient_results(results: Results, sub_fields: set[str]) -> pd.DataFram
             ResultAxis.OBJECTIVE,
             ResultAxis.NONLINEAR_CONSTRAINT,
         ],
+        names=names,
     ).rename(columns=partial(_add_prefix, prefix="evaluations"))
 
     return _join_frames(gradients, evaluations)
@@ -216,3 +246,43 @@ def _join_frames(*args: pd.DataFrame) -> pd.DataFrame:
     return (
         frames[0].join(list(frames[1:]), how="outer") if len(frames) > 1 else frames[0]
     )
+
+
+def _get_select(results: Results, field_name: str, sub_fields: set[str]) -> list[str]:
+    results_field = getattr(results, field_name)
+    return [
+        name
+        for name in {field.name for field in fields(results_field)}
+        if f"{field_name}.{name}" in sub_fields
+    ]
+
+
+def _add_prefix(name: tuple[str, ...] | str, prefix: str) -> tuple[str, ...] | str:
+    return (
+        (f"{prefix}.{name[0]}",) + name[1:]
+        if isinstance(name, tuple)
+        else f"{prefix}.{name}"
+    )
+
+
+def _add_metadata(
+    data_frame: pd.DataFrame, results: Results, sub_fields: set[str]
+) -> pd.DataFrame:
+    for field in sub_fields:
+        split_fields = field.split(".")
+        if split_fields[0] == "metadata":
+            value = _get_value(results.metadata, split_fields[1:])
+            if value is not None:
+                data_frame[field] = value
+    return data_frame
+
+
+def _get_value(data: dict[str, Any], keys: list[str]) -> Any | None:  # noqa: ANN401
+    for key in keys:
+        if isinstance(data, dict):
+            if key not in data:
+                return None
+            data = data[key]
+        else:
+            break
+    return data
