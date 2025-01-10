@@ -243,7 +243,6 @@ class EnsembleEvaluator:
             result_id=next(self._result_id_iter),
             batch_id=f_eval_results.batch_id,
             metadata={},
-            config=self._config,
             evaluations=evaluations,
             realizations=Realizations(
                 failed_realizations=failed_realizations,
@@ -323,7 +322,6 @@ class EnsembleEvaluator:
                 result_id=next(self._result_id_iter),
                 batch_id=g_eval_results.batch_id,
                 metadata={},
-                config=self._config,
                 evaluations=GradientEvaluations.create(
                     config=self._config,
                     variables=variables,
@@ -422,7 +420,6 @@ class EnsembleEvaluator:
             result_id=next(self._result_id_iter),
             batch_id=f_eval_results.batch_id,
             metadata={},
-            config=self._config,
             evaluations=evaluations,
             realizations=Realizations(
                 failed_realizations=failed_realizations,
@@ -468,7 +465,6 @@ class EnsembleEvaluator:
             result_id=next(self._result_id_iter),
             batch_id=g_eval_results.batch_id,
             metadata={},
-            config=self._config,
             evaluations=GradientEvaluations.create(
                 config=self._config,
                 variables=variables,

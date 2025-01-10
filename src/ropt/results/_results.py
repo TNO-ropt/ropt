@@ -12,7 +12,6 @@ from typing import (
 )
 
 if TYPE_CHECKING:
-    from ropt.config.enopt import EnOptConfig
     from ropt.enums import ResultAxis
 
 
@@ -42,7 +41,6 @@ class Results(ABC):
        generic information, the nature of which depends on the steps producing
        them. They are expected to be primitive values not interpreted by the
        optimization code but can be exported and reported.
-    5. The config object that was used to generate the result.
 
     The `Results` class is an abstract base class that is not intended to be
     instantiated by itself. Most data of interest will be stored in additional
@@ -62,14 +60,12 @@ class Results(ABC):
         result_id: The ID of the function/gradient evaluation.
         batch_id:  The ID of the evaluation batch that contains the result.
         metadata:  The metadata.
-        config:    The config object used while generating the result.
     """
 
     plan_id: tuple[int, ...]
     result_id: int | tuple[int, ...]
     batch_id: int | None
     metadata: dict[str, Any]
-    config: EnOptConfig
 
     def to_dataframe(
         self,

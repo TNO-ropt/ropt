@@ -60,7 +60,6 @@ def function_result_fixture(enopt_config: Any) -> FunctionResults:
         result_id=0,
         batch_id=1,
         metadata={},
-        config=config,
         evaluations=evaluations,
         realizations=realizations,
         functions=functions,
@@ -68,8 +67,7 @@ def function_result_fixture(enopt_config: Any) -> FunctionResults:
 
 
 @pytest.fixture(name="gradient_result")
-def gradient_result_fixture(enopt_config: Any) -> GradientResults:
-    config = EnOptConfig.model_validate(enopt_config)
+def gradient_result_fixture() -> GradientResults:
     evaluations = GradientEvaluations(
         variables=np.array([1.0, 2.0]),
         perturbed_variables=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
@@ -84,7 +82,6 @@ def gradient_result_fixture(enopt_config: Any) -> GradientResults:
         result_id=0,
         batch_id=1,
         metadata={},
-        config=config,
         evaluations=evaluations,
         realizations=Realizations(
             failed_realizations=np.zeros(36, dtype=np.bool_),
