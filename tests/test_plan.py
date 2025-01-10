@@ -1335,53 +1335,6 @@ def test_table(enopt_config: dict[str, Any], evaluator: Any, tmp_path: Path) -> 
     assert filecmp.cmp(path1, path2)
 
 
-def test_table_handler(
-    enopt_config: dict[str, Any], evaluator: Any, tmp_path: Path
-) -> None:
-    enopt_config["optimizer"]["max_functions"] = 5
-
-    path1 = tmp_path / "results1.txt"
-    plan_config = {
-        "variables": {
-            "enopt_config": enopt_config,
-        },
-        "steps": [
-            {
-                "optimizer": {"config": "$enopt_config", "tags": "opt"},
-            },
-        ],
-        "handlers": [
-            {
-                "table": {
-                    "tags": "opt",
-                    "columns": {
-                        "result_id": "eval-ID",
-                        "evaluations.variables": "Variables",
-                    },
-                    "path": path1,
-                },
-            },
-        ],
-    }
-
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(PlanConfig.model_validate(plan_config), context)
-    plan.run()
-
-    assert path1.exists()
-    with path1.open() as fp:
-        assert len(fp.readlines()) == 8
-
-    path2 = tmp_path / "results2.txt"
-    BasicOptimizer(enopt_config, evaluator()).add_table(
-        columns={"result_id": "eval-ID", "evaluations.variables": "Variables"},
-        path=path2,
-    ).run()
-    assert path2.exists()
-
-    assert filecmp.cmp(path1, path2)
-
-
 @pytest.mark.parametrize("file_format", ["json", "pickle"])
 def test_save_step(evaluator: Any, file_format: str, tmp_path: Path) -> None:
     path = tmp_path / "vars"

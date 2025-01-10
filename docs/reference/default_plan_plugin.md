@@ -37,7 +37,3 @@
 ::: ropt.plugins.plan._tracker.DefaultTrackerHandler
     options:
         members: [DefaultTrackerHandlerWith]
-
-::: ropt.plugins.plan._table.DefaultTableHandler
-    options:
-        members: [DefaultTableHandlerWith]
