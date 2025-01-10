@@ -736,15 +736,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.BasicOptimizer.add_metadata" class="md-nav__link">
-    <span class="md-ellipsis">
-      add_metadata
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plan.BasicOptimizer.add_table" class="md-nav__link">
     <span class="md-ellipsis">
       add_table
@@ -1375,15 +1366,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.BasicOptimizer.add_metadata" class="md-nav__link">
-    <span class="md-ellipsis">
-      add_metadata
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plan.BasicOptimizer.add_table" class="md-nav__link">
     <span class="md-ellipsis">
       add_table
@@ -1787,79 +1769,6 @@ type.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plan.BasicOptimizer.add_metadata" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">add_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span></code>
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Add metadata.</p>
-<p>Add a dictionary of metadata that will be attached to each result object
-generated during optimization.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>metadata</code>
-            </td>
-            <td>
-                  <code>dict[str, <span title="typing.Any">Any</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The dictionary containing metadata to add to each result.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="typing.Self">Self</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The <code>BasicOptimizer</code> instance, allowing for method chaining.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
 <h3 id="ropt.plan.BasicOptimizer.add_table" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">add_table</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;functions&#39;</span><span class="p">,</span> <span class="n">min_header_len</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">maximize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
@@ -1869,7 +1778,7 @@ generated during optimization.</p>
     <div class="doc doc-contents ">
 
         <p>Add a table of results.</p>
-<p>This method instructs the runner to generate a table summarizing the
+<p>This method instructs the optimizer to generate a table summarizing the
 results of the optimization. This is implemented via a
 <a class="autorefs autorefs-internal" href="../reporting/#ropt.report.ResultsTable"><code>ResultsTable</code></a> object. Refer to its
 documentation for more details.</p>

@@ -836,9 +836,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.report.ResultsTable.add_results" class="md-nav__link">
+  <a href="#ropt.report.ResultsTable.save" class="md-nav__link">
     <span class="md-ellipsis">
-      add_results
+      save
     </span>
   </a>
   
@@ -1385,9 +1385,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.report.ResultsTable.add_results" class="md-nav__link">
+  <a href="#ropt.report.ResultsTable.save" class="md-nav__link">
     <span class="md-ellipsis">
-      add_results
+      save
     </span>
   </a>
   
@@ -1478,7 +1478,7 @@ a tabular format using the <a class="autorefs autorefs-internal" href="#ropt.rep
 <a href="https://pandas.pydata.org/"><code>pandas</code></a> DataFrame.</p>
 <p>New results can be added to the stored DataFrame as they become available
 using the <code>add_results</code> method. The content of the DataFrame is taken from the
-fields of the <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a> objects passed during each call
+fields of the <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a> object passed during each call
 to <code>add_results</code>. The updated table can be retrieved at any time via the
 <a class="autorefs autorefs-internal" href="#ropt.report.ResultsDataFrame.frame"><code>frame</code></a> property.</p>
 
@@ -1567,11 +1567,10 @@ the specification would be <code>evaluations.variables</code>.</p>
 <p>Note that many fields may, in fact, generate multiple columns in the
 resulting data frame. For instance, when specifying
 <code>evaluations.variables</code>, a column will be generated for each variable.
-If available, names specified in the optimizer configuration, such as
-variable names, will be used as column labels. Because the exported fields
-may be multi-dimensional with names defined along each axis, for instance,
-realizations and objectives, which both can be named, the final name may
-consist of a tuple of names.</p>
+If available, variable names, will be used as column labels. Because
+the exported fields may be multi-dimensional with names defined along
+each axis, for instance, realizations and objectives, which both
+can be named, the final name may consist of a tuple of names.</p>
 <p>The <code>table_type</code> argument is used to determine which type of results
 should be reported: either function evaluation results (<code>functions</code>) or
 gradient results (<code>gradients</code>).</p>
@@ -1631,16 +1630,19 @@ gradient results (<code>gradients</code>).</p>
 
 
 <h4 id="ropt.report.ResultsDataFrame.add_results" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">add_results</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">add_results</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
 
     <div class="doc doc-contents ">
 
-        <p>Add results to the table.</p>
+        <p>Add a results object to the table.</p>
 <p>This method can be called directly from any observers connected to
 events that produce results.</p>
+<p>The <code>names</code> argument is an optional dictionary that maps axis types to
+names, that are used to label the multi-index columns in the resulting
+data frame. If not provided, numerical indices are used.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1659,7 +1661,7 @@ events that produce results.</p>
                 <code>results</code>
             </td>
             <td>
-                  <code><span title="typing.Iterable">Iterable</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1668,6 +1670,22 @@ events that produce results.</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>names</code>
+            </td>
+            <td>
+                  <code>dict[<a class="autorefs autorefs-internal" title="ropt.enums.ResultAxis" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a>, tuple[str, ...] | None] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary mapping axis types to names.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -1900,71 +1918,15 @@ min_header_len, empty lines will be added. For example:</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.report.ResultsTable.add_results" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">add_results</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></code>
+<h4 id="ropt.report.ResultsTable.save" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">save</span><span class="p">()</span></code>
 
 </h4>
 
 
     <div class="doc doc-contents ">
 
-        <p>Add results to the table.</p>
-<p>This method can be called directly from any observers connected to
-events that produce results.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>results</code>
-            </td>
-            <td>
-                  <code><span title="typing.Iterable">Iterable</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The results to add.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code>bool</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>True if a result was added, else False</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Write the table to a file.</p>
 
     </div>
 

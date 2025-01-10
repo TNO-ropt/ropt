@@ -1801,7 +1801,7 @@ classes:</p>
 
 
 <h4 id="ropt.results.Results.to_dataframe" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">to_dataframe</span><span class="p">(</span><span class="n">field_name</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">unstack</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">to_dataframe</span><span class="p">(</span><span class="n">field_name</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">unstack</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
@@ -1817,10 +1817,10 @@ a sub-set can be selected using the <code>select</code> argument.</p>
 <p>Any of the sub-fields in the field that is exported may be a
 multi-dimensional array, which is exported in a stacked manner. Using
 the axis types found in the metadata, the exporter will construct a
-multi-index labeled with the corresponding names found in the optimizer
-configuration (if available, otherwise numerical indices are used). Such
-multi-indices can optionally be unstacked into multiple columns by
-providing the axis types to unstack via the <code>unstack</code> argument.</p>
+multi-index labeled with the corresponding names provided via the
+<code>names</code> argument. If <code>names</code> is <code>None</code>, numerical indices are used.
+Such multi-indices can optionally be unstacked into multiple columns
+by providing the axis types to unstack via the <code>unstack</code> argument.</p>
 
 
 <details class="info" open>
@@ -1887,6 +1887,22 @@ result ID and/or batch ID.</p>
             <td>
               <div class="doc-md-description">
                 <p>Select axes to unstack, by default none.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>names</code>
+            </td>
+            <td>
+                  <code>dict[<a class="autorefs autorefs-internal" title="ropt.enums.ResultAxis" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a>, tuple[str, ...] | None] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary mapping axis types to names.</p>
               </div>
             </td>
             <td>
@@ -2112,7 +2128,7 @@ array from the metadata and return them.</p>
 
 
 <h4 id="ropt.results.ResultField.to_dict" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">to_dict</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">to_dict</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
@@ -2122,12 +2138,12 @@ array from the metadata and return them.</p>
         <p>Convert a field of ResultsField to a dictionary.</p>
 <p>The keys of the output correspond to the indices of the axis of the
 field given by <code>axis</code>. The values are a slice of the field value at each
-index. If the given <code>config</code> object contains the names of the objects
-stored along the axis, these are used as keys in the output dictionary
-rather than the numerical indices.</p>
+index. If <code>names</code> contains the names of the objects stored along the axis,
+these are used as keys in the output dictionary rather than the numerical
+indices.</p>
 <p>If <code>axis</code> is <code>None</code> (the default), a default is chosen using the following logic:</p>
 <ol>
-<li>If the field has a <code>ResultAxis.OBJECTIVE</code> axis, is used.</li>
+<li>If the field has a <code>ResultAxis.OBJECTIVE</code> axis, it is used.</li>
 <li>If the field has a <code>ResultAxis.NONLINEAR_CONSTRAINT</code> axis, it is used.</li>
 <li>Otherwise, use the last axis.</li>
 </ol>
@@ -2144,22 +2160,6 @@ rather than the numerical indices.</p>
         </tr>
       </thead>
       <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>config</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The configuration object.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
           <tr class="doc-section-item">
             <td>
                 <code>name</code>
@@ -2186,6 +2186,22 @@ rather than the numerical indices.</p>
             <td>
               <div class="doc-md-description">
                 <p>Axis to use as the keys.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>names</code>
+            </td>
+            <td>
+                  <code>dict[<a class="autorefs autorefs-internal" title="ropt.enums.ResultAxis" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a>, tuple[str, ...]] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary mapping axis types to names.</p>
               </div>
             </td>
             <td>
