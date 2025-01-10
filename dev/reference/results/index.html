@@ -1694,7 +1694,6 @@ multiple columns.</p>
    generic information, the nature of which depends on the steps producing
    them. They are expected to be primitive values not interpreted by the
    optimization code but can be exported and reported.</li>
-<li>The config object that was used to generate the result.</li>
 </ol>
 <p>The <code>Results</code> class is an abstract base class that is not intended to be
 instantiated by itself. Most data of interest will be stored in additional
@@ -1762,17 +1761,6 @@ classes:</p>
             <td>
               <div class="doc-md-description">
                 <p>The metadata.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.Results.config">config</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The config object used while generating the result.</p>
               </div>
             </td>
           </tr>
