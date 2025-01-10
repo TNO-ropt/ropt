@@ -1241,30 +1241,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._table.DefaultTableHandler" class="md-nav__link">
-    <span class="md-ellipsis">
-      DefaultTableHandler
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DefaultTableHandler">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._table.DefaultTableHandler.DefaultTableHandlerWith" class="md-nav__link">
-    <span class="md-ellipsis">
-      DefaultTableHandlerWith
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1715,30 +1691,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._table.DefaultTableHandler" class="md-nav__link">
-    <span class="md-ellipsis">
-      DefaultTableHandler
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DefaultTableHandler">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._table.DefaultTableHandler.DefaultTableHandlerWith" class="md-nav__link">
-    <span class="md-ellipsis">
-      DefaultTableHandlerWith
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1832,12 +1784,6 @@
 <ul>
 <li>A handler that tracks optimal results
 (<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._tracker.DefaultTrackerHandler"><code>tracker</code></a>).</li>
-</ul>
-</dd>
-<dd>
-<ul>
-<li>A handler that generates and saves tables of results
-(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._table.DefaultTableHandler"><code>table</code></a>).</li>
 </ul>
 </dd>
 </dl>
@@ -3321,193 +3267,6 @@ assisting result handlers in filtering relevant results.</p>
             <td>
               <div class="doc-md-description">
                 <p>An optional constraint tolerance level.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ropt.plugins.plan._table.DefaultTableHandler" class="doc doc-heading">
-            <code>ropt.plugins.plan._table.DefaultTableHandler</code>
-
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.ResultHandler" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler">ResultHandler</a></code></p>
-
-
-        <p>The default table results handler object.</p>
-<p>The table results handler generates a table that summarizes the results it
-receives. This is implemented through a
-<a class="autorefs autorefs-internal" href="../reporting/#ropt.report.ResultsTable"><code>ResultsTable</code></a> object; refer to its
-documentation for detailed information on table generation and formatting.</p>
-<p>This table handler uses the <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._table.DefaultTableHandler.DefaultTableHandlerWith"><code>DefaultTableHandlerWith</code></a>
-configuration class to parse the <code>with</code> field in the
-<a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.ResultHandlerConfig"><code>ResultHandler</code></a> used to specify this
-handler in a plan configuration.</p>
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.plugins.plan._table.DefaultTableHandler.DefaultTableHandlerWith" class="doc doc-heading">
-            <code>DefaultTableHandlerWith</code>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
-
-
-        <p>Parameters for the table results handler.</p>
-<p>The <code>columns</code>, <code>path</code>, <code>table_type</code>, and <code>min_header_len</code> fields
-correspond to the parameters of the
-<a class="autorefs autorefs-internal" href="../reporting/#ropt.report.ResultsTable"><code>ResultsTable</code></a> constructor. Refer to its
-documentation for more detailed information on these arguments.</p>
-<p>The <code>maximize</code> field allows adaptation for maximization problems.
-Typically, results are generated for minimization problems, but setting
-<code>maximize</code> to <code>True</code> will invert this interpretation for scenarios where
-the negative of an objective function is minimized.</p>
-<p>The <code>tags</code> field enables optional labels to be attached to results,
-which assists in filtering relevant results for the table.</p>
-
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._table.DefaultTableHandler.DefaultTableHandlerWith.tags">tags</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.ItemOrSet" href="../utilities/#ropt.config.validated_types.ItemOrSet">ItemOrSet</a>[str]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Tags of the sources to track.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._table.DefaultTableHandler.DefaultTableHandlerWith.columns">columns</span></code></td>
-            <td>
-                  <code>dict[str, str]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A mapping of column names for the results table.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._table.DefaultTableHandler.DefaultTableHandlerWith.path">path</span></code></td>
-            <td>
-                  <code><span title="pathlib.Path">Path</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The file path where the results table will be saved.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._table.DefaultTableHandler.DefaultTableHandlerWith.table_type">table_type</span></code></td>
-            <td>
-                  <code><span title="typing.Literal">Literal</span>[&#39;functions&#39;, &#39;gradients&#39;]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The format or type of table to generate.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._table.DefaultTableHandler.DefaultTableHandlerWith.min_header_len">min_header_len</span></code></td>
-            <td>
-                  <code>int | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The minimum number of header lines to include.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._table.DefaultTableHandler.DefaultTableHandlerWith.maximize">maximize</span></code></td>
-            <td>
-                  <code>bool</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If <code>True</code>, interprets results as a maximization
-            problem rather than the default minimization.</p>
               </div>
             </td>
           </tr>
