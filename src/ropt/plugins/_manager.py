@@ -61,7 +61,7 @@ class PluginManager:
         facilitate this, it should derive from the
         [`OptimizerPlugin`][ropt.plugins.optimizer.base.OptimizerPlugin] class.
 
-        Plugins can also be added dynamically using the `add_plugins` method.
+        Plugins can also be added dynamically using the `add_plugin` method.
         """
         # Built-in plugins, listed for all possible plugin types:
         self._plugins: dict[PluginType, dict[str, Plugin]] = {
@@ -73,36 +73,54 @@ class PluginManager:
         }
 
         for plugin_type in self._plugins:
-            self.add_plugins(plugin_type, _from_entry_points(plugin_type))
+            for name, plugin in _from_entry_points(plugin_type).items():
+                self.add_plugin(plugin_type, name, plugin)
 
-    def add_plugins(self, plugin_type: PluginType, plugins: dict[str, Plugin]) -> None:
+    def add_plugin(
+        self,
+        plugin_type: PluginType,
+        name: str,
+        plugin: Plugin,
+        *,
+        prioritize: bool = False,
+    ) -> None:
         """Add a plugin at runtime.
 
-        This method adds one or more plugins of a specific type to the plugin
-        manager. The `plugins` argument maps the names of the new plugins to
-        [`Plugin`][ropt.plugins.Plugin] object.
+        This method adds a plugins of a specific type to the plugin
+        manager. Normally it will be added at the end of the internal list
+        of plugins that may be searched for a method. However, if the `prioritize`
+        keyword is set, it will be added at the beginning of the list.
 
         The plugin names are case-insensitive.
 
         Args:
             plugin_type: Type of the plugin.
-            plugins:     Dictionary of plugins.
+            name:        The name of the plugin.
+            plugin:      The plugin object.
+            prioritize:  If `True`, the plugin will be added to the beginning of list.
         """
-        for name, plugin in plugins.items():
-            name_lower = name.lower()
-            if name_lower in self._plugins[plugin_type]:
-                msg = f"Duplicate plugin name: {name_lower}"
-                raise ConfigError(msg)
+        name_lower = name.lower()
+        if name_lower in self._plugins[plugin_type]:
+            msg = f"Duplicate plugin name: {name_lower}"
+            raise ConfigError(msg)
+        if prioritize:
+            plugins = self._plugins[plugin_type]
+            self._plugins[plugin_type] = {name_lower: plugin}
+            self._plugins[plugin_type].update(dict(plugins))
+        else:
             self._plugins[plugin_type][name_lower] = plugin
 
     def get_plugin(self, plugin_type: PluginType, method: str) -> Any:  # noqa: ANN401
         """Retrieve a plugin by type and method name.
 
+        If the method name is of the form "_plugin-name/method-name_", the method
+        _method-name_ will be retrieved from the given plugin _plugin-name_.
+
         If the given method name does not contain a slash (/), the plugin
         manager will search through all plugins and return the first plugin that
-        supports the requested method. If the method name is of the form
-        "_plugin-name/method-name_", the method _method-name_ will be retrieved
-        from the given plugin _plugin-name_.
+        supports the requested method. Searching occurs in the order that plugins
+        were added to the manager, which normally will be one of the plugins loaded
+        via entry points, but plugins added dynamically can be prioritized.
 
         Args:
             plugin_type: The type of the plugin to retrieve.
@@ -113,7 +131,9 @@ class PluginManager:
             plugin = self._plugins[plugin_type].get(split_method[0].lower())
             if plugin and plugin.is_supported(split_method[1]):
                 return plugin
-        elif split_method[0] != "default":
+        else:
+            if split_method[0] == "default":
+                msg = "Cannot specify 'default' method without a plugin name"
             for plugin in self._plugins[plugin_type].values():
                 if plugin.allows_discovery and plugin.is_supported(split_method[0]):
                     return plugin
