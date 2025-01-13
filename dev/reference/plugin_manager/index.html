@@ -931,6 +931,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.Plugin.allows_discovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      allows_discovery
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1424,6 +1433,15 @@
   <a href="#ropt.plugins.Plugin.is_supported" class="md-nav__link">
     <span class="md-ellipsis">
       is_supported
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.Plugin.allows_discovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      allows_discovery
     </span>
   </a>
   
@@ -2002,7 +2020,7 @@ form "<em>plugin-name/method-name</em>", <code>True</code> will be returned if t
 
 
 <h4 id="ropt.plugins.Plugin.is_supported" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">is_supported</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">explicit</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">is_supported</span><span class="p">(</span><span class="n">method</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -2018,21 +2036,6 @@ form "<em>plugin-name/method-name</em>", <code>True</code> will be returned if t
 <a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager.is_supported"><code>is_supported</code></a> method of
 <a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager"><code>PluginManager</code></a> objects to verify if a
 specific method is supported by this plugin.</p>
-<p>If the <code>explicit</code> flag is set to <code>True</code>, the plugin has been explicitly
-requested. In this case, <code>True</code> should be returned if the specified
-optimization method is supported.</p>
-<p>If <code>explicit</code> is <code>False</code>, the plugin manager is performing a general
-search across all available plugins for the requested method. In this
-scenario, <code>True</code> should only be returned if the plugin's method is
-compatible with this search. If the search compatibility is not
-supported, then <code>False</code> should be returned, even if the plugin
-technically supports the requested method.</p>
-<p>For example, the
-<a class="autorefs autorefs-internal" href="../external_optimizer_plugin/#ropt.plugins.optimizer.external.ExternalOptimizer"><code>external</code></a>
-optimizer plugin does not define its own methods but launches methods
-from other plugins as an external process. Therefore, the <code>external</code>
-optimizer plugin must always be specified explicitly. As a result, its
-<code>is_supported</code> method returns <code>False</code> if <code>explicit</code> is <code>False</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2056,22 +2059,6 @@ optimizer plugin must always be specified explicitly. As a result, its
             <td>
               <div class="doc-md-description">
                 <p>The name of the method to check.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>explicit</code>
-            </td>
-            <td>
-                  <code>bool</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Indicates whether the plugin was explicitly requested.</p>
               </div>
             </td>
             <td>
@@ -2104,6 +2091,42 @@ optimizer plugin must always be specified explicitly. As a result, its
       </tbody>
     </table>
 
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.plugins.Plugin.allows_discovery" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">allows_discovery</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Check if the plugin can be discovered automatically.</p>
+<p>Normally, plugins may be discovered automatically by the plugin manager
+by checking if they support a specific method. However, some plugins may
+not support this behavior and should be explicitly requested. These
+should override this property to return <code>False</code>.</p>
+<p>For example, the
+<a class="autorefs autorefs-internal" href="../external_optimizer_plugin/#ropt.plugins.optimizer.external.ExternalOptimizer"><code>external</code></a>
+optimizer plugin does not define its own methods but launches methods
+from other plugins as an external process. Therefore, the <code>external</code>
+optimizer plugin must always be specified explicitly, and this method
+is overloaded to return False.</p>
     </div>
 
 </div>
