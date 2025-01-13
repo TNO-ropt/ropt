@@ -863,9 +863,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.PluginManager.add_plugins" class="md-nav__link">
+  <a href="#ropt.plugins.PluginManager.add_plugin" class="md-nav__link">
     <span class="md-ellipsis">
-      add_plugins
+      add_plugin
     </span>
   </a>
   
@@ -1370,9 +1370,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.PluginManager.add_plugins" class="md-nav__link">
+  <a href="#ropt.plugins.PluginManager.add_plugin" class="md-nav__link">
     <span class="md-ellipsis">
-      add_plugins
+      add_plugin
     </span>
   </a>
   
@@ -1541,7 +1541,7 @@ base class defining the required functionality for each plugin type:</p>
 </ol>
 <p>Plugins can be built-in, installed separately using the standard entry points
 mechanism, or added dynamically using the
-<a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager.add_plugins"><code>add_plugins</code></a> method.</p>
+<a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager.add_plugin"><code>add_plugin</code></a> method.</p>
 <p>The plugin manager object provides the
 <a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager.get_plugin"><code>get_plugin</code></a> method, which <code>ropt</code> uses
 to retrieve the necessary plugin based on its type and name. Given the plugin's
@@ -1637,7 +1637,7 @@ will be used to create
 <a class="autorefs autorefs-internal" href="../optimizer_plugins/#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> objects and to
 facilitate this, it should derive from the
 <a class="autorefs autorefs-internal" href="../optimizer_plugins/#ropt.plugins.optimizer.base.OptimizerPlugin"><code>OptimizerPlugin</code></a> class.</p>
-<p>Plugins can also be added dynamically using the <code>add_plugins</code> method.</p>
+<p>Plugins can also be added dynamically using the <code>add_plugin</code> method.</p>
 
     </div>
 
@@ -1651,8 +1651,8 @@ facilitate this, it should derive from the
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.PluginManager.add_plugins" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">add_plugins</span><span class="p">(</span><span class="n">plugin_type</span><span class="p">,</span> <span class="n">plugins</span><span class="p">)</span></code>
+<h4 id="ropt.plugins.PluginManager.add_plugin" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">add_plugin</span><span class="p">(</span><span class="n">plugin_type</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">plugin</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">prioritize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 </h4>
 
@@ -1660,9 +1660,10 @@ facilitate this, it should derive from the
     <div class="doc doc-contents ">
 
         <p>Add a plugin at runtime.</p>
-<p>This method adds one or more plugins of a specific type to the plugin
-manager. The <code>plugins</code> argument maps the names of the new plugins to
-<a class="autorefs autorefs-internal" href="#ropt.plugins.Plugin"><code>Plugin</code></a> object.</p>
+<p>This method adds a plugins of a specific type to the plugin
+manager. Normally it will be added at the end of the internal list
+of plugins that may be searched for a method. However, if the <code>prioritize</code>
+keyword is set, it will be added at the beginning of the list.</p>
 <p>The plugin names are case-insensitive.</p>
 
 
@@ -1695,18 +1696,50 @@ manager. The <code>plugins</code> argument maps the names of the new plugins to
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>plugins</code>
+                <code>name</code>
             </td>
             <td>
-                  <code>dict[str, <a class="autorefs autorefs-internal" title="ropt.plugins.base.Plugin" href="#ropt.plugins.Plugin">Plugin</a>]</code>
+                  <code>str</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Dictionary of plugins.</p>
+                <p>The name of the plugin.</p>
               </div>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>plugin</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.base.Plugin" href="#ropt.plugins.Plugin">Plugin</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The plugin object.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>prioritize</code>
+            </td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>True</code>, the plugin will be added to the beginning of list.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
             </td>
           </tr>
       </tbody>
@@ -1733,11 +1766,13 @@ manager. The <code>plugins</code> argument maps the names of the new plugins to
     <div class="doc doc-contents ">
 
         <p>Retrieve a plugin by type and method name.</p>
+<p>If the method name is of the form "<em>plugin-name/method-name</em>", the method
+<em>method-name</em> will be retrieved from the given plugin <em>plugin-name</em>.</p>
 <p>If the given method name does not contain a slash (/), the plugin
 manager will search through all plugins and return the first plugin that
-supports the requested method. If the method name is of the form
-"<em>plugin-name/method-name</em>", the method <em>method-name</em> will be retrieved
-from the given plugin <em>plugin-name</em>.</p>
+supports the requested method. Searching occurs in the order that plugins
+were added to the manager, which normally will be one of the plugins loaded
+via entry points, but plugins added dynamically can be prioritized.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
