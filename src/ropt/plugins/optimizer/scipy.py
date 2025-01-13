@@ -582,7 +582,7 @@ class SciPyOptimizerPlugin(OptimizerPlugin):
         """
         return SciPyOptimizer(config, optimizer_callback)
 
-    def is_supported(self, method: str, *, explicit: bool) -> bool:  # noqa: ARG002
+    def is_supported(self, method: str) -> bool:
         """Check if a method is supported.
 
         See the [ropt.plugins.base.Plugin][] abstract base class.

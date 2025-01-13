@@ -95,7 +95,7 @@ class MockedSamplerPlugin(SamplerPlugin):
     ) -> MockedSampler:
         return MockedSampler(enopt_config, sampler_index, variable_indices, rng)
 
-    def is_supported(self, method: str, *, explicit: bool) -> bool:  # noqa: ARG002
+    def is_supported(self, method: str) -> bool:
         return method.lower() in {"test"}
 
 

@@ -111,11 +111,11 @@ class PluginManager:
         split_method = method.split("/", maxsplit=1)
         if len(split_method) > 1:
             plugin = self._plugins[plugin_type].get(split_method[0].lower())
-            if plugin and plugin.is_supported(split_method[1], explicit=True):
+            if plugin and plugin.is_supported(split_method[1]):
                 return plugin
         elif split_method[0] != "default":
             for plugin in self._plugins[plugin_type].values():
-                if plugin.is_supported(split_method[0], explicit=False):
+                if plugin.allows_discovery and plugin.is_supported(split_method[0]):
                     return plugin
         msg = f"Method not found: {method}"
         raise ConfigError(msg)

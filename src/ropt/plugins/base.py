@@ -13,7 +13,7 @@ class Plugin(ABC):
     """
 
     @abstractmethod
-    def is_supported(self, method: str, *, explicit: bool) -> bool:
+    def is_supported(self, method: str) -> bool:
         """Check whether a given method is supported.
 
         This method is called by the
@@ -21,28 +21,27 @@ class Plugin(ABC):
         [`PluginManager`][ropt.plugins.PluginManager] objects to verify if a
         specific method is supported by this plugin.
 
-        If the `explicit` flag is set to `True`, the plugin has been explicitly
-        requested. In this case, `True` should be returned if the specified
-        optimization method is supported.
+        Args:
+            method:   The name of the method to check.
 
-        If `explicit` is `False`, the plugin manager is performing a general
-        search across all available plugins for the requested method. In this
-        scenario, `True` should only be returned if the plugin's method is
-        compatible with this search. If the search compatibility is not
-        supported, then `False` should be returned, even if the plugin
-        technically supports the requested method.
+        Returns:
+            True if the method is supported; otherwise, False.
+        """
+
+    @property
+    def allows_discovery(self) -> bool:
+        """Check if the plugin can be discovered automatically.
+
+        Normally, plugins may be discovered automatically by the plugin manager
+        by checking if they support a specific method. However, some plugins may
+        not support this behavior and should be explicitly requested. These
+        should override this property to return `False`.
 
         For example, the
         [`external`][ropt.plugins.optimizer.external.ExternalOptimizer]
         optimizer plugin does not define its own methods but launches methods
         from other plugins as an external process. Therefore, the `external`
-        optimizer plugin must always be specified explicitly. As a result, its
-        `is_supported` method returns `False` if `explicit` is `False`.
-
-        Args:
-            method:   The name of the method to check.
-            explicit: Indicates whether the plugin was explicitly requested.
-
-        Returns:
-            True if the method is supported; otherwise, False.
+        optimizer plugin must always be specified explicitly, and this method
+        is overloaded to return False.
         """
+        return True

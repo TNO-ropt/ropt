@@ -195,17 +195,24 @@ class ExternalOptimizerPlugin(OptimizerPlugin):
         """
         return ExternalOptimizer(config, optimizer_callback)
 
-    def is_supported(self, method: str, *, explicit: bool) -> bool:
+    def is_supported(self, method: str) -> bool:
         """Check if a method is supported.
 
         See the [ropt.plugins.base.Plugin][] abstract base class.
 
         # noqa
         """
-        if not explicit:
-            return False
-
         return PluginManager().is_supported("optimizer", method)
+
+    @property
+    def allows_discovery(self) -> bool:
+        """Check if the plugin can be discovered automatically.
+
+        See the [ropt.plugins.base.Plugin][] abstract base class.
+
+        # noqa
+        """
+        return False
 
 
 class _PluginOptimizer:
