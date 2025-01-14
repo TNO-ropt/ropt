@@ -40,17 +40,26 @@ class DefaultEvaluatorStep(PlanStep):
     process the generated results.
 
     The evaluator step uses the [`DefaultEvaluatorStepWith`]
-    [ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith]
+    [ropt.plugins.plan.evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith]
     configuration class to parse the `with` field of the
     [`PlanStepConfig`][ropt.config.plan.PlanStepConfig] used to specify this step
     in a plan configuration.
+
+    Note:
+        The evaluator step is designed to serve as a base class for evaluator
+        steps that may be initialized with different configuration objects. This
+        can be done by providing a custom `parse_config` method to parse the
+        `config` entry of the plan configuration into an
+        [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object. In addition, the
+        `emit_event` method can be overridden to emit custom events, generally
+        by adding additional information to its `data` field.
     """
 
     class DefaultEvaluatorStepWith(BaseModel):
         """Parameters used by the default evaluator step.
 
         The
-        [`DefaultEvaluatorStep`][ropt.plugins.plan._evaluator.DefaultEvaluatorStep]
+        [`DefaultEvaluatorStep`][ropt.plugins.plan.evaluator.DefaultEvaluatorStep]
         requires an optimizer configuration; the `tags` and `values` parameters
         are optional. The configuration  object must be an
         [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object, or a dictionary
@@ -98,13 +107,9 @@ class DefaultEvaluatorStep(PlanStep):
 
     def run(self) -> None:
         """Run the evaluator step."""
-        config = self.plan.eval(self._with.config)
-        if not isinstance(config, dict | EnOptConfig):
-            msg = "No valid EnOpt configuration provided"
-            raise TypeError(msg)
-        self._enopt_config = EnOptConfig.model_validate(config)
+        self._enopt_config = self.parse_config(self._with.config)
 
-        self.plan.emit_event(
+        self.emit_event(
             Event(event_type=EventType.START_EVALUATOR_STEP, tags=self._with.tags)
         )
         ensemble_evaluator = EnsembleEvaluator(
@@ -130,7 +135,7 @@ class DefaultEvaluatorStep(PlanStep):
         if results[0].functions is None:
             exit_code = OptimizerExitCode.TOO_FEW_REALIZATIONS
 
-        self.plan.emit_event(
+        self.emit_event(
             Event(
                 event_type=EventType.FINISHED_EVALUATOR_STEP,
                 tags=self._with.tags,
@@ -140,6 +145,26 @@ class DefaultEvaluatorStep(PlanStep):
 
         if exit_code == OptimizerExitCode.USER_ABORT:
             self.plan.abort()
+
+    def parse_config(self, config: str) -> EnOptConfig:
+        """Parse the configuration of the step.
+
+        Returns:
+            The parsed configuration.
+        """
+        config = self.plan.eval(config)
+        if not isinstance(config, dict | EnOptConfig):
+            msg = "No valid EnOpt configuration provided"
+            raise TypeError(msg)
+        return EnOptConfig.model_validate(config)
+
+    def emit_event(self, event: Event) -> None:
+        """Emit an event.
+
+        Args:
+            event: The event to emit.
+        """
+        self.plan.emit_event(event)
 
     def _get_variables(self, config: EnOptConfig) -> NDArray[np.float64]:
         if self._with.values is not None:

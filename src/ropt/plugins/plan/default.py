@@ -9,16 +9,16 @@ from ropt.config.plan import PlanStepConfig, ResultHandlerConfig
 from ropt.plan import Plan
 from ropt.plugins.plan.base import PlanStep, ResultHandler
 
-from ._evaluator import DefaultEvaluatorStep
 from ._load_data import DefaultLoadStep
 from ._metadata import DefaultMetadataHandler
-from ._optimizer import DefaultOptimizerStep
 from ._print import DefaultPrintStep
 from ._repeat import DefaultRepeatStep
 from ._save import DefaultSaveStep
 from ._set import DefaultSetStep
 from ._tracker import DefaultTrackerHandler
 from .base import PlanPlugin
+from .evaluator import DefaultEvaluatorStep
+from .optimizer import DefaultOptimizerStep
 
 _STEP_OBJECTS: Final[dict[str, Type[PlanStep]]] = {
     "evaluator": DefaultEvaluatorStep,
@@ -49,9 +49,9 @@ class DefaultPlanPlugin(PlanPlugin):
     : - A step that saves data to a file
         ([`save`][ropt.plugins.plan._save.DefaultSaveStep]).
     : - A step that performs a single ensemble evaluation
-        ([`evaluator`][ropt.plugins.plan._evaluator.DefaultEvaluatorStep]).
+        ([`evaluator`][ropt.plugins.plan.evaluator.DefaultEvaluatorStep]).
     : - A step that runs an optimization
-        ([`optimizer`][ropt.plugins.plan._optimizer.DefaultOptimizerStep]).
+        ([`optimizer`][ropt.plugins.plan.optimizer.DefaultOptimizerStep]).
     : - A step that prints a message to the console
         ([`print`][ropt.plugins.plan._print.DefaultPrintStep]).
     : - A step that repeats a number of steps

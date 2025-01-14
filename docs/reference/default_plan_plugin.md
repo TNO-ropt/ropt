@@ -14,11 +14,11 @@
     options:
         members: [DefaultSaveStepWith]
 
-::: ropt.plugins.plan._evaluator.DefaultEvaluatorStep
+::: ropt.plugins.plan.evaluator.DefaultEvaluatorStep
     options:
         members: [DefaultEvaluatorStepWith]
 
-::: ropt.plugins.plan._optimizer.DefaultOptimizerStep
+::: ropt.plugins.plan.optimizer.DefaultOptimizerStep
     options:
         members: [DefaultOptimizerStepWith, NestedPlanConfig]
 

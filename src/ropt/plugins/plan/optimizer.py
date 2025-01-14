@@ -59,10 +59,19 @@ class DefaultOptimizerStep(PlanStep):
 
     The optimizer step utilizes the
     [`DefaultOptimizerStepWith`]
-    [ropt.plugins.plan._optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith]
+    [ropt.plugins.plan.optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith]
     configuration class to parse the `with` field of the
     [`PlanStepConfig`][ropt.config.plan.PlanStepConfig] used to specify this step
     in a plan configuration.
+
+    Note:
+        The optimizer step is designed to serve as a base class for optimization
+        steps that may be initialized with different configuration objects. This
+        can be done by providing a custom `parse_config` method to parse the
+        `config` entry of the plan configuration into an
+        [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object. In addition, the
+        `emit_event` method can be overridden to emit custom events, generally
+        by adding additional information to its `data` field.
     """
 
     class NestedPlanConfig(BaseModel):
@@ -105,7 +114,7 @@ class DefaultOptimizerStep(PlanStep):
     class DefaultOptimizerStepWith(BaseModel):
         """Parameters used by the default optimizer step.
 
-        The [`DefaultOptimizerStep`][ropt.plugins.plan._optimizer.DefaultOptimizerStep]
+        The [`DefaultOptimizerStep`][ropt.plugins.plan.optimizer.DefaultOptimizerStep]
         requires an optimizer configuration; all other parameters are optional.
         The configuration object must be an
         [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object or a dictionary
@@ -121,7 +130,7 @@ class DefaultOptimizerStep(PlanStep):
         assisting result handlers in filtering relevant results.
 
         The `nested_optimization_plan` is parsed as a [`NestedPlanConfig`]
-        [ropt.plugins.plan._optimizer.DefaultOptimizerStep.NestedPlanConfig] to
+        [ropt.plugins.plan.optimizer.DefaultOptimizerStep.NestedPlanConfig] to
         define an optional nested optimization procedure.
 
         Attributes:
@@ -163,13 +172,9 @@ class DefaultOptimizerStep(PlanStep):
         Returns:
             Whether a user abort occurred.
         """
-        config = self.plan.eval(self._with.config)
-        if not isinstance(config, dict | EnOptConfig):
-            msg = "No valid EnOpt configuration provided"
-            raise TypeError(msg)
-        self._enopt_config = EnOptConfig.model_validate(config)
+        self._enopt_config = self.parse_config(self._with.config)
 
-        self.plan.emit_event(
+        self.emit_event(
             Event(event_type=EventType.START_OPTIMIZER_STEP, tags=self._with.tags)
         )
 
@@ -206,7 +211,7 @@ class DefaultOptimizerStep(PlanStep):
         if self._with.exit_code_var is not None:
             self.plan[self._with.exit_code_var] = exit_code
 
-        self.plan.emit_event(
+        self.emit_event(
             Event(
                 event_type=EventType.FINISHED_OPTIMIZER_STEP,
                 tags=self._with.tags,
@@ -216,6 +221,26 @@ class DefaultOptimizerStep(PlanStep):
 
         if exit_code == OptimizerExitCode.USER_ABORT:
             self.plan.abort()
+
+    def parse_config(self, config: str) -> EnOptConfig:
+        """Parse the configuration of the step.
+
+        Returns:
+            The parsed configuration.
+        """
+        config = self.plan.eval(config)
+        if not isinstance(config, dict | EnOptConfig):
+            msg = "No valid EnOpt configuration provided"
+            raise TypeError(msg)
+        return EnOptConfig.model_validate(config)
+
+    def emit_event(self, event: Event) -> None:
+        """Emit an event.
+
+        Args:
+            event: The event to emit.
+        """
+        self.plan.emit_event(event)
 
     def _signal_evaluation(
         self,
@@ -234,11 +259,11 @@ class DefaultOptimizerStep(PlanStep):
             exit_code: An exit code if that may be set if the evaluation completed.
         """
         if results is None:
-            self.plan.emit_event(
+            self.emit_event(
                 Event(event_type=EventType.START_EVALUATION, tags=self._with.tags)
             )
         else:
-            self.plan.emit_event(
+            self.emit_event(
                 Event(
                     event_type=EventType.FINISHED_EVALUATION,
                     tags=self._with.tags,
