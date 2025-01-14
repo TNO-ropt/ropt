@@ -63,8 +63,7 @@ def test_scipy_samplers_shared(enopt_config: Any, method: str, evaluator: Any) -
     perturbations: dict[str, NDArray[np.float64]] = {}
 
     def _observer(event: Event, tag: str) -> None:
-        assert event.results is not None
-        for item in event.results:
+        for item in event.data["results"]:
             if isinstance(item, GradientResults) and tag not in perturbations:
                 perturbations[tag] = item.evaluations.perturbed_variables
 

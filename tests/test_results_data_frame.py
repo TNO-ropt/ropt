@@ -39,11 +39,10 @@ def _handle_results(
     reporter: ResultsDataFrame,
     variable_names: tuple[str, ...] | None = None,
 ) -> None:
-    assert event.results is not None
     names: dict[ResultAxis, tuple[str, ...] | None] | None = (
         None if variable_names is None else {ResultAxis.VARIABLE: variable_names}
     )
-    for item in event.results:
+    for item in event.data["results"]:
         reporter.add_results(item, names=names)
 
 
@@ -136,11 +135,9 @@ def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
     )
 
     def even_handler(event: Event) -> None:
-        assert event.results is not None
-        assert event.results is not None
-        for item in event.results:
+        for item in event.data["results"]:
             item.metadata["foo"] = {"bar": 1}
-        for item in event.results:
+        for item in event.data["results"]:
             reporter.add_results(item)
 
     BasicOptimizer(enopt_config, evaluator()).add_observer(

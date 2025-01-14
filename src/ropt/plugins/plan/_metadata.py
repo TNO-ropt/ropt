@@ -84,10 +84,10 @@ class DefaultMetadataHandler(ResultHandler):
                 EventType.FINISHED_EVALUATION,
                 EventType.FINISHED_EVALUATOR_STEP,
             }
-            and event.results is not None
+            and "results" in event.data
             and (event.tags & self._with.tags)
         ):
-            for results in event.results:
+            for results in event.data["results"]:
                 for key, expr in self._with.data.items():
                     results.metadata[key] = self._plan.eval(expr)
         return event

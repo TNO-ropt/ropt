@@ -3,12 +3,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from ropt.config.enopt import EnOptConfig
-    from ropt.enums import EventType, OptimizerExitCode
-    from ropt.results import Results
+    from ropt.enums import EventType
 
 
 @dataclass(slots=True)
@@ -25,16 +23,12 @@ class Event:
 
     Attributes:
         event_type: The type of the event.
-        config:     The current configuration object of the executing plan.
-        results:    Optional results passed with the event.
-        exit_code:  An optional exit code.
         tags:       Optional tags added to the results.
         plan_id:    The ID of the plan that generated the event.
+        data:       Optional data passed with the event.
     """
 
     event_type: EventType
-    config: EnOptConfig
-    results: tuple[Results, ...] | None = None
-    exit_code: OptimizerExitCode | None = None
     tags: set[str] = field(default_factory=set)
     plan_id: tuple[int, ...] = field(default_factory=tuple)
+    data: dict[str, Any] = field(default_factory=dict)

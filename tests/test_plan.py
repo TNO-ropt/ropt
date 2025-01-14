@@ -542,8 +542,8 @@ def test_two_optimizers_alternating(
 
     def _track_evaluations(event: Event) -> None:
         nonlocal completed_functions
-        assert event.results is not None
-        for item in event.results:
+
+        for item in event.data["results"]:
             if isinstance(item, FunctionResults):
                 completed_functions += 1
 
@@ -627,9 +627,9 @@ def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -
 
     def _track_evaluations(event: Event) -> None:
         nonlocal completed
-        assert event.results is not None
+
         completed += [
-            item for item in event.results if isinstance(item, FunctionResults)
+            item for item in event.data["results"] if isinstance(item, FunctionResults)
         ]
 
     enopt_config["optimizer"]["speculative"] = True
@@ -736,9 +736,9 @@ def test_restart_initial(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
     def _track_evaluations(event: Event) -> None:
         nonlocal completed
-        assert event.results is not None
+
         completed += [
-            item for item in event.results if isinstance(item, FunctionResults)
+            item for item in event.data["results"] if isinstance(item, FunctionResults)
         ]
 
     enopt_config["optimizer"]["speculative"] = True
@@ -782,9 +782,9 @@ def test_restart_last(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
     def _track_evaluations(event: Event) -> None:
         nonlocal completed
-        assert event.results is not None
+
         completed += [
-            item for item in event.results if isinstance(item, FunctionResults)
+            item for item in event.data["results"] if isinstance(item, FunctionResults)
         ]
 
     enopt_config["optimizer"]["speculative"] = True
@@ -833,9 +833,9 @@ def test_restart_optimum(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
     def _track_evaluations(event: Event) -> None:
         nonlocal completed
-        assert event.results is not None
+
         completed += [
-            item for item in event.results if isinstance(item, FunctionResults)
+            item for item in event.data["results"] if isinstance(item, FunctionResults)
         ]
 
     enopt_config["optimizer"]["speculative"] = True
@@ -885,9 +885,9 @@ def test_restart_optimum_with_reset(
 
     def _track_evaluations(event: Event) -> None:
         nonlocal completed
-        assert event.results is not None
+
         completed += [
-            item for item in event.results if isinstance(item, FunctionResults)
+            item for item in event.data["results"] if isinstance(item, FunctionResults)
         ]
 
     # Make sure each restart has worse objectives, and that the last evaluation
@@ -963,8 +963,7 @@ def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
     restarts: list[int] = []
 
     def _track_results(event: Event) -> None:
-        assert event.results is not None
-        metadata = event.results[0].metadata
+        metadata = event.data["results"][0].metadata
         restart = metadata.get("restart", -1)
         assert metadata["foo"] == 1
         assert metadata["bar"] == "string"
@@ -1097,7 +1096,7 @@ def test_exit_code(enopt_config: dict[str, Any], evaluator: Any) -> None:
         nonlocal is_called
         is_called = True
         assert isinstance(event, Event)
-        assert event.exit_code == OptimizerExitCode.MAX_FUNCTIONS_REACHED
+        assert event.data["exit_code"] == OptimizerExitCode.MAX_FUNCTIONS_REACHED
 
     plan_config = {
         "variables": {
@@ -1133,8 +1132,8 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
             assert event.plan_id == (0,)
         if "inner" in event.tags:
             assert event.plan_id == (0, completed_functions // 5)
-        assert event.results is not None
-        for item in event.results:
+
+        for item in event.data["results"]:
             if isinstance(item, FunctionResults):
                 completed_functions += 1
 
@@ -1207,8 +1206,7 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
     enopt_config["variables"]["initial_values"] = [0.0, 0.2, 0.1]
 
     def _track_evaluations(event: Event) -> None:
-        assert event.results is not None
-        for item in event.results:
+        for item in event.data["results"]:
             if isinstance(item, FunctionResults):
                 assert item.metadata.get("outer") == 1
                 if "inner" in event.tags:
@@ -1307,9 +1305,8 @@ def test_table(enopt_config: dict[str, Any], evaluator: Any, tmp_path: Path) -> 
     }
 
     def handle_results(event: Event) -> None:
-        assert event.results is not None
         added = False
-        for item in event.results:
+        for item in event.data["results"]:
             if isinstance(item, FunctionResults) and table.add_results(item):
                 added = True
         if added:

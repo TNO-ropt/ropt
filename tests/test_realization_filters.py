@@ -106,8 +106,7 @@ def _constraint_function(variables: NDArray[np.float64], context: Any) -> float:
 
 
 def _track_results(event: Event, result_list: list[Results]) -> None:
-    assert event.results
-    result_list.extend(event.results)
+    result_list.extend(event.data["results"])
 
 
 @pytest.mark.parametrize("split_evaluations", [True, False])
@@ -327,8 +326,8 @@ def test_sort_filter_mixed(  # noqa: C901
     objective_values: list[NDArray[np.float64]] = []
 
     def _add_objective(event: Event) -> None:
-        if event.results:
-            for item in event.results:
+        if event.data["results"]:
+            for item in event.data["results"]:
                 if isinstance(item, FunctionResults):
                     assert item.functions is not None
                     objective_values.append(item.functions.weighted_objective)
@@ -631,8 +630,8 @@ def test_cvar_filter_mixed(  # noqa: C901
     objective_values: list[NDArray[np.float64]] = []
 
     def _add_objective(event: Event) -> None:
-        if event.results is not None:
-            for item in event.results:
+        if "results" in event.data:
+            for item in event.data["results"]:
                 if isinstance(item, FunctionResults):
                     assert item.functions is not None
                     objective_values.append(item.functions.weighted_objective)

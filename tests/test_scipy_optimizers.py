@@ -423,8 +423,7 @@ def test_scipy_speculative(
     enopt_config["optimizer"]["speculative"] = speculative
 
     def _observer(event: Event) -> None:
-        assert event.results is not None
-        assert len(event.results) == 2 if speculative else 1
+        assert len(event.data["results"]) == 2 if speculative else 1
 
     variables = (
         BasicOptimizer(enopt_config, evaluator())

@@ -240,11 +240,11 @@ class BasicOptimizer:
     ) -> None:
         if (
             event.event_type == EventType.FINISHED_EVALUATION
-            and event.results is not None
+            and "results" in event.data
             and ("__optimizer_tag__" in event.tags)
         ):
             added = False
-            for item in event.results:
+            for item in event.data["results"]:
                 if table.add_results(
                     convert_to_maximize(item) if maximize else item, names=self._names
                 ):

@@ -105,11 +105,7 @@ class DefaultEvaluatorStep(PlanStep):
         self._enopt_config = EnOptConfig.model_validate(config)
 
         self.plan.emit_event(
-            Event(
-                event_type=EventType.START_EVALUATOR_STEP,
-                config=self._enopt_config,
-                tags=self._with.tags,
-            )
+            Event(event_type=EventType.START_EVALUATOR_STEP, tags=self._with.tags)
         )
         ensemble_evaluator = EnsembleEvaluator(
             self._enopt_config,
@@ -137,10 +133,8 @@ class DefaultEvaluatorStep(PlanStep):
         self.plan.emit_event(
             Event(
                 event_type=EventType.FINISHED_EVALUATOR_STEP,
-                config=self._enopt_config,
-                results=results,
                 tags=self._with.tags,
-                exit_code=exit_code,
+                data={"results": results, "exit_code": exit_code},
             )
         )
 

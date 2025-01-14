@@ -170,11 +170,7 @@ class DefaultOptimizerStep(PlanStep):
         self._enopt_config = EnOptConfig.model_validate(config)
 
         self.plan.emit_event(
-            Event(
-                event_type=EventType.START_OPTIMIZER_STEP,
-                config=self._enopt_config,
-                tags=self._with.tags,
-            )
+            Event(event_type=EventType.START_OPTIMIZER_STEP, tags=self._with.tags)
         )
 
         ensemble_evaluator = EnsembleEvaluator(
@@ -213,9 +209,8 @@ class DefaultOptimizerStep(PlanStep):
         self.plan.emit_event(
             Event(
                 event_type=EventType.FINISHED_OPTIMIZER_STEP,
-                config=self._enopt_config,
                 tags=self._with.tags,
-                exit_code=exit_code,
+                data={"exit_code": exit_code},
             )
         )
 
@@ -240,20 +235,14 @@ class DefaultOptimizerStep(PlanStep):
         """
         if results is None:
             self.plan.emit_event(
-                Event(
-                    event_type=EventType.START_EVALUATION,
-                    config=self._enopt_config,
-                    tags=self._with.tags,
-                )
+                Event(event_type=EventType.START_EVALUATION, tags=self._with.tags)
             )
         else:
             self.plan.emit_event(
                 Event(
                     event_type=EventType.FINISHED_EVALUATION,
-                    config=self._enopt_config,
-                    results=results,
                     tags=self._with.tags,
-                    exit_code=exit_code,
+                    data={"results": results, "exit_code": exit_code},
                 )
             )
 

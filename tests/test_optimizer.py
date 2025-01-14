@@ -40,9 +40,9 @@ def test_max_functions_exceeded(enopt_config: Any, evaluator: Any) -> None:
 
     def track_results(event: Event) -> None:
         nonlocal last_evaluation
-        assert event.results
-        assert isinstance(event.results[0].result_id, int)
-        last_evaluation = event.results[0].result_id
+
+        assert isinstance(event.data["results"][0].result_id, int)
+        last_evaluation = event.data["results"][0].result_id
 
     max_functions = 2
     enopt_config["optimizer"]["max_functions"] = max_functions
@@ -59,9 +59,9 @@ def test_max_functions_not_exceeded(enopt_config: Any, evaluator: Any) -> None:
 
     def track_results(event: Event) -> None:
         nonlocal last_evaluation
-        assert event.results
-        assert isinstance(event.results[0].result_id, int)
-        last_evaluation = event.results[0].result_id
+
+        assert isinstance(event.data["results"][0].result_id, int)
+        last_evaluation = event.data["results"][0].result_id
 
     max_functions = 100
     enopt_config["optimizer"]["max_functions"] = max_functions
@@ -76,9 +76,8 @@ def test_max_functions_not_exceeded(enopt_config: Any, evaluator: Any) -> None:
 
 def test_failed_realizations(enopt_config: Any, evaluator: Any) -> None:
     def _observer(event: Event) -> None:
-        assert event.results
-        assert isinstance(event.results[0], FunctionResults)
-        assert event.results[0].functions is None
+        assert isinstance(event.data["results"][0], FunctionResults)
+        assert event.data["results"][0].functions is None
 
     functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
     optimizer = BasicOptimizer(enopt_config, evaluator(functions)).add_observer(
@@ -107,10 +106,10 @@ def test_user_abort(enopt_config: Any, evaluator: Any) -> None:
 
     def _observer(event: Event) -> None:
         nonlocal last_evaluation
-        assert event.results
-        assert isinstance(event.results[0].result_id, int)
-        last_evaluation = event.results[0].result_id
-        if event.results[0].result_id == 1:
+
+        assert isinstance(event.data["results"][0].result_id, int)
+        last_evaluation = event.data["results"][0].result_id
+        if event.data["results"][0].result_id == 1:
             optimizer.abort_optimization()
 
     optimizer = BasicOptimizer(enopt_config, evaluator()).add_observer(
@@ -183,8 +182,7 @@ def test_constraint_auto_scale(
     scales = np.fabs(test_functions[-1](config.variables.initial_values, None))
 
     def check_constraints(event: Event) -> None:
-        assert event.results
-        for item in event.results:
+        for item in event.data["results"]:
             if isinstance(item, FunctionResults) and item.result_id == 0:
                 assert item.functions is not None
                 assert item.functions.scaled_constraints is not None
@@ -330,9 +328,7 @@ def test_optimizer_variables_subset(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["variables"]["indices"] = [0, 2]
 
     def assert_gradient(event: Event) -> None:
-        assert event.results
-        assert event.results is not None
-        for item in event.results:
+        for item in event.data["results"]:
             if isinstance(item, GradientResults):
                 assert item.gradients is not None
                 assert item.gradients.weighted_objective[1] == 0.0

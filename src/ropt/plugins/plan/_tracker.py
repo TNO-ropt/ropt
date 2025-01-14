@@ -97,7 +97,7 @@ class DefaultTrackerHandler(ResultHandler):
                 EventType.FINISHED_EVALUATION,
                 EventType.FINISHED_EVALUATOR_STEP,
             }
-            and event.results is not None
+            and "results" in event.data
             and (event.tags & self._with.tags)
         ):
             results: FunctionResults | None | tuple[FunctionResults, ...]
@@ -105,18 +105,18 @@ class DefaultTrackerHandler(ResultHandler):
             match self._with.type_:
                 case "all":
                     results = _get_all_results(
-                        event.results, self._with.constraint_tolerance
+                        event.data["results"], self._with.constraint_tolerance
                     )
                     self.plan[self._with.var] = deepcopy(results)
                 case "best":
                     results = _update_optimal_result(
                         self.plan[self._with.var],
-                        event.results,
+                        event.data["results"],
                         self._with.constraint_tolerance,
                     )
                 case "last":
                     results = _get_last_result(
-                        event.results, self._with.constraint_tolerance
+                        event.data["results"], self._with.constraint_tolerance
                     )
             if results is not None:
                 self.plan[self._with.var] = deepcopy(results)
