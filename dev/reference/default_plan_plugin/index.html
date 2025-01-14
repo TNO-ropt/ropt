@@ -1089,7 +1089,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep" class="md-nav__link">
+  <a href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultEvaluatorStep
     </span>
@@ -1099,7 +1099,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith" class="md-nav__link">
+  <a href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultEvaluatorStepWith
     </span>
@@ -1113,7 +1113,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep" class="md-nav__link">
+  <a href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultOptimizerStep
     </span>
@@ -1123,7 +1123,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith" class="md-nav__link">
+  <a href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultOptimizerStepWith
     </span>
@@ -1132,7 +1132,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep.NestedPlanConfig" class="md-nav__link">
+  <a href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep.NestedPlanConfig" class="md-nav__link">
     <span class="md-ellipsis">
       NestedPlanConfig
     </span>
@@ -1539,7 +1539,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep" class="md-nav__link">
+  <a href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultEvaluatorStep
     </span>
@@ -1549,7 +1549,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith" class="md-nav__link">
+  <a href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultEvaluatorStepWith
     </span>
@@ -1563,7 +1563,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep" class="md-nav__link">
+  <a href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultOptimizerStep
     </span>
@@ -1573,7 +1573,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith" class="md-nav__link">
+  <a href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultOptimizerStepWith
     </span>
@@ -1582,7 +1582,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep.NestedPlanConfig" class="md-nav__link">
+  <a href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep.NestedPlanConfig" class="md-nav__link">
     <span class="md-ellipsis">
       NestedPlanConfig
     </span>
@@ -1752,13 +1752,13 @@
 <dd>
 <ul>
 <li>A step that performs a single ensemble evaluation
-(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep"><code>evaluator</code></a>).</li>
+(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep"><code>evaluator</code></a>).</li>
 </ul>
 </dd>
 <dd>
 <ul>
 <li>A step that runs an optimization
-(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep"><code>optimizer</code></a>).</li>
+(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep"><code>optimizer</code></a>).</li>
 </ul>
 </dd>
 <dd>
@@ -2243,8 +2243,8 @@ extension of the output path.</p>
 
 
 
-<h2 id="ropt.plugins.plan._evaluator.DefaultEvaluatorStep" class="doc doc-heading">
-            <code>ropt.plugins.plan._evaluator.DefaultEvaluatorStep</code>
+<h2 id="ropt.plugins.plan.evaluator.DefaultEvaluatorStep" class="doc doc-heading">
+            <code>ropt.plugins.plan.evaluator.DefaultEvaluatorStep</code>
 
 
 </h2>
@@ -2266,11 +2266,22 @@ emitted. After the evaluator step finishes, an
 <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType.FINISHED_EVALUATOR_STEP"><code>FINISHED_EVALUATOR_STEP</code></a>
 event is emitted. Result handlers should respond to the latter event to
 process the generated results.</p>
-<p>The evaluator step uses the <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith"><code>DefaultEvaluatorStepWith</code></a>
+<p>The evaluator step uses the <a class="autorefs autorefs-internal" href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith"><code>DefaultEvaluatorStepWith</code></a>
 configuration class to parse the <code>with</code> field of the
 <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanStepConfig"><code>PlanStepConfig</code></a> used to specify this step
 in a plan configuration.</p>
 
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>The evaluator step is designed to serve as a base class for evaluator
+steps that may be initialized with different configuration objects. This
+can be done by providing a custom <code>parse_config</code> method to parse the
+<code>config</code> entry of the plan configuration into an
+<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. In addition, the
+<code>emit_event</code> method can be overridden to emit custom events, generally
+by adding additional information to its <code>data</code> field.</p>
+</details>
 
 
 
@@ -2292,7 +2303,7 @@ in a plan configuration.</p>
 
 
 
-<h3 id="ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith" class="doc doc-heading">
+<h3 id="ropt.plugins.plan.evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith" class="doc doc-heading">
             <code>DefaultEvaluatorStepWith</code>
 
 
@@ -2306,7 +2317,7 @@ in a plan configuration.</p>
 
         <p>Parameters used by the default evaluator step.</p>
 <p>The
-<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._evaluator.DefaultEvaluatorStep"><code>DefaultEvaluatorStep</code></a>
+<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep"><code>DefaultEvaluatorStep</code></a>
 requires an optimizer configuration; the <code>tags</code> and <code>values</code> parameters
 are optional. The configuration  object must be an
 <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object, or a dictionary
@@ -2337,7 +2348,7 @@ scaling is handled internally.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith.config">config</span></code></td>
+            <td><code><span title="ropt.plugins.plan.evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith.config">config</span></code></td>
             <td>
                   <code>str</code>
             </td>
@@ -2348,7 +2359,7 @@ scaling is handled internally.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith.tags">tags</span></code></td>
+            <td><code><span title="ropt.plugins.plan.evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith.tags">tags</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.ItemOrSet" href="../utilities/#ropt.config.validated_types.ItemOrSet">ItemOrSet</a>[str]</code>
             </td>
@@ -2359,7 +2370,7 @@ scaling is handled internally.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith.values">values</span></code></td>
+            <td><code><span title="ropt.plugins.plan.evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith.values">values</span></code></td>
             <td>
                   <code>str | <a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array2D" href="../utilities/#ropt.config.validated_types.Array2D">Array2D</a> | None</code>
             </td>
@@ -2411,8 +2422,8 @@ scaling is handled internally.</p>
 
 
 
-<h2 id="ropt.plugins.plan._optimizer.DefaultOptimizerStep" class="doc doc-heading">
-            <code>ropt.plugins.plan._optimizer.DefaultOptimizerStep</code>
+<h2 id="ropt.plugins.plan.optimizer.DefaultOptimizerStep" class="doc doc-heading">
+            <code>ropt.plugins.plan.optimizer.DefaultOptimizerStep</code>
 
 
 </h2>
@@ -2449,11 +2460,22 @@ overridden by providing them directly.</p>
 evaluation in the optimization triggers a nested optimization plan that
 should produce the result for the function evaluation.</p>
 <p>The optimizer step utilizes the
-<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith"><code>DefaultOptimizerStepWith</code></a>
+<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith"><code>DefaultOptimizerStepWith</code></a>
 configuration class to parse the <code>with</code> field of the
 <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanStepConfig"><code>PlanStepConfig</code></a> used to specify this step
 in a plan configuration.</p>
 
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>The optimizer step is designed to serve as a base class for optimization
+steps that may be initialized with different configuration objects. This
+can be done by providing a custom <code>parse_config</code> method to parse the
+<code>config</code> entry of the plan configuration into an
+<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. In addition, the
+<code>emit_event</code> method can be overridden to emit custom events, generally
+by adding additional information to its <code>data</code> field.</p>
+</details>
 
 
 
@@ -2475,7 +2497,7 @@ in a plan configuration.</p>
 
 
 
-<h3 id="ropt.plugins.plan._optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith" class="doc doc-heading">
+<h3 id="ropt.plugins.plan.optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith" class="doc doc-heading">
             <code>DefaultOptimizerStepWith</code>
 
 
@@ -2488,7 +2510,7 @@ in a plan configuration.</p>
 
 
         <p>Parameters used by the default optimizer step.</p>
-<p>The <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep"><code>DefaultOptimizerStep</code></a>
+<p>The <a class="autorefs autorefs-internal" href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep"><code>DefaultOptimizerStep</code></a>
 requires an optimizer configuration; all other parameters are optional.
 The configuration object must be an
 <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object or a dictionary
@@ -2500,7 +2522,7 @@ variable where the <a class="autorefs autorefs-internal" href="../enums/#ropt.en
 stored, which the optimizer returns upon completion.</p>
 <p>The <code>tags</code> field allows optional labels to be attached to each result,
 assisting result handlers in filtering relevant results.</p>
-<p>The <code>nested_optimization_plan</code> is parsed as a <a class="autorefs autorefs-internal" href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep.NestedPlanConfig"><code>NestedPlanConfig</code></a> to
+<p>The <code>nested_optimization_plan</code> is parsed as a <a class="autorefs autorefs-internal" href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep.NestedPlanConfig"><code>NestedPlanConfig</code></a> to
 define an optional nested optimization procedure.</p>
 
 
@@ -2515,7 +2537,7 @@ define an optional nested optimization procedure.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith.config">config</span></code></td>
+            <td><code><span title="ropt.plugins.plan.optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith.config">config</span></code></td>
             <td>
                   <code>str</code>
             </td>
@@ -2526,7 +2548,7 @@ define an optional nested optimization procedure.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith.tags">tags</span></code></td>
+            <td><code><span title="ropt.plugins.plan.optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith.tags">tags</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.ItemOrSet" href="../utilities/#ropt.config.validated_types.ItemOrSet">ItemOrSet</a>[str]</code>
             </td>
@@ -2537,7 +2559,7 @@ define an optional nested optimization procedure.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith.initial_values">initial_values</span></code></td>
+            <td><code><span title="ropt.plugins.plan.optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith.initial_values">initial_values</span></code></td>
             <td>
                   <code>str | <a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1D" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a> | None</code>
             </td>
@@ -2548,7 +2570,7 @@ define an optional nested optimization procedure.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith.exit_code_var">exit_code_var</span></code></td>
+            <td><code><span title="ropt.plugins.plan.optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith.exit_code_var">exit_code_var</span></code></td>
             <td>
                   <code>str | None</code>
             </td>
@@ -2559,9 +2581,9 @@ define an optional nested optimization procedure.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith.nested_optimization">nested_optimization</span></code></td>
+            <td><code><span title="ropt.plugins.plan.optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith.nested_optimization">nested_optimization</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan._optimizer.DefaultOptimizerStep.NestedPlanConfig" href="#ropt.plugins.plan._optimizer.DefaultOptimizerStep.NestedPlanConfig">NestedPlanConfig</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.optimizer.DefaultOptimizerStep.NestedPlanConfig" href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep.NestedPlanConfig">NestedPlanConfig</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2602,7 +2624,7 @@ define an optional nested optimization procedure.</p>
 
 
 
-<h3 id="ropt.plugins.plan._optimizer.DefaultOptimizerStep.NestedPlanConfig" class="doc doc-heading">
+<h3 id="ropt.plugins.plan.optimizer.DefaultOptimizerStep.NestedPlanConfig" class="doc doc-heading">
             <code>NestedPlanConfig</code>
 
 
@@ -2645,7 +2667,7 @@ plan, where they are processed with its own handlers.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._optimizer.DefaultOptimizerStep.NestedPlanConfig.plan">plan</span></code></td>
+            <td><code><span title="ropt.plugins.plan.optimizer.DefaultOptimizerStep.NestedPlanConfig.plan">plan</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.config.plan.PlanConfig" href="../plan_config/#ropt.config.plan.PlanConfig">PlanConfig</a></code>
             </td>
@@ -2656,7 +2678,7 @@ plan, where they are processed with its own handlers.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.plan._optimizer.DefaultOptimizerStep.NestedPlanConfig.extra_inputs">extra_inputs</span></code></td>
+            <td><code><span title="ropt.plugins.plan.optimizer.DefaultOptimizerStep.NestedPlanConfig.extra_inputs">extra_inputs</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.ItemOrTuple" href="../utilities/#ropt.config.validated_types.ItemOrTuple">ItemOrTuple</a>[<span title="typing.Any">Any</span>]</code>
             </td>

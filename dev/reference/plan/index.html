@@ -3435,39 +3435,6 @@ enumeration for more details.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plan.Event.config">config</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The current configuration object of the executing plan.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plan.Event.results">results</span></code></td>
-            <td>
-                  <code>tuple[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional results passed with the event.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plan.Event.exit_code">exit_code</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.enums.OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>An optional exit code.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
             <td><code><span title="ropt.plan.Event.tags">tags</span></code></td>
             <td>
                   <code>set[str]</code>
@@ -3486,6 +3453,17 @@ enumeration for more details.</p>
             <td>
               <div class="doc-md-description">
                 <p>The ID of the plan that generated the event.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plan.Event.data">data</span></code></td>
+            <td>
+                  <code>dict[str, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional data passed with the event.</p>
               </div>
             </td>
           </tr>
