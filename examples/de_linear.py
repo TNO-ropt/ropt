@@ -59,7 +59,6 @@ def report(event: Event) -> None:
     """
     for item in event.data["results"]:
         if isinstance(item, FunctionResults) and item.functions is not None:
-            print(f"result: {item.result_id}")
             print(f"  variables: {item.evaluations.variables}")
             print(f"  objective: {item.functions.weighted_objective}\n")
 
@@ -75,7 +74,6 @@ def run_optimization() -> None:
     assert optimal_result is not None
     assert optimal_result.functions is not None
     assert np.all(optimal_result.evaluations.variables == [3, 7])
-    print(f"BEST RESULT: {optimal_result.result_id}")
     print(f"  variables: {optimal_result.evaluations.variables}")
     print(f"  objective: {optimal_result.functions.weighted_objective}\n")
 

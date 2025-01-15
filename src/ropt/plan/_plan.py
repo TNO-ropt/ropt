@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import replace
-from itertools import chain, count
-from typing import TYPE_CHECKING, Any, Iterator
+from itertools import chain
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from ropt.config.plan import PlanConfig, PlanStepConfig
@@ -64,7 +64,6 @@ class Plan:
         self._vars: dict[str, Any] = deepcopy(optimizer_context.variables)
         self._plan_id: tuple[int, ...] = (0,) if plan_id is None else plan_id
         self._spawn_id: int = -1
-        self._result_id_iter = count()
 
         self._set_item("plan_id", list(self.plan_id))
         for var in chain(
@@ -144,19 +143,6 @@ class Plan:
             tuple: The unique tuple-based ID for this plan.
         """
         return self._plan_id
-
-    @property
-    def result_id_iterator(self) -> Iterator[int]:
-        """Return the iterator for result IDs.
-
-        This iterator generates consecutive unique IDs for results produced by
-        steps within the plan, ensuring each result can be distinctly
-        identified.
-
-        Returns:
-            Iterator: An iterator that yields unique result IDs.
-        """
-        return self._result_id_iter
 
     def create_steps(self, step_configs: list[PlanStepConfig]) -> list[PlanStep]:
         """Instantiate step objects from step configurations.

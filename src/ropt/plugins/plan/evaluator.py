@@ -116,7 +116,6 @@ class DefaultEvaluatorStep(PlanStep):
             self._enopt_config,
             self.plan.optimizer_context.evaluator,
             self.plan.plan_id,
-            self.plan.result_id_iterator,
             self.plan.optimizer_context.plugin_manager,
         )
 

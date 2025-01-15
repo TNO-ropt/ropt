@@ -55,7 +55,6 @@ def function_result_fixture(enopt_config: Any) -> FunctionResults:
     )
     return FunctionResults(
         plan_id=(0,),
-        result_id=0,
         batch_id=1,
         metadata={},
         evaluations=evaluations,

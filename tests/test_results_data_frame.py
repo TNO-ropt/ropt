@@ -60,7 +60,6 @@ def test_dataframe_results_function_results(enopt_config: Any, evaluator: Any) -
     config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsDataFrame(
         {
-            "result_id",
             "evaluations.variables",
         },
     )
@@ -81,7 +80,6 @@ def test_dataframe_results_function_results_formatted_names(
     config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsDataFrame(
         {
-            "result_id",
             "evaluations.variables",
         },
     )
@@ -104,7 +102,6 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
     config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsDataFrame(
         {
-            "result_id",
             "gradients.weighted_objective",
         },
         table_type="gradients",
@@ -127,7 +124,6 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
 def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
     reporter = ResultsDataFrame(
         {
-            "result_id",
             "evaluations.variables",
             "metadata.foo.bar",
             "metadata.not.existing",

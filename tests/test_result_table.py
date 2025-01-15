@@ -49,7 +49,6 @@ def test_tabular_report_results(
     config = EnOptConfig.model_validate(enopt_config)
     BasicOptimizer(config, evaluator()).add_table(
         {
-            "result_id": "eval-ID",
             "evaluations.variables": "Variables",
         },
         path=path,
@@ -58,11 +57,8 @@ def test_tabular_report_results(
     assert path.exists()
     results = pd.read_fwf(tmp_path / "results.txt", header=[0, 1], skiprows=[2])
 
-    assert (
-        results.columns.get_level_values(level=0).to_list()
-        == ["eval-ID"] + ["Variables"] * 3
-    )
-    assert results.columns.get_level_values(level=1)[1:].to_list() == [
+    assert results.columns.get_level_values(level=0).to_list() == ["Variables"] * 3
+    assert results.columns.get_level_values(level=1).to_list() == [
         "0",
         "1",
         "2",
@@ -78,7 +74,6 @@ def test_tabular_report_data_frames_results_formatted_names(
     config = EnOptConfig.model_validate(enopt_config)
     BasicOptimizer(config, evaluator()).add_table(
         {
-            "result_id": "eval-ID",
             "evaluations.variables": "Variables",
         },
         path=path,
@@ -86,8 +81,8 @@ def test_tabular_report_data_frames_results_formatted_names(
 
     assert path.exists()
     results = pd.read_fwf(path, header=[0, 1], skiprows=[2])
-    assert results.columns.get_level_values(level=0)[1:].to_list() == ["Variables"] * 3
-    assert list(results.columns.get_level_values(level=1)[1:].to_list()) == [
+    assert results.columns.get_level_values(level=0).to_list() == ["Variables"] * 3
+    assert list(results.columns.get_level_values(level=1).to_list()) == [
         f"a:{idx + 1}" for idx in range(3)
     ]
 
@@ -100,7 +95,6 @@ def test_tabular_report_data_frames_gradients(
     config = EnOptConfig.model_validate(enopt_config)
     BasicOptimizer(config, evaluator()).add_table(
         {
-            "result_id": "eval-ID",
             "gradients.weighted_objective": "Total Objective",
         },
         path,
@@ -109,10 +103,9 @@ def test_tabular_report_data_frames_gradients(
     assert path.exists()
     gradients = pd.read_fwf(path, header=[0, 1], skiprows=[2])
     assert (
-        gradients.columns.get_level_values(level=0).to_list()
-        == ["eval-ID"] + ["Total Objective"] * 3
+        gradients.columns.get_level_values(level=0).to_list() == ["Total Objective"] * 3
     )
-    assert gradients.columns.get_level_values(level=1)[1:].to_list() == [
+    assert gradients.columns.get_level_values(level=1).to_list() == [
         "a:1",
         "a:2",
         "a:3",
@@ -129,7 +122,6 @@ def test_tabular_report_data_frames_min_header_len(
     config = EnOptConfig.model_validate(enopt_config)
     BasicOptimizer(config, evaluator()).add_table(
         {
-            "result_id": "eval-ID",
             "evaluations.variables": "Variables",
         },
         path=path,

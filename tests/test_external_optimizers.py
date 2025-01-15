@@ -37,13 +37,12 @@ def test_external_run(enopt_config: Any, evaluator: Any) -> None:
 
 
 def test_external_max_functions_exceeded(enopt_config: Any, evaluator: Any) -> None:
-    last_evaluation = 100
+    last_evaluation = 0
 
-    def track_results(event: Event) -> None:
+    def track_results(_: Event) -> None:
         nonlocal last_evaluation
 
-        assert isinstance(event.data["results"][0].result_id, int)
-        last_evaluation = event.data["results"][0].result_id
+        last_evaluation += 1
 
     max_functions = 2
     enopt_config["optimizer"]["max_functions"] = max_functions
@@ -51,7 +50,7 @@ def test_external_max_functions_exceeded(enopt_config: Any, evaluator: Any) -> N
         EventType.FINISHED_EVALUATION, track_results
     )
     optimizer.run()
-    assert last_evaluation == max_functions
+    assert last_evaluation == max_functions + 1
     assert optimizer.exit_code == OptimizerExitCode.MAX_FUNCTIONS_REACHED
 
 
@@ -69,14 +68,13 @@ def test_external_failed_realizations(enopt_config: Any, evaluator: Any) -> None
 
 
 def test_external_user_abort(enopt_config: Any, evaluator: Any) -> None:
-    last_evaluation = 100
+    last_evaluation = 0
 
-    def _observer(event: Event) -> None:
+    def _observer(_: Event) -> None:
         nonlocal last_evaluation
 
-        assert isinstance(event.data["results"][0].result_id, int)
-        last_evaluation = event.data["results"][0].result_id
-        if event.data["results"][0].result_id == 1:
+        last_evaluation += 1
+        if last_evaluation == 1:
             optimizer.abort_optimization()
 
     optimizer = BasicOptimizer(enopt_config, evaluator()).add_observer(

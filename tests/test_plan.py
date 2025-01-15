@@ -214,8 +214,6 @@ def test_eval_attribute(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plan = Plan(parsed_config, context)
     plan.run()
     assert isinstance(plan.eval("$results"), Results)
-    assert plan.eval("$results.result_id") >= 0
-    assert plan.eval("$($results.result_id)") >= 0
     assert plan.eval("$results.plan_id[0]") == 0
     assert plan.eval("$($results.plan_id[0])") == 0
 
@@ -1288,7 +1286,6 @@ def test_table(enopt_config: dict[str, Any], evaluator: Any, tmp_path: Path) -> 
     path1 = tmp_path / "results1.txt"
     table = ResultsTable(
         columns={
-            "result_id": "eval-ID",
             "evaluations.variables": "Variables",
         },
         path=path1,
@@ -1324,7 +1321,7 @@ def test_table(enopt_config: dict[str, Any], evaluator: Any, tmp_path: Path) -> 
 
     path2 = tmp_path / "results2.txt"
     BasicOptimizer(enopt_config, evaluator()).add_table(
-        columns={"result_id": "eval-ID", "evaluations.variables": "Variables"},
+        columns={"evaluations.variables": "Variables"},
         path=path2,
     ).run()
     assert path2.exists()
