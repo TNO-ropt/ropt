@@ -5,13 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from functools import partial
 from pathlib import Path  # noqa: TC003
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Literal,
-    NoReturn,
-)
+from typing import TYPE_CHECKING, Any, Callable, Literal, NoReturn, Sequence
 
 from ropt.config.enopt import EnOptConfig
 from ropt.config.plan import PlanConfig
@@ -158,7 +152,7 @@ class BasicOptimizer:
         min_header_len: int | None = None,
         *,
         maximize: bool = False,
-        names: dict[str, tuple[str, ...] | None] | None = None,
+        names: dict[str, Sequence[str] | None] | None = None,
     ) -> Self:
         """Add a table of results.
 
@@ -235,7 +229,7 @@ class BasicOptimizer:
         *,
         table: ResultsTable,
         maximize: bool,
-        names: dict[str, tuple[str, ...] | None] | None,
+        names: dict[str, Sequence[str] | None] | None,
     ) -> None:
         if (
             event.event_type == EventType.FINISHED_EVALUATION

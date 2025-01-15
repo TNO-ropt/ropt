@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Any
+from typing import Any, Sequence
 
 import pytest
 
@@ -37,9 +37,9 @@ def enopt_config_fixture() -> dict[str, Any]:
 def _handle_results(
     event: Event,
     reporter: ResultsDataFrame,
-    variable_names: tuple[str, ...] | None = None,
+    variable_names: Sequence[str] | None = None,
 ) -> None:
-    names: dict[str, tuple[str, ...] | None] | None = (
+    names: dict[str, Sequence[str] | None] | None = (
         None if variable_names is None else {ResultAxis.VARIABLE: variable_names}
     )
     for item in event.data["results"]:
@@ -88,7 +88,7 @@ def test_dataframe_results_function_results_formatted_names(
         partial(
             _handle_results,
             reporter=reporter,
-            variable_names=tuple(f"a:{idx}" for idx in range(1, 4)),
+            variable_names=[f"a:{idx}" for idx in range(1, 4)],
         ),
     ).run()
 
@@ -111,7 +111,7 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
         partial(
             _handle_results,
             reporter=reporter,
-            variable_names=tuple(f"a:{idx}" for idx in range(1, 4)),
+            variable_names=[f"a:{idx}" for idx in range(1, 4)],
         ),
     ).run()
 

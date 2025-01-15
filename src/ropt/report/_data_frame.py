@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import fields
 from functools import partial
 from importlib.util import find_spec
-from typing import TYPE_CHECKING, Any, Final, Literal
+from typing import TYPE_CHECKING, Any, Final, Literal, Sequence
 
 from ropt.enums import ResultAxis
 from ropt.results import FunctionResults, GradientResults
@@ -80,7 +80,7 @@ class ResultsDataFrame:
     def add_results(
         self,
         results: Results,
-        names: dict[str, tuple[str, ...] | None] | None = None,
+        names: dict[str, Sequence[str] | None] | None = None,
     ) -> bool:
         """Add a results object to the table.
 
@@ -135,7 +135,7 @@ class ResultsDataFrame:
 def _get_function_results(
     results: Results,
     sub_fields: set[str],
-    names: dict[str, tuple[str, ...] | None] | None,
+    names: dict[str, Sequence[str] | None] | None,
 ) -> pd.DataFrame:
     if (
         not sub_fields
@@ -207,7 +207,7 @@ def _get_function_results(
 def _get_gradient_results(
     results: Results,
     sub_fields: set[str],
-    names: dict[str, tuple[str, ...] | None] | None,
+    names: dict[str, Sequence[str] | None] | None,
 ) -> pd.DataFrame:
     if (
         not sub_fields

@@ -3,13 +3,7 @@ from __future__ import annotations
 from abc import ABC
 from dataclasses import dataclass
 from importlib.util import find_spec
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Final,
-    Iterable,
-    TypeVar,
-)
+from typing import TYPE_CHECKING, Any, Final, Iterable, Sequence, TypeVar
 
 if TYPE_CHECKING:
     from ropt.enums import ResultAxis
@@ -69,7 +63,7 @@ class Results(ABC):
         field_name: str,
         select: Iterable[str] | None = None,
         unstack: Iterable[ResultAxis] | None = None,
-        names: dict[str, tuple[str, ...] | None] | None = None,
+        names: dict[str, Sequence[str] | None] | None = None,
     ) -> pd.DataFrame:
         """Export a field to a pandas dataframe.
 
