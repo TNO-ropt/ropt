@@ -71,7 +71,6 @@ def test_tabular_report_data_frames_results_formatted_names(
     enopt_config: Any, evaluator: Any, tmp_path: Path
 ) -> None:
     path = tmp_path / "results.txt"
-    enopt_config["variables"]["names"] = [("a", 1), ("a", 2), ("a", 3)]
     config = EnOptConfig.model_validate(enopt_config)
     BasicOptimizer(config, evaluator()).add_table(
         {
@@ -93,7 +92,6 @@ def test_tabular_report_data_frames_gradients(
     enopt_config: Any, evaluator: Any, tmp_path: Path
 ) -> None:
     path = tmp_path / "gradients.txt"
-    enopt_config["variables"]["names"] = [("a", 1), ("a", 2), ("a", 3)]
     config = EnOptConfig.model_validate(enopt_config)
     BasicOptimizer(config, evaluator()).add_table(
         {
@@ -121,7 +119,6 @@ def test_tabular_report_data_frames_min_header_len(
     enopt_config: Any, evaluator: Any, tmp_path: Path, min_header_len: int | None
 ) -> None:
     path = tmp_path / "results.txt"
-    enopt_config["variables"]["names"] = [("a", 1), ("a", 2), ("a", 3)]
     config = EnOptConfig.model_validate(enopt_config)
     BasicOptimizer(config, evaluator()).add_table(
         {

@@ -32,34 +32,6 @@ def enopt_config_fixture() -> dict[str, Any]:
     }
 
 
-def test_check_variable_names() -> None:
-    config = {"names": ["a", "b"], "initial_values": np.array([1, 2])}
-    variables = VariablesConfig.model_validate(config)
-    assert variables.names == ("a", "b")
-
-    config = {"names": [1, "b"], "initial_values": np.array([1, 2])}
-    variables = VariablesConfig.model_validate(config)
-    assert variables.names is not None
-    assert isinstance(variables.names[0], int)
-    assert isinstance(variables.names[1], str)
-
-    config = {"names": [("a",), ("b",)], "initial_values": np.array([1, 2])}
-    variables = VariablesConfig.model_validate(config)
-    assert variables.names == (("a",), ("b",))
-
-    config = {"names": [(1, "a"), "b"], "initial_values": np.array([1, 2])}
-    variables = VariablesConfig.model_validate(config)
-    assert variables.names is not None
-    assert isinstance(variables.names[0], tuple)
-    assert isinstance(variables.names[0][0], int)
-    assert isinstance(variables.names[0][1], str)
-    assert isinstance(variables.names[1], str)
-
-    config = {"names": ["a", "a", "b", "b", "c"], "initial_values": 0}
-    with pytest.raises(ValueError, match="duplicate names: a, b"):
-        VariablesConfig.model_validate(config)
-
-
 def test_check_variable_arrays() -> None:
     config = {"initial_values": np.array([1, 2]), "lower_bounds": np.array([0.0, 0.0])}
 
@@ -128,47 +100,6 @@ def test_check_variable_arrays_types() -> None:
     variables = VariablesConfig.model_validate(config)
     assert variables.types is not None
     assert np.all(variables.types == [VariableType.INTEGER, VariableType.REAL])
-
-
-def test_get_formatted_names() -> None:
-    config: dict[str, Any] = {"initial_values": [0, 0]}
-    variables = VariablesConfig.model_validate(config)
-    joined = variables.get_formatted_names()
-    assert joined is None
-
-    config = {"names": ["a", ("b", "c"), "d"], "initial_values": 0}
-    variables = VariablesConfig.model_validate(config)
-    joined = variables.get_formatted_names()
-    assert joined == ("a", "b:c", "d")
-
-    config = {"names": [("a", "b", "c", "d")], "initial_values": 0}
-    variables = VariablesConfig.model_validate(config)
-    joined = variables.get_formatted_names()
-    assert joined == ("a:b:c:d",)
-
-    config = {"names": [("a", "b", "c", "d")], "initial_values": 0, "delimiters": "123"}
-    variables = VariablesConfig.model_validate(config)
-    joined = variables.get_formatted_names()
-    assert joined == ("a1b2c3d",)
-
-    config = {
-        "names": [("a", "b", "c", "d")],
-        "initial_values": 0,
-        "delimiters": "1234",
-    }
-    variables = VariablesConfig.model_validate(config)
-    joined = variables.get_formatted_names()
-    assert joined == ("a1b2c3d",)
-
-    config = {"names": [("a", "b", "c", "d")], "initial_values": 0, "delimiters": "12"}
-    variables = VariablesConfig.model_validate(config)
-    joined = variables.get_formatted_names()
-    assert joined == ("a1b2c2d",)
-
-    config = {"names": [("a", "b", "c", "d")], "initial_values": 0, "delimiters": ""}
-    variables = VariablesConfig.model_validate(config)
-    joined = variables.get_formatted_names()
-    assert joined == ("abcd",)
 
 
 def test_check_objective_function_arrays() -> None:
@@ -334,14 +265,6 @@ def test_check_nonlinear_constraint_convert_arrays() -> None:
         config_copy[key] = [1.0, 1.0, 1.0]
         with pytest.raises(ValidationError):
             NonlinearConstraintsConfig.model_validate(config_copy)
-
-
-def test_check_realization_names() -> None:
-    config = {"names": [1, "2"]}
-    realizations = RealizationsConfig.model_validate(config)
-    assert realizations.names is not None
-    assert isinstance(realizations.names[0], int)
-    assert isinstance(realizations.names[1], str)
 
 
 def test_check_realization_arrays() -> None:

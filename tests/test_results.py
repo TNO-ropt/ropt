@@ -21,15 +21,12 @@ from ropt.results import (
 def enopt_config_fixture() -> dict[str, Any]:
     return {
         "variables": {
-            "names": ["x", "y"],
             "initial_values": [0.0, 0.0],
         },
         "objectives": {
-            "names": ["f1", "f2"],
             "weights": [0.75, 0.25],
         },
         "realizations": {
-            "names": ["r1", "r2", "r3"],
             "weights": [1.0] * 3,
         },
         "gradient": {

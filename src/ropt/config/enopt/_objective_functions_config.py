@@ -12,7 +12,6 @@ from ropt.config.validated_types import (  # noqa: TC001
     Array1D,
     Array1DBool,
     Array1DInt,
-    UniqueNames,
 )
 
 
@@ -28,9 +27,6 @@ class ObjectiveFunctionsConfig(ImmutableBaseModel):
     `numpy` array, with a length that determines the number of objective functions.
     Its values will be normalized to have a sum equal to 1. For example, when
     `weights` is set to `[1, 1]`, the stored values will be `[0.5, 0.5]`.
-
-    The `names` field is optional. If given, its length must be equal to the
-    number of objective functions.
 
     The `scales` field contains scaling values for the objectives. These values
     are used to scale the objective function values to a desired order of
@@ -64,7 +60,6 @@ class ObjectiveFunctionsConfig(ImmutableBaseModel):
         will still be calculated in the same way for practical purposes.
 
     Attributes:
-        names:               Optional names of the objective functions.
         weights:             Objective functions weights (default: 1.0).
         scales:              The scaling factors (default: 1.0).
         auto_scale:          Enable/disable auto-scaling (default: `False`).
@@ -72,7 +67,6 @@ class ObjectiveFunctionsConfig(ImmutableBaseModel):
         function_transforms: Optional function transform indices.
     """
 
-    names: UniqueNames | None = None
     weights: Array1D = np.array(1.0)
     scales: Array1D = np.array(1.0, dtype=np.float64)
     auto_scale: Array1DBool = np.array(False)  # noqa: FBT003

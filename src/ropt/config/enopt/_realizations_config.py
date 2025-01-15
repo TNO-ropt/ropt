@@ -8,7 +8,7 @@ import numpy as np
 from pydantic import ConfigDict, NonNegativeInt, model_validator
 
 from ropt.config.utils import ImmutableBaseModel, normalize
-from ropt.config.validated_types import Array1D, UniqueNames  # noqa: TC001
+from ropt.config.validated_types import Array1D  # noqa: TC001
 
 
 class RealizationsConfig(ImmutableBaseModel):
@@ -28,9 +28,6 @@ class RealizationsConfig(ImmutableBaseModel):
     example, when `weights` is set to `[1, 1]`, the stored values will be `[0.5,
     0.5]`.
 
-    The `names` field is optional. If given, its length must be equal to the
-    number of realizations.
-
     If during the calculation of the function values for each realization one or
     more values are missing, for instance due to failure of a complex
     simulation, the total function and gradient values can still be calculated
@@ -47,13 +44,11 @@ class RealizationsConfig(ImmutableBaseModel):
         and will behave as if the value is set to one.
 
     Attributes:
-        names:                   Optional names of the realizations.
         weights:                 The weights of the realizations (default: 1).
         realization_min_success: The minimum number of successful realizations
                                  (default: equal to the number of realizations).
     """
 
-    names: UniqueNames | None = None
     weights: Array1D = np.array(1.0)
     realization_min_success: NonNegativeInt | None = None
 

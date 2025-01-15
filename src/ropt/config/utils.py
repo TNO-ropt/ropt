@@ -3,7 +3,6 @@
 These utilities are intended to be used in the model validation code of Pydantic models.
 """
 
-from collections import Counter
 from collections.abc import Sequence as AbstractSequence
 from collections.abc import Set as AbstractSet
 from enum import IntEnum
@@ -143,19 +142,6 @@ def _convert_indices(array: ArrayLike | None) -> NDArray[np.intc] | None:
         NDArray[np.intc],
         np.unique(immutable_array(array, dtype=np.intc, ndmin=1)),
     )
-
-
-def _check_duplicates(names: tuple[Any, ...] | None) -> tuple[Any, ...] | None:
-    if names is None:
-        return None
-    converted_names = tuple(
-        tuple(name) if isinstance(name, list) else name for name in names
-    )
-    counts = Counter(converted_names)
-    duplicates = [str(name) for name, count in counts.items() if count > 1]
-    if duplicates:
-        raise ValueError("duplicate names: " + ", ".join(duplicates))
-    return converted_names
 
 
 T = TypeVar("T")

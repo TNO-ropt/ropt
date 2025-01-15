@@ -24,14 +24,13 @@ that single values are embedded in a set or tuple, respectively:
 - [`ItemOrTuple[T]`][ropt.config.validated_types.ItemOrTuple]: Create a tuple of type `T`.
 """
 
-from typing import Annotated, Any, TypeVar
+from typing import Annotated, TypeVar
 
 import numpy as np
 from numpy.typing import NDArray
-from pydantic import AfterValidator, BeforeValidator
+from pydantic import BeforeValidator
 
 from .utils import (
-    _check_duplicates,
     _convert_1d_array,
     _convert_1d_array_bool,
     _convert_1d_array_intc,
@@ -59,9 +58,6 @@ Array1DInt = Annotated[NDArray[np.intc], BeforeValidator(_convert_1d_array_intc)
 
 Array1DBool = Annotated[NDArray[np.bool_], BeforeValidator(_convert_1d_array_bool)]
 """Convert to an immutable 1D numpy array of boolean values."""
-
-UniqueNames = Annotated[tuple[Any, ...], AfterValidator(_check_duplicates)]
-"""Check for duplicates in a tuple, raising ValueError if duplicates are found."""
 
 
 T = TypeVar("T")

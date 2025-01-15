@@ -13,7 +13,6 @@ from ropt.config.validated_types import (  # noqa: TC001
     Array1DBool,
     Array1DInt,
     ArrayEnum,
-    UniqueNames,
 )
 from ropt.enums import ConstraintType
 
@@ -29,9 +28,6 @@ class NonlinearConstraintsConfig(ImmutableBaseModel):
     a right-hand-side value, either for equality or inequality. The `rhs_values`
     field, which is a `numpy` array with a length equal to the number of
     constraint functions, provides the right-hand-side values.
-
-    The `names` field is optional, if provided, its length should be equal to the
-    number of constraints.
 
     The `scales` field contains scaling values for the constraints. These values
     scale the constraint function values to a desired order of magnitude. Each
@@ -70,7 +66,6 @@ class NonlinearConstraintsConfig(ImmutableBaseModel):
         will still be calculated in the same way for practical purposes.
 
     Attributes:
-        names:               The names of the constraint functions (optional).
         rhs_values:          The right-hand-side values.
         scales:              The scaling factors (default: 1.0).
         auto_scale:          Enable/disable auto-scaling (default: `False`).
@@ -80,7 +75,6 @@ class NonlinearConstraintsConfig(ImmutableBaseModel):
         function_transforms: Optional function transform indices.
     """
 
-    names: UniqueNames | None = None
     rhs_values: Array1D
     scales: Array1D = np.array(1.0)
     auto_scale: Array1DBool = np.array([False])

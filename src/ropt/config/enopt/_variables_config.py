@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Self
 
 import numpy as np
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import ConfigDict, model_validator
 
 from ropt.config.utils import (
     ImmutableBaseModel,
@@ -17,10 +17,8 @@ from ropt.config.validated_types import (  # noqa: TC001
     Array1D,
     ArrayEnum,
     ArrayIndices,
-    UniqueNames,
 )
 from ropt.enums import VariableType
-from ropt.utils.misc import format_tuple
 
 
 class VariablesConfig(ImmutableBaseModel):
@@ -37,19 +35,6 @@ class VariablesConfig(ImmutableBaseModel):
     indicating that corresponding variables have no lower or upper bounds,
     respectively. These values are converted to `numpy.inf` values with an
     appropriate sign.
-
-    The `names` field is optional since variable names are not strictly needed
-    by the optimizer. If given, the lenght of this field must be equal to the number
-    of variables.
-
-    Info: Variable Names
-        `ropt` does not use the names itself, and names can be of arbitrary
-        type, as long as they are unique. However, some optimizers or external
-        code might need a string representation of each name, which can be
-        obtained using the
-        [`get_formatted_names`][ropt.config.enopt.VariablesConfig.get_formatted_names]
-        method. The `delimiters` attribute is used by this method to convert the
-        special case of names consisting of tuples of strings.
 
     The optional `types` field can be used to assign types to each variable,
     according to the [`VariableType`][ropt.enums.VariableType] enumeration. The
@@ -74,7 +59,6 @@ class VariablesConfig(ImmutableBaseModel):
     should change while others remain fixed.
 
     Attributes:
-        names:          Optional names of the variables.
         types:          The type of the variables (optional).
         initial_values: The initial values of the variables.
         lower_bounds:   Lower bound of the variables (default: $-\infty$).
@@ -82,10 +66,8 @@ class VariablesConfig(ImmutableBaseModel):
         offsets:        Optional offsets, used for scaling the variables.
         scales:         Optional scales, used for scaling the variables.
         indices:        Optional indices of variables to optimize.
-        delimiters:     Delimiters used to construct names from tuples.
     """
 
-    names: UniqueNames | None = None
     types: ArrayEnum | None = None
     initial_values: Array1D = np.array(0.0)
     lower_bounds: Array1D = np.array(-np.inf)
@@ -93,7 +75,6 @@ class VariablesConfig(ImmutableBaseModel):
     offsets: Array1D | None = None
     scales: Array1D | None = None
     indices: ArrayIndices | None = None
-    delimiters: str = Field(":", min_length=0)
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -136,23 +117,3 @@ class VariablesConfig(ImmutableBaseModel):
         self._immutable()
 
         return self
-
-    def get_formatted_names(self) -> tuple[str, ...] | None:
-        """Return string representations of the variable names.
-
-        This method converts the variable names to a tuple of strings. Each name
-        is converted using its string representation unless the name is a tuple.
-        In that case, the tuple items are converted to strings and joined using
-        the delimiters taken from the `delimiter` field in the `Variables`
-        object. This field is a string that may consist of multiple delimiters
-        used in turn. If it contains fewer items than needed, the last one is
-        used for the missing ones. By default, the `:` character is used as the
-        delimiter.
-
-        Returns:
-            A tuple of formatted variable names.
-        """
-        if self.names is None:
-            return None
-
-        return tuple(format_tuple(name, self.delimiters) for name in self.names)
