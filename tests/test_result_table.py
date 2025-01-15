@@ -4,6 +4,7 @@ from typing import Any
 import pytest
 
 from ropt.config.enopt import EnOptConfig
+from ropt.enums import ResultAxis
 from ropt.plan import BasicOptimizer
 
 # Requires pandas:
@@ -77,6 +78,7 @@ def test_tabular_report_data_frames_results_formatted_names(
             "evaluations.variables": "Variables",
         },
         path=path,
+        names={"variable": tuple(f"a:{idx + 1}" for idx in range(3))},
     ).run()
 
     assert path.exists()
@@ -99,6 +101,7 @@ def test_tabular_report_data_frames_gradients(
         },
         path,
         table_type="gradients",
+        names={ResultAxis.VARIABLE: tuple(f"a:{idx + 1}" for idx in range(3))},
     ).run()
     assert path.exists()
     gradients = pd.read_fwf(path, header=[0, 1], skiprows=[2])
