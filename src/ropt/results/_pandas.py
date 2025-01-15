@@ -17,7 +17,7 @@ def _to_dataframe(  # noqa: PLR0913
     batch_id: int | None,
     select: Iterable[str] | None,
     unstack: Iterable[ResultAxis] | None,
-    names: dict[ResultAxis, tuple[str, ...] | None] | None = None,
+    names: dict[str, tuple[str, ...] | None] | None = None,
 ) -> pd.DataFrame:
     if select is None:
         select = (field.name for field in fields(result_field))
@@ -44,7 +44,7 @@ def _to_series(
     plan_id: tuple[int, ...],
     batch_id: int | None,
     field: str,
-    names: dict[ResultAxis, tuple[str, ...] | None] | None = None,
+    names: dict[str, tuple[str, ...] | None] | None = None,
 ) -> pd.Series[Any] | None:
     try:
         data = getattr(result_field, field)

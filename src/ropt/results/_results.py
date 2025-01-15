@@ -69,7 +69,7 @@ class Results(ABC):
         field_name: str,
         select: Iterable[str] | None = None,
         unstack: Iterable[ResultAxis] | None = None,
-        names: dict[ResultAxis, tuple[str, ...] | None] | None = None,
+        names: dict[str, tuple[str, ...] | None] | None = None,
     ) -> pd.DataFrame:
         """Export a field to a pandas dataframe.
 

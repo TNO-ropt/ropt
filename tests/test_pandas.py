@@ -89,7 +89,7 @@ def gradient_result_fixture() -> GradientResults:
 
 
 def test__to_series(gradient_result: GradientResults) -> None:
-    names: dict[ResultAxis, Any] = {
+    names: dict[str, Any] = {
         ResultAxis.VARIABLE: ("v1", "v2"),
         ResultAxis.REALIZATION: ("ra", "rb", "rc"),
     }
@@ -119,7 +119,7 @@ def test__to_series(gradient_result: GradientResults) -> None:
 
 
 def test_to_dataframe(gradient_result: GradientResults) -> None:
-    names: dict[ResultAxis, Any] = {
+    names: dict[str, Any] = {
         ResultAxis.VARIABLE: ("v1", "v2"),
         ResultAxis.REALIZATION: ("ra", "rb", "rc"),
         ResultAxis.OBJECTIVE: ("fa", "fb"),
@@ -148,7 +148,7 @@ def test_to_dataframe_formatter(
 ) -> None:
     enopt_config["variables"]["names"] = [("x", 0), ("x", 1)]
     config = EnOptConfig.model_validate(enopt_config)
-    names: dict[ResultAxis, Any] = {
+    names: dict[str, Any] = {
         ResultAxis.VARIABLE: config.variables.get_formatted_names()
     }
     frame = function_result.to_dataframe(
@@ -165,7 +165,7 @@ def test_to_dataframe_unstack(
     enopt_config: Any, gradient_result: GradientResults
 ) -> None:
     config = EnOptConfig.model_validate(enopt_config)
-    names: dict[ResultAxis, Any] = {
+    names: dict[str, Any] = {
         ResultAxis.VARIABLE: config.variables.get_formatted_names(),
         ResultAxis.REALIZATION: config.realizations.names,
     }
@@ -190,7 +190,7 @@ def test_to_dataframe_unstack2(
     enopt_config: Any, gradient_result: GradientResults
 ) -> None:
     config = EnOptConfig.model_validate(enopt_config)
-    names: dict[ResultAxis, Any] = {
+    names: dict[str, Any] = {
         ResultAxis.VARIABLE: config.variables.get_formatted_names(),
         ResultAxis.REALIZATION: config.realizations.names,
         ResultAxis.OBJECTIVE: config.objectives.names,
@@ -216,7 +216,7 @@ def test_to_dataframe_unstack_only_variable(
     enopt_config: Any, gradient_result: GradientResults
 ) -> None:
     config = EnOptConfig.model_validate(enopt_config)
-    names: dict[ResultAxis, Any] = {
+    names: dict[str, Any] = {
         ResultAxis.VARIABLE: config.variables.get_formatted_names(),
         ResultAxis.REALIZATION: config.realizations.names,
     }

@@ -1,6 +1,6 @@
 """Enumerations used within the `ropt` library."""
 
-from enum import Enum, IntEnum
+from enum import IntEnum, StrEnum
 
 
 class VariableType(IntEnum):
@@ -165,7 +165,7 @@ class OptimizerExitCode(IntEnum):
     """Returned when an evaluation step terminates normally."""
 
 
-class ResultAxis(Enum):
+class ResultAxis(StrEnum):
     """Enumerates the possible axes in a Results data object.
 
     Result objects (see [`Results`][ropt.results.Results]) contain

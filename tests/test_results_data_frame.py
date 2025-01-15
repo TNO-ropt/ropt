@@ -39,7 +39,7 @@ def _handle_results(
     reporter: ResultsDataFrame,
     variable_names: tuple[str, ...] | None = None,
 ) -> None:
-    names: dict[ResultAxis, tuple[str, ...] | None] | None = (
+    names: dict[str, tuple[str, ...] | None] | None = (
         None if variable_names is None else {ResultAxis.VARIABLE: variable_names}
     )
     for item in event.data["results"]:
