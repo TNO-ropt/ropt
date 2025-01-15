@@ -1770,7 +1770,7 @@ type.</p>
 
 
 <h3 id="ropt.plan.BasicOptimizer.add_table" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">add_table</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;functions&#39;</span><span class="p">,</span> <span class="n">min_header_len</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">maximize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">add_table</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;functions&#39;</span><span class="p">,</span> <span class="n">min_header_len</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">maximize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h3>
 
@@ -1874,6 +1874,22 @@ documentation for more details.</p>
             </td>
             <td>
                   <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>names</code>
+            </td>
+            <td>
+                  <code>dict[str, tuple[str, ...] | None] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A mapping of names for the table axes.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
