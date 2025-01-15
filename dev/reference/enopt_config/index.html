@@ -616,21 +616,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="VariablesConfig">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.config.enopt.VariablesConfig.get_formatted_names" class="md-nav__link">
-    <span class="md-ellipsis">
-      get_formatted_names
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -1468,21 +1453,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="VariablesConfig">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.config.enopt.VariablesConfig.get_formatted_names" class="md-nav__link">
-    <span class="md-ellipsis">
-      get_formatted_names
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -1945,21 +1915,7 @@ bounds, are broadcasted to the number of variables, and are set to
 indicating that corresponding variables have no lower or upper bounds,
 respectively. These values are converted to <code>numpy.inf</code> values with an
 appropriate sign.</p>
-<p>The <code>names</code> field is optional since variable names are not strictly needed
-by the optimizer. If given, the lenght of this field must be equal to the number
-of variables.</p>
-
-
-<details class="info" open>
-  <summary>Variable Names</summary>
-  <p><code>ropt</code> does not use the names itself, and names can be of arbitrary
-type, as long as they are unique. However, some optimizers or external
-code might need a string representation of each name, which can be
-obtained using the
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.VariablesConfig.get_formatted_names"><code>get_formatted_names</code></a>
-method. The <code>delimiters</code> attribute is used by this method to convert the
-special case of names consisting of tuples of strings.</p>
-</details>        <p>The optional <code>types</code> field can be used to assign types to each variable,
+<p>The optional <code>types</code> field can be used to assign types to each variable,
 according to the <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.VariableType"><code>VariableType</code></a> enumeration. The
 values can be used to configure the optimizer accordingly. If not provided,
 all variables are assumed to be continuous and of real data type
@@ -1992,17 +1948,6 @@ should change while others remain fixed.</p>
         </tr>
       </thead>
       <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.VariablesConfig.names">names</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.UniqueNames" href="../utilities/#ropt.config.validated_types.UniqueNames">UniqueNames</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional names of the variables.</p>
-              </div>
-            </td>
-          </tr>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.VariablesConfig.types">types</span></code></td>
             <td>
@@ -2080,17 +2025,6 @@ should change while others remain fixed.</p>
               </div>
             </td>
           </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.VariablesConfig.delimiters">delimiters</span></code></td>
-            <td>
-                  <code>str</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Delimiters used to construct names from tuples.</p>
-              </div>
-            </td>
-          </tr>
       </tbody>
     </table>
 
@@ -2104,59 +2038,6 @@ should change while others remain fixed.</p>
 
   <div class="doc doc-children">
 
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.config.enopt.VariablesConfig.get_formatted_names" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">get_formatted_names</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return string representations of the variable names.</p>
-<p>This method converts the variable names to a tuple of strings. Each name
-is converted using its string representation unless the name is a tuple.
-In that case, the tuple items are converted to strings and joined using
-the delimiters taken from the <code>delimiter</code> field in the <code>Variables</code>
-object. This field is a string that may consist of multiple delimiters
-used in turn. If it contains fewer items than needed, the last one is
-used for the missing ones. By default, the <code>:</code> character is used as the
-delimiter.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code>tuple[str, ...] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A tuple of formatted variable names.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
 
 
 
@@ -2195,8 +2076,6 @@ weighting with values passed via the <code>weights</code> field. This field is a
 <code>numpy</code> array, with a length that determines the number of objective functions.
 Its values will be normalized to have a sum equal to 1. For example, when
 <code>weights</code> is set to <code>[1, 1]</code>, the stored values will be <code>[0.5, 0.5]</code>.</p>
-<p>The <code>names</code> field is optional. If given, its length must be equal to the
-number of objective functions.</p>
 <p>The <code>scales</code> field contains scaling values for the objectives. These values
 are used to scale the objective function values to a desired order of
 magnitude. Each time new objective function values are obtained during
@@ -2242,17 +2121,6 @@ will still be calculated in the same way for practical purposes.</p>
         </tr>
       </thead>
       <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.names">names</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.UniqueNames" href="../utilities/#ropt.config.validated_types.UniqueNames">UniqueNames</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional names of the objective functions.</p>
-              </div>
-            </td>
-          </tr>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.weights">weights</span></code></td>
             <td>
@@ -2566,8 +2434,6 @@ configuration with these adjustments applied.</p>
 a right-hand-side value, either for equality or inequality. The <code>rhs_values</code>
 field, which is a <code>numpy</code> array with a length equal to the number of
 constraint functions, provides the right-hand-side values.</p>
-<p>The <code>names</code> field is optional, if provided, its length should be equal to the
-number of constraints.</p>
 <p>The <code>scales</code> field contains scaling values for the constraints. These values
 scale the constraint function values to a desired order of magnitude. Each
 time new constraint function values are obtained during optimization, they
@@ -2617,17 +2483,6 @@ will still be calculated in the same way for practical purposes.</p>
         </tr>
       </thead>
       <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.names">names</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.UniqueNames" href="../utilities/#ropt.config.validated_types.UniqueNames">UniqueNames</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The names of the constraint functions (optional).</p>
-              </div>
-            </td>
-          </tr>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.rhs_values">rhs_values</span></code></td>
             <td>
@@ -2749,8 +2604,6 @@ of combining realizations are possible.</p>
 of realizations. Its values will be normalized to have a sum equal to 1. For
 example, when <code>weights</code> is set to <code>[1, 1]</code>, the stored values will be <code>[0.5,
 0.5]</code>.</p>
-<p>The <code>names</code> field is optional. If given, its length must be equal to the
-number of realizations.</p>
 <p>If during the calculation of the function values for each realization one or
 more values are missing, for instance due to failure of a complex
 simulation, the total function and gradient values can still be calculated
@@ -2779,17 +2632,6 @@ and will behave as if the value is set to one.</p>
         </tr>
       </thead>
       <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.RealizationsConfig.names">names</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.UniqueNames" href="../utilities/#ropt.config.validated_types.UniqueNames">UniqueNames</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional names of the realizations.</p>
-              </div>
-            </td>
-          </tr>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.RealizationsConfig.weights">weights</span></code></td>
             <td>
