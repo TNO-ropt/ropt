@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -129,6 +130,10 @@ class DefaultOptimizerStep(PlanStep):
         The `tags` field allows optional labels to be attached to each result,
         assisting result handlers in filtering relevant results.
 
+        The `data` field can be used to pass additional information via the `data`
+        field of the events emitted by the optimizer step. Avoid the use of `results`
+        and `exit_code` in this field, as these are already passed in the event data.
+
         The `nested_optimization_plan` is parsed as a [`NestedPlanConfig`]
         [ropt.plugins.plan.optimizer.DefaultOptimizerStep.NestedPlanConfig] to
         define an optional nested optimization procedure.
@@ -138,6 +143,7 @@ class DefaultOptimizerStep(PlanStep):
             tags:                  Tags to add to the emitted events.
             initial_values:        The initial values for the optimizer.
             exit_code_var:         Name of the variable to store the exit code.
+            data:                  Data to pass via events.
             nested_optimization:   Optional nested optimization plan configuration.
         """
 
@@ -146,6 +152,7 @@ class DefaultOptimizerStep(PlanStep):
         initial_values: str | Array1D | None = None
         exit_code_var: str | None = None
         nested_optimization: DefaultOptimizerStep.NestedPlanConfig | None = None
+        data: dict[str, Any] = {}
 
         model_config = ConfigDict(
             extra="forbid",
@@ -175,7 +182,11 @@ class DefaultOptimizerStep(PlanStep):
         self._enopt_config = self.parse_config(self._with.config)
 
         self.emit_event(
-            Event(event_type=EventType.START_OPTIMIZER_STEP, tags=self._with.tags)
+            Event(
+                event_type=EventType.START_OPTIMIZER_STEP,
+                tags=self._with.tags,
+                data=deepcopy(self._with.data),
+            )
         )
 
         ensemble_evaluator = EnsembleEvaluator(
@@ -210,11 +221,13 @@ class DefaultOptimizerStep(PlanStep):
         if self._with.exit_code_var is not None:
             self.plan[self._with.exit_code_var] = exit_code
 
+        data = deepcopy(self._with.data)
+        data["exit_code"] = exit_code
         self.emit_event(
             Event(
                 event_type=EventType.FINISHED_OPTIMIZER_STEP,
                 tags=self._with.tags,
-                data={"exit_code": exit_code},
+                data=data,
             )
         )
 
@@ -259,15 +272,22 @@ class DefaultOptimizerStep(PlanStep):
         """
         if results is None:
             self.emit_event(
-                Event(event_type=EventType.START_EVALUATION, tags=self._with.tags)
+                Event(
+                    event_type=EventType.START_EVALUATION,
+                    tags=self._with.tags,
+                    data=deepcopy(self._with.data),
+                )
             )
         else:
+            data = deepcopy(self._with.data)
+            data["exit_code"] = exit_code
+            data["results"] = results
             self.emit_event(
                 Event(
                     event_type=EventType.FINISHED_EVALUATION,
                     tags=self._with.tags,
-                    data={"results": results, "exit_code": exit_code},
-                )
+                    data=data,
+                ),
             )
 
     def _run_nested_plan(

@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from copy import deepcopy
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict
@@ -72,6 +73,10 @@ class DefaultEvaluatorStep(PlanStep):
         The `tags` field allows optional labels to be attached to each result,
         which can assist result handlers in filtering relevant results.
 
+        The `data` field can be used to pass additional information via the `data`
+        field of the events emitted by the optimizer step. Avoid the use of `results`
+        and `exit_code` in this field, as these are already passed in the event data.
+
         Note: Variable Scaling
             Internally, the evaluator may use scaled variables as configured by
             the optimizer. When providing `values`, ensure they are unscaled;
@@ -81,11 +86,13 @@ class DefaultEvaluatorStep(PlanStep):
             config: The optimizer configuration.
             tags:   Tags to add to the emitted events.
             values: Values to evaluate at.
+            data:   Data to pass via events.
         """
 
         config: str
         tags: ItemOrSet[str] = set()
         values: str | Array2D | None = None
+        data: dict[str, Any] = {}
 
         model_config = ConfigDict(
             extra="forbid",
@@ -110,7 +117,11 @@ class DefaultEvaluatorStep(PlanStep):
         self._enopt_config = self.parse_config(self._with.config)
 
         self.emit_event(
-            Event(event_type=EventType.START_EVALUATOR_STEP, tags=self._with.tags)
+            Event(
+                event_type=EventType.START_EVALUATOR_STEP,
+                tags=self._with.tags,
+                data=deepcopy(self._with.data),
+            )
         )
         ensemble_evaluator = EnsembleEvaluator(
             self._enopt_config,
@@ -134,11 +145,14 @@ class DefaultEvaluatorStep(PlanStep):
         if results[0].functions is None:
             exit_code = OptimizerExitCode.TOO_FEW_REALIZATIONS
 
+        data = deepcopy(self._with.data)
+        data["exit_code"] = exit_code
+        data["results"] = results
         self.emit_event(
             Event(
                 event_type=EventType.FINISHED_EVALUATOR_STEP,
                 tags=self._with.tags,
-                data={"results": results, "exit_code": exit_code},
+                data=data,
             )
         )
 
