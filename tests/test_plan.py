@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import filecmp
 import re
 from copy import deepcopy
 from typing import TYPE_CHECKING, Any
@@ -1318,15 +1317,6 @@ def test_table(enopt_config: dict[str, Any], evaluator: Any, tmp_path: Path) -> 
     assert path1.exists()
     with path1.open() as fp:
         assert len(fp.readlines()) == 8
-
-    path2 = tmp_path / "results2.txt"
-    BasicOptimizer(enopt_config, evaluator()).add_table(
-        columns={"evaluations.variables": "Variables"},
-        path=path2,
-    ).run()
-    assert path2.exists()
-
-    assert filecmp.cmp(path1, path2)
 
 
 @pytest.mark.parametrize("file_format", ["json", "pickle"])

@@ -2,17 +2,14 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import dataclass
-from functools import partial
-from pathlib import Path  # noqa: TC003
-from typing import TYPE_CHECKING, Any, Callable, Literal, NoReturn, Sequence
+from typing import TYPE_CHECKING, Any, Callable, NoReturn
 
 from ropt.config.enopt import EnOptConfig
 from ropt.config.plan import PlanConfig
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
-from ropt.report import ResultsTable
-from ropt.results import convert_to_maximize
 
 from ._context import OptimizerContext
 from ._plan import Plan
@@ -68,35 +65,12 @@ class BasicOptimizer:
             evaluator:            The evaluator object used to evaluate functions.
             constraint_tolerance: The tolerance level used to detect constraint violations.
         """
-        config = EnOptConfig.model_validate(enopt_config)
+        self._config = EnOptConfig.model_validate(enopt_config)
+        self._constraint_tolerance = constraint_tolerance
         self._optimizer_context = OptimizerContext(evaluator=evaluator)
         self._observers: list[tuple[EventType, Callable[[Event], None]]] = []
-        self._variables = {
-            "__config__": config,
-            "__optimum_tracker__": None,
-            "__exit_code__": OptimizerExitCode.UNKNOWN,
-        }
-        self._steps: list[dict[str, Any]] = [
-            {
-                "run": "optimizer",
-                "with": {
-                    "config": "$__config__",
-                    "exit_code_var": "__exit_code__",
-                    "tags": "__optimizer_tag__",
-                },
-            }
-        ]
-        self._handlers: list[dict[str, Any]] = [
-            {
-                "run": "tracker",
-                "with": {
-                    "var": "__optimum_tracker__",
-                    "constraint_tolerance": constraint_tolerance,
-                    "tags": "__optimizer_tag__",
-                },
-            },
-        ]
         self._results: _Results
+        self._event_data: dict[str, Any] = {}
 
     @property
     def results(self) -> FunctionResults | None:
@@ -144,44 +118,19 @@ class BasicOptimizer:
         self._observers.append((event_type, function))
         return self
 
-    def add_table(  # noqa: PLR0913
-        self,
-        columns: dict[str, str],
-        path: Path,
-        table_type: Literal["functions", "gradients"] = "functions",
-        min_header_len: int | None = None,
-        *,
-        maximize: bool = False,
-        names: dict[str, Sequence[str] | None] | None = None,
-    ) -> Self:
-        """Add a table of results.
+    def add_event_data(self, data: dict[str, Any]) -> Self:
+        """Add data that will be merged into event data.
 
-        This method instructs the optimizer to generate a table summarizing the
-        results of the optimization. This is implemented via a
-        [`ResultsTable`][ropt.report.ResultsTable] object. Refer to its
-        documentation for more details.
+        The given data will be merged into the event data dictionary that
+        is passed via events emitted by the optimizer.
 
         Args:
-            columns:        A mapping of column names for the results table.
-            path:           The location where the results file will be saved.
-            table_type:     The type of table to generate.
-            min_header_len: The minimum number of header lines to generate.
-            maximize:       If `True`, interpret the results as a maximization
-                            problem rather than the default minimization.
-            names:          A mapping of names for the table axes.
+            data: The data to add.
 
         Returns:
             The `BasicOptimizer` instance, allowing for method chaining.
         """
-        table = ResultsTable(
-            columns, path, table_type=table_type, min_header_len=min_header_len
-        )
-        self.add_observer(
-            EventType.FINISHED_EVALUATION,
-            partial(
-                self._handle_report_event, table=table, maximize=maximize, names=names
-            ),
-        )
+        self._event_data.update(deepcopy(data))
         return self
 
     def run(self) -> Self:
@@ -193,9 +142,32 @@ class BasicOptimizer:
         plan = Plan(
             PlanConfig.model_validate(
                 {
-                    "variables": self._variables,
-                    "steps": self._steps,
-                    "handlers": self._handlers,
+                    "variables": {
+                        "__config__": self._config,
+                        "__optimum_tracker__": None,
+                        "__exit_code__": OptimizerExitCode.UNKNOWN,
+                    },
+                    "steps": [
+                        {
+                            "run": "optimizer",
+                            "with": {
+                                "config": "$__config__",
+                                "exit_code_var": "__exit_code__",
+                                "tags": "__optimizer_tag__",
+                                "data": self._event_data,
+                            },
+                        }
+                    ],
+                    "handlers": [
+                        {
+                            "run": "tracker",
+                            "with": {
+                                "var": "__optimum_tracker__",
+                                "constraint_tolerance": self._constraint_tolerance,
+                                "tags": "__optimizer_tag__",
+                            },
+                        },
+                    ],
                 }
             ),
             self._optimizer_context,
@@ -222,25 +194,3 @@ class BasicOptimizer:
         the current function evaluation.
         """
         raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
-
-    def _handle_report_event(
-        self,
-        event: Event,
-        *,
-        table: ResultsTable,
-        maximize: bool,
-        names: dict[str, Sequence[str] | None] | None,
-    ) -> None:
-        if (
-            event.event_type == EventType.FINISHED_EVALUATION
-            and "results" in event.data
-            and ("__optimizer_tag__" in event.tags)
-        ):
-            added = False
-            for item in event.data["results"]:
-                if table.add_results(
-                    convert_to_maximize(item) if maximize else item, names=names
-                ):
-                    added = True
-            if added:
-                table.save()
