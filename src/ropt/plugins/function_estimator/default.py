@@ -1,4 +1,4 @@
-"""This module implements the default function transform plugin."""
+"""This module implements the default function estimator plugin."""
 
 from typing import Final
 
@@ -9,13 +9,13 @@ from ropt.config.enopt import EnOptConfig
 from ropt.enums import OptimizerExitCode
 from ropt.exceptions import ConfigError, OptimizationAborted
 
-from .base import FunctionTransform, FunctionTransformPlugin
+from .base import FunctionEstimator, FunctionEstimatorPlugin
 
 _MIN_STDDEV_REALIZATIONS: Final = 2
 
 
-class DefaultFunctionTransform(FunctionTransform):
-    """The default function transform plugin.
+class DefaultFunctionEstimator(FunctionEstimator):
+    """The default function estimator plugin.
 
     This plugin currently implements two methods:
 
@@ -31,23 +31,23 @@ class DefaultFunctionTransform(FunctionTransform):
        deviation is always minimized.
     """
 
-    def __init__(self, enopt_config: EnOptConfig, transform_index: int) -> None:
-        """Initialize the function transform object.
+    def __init__(self, enopt_config: EnOptConfig, estimator_index: int) -> None:
+        """Initialize the function estimator object.
 
         See the
-        [ropt.plugins.function_transform.base.FunctionTransform][]
+        [ropt.plugins.function_estimator.base.FunctionEstimator][]
         abstract base class.
 
         # noqa
         """
         self._enopt_config = enopt_config
-        self._transform_config = enopt_config.function_transforms[transform_index]
-        _, _, self._method = self._transform_config.method.lower().rpartition("/")
+        self._estimator_config = enopt_config.function_estimators[estimator_index]
+        _, _, self._method = self._estimator_config.method.lower().rpartition("/")
         if self._method == "default":
             self._method = "mean"
         if self._method == "stddev" and self._enopt_config.gradient.merge_realizations:
             msg = (
-                "The stddev transform does not support merging "
+                "The stddev estimator does not support merging "
                 "realizations in the gradient."
             )
             raise ConfigError(msg)
@@ -58,17 +58,17 @@ class DefaultFunctionTransform(FunctionTransform):
         """Calculate a function from function values for each realization.
 
         See the
-        [ropt.plugins.function_transform.base.FunctionTransform][]
+        [ropt.plugins.function_estimator.base.FunctionEstimator][]
         abstract base class.
 
         # noqa
         """
-        transform_method = self._method
-        if transform_method == "mean":
+        estimator_method = self._method
+        if estimator_method == "mean":
             return self._calculate_function_mean(functions, weights)
-        if transform_method == "stddev":
+        if estimator_method == "stddev":
             return self._calculate_function_stddev(functions, weights)
-        msg = f"Function transform method not supported: {transform_method}"
+        msg = f"Function estimator method not supported: {estimator_method}"
         raise ConfigError(msg)
 
     def calculate_gradient(
@@ -80,17 +80,17 @@ class DefaultFunctionTransform(FunctionTransform):
         """Calculate a gradient from gradients of the realizations.
 
         See the
-        [ropt.plugins.function_transform.base.FunctionTransform][]
+        [ropt.plugins.function_estimator.base.FunctionEstimator][]
         abstract base class.
 
         # noqa
         """
-        transform_method = self._method
-        if transform_method == "mean":
+        estimator_method = self._method
+        if estimator_method == "mean":
             return self._calculate_gradient_mean(functions, gradient, weights)
-        if transform_method == "stddev":
+        if estimator_method == "stddev":
             return self._calculate_gradient_stddev(functions, gradient, weights)
-        msg = f"Function transform method not supported: {transform_method}"
+        msg = f"Function estimator method not supported: {estimator_method}"
         raise ConfigError(msg)
 
     @staticmethod
@@ -153,20 +153,20 @@ class DefaultFunctionTransform(FunctionTransform):
         return norm, mean, stddev
 
 
-class DefaultFunctionTransformPlugin(FunctionTransformPlugin):
-    """Default filter transform plugin class."""
+class DefaultFunctionEstimatorPlugin(FunctionEstimatorPlugin):
+    """Default filter estimator plugin class."""
 
     def create(
-        self, enopt_config: EnOptConfig, transform_index: int
-    ) -> DefaultFunctionTransform:
+        self, enopt_config: EnOptConfig, estimator_index: int
+    ) -> DefaultFunctionEstimator:
         """Initialize the realization filter plugin.
 
-        See the [ropt.plugins.function_transform.base.FunctionTransformPlugin][]
+        See the [ropt.plugins.function_estimator.base.FunctionEstimatorPlugin][]
         abstract base class.
 
         # noqa
         """
-        return DefaultFunctionTransform(enopt_config, transform_index)
+        return DefaultFunctionEstimator(enopt_config, estimator_index)
 
     def is_supported(self, method: str) -> bool:
         """Check if a method is supported.

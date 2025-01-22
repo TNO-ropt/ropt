@@ -9,7 +9,7 @@ from pydantic import ConfigDict, model_validator
 
 from ropt.config.utils import ImmutableBaseModel
 
-from ._function_transform_config import FunctionTransformConfig
+from ._function_estimator_config import FunctionEstimatorConfig
 from ._gradient_config import GradientConfig
 from ._linear_constraints_config import LinearConstraintsConfig  # noqa: TC001
 from ._nonlinear_constraints_config import NonlinearConstraintsConfig  # noqa: TC001
@@ -35,9 +35,9 @@ class EnOptConfig(ImmutableBaseModel):
     `linear_constraints` field will be transformed accordingly so that the
     constraints remain valid for the transformed variables.
 
-    The `realization_filters`, `function_transforms`, and `samplers` fields are
+    The `realization_filters`, `function_estimators`, and `samplers` fields are
     defined as tuples of configurations for realization filter, function
-    transform, and sampler objects, respectively. Other configuration fields
+    estimator, and sampler objects, respectively. Other configuration fields
     will refer to these objects by their index into these tuples. For example,
     the `gradient` field is implemented by the
     [`GradientConfig`][ropt.config.enopt.GradientConfig] class, which contains a
@@ -68,7 +68,7 @@ class EnOptConfig(ImmutableBaseModel):
         optimizer:             Configuration of the optimizer.
         gradient:              Configuration for gradient calculations.
         realization_filters:   Configuration of realization filters.
-        function_transforms:   Configuration of function transforms.
+        function_estimators:   Configuration of function estimators.
         samplers:              Configuration of samplers.
         original_inputs:       The original input to the constructor.
     """
@@ -81,8 +81,8 @@ class EnOptConfig(ImmutableBaseModel):
     optimizer: OptimizerConfig = OptimizerConfig()
     gradient: GradientConfig = GradientConfig()
     realization_filters: tuple[RealizationFilterConfig, ...] = ()
-    function_transforms: tuple[FunctionTransformConfig, ...] = (
-        FunctionTransformConfig(),
+    function_estimators: tuple[FunctionEstimatorConfig, ...] = (
+        FunctionEstimatorConfig(),
     )
     samplers: tuple[SamplerConfig, ...] = (SamplerConfig(),)
     original_inputs: dict[str, Any] | None = None

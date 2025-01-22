@@ -1,9 +1,9 @@
-"""This module defines the abstract base classes for function transforms.
+"""This module defines the abstract base classes for function estimators.
 
-Function transforms can be added via the plugin mechanism to implement
+Function estimators can be added via the plugin mechanism to implement
 additional ways to functions and gradient ensembles. Any object that adheres to
 the
-[`FunctionTransform`][ropt.plugins.function_transform.base.FunctionTransform]
+[`FunctionEstimator`][ropt.plugins.function_estimator.base.FunctionEstimator]
 base class may be installed as a plugin.
 """
 
@@ -21,16 +21,16 @@ if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
 
 
-class FunctionTransform(ABC):
-    """Abstract base class for function transforms."""
+class FunctionEstimator(ABC):
+    """Abstract base class for function estimators."""
 
     @abstractmethod
-    def __init__(self, enopt_config: EnOptConfig, transform_index: int) -> None:
-        """Initialize the function transform object.
+    def __init__(self, enopt_config: EnOptConfig, estimator_index: int) -> None:
+        """Initialize the function estimator object.
 
         Args:
             enopt_config:    The configuration of the optimizer.
-            transform_index: The index of the transform to use.
+            estimator_index: The index of the estimator to use.
         """
 
     @abstractmethod
@@ -45,7 +45,7 @@ class FunctionTransform(ABC):
            method. The `merge_realizations` flag in the ensemble optimizer
            configuration directs the optimizer to calculate the overall gradient
            from all realizations directly. This yields a reasonable estimation
-           if the function transform is an averaging operation, but may not be
+           if the function estimator is an averaging operation, but may not be
            appropriate in other cases.
 
            At initialization, the `merge_realizations` flag should be checked,
@@ -79,16 +79,16 @@ class FunctionTransform(ABC):
         """
 
 
-class FunctionTransformPlugin(Plugin):
-    """The function transform plugin base class."""
+class FunctionEstimatorPlugin(Plugin):
+    """The function estimator plugin base class."""
 
     @abstractmethod
     def create(
-        self, enopt_config: EnOptConfig, transform_index: int
-    ) -> FunctionTransform:
-        """Initialize the function transform object.
+        self, enopt_config: EnOptConfig, estimator_index: int
+    ) -> FunctionEstimator:
+        """Initialize the function estimator object.
 
         Args:
             enopt_config:    The configuration of the optimizer.
-            transform_index: The index of the transform to use.
+            estimator_index: The index of the estimator to use.
         """

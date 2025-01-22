@@ -182,7 +182,7 @@ class ExternalOptimizer(Optimizer):
 
 
 class ExternalOptimizerPlugin(OptimizerPlugin):
-    """Default filter transform plugin class."""
+    """The external optimizer plugin class."""
 
     def create(
         self, config: EnOptConfig, optimizer_callback: OptimizerCallback

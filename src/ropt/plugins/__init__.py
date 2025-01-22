@@ -24,11 +24,11 @@ module to implement various optimization algorithms.
   [`default`][ropt.plugins.realization_filter.default.DefaultRealizationFilter]
   plugin provides filters based on ranking and for CVaR optimization.
 
-[`function_transform`][ropt.plugins.function_transform]:
+[`function_estimator`][ropt.plugins.function_estimator]:
 : These plugins calculate the final objective and gradient from sets of
   objectives or constraints and their gradients for individual realizations. The
   included
-  [`default`][ropt.plugins.function_transform.default.DefaultFunctionTransform]
+  [`default`][ropt.plugins.function_estimator.default.DefaultFunctionEstimator]
   plugin supports objectives defined by the mean or standard deviation of these
   values.
 
@@ -48,8 +48,8 @@ base class defining the required functionality for each plugin type:
     Abstract base class for sampler plugins.
 3. [`RealizationFilterPlugin`][ropt.plugins.realization_filter.base.RealizationFilterPlugin]:
     Abstract base class for realization filter plugins.
-4. [`FunctionTransformPlugin`][ropt.plugins.function_transform.base.FunctionTransformPlugin]:
-    Abstract base class for function transform plugins.
+4. [`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.base.FunctionEstimatorPlugin]:
+    Abstract base class for function estimator plugins.
 5. [`PlanPlugin`][ropt.plugins.plan.base.PlanPlugin]:
     Abstract base class for optimization plan object plugins.
 

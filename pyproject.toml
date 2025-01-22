@@ -43,8 +43,8 @@ scipy = "ropt.plugins.sampler.scipy:SciPySamplerPlugin"
 [project.entry-points."ropt.plugins.realization_filter"]
 default = "ropt.plugins.realization_filter.default:DefaultRealizationFilterPlugin"
 
-[project.entry-points."ropt.plugins.function_transform"]
-default = "ropt.plugins.function_transform.default:DefaultFunctionTransformPlugin"
+[project.entry-points."ropt.plugins.function_estimator"]
+default = "ropt.plugins.function_estimator.default:DefaultFunctionEstimatorPlugin"
 
 [project.entry-points."ropt.plugins.plan"]
 default = "ropt.plugins.plan.default:DefaultPlanPlugin"

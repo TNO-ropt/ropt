@@ -1,4 +1,4 @@
-"""Configuration class for function transforms."""
+"""Configuration class for function estimators."""
 
 from __future__ import annotations
 
@@ -7,18 +7,18 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict
 
 
-class FunctionTransformConfig(BaseModel):
-    """Configuration class for function transforms.
+class FunctionEstimatorConfig(BaseModel):
+    """Configuration class for function estimators.
 
-    This class defines the configuration for function transforms, which are
-    configured by the `function_transforms` field in an
+    This class defines the configuration for function estimators, which are
+    configured by the `function_estimators` field in an
     [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object. That field contains a
-    tuple of configuration objects that define which function transforms are
+    tuple of configuration objects that define which function estimators are
     available during the optimization.
 
     By default, the final objective and constraint functions and their gradients
     are calculated from the individual realizations by a weighted sum. Function
-    transforms are optionally used to modify this calculation.
+    estimators are optionally used to modify this calculation.
 
     The `method` field determines which method will be used to implement the
     calculation of the final function or gradient from the individual
@@ -27,8 +27,8 @@ class FunctionTransformConfig(BaseModel):
     interpretation of these options depends on the chosen method.
 
     Attributes:
-        method:  The function transform method.
-        options: Options to be passed to the transform.
+        method:  The function estimator method.
+        options: Options to be passed to the estimator.
     """
 
     method: str = "default/default"

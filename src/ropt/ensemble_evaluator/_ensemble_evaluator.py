@@ -27,13 +27,13 @@ from ._evaluator_results import (
     _get_gradient_results,
 )
 from ._function import (
-    _calculate_transformed_constraints,
-    _calculate_transformed_objectives,
+    _calculate_estimated_constraints,
+    _calculate_estimated_objectives,
     _calculate_weighted_function,
 )
 from ._gradient import (
-    _calculate_transformed_constraint_gradients,
-    _calculate_transformed_objective_gradients,
+    _calculate_estimated_constraint_gradients,
+    _calculate_estimated_objective_gradients,
     _calculate_weighted_gradient,
     _perturb_variables,
 )
@@ -46,7 +46,7 @@ if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
     from ropt.evaluator import Evaluator
     from ropt.plugins import PluginManager
-    from ropt.plugins.function_transform.base import FunctionTransform
+    from ropt.plugins.function_estimator.base import FunctionEstimator
     from ropt.plugins.realization_filter.base import RealizationFilter
     from ropt.plugins.sampler.base import Sampler
 
@@ -80,7 +80,7 @@ class EnsembleEvaluator:
         self._evaluator = evaluator
         self._plan_id = plan_id
         self._realization_filters = self._init_realization_filters(plugin_manager)
-        self._function_transforms = self._init_function_transforms(plugin_manager)
+        self._function_estimators = self._init_function_estimators(plugin_manager)
         rng = default_rng(config.gradient.seed)
         self._samplers = self._init_samplers(rng, plugin_manager)
         self._cache_for_gradient: FunctionResults | None = None
@@ -487,7 +487,7 @@ class EnsembleEvaluator:
         failed_realizations: NDArray[np.bool_],
     ) -> Functions:
         # Individual objective and constraint functions are calculated from the
-        # realizations using one or more function transforms:
+        # realizations using one or more function estimators:
         if np.all(failed_realizations):
             objectives = np.empty(
                 self._config.objectives.weights.size, dtype=np.float64
@@ -501,16 +501,16 @@ class EnsembleEvaluator:
                 constraints.fill(np.nan)
             weighted_objective = np.array(np.nan)
         else:
-            objectives = _calculate_transformed_objectives(
+            objectives = _calculate_estimated_objectives(
                 self._config,
-                self._function_transforms,
+                self._function_estimators,
                 objectives,
                 objective_weights,
                 failed_realizations,
             )
-            constraints = _calculate_transformed_constraints(
+            constraints = _calculate_estimated_constraints(
                 self._config,
-                self._function_transforms,
+                self._function_estimators,
                 constraints,
                 constraint_weights,
                 failed_realizations,
@@ -554,9 +554,9 @@ class EnsembleEvaluator:
             perturbed_variables = perturbed_variables[..., variable_indices]
 
         assert perturbed_objectives is not None
-        objective_gradients = _calculate_transformed_objective_gradients(
+        objective_gradients = _calculate_estimated_objective_gradients(
             self._config,
-            self._function_transforms,
+            self._function_estimators,
             variables,
             objectives,
             perturbed_variables,
@@ -564,9 +564,9 @@ class EnsembleEvaluator:
             objective_weights,
             failed_realizations,
         )
-        constraint_gradients = _calculate_transformed_constraint_gradients(
+        constraint_gradients = _calculate_estimated_constraint_gradients(
             self._config,
-            self._function_transforms,
+            self._function_estimators,
             variables,
             constraints,
             perturbed_variables,
@@ -696,14 +696,14 @@ class EnsembleEvaluator:
             for idx, filter_config in enumerate(self._config.realization_filters)
         ]
 
-    def _init_function_transforms(
+    def _init_function_estimators(
         self, plugin_manager: PluginManager
-    ) -> list[FunctionTransform]:
+    ) -> list[FunctionEstimator]:
         return [
             plugin_manager.get_plugin(
-                "function_transform", method=transform_config.method
+                "function_estimator", method=estimator_config.method
             ).create(self._config, idx)
-            for idx, transform_config in enumerate(self._config.function_transforms)
+            for idx, estimator_config in enumerate(self._config.function_estimators)
         ]
 
     def _init_samplers(

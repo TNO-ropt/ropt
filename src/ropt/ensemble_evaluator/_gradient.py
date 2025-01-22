@@ -3,7 +3,7 @@ from numpy.typing import NDArray
 
 from ropt.config.enopt import EnOptConfig
 from ropt.enums import BoundaryType
-from ropt.plugins.function_transform.base import FunctionTransform
+from ropt.plugins.function_estimator.base import FunctionEstimator
 from ropt.plugins.sampler.base import Sampler
 
 SVD_TOLERANCE = 0.999
@@ -135,7 +135,7 @@ def _calculate_gradient(  # noqa: PLR0913
     delta_functions: NDArray[np.float64],
     failed_realizations: NDArray[np.bool_],
     weights: NDArray[np.float64],
-    transform: FunctionTransform,
+    estimator: FunctionEstimator,
     *,
     merge_realizations: bool,
 ) -> NDArray[np.float64]:
@@ -145,13 +145,13 @@ def _calculate_gradient(  # noqa: PLR0913
         gradients = _estimate_merged_gradient(delta_variables, delta_functions, weights)
     else:
         gradients = _estimate_gradients(delta_variables, delta_functions, weights)
-    return transform.calculate_gradient(functions, gradients, weights)
+    return estimator.calculate_gradient(functions, gradients, weights)
 
 
-def _calculate_transformed_gradients(  # noqa: PLR0913
+def _calculate_estimated_gradients(  # noqa: PLR0913
     config: EnOptConfig,
-    function_transforms: list[FunctionTransform],
-    transform_indices: NDArray[np.intc] | None,
+    function_estimators: list[FunctionEstimator],
+    estimator_indices: NDArray[np.intc] | None,
     variables: NDArray[np.float64],
     functions: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
@@ -163,11 +163,11 @@ def _calculate_transformed_gradients(  # noqa: PLR0913
     delta_variables = perturbed_variables - np.expand_dims(variables, axis=1)
     delta_functions = perturbed_functions - np.expand_dims(functions, axis=1)
 
-    if transform_indices is None:
-        transform_indices = np.zeros(functions.shape[1], dtype=np.intc)
+    if estimator_indices is None:
+        estimator_indices = np.zeros(functions.shape[1], dtype=np.intc)
 
-    for transform_idx, transform in enumerate(function_transforms):
-        mask = transform_indices == transform_idx
+    for estimator_idx, estimator in enumerate(function_estimators):
+        mask = estimator_indices == estimator_idx
         for idx in np.where(mask)[0]:
             gradients[idx, ...] = _calculate_gradient(
                 functions[..., idx],
@@ -179,16 +179,16 @@ def _calculate_transformed_gradients(  # noqa: PLR0913
                     if realization_weights is None
                     else realization_weights[idx, ...]
                 ),
-                transform,
+                estimator,
                 merge_realizations=config.gradient.merge_realizations,
             )
 
     return gradients
 
 
-def _calculate_transformed_objective_gradients(  # noqa: PLR0913
+def _calculate_estimated_objective_gradients(  # noqa: PLR0913
     config: EnOptConfig,
-    function_transforms: list[FunctionTransform],
+    function_estimators: list[FunctionEstimator],
     variables: NDArray[np.float64],
     functions: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
@@ -196,10 +196,10 @@ def _calculate_transformed_objective_gradients(  # noqa: PLR0913
     realization_weights: NDArray[np.float64] | None,
     failed_realizations: NDArray[np.bool_],
 ) -> NDArray[np.float64]:
-    return _calculate_transformed_gradients(
+    return _calculate_estimated_gradients(
         config,
-        function_transforms,
-        config.objectives.function_transforms,
+        function_estimators,
+        config.objectives.function_estimators,
         variables,
         functions,
         perturbed_variables,
@@ -209,9 +209,9 @@ def _calculate_transformed_objective_gradients(  # noqa: PLR0913
     )
 
 
-def _calculate_transformed_constraint_gradients(  # noqa: PLR0913
+def _calculate_estimated_constraint_gradients(  # noqa: PLR0913
     config: EnOptConfig,
-    function_transforms: list[FunctionTransform],
+    function_estimators: list[FunctionEstimator],
     variables: NDArray[np.float64],
     constraints: NDArray[np.float64] | None,
     perturbed_variables: NDArray[np.float64],
@@ -223,10 +223,10 @@ def _calculate_transformed_constraint_gradients(  # noqa: PLR0913
         return None
     assert perturbed_constaints is not None
     assert config.nonlinear_constraints is not None
-    return _calculate_transformed_gradients(
+    return _calculate_estimated_gradients(
         config,
-        function_transforms,
-        config.nonlinear_constraints.function_transforms,
+        function_estimators,
+        config.nonlinear_constraints.function_estimators,
         variables,
         constraints,
         perturbed_variables,

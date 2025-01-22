@@ -150,7 +150,7 @@ class Evaluator(Protocol):
             consist of the mean of the objectives for each realization, plus the
             standard deviation of the same values. This can be implemented by defining
             two objectives: the first calculated as the mean of the realizations, and
-            the second using a function transform to compute the standard deviations.
+            the second using a function estimator to compute the standard deviations.
             The optimizer is unaware that both objectives use the same set of
             realizations. To prevent redundant calculations, the evaluator should
             compute the results of the realizations once and return them for both

@@ -30,7 +30,7 @@ class RealizationFilter(ABC):
 
         Args:
             enopt_config:    The configuration of the optimizer.
-            filter_index: The index of the transform to use.
+            filter_index: The index of the filter to use.
         """
 
     @abstractmethod
@@ -72,5 +72,5 @@ class RealizationFilterPlugin(Plugin):
 
         Args:
             enopt_config: The configuration of the optimizer.
-            filter_index: The index of the transform to use.
+            filter_index: The index of the filter to use.
         """

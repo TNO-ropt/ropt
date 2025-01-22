@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, Final, Generator, Literal
 
 from ropt.exceptions import ConfigError
 
-from .function_transform.base import FunctionTransformPlugin
+from .function_estimator.base import FunctionEstimatorPlugin
 from .optimizer.base import OptimizerPlugin
 from .plan.base import PlanPlugin
 from .realization_filter.base import RealizationFilterPlugin
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 
 _PLUGIN_TYPES: Final = {
-    "function_transform": FunctionTransformPlugin,
+    "function_estimator": FunctionEstimatorPlugin,
     "optimizer": OptimizerPlugin,
     "sampler": SamplerPlugin,
     "realization_filter": RealizationFilterPlugin,
@@ -30,7 +30,7 @@ PluginType = Literal[
     "optimizer",
     "sampler",
     "realization_filter",
-    "function_transform",
+    "function_estimator",
     "plan",
 ]
 """ Plugin Types Supported by `ropt`"""
@@ -68,7 +68,7 @@ class PluginManager:
             "optimizer": {},
             "sampler": {},
             "realization_filter": {},
-            "function_transform": {},
+            "function_estimator": {},
             "plan": {},
         }
 

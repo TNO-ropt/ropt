@@ -51,8 +51,8 @@ class NonlinearConstraintsConfig(ImmutableBaseModel):
     [`ConstraintType`][ropt.enums.ConstraintType] enumeration.
 
     The non-linear constraints may be subject to realization filters and
-    function transforms. The `realization_filters` and `function_transform`
-    fields contain indices to the realization filter or function transform
+    function estimators. The `realization_filters` and `function_estimator`
+    fields contain indices to the realization filter or function estimator
     objects to use. These objects are configured in the parent
     [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
 
@@ -61,7 +61,7 @@ class NonlinearConstraintsConfig(ImmutableBaseModel):
         based on the assumption that it is calculated as a weighted sum from an
         ensemble of realizations, with weights specified by the `realizations`
         field in the [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object. If
-        the `realizations_filters` and/or `function_transforms` fields are also
+        the `realizations_filters` and/or `function_estimators` fields are also
         set, this assumption may not strictly hold; however, the scaling value
         will still be calculated in the same way for practical purposes.
 
@@ -72,7 +72,7 @@ class NonlinearConstraintsConfig(ImmutableBaseModel):
         types:               The type of each non-linear constraint.
                              ([`ConstraintType`][ropt.enums.ConstraintType]).
         realization_filters: Optional realization filter indices.
-        function_transforms: Optional function transform indices.
+        function_estimators: Optional function estimator indices.
     """
 
     rhs_values: Array1D
@@ -80,7 +80,7 @@ class NonlinearConstraintsConfig(ImmutableBaseModel):
     auto_scale: Array1DBool = np.array([False])
     types: ArrayEnum
     realization_filters: Array1DInt | None = None
-    function_transforms: Array1DInt | None = None
+    function_estimators: Array1DInt | None = None
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,

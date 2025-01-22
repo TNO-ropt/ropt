@@ -45,8 +45,8 @@ class ObjectiveFunctionsConfig(ImmutableBaseModel):
         `scales` also allows for scaling to different initial values.
 
     The objective functions may be subject to realization filters and function
-    transforms. The `realization_filters` and `function_transforms` fields
-    contain indices to the realization filter or function transform objects to
+    estimators. The `realization_filters` and `function_estimators` fields
+    contain indices to the realization filter or function estimator objects to
     use. The objects referred to are configured in the parent
     [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
 
@@ -55,7 +55,7 @@ class ObjectiveFunctionsConfig(ImmutableBaseModel):
         based on the assumption that it is calculated as a weighted sum from an
         ensemble of realizations, with weights specified by the `realizations`
         field in the [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object. If
-        the `realizations_filters` and/or `function_transforms` fields are also
+        the `realizations_filters` and/or `function_estimators` fields are also
         set, this assumption may not strictly hold; however, the scaling value
         will still be calculated in the same way for practical purposes.
 
@@ -64,14 +64,14 @@ class ObjectiveFunctionsConfig(ImmutableBaseModel):
         scales:              The scaling factors (default: 1.0).
         auto_scale:          Enable/disable auto-scaling (default: `False`).
         realization_filters: Optional realization filter indices.
-        function_transforms: Optional function transform indices.
+        function_estimators: Optional function estimator indices.
     """
 
     weights: Array1D = np.array(1.0)
     scales: Array1D = np.array(1.0, dtype=np.float64)
     auto_scale: Array1DBool = np.array(False)  # noqa: FBT003
     realization_filters: Array1DInt | None = None
-    function_transforms: Array1DInt | None = None
+    function_estimators: Array1DInt | None = None
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,

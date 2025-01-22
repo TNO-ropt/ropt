@@ -9,7 +9,7 @@
             - RealizationsConfig
             - OptimizerConfig
             - GradientConfig
-            - FunctionTransformConfig
+            - FunctionEstimatorConfig
             - RealizationFilterConfig
             - SamplerConfig
         group_by_category: false
