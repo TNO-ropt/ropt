@@ -1047,11 +1047,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../function_transform_plugins/" class="md-nav__link">
+      <a href="../function_estimator_plugins/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Function transform Plugins
+    Function estimator Plugins
   </span>
   
 
@@ -1200,11 +1200,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../default_function_transform_plugin/" class="md-nav__link">
+      <a href="../default_function_estimator_plugin/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Default Function Transform Plugin
+    Default Function Estimator Plugin
   </span>
   
 
@@ -1977,7 +1977,7 @@ same objective value multiple times. For instance, a total objective could
 consist of the mean of the objectives for each realization, plus the
 standard deviation of the same values. This can be implemented by defining
 two objectives: the first calculated as the mean of the realizations, and
-the second using a function transform to compute the standard deviations.
+the second using a function estimator to compute the standard deviations.
 The optimizer is unaware that both objectives use the same set of
 realizations. To prevent redundant calculations, the evaluator should
 compute the results of the realizations once and return them for both

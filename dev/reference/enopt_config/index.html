@@ -703,9 +703,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.config.enopt.FunctionTransformConfig" class="md-nav__link">
+  <a href="#ropt.config.enopt.FunctionEstimatorConfig" class="md-nav__link">
     <span class="md-ellipsis">
-      FunctionTransformConfig
+      FunctionEstimatorConfig
     </span>
   </a>
   
@@ -1137,11 +1137,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../function_transform_plugins/" class="md-nav__link">
+      <a href="../function_estimator_plugins/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Function transform Plugins
+    Function estimator Plugins
   </span>
   
 
@@ -1290,11 +1290,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../default_function_transform_plugin/" class="md-nav__link">
+      <a href="../default_function_estimator_plugin/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Default Function Transform Plugin
+    Default Function Estimator Plugin
   </span>
   
 
@@ -1540,9 +1540,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.config.enopt.FunctionTransformConfig" class="md-nav__link">
+  <a href="#ropt.config.enopt.FunctionEstimatorConfig" class="md-nav__link">
     <span class="md-ellipsis">
-      FunctionTransformConfig
+      FunctionEstimatorConfig
     </span>
   </a>
   
@@ -1704,9 +1704,9 @@ fields. A good example is the scaling of variables: The <code>offsets</code> and
 linear transformation of the variables. Upon initialization, values of the
 <code>linear_constraints</code> field will be transformed accordingly so that the
 constraints remain valid for the transformed variables.</p>
-<p>The <code>realization_filters</code>, <code>function_transforms</code>, and <code>samplers</code> fields are
+<p>The <code>realization_filters</code>, <code>function_estimators</code>, and <code>samplers</code> fields are
 defined as tuples of configurations for realization filter, function
-transform, and sampler objects, respectively. Other configuration fields
+estimator, and sampler objects, respectively. Other configuration fields
 will refer to these objects by their index into these tuples. For example,
 the <code>gradient</code> field is implemented by the
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.GradientConfig"><code>GradientConfig</code></a> class, which contains a
@@ -1829,13 +1829,13 @@ used for all variables.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.EnOptConfig.function_transforms">function_transforms</span></code></td>
+            <td><code><span title="ropt.config.enopt.EnOptConfig.function_estimators">function_estimators</span></code></td>
             <td>
-                  <code>tuple[<a class="autorefs autorefs-internal" title="ropt.config.enopt._function_transform_config.FunctionTransformConfig" href="#ropt.config.enopt.FunctionTransformConfig">FunctionTransformConfig</a>, ...]</code>
+                  <code>tuple[<a class="autorefs autorefs-internal" title="ropt.config.enopt._function_estimator_config.FunctionEstimatorConfig" href="#ropt.config.enopt.FunctionEstimatorConfig">FunctionEstimatorConfig</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Configuration of function transforms.</p>
+                <p>Configuration of function estimators.</p>
               </div>
             </td>
           </tr>
@@ -2094,8 +2094,8 @@ applied. Thus, if <code>scales</code> is not supplied, auto-scaling will scale t
 objectives such that their initial values will be equal to one. Setting
 <code>scales</code> also allows for scaling to different initial values.</p>
 </details>        <p>The objective functions may be subject to realization filters and function
-transforms. The <code>realization_filters</code> and <code>function_transforms</code> fields
-contain indices to the realization filter or function transform objects to
+estimators. The <code>realization_filters</code> and <code>function_estimators</code> fields
+contain indices to the realization filter or function estimator objects to
 use. The objects referred to are configured in the parent
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 
@@ -2106,7 +2106,7 @@ use. The objects referred to are configured in the parent
 based on the assumption that it is calculated as a weighted sum from an
 ensemble of realizations, with weights specified by the <code>realizations</code>
 field in the <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. If
-the <code>realizations_filters</code> and/or <code>function_transforms</code> fields are also
+the <code>realizations_filters</code> and/or <code>function_estimators</code> fields are also
 set, this assumption may not strictly hold; however, the scaling value
 will still be calculated in the same way for practical purposes.</p>
 </details>
@@ -2166,13 +2166,13 @@ will still be calculated in the same way for practical purposes.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.function_transforms">function_transforms</span></code></td>
+            <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.function_estimators">function_estimators</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1DInt" href="../utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional function transform indices.</p>
+                <p>Optional function estimator indices.</p>
               </div>
             </td>
           </tr>
@@ -2456,8 +2456,8 @@ number of constraints. The <code>types</code> field is defined as an integer arr
 its values are limited to those of the
 <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.ConstraintType"><code>ConstraintType</code></a> enumeration.</p>
 <p>The non-linear constraints may be subject to realization filters and
-function transforms. The <code>realization_filters</code> and <code>function_transform</code>
-fields contain indices to the realization filter or function transform
+function estimators. The <code>realization_filters</code> and <code>function_estimator</code>
+fields contain indices to the realization filter or function estimator
 objects to use. These objects are configured in the parent
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 
@@ -2468,7 +2468,7 @@ objects to use. These objects are configured in the parent
 based on the assumption that it is calculated as a weighted sum from an
 ensemble of realizations, with weights specified by the <code>realizations</code>
 field in the <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. If
-the <code>realizations_filters</code> and/or <code>function_transforms</code> fields are also
+the <code>realizations_filters</code> and/or <code>function_estimators</code> fields are also
 set, this assumption may not strictly hold; however, the scaling value
 will still be calculated in the same way for practical purposes.</p>
 </details>
@@ -2540,13 +2540,13 @@ will still be calculated in the same way for practical purposes.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.function_transforms">function_transforms</span></code></td>
+            <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.function_estimators">function_estimators</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1DInt" href="../utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional function transform indices.</p>
+                <p>Optional function estimator indices.</p>
               </div>
             </td>
           </tr>
@@ -3170,8 +3170,8 @@ copy of the gradient configuration with the necessary modifications.</p>
 
 
 
-<h3 id="ropt.config.enopt.FunctionTransformConfig" class="doc doc-heading">
-            <code>FunctionTransformConfig</code>
+<h3 id="ropt.config.enopt.FunctionEstimatorConfig" class="doc doc-heading">
+            <code>FunctionEstimatorConfig</code>
 
 
 </h3>
@@ -3180,15 +3180,15 @@ copy of the gradient configuration with the necessary modifications.</p>
     <div class="doc doc-contents ">
 
 
-        <p>Configuration class for function transforms.</p>
-<p>This class defines the configuration for function transforms, which are
-configured by the <code>function_transforms</code> field in an
+        <p>Configuration class for function estimators.</p>
+<p>This class defines the configuration for function estimators, which are
+configured by the <code>function_estimators</code> field in an
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. That field contains a
-tuple of configuration objects that define which function transforms are
+tuple of configuration objects that define which function estimators are
 available during the optimization.</p>
 <p>By default, the final objective and constraint functions and their gradients
 are calculated from the individual realizations by a weighted sum. Function
-transforms are optionally used to modify this calculation.</p>
+estimators are optionally used to modify this calculation.</p>
 <p>The <code>method</code> field determines which method will be used to implement the
 calculation of the final function or gradient from the individual
 realizations. To further specify how such a method should function, the
@@ -3207,24 +3207,24 @@ interpretation of these options depends on the chosen method.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.FunctionTransformConfig.method">method</span></code></td>
+            <td><code><span title="ropt.config.enopt.FunctionEstimatorConfig.method">method</span></code></td>
             <td>
                   <code>str</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The function transform method.</p>
+                <p>The function estimator method.</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.FunctionTransformConfig.options">options</span></code></td>
+            <td><code><span title="ropt.config.enopt.FunctionEstimatorConfig.options">options</span></code></td>
             <td>
                   <code>dict[str, <span title="typing.Any">Any</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Options to be passed to the transform.</p>
+                <p>Options to be passed to the estimator.</p>
               </div>
             </td>
           </tr>

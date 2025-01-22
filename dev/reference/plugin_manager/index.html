@@ -1050,11 +1050,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../function_transform_plugins/" class="md-nav__link">
+      <a href="../function_estimator_plugins/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Function transform Plugins
+    Function estimator Plugins
   </span>
   
 
@@ -1203,11 +1203,11 @@
   
   
     <li class="md-nav__item">
-      <a href="../default_function_transform_plugin/" class="md-nav__link">
+      <a href="../default_function_estimator_plugin/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
-    Default Function Transform Plugin
+    Default Function Estimator Plugin
   </span>
   
 
@@ -1511,11 +1511,11 @@ module to implement various optimization algorithms.</dd>
   included
   <a class="autorefs autorefs-internal" href="../default_realization_filter_plugin/#ropt.plugins.realization_filter.default.DefaultRealizationFilter"><code>default</code></a>
   plugin provides filters based on ranking and for CVaR optimization.</dd>
-<dt><a class="autorefs autorefs-internal" href="../function_transform_plugins/#ropt.plugins.function_transform"><code>function_transform</code></a>:</dt>
+<dt><a class="autorefs autorefs-internal" href="../function_estimator_plugins/#ropt.plugins.function_estimator"><code>function_estimator</code></a>:</dt>
 <dd>These plugins calculate the final objective and gradient from sets of
   objectives or constraints and their gradients for individual realizations. The
   included
-  <a class="autorefs autorefs-internal" href="../default_function_transform_plugin/#ropt.plugins.function_transform.default.DefaultFunctionTransform"><code>default</code></a>
+  <a class="autorefs autorefs-internal" href="../default_function_estimator_plugin/#ropt.plugins.function_estimator.default.DefaultFunctionEstimator"><code>default</code></a>
   plugin supports objectives defined by the mean or standard deviation of these
   values.</dd>
 <dt><a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan"><code>plan</code></a>:</dt>
@@ -1534,8 +1534,8 @@ base class defining the required functionality for each plugin type:</p>
     Abstract base class for sampler plugins.</li>
 <li><a class="autorefs autorefs-internal" href="../realization_filter_plugins/#ropt.plugins.realization_filter.base.RealizationFilterPlugin"><code>RealizationFilterPlugin</code></a>:
     Abstract base class for realization filter plugins.</li>
-<li><a class="autorefs autorefs-internal" href="../function_transform_plugins/#ropt.plugins.function_transform.base.FunctionTransformPlugin"><code>FunctionTransformPlugin</code></a>:
-    Abstract base class for function transform plugins.</li>
+<li><a class="autorefs autorefs-internal" href="../function_estimator_plugins/#ropt.plugins.function_estimator.base.FunctionEstimatorPlugin"><code>FunctionEstimatorPlugin</code></a>:
+    Abstract base class for function estimator plugins.</li>
 <li><a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.PlanPlugin"><code>PlanPlugin</code></a>:
     Abstract base class for optimization plan object plugins.</li>
 </ol>
@@ -1994,7 +1994,7 @@ form "<em>plugin-name/method-name</em>", <code>True</code> will be returned if t
 
 
 <h3 id="ropt.plugins.PluginType" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">PluginType</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">,</span> <span class="s1">&#39;sampler&#39;</span><span class="p">,</span> <span class="s1">&#39;realization_filter&#39;</span><span class="p">,</span> <span class="s1">&#39;function_transform&#39;</span><span class="p">,</span> <span class="s1">&#39;plan&#39;</span><span class="p">]</span></code>
+            <code class="highlight language-python"><span class="n">PluginType</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">,</span> <span class="s1">&#39;sampler&#39;</span><span class="p">,</span> <span class="s1">&#39;realization_filter&#39;</span><span class="p">,</span> <span class="s1">&#39;function_estimator&#39;</span><span class="p">,</span> <span class="s1">&#39;plan&#39;</span><span class="p">]</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
