@@ -2327,7 +2327,7 @@ difference between the equations and right-hand side to a tolerance.</p>
 
 
 <h4 id="ropt.config.enopt.LinearConstraintsConfig.apply_transformation" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">apply_transformation</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">apply_transformation</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></code>
 
 </h4>
 
@@ -2362,6 +2362,22 @@ configuration with these adjustments applied.</p>
             <td>
               <div class="doc-md-description">
                 <p>A variables configuration object specifying.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>context</code>
+            </td>
+            <td>
+                  <code><span title="ropt.config.enopt.EnOptContext">EnOptContext</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration context.</p>
               </div>
             </td>
             <td>
@@ -3079,7 +3095,7 @@ parallel plan evaluations.</p>
 
 
 <h4 id="ropt.config.enopt.GradientConfig.fix_perturbations" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">fix_perturbations</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">fix_perturbations</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></code>
 
 </h4>
 
@@ -3116,6 +3132,22 @@ copy of the gradient configuration with the necessary modifications.</p>
             <td>
               <div class="doc-md-description">
                 <p>The configuration of variables.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>context</code>
+            </td>
+            <td>
+                  <code><span title="ropt.config.enopt.EnOptContext">EnOptContext</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration context.</p>
               </div>
             </td>
             <td>
