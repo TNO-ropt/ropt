@@ -140,10 +140,10 @@ def test_to_dataframe(gradient_result: GradientResults) -> None:
                     idx += 1
 
 
-def test_to_dataframe_unstack(gradient_result: GradientResults) -> None:
+def test_to_dataframe_unstack1(gradient_result: GradientResults) -> None:
     names: dict[str, Any] = {
         ResultAxis.VARIABLE: ("x", "y"),
-        ResultAxis.REALIZATION: ("r1", "r2", "r3"),
+        ResultAxis.REALIZATION: (2, 3, 1),
     }
     frame = gradient_result.to_dataframe(
         "evaluations",
@@ -153,12 +153,12 @@ def test_to_dataframe_unstack(gradient_result: GradientResults) -> None:
     )
     assert frame.index.names == ["plan_id", "batch_id", "perturbation"]
     assert list(frame.columns.values) == [
-        ("perturbed_variables", "r1", "x"),
-        ("perturbed_variables", "r1", "y"),
-        ("perturbed_variables", "r2", "x"),
-        ("perturbed_variables", "r2", "y"),
-        ("perturbed_variables", "r3", "x"),
-        ("perturbed_variables", "r3", "y"),
+        ("perturbed_variables", 2, "x"),
+        ("perturbed_variables", 2, "y"),
+        ("perturbed_variables", 3, "x"),
+        ("perturbed_variables", 3, "y"),
+        ("perturbed_variables", 1, "x"),
+        ("perturbed_variables", 1, "y"),
     ]
 
 

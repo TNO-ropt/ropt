@@ -17,7 +17,7 @@ def _to_dataframe(  # noqa: PLR0913
     batch_id: int | None,
     select: Iterable[str] | None,
     unstack: Iterable[ResultAxis] | None,
-    names: dict[str, Sequence[str] | None] | None = None,
+    names: dict[str, Sequence[str | int] | None] | None = None,
 ) -> pd.DataFrame:
     if select is None:
         select = (field.name for field in fields(result_field))
@@ -30,7 +30,10 @@ def _to_dataframe(  # noqa: PLR0913
             frame = series.to_frame()
             for axis in unstack:
                 if axis.value in frame.index.names:
-                    frame = cast(pd.DataFrame, frame.unstack(axis.value))  # noqa: PD010
+                    frame = cast(
+                        pd.DataFrame,
+                        frame.unstack(axis.value, sort=False),  # type:ignore[call-arg]  # noqa: PD010
+                    )
             frame.columns = frame.columns.to_flat_index()  # type:ignore[no-untyped-call]
             if joined_frame.empty:
                 joined_frame = frame
@@ -44,7 +47,7 @@ def _to_series(
     plan_id: tuple[int, ...],
     batch_id: int | None,
     field: str,
-    names: dict[str, Sequence[str] | None] | None = None,
+    names: dict[str, Sequence[str | int] | None] | None = None,
 ) -> pd.Series[Any] | None:
     try:
         data = getattr(result_field, field)

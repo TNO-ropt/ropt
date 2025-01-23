@@ -38,7 +38,7 @@ def _handle_event(
     event: Event,
     *,
     table: ResultsTable,
-    names: dict[str, Sequence[str] | None] | None = None,
+    names: dict[str, Sequence[str | int] | None] | None = None,
 ) -> None:
     if event.event_type == EventType.FINISHED_EVALUATION and "results" in event.data:
         added = False

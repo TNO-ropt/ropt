@@ -37,9 +37,9 @@ def enopt_config_fixture() -> dict[str, Any]:
 def _handle_results(
     event: Event,
     reporter: ResultsDataFrame,
-    variable_names: Sequence[str] | None = None,
+    variable_names: Sequence[str | int] | None = None,
 ) -> None:
-    names: dict[str, Sequence[str] | None] | None = (
+    names: dict[str, Sequence[str | int] | None] | None = (
         None if variable_names is None else {ResultAxis.VARIABLE: variable_names}
     )
     for item in event.data["results"]:
