@@ -46,7 +46,7 @@ class RealizationFilter(ABC):
         much weight each realization should be given, and return those as a
         vector.
 
-        The objectives and the constraints are passed as matrix, where the
+        The objectives and the constraints are passed as matrices, where the
         columns contain the values of the objectives or constraints. The index
         along the row axis corresponds to the number of the realization.
 

@@ -496,7 +496,8 @@ class EnsembleEvaluator:
             if constraints is not None:
                 assert self._config.nonlinear_constraints is not None
                 constraints = np.empty(
-                    self._config.nonlinear_constraints.rhs_values, dtype=np.float64
+                    self._config.nonlinear_constraints.rhs_values.shape,
+                    dtype=np.float64,
                 )
                 constraints.fill(np.nan)
             weighted_objective = np.array(np.nan)

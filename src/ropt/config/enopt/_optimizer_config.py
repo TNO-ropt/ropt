@@ -75,7 +75,7 @@ class OptimizerConfig(ImmutableBaseModel):
     split_evaluations: bool = False
     parallel: bool = False
     output_dir: Path | None = None
-    options: dict[str, Any] | None | list[str] = None
+    options: dict[str, Any] | list[str] | None = None
 
     model_config = ConfigDict(
         extra="forbid",
