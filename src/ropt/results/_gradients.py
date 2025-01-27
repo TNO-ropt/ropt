@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
+import numpy as np
+
 from ropt import utils
 from ropt.enums import ResultAxis
 
@@ -10,10 +12,10 @@ from ._result_field import ResultField
 from ._utils import _immutable_copy
 
 if TYPE_CHECKING:
-    import numpy as np
     from numpy.typing import NDArray
 
     from ropt.config.enopt import EnOptConfig
+    from ropt.transforms import Transforms
 
 
 @dataclass(slots=True)
@@ -129,4 +131,34 @@ class Gradients(ResultField):
             constraints=constraints,
             scaled_objectives=scaled_objectives,
             scaled_constraints=scaled_constraints,
+        )
+
+    def transform_back(self, transforms: Transforms) -> Gradients:
+        """Apply backward transforms to the results.
+
+        Args:
+            transforms: The transforms to apply.
+
+        Returns:
+            The transformed results.
+        """
+        objectives = self.objectives
+        if transforms.objectives is not None:
+            objectives = np.moveaxis(self.objectives, 0, -1)
+            objectives = transforms.objectives.backward(objectives)
+            objectives = np.moveaxis(objectives, 0, -1)
+
+        constraints: NDArray[np.float64] | None = self.constraints
+        if (
+            self.constraints is not None
+            and transforms.nonlinear_constraints is not None
+        ):
+            constraints = np.moveaxis(self.constraints, 0, -1)
+            constraints = transforms.nonlinear_constraints.backward(constraints)
+            constraints = np.moveaxis(constraints, 0, -1)
+
+        return Gradients(
+            weighted_objective=self.weighted_objective,
+            objectives=objectives,
+            constraints=constraints,
         )

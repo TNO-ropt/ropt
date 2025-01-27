@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, TypeVar
 from ._results import Results
 
 if TYPE_CHECKING:
+    from ropt.transforms import Transforms
+
     from ._bound_constraints import BoundConstraints
     from ._function_evaluations import FunctionEvaluations
     from ._functions import Functions
@@ -44,3 +46,25 @@ class FunctionResults(Results):
     bound_constraints: BoundConstraints | None = None
     linear_constraints: LinearConstraints | None = None
     nonlinear_constraints: NonlinearConstraints | None = None
+
+    def transform_back(self, transforms: Transforms) -> FunctionResults:
+        """Apply backward transforms to the results.
+
+        Args:
+            transforms: The transforms to apply.
+
+        Returns:
+            The transformed results.
+        """
+        return FunctionResults(
+            plan_id=self.plan_id,
+            batch_id=self.batch_id,
+            metadata=self.metadata,
+            evaluations=self.evaluations.transform_back(transforms),
+            realizations=self.realizations,
+            functions=(
+                None
+                if self.functions is None
+                else self.functions.transform_back(transforms)
+            ),
+        )

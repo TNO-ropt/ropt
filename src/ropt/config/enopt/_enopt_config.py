@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from dataclasses import dataclass, field
 from typing import Any, Self
 
-from pydantic import ConfigDict, model_validator
+from pydantic import ConfigDict, ValidationInfo, model_validator
 
 from ropt.config.utils import ImmutableBaseModel
+from ropt.transforms import Transforms
 
 from ._function_estimator_config import FunctionEstimatorConfig
 from ._gradient_config import GradientConfig
@@ -19,6 +21,13 @@ from ._realization_filter_config import RealizationFilterConfig  # noqa: TC001
 from ._realizations_config import RealizationsConfig
 from ._sampler_config import SamplerConfig
 from ._variables_config import VariablesConfig  # noqa: TC001
+
+
+@dataclass
+class EnOptContext:
+    """A context object to pass to EnOptConfig.model_validate."""
+
+    transforms: Transforms = field(default_factory=Transforms)
 
 
 class EnOptConfig(ImmutableBaseModel):
@@ -93,19 +102,19 @@ class EnOptConfig(ImmutableBaseModel):
     )
 
     @model_validator(mode="after")
-    def _linear_constraints(self) -> Self:
+    def _linear_constraints(self, info: ValidationInfo) -> Self:
         if self.linear_constraints is not None:
             self._mutable()
             self.linear_constraints = self.linear_constraints.apply_transformation(
-                self.variables
+                self.variables, info.context
             )
             self._immutable()
         return self
 
     @model_validator(mode="after")
-    def _gradient(self) -> Self:
+    def _gradient(self, info: ValidationInfo) -> Self:
         self._mutable()
-        self.gradient = self.gradient.fix_perturbations(self.variables)
+        self.gradient = self.gradient.fix_perturbations(self.variables, info.context)
         self._immutable()
         return self
 

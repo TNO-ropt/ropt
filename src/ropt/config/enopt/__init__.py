@@ -1,6 +1,6 @@
 """The `ropt.config.enopt` module contains optimization configuration classes."""
 
-from ._enopt_config import EnOptConfig
+from ._enopt_config import EnOptConfig, EnOptContext
 from ._function_estimator_config import FunctionEstimatorConfig
 from ._gradient_config import GradientConfig
 from ._linear_constraints_config import LinearConstraintsConfig
@@ -14,6 +14,7 @@ from ._variables_config import VariablesConfig
 
 __all__ = [
     "EnOptConfig",
+    "EnOptContext",
     "FunctionEstimatorConfig",
     "GradientConfig",
     "LinearConstraintsConfig",

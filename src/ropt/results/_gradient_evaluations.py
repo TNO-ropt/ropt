@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config.enopt import EnOptConfig
+    from ropt.transforms import Transforms
 
 
 @dataclass(slots=True)
@@ -215,4 +216,42 @@ class GradientEvaluations(ResultField):
             scaled_perturbed_objectives=scaled_perturbed_objectives,
             scaled_perturbed_constraints=scaled_perturbed_constraints,
             perturbed_evaluation_ids=perturbed_evaluation_ids,
+        )
+
+    def transform_back(self, transforms: Transforms) -> GradientEvaluations:
+        """Apply backward transforms to the results.
+
+        Args:
+            transforms: The transforms to apply.
+
+        Returns:
+            The transformed results.
+        """
+        return GradientEvaluations(
+            variables=(
+                self.variables
+                if transforms.variables is None
+                else transforms.variables.backward(self.variables)
+            ),
+            perturbed_variables=(
+                self.perturbed_variables
+                if transforms.variables is None
+                else transforms.variables.backward(self.perturbed_variables)
+            ),
+            perturbed_objectives=(
+                self.perturbed_objectives
+                if transforms.objectives is None
+                else transforms.objectives.backward(self.perturbed_objectives)
+            ),
+            perturbed_constraints=(
+                self.perturbed_constraints
+                if (
+                    self.perturbed_constraints is None
+                    or transforms.nonlinear_constraints is None
+                )
+                else transforms.nonlinear_constraints.backward(
+                    self.perturbed_constraints
+                )
+            ),
+            perturbed_evaluation_ids=self.perturbed_evaluation_ids,
         )

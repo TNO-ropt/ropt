@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from importlib.util import find_spec
 from typing import TYPE_CHECKING, Any, Final, Iterable, Sequence, TypeVar
 
 if TYPE_CHECKING:
     from ropt.enums import ResultAxis
+    from ropt.transforms._transforms import Transforms
 
 
 _HAVE_PANDAS: Final = find_spec("pandas") is not None
@@ -120,3 +121,14 @@ class Results(ABC):
             unstack,
             names,
         )
+
+    @abstractmethod
+    def transform_back(self, transforms: Transforms) -> Results:
+        """Apply backward transforms to the results.
+
+        Args:
+            transforms: The transforms to apply.
+
+        Returns:
+            The transformed results.
+        """

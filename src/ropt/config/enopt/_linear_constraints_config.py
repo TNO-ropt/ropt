@@ -12,7 +12,9 @@ from ropt.config.validated_types import Array1D, Array2D, ArrayEnum  # noqa: TC0
 from ropt.enums import ConstraintType
 
 if TYPE_CHECKING:
-    from ropt.config.enopt import VariablesConfig
+    from numpy.typing import NDArray
+
+    from ropt.config.enopt import EnOptContext, VariablesConfig
 
 
 class LinearConstraintsConfig(ImmutableBaseModel):
@@ -90,7 +92,7 @@ class LinearConstraintsConfig(ImmutableBaseModel):
         return self
 
     def apply_transformation(
-        self, variables: VariablesConfig
+        self, variables: VariablesConfig, context: EnOptContext | None
     ) -> LinearConstraintsConfig:
         """Transform linear constraints with variable offsets and scales.
 
@@ -101,6 +103,7 @@ class LinearConstraintsConfig(ImmutableBaseModel):
 
         Args:
             variables: A variables configuration object specifying.
+            context:   The configuration context.
 
         Returns:
             A modified configuration if transformations are applied; otherwise, self.
@@ -113,7 +116,10 @@ class LinearConstraintsConfig(ImmutableBaseModel):
             msg = f"the coefficients matrix should have {variable_count} columns"
             raise ValueError(msg)
 
-        # Correct the linear system of input constraints for scaling:
+        coefficients: NDArray[np.float64] | None = None
+        rhs_values: NDArray[np.float64] | None = None
+
+        # TODO: if this is removed, we can probably remove the function.  # noqa: FIX002, TD002, TD003
         if variables.offsets is not None or variables.scales is not None:
             coefficients = self.coefficients
             rhs_values = self.rhs_values
@@ -121,6 +127,15 @@ class LinearConstraintsConfig(ImmutableBaseModel):
                 rhs_values = rhs_values - np.matmul(coefficients, variables.offsets)
             if variables.scales is not None:
                 coefficients = coefficients * variables.scales
+
+        if context is not None and context.transforms.variables is not None:
+            coefficients, rhs_values = (
+                context.transforms.variables.transform_linear_constraints(
+                    self.coefficients, self.rhs_values
+                )
+            )
+
+        if coefficients is not None and rhs_values is not None:
             values = self.model_dump(round_trip=True)
             values.update(
                 coefficients=coefficients,
@@ -130,4 +145,5 @@ class LinearConstraintsConfig(ImmutableBaseModel):
             return LinearConstraintsConfig.model_construct(
                 **values,
             )
+
         return self

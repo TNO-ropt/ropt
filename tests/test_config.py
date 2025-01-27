@@ -7,6 +7,7 @@ from pydantic import ValidationError
 
 from ropt.config.enopt import (
     EnOptConfig,
+    EnOptContext,
     GradientConfig,
     LinearConstraintsConfig,
     NonlinearConstraintsConfig,
@@ -15,6 +16,7 @@ from ropt.config.enopt import (
     VariablesConfig,
 )
 from ropt.enums import BoundaryType, ConstraintType, PerturbationType, VariableType
+from ropt.transforms import Transforms, VariableScaler
 
 
 @pytest.fixture(name="enopt_config")
@@ -409,10 +411,46 @@ def test_perturbation_types(enopt_config: Any) -> None:
         "perturbation_types": [
             PerturbationType.ABSOLUTE,
             PerturbationType.RELATIVE,
-            PerturbationType.SCALED,
+            PerturbationType.ABSOLUTE,
         ],
     }
     config = EnOptConfig.model_validate(enopt_config)
+    assert np.allclose(config.gradient.perturbation_magnitudes, [0.1, 5.0, 0.02])
+
+
+def test_perturbation_types_with_scaler(enopt_config: Any) -> None:
+    enopt_config["gradient"] = {
+        "perturbation_magnitudes": [0.1, 0.01],
+        "perturbation_types": [PerturbationType.ABSOLUTE, PerturbationType.RELATIVE],
+    }
+    enopt_config["variables"]["lower_bounds"] = [0.0, np.inf]
+    enopt_config["variables"]["upper_bounds"] = [1.0, 600.0]
+    with pytest.raises(
+        ValueError,
+        match="The variable bounds must be finite to use relative perturbations",
+    ):
+        config = EnOptConfig.model_validate(enopt_config)
+
+    enopt_config["variables"]["initial_values"] = [0.0, 0.0, 0.0]
+    enopt_config["variables"]["lower_bounds"] = [0.0, 100.0, 0.0]
+    enopt_config["variables"]["upper_bounds"] = [np.inf, 600.0, 1.0]
+
+    enopt_config["gradient"] = {
+        "perturbation_magnitudes": [0.1, 0.01, 1.0],
+        "perturbation_types": [
+            PerturbationType.ABSOLUTE,
+            PerturbationType.RELATIVE,
+            PerturbationType.ABSOLUTE,
+        ],
+    }
+    config = EnOptConfig.model_validate(
+        enopt_config,
+        context=EnOptContext(
+            transforms=Transforms(
+                variables=VariableScaler(np.array([1.0, 1.0, 50.0]), None)
+            )
+        ),
+    )
     assert np.allclose(config.gradient.perturbation_magnitudes, [0.1, 5.0, 0.02])
 
 

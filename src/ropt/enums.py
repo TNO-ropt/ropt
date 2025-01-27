@@ -91,13 +91,6 @@ class PerturbationType(IntEnum):
     the variables (see [`VariablesConfig`][ropt.config.enopt.VariablesConfig]).
     """
 
-    SCALED = 3
-    r"""Scale each perturbation $p_i$ according to the scales ($s_i$) for each
-    variable: $\hat{p}_i = p_i/s_i$. The scales $s_i$ will generally be defined
-    in the configuration of the variables (see
-    [`VariablesConfig`][ropt.config.enopt.VariablesConfig]).
-    """
-
 
 class EventType(IntEnum):
     """Enumerates the events handled by the event broker.

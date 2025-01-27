@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config.enopt import EnOptConfig
+    from ropt.transforms import Transforms
 
 
 @dataclass(slots=True)
@@ -117,4 +118,27 @@ class Functions(ResultField):
             constraints=constraints,
             scaled_objectives=scaled_objectives,
             scaled_constraints=scaled_constraints,
+        )
+
+    def transform_back(self, transforms: Transforms) -> Functions:
+        """Apply backward transforms to the results.
+
+        Args:
+            transforms: The transforms to apply.
+
+        Returns:
+            The transformed results.
+        """
+        return Functions(
+            weighted_objective=self.weighted_objective,
+            objectives=(
+                self.objectives
+                if transforms.objectives is None
+                else transforms.objectives.backward(self.objectives)
+            ),
+            constraints=(
+                self.constraints
+                if self.constraints is None or transforms.nonlinear_constraints is None
+                else transforms.nonlinear_constraints.backward(self.constraints)
+            ),
         )

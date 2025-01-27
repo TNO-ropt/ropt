@@ -25,7 +25,7 @@ from .constants import (
 )
 
 if TYPE_CHECKING:
-    from ropt.config.enopt import VariablesConfig
+    from ropt.config.enopt import EnOptContext, VariablesConfig
 
 
 class GradientConfig(ImmutableBaseModel):
@@ -149,7 +149,9 @@ class GradientConfig(ImmutableBaseModel):
         check_enum_values(self.boundary_types, BoundaryType)
         return self
 
-    def fix_perturbations(self, variables: VariablesConfig) -> GradientConfig:
+    def fix_perturbations(
+        self, variables: VariablesConfig, context: EnOptContext | None
+    ) -> GradientConfig:
         """Adjust the gradient perturbation configuration.
 
         This method modifies the gradient's perturbation settings to account for
@@ -161,6 +163,7 @@ class GradientConfig(ImmutableBaseModel):
 
         Args:
             variables: The configuration of variables.
+            context:   The configuration context.
 
         Returns:
             A modified gradient configuration with applied bounds and scaling.
@@ -213,9 +216,15 @@ class GradientConfig(ImmutableBaseModel):
             magnitudes,
         )
 
+        absolute = types == PerturbationType.ABSOLUTE
         if variables.scales is not None:
-            scaled = types == PerturbationType.SCALED
-            magnitudes = np.where(scaled, magnitudes / variables.scales, magnitudes)
+            magnitudes = np.where(absolute, magnitudes / variables.scales, magnitudes)
+
+        if context is not None and context.transforms.variables is not None:
+            scaled_magnitudes = context.transforms.variables.transform_magnitudes(
+                magnitudes
+            )
+            magnitudes[absolute] = scaled_magnitudes[absolute]
 
         return self.model_copy(
             update={

@@ -7,6 +7,7 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt.evaluator import Evaluator, EvaluatorContext, EvaluatorResult
+from ropt.transforms import Transforms
 from ropt.utils.scaling import scale_back_variables
 
 _Function = Callable[[NDArray[np.float64], Any], float]
@@ -32,16 +33,19 @@ class FunctionContext:
     index: int
 
 
-def _function_runner(
+def _function_runner(  # noqa: C901
     variables: NDArray[np.float64],
     evaluator_context: EvaluatorContext,
     functions: list[_Function],
+    transforms: Transforms | None,
 ) -> EvaluatorResult:
     unscaled_variables = scale_back_variables(
         evaluator_context.config, variables, axis=-1
     )
     if unscaled_variables is not None:
         variables = unscaled_variables
+    if transforms is not None and transforms.variables is not None:
+        variables = transforms.variables.backward(variables)
     objective_count = evaluator_context.config.objectives.weights.size
     constraint_count = (
         0
@@ -74,6 +78,17 @@ def _function_runner(
                 function = functions[idx + objective_count]
                 assert constraint_results is not None
                 constraint_results[sim, idx] = function(variables[sim, :], context)
+    if transforms is not None:
+        if transforms.objectives is not None:
+            objective_results = transforms.objectives.forward(objective_results)
+        if (
+            constraint_results is not None
+            and transforms.nonlinear_constraints is not None
+        ):
+            constraint_results = transforms.nonlinear_constraints.forward(
+                constraint_results
+            )
+
     return EvaluatorResult(
         objectives=objective_results,
         constraints=constraint_results,
@@ -97,9 +112,16 @@ def fixture_test_functions() -> tuple[_Function, _Function]:
 
 
 @pytest.fixture(scope="session")
-def evaluator(test_functions: Any) -> Callable[[list[_Function]], Evaluator]:
-    def _evaluator(test_functions: list[_Function] = test_functions) -> Evaluator:
-        return partial(_function_runner, functions=test_functions)
+def evaluator(
+    test_functions: Any, transforms: Transforms | None = None
+) -> Callable[[list[_Function]], Evaluator]:
+    def _evaluator(
+        test_functions: list[_Function] = test_functions,
+        transforms: Transforms | None = transforms,
+    ) -> Evaluator:
+        return partial(
+            _function_runner, functions=test_functions, transforms=transforms
+        )
 
     return _evaluator
 

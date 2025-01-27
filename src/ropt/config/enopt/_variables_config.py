@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Self
 
 import numpy as np
-from pydantic import ConfigDict, model_validator
+from pydantic import ConfigDict, ValidationInfo, model_validator
 
 from ropt.config.utils import (
     ImmutableBaseModel,
@@ -83,7 +83,7 @@ class VariablesConfig(ImmutableBaseModel):
     )
 
     @model_validator(mode="after")
-    def _broadcast_and_scale(self) -> Self:
+    def _broadcast_and_scale(self, info: ValidationInfo) -> Self:
         self._mutable()
 
         self.lower_bounds = broadcast_1d_array(
@@ -107,6 +107,17 @@ class VariablesConfig(ImmutableBaseModel):
             self.initial_values = immutable_array(self.initial_values / self.scales)
             self.lower_bounds = immutable_array(self.lower_bounds / self.scales)
             self.upper_bounds = immutable_array(self.upper_bounds / self.scales)
+
+        if info.context is not None and info.context.transforms.variables is not None:
+            self.initial_values = info.context.transforms.variables.forward(
+                self.initial_values
+            )
+            self.lower_bounds = info.context.transforms.variables.forward(
+                self.lower_bounds
+            )
+            self.upper_bounds = info.context.transforms.variables.forward(
+                self.upper_bounds
+            )
 
         if self.types is not None:
             check_enum_values(self.types, VariableType)

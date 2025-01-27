@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Self
 
 import numpy as np
-from pydantic import ConfigDict, model_validator
+from pydantic import ConfigDict, ValidationInfo, model_validator
 
 from ropt.config.utils import ImmutableBaseModel, broadcast_1d_array, check_enum_values
 from ropt.config.validated_types import (  # noqa: TC001
@@ -89,15 +89,25 @@ class NonlinearConstraintsConfig(ImmutableBaseModel):
     )
 
     @model_validator(mode="after")
-    def _broadcast_and_check(
-        self,
-    ) -> Self:
+    def _broadcast_and_check(self, info: ValidationInfo) -> Self:
         self._mutable()
+
         self.scales = broadcast_1d_array(self.scales, "scales", self.rhs_values.size)
         self.auto_scale = broadcast_1d_array(
             self.auto_scale, "auto_scale", self.rhs_values.size
         )
         check_enum_values(self.types, ConstraintType)
         self.types = broadcast_1d_array(self.types, "types", self.rhs_values.size)
+
+        if (
+            info.context is not None
+            and info.context.transforms.nonlinear_constraints is not None
+        ):
+            self.rhs_values, self.types = (
+                info.context.transforms.nonlinear_constraints.transform_rhs_values(
+                    self.rhs_values, self.types
+                )
+            )
+
         self._immutable()
         return self
