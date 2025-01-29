@@ -2030,6 +2030,8 @@ evaluators receive a <code>EvaluatorContext</code> object with the following det
 <ul>
 <li>The configuration object for the ongoing optimization step.</li>
 <li>Indices indicating the realization to which each variable vector belongs.</li>
+<li>Optional indices indicating which perturbation a variable vector is. This
+  index may be &lt; 0 to indicate that it is not a perturbation.</li>
 <li>A matrix indicating, for each function and realization, whether it is
   active and needs computation.</li>
 <li>A matrix indicating, for each constraint and realization, whether it is
