@@ -19,6 +19,8 @@ class EvaluatorContext:
 
     - The configuration object for the ongoing optimization step.
     - Indices indicating the realization to which each variable vector belongs.
+    - Optional indices indicating which perturbation a variable vector is. This
+      index may be < 0 to indicate that it is not a perturbation.
     - A matrix indicating, for each function and realization, whether it is
       active and needs computation.
     - A matrix indicating, for each constraint and realization, whether it is
@@ -38,6 +40,7 @@ class EvaluatorContext:
     Attributes:
         config:             Configuration of the optimizer.
         realizations:       Realization numbers for each requested evaluation.
+        perturbations:      Perturbations numbers for each requested evalation.
         active_objectives:  Signifies which function/realization evaluations are
                             essential for the optimizer.
         active_constraints: Signifies which constraint/realization evaluations are
@@ -47,6 +50,7 @@ class EvaluatorContext:
 
     config: EnOptConfig
     realizations: NDArray[np.intc]
+    perturbations: NDArray[np.intc] | None = None
     active_objectives: NDArray[np.bool_] | None = None
     active_constraints: NDArray[np.bool_] | None = None
     active: NDArray[np.bool_] | None = field(init=False)

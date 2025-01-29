@@ -165,6 +165,7 @@ def _get_gradient_results(
     context = EvaluatorContext(
         config=config,
         realizations=np.repeat(np.arange(realization_num), perturbation_num),
+        perturbations=np.tile(np.arange(perturbation_num), realization_num),
         active_objectives=active_objectives,
         active_constraints=active_constraints,
     )
@@ -195,7 +196,16 @@ def _get_function_and_gradient_results(  # noqa: PLR0913
     context = EvaluatorContext(
         config=config,
         realizations=np.hstack(
-            (realizations, np.repeat(realizations, perturbation_num)),
+            (
+                realizations,
+                np.repeat(realizations, perturbation_num),
+            ),
+        ),
+        perturbations=np.hstack(
+            (
+                np.full(realization_num, -1),
+                np.tile(np.arange(perturbation_num), realization_num),
+            )
         ),
         active_objectives=active_objectives,
         active_constraints=active_constraints,
