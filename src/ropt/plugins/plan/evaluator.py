@@ -116,13 +116,12 @@ class DefaultEvaluatorStep(PlanStep):
         """Run the evaluator step."""
         self._enopt_config = self.parse_config(self._with.config)
 
-        self.emit_event(
-            Event(
-                event_type=EventType.START_EVALUATOR_STEP,
-                tags=self._with.tags,
-                data=deepcopy(self._with.data),
+        data = deepcopy(self._with.data)
+        for event_type in (EventType.START_EVALUATOR_STEP, EventType.START_EVALUATION):
+            self.emit_event(
+                Event(event_type=event_type, tags=self._with.tags, data=data)
             )
-        )
+
         ensemble_evaluator = EnsembleEvaluator(
             self._enopt_config,
             self.plan.optimizer_context.evaluator,
@@ -148,13 +147,13 @@ class DefaultEvaluatorStep(PlanStep):
         data = deepcopy(self._with.data)
         data["exit_code"] = exit_code
         data["results"] = results
-        self.emit_event(
-            Event(
-                event_type=EventType.FINISHED_EVALUATOR_STEP,
-                tags=self._with.tags,
-                data=data,
+        for event_type in (
+            EventType.FINISHED_EVALUATION,
+            EventType.FINISHED_EVALUATOR_STEP,
+        ):
+            self.emit_event(
+                Event(event_type=event_type, tags=self._with.tags, data=data)
             )
-        )
 
         if exit_code == OptimizerExitCode.USER_ABORT:
             self.plan.abort()

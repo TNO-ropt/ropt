@@ -134,15 +134,25 @@ def test_single_perturbation(enopt_config: Any, evaluator: Any) -> None:
 def test_objective_auto_scale(
     enopt_config: Any, evaluator: Any, test_functions: Any, speculative: bool
 ) -> None:
-    checked = False
+    check_count = 0
 
     def check_value(event: Event, value: float) -> None:
-        nonlocal checked
+        nonlocal check_count
         for item in event.data["results"]:
-            if isinstance(item, FunctionResults) and not checked:
-                checked = True
+            if isinstance(item, FunctionResults) and check_count:
+                check_count -= 1
                 assert item.functions is not None
                 assert item.functions.scaled_objectives is not None
+                assert np.allclose(item.functions.scaled_objectives[-1], value)
+
+    def check_scale(event: Event, scale: float, value: float) -> None:
+        nonlocal check_count
+        for item in event.data["results"]:
+            if isinstance(item, FunctionResults) and check_count:
+                check_count -= 1
+                assert item.functions is not None
+                assert item.functions.scaled_objectives is not None
+                assert np.allclose(item.functions.objectives[-1], scale)
                 assert np.allclose(item.functions.scaled_objectives[-1], value)
 
     enopt_config["optimizer"]["speculative"] = speculative
@@ -154,34 +164,45 @@ def test_objective_auto_scale(
     optimizer = BasicOptimizer(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, partial(check_value, value=1.0)
     )
+    check_count = 1
     manual_result = optimizer.run().variables
     assert manual_result is not None
 
-    checked = False
     enopt_config["objectives"]["scales"] = [1.0, 1.0]
     enopt_config["objectives"]["auto_scale"] = [False, True]
-    optimizer = BasicOptimizer(enopt_config, evaluator()).add_observer(
-        EventType.FINISHED_EVALUATION, partial(check_value, value=1.0)
+    optimizer = (
+        BasicOptimizer(enopt_config, evaluator())
+        .add_observer(EventType.FINISHED_EVALUATION, partial(check_value, value=1.0))
+        .add_observer(
+            EventType.FINISHED_EVALUATOR_STEP,
+            partial(check_scale, scale=init1, value=1.0),
+        )
     )
+    check_count = 2
     variables = optimizer.run().variables
     assert variables is not None
     assert np.allclose(variables, manual_result)
 
-    checked = False
     enopt_config["objectives"]["scales"] = [1.0, 2.0 * init1]
     enopt_config["objectives"]["auto_scale"] = False
     optimizer = BasicOptimizer(enopt_config, evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, partial(check_value, value=0.5)
     )
+    check_count = 1
     manual_result = optimizer.run().variables
     assert manual_result is not None
 
-    checked = False
     enopt_config["objectives"]["scales"] = [1.0, 2.0]
     enopt_config["objectives"]["auto_scale"] = [False, True]
-    optimizer = BasicOptimizer(enopt_config, evaluator()).add_observer(
-        EventType.FINISHED_EVALUATION, partial(check_value, value=0.5)
+    optimizer = (
+        BasicOptimizer(enopt_config, evaluator())
+        .add_observer(EventType.FINISHED_EVALUATION, partial(check_value, value=0.5))
+        .add_observer(
+            EventType.FINISHED_EVALUATOR_STEP,
+            partial(check_scale, scale=init1, value=0.5),
+        )
     )
+    check_count = 2
     variables = optimizer.run().variables
     assert variables is not None
     assert np.allclose(variables, manual_result)
@@ -257,27 +278,48 @@ def test_constraint_auto_scale(
     config = EnOptConfig.model_validate(enopt_config)
     scales = np.fabs(test_functions[-1](config.variables.initial_values, None))
 
-    check = True
+    check_count = 0
 
-    def check_constraints(event: Event) -> None:
-        nonlocal check
+    def check_value(event: Event) -> None:
+        nonlocal check_count
         for item in event.data["results"]:
-            if isinstance(item, FunctionResults) and check:
-                check = False
+            if isinstance(item, FunctionResults) and check_count:
+                check_count -= 1
                 assert item.functions is not None
                 assert item.functions.scaled_constraints is not None
                 assert np.allclose(item.functions.scaled_constraints, 1.0)
 
+    def check_scale(event: Event, scale: float) -> None:
+        nonlocal check_count
+        for item in event.data["results"]:
+            if isinstance(item, FunctionResults) and check_count:
+                check_count -= 1
+                assert item.functions is not None
+                assert item.functions.constraints is not None
+                assert item.functions.scaled_constraints is not None
+                assert np.allclose(item.functions.constraints[-1], scale)
+                assert np.allclose(item.functions.scaled_constraints[-1], 1.0)
+
     enopt_config["nonlinear_constraints"]["scales"] = scales
     enopt_config["nonlinear_constraints"]["auto_scale"] = False
+    check_count = 1
     BasicOptimizer(enopt_config, evaluator(test_functions)).add_observer(
-        EventType.FINISHED_EVALUATION, check_constraints
+        EventType.FINISHED_EVALUATION, check_value
     ).run()
 
+    check_count = 2
     enopt_config["nonlinear_constraints"]["scales"] = 1.0
     enopt_config["nonlinear_constraints"]["auto_scale"] = True
     BasicOptimizer(enopt_config, evaluator(test_functions)).add_observer(
-        EventType.FINISHED_EVALUATION, check_constraints
+        EventType.FINISHED_EVALUATION, check_value
+    ).add_observer(
+        EventType.FINISHED_EVALUATOR_STEP,
+        partial(
+            check_scale,
+            scale=(
+                config.variables.initial_values[0] + config.variables.initial_values[2]
+            ),
+        ),
     ).run()
 
 

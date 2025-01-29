@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable, NoReturn
+from typing import TYPE_CHECKING, Any, Callable, NoReturn, Self
+
+import numpy as np
 
 from ropt.config.enopt import EnOptConfig
 from ropt.config.plan import PlanConfig
@@ -15,14 +17,11 @@ from ._context import OptimizerContext
 from ._plan import Plan
 
 if TYPE_CHECKING:
-    import numpy as np
     from numpy.typing import NDArray
 
     from ropt.evaluator import Evaluator
     from ropt.plan import Event
     from ropt.results import FunctionResults
-
-from typing import Self
 
 
 @dataclass(slots=True)
@@ -139,6 +138,33 @@ class BasicOptimizer:
         Returns:
             The `BasicOptimizer` instance, allowing for method chaining.
         """
+        steps: list[dict[str, Any]] = []
+        if np.any(self._config.objectives.auto_scale) or (
+            self._config.nonlinear_constraints is not None
+            and np.any(self._config.nonlinear_constraints.auto_scale)
+        ):
+            steps.append(
+                {
+                    "run": "evaluator",
+                    "with": {
+                        "config": "$__config__",
+                        "tags": "__optimizer_tag__",
+                        "data": self._event_data,
+                        "values": self._config.variables.initial_values,
+                    },
+                }
+            )
+        steps.append(
+            {
+                "run": "optimizer",
+                "with": {
+                    "config": "$__config__",
+                    "exit_code_var": "__exit_code__",
+                    "tags": "__optimizer_tag__",
+                    "data": self._event_data,
+                },
+            }
+        )
         plan = Plan(
             PlanConfig.model_validate(
                 {
@@ -147,17 +173,7 @@ class BasicOptimizer:
                         "__optimum_tracker__": None,
                         "__exit_code__": OptimizerExitCode.UNKNOWN,
                     },
-                    "steps": [
-                        {
-                            "run": "optimizer",
-                            "with": {
-                                "config": "$__config__",
-                                "exit_code_var": "__exit_code__",
-                                "tags": "__optimizer_tag__",
-                                "data": self._event_data,
-                            },
-                        }
-                    ],
+                    "steps": steps,
                     "handlers": [
                         {
                             "run": "tracker",
