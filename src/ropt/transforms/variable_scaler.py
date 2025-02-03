@@ -29,10 +29,7 @@ class VariableScaler(VariableTransform):
         self._scales = scales
         self._offsets = offsets
 
-    def forward(
-        self,
-        values: NDArray[np.float64],
-    ) -> NDArray[np.float64]:
+    def forward(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
         """Implement the forward scaling.
 
         The values may consist of an array with multiple dimensions. It is
