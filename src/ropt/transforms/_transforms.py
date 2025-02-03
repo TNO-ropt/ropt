@@ -1,4 +1,4 @@
-"""This module defines the Transforms class, a container for transforms."""
+"""This module defines the OptModelTransforms class."""
 
 from __future__ import annotations
 
@@ -14,8 +14,8 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class Transforms:
-    """A container for transformers."""
+class OptModelTransforms:
+    """A container for optimization model transformers."""
 
     variables: VariableTransform | None = None
     objectives: ObjectiveTransform | None = None

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, TypeVar
 from ._results import Results
 
 if TYPE_CHECKING:
-    from ropt.transforms import Transforms
+    from ropt.transforms import OptModelTransforms
 
     from ._bound_constraints import BoundConstraints
     from ._function_evaluations import FunctionEvaluations
@@ -47,7 +47,7 @@ class FunctionResults(Results):
     linear_constraints: LinearConstraints | None = None
     nonlinear_constraints: NonlinearConstraints | None = None
 
-    def transform_back(self, transforms: Transforms) -> FunctionResults:
+    def transform_back(self, transforms: OptModelTransforms) -> FunctionResults:
         """Apply backward transforms to the results.
 
         Args:

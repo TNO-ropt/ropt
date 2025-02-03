@@ -16,7 +16,7 @@ from ropt.config.enopt import (
     VariablesConfig,
 )
 from ropt.enums import BoundaryType, ConstraintType, PerturbationType, VariableType
-from ropt.transforms import Transforms, VariableScaler
+from ropt.transforms import OptModelTransforms, VariableScaler
 
 
 @pytest.fixture(name="enopt_config")
@@ -446,7 +446,7 @@ def test_perturbation_types_with_scaler(enopt_config: Any) -> None:
     config = EnOptConfig.model_validate(
         enopt_config,
         context=EnOptContext(
-            transforms=Transforms(
+            transforms=OptModelTransforms(
                 variables=VariableScaler(np.array([1.0, 1.0, 50.0]), None)
             )
         ),

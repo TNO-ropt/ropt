@@ -12,7 +12,7 @@ from ropt.config.enopt.constants import DEFAULT_SEED
 from ropt.enums import ConstraintType, EventType, OptimizerExitCode
 from ropt.plan import BasicOptimizer
 from ropt.results import FunctionResults, GradientResults
-from ropt.transforms import Transforms, VariableScaler
+from ropt.transforms import OptModelTransforms, VariableScaler
 from ropt.transforms.base import NonLinearConstraintTransform, ObjectiveTransform
 
 if TYPE_CHECKING:
@@ -246,7 +246,9 @@ def test_objective_with_scaler(
     assert np.allclose(objectives, [0.5, 4.5], atol=0.02)
 
     init1 = test_functions[1](config.variables.initial_values, None)
-    transforms = Transforms(objectives=ObjectiveScaler(np.array([init1, init1])))
+    transforms = OptModelTransforms(
+        objectives=ObjectiveScaler(np.array([init1, init1]))
+    )
 
     optimizer = BasicOptimizer(
         enopt_config, evaluator(transforms=transforms)
@@ -373,7 +375,7 @@ def test_constraint_with_scaler(
     scales = np.array(
         test_functions[-1](enopt_config["variables"]["initial_values"], None), ndmin=1
     )
-    transforms = Transforms(nonlinear_constraints=ConstraintScaler(scales))
+    transforms = OptModelTransforms(nonlinear_constraints=ConstraintScaler(scales))
     context = EnOptContext(transforms=transforms)
     config = EnOptConfig.model_validate(enopt_config, context=context)
     assert config.nonlinear_constraints is not None
@@ -458,7 +460,7 @@ def test_variables_scale_with_scaler(
     enopt_config["variables"]["lower_bounds"] = lower_bounds
     enopt_config["variables"]["upper_bounds"] = upper_bounds
 
-    transforms = Transforms(variables=VariableScaler(scales, offsets))
+    transforms = OptModelTransforms(variables=VariableScaler(scales, offsets))
     context = EnOptContext(transforms=transforms)
     results = (
         BasicOptimizer(
@@ -539,7 +541,7 @@ def test_variables_scale_linear_constraints_with_scaler(
     offsets = np.array([1.0, 1.1, 1.2])
     scales = np.array([2.0, 2.1, 2.2])
 
-    transforms = Transforms(variables=VariableScaler(scales, offsets))
+    transforms = OptModelTransforms(variables=VariableScaler(scales, offsets))
     context = EnOptContext(transforms=transforms)
     config = EnOptConfig.model_validate(enopt_config, context=context)
     assert config.linear_constraints is not None

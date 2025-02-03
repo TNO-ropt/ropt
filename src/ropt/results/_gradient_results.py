@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, TypeVar
 from ._results import Results
 
 if TYPE_CHECKING:
-    from ropt.transforms._transforms import Transforms
+    from ropt.transforms._transforms import OptModelTransforms
 
     from ._gradient_evaluations import GradientEvaluations
     from ._gradients import Gradients
@@ -36,7 +36,7 @@ class GradientResults(Results):
     realizations: Realizations
     gradients: Gradients | None
 
-    def transform_back(self, transforms: Transforms) -> GradientResults:
+    def transform_back(self, transforms: OptModelTransforms) -> GradientResults:
         """Apply backward transforms to the results.
 
         Args:

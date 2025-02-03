@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, Final, Iterable, Sequence, TypeVar
 
 if TYPE_CHECKING:
     from ropt.enums import ResultAxis
-    from ropt.transforms._transforms import Transforms
+    from ropt.transforms._transforms import OptModelTransforms
 
 
 _HAVE_PANDAS: Final = find_spec("pandas") is not None
@@ -123,7 +123,7 @@ class Results(ABC):
         )
 
     @abstractmethod
-    def transform_back(self, transforms: Transforms) -> Results:
+    def transform_back(self, transforms: OptModelTransforms) -> Results:
         """Apply backward transforms to the results.
 
         Args:

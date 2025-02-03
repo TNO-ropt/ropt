@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config.enopt import EnOptConfig
-    from ropt.transforms import Transforms
+    from ropt.transforms import OptModelTransforms
 
 
 @dataclass(slots=True)
@@ -161,7 +161,7 @@ class FunctionEvaluations(ResultField):
             evaluation_ids=evaluation_ids,
         )
 
-    def transform_back(self, transforms: Transforms) -> FunctionEvaluations:
+    def transform_back(self, transforms: OptModelTransforms) -> FunctionEvaluations:
         """Apply backward transforms to the results.
 
         Args:

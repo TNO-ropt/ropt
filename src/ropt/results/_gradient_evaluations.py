@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config.enopt import EnOptConfig
-    from ropt.transforms import Transforms
+    from ropt.transforms import OptModelTransforms
 
 
 @dataclass(slots=True)
@@ -218,7 +218,7 @@ class GradientEvaluations(ResultField):
             perturbed_evaluation_ids=perturbed_evaluation_ids,
         )
 
-    def transform_back(self, transforms: Transforms) -> GradientEvaluations:
+    def transform_back(self, transforms: OptModelTransforms) -> GradientEvaluations:
         """Apply backward transforms to the results.
 
         Args:

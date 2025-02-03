@@ -9,7 +9,7 @@ from typing import Any, Self
 from pydantic import ConfigDict, ValidationInfo, model_validator
 
 from ropt.config.utils import ImmutableBaseModel
-from ropt.transforms import Transforms
+from ropt.transforms import OptModelTransforms
 
 from ._function_estimator_config import FunctionEstimatorConfig
 from ._gradient_config import GradientConfig
@@ -27,7 +27,7 @@ from ._variables_config import VariablesConfig  # noqa: TC001
 class EnOptContext:
     """A context object to pass to EnOptConfig.model_validate."""
 
-    transforms: Transforms = field(default_factory=Transforms)
+    transforms: OptModelTransforms = field(default_factory=OptModelTransforms)
 
 
 class EnOptConfig(ImmutableBaseModel):
