@@ -130,7 +130,13 @@ class Functions(ResultField):
             The transformed results.
         """
         return Functions(
-            weighted_objective=self.weighted_objective,
+            weighted_objective=(
+                self.weighted_objective
+                if transforms.objectives is None
+                else transforms.objectives.transform_weighted_objective(
+                    self.weighted_objective
+                )
+            ),
             objectives=(
                 self.objectives
                 if transforms.objectives is None

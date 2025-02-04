@@ -112,6 +112,29 @@ class ObjectiveTransform(ABC):
             The transformed values.
         """
 
+    def transform_weighted_objective(
+        self, weighted_objective: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
+        """Transform the weighted objective value.
+
+        The optimizer generates weighted objective values using transformed
+        values. This method is called to apply a transformation when
+        transforming backwards. For example when the forward transformation
+        of the objectives involves a sign change to implement maximization,
+        this can be used to change the sign of the weighted objective values.
+
+        Note:
+            This function may be applied to the weighted objective itself,
+            or to its gradient, hence the input may be a vector of values.
+
+        Args:
+            weighted_objective: The weighted objective to transform.
+
+        Returns:
+            The transformed weighted objective.
+        """
+        return weighted_objective
+
 
 class NonLinearConstraintTransform(ABC):
     """Abstract base class for non-linear constraint transformers."""

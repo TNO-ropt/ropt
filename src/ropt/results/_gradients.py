@@ -158,7 +158,13 @@ class Gradients(ResultField):
             constraints = np.moveaxis(constraints, 0, -1)
 
         return Gradients(
-            weighted_objective=self.weighted_objective,
+            weighted_objective=(
+                self.weighted_objective
+                if transforms.objectives is None
+                else transforms.objectives.transform_weighted_objective(
+                    self.weighted_objective
+                )
+            ),
             objectives=objectives,
             constraints=constraints,
         )
