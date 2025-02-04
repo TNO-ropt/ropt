@@ -1,6 +1,6 @@
 ::: ropt.plugins.realization_filter.default.DefaultRealizationFilter
     options:
-        members: none
+        members: False
 
 ::: ropt.plugins.realization_filter.default.SortObjectiveOptions
 

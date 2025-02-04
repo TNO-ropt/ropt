@@ -4,4 +4,4 @@
 
 ::: ropt.plugins.realization_filter.default
     options:
-        members: none
+        members: False

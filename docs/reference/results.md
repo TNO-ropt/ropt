@@ -1,6 +1,6 @@
 ::: ropt.results
     options:
-        members: none
+        members: False
 
 ::: ropt.results.Results
     options:
@@ -17,32 +17,32 @@
 ::: ropt.results.FunctionEvaluations
     options:
         heading_level: 3
-        members: none
+        members: False
 
 ::: ropt.results.Realizations
     options:
         heading_level: 3
-        members: none
+        members: False
 
 ::: ropt.results.Functions
     options:
         heading_level: 3
-        members: none
+        members: False
 
 ::: ropt.results.BoundConstraints
     options:
         heading_level: 3
-        members: none
+        members: False
 
 ::: ropt.results.LinearConstraints
     options:
         heading_level: 3
-        members: none
+        members: False
 
 ::: ropt.results.NonlinearConstraints
     options:
         heading_level: 3
-        members: none
+        members: False
 
 ::: ropt.results.GradientResults
     options:
@@ -51,11 +51,11 @@
 ::: ropt.results.GradientEvaluations
     options:
         heading_level: 3
-        members: none
+        members: False
 
 ::: ropt.results.Gradients
     options:
         heading_level: 3
-        members: none
+        members: False
 
 ::: ropt.results.convert_to_maximize

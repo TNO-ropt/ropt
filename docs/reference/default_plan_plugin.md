@@ -1,6 +1,6 @@
 ::: ropt.plugins.plan.default.DefaultPlanPlugin
     options:
-        members: none
+        members: False
 
 ::: ropt.plugins.plan._set.DefaultSetStep
     options:

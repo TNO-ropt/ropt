@@ -4,4 +4,4 @@
 
 ::: ropt.plugins.function_estimator.default
     options:
-        members: none
+        members: False
