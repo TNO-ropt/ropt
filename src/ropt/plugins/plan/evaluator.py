@@ -16,7 +16,6 @@ from ropt.exceptions import OptimizationAborted
 from ropt.plan import Event
 from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
-from ropt.utils.scaling import scale_variables
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -45,15 +44,6 @@ class DefaultEvaluatorStep(PlanStep):
     configuration class to parse the `with` field of the
     [`PlanStepConfig`][ropt.config.plan.PlanStepConfig] used to specify this step
     in a plan configuration.
-
-    Note:
-        The evaluator step is designed to serve as a base class for evaluator
-        steps that may be initialized with different configuration objects. This
-        can be done by providing a custom `parse_config` method to parse the
-        `config` entry of the plan configuration into an
-        [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object. In addition, the
-        `emit_event` method can be overridden to emit custom events, generally
-        by adding additional information to its `data` field.
     """
 
     class DefaultEvaluatorStepWith(BaseModel):
@@ -114,22 +104,33 @@ class DefaultEvaluatorStep(PlanStep):
 
     def run(self) -> None:
         """Run the evaluator step."""
-        self._enopt_config = self.parse_config(self._with.config)
+        variables = self._get_variables()
+        config = self.plan.eval(self._with.config)
+        if not isinstance(config, dict | EnOptConfig):
+            msg = "No valid EnOpt configuration provided"
+            raise TypeError(msg)
+        enopt_config = EnOptConfig.model_validate(config)
+        if variables is None:
+            variables = enopt_config.variables.initial_values
+        self._run(enopt_config, variables)
 
-        data = deepcopy(self._with.data)
+    def _run(self, enopt_config: EnOptConfig, variables: NDArray[np.float64]) -> None:
         for event_type in (EventType.START_EVALUATOR_STEP, EventType.START_EVALUATION):
             self.emit_event(
-                Event(event_type=event_type, tags=self._with.tags, data=data)
+                Event(
+                    event_type=event_type,
+                    tags=self._with.tags,
+                    data=deepcopy(self._with.data),
+                )
             )
 
         ensemble_evaluator = EnsembleEvaluator(
-            self._enopt_config,
+            enopt_config,
             self.plan.optimizer_context.evaluator,
             self.plan.plan_id,
             self.plan.optimizer_context.plugin_manager,
         )
 
-        variables = self._get_variables(self._enopt_config)
         exit_code = OptimizerExitCode.EVALUATION_STEP_FINISHED
 
         try:
@@ -158,18 +159,6 @@ class DefaultEvaluatorStep(PlanStep):
         if exit_code == OptimizerExitCode.USER_ABORT:
             self.plan.abort()
 
-    def parse_config(self, config: str) -> EnOptConfig:
-        """Parse the configuration of the step.
-
-        Returns:
-            The parsed configuration.
-        """
-        config = self.plan.eval(config)
-        if not isinstance(config, dict | EnOptConfig):
-            msg = "No valid EnOpt configuration provided"
-            raise TypeError(msg)
-        return EnOptConfig.model_validate(config)
-
     def emit_event(self, event: Event) -> None:
         """Emit an event.
 
@@ -178,22 +167,17 @@ class DefaultEvaluatorStep(PlanStep):
         """
         self.plan.emit_event(event)
 
-    def _get_variables(self, config: EnOptConfig) -> NDArray[np.float64]:
+    def _get_variables(self) -> NDArray[np.float64] | None:
         if self._with.values is not None:
             parsed_variables = self.plan.eval(self._with.values)
-            if isinstance(parsed_variables, FunctionResults):
-                return (
-                    parsed_variables.evaluations.variables
-                    if parsed_variables.evaluations.scaled_variables is None
-                    else parsed_variables.evaluations.scaled_variables
-                )
-            if isinstance(parsed_variables, np.ndarray | list):
-                parsed_variables = np.array(parsed_variables)
-                scaled_variables = scale_variables(config, parsed_variables, axis=-1)
-                return (
-                    parsed_variables if scaled_variables is None else scaled_variables
-                )
-            if parsed_variables is not None:
-                msg = f"`{self._with.values} does not contain variables."
-                raise ValueError(msg)
-        return self._enopt_config.variables.initial_values
+            match parsed_variables:
+                case FunctionResults():
+                    return parsed_variables.evaluations.variables
+                case np.ndarray() | list():
+                    return np.asarray(parsed_variables, dtype=np.float64)
+                case None:
+                    return None
+                case _:
+                    msg = f"`{self._with.values}` does not contain variables."
+                    raise ValueError(msg)
+        return None
