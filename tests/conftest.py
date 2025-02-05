@@ -32,7 +32,7 @@ class FunctionContext:
     index: int
 
 
-def _function_runner(  # noqa: C901
+def _function_runner(
     variables: NDArray[np.float64],
     evaluator_context: EvaluatorContext,
     functions: list[_Function],
@@ -77,16 +77,6 @@ def _function_runner(  # noqa: C901
                 function = functions[idx + objective_count]
                 assert constraint_results is not None
                 constraint_results[sim, idx] = function(variables[sim, :], context)
-    if transforms is not None:
-        if transforms.objectives is not None:
-            objective_results = transforms.objectives.forward(objective_results)
-        if (
-            constraint_results is not None
-            and transforms.nonlinear_constraints is not None
-        ):
-            constraint_results = transforms.nonlinear_constraints.forward(
-                constraint_results
-            )
 
     return EvaluatorResult(
         objectives=objective_results,

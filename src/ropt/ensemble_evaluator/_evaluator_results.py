@@ -124,6 +124,20 @@ def _get_function_results(
         active_constraints=active_constraints,
     )
     evaluator_result = evaluator(np.repeat(variables, realization_num, axis=0), context)
+    if config.transforms is not None:
+        if config.transforms.objectives is not None:
+            evaluator_result.objectives = config.transforms.objectives.forward(
+                evaluator_result.objectives
+            )
+        if (
+            evaluator_result.constraints is not None
+            and config.transforms.nonlinear_constraints is not None
+        ):
+            evaluator_result.constraints = (
+                config.transforms.nonlinear_constraints.forward(
+                    evaluator_result.constraints
+                )
+            )
     split_objectives = np.vsplit(evaluator_result.objectives, variables.shape[0])
     split_constraints = (
         []
@@ -172,6 +186,20 @@ def _get_gradient_results(
     evaluator_result = evaluator(
         perturbed_variables.reshape(-1, perturbed_variables.shape[-1]), context
     )
+    if config.transforms is not None:
+        if config.transforms.objectives is not None:
+            evaluator_result.objectives = config.transforms.objectives.forward(
+                evaluator_result.objectives
+            )
+        if (
+            evaluator_result.constraints is not None
+            and config.transforms.nonlinear_constraints is not None
+        ):
+            evaluator_result.constraints = (
+                config.transforms.nonlinear_constraints.forward(
+                    evaluator_result.constraints
+                )
+            )
     return _GradientEvaluatorResults(
         batch_id=evaluator_result.batch_id,
         perturbed_objectives=evaluator_result.objectives,
@@ -219,6 +247,20 @@ def _get_function_and_gradient_results(  # noqa: PLR0913
         ),
         context,
     )
+    if config.transforms is not None:
+        if config.transforms.objectives is not None:
+            evaluator_result.objectives = config.transforms.objectives.forward(
+                evaluator_result.objectives
+            )
+        if (
+            evaluator_result.constraints is not None
+            and config.transforms.nonlinear_constraints is not None
+        ):
+            evaluator_result.constraints = (
+                config.transforms.nonlinear_constraints.forward(
+                    evaluator_result.constraints
+                )
+            )
     return (
         _FunctionEvaluatorResults(
             batch_id=evaluator_result.batch_id,
