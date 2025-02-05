@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from ropt import utils
 from ropt.enums import ResultAxis
+from ropt.utils.scaling import scale_back_variables
 
 from ._result_field import ResultField
 from ._utils import (
@@ -134,7 +134,7 @@ class BoundConstraints(ResultField):
             unscaled = None
             if scaled is not None:
                 assert config is not None
-                unscaled = utils.scaling.scale_back_variables(
+                unscaled = scale_back_variables(
                     config,
                     scaled,
                     correct_offsets=False,

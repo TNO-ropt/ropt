@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
-from ropt import utils
 from ropt.enums import ResultAxis
+from ropt.utils.scaling import scale_back_variables, scale_constraints, scale_objectives
 
 from ._result_field import ResultField
 from ._utils import _immutable_copy
@@ -136,16 +136,14 @@ class FunctionEvaluations(ResultField):
         Returns:
             A new FunctionEvaluations object.
         """
-        unscaled_variables = utils.scaling.scale_back_variables(
-            config, variables, axis=-1
-        )
-        scaled_objectives = utils.scaling.scale_objectives(
+        unscaled_variables = scale_back_variables(config, variables, axis=-1)
+        scaled_objectives = scale_objectives(
             config,
             objectives,
             None if objective_auto_scales is None else objective_auto_scales,
             axis=-1,
         )
-        scaled_constraints = utils.scaling.scale_constraints(
+        scaled_constraints = scale_constraints(
             config,
             constraints,
             None if constraint_auto_scales is None else constraint_auto_scales,

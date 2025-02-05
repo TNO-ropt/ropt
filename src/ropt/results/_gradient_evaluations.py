@@ -3,8 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
-from ropt import utils
 from ropt.enums import ResultAxis
+from ropt.utils.scaling import scale_back_variables, scale_constraints, scale_objectives
 
 from ._result_field import ResultField
 from ._utils import _immutable_copy
@@ -182,19 +182,17 @@ class GradientEvaluations(ResultField):
         Returns:
             A new FunctionEvaluations object.
         """
-        unscaled_variables = utils.scaling.scale_back_variables(
-            config, variables, axis=-1
-        )
-        unscaled_perturbed_variables = utils.scaling.scale_back_variables(
+        unscaled_variables = scale_back_variables(config, variables, axis=-1)
+        unscaled_perturbed_variables = scale_back_variables(
             config, perturbed_variables, axis=-1
         )
-        scaled_perturbed_objectives = utils.scaling.scale_objectives(
+        scaled_perturbed_objectives = scale_objectives(
             config,
             perturbed_objectives,
             None if objective_auto_scales is None else objective_auto_scales,
             axis=-1,
         )
-        scaled_perturbed_constraints = utils.scaling.scale_constraints(
+        scaled_perturbed_constraints = scale_constraints(
             config,
             perturbed_constraints,
             None if constraint_auto_scales is None else constraint_auto_scales,

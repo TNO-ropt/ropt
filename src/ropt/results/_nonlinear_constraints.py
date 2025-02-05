@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 
 import numpy as np  # noqa: TC002
 
-from ropt import utils
 from ropt.enums import ResultAxis
+from ropt.utils.scaling import scale_constraints
 
 from ._result_field import ResultField
 from ._utils import (
@@ -104,7 +104,7 @@ class NonlinearConstraints(ResultField):
         ) -> NDArray[np.float64] | None:
             if unscaled is not None:
                 assert config is not None
-                return utils.scaling.scale_constraints(
+                return scale_constraints(
                     config,
                     unscaled,
                     None if constraint_auto_scales is None else constraint_auto_scales,

@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from ropt import utils
 from ropt.enums import ResultAxis
+from ropt.utils.scaling import scale_constraints, scale_objectives
 
 from ._result_field import ResultField
 from ._utils import _immutable_copy
@@ -113,13 +113,13 @@ class Gradients(ResultField):
         Returns:
             A new Functions object.
         """
-        scaled_objectives = utils.scaling.scale_objectives(
+        scaled_objectives = scale_objectives(
             config,
             objectives,
             None if objective_auto_scales is None else objective_auto_scales,
             axis=0,
         )
-        scaled_constraints = utils.scaling.scale_constraints(
+        scaled_constraints = scale_constraints(
             config,
             constraints,
             None if constraint_auto_scales is None else constraint_auto_scales,
