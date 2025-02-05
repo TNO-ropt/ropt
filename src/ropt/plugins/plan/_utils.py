@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 import numpy as np
 
 from ropt.results import FunctionResults, Results
@@ -66,16 +68,20 @@ def _check_constraints(
 
 
 def _get_last_result(
-    results: tuple[Results, ...], constraint_tolerance: float | None
+    unscaled_results: tuple[Results, ...],
+    scaled_results: tuple[Results, ...],
+    constraint_tolerance: float | None,
 ) -> FunctionResults | None:
     return next(
         (
-            item
-            for item in reversed(results)
+            cast(FunctionResults, unscaled_item)
+            for unscaled_item, scaled_item in zip(
+                reversed(unscaled_results), reversed(scaled_results), strict=False
+            )
             if (
-                isinstance(item, FunctionResults)
-                and item.functions is not None
-                and _check_constraints(item, constraint_tolerance)
+                isinstance(scaled_item, FunctionResults)
+                and scaled_item.functions is not None
+                and _check_constraints(scaled_item, constraint_tolerance)
             )
         ),
         None,
@@ -84,17 +90,21 @@ def _get_last_result(
 
 def _update_optimal_result(
     optimal_result: FunctionResults | None,
-    results: tuple[Results, ...],
+    unscaled_results: tuple[Results, ...],
+    scaled_results: tuple[Results, ...],
     constraint_tolerance: float | None,
 ) -> FunctionResults | None:
     return_result: FunctionResults | None = None
-    for item in results:
+    for unscaled_item, scaled_item in zip(
+        unscaled_results, scaled_results, strict=False
+    ):
         if (
-            isinstance(item, FunctionResults)
-            and item.functions is not None
-            and _check_constraints(item, constraint_tolerance)
+            isinstance(scaled_item, FunctionResults)
+            and scaled_item.functions is not None
+            and _check_constraints(scaled_item, constraint_tolerance)
         ):
-            new_optimal_result = _get_new_optimal_result(optimal_result, item)
+            assert isinstance(unscaled_item, FunctionResults)
+            new_optimal_result = _get_new_optimal_result(optimal_result, unscaled_item)
             if new_optimal_result is not None:
                 optimal_result = new_optimal_result
                 return_result = new_optimal_result
@@ -102,14 +112,18 @@ def _update_optimal_result(
 
 
 def _get_all_results(
-    results: tuple[Results, ...], constraint_tolerance: float | None
+    unscaled_results: tuple[Results, ...],
+    scaled_results: tuple[Results, ...],
+    constraint_tolerance: float | None,
 ) -> tuple[FunctionResults, ...]:
     return tuple(
-        item
-        for item in results
+        cast(FunctionResults, unscaled_item)
+        for unscaled_item, scaled_item in zip(
+            unscaled_results, scaled_results, strict=False
+        )
         if (
-            isinstance(item, FunctionResults)
-            and item.functions is not None
-            and _check_constraints(item, constraint_tolerance)
+            isinstance(scaled_item, FunctionResults)
+            and scaled_item.functions is not None
+            and _check_constraints(scaled_item, constraint_tolerance)
         )
     )

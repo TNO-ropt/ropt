@@ -225,25 +225,25 @@ def test_objective_with_scaler(
 ) -> None:
     checked = False
 
-    def check_value(event: Event, value: float) -> None:
+    def check_value(event: Event) -> None:
         nonlocal checked
-        for item in event.data["results"]:
+        for item in event.data["scaled_results"]:
             if isinstance(item, FunctionResults) and not checked:
                 checked = True
                 assert item.functions is not None
                 assert item.functions.objectives is not None
-                assert np.allclose(item.functions.objectives[-1], value)
+                assert np.allclose(item.functions.objectives[-1], 1.0)
 
     enopt_config["optimizer"]["speculative"] = speculative
     config = EnOptConfig.model_validate(enopt_config)
 
-    results = BasicOptimizer(enopt_config, evaluator()).run().results
-    assert results is not None
-    assert results.functions is not None
-    variables = results.evaluations.variables
-    objectives = results.functions.objectives
-    assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
-    assert np.allclose(objectives, [0.5, 4.5], atol=0.02)
+    results1 = BasicOptimizer(enopt_config, evaluator()).run().results
+    assert results1 is not None
+    assert results1.functions is not None
+    variables1 = results1.evaluations.variables
+    objectives1 = results1.functions.objectives
+    assert np.allclose(variables1, [0.0, 0.0, 0.5], atol=0.02)
+    assert np.allclose(objectives1, [0.5, 4.5], atol=0.02)
 
     init1 = test_functions[1](config.variables.initial_values, None)
     transforms = OptModelTransforms(
@@ -255,14 +255,12 @@ def test_objective_with_scaler(
             enopt_config, context=EnOptContext(transforms=transforms)
         ),
         evaluator(),
-    ).add_observer(EventType.FINISHED_EVALUATION, partial(check_value, value=1.0))
-    scaled_results = optimizer.run().results
-    assert scaled_results is not None
-    scaled_variables = scaled_results.evaluations.variables
-    assert np.allclose(scaled_variables, variables, atol=0.02)
-    unscaled_results = scaled_results.transform_back(transforms)
-    assert unscaled_results.functions is not None
-    assert np.allclose(objectives, unscaled_results.functions.objectives, atol=0.025)
+    ).add_observer(EventType.FINISHED_EVALUATION, check_value)
+    results2 = optimizer.run().results
+    assert results2 is not None
+    assert np.allclose(results2.evaluations.variables, variables1, atol=0.02)
+    assert results2.functions is not None
+    assert np.allclose(objectives1, results2.functions.objectives, atol=0.025)
 
 
 @pytest.mark.parametrize("speculative", [True, False])
@@ -388,7 +386,7 @@ def test_constraint_with_scaler(
 
     def check_constraints(event: Event) -> None:
         nonlocal check
-        for item in event.data["results"]:
+        for item in event.data["scaled_results"]:
             if isinstance(item, FunctionResults) and check:
                 check = False
                 assert item.functions is not None
@@ -488,13 +486,7 @@ def test_variables_scale_with_scaler(
     assert np.allclose(config.variables.lower_bounds, lower_bounds)
     assert np.allclose(config.variables.upper_bounds, upper_bounds)
     result = results.evaluations.variables
-    if scales is not None:
-        result = result * scales
-    if offsets is not None:
-        result = result + offsets
     assert np.allclose(result, [0.0, 0.0, 0.5], atol=0.05)
-    results = results.transform_back(context.transforms)
-    assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.05)
 
 
 def test_variables_scale_linear_constraints(enopt_config: Any, evaluator: Any) -> None:
@@ -557,7 +549,6 @@ def test_variables_scale_linear_constraints_with_scaler(
     results = BasicOptimizer(config, evaluator()).run().results
     assert results is not None
     assert results.evaluations.variables is not None
-    results = results.transform_back(context.transforms)
     assert np.allclose(results.evaluations.variables, [0.25, 0.0, 0.75], atol=0.02)
 
 

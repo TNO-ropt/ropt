@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from functools import partial
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -23,6 +24,7 @@ if TYPE_CHECKING:
 
     from ropt.config.plan import PlanStepConfig
     from ropt.results import Results
+    from ropt.transforms import OptModelTransforms
 
 MetaDataType = dict[str, int | float | bool | str]
 
@@ -203,7 +205,9 @@ class DefaultOptimizerStep(PlanStep):
                 if self._with.nested_optimization is not None
                 else None
             ),
-            signal_evaluation=self._signal_evaluation,
+            signal_evaluation=partial(
+                self._signal_evaluation, transforms=enopt_config.transforms
+            ),
         )
 
         if (
@@ -244,6 +248,7 @@ class DefaultOptimizerStep(PlanStep):
         results: tuple[Results, ...] | None = None,
         *,
         exit_code: OptimizerExitCode | None = None,
+        transforms: OptModelTransforms | None = None,
     ) -> None:
         """Called before and after the optimizer finishes an evaluation.
 
@@ -252,8 +257,9 @@ class DefaultOptimizerStep(PlanStep):
         with `results` set to the results of the evaluation.
 
         Args:
-            results: The results produced by the evaluation.
-            exit_code: An exit code if that may be set if the evaluation completed.
+            results:    The results produced by the evaluation.
+            exit_code:  An exit code if that may be set if the evaluation completed.
+            transforms: Optional transforms for the results.
         """
         if results is None:
             self.emit_event(
@@ -266,7 +272,11 @@ class DefaultOptimizerStep(PlanStep):
         else:
             data = deepcopy(self._with.data)
             data["exit_code"] = exit_code
-            data["results"] = results
+            if transforms is not None:
+                data["scaled_results"] = results
+                data["results"] = [item.transform_back(transforms) for item in results]
+            else:
+                data["results"] = results
             self.emit_event(
                 Event(
                     event_type=EventType.FINISHED_EVALUATION,

@@ -147,7 +147,13 @@ class DefaultEvaluatorStep(PlanStep):
 
         data = deepcopy(self._with.data)
         data["exit_code"] = exit_code
-        data["results"] = results
+        if enopt_config.transforms is not None:
+            data["scaled_results"] = results
+            data["results"] = [
+                item.transform_back(enopt_config.transforms) for item in results
+            ]
+        else:
+            data["results"] = results
         for event_type in (
             EventType.FINISHED_EVALUATION,
             EventType.FINISHED_EVALUATOR_STEP,
