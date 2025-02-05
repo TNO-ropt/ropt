@@ -2306,17 +2306,6 @@ configuration class to parse the <code>with</code> field of the
 in a plan configuration.</p>
 
 
-<details class="note" open>
-  <summary>Note</summary>
-  <p>The evaluator step is designed to serve as a base class for evaluator
-steps that may be initialized with different configuration objects. This
-can be done by providing a custom <code>parse_config</code> method to parse the
-<code>config</code> entry of the plan configuration into an
-<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. In addition, the
-<code>emit_event</code> method can be overridden to emit custom events, generally
-by adding additional information to its <code>data</code> field.</p>
-</details>
-
 
 
 
@@ -2513,17 +2502,6 @@ configuration class to parse the <code>with</code> field of the
 <a class="autorefs autorefs-internal" href="../plan_config/#ropt.config.plan.PlanStepConfig"><code>PlanStepConfig</code></a> used to specify this step
 in a plan configuration.</p>
 
-
-<details class="note" open>
-  <summary>Note</summary>
-  <p>The optimizer step is designed to serve as a base class for optimization
-steps that may be initialized with different configuration objects. This
-can be done by providing a custom <code>parse_config</code> method to parse the
-<code>config</code> entry of the plan configuration into an
-<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. In addition, the
-<code>emit_event</code> method can be overridden to emit custom events, generally
-by adding additional information to its <code>data</code> field.</p>
-</details>
 
 
 
