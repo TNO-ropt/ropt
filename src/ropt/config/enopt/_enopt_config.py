@@ -95,11 +95,29 @@ class EnOptConfig(ImmutableBaseModel):
     )
     samplers: tuple[SamplerConfig, ...] = (SamplerConfig(),)
     original_inputs: dict[str, Any] | None = None
+    _transforms: OptModelTransforms | None = None
 
     model_config = ConfigDict(
         extra="forbid",
         validate_default=True,
     )
+
+    @property
+    def transforms(self) -> OptModelTransforms | None:
+        """Return the transforms.
+
+        Returns:
+            A transforms object or None.
+        """
+        return self._transforms
+
+    @model_validator(mode="after")
+    def _add_transforms(self, info: ValidationInfo) -> Self:
+        if info.context is not None:
+            self._mutable()
+            self._transforms = info.context.transforms
+            self._immutable()
+        return self
 
     @model_validator(mode="after")
     def _linear_constraints(self, info: ValidationInfo) -> Self:

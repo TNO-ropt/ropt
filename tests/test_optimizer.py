@@ -251,7 +251,10 @@ def test_objective_with_scaler(
     )
 
     optimizer = BasicOptimizer(
-        enopt_config, evaluator(transforms=transforms)
+        EnOptConfig.model_validate(
+            enopt_config, context=EnOptContext(transforms=transforms)
+        ),
+        evaluator(),
     ).add_observer(EventType.FINISHED_EVALUATION, partial(check_value, value=1.0))
     scaled_results = optimizer.run().results
     assert scaled_results is not None
@@ -392,9 +395,9 @@ def test_constraint_with_scaler(
                 assert item.functions.constraints is not None
                 assert np.allclose(item.functions.constraints, 1.0)
 
-    BasicOptimizer(
-        config, evaluator(test_functions, transforms=transforms)
-    ).add_observer(EventType.FINISHED_EVALUATION, check_constraints).run()
+    BasicOptimizer(config, evaluator(test_functions)).add_observer(
+        EventType.FINISHED_EVALUATION, check_constraints
+    ).run()
 
 
 @pytest.mark.parametrize("offsets", [None, np.array([1.0, 1.1, 1.2])])
@@ -465,7 +468,7 @@ def test_variables_scale_with_scaler(
     results = (
         BasicOptimizer(
             EnOptConfig.model_validate(enopt_config, context=context),
-            evaluator(transforms=transforms),
+            evaluator(),
         )
         .run()
         .results
@@ -551,7 +554,7 @@ def test_variables_scale_linear_constraints_with_scaler(
         rhs_values - np.matmul(coefficients, offsets),
     )
 
-    results = BasicOptimizer(config, evaluator(transforms=transforms)).run().results
+    results = BasicOptimizer(config, evaluator()).run().results
     assert results is not None
     assert results.evaluations.variables is not None
     results = results.transform_back(context.transforms)

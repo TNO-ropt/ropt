@@ -7,7 +7,6 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt.evaluator import Evaluator, EvaluatorContext, EvaluatorResult
-from ropt.transforms import OptModelTransforms
 from ropt.utils.scaling import scale_back_variables
 
 _Function = Callable[[NDArray[np.float64], Any], float]
@@ -37,13 +36,13 @@ def _function_runner(  # noqa: C901
     variables: NDArray[np.float64],
     evaluator_context: EvaluatorContext,
     functions: list[_Function],
-    transforms: OptModelTransforms | None,
 ) -> EvaluatorResult:
     unscaled_variables = scale_back_variables(
         evaluator_context.config, variables, axis=-1
     )
     if unscaled_variables is not None:
         variables = unscaled_variables
+    transforms = evaluator_context.config.transforms
     if transforms is not None and transforms.variables is not None:
         variables = transforms.variables.backward(variables)
     objective_count = evaluator_context.config.objectives.weights.size
@@ -112,16 +111,11 @@ def fixture_test_functions() -> tuple[_Function, _Function]:
 
 
 @pytest.fixture(scope="session")
-def evaluator(
-    test_functions: Any, transforms: OptModelTransforms | None = None
-) -> Callable[[list[_Function]], Evaluator]:
+def evaluator(test_functions: Any) -> Callable[[list[_Function]], Evaluator]:
     def _evaluator(
         test_functions: list[_Function] = test_functions,
-        transforms: OptModelTransforms | None = transforms,
     ) -> Evaluator:
-        return partial(
-            _function_runner, functions=test_functions, transforms=transforms
-        )
+        return partial(_function_runner, functions=test_functions)
 
     return _evaluator
 
