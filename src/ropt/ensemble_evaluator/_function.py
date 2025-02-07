@@ -68,11 +68,3 @@ def _calculate_estimated_constraints(
         realization_weights,
         failed_realizations,
     )
-
-
-def _calculate_weighted_function(
-    functions: NDArray[np.float64],
-    weights: NDArray[np.float64],
-    scales: NDArray[np.float64],
-) -> NDArray[np.float64]:
-    return np.array((weights * functions / scales).sum())

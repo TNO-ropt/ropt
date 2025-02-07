@@ -191,16 +191,13 @@ class EnsembleOptimizer:
             compute_gradients=return_gradients,
         )
 
-        # Functions and gradients might need to be scaled:
-        scales, offsets = self._get_scale_parameters()
-
         functions = np.array([])
         if return_functions:
             # Functions might be parallelized hence we need potentially to
             # process a list of function results:
             functions_list = [
-                self._scale_constraints(
-                    self._functions_from_results(item.functions), scales, offsets
+                self._transform_constraints(
+                    self._functions_from_results(item.functions)
                 )
                 for item in results
                 if isinstance(item, FunctionResults)
@@ -213,7 +210,7 @@ class EnsembleOptimizer:
         gradients = np.array([])
         if return_gradients:
             # Gradients cannot be parallelized, there is at most one gradient:
-            gradients = self._scale_constraints(
+            gradients = self._transform_constraint_gradients(
                 self._gradients_from_results(
                     next(
                         item.gradients
@@ -222,7 +219,6 @@ class EnsembleOptimizer:
                     ),
                     self._enopt_config.variables.indices,
                 ),
-                scales,
             )
 
         return functions, gradients
@@ -326,38 +322,33 @@ class EnsembleOptimizer:
             else np.vstack((weighted_objective_gradient, constraint_gradients))
         )
 
-    def _get_constraint_scales(self, config: EnOptConfig) -> NDArray[np.float64]:
-        assert config.nonlinear_constraints is not None
-        scales = self._function_evaluator.constraint_auto_scales
-        if scales is None:
-            return config.nonlinear_constraints.scales
-        return config.nonlinear_constraints.scales * scales
-
-    def _get_scale_parameters(
-        self,
-    ) -> tuple[NDArray[np.float64] | None, NDArray[np.float64] | None]:
-        if self._enopt_config.nonlinear_constraints is not None:
-            offsets = self._enopt_config.nonlinear_constraints.rhs_values
-            scales = self._get_constraint_scales(self._enopt_config)
-            scales = np.where(
-                self._enopt_config.nonlinear_constraints.types == ConstraintType.GE,
-                -scales,
-                scales,
-            )
-            return scales, offsets
-        return None, None
-
-    def _scale_constraints(
-        self,
-        functions: NDArray[np.float64],
-        scales: NDArray[np.float64] | None,
-        offsets: NDArray[np.float64] | None = None,
+    def _fix_constraint_signs(
+        self, functions: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        if functions.size > 1:
-            if offsets is not None:
-                functions[1:, ...] = functions[1:, ...] - offsets
-            if scales is not None:
-                if functions.ndim > 1:
-                    scales = scales[:, np.newaxis]
-                functions[1:, ...] = functions[1:, ...] / scales
+        assert self._enopt_config.nonlinear_constraints is not None
+        signs = np.where(
+            self._enopt_config.nonlinear_constraints.types == ConstraintType.GE,
+            -1.0,
+            1.0,
+        )
+        if functions.ndim > 1:
+            signs = signs[:, np.newaxis]
+        functions[1:, ...] = functions[1:, ...] / signs
+        return functions
+
+    def _transform_constraints(
+        self, functions: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
+        if functions.size > 1 and self._enopt_config.nonlinear_constraints is not None:
+            functions[1:, ...] = (
+                functions[1:, ...] - self._enopt_config.nonlinear_constraints.rhs_values
+            )
+            return self._fix_constraint_signs(functions)
+        return functions
+
+    def _transform_constraint_gradients(
+        self, functions: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
+        if functions.size > 1 and self._enopt_config.nonlinear_constraints is not None:
+            return self._fix_constraint_signs(functions)
         return functions

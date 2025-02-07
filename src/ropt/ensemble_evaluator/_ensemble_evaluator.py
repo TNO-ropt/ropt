@@ -26,18 +26,13 @@ from ._evaluator_results import (
     _get_function_results,
     _get_gradient_results,
 )
-from ._function import (
-    _calculate_estimated_constraints,
-    _calculate_estimated_objectives,
-    _calculate_weighted_function,
-)
+from ._function import _calculate_estimated_constraints, _calculate_estimated_objectives
 from ._gradient import (
     _calculate_estimated_constraint_gradients,
     _calculate_estimated_objective_gradients,
-    _calculate_weighted_gradient,
     _perturb_variables,
 )
-from ._utils import _compute_auto_scales, _get_failed_realizations
+from ._utils import _get_failed_realizations
 
 if TYPE_CHECKING:
     from numpy.random import Generator
@@ -84,17 +79,6 @@ class EnsembleEvaluator:
         rng = default_rng(config.gradient.seed)
         self._samplers = self._init_samplers(rng, plugin_manager)
         self._cache_for_gradient: FunctionResults | None = None
-        self._objective_auto_scales: NDArray[np.float64] | None = None
-        self._constraint_auto_scales: NDArray[np.float64] | None = None
-
-    @property
-    def constraint_auto_scales(self) -> NDArray[np.float64] | None:
-        """Return optional auto-calculated scales for constraints.
-
-        Returns:
-            The calculated scales, or `None` if no scales are available.
-        """
-        return self._constraint_auto_scales
 
     def calculate(
         self,
@@ -176,24 +160,6 @@ class EnsembleEvaluator:
     def _calculate_one_set_of_functions(
         self, f_eval_results: _FunctionEvaluatorResults, variables: NDArray[np.float64]
     ) -> FunctionResults:
-        # Autoscaling is done by finding the weighted mean of the realizations:
-        if self._objective_auto_scales is None:
-            self._objective_auto_scales = _compute_auto_scales(
-                f_eval_results.objectives,
-                self._config.objectives.auto_scale,
-                self._config.realizations.weights,
-            )
-        if (
-            f_eval_results.constraints is not None
-            and self._constraint_auto_scales is None
-        ):
-            assert self._config.nonlinear_constraints is not None
-            self._constraint_auto_scales = _compute_auto_scales(
-                f_eval_results.constraints,
-                self._config.nonlinear_constraints.auto_scale,
-                self._config.realizations.weights,
-            )
-
         (
             objective_weights,
             constraint_weights,
@@ -241,9 +207,7 @@ class EnsembleEvaluator:
             functions=functions,
             bound_constraints=BoundConstraints.create(self._config, evaluations),
             linear_constraints=LinearConstraints.create(self._config, evaluations),
-            nonlinear_constraints=NonlinearConstraints.create(
-                self._config, functions, self._constraint_auto_scales
-            ),
+            nonlinear_constraints=NonlinearConstraints.create(self._config, functions),
         )
 
     def _calculate_gradients(
@@ -344,24 +308,6 @@ class EnsembleEvaluator:
             active_constraints,
         )
 
-        # Autoscaling is done by finding the weighted mean of the realizations:
-        if self._objective_auto_scales is None:
-            self._objective_auto_scales = _compute_auto_scales(
-                f_eval_results.objectives,
-                self._config.objectives.auto_scale,
-                self._config.realizations.weights,
-            )
-        if (
-            f_eval_results.constraints is not None
-            and self._constraint_auto_scales is None
-        ):
-            assert self._config.nonlinear_constraints is not None
-            self._constraint_auto_scales = _compute_auto_scales(
-                f_eval_results.constraints,
-                self._config.nonlinear_constraints.auto_scale,
-                self._config.realizations.weights,
-            )
-
         evaluations = FunctionEvaluations.create(
             variables=variables,
             objectives=f_eval_results.objectives,
@@ -410,9 +356,7 @@ class EnsembleEvaluator:
             functions=functions,
             bound_constraints=BoundConstraints.create(self._config, evaluations),
             linear_constraints=LinearConstraints.create(self._config, evaluations),
-            nonlinear_constraints=NonlinearConstraints.create(
-                self._config, functions, self._constraint_auto_scales
-            ),
+            nonlinear_constraints=NonlinearConstraints.create(self._config, functions),
         )
 
         assert self._config.gradient.perturbation_min_success is not None
@@ -501,19 +445,14 @@ class EnsembleEvaluator:
                 failed_realizations,
             )
 
-            weighted_objective = _calculate_weighted_function(
-                objectives,
-                self._config.objectives.weights,
-                self._get_objective_scales(self._objective_auto_scales),
+            weighted_objective = np.array(
+                (self._config.objectives.weights * objectives).sum()
             )
 
         return Functions.create(
-            config=self._config,
             weighted_objective=weighted_objective,
             objectives=objectives,
             constraints=constraints,
-            objective_auto_scales=self._objective_auto_scales,
-            constraint_auto_scales=self._constraint_auto_scales,
         )
 
     def _compute_gradients(  # noqa: PLR0913
@@ -560,14 +499,13 @@ class EnsembleEvaluator:
             failed_realizations,
         )
 
-        weighted_objective_gradient = _calculate_weighted_gradient(
-            objective_gradients,
-            self._config.objectives.weights,
-            self._get_objective_scales(self._objective_auto_scales),
+        weighted_objective_gradient = np.array(
+            (self._config.objectives.weights[:, np.newaxis] * objective_gradients).sum(
+                axis=0
+            )
         )
 
         return Gradients.create(
-            config=self._config,
             weighted_objective=self._expand_gradients(
                 weighted_objective_gradient, variable_indices
             ),
@@ -577,8 +515,6 @@ class EnsembleEvaluator:
                 if constraint_gradients is None
                 else self._expand_gradients(constraint_gradients, variable_indices)
             ),
-            objective_auto_scales=self._objective_auto_scales,
-            constraint_auto_scales=self._constraint_auto_scales,
         )
 
     def _expand_gradients(
@@ -602,16 +538,6 @@ class EnsembleEvaluator:
         objectives = evaluator_results.objectives
         assert objectives is not None
         constraints = evaluator_results.constraints
-
-        objectives = objectives / self._get_objective_scales(
-            self._objective_auto_scales
-        )
-
-        if constraints is not None:
-            assert self._config.nonlinear_constraints is not None
-            rhs_values = self._config.nonlinear_constraints.rhs_values
-            scales = self._get_constraint_scales(self._constraint_auto_scales)
-            constraints = (constraints - rhs_values) / scales
 
         objective_filters = self._config.objectives.realization_filters
         constraint_filters = (
@@ -655,21 +581,6 @@ class EnsembleEvaluator:
                     )
                 constraint_weights[apply_to_constraints, :] = weights
         return objective_weights, constraint_weights
-
-    def _get_objective_scales(
-        self, auto_scales: NDArray[np.float64] | None
-    ) -> NDArray[np.float64]:
-        if auto_scales is None:
-            return self._config.objectives.scales
-        return self._config.objectives.scales * auto_scales
-
-    def _get_constraint_scales(
-        self, auto_scales: NDArray[np.float64] | None
-    ) -> NDArray[np.float64]:
-        assert self._config.nonlinear_constraints is not None
-        if auto_scales is None:
-            return self._config.nonlinear_constraints.scales
-        return self._config.nonlinear_constraints.scales * auto_scales
 
     def _init_realization_filters(
         self, plugin_manager: PluginManager

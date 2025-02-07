@@ -11,7 +11,6 @@ from ropt.results import (
     FunctionResults,
     Functions,
     LinearConstraints,
-    NonlinearConstraints,
     Realizations,
 )
 
@@ -35,8 +34,7 @@ def enopt_config_fixture() -> dict[str, Any]:
 
 
 @pytest.fixture(name="function_result")
-def function_result_fixture(enopt_config: Any) -> FunctionResults:
-    config = EnOptConfig.model_validate(enopt_config)
+def function_result_fixture() -> FunctionResults:
     evaluations = FunctionEvaluations.create(
         variables=np.array([1.0, 2.0]),
         objectives=np.arange(6, dtype=np.float64).reshape((3, 2)),
@@ -46,7 +44,7 @@ def function_result_fixture(enopt_config: Any) -> FunctionResults:
         failed_realizations=np.zeros(3, dtype=np.bool_),
     )
     functions = Functions.create(
-        config=config, weighted_objective=np.array(1.0), objectives=np.array([1.0, 2.0])
+        weighted_objective=np.array(1.0), objectives=np.array([1.0, 2.0])
     )
     return FunctionResults(
         plan_id=(0,),
@@ -93,24 +91,6 @@ def test_linear_constraint_results(
     assert constraints.violations is not None
     assert np.allclose(constraints.values, [1.0, 1.0])
     assert np.allclose(constraints.violations, [1.0, 0.0])
-
-
-def test_nonlinear_constraint_results(
-    enopt_config: Any, function_result: FunctionResults
-) -> None:
-    enopt_config["nonlinear_constraints"] = {
-        "rhs_values": [0.0, 1.0, 0.0],
-        "types": [ConstraintType.LE, ConstraintType.GE, ConstraintType.EQ],
-    }
-    config = EnOptConfig.model_validate(enopt_config)
-    assert function_result.functions is not None
-    function_result.functions.constraints = np.array([1.0, 1.0, -1.0])
-    constraints = NonlinearConstraints.create(config, function_result.functions, None)
-    assert constraints is not None
-    assert constraints.values is not None
-    assert constraints.violations is not None
-    assert np.allclose(constraints.values, [1.0, 0.0, -1.0])
-    assert np.allclose(constraints.violations, [1.0, 0.0, 1.0])
 
 
 @pytest.mark.parametrize("axis", [ResultAxis.OBJECTIVE, None])

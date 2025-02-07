@@ -3,7 +3,6 @@ from typing import Any
 import numpy as np
 import pytest
 
-from ropt.config.enopt import EnOptConfig
 from ropt.enums import ResultAxis
 from ropt.results import (
     FunctionEvaluations,
@@ -38,8 +37,7 @@ def enopt_config_fixture() -> dict[str, Any]:
 
 
 @pytest.fixture(name="function_result")
-def function_result_fixture(enopt_config: Any) -> FunctionResults:
-    config = EnOptConfig.model_validate(enopt_config)
+def function_result_fixture() -> FunctionResults:
     evaluations = FunctionEvaluations.create(
         variables=np.array([1.0, 2.0]),
         objectives=np.arange(6, dtype=np.float64).reshape((3, 2)),
@@ -49,7 +47,7 @@ def function_result_fixture(enopt_config: Any) -> FunctionResults:
         failed_realizations=np.zeros(3, dtype=np.bool_),
     )
     functions = Functions.create(
-        config=config, weighted_objective=np.array(1.0), objectives=np.array([1.0, 2.0])
+        weighted_objective=np.array(1.0), objectives=np.array([1.0, 2.0])
     )
     return FunctionResults(
         plan_id=(0,),

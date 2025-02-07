@@ -67,11 +67,6 @@ class DefaultEvaluatorStep(PlanStep):
         field of the events emitted by the optimizer step. Avoid the use of `results`
         and `exit_code` in this field, as these are already passed in the event data.
 
-        Note: Variable Scaling
-            Internally, the evaluator may use scaled variables as configured by
-            the optimizer. When providing `values`, ensure they are unscaled;
-            scaling is handled internally.
-
         Attributes:
             config: The optimizer configuration.
             tags:   Tags to add to the emitted events.

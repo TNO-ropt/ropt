@@ -234,12 +234,3 @@ def _calculate_estimated_constraint_gradients(  # noqa: PLR0913
         realization_weights,
         failed_realizations,
     )
-
-
-def _calculate_weighted_gradient(
-    gradients: NDArray[np.float64],
-    weights: NDArray[np.float64],
-    scales: NDArray[np.float64],
-) -> NDArray[np.float64]:
-    weights = weights / scales
-    return np.array((weights[:, np.newaxis] * gradients).sum(axis=0))

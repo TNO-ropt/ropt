@@ -7,15 +7,6 @@ of the derived [`FunctionResults`][ropt.results.FunctionResults] or
 [`GradientResults`][ropt.results.GradientResults] classes, which contain results
 for function and gradient evaluations, respectively.
 
-These classes are nested `dataclasses` with several added features:
-
-- **Scaling and Offsets**: Variables may have associated scaling and offset
-  factors; if so, scaled values are also stored.
-- **Objective and Constraint Scaling**: Objective and constraint function values
-  may also have scaling factors, with scaled values stored as necessary.
-- **Data Export Methods**: Functions are provided to export results to
-  [`pandas`](https://pandas.pydata.org/) DataFrames.
-
 Much of the data stored in the result objects is multi-dimensional. For example,
 the `objectives` field, which is part of the nested
 [`evaluations`][ropt.results.FunctionEvaluations] object in the
