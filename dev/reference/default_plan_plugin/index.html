@@ -2356,13 +2356,6 @@ field of the events emitted by the optimizer step. Avoid the use of <code>result
 and <code>exit_code</code> in this field, as these are already passed in the event data.</p>
 
 
-<details class="note" open>
-  <summary>Variable Scaling</summary>
-  <p>Internally, the evaluator may use scaled variables as configured by
-the optimizer. When providing <code>values</code>, ensure they are unscaled;
-scaling is handled internally.</p>
-</details>
-
 <p><span class="doc-section-title">Attributes:</span></p>
     <table>
       <thead>

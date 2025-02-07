@@ -959,15 +959,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#ropt.results.convert_to_maximize" class="md-nav__link">
-    <span class="md-ellipsis">
-      convert_to_maximize
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1667,15 +1658,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#ropt.results.convert_to_maximize" class="md-nav__link">
-    <span class="md-ellipsis">
-      convert_to_maximize
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1716,15 +1698,6 @@ as a tuple of <a class="autorefs autorefs-internal" href="#ropt.results.Results"
 of the derived <a class="autorefs autorefs-internal" href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> or
 <a class="autorefs autorefs-internal" href="#ropt.results.GradientResults"><code>GradientResults</code></a> classes, which contain results
 for function and gradient evaluations, respectively.</p>
-<p>These classes are nested <code>dataclasses</code> with several added features:</p>
-<ul>
-<li><strong>Scaling and Offsets</strong>: Variables may have associated scaling and offset
-  factors; if so, scaled values are also stored.</li>
-<li><strong>Objective and Constraint Scaling</strong>: Objective and constraint function values
-  may also have scaling factors, with scaled values stored as necessary.</li>
-<li><strong>Data Export Methods</strong>: Functions are provided to export results to
-  <a href="https://pandas.pydata.org/"><code>pandas</code></a> DataFrames.</li>
-</ul>
 <p>Much of the data stored in the result objects is multi-dimensional. For example,
 the <code>objectives</code> field, which is part of the nested
 <a class="autorefs autorefs-internal" href="#ropt.results.FunctionEvaluations"><code>evaluations</code></a> object in the
@@ -2642,9 +2615,6 @@ functions. It contains the following information:</p>
    two-dimensional array, with the objective or constraint values arranged
    along the second axis. The first axis index indicates the realization
    number.</li>
-<li>Scaled versions of the variables if variable scaling was enabled.</li>
-<li>Scaled versions of the objective and constraint values if scaling was
-   enabled.</li>
 <li>Optional evaluation IDs that may have been passed from the evaluator,
    identifying each calculated realization.</li>
 </ol>
@@ -2690,39 +2660,6 @@ functions. It contains the following information:</p>
             <td>
               <div class="doc-md-description">
                 <p>The constraint functions for each realization.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.FunctionEvaluations.scaled_variables">scaled_variables</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional variables after scaling.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.FunctionEvaluations.scaled_objectives">scaled_objectives</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional scaled objectives.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.FunctionEvaluations.scaled_constraints">scaled_constraints</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional scaled constraints.</p>
               </div>
             </td>
           </tr>
@@ -2895,8 +2832,6 @@ There may be multiple objectives and constraints. Multiple objectives are
 handled by the optimizer using a weighted sum, stored in the
 <code>weighted_objective</code> field. Multiple constraints are directly handled by the
 optimizer.</p>
-<p>If scaling of objectives and/or constraint functions is enabled, also scaled
-versions of the objective or constraint values are stored.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2939,28 +2874,6 @@ versions of the objective or constraint values are stored.</p>
             <td>
               <div class="doc-md-description">
                 <p>The value of each constraint.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.Functions.scaled_objectives">scaled_objectives</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional scaled objectives.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.Functions.scaled_constraints">scaled_constraints</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional scaled constraints.</p>
               </div>
             </td>
           </tr>
@@ -3019,7 +2932,6 @@ versions of the objective or constraint values are stored.</p>
 <li>Differences between the current variable and the lower or upper bounds.</li>
 <li>Violations of constraints, defined as the absolute value of the
    difference if the constraint is violated, or else zero.</li>
-<li>If variable scaling is configured, scaled versions of all values.</li>
 </ol>
 
 
@@ -3074,50 +2986,6 @@ versions of the objective or constraint values are stored.</p>
             <td>
               <div class="doc-md-description">
                 <p>Upper bound violations.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.BoundConstraints.scaled_lower_values">scaled_lower_values</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional scaled lower bound differences.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.BoundConstraints.scaled_lower_violations">scaled_lower_violations</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional scaled lower bound violations.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.BoundConstraints.scaled_upper_values">scaled_upper_values</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional scaled upper bound differences.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.BoundConstraints.scaled_upper_violations">scaled_upper_violations</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional scaled upper bound violations.</p>
               </div>
             </td>
           </tr>
@@ -3268,7 +3136,6 @@ versions of the objective or constraint values are stored.</p>
    values.</li>
 <li>Violations of constraints, defined as the absolute value of the
    difference if the constraint is violated, or else zero.</li>
-<li>Scaled versions for these values.</li>
 </ol>
 
 
@@ -3301,28 +3168,6 @@ versions of the objective or constraint values are stored.</p>
             <td>
               <div class="doc-md-description">
                 <p>Violations of the nonlinear constraints.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.NonlinearConstraints.scaled_values">scaled_values</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional scaled non-linear constraint values.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.NonlinearConstraints.scaled_violations">scaled_violations</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional scaled violations of the nonlinear constraints.</p>
               </div>
             </td>
           </tr>
@@ -3562,10 +3407,6 @@ constraints gradients. It contains the following information:</p>
    constraint values arranged along the third axis. The second axis index
    indicates the perturbation number, whereas the first axis index
    represents the realization number.</li>
-<li>Scaled versions of the variables and perturbed variables if scaling
-   was enabled.</li>
-<li>Scaled versions of the objective and constraint values if scaling was
-   enabled.</li>
 <li>Optional evaluation IDs that may have been passed from the evaluator,
    identifying each calculated realization and perturbation.</li>
 </ol>
@@ -3611,7 +3452,7 @@ constraints gradients. It contains the following information:</p>
             <td>
               <div class="doc-md-description">
                 <p>The objective functions for each realization and
-                          perturbation.</p>
+                      perturbation.</p>
               </div>
             </td>
           </tr>
@@ -3623,51 +3464,7 @@ constraints gradients. It contains the following information:</p>
             <td>
               <div class="doc-md-description">
                 <p>The constraint functions for each realization and
-                          perturbation.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.GradientEvaluations.scaled_variables">scaled_variables</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional variables after scaling back.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.GradientEvaluations.scaled_perturbed_variables">scaled_perturbed_variables</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional variables after scaling back.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.GradientEvaluations.scaled_perturbed_objectives">scaled_perturbed_objectives</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional scaled objectives.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.GradientEvaluations.scaled_perturbed_constraints">scaled_perturbed_constraints</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional scaled constraints.</p>
+                      perturbation.</p>
               </div>
             </td>
           </tr>
@@ -3738,8 +3535,6 @@ There may be multiple objectives and constraints. Multiple objectives are
 handled by the optimizer using a weighted sum of the individual gradients,
 stored in the <code>weighted_objective</code> field. Multiple constraints are directly
 handled by the optimizer.</p>
-<p>If scaling of objectives and/or constraint functions is enabled, also scaled
-versions of the objective or constraint gradients are stored.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3785,28 +3580,6 @@ versions of the objective or constraint gradients are stored.</p>
               </div>
             </td>
           </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.Gradients.scaled_objectives">scaled_objectives</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional scaled objective gradients.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.results.Gradients.scaled_constraints">scaled_constraints</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional scaled constraint gradients.</p>
-              </div>
-            </td>
-          </tr>
       </tbody>
     </table>
 
@@ -3831,84 +3604,6 @@ versions of the objective or constraint gradients are stored.</p>
 
 
   </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="ropt.results.convert_to_maximize" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">ropt</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">convert_to_maximize</span><span class="p">(</span><span class="n">results</span><span class="p">)</span></code>
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-
-        <p>Convert results to maximization results.</p>
-<p>The optimization process always assumes that the objective functions must be
-minimized. To perform a maximization, the negative of the objective
-functions can be passed instead. However, the result objects will then
-contain those negative values and all objective function values derived from
-it. Since this may be inconvenient for the application, this convenience
-function can be used make a copy of a result where all objective values are
-multiplied by -1, which would correspond to a maximization.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>results</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.results._results.Results" href="#ropt.results.Results">Results</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The result to convert.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.results._results.Results" href="#ropt.results.Results">Results</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A copy of the result, modified to reflect maximization.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
 
     </div>
 

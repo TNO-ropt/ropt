@@ -1761,13 +1761,6 @@
         <p>The primary configuration class for a single optimization step.</p>
 <p>The fields of the <code>EnOptConfig</code> class are nested configuration classes that
 specify specific aspects of a single optimization run.</p>
-<p>Upon initialization and validation of an <code>EnOptConfig</code> object, the contents
-of some of these fields may be modified, depending on the content of other
-fields. A good example is the scaling of variables: The <code>offsets</code> and
-<code>scales</code> field in the <code>variables</code> field of an <code>EnOptConfig</code> object define a
-linear transformation of the variables. Upon initialization, values of the
-<code>linear_constraints</code> field will be transformed accordingly so that the
-constraints remain valid for the transformed variables.</p>
 <p>The <code>realization_filters</code>, <code>function_estimators</code>, and <code>samplers</code> fields are
 defined as tuples of configurations for realization filter, function
 estimator, and sampler objects, respectively. Other configuration fields
@@ -2033,20 +2026,7 @@ according to the <a class="autorefs autorefs-internal" href="../enums/#ropt.enum
 values can be used to configure the optimizer accordingly. If not provided,
 all variables are assumed to be continuous and of real data type
 (corresponding to <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.VariableType.REAL"><code>VariableType.REAL</code></a>)</p>
-<p>The <code>offsets</code> and <code>scales</code> fields are optional: if given, they are
-broadcasted to the number of variables and used for scaling. The elements
-<span class="arithmatex">\(x_i\)</span> of <code>initial_values</code>, <code>lower_bounds</code>, and <code>upper_bounds</code> fields are
-rescaled by the elements <span class="arithmatex">\(o_i\)</span> and <span class="arithmatex">\(s_i\)</span> of <code>offsets</code> and <code>scales</code>: <span class="arithmatex">\((x_i -
-o_i) / s_i\)</span>.</p>
-
-
-<details class="info" open>
-  <summary>Transformation of Linear Constraints</summary>
-  <p>Any linear constraints defined in the <code>EnOptConfig</code> object via its
-<code>linear_constraints</code> field will also be transformed using any offsets
-and scales passed via the <code>VariablesConfig</code> object. See:
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.LinearConstraintsConfig"><code>LinearConstraintsConfig</code></a>.</p>
-</details>        <p>The optional <code>indices</code> field contains the indices of the variables
+<p>The optional <code>indices</code> field contains the indices of the variables
 considered to be free to change. During optimization, only these variables
 should change while others remain fixed.</p>
 
@@ -2102,28 +2082,6 @@ should change while others remain fixed.</p>
             <td>
               <div class="doc-md-description">
                 <p>Upper bound of the variables (default: <span class="arithmatex">\(+\infty\)</span>).</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.VariablesConfig.offsets">offsets</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1D" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional offsets, used for scaling the variables.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.VariablesConfig.scales">scales</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1D" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional scales, used for scaling the variables.</p>
               </div>
             </td>
           </tr>
@@ -2189,40 +2147,12 @@ weighting with values passed via the <code>weights</code> field. This field is a
 <code>numpy</code> array, with a length that determines the number of objective functions.
 Its values will be normalized to have a sum equal to 1. For example, when
 <code>weights</code> is set to <code>[1, 1]</code>, the stored values will be <code>[0.5, 0.5]</code>.</p>
-<p>The <code>scales</code> field contains scaling values for the objectives. These values
-are used to scale the objective function values to a desired order of
-magnitude. Each time new objective function values are obtained during
-optimization, they are divided by these values. The <code>auto_scale</code> field can
-be used to direct the optimizer to obtain an additional scaling by
-multiplying the values of <code>scales</code> by the values of the objective functions
-at the start of the optimization. Both the <code>scales</code> and <code>auto_scale</code> arrays
-will be broadcasted to have a size equal to the number of objective
-functions.</p>
-
-
-<details class="info" open>
-  <summary>Manual scaling and auto_scaling</summary>
-  <p>Both the <code>scales</code> values and the values obtained by auto-scaling will be
-applied. Thus, if <code>scales</code> is not supplied, auto-scaling will scale the
-objectives such that their initial values will be equal to one. Setting
-<code>scales</code> also allows for scaling to different initial values.</p>
-</details>        <p>The objective functions may be subject to realization filters and function
+<p>The objective functions may be subject to realization filters and function
 estimators. The <code>realization_filters</code> and <code>function_estimators</code> fields
 contain indices to the realization filter or function estimator objects to
 use. The objects referred to are configured in the parent
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 
-
-<details class="info" open>
-  <summary>Calculating auto-scaling values</summary>
-  <p>For auto-scaling, the initial value of the objective functions is used
-based on the assumption that it is calculated as a weighted sum from an
-ensemble of realizations, with weights specified by the <code>realizations</code>
-field in the <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. If
-the <code>realizations_filters</code> and/or <code>function_estimators</code> fields are also
-set, this assumption may not strictly hold; however, the scaling value
-will still be calculated in the same way for practical purposes.</p>
-</details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
     <table>
@@ -2242,28 +2172,6 @@ will still be calculated in the same way for practical purposes.</p>
             <td>
               <div class="doc-md-description">
                 <p>Objective functions weights (default: 1.0).</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.scales">scales</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1D" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The scaling factors (default: 1.0).</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.auto_scale">auto_scale</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1DBool" href="../utilities/#ropt.config.validated_types.Array1DBool">Array1DBool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Enable/disable auto-scaling (default: <code>False</code>).</p>
               </div>
             </td>
           </tr>
@@ -2397,30 +2305,6 @@ but its values are limited to those of the
     </table>
 
 
-<details class="info" open>
-  <summary>Rescaled variables</summary>
-  <p>If a <code>LinearConstraintsConfig</code> object is part of an
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object, it may be
-modified during initialization. If the <code>EnOptConfig</code> object defines a
-rescaling of the variables, the linear coefficients (<span class="arithmatex">\(\mathbf{A}\)</span>) and
-offsets (<span class="arithmatex">\(\mathbf{b}\)</span>) are converted to remain valid for the scaled
-variables:</p>
-<div class="arithmatex">\[
-\begin{align}
-    \hat{\mathbf{A}} &amp;= \mathbf{A}\mathbf{S} \\
-    \hat{\mathbf{b}} &amp;= \mathbf{b} - \mathbf{A}\mathbf{o}
-\end{align}
-\]</div>
-<p>where <span class="arithmatex">\(\mathbf{S}\)</span> is a diagonal matrix containing the variable scales,
-and <span class="arithmatex">\(\mathbf{o}\)</span> is a vector containing the variable offsets.</p>
-<p>It is important to realize that this does not mean that the constraints
-themselves are scaled. The equations and right-hand values are
-transformed, ensuring they yield the same results with scaled variables
-as the original equations and right-hand side values would with unscaled
-variables. This should be taken into account when comparing the
-difference between the equations and right-hand side to a tolerance.</p>
-</details>
-
 
 
 
@@ -2447,11 +2331,7 @@ difference between the equations and right-hand side to a tolerance.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Transform linear constraints with variable offsets and scales.</p>
-<p>If offsets and/or scales are specified in the variables configuration,
-the linear constraints need adjustment to maintain their validity after
-variable transformation. This method returns a new linear constraints
-configuration with these adjustments applied.</p>
+        <p>Transform linear constraints.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2563,23 +2443,7 @@ configuration with these adjustments applied.</p>
 a right-hand-side value, either for equality or inequality. The <code>rhs_values</code>
 field, which is a <code>numpy</code> array with a length equal to the number of
 constraint functions, provides the right-hand-side values.</p>
-<p>The <code>scales</code> field contains scaling values for the constraints. These values
-scale the constraint function values to a desired order of magnitude. Each
-time new constraint function values are obtained during optimization, they
-are divided by these values. The <code>auto_scale</code> field can be used to direct
-the optimizer to obtain additional scaling by multiplying the values of
-<code>scales</code> by the values of the constraint functions at the start of the
-optimization. Both the <code>scales</code> and <code>auto_scale</code> arrays will be broadcasted
-to have a size equal to the number of constraint functions.</p>
-
-
-<details class="info" open>
-  <summary>Manual scaling and auto_scaling</summary>
-  <p>Both the <code>scales</code> values and the values obtained by auto-scaling will be
-applied. If <code>scales</code> is not supplied, auto-scaling will scale the
-constraints such that their initial values will be equal to one. Setting
-<code>scales</code> additionally allows for scaling to different initial values.</p>
-</details>        <p>The <code>types</code> field determines the type of each constraint: equality (<span class="arithmatex">\(=\)</span>) or
+<p>The <code>types</code> field determines the type of each constraint: equality (<span class="arithmatex">\(=\)</span>) or
 inequality (<span class="arithmatex">\(\le\)</span> or <span class="arithmatex">\(\ge\)</span>), and is broadcasted to a length equal to the
 number of constraints. The <code>types</code> field is defined as an integer array, but
 its values are limited to those of the
@@ -2590,17 +2454,6 @@ fields contain indices to the realization filter or function estimator
 objects to use. These objects are configured in the parent
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 
-
-<details class="info" open>
-  <summary>Calculating auto-scaling values</summary>
-  <p>For auto-scaling, the initial value of the constraint functions is used
-based on the assumption that it is calculated as a weighted sum from an
-ensemble of realizations, with weights specified by the <code>realizations</code>
-field in the <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. If
-the <code>realizations_filters</code> and/or <code>function_estimators</code> fields are also
-set, this assumption may not strictly hold; however, the scaling value
-will still be calculated in the same way for practical purposes.</p>
-</details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
     <table>
@@ -2620,28 +2473,6 @@ will still be calculated in the same way for practical purposes.</p>
             <td>
               <div class="doc-md-description">
                 <p>The right-hand-side values.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.scales">scales</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1D" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The scaling factors (default: 1.0).</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.auto_scale">auto_scale</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1DBool" href="../utilities/#ropt.config.validated_types.Array1DBool">Array1DBool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Enable/disable auto-scaling (default: <code>False</code>).</p>
               </div>
             </td>
           </tr>
@@ -3217,11 +3048,11 @@ parallel plan evaluations.</p>
 
         <p>Adjust the gradient perturbation configuration.</p>
 <p>This method modifies the gradient's perturbation settings to account for
-variable bounds and scaling factors, as defined in the <code>variables</code>
-configuration. If bounds are set on the variables or if variable scaling
-is applied, the perturbations in the gradient configuration may need
-adjustment to reflect these constraints. This method returns an updated
-copy of the gradient configuration with the necessary modifications.</p>
+variable bounds, as defined in the <code>variables</code> configuration. If bounds
+are set on the variables, the perturbations in the gradient
+configuration may need adjustment to reflect these constraints. This
+method returns an updated copy of the gradient configuration with the
+necessary modifications.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3286,7 +3117,7 @@ copy of the gradient configuration with the necessary modifications.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A modified gradient configuration with applied bounds and scaling.</p>
+                <p>A modified gradient configuration.</p>
               </div>
             </td>
           </tr>
