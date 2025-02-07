@@ -227,7 +227,7 @@ def test_objective_with_scaler(
 
     def check_value(event: Event) -> None:
         nonlocal checked
-        for item in event.data["scaled_results"]:
+        for item in event.data["transformed_results"]:
             if isinstance(item, FunctionResults) and not checked:
                 checked = True
                 assert item.functions is not None
@@ -386,7 +386,7 @@ def test_constraint_with_scaler(
 
     def check_constraints(event: Event) -> None:
         nonlocal check
-        for item in event.data["scaled_results"]:
+        for item in event.data["transformed_results"]:
             if isinstance(item, FunctionResults) and check:
                 check = False
                 assert item.functions is not None

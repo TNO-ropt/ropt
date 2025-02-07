@@ -100,31 +100,32 @@ class DefaultTrackerHandler(ResultHandler):
             and "results" in event.data
             and (event.tags & self._with.tags)
         ):
-            results: FunctionResults | None | tuple[FunctionResults, ...]
-            unscaled_results = event.data["results"]
-            scaled_results = event.data.get("scaled_results", unscaled_results)
-            results = None
+            results = event.data["results"]
+            transformed_results = event.data.get("transformed_results", results)
+            filtered_results: FunctionResults | tuple[FunctionResults, ...] | None = (
+                None
+            )
             match self._with.type_:
                 case "all":
-                    results = _get_all_results(
-                        unscaled_results,
-                        scaled_results,
+                    filtered_results = _get_all_results(
+                        results,
+                        transformed_results,
                         self._with.constraint_tolerance,
                     )
-                    self.plan[self._with.var] = deepcopy(results)
+                    self.plan[self._with.var] = deepcopy(filtered_results)
                 case "best":
-                    results = _update_optimal_result(
+                    filtered_results = _update_optimal_result(
                         self.plan[self._with.var],
-                        unscaled_results,
-                        scaled_results,
+                        results,
+                        transformed_results,
                         self._with.constraint_tolerance,
                     )
                 case "last":
-                    results = _get_last_result(
-                        unscaled_results,
-                        scaled_results,
+                    filtered_results = _get_last_result(
+                        results,
+                        transformed_results,
                         self._with.constraint_tolerance,
                     )
-            if results is not None:
-                self.plan[self._with.var] = deepcopy(results)
+            if filtered_results is not None:
+                self.plan[self._with.var] = deepcopy(filtered_results)
         return event

@@ -68,15 +68,15 @@ def _check_constraints(
 
 
 def _get_last_result(
-    unscaled_results: tuple[Results, ...],
-    scaled_results: tuple[Results, ...],
+    results: tuple[Results, ...],
+    transformed_results: tuple[Results, ...],
     constraint_tolerance: float | None,
 ) -> FunctionResults | None:
     return next(
         (
             cast(FunctionResults, unscaled_item)
             for unscaled_item, scaled_item in zip(
-                reversed(unscaled_results), reversed(scaled_results), strict=False
+                reversed(results), reversed(transformed_results), strict=False
             )
             if (
                 isinstance(scaled_item, FunctionResults)
@@ -90,14 +90,12 @@ def _get_last_result(
 
 def _update_optimal_result(
     optimal_result: FunctionResults | None,
-    unscaled_results: tuple[Results, ...],
-    scaled_results: tuple[Results, ...],
+    results: tuple[Results, ...],
+    transformed_results: tuple[Results, ...],
     constraint_tolerance: float | None,
 ) -> FunctionResults | None:
     return_result: FunctionResults | None = None
-    for unscaled_item, scaled_item in zip(
-        unscaled_results, scaled_results, strict=False
-    ):
+    for unscaled_item, scaled_item in zip(results, transformed_results, strict=False):
         if (
             isinstance(scaled_item, FunctionResults)
             and scaled_item.functions is not None
@@ -112,14 +110,14 @@ def _update_optimal_result(
 
 
 def _get_all_results(
-    unscaled_results: tuple[Results, ...],
-    scaled_results: tuple[Results, ...],
+    results: tuple[Results, ...],
+    transformed_results: tuple[Results, ...],
     constraint_tolerance: float | None,
 ) -> tuple[FunctionResults, ...]:
     return tuple(
         cast(FunctionResults, unscaled_item)
         for unscaled_item, scaled_item in zip(
-            unscaled_results, scaled_results, strict=False
+            results, transformed_results, strict=False
         )
         if (
             isinstance(scaled_item, FunctionResults)
