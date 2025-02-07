@@ -155,18 +155,18 @@ class GradientConfig(ImmutableBaseModel):
         """Adjust the gradient perturbation configuration.
 
         This method modifies the gradient's perturbation settings to account for
-        variable bounds and scaling factors, as defined in the `variables`
-        configuration. If bounds are set on the variables or if variable scaling
-        is applied, the perturbations in the gradient configuration may need
-        adjustment to reflect these constraints. This method returns an updated
-        copy of the gradient configuration with the necessary modifications.
+        variable bounds, as defined in the `variables` configuration. If bounds
+        are set on the variables, the perturbations in the gradient
+        configuration may need adjustment to reflect these constraints. This
+        method returns an updated copy of the gradient configuration with the
+        necessary modifications.
 
         Args:
             variables: The configuration of variables.
             context:   The configuration context.
 
         Returns:
-            A modified gradient configuration with applied bounds and scaling.
+            A modified gradient configuration.
         """
         variable_count = variables.initial_values.size
         magnitudes = self.perturbation_magnitudes
@@ -216,15 +216,10 @@ class GradientConfig(ImmutableBaseModel):
             magnitudes,
         )
 
-        absolute = types == PerturbationType.ABSOLUTE
-        if variables.scales is not None:
-            magnitudes = np.where(absolute, magnitudes / variables.scales, magnitudes)
-
         if context is not None and context.transforms.variables is not None:
-            scaled_magnitudes = context.transforms.variables.transform_magnitudes(
-                magnitudes
-            )
-            magnitudes[absolute] = scaled_magnitudes[absolute]
+            absolute = types == PerturbationType.ABSOLUTE
+            transformed = context.transforms.variables.transform_magnitudes(magnitudes)
+            magnitudes[absolute] = transformed[absolute]
 
         return self.model_copy(
             update={

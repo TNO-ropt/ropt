@@ -4,7 +4,6 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from ropt.enums import ResultAxis
-from ropt.utils.scaling import scale_back_variables, scale_constraints, scale_objectives
 
 from ._result_field import ResultField
 from ._utils import _immutable_copy
@@ -13,7 +12,6 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
-    from ropt.config.enopt import EnOptConfig
     from ropt.transforms import OptModelTransforms
 
 
@@ -29,20 +27,14 @@ class FunctionEvaluations(ResultField):
        two-dimensional array, with the objective or constraint values arranged
        along the second axis. The first axis index indicates the realization
        number.
-    3. Scaled versions of the variables if variable scaling was enabled.
-    4. Scaled versions of the objective and constraint values if scaling was
-       enabled.
-    5. Optional evaluation IDs that may have been passed from the evaluator,
+    3. Optional evaluation IDs that may have been passed from the evaluator,
        identifying each calculated realization.
 
     Attributes:
-        variables:          The unperturbed variable vector.
-        objectives:         The objective functions for each realization.
-        constraints:        The constraint functions for each realization.
-        scaled_variables:   Optional variables after scaling.
-        scaled_objectives:  Optional scaled objectives.
-        scaled_constraints: Optional scaled constraints.
-        evaluation_ids:     Optional id of each evaluated realization.
+        variables:      The unperturbed variable vector.
+        objectives:     The objective functions for each realization.
+        constraints:    The constraint functions for each realization.
+        evaluation_ids: Optional id of each evaluated realization.
     """
 
     variables: NDArray[np.float64] = field(
@@ -67,30 +59,6 @@ class FunctionEvaluations(ResultField):
             ),
         },
     )
-    scaled_variables: NDArray[np.float64] | None = field(
-        default=None,
-        metadata={
-            "__axes__": (ResultAxis.VARIABLE,),
-        },
-    )
-    scaled_objectives: NDArray[np.float64] | None = field(
-        default=None,
-        metadata={
-            "__axes__": (
-                ResultAxis.REALIZATION,
-                ResultAxis.OBJECTIVE,
-            ),
-        },
-    )
-    scaled_constraints: NDArray[np.float64] | None = field(
-        default=None,
-        metadata={
-            "__axes__": (
-                ResultAxis.REALIZATION,
-                ResultAxis.NONLINEAR_CONSTRAINT,
-            ),
-        },
-    )
     evaluation_ids: NDArray[np.intc] | None = field(
         default=None,
         metadata={
@@ -106,20 +74,14 @@ class FunctionEvaluations(ResultField):
         self.variables = _immutable_copy(self.variables)
         self.objectives = _immutable_copy(self.objectives)
         self.constraints = _immutable_copy(self.constraints)
-        self.scaled_variables = _immutable_copy(self.scaled_variables)
-        self.scaled_objectives = _immutable_copy(self.scaled_objectives)
-        self.scaled_constraints = _immutable_copy(self.scaled_constraints)
         self.evaluation_ids = _immutable_copy(self.evaluation_ids)
 
     @classmethod
-    def create(  # noqa: PLR0913
+    def create(
         cls,
-        config: EnOptConfig,
         variables: NDArray[np.float64],
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None = None,
-        objective_auto_scales: NDArray[np.float64] | None = None,
-        constraint_auto_scales: NDArray[np.float64] | None = None,
         evaluation_ids: NDArray[np.intc] | None = None,
     ) -> FunctionEvaluations:
         """Create a FunctionEvaluations object with the given information.
@@ -129,33 +91,15 @@ class FunctionEvaluations(ResultField):
             variables:              The unperturbed variable vector.
             objectives:             The objective functions for each realization.
             constraints:            The constraint functions for each realization.
-            objective_auto_scales:  Objective auto-scaling information.
-            constraint_auto_scales: Constraint auto-scaling information.
             evaluation_ids:         Optional IDs of the objective calculations.
 
         Returns:
             A new FunctionEvaluations object.
         """
-        unscaled_variables = scale_back_variables(config, variables, axis=-1)
-        scaled_objectives = scale_objectives(
-            config,
-            objectives,
-            None if objective_auto_scales is None else objective_auto_scales,
-            axis=-1,
-        )
-        scaled_constraints = scale_constraints(
-            config,
-            constraints,
-            None if constraint_auto_scales is None else constraint_auto_scales,
-            axis=-1,
-        )
         return FunctionEvaluations(
-            variables=variables if unscaled_variables is None else unscaled_variables,
+            variables=variables,
             objectives=objectives,
             constraints=constraints,
-            scaled_variables=None if unscaled_variables is None else variables,
-            scaled_objectives=scaled_objectives,
-            scaled_constraints=scaled_constraints,
             evaluation_ids=evaluation_ids,
         )
 

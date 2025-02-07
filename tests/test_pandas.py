@@ -41,7 +41,6 @@ def enopt_config_fixture() -> dict[str, Any]:
 def function_result_fixture(enopt_config: Any) -> FunctionResults:
     config = EnOptConfig.model_validate(enopt_config)
     evaluations = FunctionEvaluations.create(
-        config=config,
         variables=np.array([1.0, 2.0]),
         objectives=np.arange(6, dtype=np.float64).reshape((3, 2)),
     )

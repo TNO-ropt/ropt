@@ -52,7 +52,6 @@ from ._gradient_evaluations import GradientEvaluations
 from ._gradient_results import GradientResults
 from ._gradients import Gradients
 from ._linear_constraints import LinearConstraints
-from ._maximize import convert_to_maximize
 from ._nonlinear_constraints import NonlinearConstraints
 from ._realizations import Realizations
 from ._result_field import ResultField
@@ -71,5 +70,4 @@ __all__ = [
     "Realizations",
     "ResultField",
     "Results",
-    "convert_to_maximize",
 ]

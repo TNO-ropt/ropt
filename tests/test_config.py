@@ -405,7 +405,6 @@ def test_perturbation_types(enopt_config: Any) -> None:
     enopt_config["variables"]["initial_values"] = [0.0, 0.0, 0.0]
     enopt_config["variables"]["lower_bounds"] = [0.0, 100.0, 0.0]
     enopt_config["variables"]["upper_bounds"] = [np.inf, 600.0, 1.0]
-    enopt_config["variables"]["scales"] = [1.0, 1.0, 50]
     enopt_config["gradient"] = {
         "perturbation_magnitudes": [0.1, 0.01, 1.0],
         "perturbation_types": [
@@ -415,7 +414,7 @@ def test_perturbation_types(enopt_config: Any) -> None:
         ],
     }
     config = EnOptConfig.model_validate(enopt_config)
-    assert np.allclose(config.gradient.perturbation_magnitudes, [0.1, 5.0, 0.02])
+    assert np.allclose(config.gradient.perturbation_magnitudes, [0.1, 5.0, 1.0])
 
 
 def test_perturbation_types_with_scaler(enopt_config: Any) -> None:

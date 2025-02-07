@@ -400,53 +400,6 @@ def test_constraint_with_scaler(
 
 @pytest.mark.parametrize("offsets", [None, np.array([1.0, 1.1, 1.2])])
 @pytest.mark.parametrize("scales", [None, np.array([2.0, 2.1, 2.2])])
-def test_variables_scale(
-    enopt_config: Any,
-    evaluator: Any,
-    offsets: NDArray[np.float64] | None,
-    scales: NDArray[np.float64] | None,
-) -> None:
-    initial_values = np.array(enopt_config["variables"]["initial_values"])
-    lower_bounds = np.array([-2.0, -np.inf, -3.0])
-    upper_bounds = np.array([np.inf, 1.0, 4.0])
-
-    enopt_config["optimizer"]["max_iterations"] = 20
-    enopt_config["variables"]["lower_bounds"] = lower_bounds
-    enopt_config["variables"]["upper_bounds"] = upper_bounds
-
-    if offsets is not None:
-        enopt_config["variables"]["offsets"] = offsets
-    if scales is not None:
-        enopt_config["variables"]["scales"] = scales
-
-    results = BasicOptimizer(enopt_config, evaluator()).run().results
-    assert results is not None
-
-    if offsets is not None:
-        initial_values = initial_values - offsets
-        lower_bounds = lower_bounds - offsets
-        upper_bounds = upper_bounds - offsets
-    if scales is not None:
-        initial_values = initial_values / scales
-        lower_bounds = lower_bounds / scales
-        upper_bounds = upper_bounds / scales
-    config = EnOptConfig.model_validate(enopt_config)
-    assert np.allclose(config.variables.initial_values, initial_values)
-    assert np.allclose(config.variables.lower_bounds, lower_bounds)
-    assert np.allclose(config.variables.upper_bounds, upper_bounds)
-    result = results.evaluations.scaled_variables
-    if result is None:
-        result = results.evaluations.variables
-    if scales is not None:
-        result = result * scales
-    if offsets is not None:
-        result = result + offsets
-    assert np.allclose(result, [0.0, 0.0, 0.5], atol=0.05)
-    assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.05)
-
-
-@pytest.mark.parametrize("offsets", [None, np.array([1.0, 1.1, 1.2])])
-@pytest.mark.parametrize("scales", [None, np.array([2.0, 2.1, 2.2])])
 def test_variables_scale_with_scaler(
     enopt_config: Any,
     evaluator: Any,
@@ -487,37 +440,6 @@ def test_variables_scale_with_scaler(
     assert np.allclose(config.variables.upper_bounds, upper_bounds)
     result = results.evaluations.variables
     assert np.allclose(result, [0.0, 0.0, 0.5], atol=0.05)
-
-
-def test_variables_scale_linear_constraints(enopt_config: Any, evaluator: Any) -> None:
-    enopt_config["linear_constraints"] = {
-        "coefficients": [[1, 0, 1], [0, 1, 1]],
-        "rhs_values": [1.0, 0.75],
-        "types": [ConstraintType.EQ, ConstraintType.EQ],
-    }
-
-    offsets = np.array([1.0, 1.1, 1.2])
-    scales = np.array([2.0, 2.1, 2.2])
-    enopt_config["variables"]["offsets"] = offsets
-    enopt_config["variables"]["scales"] = scales
-
-    config = EnOptConfig.model_validate(enopt_config)
-    assert config.linear_constraints is not None
-    coefficients = config.linear_constraints.coefficients
-    rhs_values = config.linear_constraints.rhs_values
-    assert np.allclose(
-        coefficients / scales, enopt_config["linear_constraints"]["coefficients"]
-    )
-    assert np.allclose(
-        rhs_values
-        + np.matmul(coefficients if scales is None else coefficients / scales, offsets),
-        enopt_config["linear_constraints"]["rhs_values"],
-    )
-
-    results = BasicOptimizer(enopt_config, evaluator()).run().results
-    assert results is not None
-    assert results.evaluations.variables is not None
-    assert np.allclose(results.evaluations.variables, [0.25, 0.0, 0.75], atol=0.02)
 
 
 def test_variables_scale_linear_constraints_with_scaler(

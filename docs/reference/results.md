@@ -57,5 +57,3 @@
     options:
         heading_level: 3
         members: False
-
-::: ropt.results.convert_to_maximize

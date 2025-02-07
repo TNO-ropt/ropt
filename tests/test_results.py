@@ -1,4 +1,3 @@
-from dataclasses import replace
 from typing import Any
 
 import numpy as np
@@ -39,7 +38,6 @@ def enopt_config_fixture() -> dict[str, Any]:
 def function_result_fixture(enopt_config: Any) -> FunctionResults:
     config = EnOptConfig.model_validate(enopt_config)
     evaluations = FunctionEvaluations.create(
-        config=config,
         variables=np.array([1.0, 2.0]),
         objectives=np.arange(6, dtype=np.float64).reshape((3, 2)),
     )
@@ -57,93 +55,6 @@ def function_result_fixture(enopt_config: Any) -> FunctionResults:
         evaluations=evaluations,
         realizations=realizations,
         functions=functions,
-    )
-
-
-def test_scaling_evaluations_functions(
-    enopt_config: Any, function_result: FunctionResults
-) -> None:
-    enopt_config["variables"]["scales"] = [2.0, 2.0]
-    enopt_config["objectives"]["scales"] = [2.0, 2.0]
-    config = EnOptConfig.model_validate(enopt_config)
-    evaluations = FunctionEvaluations.create(
-        config=config,
-        variables=np.array([1.0, 2.0]),
-        objectives=np.arange(6, dtype=np.float64).reshape((3, 2)),
-    )
-    function_result = replace(function_result, evaluations=evaluations)
-    assert config.variables.scales is not None
-    assert function_result.evaluations.scaled_variables is not None
-    assert np.allclose(
-        function_result.evaluations.variables,
-        function_result.evaluations.scaled_variables * config.variables.scales,
-    )
-    assert function_result.evaluations.scaled_objectives is not None
-    assert np.allclose(
-        function_result.evaluations.scaled_objectives,
-        function_result.evaluations.objectives / config.objectives.scales,
-    )
-
-
-def test_scaling_evaluations_functions_auto(
-    enopt_config: Any, function_result: FunctionResults
-) -> None:
-    enopt_config["objectives"]["scales"] = [2.0, 2.0]
-    config = EnOptConfig.model_validate(enopt_config)
-    objective_auto_scales = np.array([3.0, 3.0])
-    evaluations = FunctionEvaluations.create(
-        config=config,
-        objective_auto_scales=objective_auto_scales,
-        variables=np.array([1.0, 2.0]),
-        objectives=np.arange(6, dtype=np.float64).reshape((3, 2)),
-    )
-    function_result = replace(function_result, evaluations=evaluations)
-    assert function_result.evaluations.scaled_objectives is not None
-    assert np.allclose(
-        function_result.evaluations.scaled_objectives,
-        function_result.evaluations.objectives
-        / config.objectives.scales
-        / objective_auto_scales,
-    )
-
-
-def test_scaling_functions(enopt_config: Any, function_result: FunctionResults) -> None:
-    enopt_config["objectives"]["scales"] = [2.0, 2.0]
-    config = EnOptConfig.model_validate(enopt_config)
-    functions = Functions.create(
-        config=config,
-        weighted_objective=np.array(1.0),
-        objectives=np.array([1.0, 2.0]),
-    )
-    function_result = replace(function_result, functions=functions)
-    assert function_result.functions is not None
-    assert function_result.functions.scaled_objectives is not None
-    assert np.allclose(
-        function_result.functions.scaled_objectives,
-        function_result.functions.objectives / config.objectives.scales,
-    )
-
-
-def test_scaling_functions_auto(
-    enopt_config: Any, function_result: FunctionResults
-) -> None:
-    enopt_config["objectives"]["scales"] = [2.0, 2.0]
-    config = EnOptConfig.model_validate(enopt_config)
-    objective_auto_scales = np.array([3.0, 3.0])
-    functions = Functions.create(
-        config=config,
-        objective_auto_scales=objective_auto_scales,
-        weighted_objective=np.array(1.0),
-        objectives=np.array([1.0, 2.0]),
-    )
-    function_result = replace(function_result, functions=functions)
-    assert function_result.functions is not None
-    assert function_result.functions.scaled_objectives is not None
-    assert np.allclose(
-        function_result.functions.scaled_objectives,
-        function_result.functions.objectives
-        / config.objectives.scales
-        / objective_auto_scales,
     )
 
 

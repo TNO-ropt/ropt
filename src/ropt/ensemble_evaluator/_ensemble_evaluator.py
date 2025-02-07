@@ -133,11 +133,7 @@ class EnsembleEvaluator:
             and not compute_functions
             and self._cache_for_gradient is not None
             and np.allclose(
-                (
-                    self._cache_for_gradient.evaluations.variables
-                    if self._cache_for_gradient.evaluations.scaled_variables is None
-                    else self._cache_for_gradient.evaluations.scaled_variables
-                ),
+                self._cache_for_gradient.evaluations.variables,
                 variables,
                 rtol=0.0,
                 atol=1e-15,
@@ -226,9 +222,6 @@ class EnsembleEvaluator:
             functions = None
 
         evaluations = FunctionEvaluations.create(
-            config=self._config,
-            objective_auto_scales=self._objective_auto_scales,
-            constraint_auto_scales=self._constraint_auto_scales,
             variables=variables,
             objectives=f_eval_results.objectives,
             constraints=f_eval_results.constraints,
@@ -318,13 +311,10 @@ class EnsembleEvaluator:
                 batch_id=g_eval_results.batch_id,
                 metadata={},
                 evaluations=GradientEvaluations.create(
-                    config=self._config,
                     variables=variables,
                     perturbed_variables=perturbed_variables,
                     perturbed_objectives=g_eval_results.perturbed_objectives,
                     perturbed_constraints=g_eval_results.perturbed_constraints,
-                    objective_auto_scales=self._objective_auto_scales,
-                    constraint_auto_scales=self._constraint_auto_scales,
                     perturbed_evaluation_ids=g_eval_results.perturbed_evaluation_ids,
                 ),
                 realizations=Realizations(
@@ -373,9 +363,6 @@ class EnsembleEvaluator:
             )
 
         evaluations = FunctionEvaluations.create(
-            config=self._config,
-            objective_auto_scales=self._objective_auto_scales,
-            constraint_auto_scales=self._constraint_auto_scales,
             variables=variables,
             objectives=f_eval_results.objectives,
             constraints=f_eval_results.constraints,
@@ -459,13 +446,10 @@ class EnsembleEvaluator:
             batch_id=g_eval_results.batch_id,
             metadata={},
             evaluations=GradientEvaluations.create(
-                config=self._config,
                 variables=variables,
                 perturbed_variables=perturbed_variables,
                 perturbed_objectives=g_eval_results.perturbed_objectives,
                 perturbed_constraints=g_eval_results.perturbed_constraints,
-                objective_auto_scales=self._objective_auto_scales,
-                constraint_auto_scales=self._constraint_auto_scales,
                 perturbed_evaluation_ids=g_eval_results.perturbed_evaluation_ids,
             ),
             realizations=Realizations(

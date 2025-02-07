@@ -182,11 +182,7 @@ class EnsembleOptimizer:
                 raise OptimizationAborted(
                     exit_code=OptimizerExitCode.NESTED_OPTIMIZER_FAILED
                 )
-            variables = (
-                nested_results.evaluations.variables
-                if nested_results.evaluations.scaled_variables is None
-                else nested_results.evaluations.scaled_variables
-            )
+            variables = nested_results.evaluations.variables
             self._fixed_variables = variables.copy()
 
         results = self._run_evaluations(

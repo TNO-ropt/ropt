@@ -36,14 +36,6 @@ class EnOptConfig(ImmutableBaseModel):
     The fields of the `EnOptConfig` class are nested configuration classes that
     specify specific aspects of a single optimization run.
 
-    Upon initialization and validation of an `EnOptConfig` object, the contents
-    of some of these fields may be modified, depending on the content of other
-    fields. A good example is the scaling of variables: The `offsets` and
-    `scales` field in the `variables` field of an `EnOptConfig` object define a
-    linear transformation of the variables. Upon initialization, values of the
-    `linear_constraints` field will be transformed accordingly so that the
-    constraints remain valid for the transformed variables.
-
     The `realization_filters`, `function_estimators`, and `samplers` fields are
     defined as tuples of configurations for realization filter, function
     estimator, and sampler objects, respectively. Other configuration fields

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Self
 
-import numpy as np
 from pydantic import ConfigDict, model_validator
 
 from ropt.config.utils import ImmutableBaseModel, broadcast_1d_array, check_enum_values
@@ -12,8 +11,6 @@ from ropt.config.validated_types import Array1D, Array2D, ArrayEnum  # noqa: TC0
 from ropt.enums import ConstraintType
 
 if TYPE_CHECKING:
-    from numpy.typing import NDArray
-
     from ropt.config.enopt import EnOptContext, VariablesConfig
 
 
@@ -44,31 +41,6 @@ class LinearConstraintsConfig(ImmutableBaseModel):
         rhs_values:   The right-hand-sides of the constraint equations.
         types:        The type of each equation
                       (see [`ConstraintType`][ropt.enums.ConstraintType]).
-
-    Info: Rescaled variables
-        If a `LinearConstraintsConfig` object is part of an
-        [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object, it may be
-        modified during initialization. If the `EnOptConfig` object defines a
-        rescaling of the variables, the linear coefficients ($\mathbf{A}$) and
-        offsets ($\mathbf{b}$) are converted to remain valid for the scaled
-        variables:
-
-        $$
-        \begin{align}
-            \hat{\mathbf{A}} &= \mathbf{A}\mathbf{S} \\
-            \hat{\mathbf{b}} &= \mathbf{b} - \mathbf{A}\mathbf{o}
-        \end{align}
-        $$
-
-        where $\mathbf{S}$ is a diagonal matrix containing the variable scales,
-        and $\mathbf{o}$ is a vector containing the variable offsets.
-
-        It is important to realize that this does not mean that the constraints
-        themselves are scaled. The equations and right-hand values are
-        transformed, ensuring they yield the same results with scaled variables
-        as the original equations and right-hand side values would with unscaled
-        variables. This should be taken into account when comparing the
-        difference between the equations and right-hand side to a tolerance.
     """
 
     coefficients: Array2D
@@ -94,12 +66,7 @@ class LinearConstraintsConfig(ImmutableBaseModel):
     def apply_transformation(
         self, variables: VariablesConfig, context: EnOptContext | None
     ) -> LinearConstraintsConfig:
-        """Transform linear constraints with variable offsets and scales.
-
-        If offsets and/or scales are specified in the variables configuration,
-        the linear constraints need adjustment to maintain their validity after
-        variable transformation. This method returns a new linear constraints
-        configuration with these adjustments applied.
+        """Transform linear constraints.
 
         Args:
             variables: A variables configuration object specifying.
@@ -116,26 +83,12 @@ class LinearConstraintsConfig(ImmutableBaseModel):
             msg = f"the coefficients matrix should have {variable_count} columns"
             raise ValueError(msg)
 
-        coefficients: NDArray[np.float64] | None = None
-        rhs_values: NDArray[np.float64] | None = None
-
-        # TODO: if this is removed, we can probably remove the function.  # noqa: FIX002, TD002, TD003
-        if variables.offsets is not None or variables.scales is not None:
-            coefficients = self.coefficients
-            rhs_values = self.rhs_values
-            if variables.offsets is not None:
-                rhs_values = rhs_values - np.matmul(coefficients, variables.offsets)
-            if variables.scales is not None:
-                coefficients = coefficients * variables.scales
-
         if context is not None and context.transforms.variables is not None:
             coefficients, rhs_values = (
                 context.transforms.variables.transform_linear_constraints(
                     self.coefficients, self.rhs_values
                 )
             )
-
-        if coefficients is not None and rhs_values is not None:
             values = self.model_dump(round_trip=True)
             values.update(
                 coefficients=coefficients,

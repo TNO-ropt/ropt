@@ -11,7 +11,6 @@ from ropt.config.utils import (
     ImmutableBaseModel,
     broadcast_1d_array,
     check_enum_values,
-    immutable_array,
 )
 from ropt.config.validated_types import (  # noqa: TC001
     Array1D,
@@ -42,18 +41,6 @@ class VariablesConfig(ImmutableBaseModel):
     all variables are assumed to be continuous and of real data type
     (corresponding to [`VariableType.REAL`][ropt.enums.VariableType.REAL])
 
-    The `offsets` and `scales` fields are optional: if given, they are
-    broadcasted to the number of variables and used for scaling. The elements
-    $x_i$ of `initial_values`, `lower_bounds`, and `upper_bounds` fields are
-    rescaled by the elements $o_i$ and $s_i$ of `offsets` and `scales`: $(x_i -
-    o_i) / s_i$.
-
-    Info: Transformation of Linear Constraints
-        Any linear constraints defined in the `EnOptConfig` object via its
-        `linear_constraints` field will also be transformed using any offsets
-        and scales passed via the `VariablesConfig` object. See:
-        [`LinearConstraintsConfig`][ropt.config.enopt.LinearConstraintsConfig].
-
     The optional `indices` field contains the indices of the variables
     considered to be free to change. During optimization, only these variables
     should change while others remain fixed.
@@ -63,8 +50,6 @@ class VariablesConfig(ImmutableBaseModel):
         initial_values: The initial values of the variables.
         lower_bounds:   Lower bound of the variables (default: $-\infty$).
         upper_bounds:   Upper bound of the variables (default: $+\infty$).
-        offsets:        Optional offsets, used for scaling the variables.
-        scales:         Optional scales, used for scaling the variables.
         indices:        Optional indices of variables to optimize.
     """
 
@@ -72,8 +57,6 @@ class VariablesConfig(ImmutableBaseModel):
     initial_values: Array1D = np.array(0.0)
     lower_bounds: Array1D = np.array(-np.inf)
     upper_bounds: Array1D = np.array(np.inf)
-    offsets: Array1D | None = None
-    scales: Array1D | None = None
     indices: ArrayIndices | None = None
 
     model_config = ConfigDict(
@@ -83,7 +66,7 @@ class VariablesConfig(ImmutableBaseModel):
     )
 
     @model_validator(mode="after")
-    def _broadcast_and_scale(self, info: ValidationInfo) -> Self:
+    def _broadcast_and_transform(self, info: ValidationInfo) -> Self:
         self._mutable()
 
         self.lower_bounds = broadcast_1d_array(
@@ -92,21 +75,6 @@ class VariablesConfig(ImmutableBaseModel):
         self.upper_bounds = broadcast_1d_array(
             self.upper_bounds, "upper_bounds", self.initial_values.size
         )
-
-        if self.offsets is not None:
-            self.offsets = broadcast_1d_array(
-                self.offsets, "offsets", self.initial_values.size
-            )
-            self.initial_values = immutable_array(self.initial_values - self.offsets)
-            self.lower_bounds = immutable_array(self.lower_bounds - self.offsets)
-            self.upper_bounds = immutable_array(self.upper_bounds - self.offsets)
-        if self.scales is not None:
-            self.scales = broadcast_1d_array(
-                self.scales, "scales", self.initial_values.size
-            )
-            self.initial_values = immutable_array(self.initial_values / self.scales)
-            self.lower_bounds = immutable_array(self.lower_bounds / self.scales)
-            self.upper_bounds = immutable_array(self.upper_bounds / self.scales)
 
         if info.context is not None and info.context.transforms.variables is not None:
             self.initial_values = info.context.transforms.variables.forward(

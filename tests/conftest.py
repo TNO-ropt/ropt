@@ -7,7 +7,6 @@ import pytest
 from numpy.typing import NDArray
 
 from ropt.evaluator import Evaluator, EvaluatorContext, EvaluatorResult
-from ropt.utils.scaling import scale_back_variables
 
 _Function = Callable[[NDArray[np.float64], Any], float]
 
@@ -37,11 +36,6 @@ def _function_runner(
     evaluator_context: EvaluatorContext,
     functions: list[_Function],
 ) -> EvaluatorResult:
-    unscaled_variables = scale_back_variables(
-        evaluator_context.config, variables, axis=-1
-    )
-    if unscaled_variables is not None:
-        variables = unscaled_variables
     transforms = evaluator_context.config.transforms
     if transforms is not None and transforms.variables is not None:
         variables = transforms.variables.backward(variables)

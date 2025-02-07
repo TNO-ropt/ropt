@@ -27,13 +27,10 @@ def _check_bound_constraints(
     results: FunctionResults, constraint_tolerance: float
 ) -> bool:
     if results.bound_constraints is not None:
-        lower_violations = results.bound_constraints.scaled_lower_violations
-        if lower_violations is None:
-            lower_violations = results.bound_constraints.lower_violations
-        upper_violations = results.bound_constraints.scaled_upper_violations
-        if upper_violations is None:
-            upper_violations = results.bound_constraints.upper_violations
-        for violations in (lower_violations, upper_violations):
+        for violations in (
+            results.bound_constraints.lower_violations,
+            results.bound_constraints.upper_violations,
+        ):
             if (
                 violations is not None
                 and np.any(violations > constraint_tolerance).item()
