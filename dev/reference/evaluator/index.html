@@ -1943,7 +1943,7 @@ all variable vectors and realizations, along with any additional metadata.</p>
 
 
 <details class="tip" open>
-  <summary>Reusing Objective and Non-linear Constraint Values</summary>
+  <summary>Reusing Objective</summary>
   <p>When defining multiple objectives, there may be a need to reuse the
 same objective value multiple times. For instance, a total objective could
 consist of the mean of the objectives for each realization, plus the
@@ -1954,14 +1954,6 @@ The optimizer is unaware that both objectives use the same set of
 realizations. To prevent redundant calculations, the evaluator should
 compute the results of the realizations once and return them for both
 objectives.</p>
-<p>Non-linear constraint values may potentially appear multiple times in the
-<code>constraint_results</code> matrix. For example, to express the constraint <span class="arithmatex">\(a &lt; F_c \le b\)</span>,
-two constraints must be defined: <span class="arithmatex">\(F_c \ge a\)</span> and <span class="arithmatex">\(F_c \le b\)</span>,
-sharing the same function value <span class="arithmatex">\(F_c\)</span> but differing in types and
-right-hand sides (<code>ConstraintType.GE</code>/<code>ConstraintType.LE</code> and <span class="arithmatex">\(a\)</span>/<span class="arithmatex">\(b\)</span>). The
-run method should ensure that the calculated value of <span class="arithmatex">\(F_c\)</span> is the same in
-both cases, which is most efficiently achieved by evaluating <span class="arithmatex">\(F_c\)</span> only
-once.</p>
 </details>
     </div>
 
