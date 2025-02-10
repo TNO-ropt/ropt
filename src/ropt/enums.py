@@ -19,24 +19,6 @@ class VariableType(IntEnum):
     "Discrete variables represented by integer values."
 
 
-class ConstraintType(IntEnum):
-    r"""Enumerates the types of linear or non-linear constraints.
-
-    Both linear and non-linear constraints may be less or equal ($\le$), greater
-    or equal ($\ge$), or equal ($=$). Internally, $\le$ or $\ge$ constraints may
-    be converted to an opposite constraint, depending on the optimizer backend.
-    """
-
-    LE = 1
-    r"Less or equal constraint ($\le$)."
-
-    GE = 2
-    r"Greater or equal constraint ($\ge$)."
-
-    EQ = 3
-    r"Equality constraint ($=$)."
-
-
 class BoundaryType(IntEnum):
     """Enumerates the ways boundaries should be treated.
 

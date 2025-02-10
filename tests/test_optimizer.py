@@ -8,7 +8,7 @@ from numpy.typing import NDArray
 
 from ropt.config.enopt import EnOptConfig, EnOptContext
 from ropt.config.enopt.constants import DEFAULT_SEED
-from ropt.enums import ConstraintType, EventType, OptimizerExitCode
+from ropt.enums import EventType, OptimizerExitCode
 from ropt.plan import BasicOptimizer
 from ropt.results import FunctionResults, GradientResults
 from ropt.transforms import OptModelTransforms, VariableScaler
@@ -182,14 +182,6 @@ def test_objective_with_scaler(
     assert np.allclose(results2.evaluations.variables, variables1, atol=0.02)
     assert results2.functions is not None
     assert np.allclose(objectives1, results2.functions.objectives, atol=0.025)
-
-
-def _flip_type(constraint_type: ConstraintType) -> ConstraintType:
-    if constraint_type == ConstraintType.GE:
-        return ConstraintType.LE
-    if constraint_type == ConstraintType.LE:
-        return ConstraintType.GE
-    return constraint_type
 
 
 class ConstraintScaler(NonLinearConstraintTransform):
