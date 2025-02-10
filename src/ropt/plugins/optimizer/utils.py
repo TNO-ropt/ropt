@@ -34,16 +34,16 @@ def filter_linear_constraints(
     mask = np.ones(config.coefficients.shape[-1], dtype=np.bool_)
     mask[variable_indices] = False
     keep_rows = np.all(config.coefficients[:, mask] == 0, axis=1)
-    types = config.types[keep_rows]
     coefficients = config.coefficients[keep_rows, :]
-    rhs_values = config.rhs_values[keep_rows]
+    lower_bounds = config.lower_bounds[keep_rows]
+    upper_bounds = config.upper_bounds[keep_rows]
     # Keep coefficients for the active variables:
     coefficients = coefficients[:, variable_indices]
 
     return LinearConstraintsConfig(
         coefficients=coefficients,
-        types=types,
-        rhs_values=rhs_values,
+        lower_bounds=lower_bounds,
+        upper_bounds=upper_bounds,
     )
 
 
@@ -154,9 +154,13 @@ def _validate_linear_constraints(
         method,
         supported_constraints,
         required_constraints,
-        have_constraint=bool(
-            np.any(linear_constraints.types == ConstraintType.LE)
-            or np.any(linear_constraints.types == ConstraintType.GE),
+        have_constraint=not bool(
+            np.allclose(
+                linear_constraints.lower_bounds,
+                linear_constraints.upper_bounds,
+                rtol=0.0,
+                atol=1e-15,
+            )
         ),
     )
 
@@ -165,7 +169,14 @@ def _validate_linear_constraints(
         method,
         supported_constraints,
         required_constraints,
-        have_constraint=bool(np.any(linear_constraints.types == ConstraintType.EQ)),
+        have_constraint=bool(
+            np.allclose(
+                linear_constraints.lower_bounds,
+                linear_constraints.upper_bounds,
+                rtol=0.0,
+                atol=1e-15,
+            )
+        ),
     )
 
 

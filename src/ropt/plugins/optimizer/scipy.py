@@ -296,18 +296,18 @@ class SciPyOptimizer(Optimizer):
                 linear_constraints_config, self._config.variables.indices
             )
 
-        types = linear_constraints_config.types
         coefficients = linear_constraints_config.coefficients
-        rhs_values = linear_constraints_config.rhs_values
+        lower_bounds = linear_constraints_config.lower_bounds
+        upper_bounds = linear_constraints_config.upper_bounds
 
-        eq_idx = types == ConstraintType.EQ
+        eq_idx = np.abs(lower_bounds - upper_bounds) <= 1e-15  # noqa: PLR2004
         if np.any(eq_idx):
             assert coefficients is not None
             constraints.append(
                 {
                     "type": "eq",
                     "fun": lambda x: (
-                        np.matmul(coefficients[eq_idx, :], x) - rhs_values[eq_idx]
+                        np.matmul(coefficients[eq_idx, :], x) - lower_bounds[eq_idx]
                     ),
                     "jac": lambda _: coefficients[eq_idx, :],
                 },
@@ -315,18 +315,14 @@ class SciPyOptimizer(Optimizer):
 
         ineq_constraints = []
         ineq_rhs_values = []
-        ge_idx = types == ConstraintType.GE
+        ge_idx = np.logical_and(lower_bounds > -np.inf, np.logical_not(eq_idx))
         if np.any(ge_idx):
-            assert coefficients is not None
-            assert rhs_values is not None
             ineq_constraints.append(coefficients[ge_idx, :])
-            ineq_rhs_values.append(rhs_values[ge_idx])
-        le_idx = types == ConstraintType.LE
+            ineq_rhs_values.append(lower_bounds[ge_idx])
+        le_idx = np.logical_and(upper_bounds < np.inf, np.logical_not(eq_idx))
         if np.any(le_idx):
-            assert coefficients is not None
-            assert rhs_values is not None
             ineq_constraints.append(-coefficients[le_idx, :])
-            ineq_rhs_values.append(-rhs_values[le_idx])
+            ineq_rhs_values.append(-upper_bounds[le_idx])
         if ineq_constraints:
             coefficients_matrix = np.vstack(tuple(ineq_constraints))
             rhs_vector = np.hstack(tuple(ineq_rhs_values))
@@ -350,19 +346,11 @@ class SciPyOptimizer(Optimizer):
                 linear_constraints_config, self._config.variables.indices
             )
 
-        lower_bounds = linear_constraints_config.rhs_values.copy()
-        upper_bounds = linear_constraints_config.rhs_values.copy()
-
-        ge_idx = linear_constraints_config.types == ConstraintType.GE
-        le_idx = linear_constraints_config.types == ConstraintType.LE
-        if np.any(le_idx):
-            lower_bounds[le_idx] = -np.inf
-        if np.any(ge_idx):
-            upper_bounds[ge_idx] = np.inf
-
         return (
             LinearConstraint(
-                linear_constraints_config.coefficients, lower_bounds, upper_bounds
+                linear_constraints_config.coefficients,
+                linear_constraints_config.lower_bounds,
+                linear_constraints_config.upper_bounds,
             ),
         )
 

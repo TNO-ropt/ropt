@@ -62,16 +62,20 @@ class VariableTransform(ABC):
         """
 
     def transform_linear_constraints(
-        self, coefficients: NDArray[np.float64], rhs_values: NDArray[np.float64]
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        self,
+        coefficients: NDArray[np.float64],
+        lower_bounds: NDArray[np.float64],
+        upper_bounds: NDArray[np.float64],
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
         """Implement the forward transformation of linear constraints.
 
         Args:
             coefficients: The coefficient matrix of the linear constraints.
-            rhs_values:   The right-hand side values of the linear constraints.
+            lower_bounds: The lower bounds on the right-hand-sides of the constraint equations.
+            upper_bounds: The upper bounds on the right-hand-sides of the constraint equations.
 
         Returns:
-            The transformed coefficient matrix and right-hand side values.
+            The transformed coefficient matrix and right-hand side bounds.
         """
         msg = "This transformer does not support linear constraints."
         raise NotImplementedError(msg)

@@ -305,12 +305,13 @@ def test_variables_scale_linear_constraints_with_scaler(
     evaluator: Any,
 ) -> None:
     coefficients = [[1, 0, 1], [0, 1, 1]]
-    rhs_values = [1.0, 0.75]
+    lower_bounds = [1.0, 0.75]
+    upper_bounds = [1.0, 0.75]
 
     enopt_config["linear_constraints"] = {
         "coefficients": coefficients,
-        "rhs_values": rhs_values,
-        "types": [ConstraintType.EQ, ConstraintType.EQ],
+        "lower_bounds": lower_bounds,
+        "upper_bounds": upper_bounds,
     }
 
     offsets = np.array([1.0, 1.1, 1.2])
@@ -321,10 +322,9 @@ def test_variables_scale_linear_constraints_with_scaler(
     config = EnOptConfig.model_validate(enopt_config, context=context)
     assert config.linear_constraints is not None
     assert np.allclose(config.linear_constraints.coefficients, coefficients * scales)
-    assert np.allclose(
-        config.linear_constraints.rhs_values,
-        rhs_values - np.matmul(coefficients, offsets),
-    )
+    offsets = np.matmul(coefficients, offsets)
+    assert np.allclose(config.linear_constraints.lower_bounds, lower_bounds - offsets)
+    assert np.allclose(config.linear_constraints.upper_bounds, upper_bounds - offsets)
 
     results = BasicOptimizer(config, evaluator()).run().results
     assert results is not None
@@ -335,14 +335,15 @@ def test_variables_scale_linear_constraints_with_scaler(
 def test_check_linear_constraints(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["linear_constraints"] = {
         "coefficients": [[1, 1, 0], [1, 1, 0], [1, 1, 0]],
-        "rhs_values": [0.0, 1.0, -1.0],
-        "types": [ConstraintType.EQ, ConstraintType.LE, ConstraintType.GE],
+        "lower_bounds": [0.0, -np.inf, -1.0],
+        "upper_bounds": [0.0, 1.0, np.inf],
     }
     enopt_config["optimizer"]["max_functions"] = 1
     results = BasicOptimizer(enopt_config, evaluator()).run().results
     assert results is not None
 
-    enopt_config["linear_constraints"]["rhs_values"] = [1.0, -1.0, 1.0]
+    enopt_config["linear_constraints"]["lower_bounds"] = [1.0, -np.inf, 1.0]
+    enopt_config["linear_constraints"]["upper_bounds"] = [1.0, -1.0, np.inf]
     results = BasicOptimizer(enopt_config, evaluator()).run().results
     assert results is None
 
@@ -406,8 +407,8 @@ def test_optimizer_variables_subset_linear_constraints(
     # variables that are not optimized.
     enopt_config["linear_constraints"] = {
         "coefficients": [[1, 0, 1], [0, 1, 0], [1, 1, 1]],
-        "rhs_values": [1.0, 1.0, 2.0],
-        "types": [ConstraintType.EQ, ConstraintType.EQ, ConstraintType.EQ],
+        "lower_bounds": [1.0, 1.0, 2.0],
+        "upper_bounds": [1.0, 1.0, 2.0],
     }
     enopt_config["variables"]["indices"] = [0, 2]
 

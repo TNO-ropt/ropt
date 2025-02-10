@@ -11,6 +11,7 @@ from ropt.config.utils import (
     ImmutableBaseModel,
     broadcast_1d_array,
     check_enum_values,
+    immutable_array,
 )
 from ropt.config.validated_types import (  # noqa: TC001
     Array1D,
@@ -69,23 +70,26 @@ class VariablesConfig(ImmutableBaseModel):
     def _broadcast_and_transform(self, info: ValidationInfo) -> Self:
         self._mutable()
 
-        self.lower_bounds = broadcast_1d_array(
+        lower_bounds = broadcast_1d_array(
             self.lower_bounds, "lower_bounds", self.initial_values.size
         )
-        self.upper_bounds = broadcast_1d_array(
+        upper_bounds = broadcast_1d_array(
             self.upper_bounds, "upper_bounds", self.initial_values.size
         )
 
         if info.context is not None and info.context.transforms.variables is not None:
-            self.initial_values = info.context.transforms.variables.forward(
-                self.initial_values
+            self.initial_values = immutable_array(
+                info.context.transforms.variables.forward(self.initial_values)
             )
-            self.lower_bounds = info.context.transforms.variables.forward(
-                self.lower_bounds
-            )
-            self.upper_bounds = info.context.transforms.variables.forward(
-                self.upper_bounds
-            )
+            lower_bounds = info.context.transforms.variables.forward(lower_bounds)
+            upper_bounds = info.context.transforms.variables.forward(upper_bounds)
+
+        self.lower_bounds = immutable_array(
+            np.where(lower_bounds < upper_bounds, lower_bounds, upper_bounds)
+        )
+        self.upper_bounds = immutable_array(
+            np.where(upper_bounds > lower_bounds, upper_bounds, lower_bounds)
+        )
 
         if self.types is not None:
             check_enum_values(self.types, VariableType)

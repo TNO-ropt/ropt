@@ -83,19 +83,25 @@ class VariableScaler(VariableTransform):
         return values
 
     def transform_linear_constraints(
-        self, coefficients: NDArray[np.float64], rhs_values: NDArray[np.float64]
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Implement the forward scaling of linear constraints.
+        self,
+        coefficients: NDArray[np.float64],
+        lower_bounds: NDArray[np.float64],
+        upper_bounds: NDArray[np.float64],
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+        """Implement the forward transformation of linear constraints.
 
         Args:
             coefficients: The coefficient matrix of the linear constraints.
-            rhs_values:   The right-hand side values of the linear constraints.
+            lower_bounds: The lower bounds on the right-hand-sides of the constraint equations.
+            upper_bounds: The upper bounds on the right-hand-sides of the constraint equations.
 
         Returns:
-            The scaled coefficients and right-hand side values.
+            The transformed coefficient matrix and right-hand side bounds.
         """
         if self._offsets is not None:
-            rhs_values = rhs_values - np.matmul(coefficients, self._offsets)
+            offsets = np.matmul(coefficients, self._offsets)
+            lower_bounds = lower_bounds - offsets
+            upper_bounds = upper_bounds - offsets
         if self._scales is not None:
             coefficients = coefficients * self._scales
-        return coefficients, rhs_values
+        return coefficients, lower_bounds, upper_bounds

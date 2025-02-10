@@ -49,21 +49,21 @@ def _get_constraint_violations(
 
 
 def _check_linear_constraints(
-    config: EnOptConfig, variables: NDArray[np.float64], tolerance: float
+    config: EnOptConfig,
+    variables: NDArray[np.float64],
+    bounds: NDArray[np.float64],
+    tolerance: float,
 ) -> bool:
     if config.linear_constraints is None:
         return False
     assert config.linear_constraints is not None
     coefficients = config.linear_constraints.coefficients
-    rhs_values = config.linear_constraints.rhs_values
     constraint_values = np.empty(
-        variables.shape[:-1] + (rhs_values.size,), dtype=np.float64
+        variables.shape[:-1] + (bounds.size,), dtype=np.float64
     )
     for idx in np.ndindex(*variables.shape[:-1]):
         constraint_values[idx] = np.matmul(coefficients, variables[idx])
-    return _get_constraint_violations(
-        constraint_values - rhs_values, config.linear_constraints.types, tolerance
-    )
+    return bool(np.any(constraint_values - bounds > tolerance))
 
 
 def _check_nonlinear_constraints(
@@ -86,14 +86,29 @@ def _check_constraints(
         return True
 
     if _check_bounds(
-        -results.evaluations.variables, -config.variables.lower_bounds, tolerance
+        -results.evaluations.variables,
+        -config.variables.lower_bounds,
+        tolerance,
     ) or _check_bounds(
-        results.evaluations.variables, config.variables.upper_bounds, tolerance
+        results.evaluations.variables,
+        config.variables.upper_bounds,
+        tolerance,
     ):
         return False
 
-    if config.linear_constraints is not None and _check_linear_constraints(
-        config, results.evaluations.variables, tolerance
+    if config.linear_constraints is not None and (
+        _check_linear_constraints(
+            config,
+            -results.evaluations.variables,
+            -config.linear_constraints.lower_bounds,
+            tolerance,
+        )
+        or _check_linear_constraints(
+            config,
+            results.evaluations.variables,
+            config.linear_constraints.upper_bounds,
+            tolerance,
+        )
     ):
         return False
 

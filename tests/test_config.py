@@ -10,7 +10,7 @@ from ropt.config.enopt import (
     GradientConfig,
     LinearConstraintsConfig,
 )
-from ropt.enums import BoundaryType, ConstraintType, PerturbationType
+from ropt.enums import BoundaryType, PerturbationType
 from ropt.transforms import OptModelTransforms, VariableScaler
 
 
@@ -32,22 +32,22 @@ def enopt_config_fixture() -> dict[str, Any]:
 def test_check_linear_constraints() -> None:
     config = {
         "coefficients": np.array([[1, 2], [1, 2], [1, 2]]),
-        "rhs_values": np.array([1, 2, 3]),
-        "types": [ConstraintType.LE, ConstraintType.GE, ConstraintType.EQ],
+        "lower_bounds": np.array([-np.inf, 2, 3]),
+        "upper_bounds": np.array([1, np.inf, 3]),
     }
     linear_constraints = LinearConstraintsConfig.model_validate(config)
     assert linear_constraints.coefficients is not None
     with pytest.raises(ValueError):  # noqa: PT011
         linear_constraints.coefficients[0, 0] = 0
     with pytest.raises(ValueError):  # noqa: PT011
-        linear_constraints.rhs_values[0] = 0
+        linear_constraints.upper_bounds[0] = 1
 
 
 def test_check_linear_constraints_convert() -> None:
     config = {
         "coefficients": [[1, 2], [1, 2], [1, 2]],
-        "rhs_values": [1, 2, 3],
-        "types": [ConstraintType.LE, ConstraintType.GE, ConstraintType.EQ],
+        "lower_bounds": np.array([-np.inf, 2, 3]),
+        "upper_bounds": np.array([1, np.inf, 3]),
     }
     LinearConstraintsConfig.model_validate(config)
 
@@ -55,24 +55,16 @@ def test_check_linear_constraints_convert() -> None:
 def test_check_linear_constraints_vector_shapes() -> None:
     config = {
         "coefficients": [[1, 2, 3], [1, 2, 3]],
-        "rhs_values": [1, 2],
-        "types": [ConstraintType.LE, ConstraintType.GE],
+        "lower_bounds": np.array([-np.inf, 2]),
+        "upper_bounds": np.array([1, np.inf]),
     }
     LinearConstraintsConfig.model_validate(config)
 
     config_copy = copy.deepcopy(config)
-    config_copy["rhs_values"] = [1, 2, 3]
+    config_copy["lower_bounds"] = [1, 2, 3]
     with pytest.raises(
         ValueError,
-        match="rhs_values cannot be broadcasted to a length of 2",
-    ):
-        LinearConstraintsConfig.model_validate(config_copy)
-
-    config_copy = copy.deepcopy(config)
-    config_copy["types"] = [ConstraintType.LE, ConstraintType.GE, ConstraintType.EQ]
-    with pytest.raises(
-        ValueError,
-        match="types cannot be broadcasted to a length of 2",
+        match="lower_bounds cannot be broadcasted to a length of 2",
     ):
         LinearConstraintsConfig.model_validate(config_copy)
 
@@ -90,8 +82,8 @@ def test_check_config(enopt_config: Any) -> None:
 def test_check_config_linear_constraints(enopt_config: Any) -> None:
     enopt_config["linear_constraints"] = {
         "coefficients": [[1, 2, 3], [2, 3, 4]],
-        "rhs_values": [1, 2],
-        "types": [ConstraintType.GE, ConstraintType.GE],
+        "lower_bounds": [1, 2],
+        "upper_bounds": [np.inf, np.inf],
     }
     with pytest.raises(
         ValueError,

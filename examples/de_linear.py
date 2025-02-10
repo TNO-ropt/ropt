@@ -9,7 +9,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.enums import ConstraintType, EventType, VariableType
+from ropt.enums import EventType, VariableType
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
 from ropt.plan import BasicOptimizer, Event
 from ropt.results import FunctionResults
@@ -29,8 +29,8 @@ CONFIG: dict[str, Any] = {
     },
     "linear_constraints": {
         "coefficients": [1.0, 1.0],
-        "types": [ConstraintType.LE],
-        "rhs_values": [10.0],
+        "lower_bounds": [-np.inf],
+        "upper_bounds": [10.0],
     },
 }
 

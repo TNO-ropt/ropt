@@ -205,7 +205,7 @@ class GradientConfig(ImmutableBaseModel):
         if not np.all(
             np.logical_and(
                 np.isfinite(variables.lower_bounds[relative]),
-                np.isfinite(variables.lower_bounds[relative]),
+                np.isfinite(variables.upper_bounds[relative]),
             ),
         ):
             msg = "The variable bounds must be finite to use relative perturbations"
