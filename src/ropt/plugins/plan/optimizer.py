@@ -24,7 +24,6 @@ if TYPE_CHECKING:
 
     from ropt.config.plan import PlanStepConfig
     from ropt.results import Results
-    from ropt.transforms import OptModelTransforms
 
 MetaDataType = dict[str, int | float | bool | str]
 
@@ -184,6 +183,7 @@ class DefaultOptimizerStep(PlanStep):
         self.emit_event(
             Event(
                 event_type=EventType.START_OPTIMIZER_STEP,
+                config=enopt_config,
                 tags=self._with.tags,
                 data=deepcopy(self._with.data),
             )
@@ -205,9 +205,7 @@ class DefaultOptimizerStep(PlanStep):
                 if self._with.nested_optimization is not None
                 else None
             ),
-            signal_evaluation=partial(
-                self._signal_evaluation, transforms=enopt_config.transforms
-            ),
+            signal_evaluation=partial(self._signal_evaluation, enopt_config),
         )
 
         if (
@@ -227,6 +225,7 @@ class DefaultOptimizerStep(PlanStep):
         self.emit_event(
             Event(
                 event_type=EventType.FINISHED_OPTIMIZER_STEP,
+                config=enopt_config,
                 tags=self._with.tags,
                 data=data,
             )
@@ -245,10 +244,10 @@ class DefaultOptimizerStep(PlanStep):
 
     def _signal_evaluation(
         self,
+        enopt_config: EnOptConfig,
         results: tuple[Results, ...] | None = None,
         *,
         exit_code: OptimizerExitCode | None = None,
-        transforms: OptModelTransforms | None = None,
     ) -> None:
         """Called before and after the optimizer finishes an evaluation.
 
@@ -257,14 +256,15 @@ class DefaultOptimizerStep(PlanStep):
         with `results` set to the results of the evaluation.
 
         Args:
-            results:    The results produced by the evaluation.
-            exit_code:  An exit code if that may be set if the evaluation completed.
-            transforms: Optional transforms for the results.
+            enopt_config: The configuration object.
+            results:      The results produced by the evaluation.
+            exit_code:    An exit code if that may be set if the evaluation completed.
         """
         if results is None:
             self.emit_event(
                 Event(
                     event_type=EventType.START_EVALUATION,
+                    config=enopt_config,
                     tags=self._with.tags,
                     data=deepcopy(self._with.data),
                 )
@@ -272,14 +272,17 @@ class DefaultOptimizerStep(PlanStep):
         else:
             data = deepcopy(self._with.data)
             data["exit_code"] = exit_code
-            if transforms is not None:
+            if enopt_config.transforms is not None:
                 data["transformed_results"] = results
-                data["results"] = [item.transform_back(transforms) for item in results]
+                data["results"] = [
+                    item.transform_back(enopt_config.transforms) for item in results
+                ]
             else:
                 data["results"] = results
             self.emit_event(
                 Event(
                     event_type=EventType.FINISHED_EVALUATION,
+                    config=enopt_config,
                     tags=self._with.tags,
                     data=data,
                 ),

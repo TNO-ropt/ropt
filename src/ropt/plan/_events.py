@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    from ropt.config.enopt import EnOptConfig
     from ropt.enums import EventType
 
 
@@ -29,6 +30,7 @@ class Event:
     """
 
     event_type: EventType
+    config: EnOptConfig
     tags: set[str] = field(default_factory=set)
     plan_id: tuple[int, ...] = field(default_factory=tuple)
     data: dict[str, Any] = field(default_factory=dict)

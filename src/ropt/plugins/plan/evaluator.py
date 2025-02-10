@@ -114,6 +114,7 @@ class DefaultEvaluatorStep(PlanStep):
             self.emit_event(
                 Event(
                     event_type=event_type,
+                    config=enopt_config,
                     tags=self._with.tags,
                     data=deepcopy(self._with.data),
                 )
@@ -154,7 +155,12 @@ class DefaultEvaluatorStep(PlanStep):
             EventType.FINISHED_EVALUATOR_STEP,
         ):
             self.emit_event(
-                Event(event_type=event_type, tags=self._with.tags, data=data)
+                Event(
+                    event_type=event_type,
+                    config=enopt_config,
+                    tags=self._with.tags,
+                    data=data,
+                )
             )
 
         if exit_code == OptimizerExitCode.USER_ABORT:

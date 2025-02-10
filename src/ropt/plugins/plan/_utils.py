@@ -2,11 +2,17 @@
 
 from __future__ import annotations
 
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 
+from ropt.enums import ConstraintType
 from ropt.results import FunctionResults, Results
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
+
+    from ropt.config.enopt import EnOptConfig
 
 
 def _get_new_optimal_result(
@@ -23,46 +29,87 @@ def _get_new_optimal_result(
     return None
 
 
-def _check_bound_constraints(
-    results: FunctionResults, constraint_tolerance: float
+def _check_bounds(distance_to_bound: NDArray[np.float64], tolerance: float) -> bool:
+    return bool(
+        np.any(
+            np.logical_and(
+                np.isfinite(distance_to_bound), distance_to_bound > tolerance
+            )
+        )
+    )
+
+
+def _get_constraint_violations(
+    constraint_values: NDArray[np.float64], types: NDArray[np.ubyte], tolerance: float
 ) -> bool:
-    if results.bound_constraints is not None:
-        for violations in (
-            results.bound_constraints.lower_violations,
-            results.bound_constraints.upper_violations,
-        ):
-            if (
-                violations is not None
-                and np.any(violations > constraint_tolerance).item()
-            ):
-                return False
-    return True
+    le_inx = types == ConstraintType.LE
+    ge_inx = types == ConstraintType.GE
+    constraint_values = constraint_values.copy()
+    constraint_values[le_inx] = np.maximum(constraint_values[le_inx], 0.0)
+    constraint_values[ge_inx] = np.minimum(constraint_values[ge_inx], 0.0)
+    return bool(np.any(np.abs(constraint_values) > tolerance))
+
+
+def _check_linear_constraints(
+    config: EnOptConfig, variables: NDArray[np.float64], tolerance: float
+) -> bool:
+    assert config.linear_constraints is not None
+    coefficients = config.linear_constraints.coefficients
+    rhs_values = config.linear_constraints.rhs_values
+    constraint_values = np.empty(
+        variables.shape[:-1] + (rhs_values.size,), dtype=np.float64
+    )
+    for idx in np.ndindex(*variables.shape[:-1]):
+        constraint_values[idx] = np.matmul(coefficients, variables[idx])
+    return _get_constraint_violations(
+        np.array(constraint_values - rhs_values),
+        config.linear_constraints.types,
+        tolerance,
+    )
+
+
+def _check_nonlinear_constraints(
+    config: EnOptConfig, constraints: NDArray[np.float64], tolerance: float
+) -> bool:
+    assert config.nonlinear_constraints is not None
+    rhs_values = config.nonlinear_constraints.rhs_values
+    return _get_constraint_violations(
+        constraints - rhs_values, config.nonlinear_constraints.types, tolerance
+    )
 
 
 def _check_constraints(
-    results: FunctionResults, constraint_tolerance: float | None
+    config: EnOptConfig, results: FunctionResults, tolerance: float | None
 ) -> bool:
-    if constraint_tolerance is None:
+    if tolerance is None:
         return True
 
-    if not _check_bound_constraints(results, constraint_tolerance):
-        return False
-
-    if results.linear_constraints is not None and (
-        results.linear_constraints.violations is not None
-        and np.any(results.linear_constraints.violations > constraint_tolerance).item()
+    if _check_bounds(
+        config.variables.lower_bounds - results.evaluations.variables,
+        tolerance,
+    ) or _check_bounds(
+        results.evaluations.variables - config.variables.upper_bounds,
+        tolerance,
     ):
         return False
 
-    if results.nonlinear_constraints is not None:
-        violations = results.nonlinear_constraints.violations
-        if violations is not None and np.any(violations > constraint_tolerance).item():
+    if results.linear_constraints is not None and _check_linear_constraints(
+        config, results.evaluations.variables, tolerance
+    ):
+        return False
+
+    if results.nonlinear_constraints is not None and results.functions is not None:
+        assert results.functions.constraints is not None
+        if _check_nonlinear_constraints(
+            config, results.functions.constraints, tolerance
+        ):
             return False
 
     return True
 
 
 def _get_last_result(
+    config: EnOptConfig,
     results: tuple[Results, ...],
     transformed_results: tuple[Results, ...],
     constraint_tolerance: float | None,
@@ -76,7 +123,7 @@ def _get_last_result(
             if (
                 isinstance(item, FunctionResults)
                 and item.functions is not None
-                and _check_constraints(item, constraint_tolerance)
+                and _check_constraints(config, item, constraint_tolerance)
             )
         ),
         None,
@@ -84,6 +131,7 @@ def _get_last_result(
 
 
 def _update_optimal_result(
+    config: EnOptConfig,
     optimal_result: FunctionResults | None,
     results: tuple[Results, ...],
     transformed_results: tuple[Results, ...],
@@ -94,7 +142,7 @@ def _update_optimal_result(
         if (
             isinstance(transformed_item, FunctionResults)
             and transformed_item.functions is not None
-            and _check_constraints(transformed_item, constraint_tolerance)
+            and _check_constraints(config, transformed_item, constraint_tolerance)
         ):
             assert isinstance(item, FunctionResults)
             new_optimal_result = _get_new_optimal_result(optimal_result, item)
@@ -105,6 +153,7 @@ def _update_optimal_result(
 
 
 def _get_all_results(
+    config: EnOptConfig,
     results: tuple[Results, ...],
     transformed_results: tuple[Results, ...],
     constraint_tolerance: float | None,
@@ -115,6 +164,6 @@ def _get_all_results(
         if (
             isinstance(transformed_item, FunctionResults)
             and transformed_item.functions is not None
-            and _check_constraints(transformed_item, constraint_tolerance)
+            and _check_constraints(config, transformed_item, constraint_tolerance)
         )
     )
