@@ -3,16 +3,8 @@ from typing import Any
 import numpy as np
 import pytest
 
-from ropt.config.enopt import EnOptConfig
-from ropt.enums import ConstraintType, ResultAxis
-from ropt.results import (
-    BoundConstraints,
-    FunctionEvaluations,
-    FunctionResults,
-    Functions,
-    LinearConstraints,
-    Realizations,
-)
+from ropt.enums import ResultAxis
+from ropt.results import FunctionEvaluations, FunctionResults, Functions, Realizations
 
 
 @pytest.fixture(name="enopt_config")
@@ -54,43 +46,6 @@ def function_result_fixture() -> FunctionResults:
         realizations=realizations,
         functions=functions,
     )
-
-
-def test_bound_constraint_results(
-    enopt_config: Any, function_result: FunctionResults
-) -> None:
-    enopt_config["variables"]["lower_bounds"] = [1.2, 1.4]
-    enopt_config["variables"]["upper_bounds"] = [1.0, 1.5]
-    config = EnOptConfig.model_validate(enopt_config)
-    assert function_result.functions is not None
-    constraints = BoundConstraints.create(config, function_result.evaluations)
-    assert constraints is not None
-    assert constraints.lower_values is not None
-    assert constraints.upper_values is not None
-    assert constraints.lower_violations is not None
-    assert constraints.upper_violations is not None
-    assert np.allclose(constraints.lower_values, [-0.2, 0.6])
-    assert np.allclose(constraints.upper_values, [0.0, 0.5])
-    assert np.allclose(constraints.lower_violations, [0.2, 0.0])
-    assert np.allclose(constraints.upper_violations, [0.0, 0.5])
-
-
-def test_linear_constraint_results(
-    enopt_config: Any, function_result: FunctionResults
-) -> None:
-    enopt_config["linear_constraints"] = {
-        "coefficients": [[1.0, 0.0], [0.0, 1.0]],
-        "rhs_values": [0.0, 1.0],
-        "types": [ConstraintType.LE, ConstraintType.GE],
-    }
-    config = EnOptConfig.model_validate(enopt_config)
-    assert function_result.functions is not None
-    constraints = LinearConstraints.create(config, function_result.evaluations)
-    assert constraints is not None
-    assert constraints.values is not None
-    assert constraints.violations is not None
-    assert np.allclose(constraints.values, [1.0, 1.0])
-    assert np.allclose(constraints.violations, [1.0, 0.0])
 
 
 @pytest.mark.parametrize("axis", [ResultAxis.OBJECTIVE, None])

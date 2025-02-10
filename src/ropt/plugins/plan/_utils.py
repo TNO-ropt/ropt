@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, cast
 import numpy as np
 
 from ropt.enums import ConstraintType
-from ropt.results import FunctionResults, Results
+from ropt.results import FunctionResults, Functions, Results
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -29,13 +29,11 @@ def _get_new_optimal_result(
     return None
 
 
-def _check_bounds(distance_to_bound: NDArray[np.float64], tolerance: float) -> bool:
+def _check_bounds(
+    variables: NDArray[np.float64], bounds: NDArray[np.float64], tolerance: float
+) -> bool:
     return bool(
-        np.any(
-            np.logical_and(
-                np.isfinite(distance_to_bound), distance_to_bound > tolerance
-            )
-        )
+        np.any(np.logical_and(np.isfinite(bounds), variables - bounds > tolerance))
     )
 
 
@@ -53,6 +51,8 @@ def _get_constraint_violations(
 def _check_linear_constraints(
     config: EnOptConfig, variables: NDArray[np.float64], tolerance: float
 ) -> bool:
+    if config.linear_constraints is None:
+        return False
     assert config.linear_constraints is not None
     coefficients = config.linear_constraints.coefficients
     rhs_values = config.linear_constraints.rhs_values
@@ -62,19 +62,20 @@ def _check_linear_constraints(
     for idx in np.ndindex(*variables.shape[:-1]):
         constraint_values[idx] = np.matmul(coefficients, variables[idx])
     return _get_constraint_violations(
-        np.array(constraint_values - rhs_values),
-        config.linear_constraints.types,
-        tolerance,
+        constraint_values - rhs_values, config.linear_constraints.types, tolerance
     )
 
 
 def _check_nonlinear_constraints(
-    config: EnOptConfig, constraints: NDArray[np.float64], tolerance: float
+    config: EnOptConfig, functions: Functions, tolerance: float
 ) -> bool:
     assert config.nonlinear_constraints is not None
     rhs_values = config.nonlinear_constraints.rhs_values
+    assert functions.constraints is not None
     return _get_constraint_violations(
-        constraints - rhs_values, config.nonlinear_constraints.types, tolerance
+        functions.constraints - rhs_values,
+        config.nonlinear_constraints.types,
+        tolerance,
     )
 
 
@@ -85,27 +86,22 @@ def _check_constraints(
         return True
 
     if _check_bounds(
-        config.variables.lower_bounds - results.evaluations.variables,
-        tolerance,
+        -results.evaluations.variables, -config.variables.lower_bounds, tolerance
     ) or _check_bounds(
-        results.evaluations.variables - config.variables.upper_bounds,
-        tolerance,
+        results.evaluations.variables, config.variables.upper_bounds, tolerance
     ):
         return False
 
-    if results.linear_constraints is not None and _check_linear_constraints(
+    if config.linear_constraints is not None and _check_linear_constraints(
         config, results.evaluations.variables, tolerance
     ):
         return False
 
-    if results.nonlinear_constraints is not None and results.functions is not None:
-        assert results.functions.constraints is not None
-        if _check_nonlinear_constraints(
-            config, results.functions.constraints, tolerance
-        ):
-            return False
-
-    return True
+    return (
+        config.nonlinear_constraints is None
+        or results.functions is None
+        or not _check_nonlinear_constraints(config, results.functions, tolerance)
+    )
 
 
 def _get_last_result(

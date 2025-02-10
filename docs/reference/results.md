@@ -29,21 +29,6 @@
         heading_level: 3
         members: False
 
-::: ropt.results.BoundConstraints
-    options:
-        heading_level: 3
-        members: False
-
-::: ropt.results.LinearConstraints
-    options:
-        heading_level: 3
-        members: False
-
-::: ropt.results.NonlinearConstraints
-    options:
-        heading_level: 3
-        members: False
-
 ::: ropt.results.GradientResults
     options:
         heading_level: 3

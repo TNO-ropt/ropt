@@ -151,39 +151,6 @@ def _get_function_results(
         names=names,
     ).rename(columns=partial(_add_prefix, prefix="functions"))
 
-    bound_constraints = (
-        pd.DataFrame()
-        if results.bound_constraints is None
-        else results.to_dataframe(
-            "bound_constraints",
-            select=_get_select(results, "bound_constraints", sub_fields),
-            unstack=[ResultAxis.VARIABLE],
-            names=names,
-        ).rename(columns=partial(_add_prefix, prefix="bound_constraints"))
-    )
-
-    linear_constraints = (
-        pd.DataFrame()
-        if results.linear_constraints is None
-        else results.to_dataframe(
-            "linear_constraints",
-            select=_get_select(results, "linear_constraints", sub_fields),
-            unstack=[ResultAxis.LINEAR_CONSTRAINT],
-            names=names,
-        ).rename(columns=partial(_add_prefix, prefix="linear_constraints"))
-    )
-
-    nonlinear_constraints = (
-        pd.DataFrame()
-        if results.nonlinear_constraints is None
-        else results.to_dataframe(
-            "nonlinear_constraints",
-            select=_get_select(results, "nonlinear_constraints", sub_fields),
-            unstack=[ResultAxis.NONLINEAR_CONSTRAINT],
-            names=names,
-        ).rename(columns=partial(_add_prefix, prefix="nonlinear_constraints"))
-    )
-
     evaluations = results.to_dataframe(
         "evaluations",
         select=_get_select(results, "evaluations", sub_fields),
@@ -195,13 +162,7 @@ def _get_function_results(
         names=names,
     ).rename(columns=partial(_add_prefix, prefix="evaluations"))
 
-    return _join_frames(
-        functions,
-        bound_constraints,
-        linear_constraints,
-        nonlinear_constraints,
-        evaluations,
-    )
+    return _join_frames(functions, evaluations)
 
 
 def _get_gradient_results(
