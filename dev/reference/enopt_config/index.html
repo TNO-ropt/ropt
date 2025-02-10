@@ -2247,14 +2247,10 @@ variables, including equality or non-equality constraints. The
 <code>coefficients</code> field is a 2D <code>numpy</code> array where the number of rows equals
 the number of constraints, and the number of columns equals the number of
 variables.</p>
-<p>The right-hand sides of the equations are given in the <code>rhs_values</code> field,
-which will be converted and broadcasted to a <code>numpy</code> array with a length
-equal to the number of equations.</p>
-<p>The <code>types</code> field determines the type of each equation: equality (<span class="arithmatex">\(=\)</span>) or
-inequality (<span class="arithmatex">\(\leq\)</span> or <span class="arithmatex">\(\geq\)</span>), and it is broadcasted to a length equal to
-the number of equations. The <code>types</code> field is defined as an integer array,
-but its values are limited to those of the
-<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.ConstraintType"><code>ConstraintType</code></a> enumeration.</p>
+<p>Lower and upper bounds on he right-hand sides of the equations are given in
+the <code>lower_bounds</code> and <code>upper_bounds fields, which will be converted and
+broadcasted to a</code>numpy` array with a length equal to the number of
+equations.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2279,25 +2275,24 @@ but its values are limited to those of the
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.LinearConstraintsConfig.rhs_values">rhs_values</span></code></td>
+            <td><code><span title="ropt.config.enopt.LinearConstraintsConfig.lower_bounds">lower_bounds</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1D" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The right-hand-sides of the constraint equations.</p>
+                <p>The lower bounds on the right-hand-sides of the constraint equations.</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.LinearConstraintsConfig.types">types</span></code></td>
+            <td><code><span title="ropt.config.enopt.LinearConstraintsConfig.upper_bounds">upper_bounds</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.ArrayEnum" href="../utilities/#ropt.config.validated_types.ArrayEnum">ArrayEnum</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1D" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The type of each equation
-          (see <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.ConstraintType"><code>ConstraintType</code></a>).</p>
+                <p>The upper bounds on the right-hand-sides of the constraint equations.</p>
               </div>
             </td>
           </tr>
