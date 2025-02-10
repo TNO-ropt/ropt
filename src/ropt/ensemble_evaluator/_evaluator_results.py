@@ -94,7 +94,7 @@ def _get_active_realizations(
             else np.broadcast_to(
                 active_realizations,
                 (
-                    config.nonlinear_constraints.rhs_values.size,
+                    config.nonlinear_constraints.lower_bounds.size,
                     active_realizations.size,
                 ),
             )

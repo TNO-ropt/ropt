@@ -10,7 +10,6 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.config.enopt import EnOptConfig, LinearConstraintsConfig
-from ropt.enums import ConstraintType
 
 
 def filter_linear_constraints(
@@ -195,9 +194,13 @@ def _validate_nonlinear_constraints(
         method,
         supported_constraints,
         required_constraints,
-        have_constraint=bool(
-            np.any(nonlinear_constraints.types == ConstraintType.LE)
-            or np.any(nonlinear_constraints.types == ConstraintType.GE),
+        have_constraint=not bool(
+            np.allclose(
+                nonlinear_constraints.lower_bounds,
+                nonlinear_constraints.upper_bounds,
+                rtol=0.0,
+                atol=1e-15,
+            )
         ),
     )
 
@@ -207,7 +210,12 @@ def _validate_nonlinear_constraints(
         supported_constraints,
         required_constraints,
         have_constraint=bool(
-            np.any(nonlinear_constraints.types == ConstraintType.EQ),
+            np.allclose(
+                nonlinear_constraints.lower_bounds,
+                nonlinear_constraints.upper_bounds,
+                rtol=0.0,
+                atol=1e-15,
+            )
         ),
     )
 

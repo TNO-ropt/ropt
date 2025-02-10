@@ -144,14 +144,14 @@ class NonLinearConstraintTransform(ABC):
     """Abstract base class for non-linear constraint transformers."""
 
     @abstractmethod
-    def transform_rhs_values(
-        self, rhs_values: NDArray[np.float64], types: NDArray[np.ubyte]
-    ) -> tuple[NDArray[np.float64], NDArray[np.ubyte]]:
-        """Implement the forward transformation of the right-hand side values.
+    def transform_bounds(
+        self, lower_bounds: NDArray[np.float64], upper_bounds: NDArray[np.float64]
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Implement the forward transformation of the right-hand side bounds.
 
         Args:
-            rhs_values: The right-hand side values of the non-linear constraints.
-            types:      The types of the non-linear constraints.
+            lower_bounds: The lower bounds on the right-hand side values.
+            upper_bounds: The upper bounds on the right-hand side values.
 
         Returns:
             The transformed right-hand side values.

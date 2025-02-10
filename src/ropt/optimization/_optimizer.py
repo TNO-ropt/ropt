@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Protocol
 
 import numpy as np
 
-from ropt.enums import ConstraintType, OptimizerExitCode
+from ropt.enums import OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
 from ropt.results import FunctionResults, GradientResults
 
@@ -196,9 +196,7 @@ class EnsembleOptimizer:
             # Functions might be parallelized hence we need potentially to
             # process a list of function results:
             functions_list = [
-                self._transform_constraints(
-                    self._functions_from_results(item.functions)
-                )
+                self._functions_from_results(item.functions)
                 for item in results
                 if isinstance(item, FunctionResults)
             ]
@@ -210,15 +208,13 @@ class EnsembleOptimizer:
         gradients = np.array([])
         if return_gradients:
             # Gradients cannot be parallelized, there is at most one gradient:
-            gradients = self._transform_constraint_gradients(
-                self._gradients_from_results(
-                    next(
-                        item.gradients
-                        for item in results
-                        if isinstance(item, GradientResults)
-                    ),
-                    self._enopt_config.variables.indices,
+            gradients = self._gradients_from_results(
+                next(
+                    item.gradients
+                    for item in results
+                    if isinstance(item, GradientResults)
                 ),
+                self._enopt_config.variables.indices,
             )
 
         return functions, gradients
@@ -321,34 +317,3 @@ class EnsembleOptimizer:
             if constraint_gradients is None
             else np.vstack((weighted_objective_gradient, constraint_gradients))
         )
-
-    def _fix_constraint_signs(
-        self, functions: NDArray[np.float64]
-    ) -> NDArray[np.float64]:
-        assert self._enopt_config.nonlinear_constraints is not None
-        signs = np.where(
-            self._enopt_config.nonlinear_constraints.types == ConstraintType.GE,
-            -1.0,
-            1.0,
-        )
-        if functions.ndim > 1:
-            signs = signs[:, np.newaxis]
-        functions[1:, ...] = functions[1:, ...] / signs
-        return functions
-
-    def _transform_constraints(
-        self, functions: NDArray[np.float64]
-    ) -> NDArray[np.float64]:
-        if functions.size > 1 and self._enopt_config.nonlinear_constraints is not None:
-            functions[1:, ...] = (
-                functions[1:, ...] - self._enopt_config.nonlinear_constraints.rhs_values
-            )
-            return self._fix_constraint_signs(functions)
-        return functions
-
-    def _transform_constraint_gradients(
-        self, functions: NDArray[np.float64]
-    ) -> NDArray[np.float64]:
-        if functions.size > 1 and self._enopt_config.nonlinear_constraints is not None:
-            return self._fix_constraint_signs(functions)
-        return functions

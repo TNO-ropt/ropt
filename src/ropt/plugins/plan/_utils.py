@@ -6,8 +6,7 @@ from typing import TYPE_CHECKING, cast
 
 import numpy as np
 
-from ropt.enums import ConstraintType
-from ropt.results import FunctionResults, Functions, Results
+from ropt.results import FunctionResults, Results
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -37,17 +36,6 @@ def _check_bounds(
     )
 
 
-def _get_constraint_violations(
-    constraint_values: NDArray[np.float64], types: NDArray[np.ubyte], tolerance: float
-) -> bool:
-    le_inx = types == ConstraintType.LE
-    ge_inx = types == ConstraintType.GE
-    constraint_values = constraint_values.copy()
-    constraint_values[le_inx] = np.maximum(constraint_values[le_inx], 0.0)
-    constraint_values[ge_inx] = np.minimum(constraint_values[ge_inx], 0.0)
-    return bool(np.any(np.abs(constraint_values) > tolerance))
-
-
 def _check_linear_constraints(
     config: EnOptConfig,
     variables: NDArray[np.float64],
@@ -67,16 +55,11 @@ def _check_linear_constraints(
 
 
 def _check_nonlinear_constraints(
-    config: EnOptConfig, functions: Functions, tolerance: float
+    constraints: NDArray[np.float64],
+    bounds: NDArray[np.float64],
+    tolerance: float,
 ) -> bool:
-    assert config.nonlinear_constraints is not None
-    rhs_values = config.nonlinear_constraints.rhs_values
-    assert functions.constraints is not None
-    return _get_constraint_violations(
-        functions.constraints - rhs_values,
-        config.nonlinear_constraints.types,
-        tolerance,
-    )
+    return bool(np.any(constraints - bounds > tolerance))
 
 
 def _check_constraints(
@@ -112,11 +95,20 @@ def _check_constraints(
     ):
         return False
 
-    return (
-        config.nonlinear_constraints is None
-        or results.functions is None
-        or not _check_nonlinear_constraints(config, results.functions, tolerance)
-    )
+    if config.nonlinear_constraints is not None and results.functions is not None:
+        assert results.functions.constraints is not None
+        if _check_nonlinear_constraints(
+            -results.functions.constraints,
+            -config.nonlinear_constraints.lower_bounds,
+            tolerance,
+        ) or _check_nonlinear_constraints(
+            results.functions.constraints,
+            config.nonlinear_constraints.upper_bounds,
+            tolerance,
+        ):
+            return False
+
+    return True
 
 
 def _get_last_result(

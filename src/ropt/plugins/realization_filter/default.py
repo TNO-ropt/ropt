@@ -7,7 +7,7 @@ from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt
 
 from ropt.config.enopt import EnOptConfig
-from ropt.enums import ConstraintType, OptimizerExitCode
+from ropt.enums import OptimizerExitCode
 from ropt.exceptions import ConfigError, OptimizationAborted
 
 from .base import RealizationFilter, RealizationFilterPlugin
@@ -285,13 +285,8 @@ class DefaultRealizationFilter(RealizationFilter):
         failed_realizations = np.isnan(constraints[..., 0])
         constraints = np.nan_to_num(constraints[..., options.sort])
         assert self._enopt_config.nonlinear_constraints is not None
-        constraint_type = self._enopt_config.nonlinear_constraints.types[options.sort]
-        if constraint_type == ConstraintType.LE:
-            constraints = -constraints
-        if constraint_type == ConstraintType.EQ:
-            constraints = -np.abs(constraints)
         return _get_cvar_weights_from_percentile(
-            constraints, failed_realizations, options.percentile
+            -constraints, failed_realizations, options.percentile
         )
 
 

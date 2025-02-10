@@ -196,18 +196,10 @@ class ConstraintScaler(NonLinearConstraintTransform):
     def __init__(self, scales: NDArray[np.float64]) -> None:
         self._scales = scales
 
-    def transform_rhs_values(
-        self, rhs_values: NDArray[np.float64], types: NDArray[np.ubyte]
-    ) -> tuple[NDArray[np.float64], NDArray[np.ubyte]]:
-        rhs_values = rhs_values / self._scales
-        types = np.fromiter(
-            (
-                _flip_type(type_) if scale < 0 else type_
-                for type_, scale in zip(types, self._scales, strict=False)
-            ),
-            np.ubyte,
-        )
-        return rhs_values, types
+    def transform_bounds(
+        self, lower_bounds: NDArray[np.float64], upper_bounds: NDArray[np.float64]
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        return lower_bounds / self._scales, upper_bounds / self._scales
 
     def forward(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
         return constraints / self._scales
@@ -222,8 +214,8 @@ def test_constraint_with_scaler(
 ) -> None:
     enopt_config["optimizer"]["speculative"] = speculative
     enopt_config["nonlinear_constraints"] = {
-        "rhs_values": 0.4,
-        "types": ConstraintType.GE,
+        "lower_bounds": 0.4,
+        "upper_bounds": np.inf,
     }
 
     test_functions = (
@@ -238,7 +230,7 @@ def test_constraint_with_scaler(
     context = EnOptContext(transforms=transforms)
     config = EnOptConfig.model_validate(enopt_config, context=context)
     assert config.nonlinear_constraints is not None
-    assert config.nonlinear_constraints.rhs_values == 0.4 / scales
+    assert config.nonlinear_constraints.lower_bounds == 0.4 / scales
 
     check = True
 
@@ -338,12 +330,18 @@ def test_check_linear_constraints(enopt_config: Any, evaluator: Any) -> None:
         "lower_bounds": [0.0, -np.inf, -1.0],
         "upper_bounds": [0.0, 1.0, np.inf],
     }
-    enopt_config["optimizer"]["max_functions"] = 1
-    results = BasicOptimizer(enopt_config, evaluator()).run().results
-    assert results is not None
+    results1 = BasicOptimizer(enopt_config, evaluator()).run().results
+    assert results1 is not None
+
+    enopt_config["linear_constraints"]["lower_bounds"] = [0.0, 1.0, np.inf]
+    enopt_config["linear_constraints"]["upper_bounds"] = [0.0, -np.inf, -1.0]
+    results2 = BasicOptimizer(enopt_config, evaluator()).run().results
+    assert results2 is not None
+    assert np.allclose(results1.evaluations.variables, results2.evaluations.variables)
 
     enopt_config["linear_constraints"]["lower_bounds"] = [1.0, -np.inf, 1.0]
     enopt_config["linear_constraints"]["upper_bounds"] = [1.0, -1.0, np.inf]
+
     results = BasicOptimizer(enopt_config, evaluator()).run().results
     assert results is None
 
@@ -352,8 +350,8 @@ def test_check_nonlinear_constraints(
     enopt_config: Any, evaluator: Any, test_functions: Any
 ) -> None:
     enopt_config["nonlinear_constraints"] = {
-        "rhs_values": [0.0, 0.0, 0.0],
-        "types": [ConstraintType.EQ, ConstraintType.LE, ConstraintType.GE],
+        "lower_bounds": [0.0, -np.inf, 0.0],
+        "upper_bounds": [0.0, 0.0, np.inf],
     }
 
     test_functions = (
@@ -363,12 +361,18 @@ def test_check_nonlinear_constraints(
         lambda variables, _: cast(NDArray[np.float64], variables[0]),
     )
 
-    enopt_config["optimizer"]["max_functions"] = 1
+    results1 = BasicOptimizer(enopt_config, evaluator(test_functions)).run().results
+    assert results1 is not None
 
-    results = BasicOptimizer(enopt_config, evaluator(test_functions)).run().results
-    assert results is not None
+    # Flipping the bounds should still work:
+    enopt_config["nonlinear_constraints"]["lower_bounds"] = [0.0, 0.0, np.inf]
+    enopt_config["nonlinear_constraints"]["upper_bounds"] = [0.0, -np.inf, 0.0]
+    results2 = BasicOptimizer(enopt_config, evaluator(test_functions)).run().results
+    assert results2 is not None
+    assert np.allclose(results1.evaluations.variables, results2.evaluations.variables)
 
-    enopt_config["nonlinear_constraints"]["rhs_values"] = [1.0, -1.0, 1.0]
+    enopt_config["nonlinear_constraints"]["lower_bounds"] = [1.0, -np.inf, 1.0]
+    enopt_config["nonlinear_constraints"]["upper_bounds"] = [1.0, -1.0, np.inf]
 
     results = BasicOptimizer(enopt_config, evaluator(test_functions)).run().results
     assert results is None

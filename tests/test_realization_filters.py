@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from ropt.enums import ConstraintType, EventType
+from ropt.enums import EventType
 from ropt.plan import BasicOptimizer, Event
 from ropt.plugins.realization_filter.default import (
     _get_cvar_weights_from_percentile,
@@ -185,8 +185,8 @@ def test_sort_filter_on_objectives_with_constraints(
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations
 
     enopt_config["nonlinear_constraints"] = {
-        "rhs_values": 0.4,
-        "types": [ConstraintType.LE],
+        "lower_bounds": -np.inf,
+        "upper_bounds": 0.4,
     }
     enopt_config["realization_filters"] = [
         {
@@ -253,8 +253,8 @@ def test_sort_filter_on_constraints(
 
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations
     enopt_config["nonlinear_constraints"] = {
-        "rhs_values": 0.4,
-        "types": [ConstraintType.LE],
+        "lower_bounds": -np.inf,
+        "upper_bounds": 0.4,
     }
     enopt_config["realization_filters"] = [
         {
@@ -490,8 +490,8 @@ def test_cvar_filter_on_objectives_with_constraints(
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations
 
     enopt_config["nonlinear_constraints"] = {
-        "rhs_values": 0.4,
-        "types": [ConstraintType.LE],
+        "lower_bounds": -np.inf,
+        "upper_bounds": 0.4,
     }
     enopt_config["realization_filters"] = [
         {
@@ -558,8 +558,8 @@ def test_cvar_filter_on_constraints(
     enopt_config["optimizer"]["split_evaluations"] = split_evaluations
 
     enopt_config["nonlinear_constraints"] = {
-        "rhs_values": 0.4,
-        "types": [ConstraintType.LE],
+        "lower_bounds": -np.inf,
+        "upper_bounds": 0.4,
     }
     enopt_config["realization_filters"] = [
         {

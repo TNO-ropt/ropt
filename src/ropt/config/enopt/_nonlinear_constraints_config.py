@@ -4,15 +4,14 @@ from __future__ import annotations
 
 from typing import Self
 
+import numpy as np
 from pydantic import ConfigDict, ValidationInfo, model_validator
 
-from ropt.config.utils import ImmutableBaseModel, broadcast_1d_array, check_enum_values
+from ropt.config.utils import ImmutableBaseModel, broadcast_arrays, immutable_array
 from ropt.config.validated_types import (  # noqa: TC001
     Array1D,
     Array1DInt,
-    ArrayEnum,
 )
-from ropt.enums import ConstraintType
 
 
 class NonlinearConstraintsConfig(ImmutableBaseModel):
@@ -23,15 +22,10 @@ class NonlinearConstraintsConfig(ImmutableBaseModel):
     [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
 
     Non-linear constraints require that some constraint function is compared to
-    a right-hand-side value, either for equality or inequality. The `rhs_values`
-    field, which is a `numpy` array with a length equal to the number of
-    constraint functions, provides the right-hand-side values.
-
-    The `types` field determines the type of each constraint: equality ($=$) or
-    inequality ($\le$ or $\ge$), and is broadcasted to a length equal to the
-    number of constraints. The `types` field is defined as an integer array, but
-    its values are limited to those of the
-    [`ConstraintType`][ropt.enums.ConstraintType] enumeration.
+    a right-hand-side value, either for equality or inequality. The
+    `lower_bounds` and `upper_bounds` fields, which is a `numpy` arrays with a
+    length equal to the number of constraint functions, provides the bounds on
+    the right-hand-side values.
 
     The non-linear constraints may be subject to realization filters and
     function estimators. The `realization_filters` and `function_estimator`
@@ -40,15 +34,14 @@ class NonlinearConstraintsConfig(ImmutableBaseModel):
     [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
 
     Attributes:
-        rhs_values:          The right-hand-side values.
-        types:               The type of each non-linear constraint.
-                             ([`ConstraintType`][ropt.enums.ConstraintType]).
+        lower_bounds:        The lower bounds on the right-hand-side values.
+        upper_bounds:        The upper bounds on the right-hand-side values.
         realization_filters: Optional realization filter indices.
         function_estimators: Optional function estimator indices.
     """
 
-    rhs_values: Array1D
-    types: ArrayEnum
+    lower_bounds: Array1D
+    upper_bounds: Array1D
     realization_filters: Array1DInt | None = None
     function_estimators: Array1DInt | None = None
 
@@ -60,20 +53,27 @@ class NonlinearConstraintsConfig(ImmutableBaseModel):
 
     @model_validator(mode="after")
     def _broadcast_and_check(self, info: ValidationInfo) -> Self:
-        self._mutable()
-
-        check_enum_values(self.types, ConstraintType)
-        self.types = broadcast_1d_array(self.types, "types", self.rhs_values.size)
+        lower_bounds, upper_bounds = broadcast_arrays(
+            self.lower_bounds, self.upper_bounds
+        )
 
         if (
             info.context is not None
             and info.context.transforms.nonlinear_constraints is not None
         ):
-            self.rhs_values, self.types = (
-                info.context.transforms.nonlinear_constraints.transform_rhs_values(
-                    self.rhs_values, self.types
+            lower_bounds, upper_bounds = (
+                info.context.transforms.nonlinear_constraints.transform_bounds(
+                    lower_bounds, upper_bounds
                 )
             )
 
+        self._mutable()
+        self.lower_bounds = immutable_array(
+            np.where(lower_bounds < upper_bounds, lower_bounds, upper_bounds)
+        )
+        self.upper_bounds = immutable_array(
+            np.where(upper_bounds > lower_bounds, upper_bounds, lower_bounds)
+        )
         self._immutable()
+
         return self

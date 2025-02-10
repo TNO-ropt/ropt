@@ -415,7 +415,7 @@ class EnsembleEvaluator:
             if constraints is not None:
                 assert self._config.nonlinear_constraints is not None
                 constraints = np.empty(
-                    self._config.nonlinear_constraints.rhs_values.shape,
+                    self._config.nonlinear_constraints.lower_bounds.shape,
                     dtype=np.float64,
                 )
                 constraints.fill(np.nan)
@@ -566,7 +566,7 @@ class EnsembleEvaluator:
                 if constraint_weights is None:
                     constraint_weights = np.ones(
                         (
-                            self._config.nonlinear_constraints.rhs_values.size,
+                            self._config.nonlinear_constraints.lower_bounds.size,
                             self._config.realizations.weights.size,
                         ),
                     )
