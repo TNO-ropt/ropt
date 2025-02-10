@@ -2435,14 +2435,10 @@ equations.</p>
 <code>nonlinear_constraints</code> field in an
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 <p>Non-linear constraints require that some constraint function is compared to
-a right-hand-side value, either for equality or inequality. The <code>rhs_values</code>
-field, which is a <code>numpy</code> array with a length equal to the number of
-constraint functions, provides the right-hand-side values.</p>
-<p>The <code>types</code> field determines the type of each constraint: equality (<span class="arithmatex">\(=\)</span>) or
-inequality (<span class="arithmatex">\(\le\)</span> or <span class="arithmatex">\(\ge\)</span>), and is broadcasted to a length equal to the
-number of constraints. The <code>types</code> field is defined as an integer array, but
-its values are limited to those of the
-<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.ConstraintType"><code>ConstraintType</code></a> enumeration.</p>
+a right-hand-side value, either for equality or inequality. The
+<code>lower_bounds</code> and <code>upper_bounds</code> fields, which is a <code>numpy</code> arrays with a
+length equal to the number of constraint functions, provides the bounds on
+the right-hand-side values.</p>
 <p>The non-linear constraints may be subject to realization filters and
 function estimators. The <code>realization_filters</code> and <code>function_estimator</code>
 fields contain indices to the realization filter or function estimator
@@ -2461,25 +2457,24 @@ objects to use. These objects are configured in the parent
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.rhs_values">rhs_values</span></code></td>
+            <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.lower_bounds">lower_bounds</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1D" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The right-hand-side values.</p>
+                <p>The lower bounds on the right-hand-side values.</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.types">types</span></code></td>
+            <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.upper_bounds">upper_bounds</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.ArrayEnum" href="../utilities/#ropt.config.validated_types.ArrayEnum">ArrayEnum</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1D" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The type of each non-linear constraint.
-                 (<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.ConstraintType"><code>ConstraintType</code></a>).</p>
+                <p>The upper bounds on the right-hand-side values.</p>
               </div>
             </td>
           </tr>
