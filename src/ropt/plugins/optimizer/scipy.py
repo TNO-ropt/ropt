@@ -32,6 +32,7 @@ from ropt.plugins.optimizer.utils import (
 )
 
 from .base import Optimizer, OptimizerCallback, OptimizerPlugin
+from .utils import NormalizedConstraints
 
 _SUPPORTED_METHODS: Final[set[str]] = {
     name.lower()
@@ -170,21 +171,7 @@ class SciPyOptimizer(Optimizer):
             self._required_constraints,
         )
         self._bounds = self._initialize_bounds()
-
-        self._constraints: (
-            tuple[LinearConstraint, ...] | list[dict[str, _ConstraintType]]
-        )
-
-        if self._method == "differential_evolution":
-            self._constraints = (
-                self._initialize_linear_constraint_object()
-                + self._initialize_nonlinear_constraint_object()
-            )
-        else:
-            self._constraints = (
-                self._initialize_linear_constraints()
-                + self._initialize_nonlinear_constraints()
-            )
+        self._constraints = self._initialize_constraints()
         self._options = self._parse_options()
         self._parallel = (
             self._config.optimizer.parallel and self._method == "differential_evolution"
@@ -283,146 +270,122 @@ class SciPyOptimizer(Optimizer):
             return Bounds(lower_bounds, upper_bounds)
         return None
 
-    def _initialize_linear_constraints(self) -> list[dict[str, _ConstraintType]]:
-        constraints: list[dict[str, _ConstraintType]] = []
+    def _initialize_constraints(
+        self,
+    ) -> list[dict[str, _ConstraintType] | NonlinearConstraint | LinearConstraint]:
+        self._normalized_constraints = None
 
-        if self._config.linear_constraints is None:
-            return constraints
+        if self._method == "differential_evolution":
+            return self._initialize_constraints_object()
 
-        coefficients = self._config.linear_constraints.coefficients
-        lower_bounds = self._config.linear_constraints.lower_bounds
-        upper_bounds = self._config.linear_constraints.upper_bounds
-        if self._config.variables.indices is not None:
-            coefficients = coefficients[:, self._config.variables.indices]
-
-        eq_idx = np.abs(lower_bounds - upper_bounds) <= 1e-15  # noqa: PLR2004
-        if np.any(eq_idx):
-            constraints.append(
-                {
-                    "type": "eq",
-                    "fun": lambda x: (
-                        np.matmul(coefficients[eq_idx, :], x) - lower_bounds[eq_idx]
-                    ),
-                    "jac": lambda _: coefficients[eq_idx, :],
-                },
+        lower_bounds = []
+        upper_bounds = []
+        if self._config.nonlinear_constraints is not None:
+            lower_bounds.append(self._config.nonlinear_constraints.lower_bounds)
+            upper_bounds.append(self._config.nonlinear_constraints.upper_bounds)
+        if self._config.linear_constraints is not None:
+            lower_bounds.append(self._config.linear_constraints.lower_bounds)
+            upper_bounds.append(self._config.linear_constraints.upper_bounds)
+        if lower_bounds:
+            self._normalized_constraints = NormalizedConstraints(
+                np.concatenate(lower_bounds), np.concatenate(upper_bounds)
             )
+            return self._initialize_constraints_dict()
 
-        ineq_constraints = []
-        ineq_bounds = []
-        ge_idx = np.logical_and(lower_bounds > -np.inf, np.logical_not(eq_idx))
-        if np.any(ge_idx):
-            ineq_constraints.append(coefficients[ge_idx, :])
-            ineq_bounds.append(lower_bounds[ge_idx])
-        le_idx = np.logical_and(upper_bounds < np.inf, np.logical_not(eq_idx))
-        if np.any(le_idx):
-            ineq_constraints.append(-coefficients[le_idx, :])
-            ineq_bounds.append(-upper_bounds[le_idx])
-        if ineq_constraints:
-            coefficients_matrix = np.vstack(tuple(ineq_constraints))
-            rhs_vector = np.hstack(tuple(ineq_bounds))
-            constraints.append(
-                {
-                    "type": "ineq",
-                    "fun": lambda x: (np.matmul(coefficients_matrix, x) - rhs_vector),
-                    "jac": lambda _: coefficients_matrix,
-                },
+        return []
+
+    def _fun(
+        self,
+        variables: NDArray[np.float64],
+        index: int,
+        coefficients: NDArray[np.float64] | None,
+    ) -> NDArray[np.float64]:
+        assert self._normalized_constraints is not None
+        if self._normalized_constraints.constraints is None:
+            constraints = []
+            if self._config.nonlinear_constraints is not None:
+                constraints.append(self._constraint_functions(variables).transpose())
+            if coefficients is not None:
+                constraints.append(np.matmul(coefficients, variables))
+            self._normalized_constraints.set_constraints(
+                np.concatenate(constraints, axis=0)
             )
+        assert self._normalized_constraints.constraints is not None
+        return self._normalized_constraints.constraints[index, :]
 
-        return constraints
+    def _jac(
+        self,
+        variables: NDArray[np.float64],
+        index: int,
+        coefficients: NDArray[np.float64] | None,
+    ) -> NDArray[np.float64]:
+        assert self._normalized_constraints is not None
+        if self._normalized_constraints.gradients is None:
+            gradients = []
+            if self._config.nonlinear_constraints is not None:
+                gradients.append(self._constraint_gradients(variables))
+            if coefficients is not None:
+                gradients.append(coefficients)
+            self._normalized_constraints.set_gradients(
+                np.concatenate(gradients, axis=0)
+            )
+        assert self._normalized_constraints.gradients is not None
+        return self._normalized_constraints.gradients[index, :]
 
-    def _initialize_linear_constraint_object(self) -> tuple[LinearConstraint, ...]:
-        if self._config.linear_constraints is None:
-            return ()
-
-        return (
-            LinearConstraint(
-                self._config.linear_constraints.coefficients,
-                self._config.linear_constraints.lower_bounds,
-                self._config.linear_constraints.upper_bounds,
-            ),
-        )
-
-    def _initialize_nonlinear_constraints(self) -> list[dict[str, _ConstraintType]]:
-        constraints: list[dict[str, _ConstraintType]] = []
-
-        if self._config.nonlinear_constraints is None:
-            return constraints
-
-        def _fun(
-            variables: NDArray[np.float64],
-            bound: float,
-            sign: float,
-            index: int,
-        ) -> NDArray[np.float64]:
-            return (self._constraint_function(variables, index) - bound) * sign
-
-        def _jac(
-            variables: NDArray[np.float64],
-            sign: float,
-            index: int,
-        ) -> NDArray[np.float64]:
-            return self._constraint_gradient(variables, index) * sign
+    def _initialize_constraints_dict(self) -> list[dict[str, _ConstraintType]]:
+        if self._normalized_constraints is None:
+            return []
 
         def _constraint_entry(
-            type_: str, bound: float, sign: float, index: int
+            type_: str, index: int, coefficients: NDArray[np.float64] | None
         ) -> dict[str, _ConstraintType]:
-            fun = partial(_fun, bound=bound, sign=sign, index=index)
+            fun = partial(self._fun, index=index, coefficients=coefficients)
             if self._method == "cobyla":
                 return {"type": type_, "fun": fun}
-            jac = partial(_jac, sign=sign, index=index)
+            jac = partial(self._jac, index=index, coefficients=coefficients)
             return {"type": type_, "fun": fun, "jac": jac}
 
-        for inx, (lower_bound, upper_bound) in enumerate(
-            zip(
-                self._config.nonlinear_constraints.lower_bounds,
-                self._config.nonlinear_constraints.upper_bounds,
-                strict=True,
-            )
-        ):
-            if abs(upper_bound - lower_bound) < 1e-15:  # noqa: PLR2004
-                constraints.append(_constraint_entry("eq", lower_bound, 1.0, inx))
-            else:
-                if np.isfinite(lower_bound):
-                    constraints.append(
-                        _constraint_entry("ineq", lower_bound, 1.0, inx),
-                    )
-                if np.isfinite(upper_bound):
-                    constraints.append(
-                        _constraint_entry("ineq", upper_bound, -1.0, inx)
-                    )
-        return constraints
+        coefficients = None
+        if self._config.linear_constraints is not None:
+            coefficients = self._config.linear_constraints.coefficients
+            if self._config.variables.indices is not None:
+                coefficients = coefficients[:, self._config.variables.indices]
 
-    def _initialize_nonlinear_constraint_object(
+        return [
+            _constraint_entry("eq" if is_eq else "ineq", inx, coefficients)
+            for inx, is_eq in enumerate(self._normalized_constraints.is_eq)
+        ]
+
+    def _initialize_constraints_object(
         self,
-    ) -> tuple[NonlinearConstraint, ...]:
-        if self._config.nonlinear_constraints is None:
-            return ()
-
-        lower_bounds = self._config.nonlinear_constraints.lower_bounds
-        upper_bounds = self._config.nonlinear_constraints.upper_bounds
-
-        def fun(variables: NDArray[np.float64]) -> NDArray[np.float64]:
-            if variables.ndim == 1:
-                result = np.empty(lower_bounds.size, dtype=np.float64)
-                for inx in range(lower_bounds.size):
-                    result[inx] = self._constraint_function(variables, inx)
-            else:
-                result = np.empty(
-                    (lower_bounds.size, variables.shape[1]), dtype=np.float64
+    ) -> list[LinearConstraint | NonlinearConstraint]:
+        constraints = []
+        if self._config.linear_constraints is not None:
+            constraints.append(
+                LinearConstraint(
+                    self._config.linear_constraints.coefficients,
+                    self._config.linear_constraints.lower_bounds,
+                    self._config.linear_constraints.upper_bounds,
                 )
-                for inx in range(lower_bounds.size):
-                    result[inx, :] = self._constraint_function(variables, inx)
-            return result
+            )
 
-        def jac(variables: NDArray[np.float64]) -> NDArray[np.float64]:
-            result = np.empty((lower_bounds.size, variables.size), dtype=np.float64)
-            for inx in range(lower_bounds.size):
-                result[inx, :] = self._constraint_gradient(variables, index=inx)
-            return result
+        if self._config.nonlinear_constraints is not None:
+            lower_bounds = self._config.nonlinear_constraints.lower_bounds
+            upper_bounds = self._config.nonlinear_constraints.upper_bounds
 
-        return (
-            NonlinearConstraint(fun=fun, jac=jac, lb=lower_bounds, ub=upper_bounds),
-        )
+            def _fun(variables: NDArray[np.float64]) -> NDArray[np.float64]:
+                functions = self._constraint_functions(variables)
+                return functions.transpose()
+
+            def _jac(variables: NDArray[np.float64]) -> NDArray[np.float64]:
+                return self._constraint_gradients(variables)
+
+            constraints.append(
+                NonlinearConstraint(
+                    fun=_fun, jac=_jac, lb=lower_bounds, ub=upper_bounds
+                ),
+            )
+        return constraints
 
     def _function(self, variables: NDArray[np.float64]) -> NDArray[np.float64]:
         if variables.ndim > 1 and variables.size == 0:
@@ -442,8 +405,8 @@ class SciPyOptimizer(Optimizer):
         assert gradients is not None
         return gradients[0, :]
 
-    def _constraint_function(
-        self, variables: NDArray[np.float64], index: int
+    def _constraint_functions(
+        self, variables: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         if variables.ndim > 1 and variables.size == 0:
             return np.array([])
@@ -452,17 +415,17 @@ class SciPyOptimizer(Optimizer):
         )
         assert functions is not None
         if variables.ndim > 1:
-            return functions[:, index + 1]
-        return np.array(functions[index + 1])
+            return functions[:, 1:]
+        return np.array(functions[1:])
 
-    def _constraint_gradient(
-        self, variables: NDArray[np.float64], index: int
+    def _constraint_gradients(
+        self, variables: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         _, gradients = self._get_function_or_gradient(
             variables, get_function=False, get_gradient=True
         )
         assert gradients is not None
-        return gradients[index + 1, :]
+        return gradients[1:, :]
 
     def _get_function_or_gradient(
         self, variables: NDArray[np.float64], *, get_function: bool, get_gradient: bool
@@ -481,6 +444,8 @@ class SciPyOptimizer(Optimizer):
             self._cached_variables = None
             self._cached_function = None
             self._cached_gradient = None
+            if self._normalized_constraints is not None:
+                self._normalized_constraints.reset()
 
         function = self._cached_function if get_function else None
         gradient = self._cached_gradient if get_gradient else None

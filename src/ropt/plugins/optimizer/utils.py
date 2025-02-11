@@ -261,7 +261,7 @@ class NormalizedConstraints:
         The raw constraints may be a vector of constraints, or may be a matrix
         of constraints for multiple variables to support parallel evaluation. In
         the latter case, the constraints for different variables are given by
-        the rows of the matrix. In this case, the `constraints` property will
+        the columns of the matrix. In this case, the `constraints` property will
         have the same structure. Note that this is only supported for the
         constraint values, not for the gradients. Hence, parallel evaluation of
         multiple gradients is not supported.
@@ -279,8 +279,9 @@ class NormalizedConstraints:
         Args:
             lower_bounds: The lower bounds on the right hand sides.
             upper_bounds: The upper bounds on the right hand sides.
-            flip:         Whether to flip the sign of the constraints.
+            flip: Whether to flip the sign of the constraints.
         """
+        self._apply_flip = flip
         self._is_eq: list[bool] = []
         self._indices: list[int] = []
         self._rhs: list[float] = []
@@ -290,24 +291,24 @@ class NormalizedConstraints:
         self._gradients: NDArray[np.float64] | None = None
 
         for idx, (lower_bound, upper_bound) in enumerate(
-            zip(lower_bounds, upper_bounds, strict=True)
+            zip(lower_bounds, upper_bounds, strict=True), start=len(self._is_eq)
         ):
             if abs(upper_bound - lower_bound) < 1e-15:  # noqa: PLR2004
                 self._is_eq.append(True)
                 self._indices.append(idx)
                 self._rhs.append(lower_bound)
-                self._flip.append(flip)
+                self._flip.append(self._apply_flip)
             else:
                 if np.isfinite(lower_bound):
                     self._is_eq.append(False)
                     self._indices.append(idx)
                     self._rhs.append(lower_bound)
-                    self._flip.append(flip)
+                    self._flip.append(self._apply_flip)
                 if np.isfinite(upper_bound):
                     self._is_eq.append(False)
                     self._indices.append(idx)
                     self._rhs.append(upper_bound)
-                    self._flip.append(not flip)
+                    self._flip.append(not self._apply_flip)
 
     @property
     def is_eq(self) -> list[bool]:
@@ -337,38 +338,36 @@ class NormalizedConstraints:
         """
         return self._gradients
 
-    def set_constraints(self, values: NDArray[np.float64] | None) -> None:
+    def set_constraints(self, values: NDArray[np.float64]) -> None:
         """Set the constraints property.
 
         Args:
             values: The raw constraint values.
         """
-        if self._constraints is None and values is not None:
-            if values.ndim == 1:
-                values = np.expand_dims(values, axis=0)
-            self._constraints = np.empty(
-                (values.shape[0], len(self._indices)), dtype=np.float64
-            )
-            for idx, (constraint_idx, rhs_value, flip) in enumerate(
-                zip(self._indices, self._rhs, self._flip, strict=True)
-            ):
-                self._constraints[:, idx] = values[:, constraint_idx] - rhs_value
-                if flip:
-                    self._constraints[:, idx] = -self._constraints[:, idx]
+        if values.ndim == 1:
+            values = np.expand_dims(values, axis=1)
+        self._constraints = np.empty(
+            (len(self._indices), values.shape[1]), dtype=np.float64
+        )
+        for idx, (constraint_idx, rhs_value, flip) in enumerate(
+            zip(self._indices, self._rhs, self._flip, strict=True)
+        ):
+            self._constraints[idx, :] = values[constraint_idx, :] - rhs_value
+            if flip:
+                self._constraints[idx, :] = -self._constraints[idx, :]
 
-    def set_gradients(self, values: NDArray[np.float64] | None) -> None:
+    def set_gradients(self, values: NDArray[np.float64]) -> None:
         """Set the normalized and gradients.
 
         Args:
             values: The raw gradient values.
         """
-        if self._gradients is None and values is not None:
-            self._gradients = np.empty(
-                (len(self._indices), values.shape[1]), dtype=np.float64
-            )
-            for idx, (constraint_idx, flip) in enumerate(
-                zip(self._indices, self._flip, strict=True)
-            ):
-                self._gradients[idx, :] = values[constraint_idx, :]
-                if flip:
-                    self._gradients[idx, :] = -self._gradients[idx, :]
+        self._gradients = np.empty(
+            (len(self._indices), values.shape[1]), dtype=np.float64
+        )
+        for idx, (constraint_idx, flip) in enumerate(
+            zip(self._indices, self._flip, strict=True)
+        ):
+            self._gradients[idx, :] = values[constraint_idx, :]
+            if flip:
+                self._gradients[idx, :] = -self._gradients[idx, :]
