@@ -1029,6 +1029,66 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      NormalizedConstraints
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="NormalizedConstraints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.is_eq" class="md-nav__link">
+    <span class="md-ellipsis">
+      is_eq
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      constraints
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.gradients" class="md-nav__link">
+    <span class="md-ellipsis">
+      gradients
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.plugins.optimizer.utils.filter_linear_constraints" class="md-nav__link">
     <span class="md-ellipsis">
       filter_linear_constraints
@@ -1553,6 +1613,66 @@
   
     <nav class="md-nav" aria-label="utils">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      NormalizedConstraints
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="NormalizedConstraints">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.is_eq" class="md-nav__link">
+    <span class="md-ellipsis">
+      is_eq
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      constraints
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.gradients" class="md-nav__link">
+    <span class="md-ellipsis">
+      gradients
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#ropt.plugins.optimizer.utils.filter_linear_constraints" class="md-nav__link">
@@ -2299,6 +2419,303 @@ linear constraints, and to retrieve the list of supported optimizers.</p>
 
 
 
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.plugins.optimizer.utils.NormalizedConstraints" class="doc doc-heading">
+            <code>NormalizedConstraints</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+        <p>Class for handling normalized constraints.</p>
+<p>This class can be used to normalize non-linear constraints into the form
+C(x) = 0, C(x) &lt;= 0, or C(x) &gt;= 0. By default this is done by subtracting
+the right-hand side value, and multiplying with -1, if necessary.</p>
+<p>The right hand sides are provided by the <code>lower_bounds</code> and <code>upper_bound</code>
+values. If corresponding entries in these arrays are equeal (within a 1e-15
+tolerance), the corresponding constraint is assumed to be a equality
+constraint. If they are not, they are considered inequality constraints, if
+one or both values are finite. If the lower bounds are finite, the
+constraint is added as is, after subtracting of the lower bound. If the
+upper bound is finite, the same is done, but the constraint is multiplied by
+-1. If both are finite, both constraints are added, effectively splitting a
+two-sided constraint into two normalized constraints.</p>
+<p>By default this normalizes inequality constraints to the form C(x) &lt; 0, by
+setting <code>flip</code> flag, this can be changed to C(x) &gt; 0.</p>
+
+
+<details class="usage" open>
+  <summary>Usage</summary>
+  <ol>
+<li>Initialize with the lower and upper bounds.</li>
+<li>Before each new function/gradient evaluation with a new variable
+   vector, reset the normalized constraints by calling the <code>reset</code>
+   method.</li>
+<li>The constraint values are given by the <code>constraints</code> property. If this
+    property is <code>None</code>, first assign the raw constraints to the
+   <code>constraints</code> property. This will calculate and cache the normalized
+   values. Since values are cached, multiple accesses to the <code>constraint</code>
+   properties are cheap.</li>
+<li>Use the same procedure for gradients, using the <code>gradients</code> property.
+   Raw gradients must be provided as a matrix, where the rows are the
+   gradients of each constraint.</li>
+<li>Use the <code>is_eq</code> property to retrieve a vector of boolean flags to
+   check which constraints are equality constraints.</li>
+</ol>
+<p>See the <code>scipy</code> optimization backend in the <code>ropt</code> source code for an
+example of usage.</p>
+</details>
+
+<details class="note" open>
+  <summary>Parallel evaluation.</summary>
+  <p>The raw constraints may be a vector of constraints, or may be a matrix
+of constraints for multiple variables to support parallel evaluation. In
+the latter case, the constraints for different variables are given by
+the rows of the matrix. In this case, the <code>constraints</code> property will
+have the same structure. Note that this is only supported for the
+constraint values, not for the gradients. Hence, parallel evaluation of
+multiple gradients is not supported.</p>
+</details>
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.plugins.optimizer.utils.NormalizedConstraints.is_eq" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">is_eq</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the flags that indicate equality transforms.</p>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.plugins.optimizer.utils.NormalizedConstraints.constraints" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">constraints</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+      <small class="doc doc-label doc-label-writable"><code>writable</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the normalized constraints.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The normalized constraints.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.plugins.optimizer.utils.NormalizedConstraints.gradients" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">gradients</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+      <small class="doc doc-label doc-label-writable"><code>writable</code></small>
+  </span>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Return the normalized constraint gradients.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The normalized constraint gradients.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+    </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plugins.optimizer.utils.NormalizedConstraints.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">lower_bounds</span><span class="p">,</span> <span class="n">upper_bounds</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">flip</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize the normalization class.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>lower_bounds</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The lower bounds on the right hand sides.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>upper_bounds</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The upper bounds on the right hand sides.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>flip</code>
+            </td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to flip the sign of the constraints.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plugins.optimizer.utils.NormalizedConstraints.reset" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">reset</span><span class="p">()</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Reset the constraints and its gradients.</p>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 
 <div class="doc doc-object doc-function">
