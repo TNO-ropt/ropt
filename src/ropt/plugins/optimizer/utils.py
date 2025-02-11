@@ -9,42 +9,7 @@ from pathlib import Path
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.config.enopt import EnOptConfig, LinearConstraintsConfig
-
-
-def filter_linear_constraints(
-    config: LinearConstraintsConfig, variable_indices: NDArray[np.intc]
-) -> LinearConstraintsConfig:
-    """Filter unnecessary constraints from a linear constraint configuration.
-
-    In the case that the optimizer only optimizes a sub-set of the variables,
-    linear constraints that are only formed from the unused variables are
-    superfluous. This utility function removes those constraints from a  linear
-    configuration constraint.
-
-    Args:
-        config:           The linear configuration constraint.
-        variable_indices: The indices of the variables used by the optimizer.
-
-    Returns:
-        The filtered linear constraint configuration.
-    """
-    # Keep rows that only contain non-zero values for the active variables:
-    mask = np.ones(config.coefficients.shape[-1], dtype=np.bool_)
-    mask[variable_indices] = False
-    keep_rows = np.all(config.coefficients[:, mask] == 0, axis=1)
-    coefficients = config.coefficients[keep_rows, :]
-    lower_bounds = config.lower_bounds[keep_rows]
-    upper_bounds = config.upper_bounds[keep_rows]
-    # Keep coefficients for the active variables:
-    coefficients = coefficients[:, variable_indices]
-
-    return LinearConstraintsConfig(
-        coefficients=coefficients,
-        lower_bounds=lower_bounds,
-        upper_bounds=upper_bounds,
-    )
-
+from ropt.config.enopt import EnOptConfig
 
 _MESSAGES = {
     "bounds": "bound constraints",
@@ -139,14 +104,8 @@ def _validate_linear_constraints(
     supported_constraints: dict[str, set[str]],
     required_constraints: dict[str, set[str]],
 ) -> None:
-    linear_constraints = config.linear_constraints
-    if linear_constraints is None:
+    if config.linear_constraints is None:
         return
-
-    if config.variables.indices is not None:
-        linear_constraints = filter_linear_constraints(
-            linear_constraints, config.variables.indices
-        )
 
     _check_constraint(
         "linear:ineq",
@@ -155,8 +114,8 @@ def _validate_linear_constraints(
         required_constraints,
         have_constraint=not bool(
             np.allclose(
-                linear_constraints.lower_bounds,
-                linear_constraints.upper_bounds,
+                config.linear_constraints.lower_bounds,
+                config.linear_constraints.upper_bounds,
                 rtol=0.0,
                 atol=1e-15,
             )
@@ -170,8 +129,8 @@ def _validate_linear_constraints(
         required_constraints,
         have_constraint=bool(
             np.allclose(
-                linear_constraints.lower_bounds,
-                linear_constraints.upper_bounds,
+                config.linear_constraints.lower_bounds,
+                config.linear_constraints.upper_bounds,
                 rtol=0.0,
                 atol=1e-15,
             )
@@ -257,3 +216,159 @@ def create_output_path(
         if suffix is not None:
             output = output.with_suffix(suffix)
     return output
+
+
+class NormalizedConstraints:
+    """Class for handling normalized constraints.
+
+    This class can be used to normalize non-linear constraints into the form
+    C(x) = 0, C(x) <= 0, or C(x) >= 0. By default this is done by subtracting
+    the right-hand side value, and multiplying with -1, if necessary.
+
+    The right hand sides are provided by the `lower_bounds` and `upper_bound`
+    values. If corresponding entries in these arrays are equeal (within a 1e-15
+    tolerance), the corresponding constraint is assumed to be a equality
+    constraint. If they are not, they are considered inequality constraints, if
+    one or both values are finite. If the lower bounds are finite, the
+    constraint is added as is, after subtracting of the lower bound. If the
+    upper bound is finite, the same is done, but the constraint is multiplied by
+    -1. If both are finite, both constraints are added, effectively splitting a
+    two-sided constraint into two normalized constraints.
+
+    By default this normalizes inequality constraints to the form C(x) < 0, by
+    setting `flip` flag, this can be changed to C(x) > 0.
+
+    Usage:
+        1. Initialize with the lower and upper bounds.
+        2. Before each new function/gradient evaluation with a new variable
+           vector, reset the normalized constraints by calling the `reset`
+           method.
+        3. The constraint values are given by the `constraints` property. Before
+           accessing it, call the `set_constraints` with the raw constraints. If
+           necessary, this will calculate and cache the normalized values. Since
+           values are cached, calling this method and accessing `constraints`
+           multiple times is cheap.
+        4. Use the same procedure for gradients, using the `gradients` property
+           and `set_gradients`. Raw gradients must be provided as a matrix,
+           where the rows are the gradients of each constraint.
+        5. Use the `is_eq` property to retrieve a vector of boolean flags to
+           check which constraints are equality constraints.
+
+        See the `scipy` optimization backend in the `ropt` source code for an
+        example of usage.
+
+    Note: Parallel evaluation.
+        The raw constraints may be a vector of constraints, or may be a matrix
+        of constraints for multiple variables to support parallel evaluation. In
+        the latter case, the constraints for different variables are given by
+        the rows of the matrix. In this case, the `constraints` property will
+        have the same structure. Note that this is only supported for the
+        constraint values, not for the gradients. Hence, parallel evaluation of
+        multiple gradients is not supported.
+    """
+
+    def __init__(
+        self,
+        lower_bounds: NDArray[np.float64],
+        upper_bounds: NDArray[np.float64],
+        *,
+        flip: bool = False,
+    ) -> None:
+        """Initialize the normalization class.
+
+        Args:
+            lower_bounds: The lower bounds on the right hand sides.
+            upper_bounds: The upper bounds on the right hand sides.
+            flip:         Whether to flip the sign of the constraints.
+        """
+        self._is_eq: list[bool] = []
+        self._indices: list[int] = []
+        self._rhs: list[float] = []
+        self._flip: list[bool] = []
+
+        self._constraints: NDArray[np.float64] | None = None
+        self._gradients: NDArray[np.float64] | None = None
+
+        for idx, (lower_bound, upper_bound) in enumerate(
+            zip(lower_bounds, upper_bounds, strict=True)
+        ):
+            if abs(upper_bound - lower_bound) < 1e-15:  # noqa: PLR2004
+                self._is_eq.append(True)
+                self._indices.append(idx)
+                self._rhs.append(lower_bound)
+                self._flip.append(flip)
+            else:
+                if np.isfinite(lower_bound):
+                    self._is_eq.append(False)
+                    self._indices.append(idx)
+                    self._rhs.append(lower_bound)
+                    self._flip.append(flip)
+                if np.isfinite(upper_bound):
+                    self._is_eq.append(False)
+                    self._indices.append(idx)
+                    self._rhs.append(upper_bound)
+                    self._flip.append(not flip)
+
+    @property
+    def is_eq(self) -> list[bool]:
+        """Return the flags that indicate equality transforms."""
+        return self._is_eq
+
+    def reset(self) -> None:
+        """Reset the constraints and its gradients."""
+        self._constraints = None
+        self._gradients = None
+
+    @property
+    def constraints(self) -> NDArray[np.float64] | None:
+        """Return the normalized constraints.
+
+        Returns:
+            The normalized constraints.
+        """
+        return self._constraints
+
+    @property
+    def gradients(self) -> NDArray[np.float64] | None:
+        """Return the normalized constraint gradients.
+
+        Returns:
+            The normalized constraint gradients.
+        """
+        return self._gradients
+
+    def set_constraints(self, values: NDArray[np.float64] | None) -> None:
+        """Set the constraints property.
+
+        Args:
+            values: The raw constraint values.
+        """
+        if self._constraints is None and values is not None:
+            if values.ndim == 1:
+                values = np.expand_dims(values, axis=0)
+            self._constraints = np.empty(
+                (values.shape[0], len(self._indices)), dtype=np.float64
+            )
+            for idx, (constraint_idx, rhs_value, flip) in enumerate(
+                zip(self._indices, self._rhs, self._flip, strict=True)
+            ):
+                self._constraints[:, idx] = values[:, constraint_idx] - rhs_value
+                if flip:
+                    self._constraints[:, idx] = -self._constraints[:, idx]
+
+    def set_gradients(self, values: NDArray[np.float64] | None) -> None:
+        """Set the normalized and gradients.
+
+        Args:
+            values: The raw gradient values.
+        """
+        if self._gradients is None and values is not None:
+            self._gradients = np.empty(
+                (len(self._indices), values.shape[1]), dtype=np.float64
+            )
+            for idx, (constraint_idx, flip) in enumerate(
+                zip(self._indices, self._flip, strict=True)
+            ):
+                self._gradients[idx, :] = values[constraint_idx, :]
+                if flip:
+                    self._gradients[idx, :] = -self._gradients[idx, :]

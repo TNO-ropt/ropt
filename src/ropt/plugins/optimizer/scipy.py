@@ -28,7 +28,6 @@ from ropt.config.enopt import EnOptConfig
 from ropt.enums import VariableType
 from ropt.plugins.optimizer.utils import (
     create_output_path,
-    filter_linear_constraints,
     validate_supported_constraints,
 )
 
@@ -287,22 +286,17 @@ class SciPyOptimizer(Optimizer):
     def _initialize_linear_constraints(self) -> list[dict[str, _ConstraintType]]:
         constraints: list[dict[str, _ConstraintType]] = []
 
-        linear_constraints_config = self._config.linear_constraints
-        if linear_constraints_config is None:
+        if self._config.linear_constraints is None:
             return constraints
 
+        coefficients = self._config.linear_constraints.coefficients
+        lower_bounds = self._config.linear_constraints.lower_bounds
+        upper_bounds = self._config.linear_constraints.upper_bounds
         if self._config.variables.indices is not None:
-            linear_constraints_config = filter_linear_constraints(
-                linear_constraints_config, self._config.variables.indices
-            )
-
-        coefficients = linear_constraints_config.coefficients
-        lower_bounds = linear_constraints_config.lower_bounds
-        upper_bounds = linear_constraints_config.upper_bounds
+            coefficients = coefficients[:, self._config.variables.indices]
 
         eq_idx = np.abs(lower_bounds - upper_bounds) <= 1e-15  # noqa: PLR2004
         if np.any(eq_idx):
-            assert coefficients is not None
             constraints.append(
                 {
                     "type": "eq",
@@ -337,20 +331,14 @@ class SciPyOptimizer(Optimizer):
         return constraints
 
     def _initialize_linear_constraint_object(self) -> tuple[LinearConstraint, ...]:
-        linear_constraints_config = self._config.linear_constraints
-        if linear_constraints_config is None:
+        if self._config.linear_constraints is None:
             return ()
-
-        if self._config.variables.indices is not None:
-            linear_constraints_config = filter_linear_constraints(
-                linear_constraints_config, self._config.variables.indices
-            )
 
         return (
             LinearConstraint(
-                linear_constraints_config.coefficients,
-                linear_constraints_config.lower_bounds,
-                linear_constraints_config.upper_bounds,
+                self._config.linear_constraints.coefficients,
+                self._config.linear_constraints.lower_bounds,
+                self._config.linear_constraints.upper_bounds,
             ),
         )
 
