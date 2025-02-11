@@ -1083,17 +1083,26 @@
   
 </li>
         
-      </ul>
-    </nav>
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.set_constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_constraints
+    </span>
+  </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.optimizer.utils.filter_linear_constraints" class="md-nav__link">
+  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.set_gradients" class="md-nav__link">
     <span class="md-ellipsis">
-      filter_linear_constraints
+      set_gradients
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1669,17 +1678,26 @@
   
 </li>
         
-      </ul>
-    </nav>
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.set_constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_constraints
+    </span>
+  </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.optimizer.utils.filter_linear_constraints" class="md-nav__link">
+  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.set_gradients" class="md-nav__link">
     <span class="md-ellipsis">
-      filter_linear_constraints
+      set_gradients
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -2458,14 +2476,14 @@ setting <code>flip</code> flag, this can be changed to C(x) &gt; 0.</p>
 <li>Before each new function/gradient evaluation with a new variable
    vector, reset the normalized constraints by calling the <code>reset</code>
    method.</li>
-<li>The constraint values are given by the <code>constraints</code> property. If this
-    property is <code>None</code>, first assign the raw constraints to the
-   <code>constraints</code> property. This will calculate and cache the normalized
-   values. Since values are cached, multiple accesses to the <code>constraint</code>
-   properties are cheap.</li>
-<li>Use the same procedure for gradients, using the <code>gradients</code> property.
-   Raw gradients must be provided as a matrix, where the rows are the
-   gradients of each constraint.</li>
+<li>The constraint values are given by the <code>constraints</code> property. Before
+   accessing it, call the <code>set_constraints</code> with the raw constraints. If
+   necessary, this will calculate and cache the normalized values. Since
+   values are cached, calling this method and accessing <code>constraints</code>
+   multiple times is cheap.</li>
+<li>Use the same procedure for gradients, using the <code>gradients</code> property
+   and <code>set_gradients</code>. Raw gradients must be provided as a matrix,
+   where the rows are the gradients of each constraint.</li>
 <li>Use the <code>is_eq</code> property to retrieve a vector of boolean flags to
    check which constraints are equality constraints.</li>
 </ol>
@@ -2478,7 +2496,7 @@ example of usage.</p>
   <p>The raw constraints may be a vector of constraints, or may be a matrix
 of constraints for multiple variables to support parallel evaluation. In
 the latter case, the constraints for different variables are given by
-the rows of the matrix. In this case, the <code>constraints</code> property will
+the columns of the matrix. In this case, the <code>constraints</code> property will
 have the same structure. Note that this is only supported for the
 constraint values, not for the gradients. Hence, parallel evaluation of
 multiple gradients is not supported.</p>
@@ -2529,7 +2547,6 @@ multiple gradients is not supported.</p>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
-      <small class="doc doc-label doc-label-writable"><code>writable</code></small>
   </span>
 
 </h4>
@@ -2574,7 +2591,6 @@ multiple gradients is not supported.</p>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
-      <small class="doc doc-label doc-label-writable"><code>writable</code></small>
   </span>
 
 </h4>
@@ -2709,31 +2725,18 @@ multiple gradients is not supported.</p>
 
 </div>
 
-
-
-  </div>
-
-    </div>
-
-</div>
-
-
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plugins.optimizer.utils.filter_linear_constraints" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">filter_linear_constraints</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">variable_indices</span><span class="p">)</span></code>
+<h4 id="ropt.plugins.optimizer.utils.NormalizedConstraints.set_constraints" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">set_constraints</span><span class="p">(</span><span class="n">values</span><span class="p">)</span></code>
 
-</h3>
+</h4>
 
 
     <div class="doc doc-contents ">
 
-        <p>Filter unnecessary constraints from a linear constraint configuration.</p>
-<p>In the case that the optimizer only optimizes a sub-set of the variables,
-linear constraints that are only formed from the unused variables are
-superfluous. This utility function removes those constraints from a  linear
-configuration constraint.</p>
+        <p>Set the constraints property.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2749,57 +2752,18 @@ configuration constraint.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>config</code>
+                <code>values</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.LinearConstraintsConfig" href="../enopt_config/#ropt.config.enopt.LinearConstraintsConfig">LinearConstraintsConfig</a></code>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The linear configuration constraint.</p>
+                <p>The raw constraint values.</p>
               </div>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>variable_indices</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The indices of the variables used by the optimizer.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.LinearConstraintsConfig" href="../enopt_config/#ropt.config.enopt.LinearConstraintsConfig">LinearConstraintsConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The filtered linear constraint configuration.</p>
-              </div>
             </td>
           </tr>
       </tbody>
@@ -2808,6 +2772,63 @@ configuration constraint.</p>
     </div>
 
 </div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plugins.optimizer.utils.NormalizedConstraints.set_gradients" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">set_gradients</span><span class="p">(</span><span class="n">values</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Set the normalized and gradients.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>values</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The raw gradient values.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
 
 <div class="doc doc-object doc-function">
 
