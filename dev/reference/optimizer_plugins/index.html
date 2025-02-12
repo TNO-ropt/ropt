@@ -1075,15 +1075,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.add" class="md-nav__link">
-    <span class="md-ellipsis">
-      add
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.reset" class="md-nav__link">
     <span class="md-ellipsis">
       reset
@@ -1673,15 +1664,6 @@
   <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.add" class="md-nav__link">
-    <span class="md-ellipsis">
-      add
     </span>
   </a>
   
@@ -2650,55 +2632,7 @@ multiple gradients is not supported.</p>
 
 
 <h4 id="ropt.plugins.optimizer.utils.NormalizedConstraints.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">flip</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Initialize the normalization class.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>flip</code>
-            </td>
-            <td>
-                  <code>bool</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Whether to flip the sign of the constraints.</p>
-              </div>
-            </td>
-            <td>
-                  <code>False</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plugins.optimizer.utils.NormalizedConstraints.add" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">add</span><span class="p">(</span><span class="n">lower_bounds</span><span class="p">,</span> <span class="n">upper_bounds</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">lower_bounds</span><span class="p">,</span> <span class="n">upper_bounds</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">flip</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 </h4>
 
@@ -2749,6 +2683,22 @@ multiple gradients is not supported.</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>flip</code>
+            </td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to flip the sign of the constraints.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
             </td>
           </tr>
       </tbody>
