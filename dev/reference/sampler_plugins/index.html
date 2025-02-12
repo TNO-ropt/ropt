@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.3">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.d7758b05.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.8608ea7d.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -1566,7 +1566,7 @@ method used to generate samples used to create perturbed values.</p>
 
 
 <h4 id="ropt.plugins.sampler.base.Sampler.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">sampler_index</span><span class="p">,</span> <span class="n">variable_indices</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">sampler_index</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -1584,8 +1584,8 @@ the optimization is a tuple of sampler configurations (see
 <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.SamplerConfig"><code>SamplerConfig</code></a>). The <code>sampler_index</code>
 field is used to identify the configuration to use to initialize this
 sampler.</p>
-<p>The sampler may be used for a subset of the variables. The <code>variable_indices</code>
-array lists the indices of the variables that are handled by this sampler.</p>
+<p>The sampler may be used for a subset of the variables. The boolean
+<code>mask</code> array indicates the variables that are handled by this sampler.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1633,14 +1633,14 @@ array lists the indices of the variables that are handled by this sampler.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>variable_indices</code>
+                <code>mask</code>
             </td>
             <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>] | None</code>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The indices of the variables to sample.</p>
+                <p>The mask of the variables to sample.</p>
               </div>
             </td>
             <td>
@@ -1785,7 +1785,7 @@ deviation.</p>
 
 
 <h4 id="ropt.plugins.sampler.base.SamplerPlugin.create" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">sampler_index</span><span class="p">,</span> <span class="n">variable_indices</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">sampler_index</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">rng</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -1844,10 +1844,10 @@ deviation.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>variable_indices</code>
+                <code>mask</code>
             </td>
             <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>] | None</code>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">

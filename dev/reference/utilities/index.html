@@ -14,7 +14,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.3">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
     
     
       
@@ -22,7 +22,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.d7758b05.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.8608ea7d.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -1327,15 +1327,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.config.validated_types.ArrayIndices" class="md-nav__link">
-    <span class="md-ellipsis">
-      ArrayIndices
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.config.validated_types.ArrayEnum" class="md-nav__link">
     <span class="md-ellipsis">
       ArrayEnum
@@ -1532,15 +1523,6 @@
   <a href="#ropt.config.validated_types.Array2D" class="md-nav__link">
     <span class="md-ellipsis">
       Array2D
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.config.validated_types.ArrayIndices" class="md-nav__link">
-    <span class="md-ellipsis">
-      ArrayIndices
     </span>
   </a>
   
@@ -2236,8 +2218,6 @@ arrays of specified dimension and type:</p>
   immutable one-dimensional floating-point arrays.</li>
 <li><a class="autorefs autorefs-internal" href="#ropt.config.validated_types.Array2D"><code>Array2D</code></a>: For converting sequences to
   immutable two-dimensional floating-point arrays.</li>
-<li><a class="autorefs autorefs-internal" href="#ropt.config.validated_types.ArrayIndices"><code>ArrayIndices</code></a>: For converting
-  sequences to immutable arrays containing indices of any dimension.</li>
 <li><a class="autorefs autorefs-internal" href="#ropt.config.validated_types.ArrayEnum"><code>ArrayEnum</code></a>: For converting
   sequences to values of numerical enumerations of any dimension.</li>
 <li><a class="autorefs autorefs-internal" href="#ropt.config.validated_types.Array1DInt"><code>Array1DInt</code></a>: For converting
@@ -2305,27 +2285,6 @@ that single values are embedded in a set or tuple, respectively:</p>
     <div class="doc doc-contents ">
 
         <p>Convert to an immutable 2D numpy array of floating point values.</p>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.config.validated_types.ArrayIndices" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">ArrayIndices</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">intc</span><span class="p">],</span> <span class="n">BeforeValidator</span><span class="p">(</span><span class="n">_convert_indices</span><span class="p">)]</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
-  </span>
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Convert to an immutable numpy array of indices.</p>
     </div>
 
 </div>

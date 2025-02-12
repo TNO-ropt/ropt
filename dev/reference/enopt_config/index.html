@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.3">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.4">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.d7758b05.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.8608ea7d.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -2026,9 +2026,9 @@ according to the <a class="autorefs autorefs-internal" href="../enums/#ropt.enum
 values can be used to configure the optimizer accordingly. If not provided,
 all variables are assumed to be continuous and of real data type
 (corresponding to <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.VariableType.REAL"><code>VariableType.REAL</code></a>)</p>
-<p>The optional <code>indices</code> field contains the indices of the variables
-considered to be free to change. During optimization, only these variables
-should change while others remain fixed.</p>
+<p>The boolean entries of the optional <code>mask</code> field indicates which variables
+are considered to be free to change. During optimization, only these
+variables should change while others remain fixed.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2086,13 +2086,13 @@ should change while others remain fixed.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.VariablesConfig.indices">indices</span></code></td>
+            <td><code><span title="ropt.config.enopt.VariablesConfig.mask">mask</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.ArrayIndices" href="../utilities/#ropt.config.validated_types.ArrayIndices">ArrayIndices</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.Array1DBool" href="../utilities/#ropt.config.validated_types.Array1DBool">Array1DBool</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional indices of variables to optimize.</p>
+                <p>Optional mask of variables to optimize.</p>
               </div>
             </td>
           </tr>
