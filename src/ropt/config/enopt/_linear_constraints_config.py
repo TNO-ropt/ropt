@@ -92,11 +92,9 @@ class LinearConstraintsConfig(ImmutableBaseModel):
         lower_bounds: NDArray[np.float64] | None = None
         upper_bounds: NDArray[np.float64] | None = None
 
-        if variables.indices is not None:
+        if variables.mask is not None:
             # Keep rows that only contain non-zero values for the active variables:
-            mask = np.ones(self.coefficients.shape[-1], dtype=np.bool_)
-            mask[variables.indices] = False
-            keep_rows = np.all(self.coefficients[:, mask] == 0, axis=1)
+            keep_rows = np.all(self.coefficients[:, ~variables.mask] == 0, axis=1)
             coefficients = self.coefficients[keep_rows, :]
             lower_bounds = self.lower_bounds[keep_rows]
             upper_bounds = self.upper_bounds[keep_rows]

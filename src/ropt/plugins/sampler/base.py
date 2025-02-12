@@ -36,7 +36,7 @@ class Sampler(ABC):
         self,
         enopt_config: EnOptConfig,
         sampler_index: int,
-        variable_indices: NDArray[np.intc] | None,
+        mask: NDArray[np.bool_] | None,
         rng: Generator,
     ) -> None:
         """Initialize the sampler object.
@@ -48,14 +48,14 @@ class Sampler(ABC):
         field is used to identify the configuration to use to initialize this
         sampler.
 
-        The sampler may be used for a subset of the variables. The `variable_indices`
-        array lists the indices of the variables that are handled by this sampler.
+        The sampler may be used for a subset of the variables. The boolean
+        `mask` array indicates the variables that are handled by this sampler.
 
         Args:
-            enopt_config:     The configuration of the optimizer.
-            sampler_index:    The index of the sampler to use.
-            variable_indices: The indices of the variables to sample.
-            rng:              A random generator object for use by stochastic samplers.
+            enopt_config:  The configuration of the optimizer.
+            sampler_index: The index of the sampler to use.
+            mask:          The mask of the variables to sample.
+            rng:           A random generator object for use by stochastic samplers.
         """
 
     @abstractmethod
@@ -99,14 +99,14 @@ class SamplerPlugin(Plugin):
         self,
         enopt_config: EnOptConfig,
         sampler_index: int,
-        variable_indices: NDArray[np.intc] | None,
+        mask: NDArray[np.bool_] | None,
         rng: Generator,
     ) -> Sampler:
         """Create a sampler.
 
         Args:
-            enopt_config:     The configuration of the optimizer.
-            sampler_index:    The index of the sampler to use.
-            variable_indices: The indices of the variables to sample.
-            rng:              A random generator object for use by stochastic samplers.
+            enopt_config:  The configuration of the optimizer.
+            sampler_index: The index of the sampler to use.
+            mask:          The indices of the variables to sample.
+            rng:           A random generator object for use by stochastic samplers.
         """

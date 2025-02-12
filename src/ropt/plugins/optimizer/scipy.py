@@ -193,9 +193,8 @@ class SciPyOptimizer(Optimizer):
         self._cached_function = None
         self._cached_gradient = None
 
-        variable_indices = self._config.variables.indices
-        if variable_indices is not None:
-            initial_values = np.take(initial_values, variable_indices, axis=-1)
+        if self._config.variables.mask is not None:
+            initial_values = initial_values[..., self._config.variables.mask]
 
         output_dir = self._config.optimizer.output_dir
         output_file: str | Path
@@ -263,10 +262,9 @@ class SciPyOptimizer(Optimizer):
         ):
             lower_bounds = self._config.variables.lower_bounds
             upper_bounds = self._config.variables.upper_bounds
-            variable_indices = self._config.variables.indices
-            if variable_indices is not None:
-                lower_bounds = lower_bounds[variable_indices]
-                upper_bounds = upper_bounds[variable_indices]
+            if self._config.variables.mask is not None:
+                lower_bounds = lower_bounds[self._config.variables.mask]
+                upper_bounds = upper_bounds[self._config.variables.mask]
             return Bounds(lower_bounds, upper_bounds)
         return None
 
@@ -284,8 +282,16 @@ class SciPyOptimizer(Optimizer):
             lower_bounds.append(self._config.nonlinear_constraints.lower_bounds)
             upper_bounds.append(self._config.nonlinear_constraints.upper_bounds)
         if self._config.linear_constraints is not None:
-            lower_bounds.append(self._config.linear_constraints.lower_bounds)
-            upper_bounds.append(self._config.linear_constraints.upper_bounds)
+            mask = self._config.variables.mask
+            if mask is not None:
+                offsets = np.matmul(
+                    self._config.linear_constraints.coefficients[:, ~mask],
+                    self._config.variables.initial_values[~mask],
+                )
+            else:
+                offsets = 0
+            lower_bounds.append(self._config.linear_constraints.lower_bounds - offsets)
+            upper_bounds.append(self._config.linear_constraints.upper_bounds - offsets)
         if lower_bounds:
             self._normalized_constraints = NormalizedConstraints(
                 np.concatenate(lower_bounds), np.concatenate(upper_bounds)
@@ -348,8 +354,8 @@ class SciPyOptimizer(Optimizer):
         coefficients = None
         if self._config.linear_constraints is not None:
             coefficients = self._config.linear_constraints.coefficients
-            if self._config.variables.indices is not None:
-                coefficients = coefficients[:, self._config.variables.indices]
+            if self._config.variables.mask is not None:
+                coefficients = coefficients[:, self._config.variables.mask]
 
         return [
             _constraint_entry("eq" if is_eq else "ineq", inx, coefficients)
@@ -361,11 +367,21 @@ class SciPyOptimizer(Optimizer):
     ) -> list[LinearConstraint | NonlinearConstraint]:
         constraints = []
         if self._config.linear_constraints is not None:
+            mask = self._config.variables.mask
+            coefficients = self._config.linear_constraints.coefficients
+            if mask is not None:
+                offsets = np.matmul(
+                    self._config.linear_constraints.coefficients[:, ~mask],
+                    self._config.variables.initial_values[~mask],
+                )
+                coefficients = coefficients[:, mask]
+            else:
+                offsets = 0
             constraints.append(
                 LinearConstraint(
-                    self._config.linear_constraints.coefficients,
-                    self._config.linear_constraints.lower_bounds,
-                    self._config.linear_constraints.upper_bounds,
+                    coefficients,
+                    self._config.linear_constraints.lower_bounds - offsets,
+                    self._config.linear_constraints.upper_bounds - offsets,
                 )
             )
 

@@ -48,12 +48,12 @@ class MockedSampler(Sampler):
         self,
         enopt_config: EnOptConfig,
         sampler_index: int,
-        variable_indices: NDArray[np.intc] | None,
+        mask: NDArray[np.bool_] | None,
         _: Generator,
     ) -> None:
         self._config = enopt_config
         self._sampler = enopt_config.samplers[sampler_index]
-        self._variable_indices = variable_indices
+        self._mask = mask
         # This sampler only works if the number of perturbation equals the
         # number of variables:
         assert enopt_config.gradient.number_of_perturbations == len(
@@ -66,7 +66,7 @@ class MockedSampler(Sampler):
         perturbation_count = self._config.gradient.number_of_perturbations
 
         samples: NDArray[np.float64]
-        if self._variable_indices is None:
+        if self._mask is None:
             samples = np.ones(
                 (realization_count, perturbation_count, variable_count),
                 dtype=np.float64,
@@ -76,7 +76,7 @@ class MockedSampler(Sampler):
                 (realization_count, perturbation_count, variable_count),
                 dtype=np.float64,
             )
-            samples[..., self._variable_indices] = 1.0
+            samples[..., self._mask] = 1.0
         if "scale" in self._sampler.options:
             samples *= self._sampler.options["scale"]
         for idx in range(samples.shape[0]):
@@ -90,10 +90,10 @@ class MockedSamplerPlugin(SamplerPlugin):
         self,
         enopt_config: EnOptConfig,
         sampler_index: int,
-        variable_indices: NDArray[np.intc] | None,
+        mask: NDArray[np.bool_] | None,
         rng: Generator,
     ) -> MockedSampler:
-        return MockedSampler(enopt_config, sampler_index, variable_indices, rng)
+        return MockedSampler(enopt_config, sampler_index, mask, rng)
 
     def is_supported(self, method: str) -> bool:
         return method.lower() in {"test"}

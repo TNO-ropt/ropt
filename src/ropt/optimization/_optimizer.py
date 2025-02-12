@@ -214,7 +214,7 @@ class EnsembleOptimizer:
                     for item in results
                     if isinstance(item, GradientResults)
                 ),
-                self._enopt_config.variables.indices,
+                self._enopt_config.variables.mask,
             )
 
         return functions, gradients
@@ -222,16 +222,16 @@ class EnsembleOptimizer:
     def _get_completed_variables(
         self, variables: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        indices = self._enopt_config.variables.indices
-        if indices is not None:
+        mask = self._enopt_config.variables.mask
+        if mask is not None:
             if variables.ndim > 1:
                 tmp_variables = np.repeat(
                     self._fixed_variables[np.newaxis, :], variables.shape[0], axis=0
                 )
-                tmp_variables[:, indices] = variables
+                tmp_variables[:, mask] = variables
             else:
                 tmp_variables = self._fixed_variables.copy()
-                tmp_variables[indices] = variables
+                tmp_variables[mask] = variables
             return tmp_variables
         return variables.copy()
 
@@ -295,21 +295,21 @@ class EnsembleOptimizer:
 
     @staticmethod
     def _gradients_from_results(
-        gradients: Gradients | None, variable_indices: NDArray[np.intc] | None
+        gradients: Gradients | None, mask: NDArray[np.bool_] | None
     ) -> NDArray[np.float64]:
         assert gradients is not None
         weighted_objective_gradient = (
             gradients.weighted_objective.copy()
-            if variable_indices is None
-            else gradients.weighted_objective[variable_indices]
+            if mask is None
+            else gradients.weighted_objective[mask]
         )
         constraint_gradients = (
             None
             if gradients.constraints is None
             else (
                 gradients.constraints.copy()
-                if variable_indices is None
-                else gradients.constraints[:, variable_indices]
+                if mask is None
+                else gradients.constraints[:, mask]
             )
         )
         return (

@@ -15,8 +15,8 @@ from ropt.config.utils import (
 )
 from ropt.config.validated_types import (  # noqa: TC001
     Array1D,
+    Array1DBool,
     ArrayEnum,
-    ArrayIndices,
 )
 from ropt.enums import VariableType
 
@@ -42,23 +42,23 @@ class VariablesConfig(ImmutableBaseModel):
     all variables are assumed to be continuous and of real data type
     (corresponding to [`VariableType.REAL`][ropt.enums.VariableType.REAL])
 
-    The optional `indices` field contains the indices of the variables
-    considered to be free to change. During optimization, only these variables
-    should change while others remain fixed.
+    The boolean entries of the optional `mask` field indicates which variables
+    are considered to be free to change. During optimization, only these
+    variables should change while others remain fixed.
 
     Attributes:
         types:          The type of the variables (optional).
         initial_values: The initial values of the variables.
         lower_bounds:   Lower bound of the variables (default: $-\infty$).
         upper_bounds:   Upper bound of the variables (default: $+\infty$).
-        indices:        Optional indices of variables to optimize.
+        mask:           Optional mask of variables to optimize.
     """
 
     types: ArrayEnum | None = None
     initial_values: Array1D = np.array(0.0)
     lower_bounds: Array1D = np.array(-np.inf)
     upper_bounds: Array1D = np.array(np.inf)
-    indices: ArrayIndices | None = None
+    mask: Array1DBool | None = None
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -96,6 +96,8 @@ class VariablesConfig(ImmutableBaseModel):
             self.types = broadcast_1d_array(
                 self.types, "types", self.initial_values.size
             )
+        if self.mask is not None:
+            self.mask = broadcast_1d_array(self.mask, "mask", self.initial_values.size)
 
         self._immutable()
 

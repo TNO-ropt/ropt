@@ -8,8 +8,6 @@ arrays of specified dimension and type:
   immutable one-dimensional floating-point arrays.
 - [`Array2D`][ropt.config.validated_types.Array2D]: For converting sequences to
   immutable two-dimensional floating-point arrays.
-- [`ArrayIndices`][ropt.config.validated_types.ArrayIndices]: For converting
-  sequences to immutable arrays containing indices of any dimension.
 - [`ArrayEnum`][ropt.config.validated_types.ArrayEnum]: For converting
   sequences to values of numerical enumerations of any dimension.
 - [`Array1DInt`][ropt.config.validated_types.Array1DInt]: For converting
@@ -36,7 +34,6 @@ from .utils import (
     _convert_1d_array_intc,
     _convert_2d_array,
     _convert_enum_array,
-    _convert_indices,
     _convert_set,
     _convert_tuple,
 )
@@ -46,9 +43,6 @@ Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
 
 Array2D = Annotated[NDArray[np.float64], BeforeValidator(_convert_2d_array)]
 """Convert to an immutable 2D numpy array of floating point values."""
-
-ArrayIndices = Annotated[NDArray[np.intc], BeforeValidator(_convert_indices)]
-"""Convert to an immutable numpy array of indices."""
 
 ArrayEnum = Annotated[NDArray[np.ubyte], BeforeValidator(_convert_enum_array)]
 """Convert to an immutable numpy array of numerical enumeration values."""

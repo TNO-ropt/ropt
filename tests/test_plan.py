@@ -556,10 +556,10 @@ def test_two_optimizers_alternating(
     }
 
     enopt_config1 = deepcopy(enopt_config)
-    enopt_config1["variables"]["indices"] = [0, 2]
+    enopt_config1["variables"]["mask"] = [True, False, True]
     enopt_config1["optimizer"] = opt_config1
     enopt_config2 = deepcopy(enopt_config)
-    enopt_config2["variables"]["indices"] = [1]
+    enopt_config2["variables"]["mask"] = [False, True, False]
     enopt_config2["optimizer"] = opt_config2
 
     plan_config = {
@@ -1137,9 +1137,9 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
     enopt_config["optimizer"]["tolerance"] = 1e-10
     enopt_config["optimizer"]["speculative"] = True
     enopt_config["optimizer"]["max_functions"] = 4
-    enopt_config["variables"]["indices"] = [0, 2]
+    enopt_config["variables"]["mask"] = [True, False, True]
     nested_config = deepcopy(enopt_config)
-    nested_config["variables"]["indices"] = [1]
+    nested_config["variables"]["mask"] = [False, True, False]
     enopt_config["optimizer"]["max_functions"] = 5
 
     inner_config = {
@@ -1212,9 +1212,9 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
     enopt_config["optimizer"]["tolerance"] = 1e-10
     enopt_config["optimizer"]["speculative"] = True
     enopt_config["optimizer"]["max_functions"] = 4
-    enopt_config["variables"]["indices"] = [0, 2]
+    enopt_config["variables"]["mask"] = [True, False, True]
     nested_config = deepcopy(enopt_config)
-    nested_config["variables"]["indices"] = [1]
+    nested_config["variables"]["mask"] = [False, True, False]
     enopt_config["optimizer"]["max_functions"] = 5
 
     inner_config = {

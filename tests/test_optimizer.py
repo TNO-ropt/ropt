@@ -374,7 +374,7 @@ def test_optimizer_variables_subset(enopt_config: Any, evaluator: Any) -> None:
     # Set the second variable a constant value, this will not affect the
     # optimization of the other variables in this particular test problem:
     enopt_config["variables"]["initial_values"] = [0.0, 1.0, 0.1]
-    enopt_config["variables"]["indices"] = [0, 2]
+    enopt_config["variables"]["mask"] = [True, False, True]
 
     def assert_gradient(event: Event) -> None:
         for item in event.data["results"]:
@@ -406,7 +406,7 @@ def test_optimizer_variables_subset_linear_constraints(
         "lower_bounds": [1.0, 1.0, 2.0],
         "upper_bounds": [1.0, 1.0, 2.0],
     }
-    enopt_config["variables"]["indices"] = [0, 2]
+    enopt_config["variables"]["mask"] = [True, False, True]
 
     variables = BasicOptimizer(enopt_config, evaluator()).run().variables
     assert variables is not None

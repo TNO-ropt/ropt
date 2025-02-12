@@ -73,7 +73,7 @@ class SciPySampler(Sampler):
         self,
         enopt_config: EnOptConfig,
         sampler_index: int,
-        variable_indices: NDArray[np.intc] | None,
+        mask: NDArray[np.bool_] | None,
         rng: Generator,
     ) -> None:
         """Initialize the sampler object.
@@ -84,7 +84,7 @@ class SciPySampler(Sampler):
         """
         self._enopt_config = enopt_config
         self._sampler_config = enopt_config.samplers[sampler_index]
-        self._variable_indices = variable_indices
+        self._mask = mask
         _, _, self._method = self._sampler_config.method.lower().rpartition("/")
         if self._method == "default":
             self._method = "norm"
@@ -107,11 +107,7 @@ class SciPySampler(Sampler):
         realization_count = self._enopt_config.realizations.weights.size
         perturbation_count = self._enopt_config.gradient.number_of_perturbations
 
-        sample_dim = (
-            variable_count
-            if self._variable_indices is None
-            else len(self._variable_indices)
-        )
+        sample_dim = variable_count if self._mask is None else self._mask.sum()
 
         if self._method in _STATS_SAMPLERS:
             samples = self._generate_stats_samples(
@@ -129,10 +125,10 @@ class SciPySampler(Sampler):
         if self._sampler_config.shared:
             samples = np.repeat(samples, realization_count, axis=0)
 
-        if self._variable_indices is not None:
+        if self._mask is not None:
             shape = (realization_count, perturbation_count, variable_count)
             result = np.zeros(shape, dtype=np.float64)
-            result[..., self._variable_indices] = samples
+            result[..., self._mask] = samples
             return result
         return samples
 
@@ -146,8 +142,8 @@ class SciPySampler(Sampler):
         elif self._method in _QMC_ENGINES:
             sample_dim = (
                 self._enopt_config.variables.initial_values.size
-                if self._variable_indices is None
-                else len(self._variable_indices)
+                if self._mask is None
+                else self._mask.sum()
             )
             sampler = _QMC_ENGINES[self._method](sample_dim, seed=self._rng, **options)
         else:
@@ -202,7 +198,7 @@ class SciPySamplerPlugin(SamplerPlugin):
         self,
         enopt_config: EnOptConfig,
         sampler_index: int,
-        variable_indices: NDArray[np.intc] | None,
+        mask: NDArray[np.bool_] | None,
         rng: Generator,
     ) -> SciPySampler:
         """Initialize the sampler plugin.
@@ -211,7 +207,7 @@ class SciPySamplerPlugin(SamplerPlugin):
 
         # noqa
         """
-        return SciPySampler(enopt_config, sampler_index, variable_indices, rng)
+        return SciPySampler(enopt_config, sampler_index, mask, rng)
 
     def is_supported(self, method: str) -> bool:
         """Check if a method is supported.

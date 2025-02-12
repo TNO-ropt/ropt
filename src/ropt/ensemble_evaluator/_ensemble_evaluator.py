@@ -124,11 +124,11 @@ class EnsembleEvaluator:
             # same parameters as the gradient is to be calculated. This is true
             # because each optimization step is a single optimizer run and uses
             # its own copy of an `EnsembleFunctionEvaluation` object.
-            return self._calculate_gradients(variables, self._config.variables.indices)
+            return self._calculate_gradients(variables, self._config.variables.mask)
 
         # A function + gradient, or a gradient without cached function:
         self._cache_for_gradient = None
-        return self._calculate_both(variables, self._config.variables.indices)
+        return self._calculate_both(variables, self._config.variables.mask)
 
     def _calculate_functions(
         self, variables: NDArray[np.float64]
@@ -207,7 +207,7 @@ class EnsembleEvaluator:
     def _calculate_gradients(
         self,
         variables: NDArray[np.float64],
-        variable_indices: NDArray[np.intc] | None,
+        mask: NDArray[np.bool_] | None,
     ) -> tuple[GradientResults]:
         perturbed_variables = _perturb_variables(
             self._config, variables, self._samplers
@@ -249,7 +249,7 @@ class EnsembleEvaluator:
         ):
             gradients = self._compute_gradients(
                 variables,
-                variable_indices,
+                mask,
                 perturbed_variables,
                 self._cache_for_gradient.evaluations.objectives,
                 self._cache_for_gradient.evaluations.constraints,
@@ -287,7 +287,7 @@ class EnsembleEvaluator:
     def _calculate_both(
         self,
         variables: NDArray[np.float64],
-        variable_indices: NDArray[np.intc] | None,
+        mask: NDArray[np.bool_] | None,
     ) -> tuple[FunctionResults, GradientResults]:
         perturbed_variables = _perturb_variables(
             self._config, variables, self._samplers
@@ -363,7 +363,7 @@ class EnsembleEvaluator:
         ):
             gradients = self._compute_gradients(
                 variables,
-                variable_indices,
+                mask,
                 perturbed_variables,
                 f_eval_results.objectives,
                 f_eval_results.constraints,
@@ -449,7 +449,7 @@ class EnsembleEvaluator:
     def _compute_gradients(  # noqa: PLR0913
         self,
         variables: NDArray[np.float64],
-        variable_indices: NDArray[np.intc] | None,
+        mask: NDArray[np.bool_] | None,
         perturbed_variables: NDArray[np.float64],
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None,
@@ -459,14 +459,14 @@ class EnsembleEvaluator:
         constraint_weights: NDArray[np.float64] | None,
         failed_realizations: NDArray[np.bool_],
     ) -> Gradients:
-        if variable_indices is not None:
-            variables = variables[variable_indices]
+        if mask is not None:
+            variables = variables[mask]
         variables = np.repeat(
             variables[np.newaxis, ...], self._config.realizations.weights.size, axis=0
         )
 
-        if variable_indices is not None:
-            perturbed_variables = perturbed_variables[..., variable_indices]
+        if mask is not None:
+            perturbed_variables = perturbed_variables[..., mask]
 
         assert perturbed_objectives is not None
         objective_gradients = _calculate_estimated_objective_gradients(
@@ -498,26 +498,26 @@ class EnsembleEvaluator:
 
         return Gradients.create(
             weighted_objective=self._expand_gradients(
-                weighted_objective_gradient, variable_indices
+                weighted_objective_gradient, mask
             ),
-            objectives=self._expand_gradients(objective_gradients, variable_indices),
+            objectives=self._expand_gradients(objective_gradients, mask),
             constraints=(
                 None
                 if constraint_gradients is None
-                else self._expand_gradients(constraint_gradients, variable_indices)
+                else self._expand_gradients(constraint_gradients, mask)
             ),
         )
 
+    @staticmethod
     def _expand_gradients(
-        self,
         gradients: NDArray[np.float64],
-        variable_indices: NDArray[np.intc] | None,
+        mask: NDArray[np.bool_] | None,
     ) -> NDArray[np.float64]:
-        if variable_indices is None:
+        if mask is None:
             return gradients
-        shape = gradients.shape[:-1] + (self._config.variables.initial_values.size,)
+        shape = gradients.shape[:-1] + (mask.size,)
         result = np.zeros(shape, dtype=np.float64)
-        result[..., variable_indices] = gradients
+        result[..., mask] = gradients
         return result
 
     def _calculate_filtered_realization_weights(
@@ -598,8 +598,8 @@ class EnsembleEvaluator:
     ) -> list[Sampler]:
         samplers: list[Sampler] = []
         for idx, sampler_config in enumerate(self._config.samplers):
-            variable_indices = _get_indices(
-                idx, self._config.gradient.samplers, self._config.variables.indices
+            variable_indices = _get_mask(
+                idx, self._config.gradient.samplers, self._config.variables.mask
             )
             if variable_indices is None or variable_indices.size:
                 plugin = plugin_manager.get_plugin(
@@ -609,16 +609,11 @@ class EnsembleEvaluator:
         return samplers
 
 
-def _get_indices(
-    idx: int,
-    gradient_indices: NDArray[np.intc] | None,
-    variable_indices: NDArray[np.intc] | None,
-) -> NDArray[np.intc] | None:
+def _get_mask(
+    idx: int, gradient_indices: NDArray[np.intc] | None, mask: NDArray[np.bool_] | None
+) -> NDArray[np.bool_] | None:
     if gradient_indices is None:
-        return variable_indices
-    if variable_indices is None:
-        return np.asarray(np.where(gradient_indices == idx)[0], dtype=np.intc)
-    indices = np.zeros(gradient_indices.shape, dtype=np.bool_)
-    indices[variable_indices] = True
-    indices &= gradient_indices == idx
-    return np.asarray(np.where(indices)[0], dtype=np.intc)
+        return mask
+    if mask is None:
+        return np.asarray(gradient_indices == idx)
+    return np.asarray(mask & (gradient_indices == idx))

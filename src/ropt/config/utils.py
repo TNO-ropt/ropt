@@ -135,15 +135,6 @@ def _convert_enum_array(array: ArrayLike | None) -> NDArray[np.ubyte] | None:
     return immutable_array(array, dtype=np.ubyte, ndmin=1)
 
 
-def _convert_indices(array: ArrayLike | None) -> NDArray[np.intc] | None:
-    if array is None:
-        return array
-    return cast(
-        NDArray[np.intc],
-        np.unique(immutable_array(array, dtype=np.intc, ndmin=1)),
-    )
-
-
 T = TypeVar("T")
 
 
