@@ -1124,6 +1124,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.utils.get_masked_linear_constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_masked_linear_constraints
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1714,6 +1723,15 @@
   <a href="#ropt.plugins.optimizer.utils.create_output_path" class="md-nav__link">
     <span class="md-ellipsis">
       create_output_path
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.utils.get_masked_linear_constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_masked_linear_constraints
     </span>
   </a>
   
@@ -3048,6 +3066,81 @@ specified by the key.</p>
             <td>
               <div class="doc-md-description">
                 <p>The constructed path</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.optimizer.utils.get_masked_linear_constraints" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_masked_linear_constraints</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Get masked coefficients and bounds for linear constraints.</p>
+<p>If a mask is defined on the variables that defines a sub-set of variables to
+optimize, any linear constraints must be adapted accordingly. This function
+does this by removing masked variables from the coefficients, and absorbing
+the fixed variables in the lower and upper bounds.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>config</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The optimization configuration.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>tuple[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The corrected linear constraints.</p>
               </div>
             </td>
           </tr>
