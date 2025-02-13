@@ -119,13 +119,14 @@ def _get_function_results(  # noqa: PLR0913
     realization_num = config.realizations.weights.size
     context = EvaluatorContext(
         config=config,
-        transforms=transforms,
         realizations=np.tile(
             np.arange(realization_num, dtype=np.intc), variables.shape[0]
         ),
         active_objectives=active_objectives,
         active_constraints=active_constraints,
     )
+    if transforms is not None and transforms.variables:
+        variables = transforms.variables.backward(variables)
     evaluator_result = evaluator(np.repeat(variables, realization_num, axis=0), context)
     if transforms is not None:
         if transforms.objectives is not None:
@@ -180,15 +181,15 @@ def _get_gradient_results(  # noqa: PLR0913
     perturbation_num = config.gradient.number_of_perturbations
     context = EvaluatorContext(
         config=config,
-        transforms=transforms,
         realizations=np.repeat(np.arange(realization_num), perturbation_num),
         perturbations=np.tile(np.arange(perturbation_num), realization_num),
         active_objectives=active_objectives,
         active_constraints=active_constraints,
     )
-    evaluator_result = evaluator(
-        perturbed_variables.reshape(-1, perturbed_variables.shape[-1]), context
-    )
+    variables = perturbed_variables.reshape(-1, perturbed_variables.shape[-1])
+    if transforms is not None and transforms.variables:
+        variables = transforms.variables.backward(variables)
+    evaluator_result = evaluator(variables, context)
     if transforms is not None:
         if transforms.objectives is not None:
             evaluator_result.objectives = transforms.objectives.forward(
@@ -225,7 +226,6 @@ def _get_function_and_gradient_results(  # noqa: PLR0913
     realizations = np.arange(realization_num)
     context = EvaluatorContext(
         config=config,
-        transforms=transforms,
         realizations=np.hstack(
             (
                 realizations,
@@ -241,15 +241,15 @@ def _get_function_and_gradient_results(  # noqa: PLR0913
         active_objectives=active_objectives,
         active_constraints=active_constraints,
     )
-    evaluator_result = evaluator(
-        np.vstack(
-            (
-                np.repeat(variables[np.newaxis, ...], realization_num, axis=0),
-                perturbed_variables.reshape(-1, perturbed_variables.shape[-1]),
-            ),
+    all_variables = np.vstack(
+        (
+            np.repeat(variables[np.newaxis, ...], realization_num, axis=0),
+            perturbed_variables.reshape(-1, perturbed_variables.shape[-1]),
         ),
-        context,
     )
+    if transforms is not None and transforms.variables:
+        all_variables = transforms.variables.backward(all_variables)
+    evaluator_result = evaluator(all_variables, context)
     if transforms is not None:
         if transforms.objectives is not None:
             evaluator_result.objectives = transforms.objectives.forward(
