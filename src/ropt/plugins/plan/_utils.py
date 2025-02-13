@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -63,10 +63,12 @@ def _check_nonlinear_constraints(
 
 
 def _check_constraints(
-    config: EnOptConfig, results: FunctionResults, tolerance: float | None
+    config: EnOptConfig, results: Results, tolerance: float | None
 ) -> bool:
     if tolerance is None:
         return True
+
+    assert isinstance(results, FunctionResults)
 
     if _check_bounds(
         -results.evaluations.variables,
@@ -119,14 +121,14 @@ def _get_last_result(
 ) -> FunctionResults | None:
     return next(
         (
-            cast(FunctionResults, transformed_item)
+            item
             for item, transformed_item in zip(
                 reversed(results), reversed(transformed_results), strict=False
             )
             if (
                 isinstance(item, FunctionResults)
                 and item.functions is not None
-                and _check_constraints(config, item, constraint_tolerance)
+                and _check_constraints(config, transformed_item, constraint_tolerance)
             )
         ),
         None,
@@ -162,11 +164,11 @@ def _get_all_results(
     constraint_tolerance: float | None,
 ) -> tuple[FunctionResults, ...]:
     return tuple(
-        cast(FunctionResults, item)
+        item
         for item, transformed_item in zip(results, transformed_results, strict=False)
         if (
-            isinstance(transformed_item, FunctionResults)
-            and transformed_item.functions is not None
+            isinstance(item, FunctionResults)
+            and item.functions is not None
             and _check_constraints(config, transformed_item, constraint_tolerance)
         )
     )
