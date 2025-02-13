@@ -36,7 +36,7 @@ def _function_runner(
     evaluator_context: EvaluatorContext,
     functions: list[_Function],
 ) -> EvaluatorResult:
-    transforms = evaluator_context.config.transforms
+    transforms = evaluator_context.transforms
     if transforms is not None and transforms.variables is not None:
         variables = transforms.variables.backward(variables)
     objective_count = evaluator_context.config.objectives.weights.size

@@ -24,6 +24,7 @@ if TYPE_CHECKING:
 
     from ropt.config.plan import PlanStepConfig
     from ropt.results import Results
+    from ropt.transforms import OptModelTransforms
 
 MetaDataType = dict[str, int | float | bool | str]
 
@@ -138,7 +139,7 @@ class DefaultOptimizerStep(PlanStep):
             nested_optimization:   Optional nested optimization plan configuration.
         """
 
-        config: str
+        config: Any
         tags: ItemOrSet[str] = set()
         initial_values: str | Array1D | None = None
         exit_code_var: str | None = None
@@ -171,15 +172,26 @@ class DefaultOptimizerStep(PlanStep):
         """
         variables = self._get_initial_variables()
         config = self.plan.eval(self._with.config)
-        if not isinstance(config, dict | EnOptConfig):
-            msg = "No valid EnOpt configuration provided"
-            raise TypeError(msg)
-        enopt_config = EnOptConfig.model_validate(config)
+        match config:
+            case dict():
+                enopt_config, transforms = EnOptConfig.model_validate(config), None
+            case EnOptConfig():
+                enopt_config, transforms = config, None
+            case list():
+                enopt_config, transforms = config
+            case _:
+                msg = "No valid EnOpt configuration provided"
+                raise TypeError(msg)
         if variables is None:
             variables = enopt_config.variables.initial_values
-        self._run(enopt_config, variables)
+        self._run(enopt_config, transforms, variables)
 
-    def _run(self, enopt_config: EnOptConfig, variables: NDArray[np.float64]) -> None:
+    def _run(
+        self,
+        enopt_config: EnOptConfig,
+        transforms: OptModelTransforms | None,
+        variables: NDArray[np.float64],
+    ) -> None:
         self.emit_event(
             Event(
                 event_type=EventType.START_OPTIMIZER_STEP,
@@ -191,6 +203,7 @@ class DefaultOptimizerStep(PlanStep):
 
         ensemble_evaluator = EnsembleEvaluator(
             enopt_config,
+            transforms,
             self.plan.optimizer_context.evaluator,
             self.plan.plan_id,
             self.plan.optimizer_context.plugin_manager,
@@ -205,7 +218,9 @@ class DefaultOptimizerStep(PlanStep):
                 if self._with.nested_optimization is not None
                 else None
             ),
-            signal_evaluation=partial(self._signal_evaluation, enopt_config),
+            signal_evaluation=partial(
+                self._signal_evaluation, enopt_config, transforms
+            ),
         )
 
         if (
@@ -245,6 +260,7 @@ class DefaultOptimizerStep(PlanStep):
     def _signal_evaluation(
         self,
         enopt_config: EnOptConfig,
+        transforms: OptModelTransforms | None,
         results: tuple[Results, ...] | None = None,
         *,
         exit_code: OptimizerExitCode | None = None,
@@ -257,6 +273,7 @@ class DefaultOptimizerStep(PlanStep):
 
         Args:
             enopt_config: The configuration object.
+            transforms:   Optional transforms object.
             results:      The results produced by the evaluation.
             exit_code:    An exit code if that may be set if the evaluation completed.
         """
@@ -272,11 +289,9 @@ class DefaultOptimizerStep(PlanStep):
         else:
             data = deepcopy(self._with.data)
             data["exit_code"] = exit_code
-            if enopt_config.transforms is not None:
+            if transforms is not None:
                 data["transformed_results"] = results
-                data["results"] = [
-                    item.transform_back(enopt_config.transforms) for item in results
-                ]
+                data["results"] = [item.transform_back(transforms) for item in results]
             else:
                 data["results"] = results
             self.emit_event(

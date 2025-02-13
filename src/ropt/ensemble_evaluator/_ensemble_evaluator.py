@@ -41,6 +41,7 @@ if TYPE_CHECKING:
     from ropt.plugins.function_estimator.base import FunctionEstimator
     from ropt.plugins.realization_filter.base import RealizationFilter
     from ropt.plugins.sampler.base import Sampler
+    from ropt.transforms import OptModelTransforms
 
 
 class EnsembleEvaluator:
@@ -56,6 +57,7 @@ class EnsembleEvaluator:
     def __init__(
         self,
         config: EnOptConfig,
+        transforms: OptModelTransforms | None,
         evaluator: Evaluator,
         plan_id: tuple[int, ...],
         plugin_manager: PluginManager,
@@ -64,11 +66,13 @@ class EnsembleEvaluator:
 
         Args:
             config:         The configuration object.
+            transforms:     Optional transforms object.
             evaluator:      The callable for evaluation individual functions.
             plan_id:        A tuple identifying the plan running this evaluator.
             plugin_manager: A plugin manager to load required plugins.
         """
         self._config = config
+        self._transforms = transforms
         self._evaluator = evaluator
         self._plan_id = plan_id
         self._realization_filters = self._init_realization_filters(plugin_manager)
@@ -140,6 +144,7 @@ class EnsembleEvaluator:
             self._calculate_one_set_of_functions(f_eval_results, variables[idx, :])
             for idx, f_eval_results in _get_function_results(
                 self._config,
+                self._transforms,
                 self._evaluator,
                 variables,
                 active_objectives,
@@ -230,6 +235,7 @@ class EnsembleEvaluator:
         )
         g_eval_results = _get_gradient_results(
             self._config,
+            self._transforms,
             self._evaluator,
             perturbed_variables,
             active_objectives,
@@ -295,6 +301,7 @@ class EnsembleEvaluator:
         active_objectives, active_constraints = _get_active_realizations(self._config)
         f_eval_results, g_eval_results = _get_function_and_gradient_results(
             self._config,
+            self._transforms,
             self._evaluator,
             variables,
             perturbed_variables,

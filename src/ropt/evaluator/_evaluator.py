@@ -5,6 +5,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.config.enopt import EnOptConfig
+from ropt.transforms import OptModelTransforms
 
 
 @dataclass(slots=True)
@@ -39,6 +40,7 @@ class EvaluatorContext:
 
     Attributes:
         config:             Configuration of the optimizer.
+        transforms:         Optional transforms.
         realizations:       Realization numbers for each requested evaluation.
         perturbations:      Perturbations numbers for each requested evalation.
         active_objectives:  Signifies which function/realization evaluations are
@@ -49,6 +51,7 @@ class EvaluatorContext:
     """
 
     config: EnOptConfig
+    transforms: OptModelTransforms | None
     realizations: NDArray[np.intc]
     perturbations: NDArray[np.intc] | None = None
     active_objectives: NDArray[np.bool_] | None = None

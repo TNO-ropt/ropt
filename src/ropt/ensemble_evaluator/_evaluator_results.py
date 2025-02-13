@@ -7,6 +7,7 @@ from numpy.typing import NDArray
 
 from ropt.config.enopt import EnOptConfig
 from ropt.evaluator import Evaluator, EvaluatorContext
+from ropt.transforms import OptModelTransforms
 
 
 @dataclass(slots=True)
@@ -107,8 +108,9 @@ def _get_active_realizations(
     return active_objectives, active_constraints
 
 
-def _get_function_results(
+def _get_function_results(  # noqa: PLR0913
     config: EnOptConfig,
+    transforms: OptModelTransforms | None,
     evaluator: Evaluator,
     variables: NDArray[np.float64],
     active_objectives: NDArray[np.bool_] | None,
@@ -117,6 +119,7 @@ def _get_function_results(
     realization_num = config.realizations.weights.size
     context = EvaluatorContext(
         config=config,
+        transforms=transforms,
         realizations=np.tile(
             np.arange(realization_num, dtype=np.intc), variables.shape[0]
         ),
@@ -124,19 +127,17 @@ def _get_function_results(
         active_constraints=active_constraints,
     )
     evaluator_result = evaluator(np.repeat(variables, realization_num, axis=0), context)
-    if config.transforms is not None:
-        if config.transforms.objectives is not None:
-            evaluator_result.objectives = config.transforms.objectives.forward(
+    if transforms is not None:
+        if transforms.objectives is not None:
+            evaluator_result.objectives = transforms.objectives.forward(
                 evaluator_result.objectives
             )
         if (
             evaluator_result.constraints is not None
-            and config.transforms.nonlinear_constraints is not None
+            and transforms.nonlinear_constraints is not None
         ):
-            evaluator_result.constraints = (
-                config.transforms.nonlinear_constraints.forward(
-                    evaluator_result.constraints
-                )
+            evaluator_result.constraints = transforms.nonlinear_constraints.forward(
+                evaluator_result.constraints
             )
     split_objectives = np.vsplit(evaluator_result.objectives, variables.shape[0])
     split_constraints = (
@@ -167,8 +168,9 @@ def _get_function_results(
         )
 
 
-def _get_gradient_results(
+def _get_gradient_results(  # noqa: PLR0913
     config: EnOptConfig,
+    transforms: OptModelTransforms | None,
     evaluator: Evaluator,
     perturbed_variables: NDArray[np.float64],
     active_objectives: NDArray[np.bool_] | None,
@@ -178,6 +180,7 @@ def _get_gradient_results(
     perturbation_num = config.gradient.number_of_perturbations
     context = EvaluatorContext(
         config=config,
+        transforms=transforms,
         realizations=np.repeat(np.arange(realization_num), perturbation_num),
         perturbations=np.tile(np.arange(perturbation_num), realization_num),
         active_objectives=active_objectives,
@@ -186,19 +189,17 @@ def _get_gradient_results(
     evaluator_result = evaluator(
         perturbed_variables.reshape(-1, perturbed_variables.shape[-1]), context
     )
-    if config.transforms is not None:
-        if config.transforms.objectives is not None:
-            evaluator_result.objectives = config.transforms.objectives.forward(
+    if transforms is not None:
+        if transforms.objectives is not None:
+            evaluator_result.objectives = transforms.objectives.forward(
                 evaluator_result.objectives
             )
         if (
             evaluator_result.constraints is not None
-            and config.transforms.nonlinear_constraints is not None
+            and transforms.nonlinear_constraints is not None
         ):
-            evaluator_result.constraints = (
-                config.transforms.nonlinear_constraints.forward(
-                    evaluator_result.constraints
-                )
+            evaluator_result.constraints = transforms.nonlinear_constraints.forward(
+                evaluator_result.constraints
             )
     return _GradientEvaluatorResults(
         batch_id=evaluator_result.batch_id,
@@ -212,6 +213,7 @@ def _get_gradient_results(
 
 def _get_function_and_gradient_results(  # noqa: PLR0913
     config: EnOptConfig,
+    transforms: OptModelTransforms | None,
     evaluator: Evaluator,
     variables: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
@@ -223,6 +225,7 @@ def _get_function_and_gradient_results(  # noqa: PLR0913
     realizations = np.arange(realization_num)
     context = EvaluatorContext(
         config=config,
+        transforms=transforms,
         realizations=np.hstack(
             (
                 realizations,
@@ -247,19 +250,17 @@ def _get_function_and_gradient_results(  # noqa: PLR0913
         ),
         context,
     )
-    if config.transforms is not None:
-        if config.transforms.objectives is not None:
-            evaluator_result.objectives = config.transforms.objectives.forward(
+    if transforms is not None:
+        if transforms.objectives is not None:
+            evaluator_result.objectives = transforms.objectives.forward(
                 evaluator_result.objectives
             )
         if (
             evaluator_result.constraints is not None
-            and config.transforms.nonlinear_constraints is not None
+            and transforms.nonlinear_constraints is not None
         ):
-            evaluator_result.constraints = (
-                config.transforms.nonlinear_constraints.forward(
-                    evaluator_result.constraints
-                )
+            evaluator_result.constraints = transforms.nonlinear_constraints.forward(
+                evaluator_result.constraints
             )
     return (
         _FunctionEvaluatorResults(

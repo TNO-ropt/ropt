@@ -12,6 +12,7 @@ import numpy as np
 
 from ropt.config.enopt import EnOptConfig
 from ropt.results import Results
+from ropt.transforms import OptModelTransforms
 
 _SUPPORTED_CONSTANTS: Final = (int, float, bool, str)
 _UNARY_OPS: Final = (ast.UAdd, ast.USub, ast.Not)
@@ -26,6 +27,7 @@ _SUPPORTED_VARIABLE_TYPES: Final = (
     np.ndarray,
     Results,
     EnOptConfig,
+    OptModelTransforms,
 )
 _BUILTIN_FUNCTIONS: Final[dict[str, Callable[..., Any]]] = {
     "abs": abs,

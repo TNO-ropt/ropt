@@ -21,6 +21,7 @@ if TYPE_CHECKING:
     from ropt.evaluator import Evaluator
     from ropt.plan import Event
     from ropt.results import FunctionResults
+    from ropt.transforms import OptModelTransforms
 
 
 @dataclass(slots=True)
@@ -51,6 +52,7 @@ class BasicOptimizer:
         enopt_config: dict[str, Any] | EnOptConfig,
         evaluator: Evaluator,
         *,
+        transforms: OptModelTransforms | None = None,
         constraint_tolerance: float = 1e-10,
     ) -> None:
         """Initialize an `BasicOptimizer` object.
@@ -61,9 +63,11 @@ class BasicOptimizer:
         Args:
             enopt_config:         The configuration for the optimization.
             evaluator:            The evaluator object used to evaluate functions.
+            transforms:           Optional transforms object.
             constraint_tolerance: The tolerance level used to detect constraint violations.
         """
         self._config = EnOptConfig.model_validate(enopt_config)
+        self._transforms = transforms
         self._constraint_tolerance = constraint_tolerance
         self._optimizer_context = OptimizerContext(evaluator=evaluator)
         self._observers: list[tuple[EventType, Callable[[Event], None]]] = []
@@ -148,11 +152,16 @@ class BasicOptimizer:
                 },
             }
         ]
+        config = (
+            self._config
+            if self._transforms is None
+            else [self._config, self._transforms]
+        )
         plan = Plan(
             PlanConfig.model_validate(
                 {
                     "variables": {
-                        "__config__": self._config,
+                        "__config__": config,
                         "__optimum_tracker__": None,
                         "__exit_code__": OptimizerExitCode.UNKNOWN,
                     },
