@@ -153,7 +153,7 @@ class ExternalOptimizer(Optimizer):
         request = comm.read()
 
         if request == "config":
-            return self._config.original_inputs
+            return self._config.model_dump(round_trip=True)
 
         if request == "initial_values":
             return initial_values.tolist()  # type: ignore[no-any-return]
@@ -343,6 +343,12 @@ class _JSONPipeCommunicator:
         return None
 
     def write(self, data: str | list[Any] | dict[str, Any]) -> bool:
+        class NumpyEncoder(json.JSONEncoder):
+            def default(self, obj: Any) -> Any:  # noqa: ANN401
+                if isinstance(obj, np.ndarray):
+                    return obj.tolist()
+                return super().default(obj)
+
         if self._write_fd is None:
             self._write_fd = os.open(self._write_pipe, os.O_WRONLY | os.O_NONBLOCK)
             self._selector.register(self._write_fd, selectors.EVENT_WRITE)
@@ -350,7 +356,8 @@ class _JSONPipeCommunicator:
         for _, mask in events:
             if mask & selectors.EVENT_WRITE:
                 os.write(
-                    self._write_fd, f"{json.dumps(data)}\n{self.DELIMITER}\n".encode()
+                    self._write_fd,
+                    f"{json.dumps(data, cls=NumpyEncoder)}\n{self.DELIMITER}\n".encode(),
                 )
                 return True
         return False

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Any, Self
 
@@ -45,9 +44,6 @@ class EnOptConfig(ImmutableBaseModel):
     `samplers` field that is an array of indices, indicating for each variable
     which sampler should be used.
 
-    The original values of all fields used to create the object will be stored
-    internally and are available via the `original_inputs` field.
-
     Info:
         Many of these nested classes contain fields that are
         [`numpy`](https://np.org) arrays of values. In general, these arrays
@@ -71,7 +67,6 @@ class EnOptConfig(ImmutableBaseModel):
         realization_filters:   Configuration of realization filters.
         function_estimators:   Configuration of function estimators.
         samplers:              Configuration of samplers.
-        original_inputs:       The original input to the constructor.
     """
 
     variables: VariablesConfig
@@ -86,7 +81,6 @@ class EnOptConfig(ImmutableBaseModel):
         FunctionEstimatorConfig(),
     )
     samplers: tuple[SamplerConfig, ...] = (SamplerConfig(),)
-    original_inputs: dict[str, Any] | None = None
 
     model_config = ConfigDict(
         extra="forbid",
@@ -109,16 +103,6 @@ class EnOptConfig(ImmutableBaseModel):
         self.gradient = self.gradient.fix_perturbations(self.variables, info.context)
         self._immutable()
         return self
-
-    @model_validator(mode="before")
-    @classmethod
-    def _add_original_data(cls, data: Any) -> Any:  # noqa: ANN401
-        if isinstance(data, dict):
-            newdata = deepcopy(data)
-            newdata["original_inputs"] = deepcopy(data)
-            return newdata
-        msg = "EnOptConfig objects must be constructed from dicts"
-        raise ValueError(msg)
 
     @model_validator(mode="wrap")  # type: ignore[arg-type]
     def _pass_enopt_config_unchanged(self, handler: Any) -> Any:  # noqa: ANN401

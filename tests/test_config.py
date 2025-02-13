@@ -1,5 +1,5 @@
 import copy
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 import pytest
@@ -203,10 +203,3 @@ def test_perturbation_types_with_scaler(enopt_config: Any) -> None:
         ),
     )
     assert np.allclose(config.gradient.perturbation_magnitudes, [0.1, 5.0, 0.02])
-
-
-def test_config_inputs_property(
-    enopt_config: Any, assert_equal_dicts: Callable[[Any, Any], None]
-) -> None:
-    config = EnOptConfig.model_validate(enopt_config)
-    assert_equal_dicts(enopt_config, config.original_inputs)
