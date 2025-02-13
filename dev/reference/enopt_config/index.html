@@ -2227,7 +2227,7 @@ equations.</p>
 
 
 <h4 id="ropt.config.enopt.LinearConstraintsConfig.apply_transformation" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">apply_transformation</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">apply_transformation</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">transforms</span><span class="p">)</span></code>
 
 </h4>
 
@@ -2266,14 +2266,14 @@ equations.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>context</code>
+                <code>transforms</code>
             </td>
             <td>
-                  <code><span title="ropt.config.enopt.EnOptContext">EnOptContext</span> | None</code>
+                  <code><span title="ropt.transforms.OptModelTransforms">OptModelTransforms</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The configuration context.</p>
+                <p>An optional transforms object.</p>
               </div>
             </td>
             <td>
@@ -2937,7 +2937,7 @@ parallel plan evaluations.</p>
 
 
 <h4 id="ropt.config.enopt.GradientConfig.fix_perturbations" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">fix_perturbations</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">fix_perturbations</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">transforms</span><span class="p">)</span></code>
 
 </h4>
 
@@ -2982,14 +2982,14 @@ necessary modifications.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>context</code>
+                <code>transforms</code>
             </td>
             <td>
-                  <code><span title="ropt.config.enopt.EnOptContext">EnOptContext</span> | None</code>
+                  <code><span title="ropt.transforms.OptModelTransforms">OptModelTransforms</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The configuration context.</p>
+                <p>An optional transform object.</p>
               </div>
             </td>
             <td>
