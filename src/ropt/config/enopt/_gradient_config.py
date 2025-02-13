@@ -25,7 +25,8 @@ from .constants import (
 )
 
 if TYPE_CHECKING:
-    from ropt.config.enopt import EnOptContext, VariablesConfig
+    from ropt.config.enopt import VariablesConfig
+    from ropt.transforms import OptModelTransforms
 
 
 class GradientConfig(ImmutableBaseModel):
@@ -150,7 +151,7 @@ class GradientConfig(ImmutableBaseModel):
         return self
 
     def fix_perturbations(
-        self, variables: VariablesConfig, context: EnOptContext | None
+        self, variables: VariablesConfig, transforms: OptModelTransforms | None
     ) -> GradientConfig:
         """Adjust the gradient perturbation configuration.
 
@@ -162,8 +163,8 @@ class GradientConfig(ImmutableBaseModel):
         necessary modifications.
 
         Args:
-            variables: The configuration of variables.
-            context:   The configuration context.
+            variables:  The configuration of variables.
+            transforms:  An optional transform object.
 
         Returns:
             A modified gradient configuration.
@@ -216,9 +217,9 @@ class GradientConfig(ImmutableBaseModel):
             magnitudes,
         )
 
-        if context is not None and context.transforms.variables is not None:
+        if transforms is not None and transforms.variables is not None:
             absolute = types == PerturbationType.ABSOLUTE
-            transformed = context.transforms.variables.transform_magnitudes(magnitudes)
+            transformed = transforms.variables.transform_magnitudes(magnitudes)
             magnitudes[absolute] = transformed[absolute]
 
         return self.model_copy(

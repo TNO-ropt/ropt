@@ -2,13 +2,11 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 from typing import Any, Self
 
 from pydantic import ConfigDict, ValidationInfo, model_validator
 
 from ropt.config.utils import ImmutableBaseModel
-from ropt.transforms import OptModelTransforms
 
 from ._function_estimator_config import FunctionEstimatorConfig
 from ._gradient_config import GradientConfig
@@ -20,13 +18,6 @@ from ._realization_filter_config import RealizationFilterConfig  # noqa: TC001
 from ._realizations_config import RealizationsConfig
 from ._sampler_config import SamplerConfig
 from ._variables_config import VariablesConfig  # noqa: TC001
-
-
-@dataclass
-class EnOptContext:
-    """A context object to pass to EnOptConfig.model_validate."""
-
-    transforms: OptModelTransforms = field(default_factory=OptModelTransforms)
 
 
 class EnOptConfig(ImmutableBaseModel):

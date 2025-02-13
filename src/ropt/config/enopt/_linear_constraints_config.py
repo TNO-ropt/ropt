@@ -17,7 +17,8 @@ from ropt.config.validated_types import Array1D, Array2D  # noqa: TC001
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt.config.enopt import EnOptContext, VariablesConfig
+    from ropt.config.enopt import VariablesConfig
+    from ropt.transforms import OptModelTransforms
 
 
 class LinearConstraintsConfig(ImmutableBaseModel):
@@ -69,13 +70,13 @@ class LinearConstraintsConfig(ImmutableBaseModel):
         return self
 
     def apply_transformation(
-        self, variables: VariablesConfig, context: EnOptContext | None
+        self, variables: VariablesConfig, transforms: OptModelTransforms | None
     ) -> LinearConstraintsConfig:
         """Transform linear constraints.
 
         Args:
-            variables: A variables configuration object specifying.
-            context:   The configuration context.
+            variables:  A variables configuration object specifying.
+            transforms: An optional transforms object.
 
         Returns:
             A modified configuration if transformations are applied; otherwise, self.
@@ -99,9 +100,9 @@ class LinearConstraintsConfig(ImmutableBaseModel):
             lower_bounds = self.lower_bounds[keep_rows]
             upper_bounds = self.upper_bounds[keep_rows]
 
-        if context is not None and context.transforms.variables is not None:
+        if transforms is not None and transforms.variables is not None:
             coefficients, lower_bounds, upper_bounds = (
-                context.transforms.variables.transform_linear_constraints(
+                transforms.variables.transform_linear_constraints(
                     self.coefficients, self.lower_bounds, self.upper_bounds
                 )
             )

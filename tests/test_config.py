@@ -4,12 +4,7 @@ from typing import Any
 import numpy as np
 import pytest
 
-from ropt.config.enopt import (
-    EnOptConfig,
-    EnOptContext,
-    GradientConfig,
-    LinearConstraintsConfig,
-)
+from ropt.config.enopt import EnOptConfig, GradientConfig, LinearConstraintsConfig
 from ropt.enums import BoundaryType, PerturbationType
 from ropt.transforms import OptModelTransforms, VariableScaler
 
@@ -196,10 +191,8 @@ def test_perturbation_types_with_scaler(enopt_config: Any) -> None:
     }
     config = EnOptConfig.model_validate(
         enopt_config,
-        context=EnOptContext(
-            transforms=OptModelTransforms(
-                variables=VariableScaler(np.array([1.0, 1.0, 50.0]), None)
-            )
+        context=OptModelTransforms(
+            variables=VariableScaler(np.array([1.0, 1.0, 50.0]), None)
         ),
     )
     assert np.allclose(config.gradient.perturbation_magnitudes, [0.1, 5.0, 0.02])

@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from ropt.config.enopt import EnOptConfig, EnOptContext
+from ropt.config.enopt import EnOptConfig
 from ropt.config.enopt.constants import DEFAULT_SEED
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.plan import BasicOptimizer
@@ -172,9 +172,7 @@ def test_objective_with_scaler(
     )
 
     optimizer = BasicOptimizer(
-        EnOptConfig.model_validate(
-            enopt_config, context=EnOptContext(transforms=transforms)
-        ),
+        EnOptConfig.model_validate(enopt_config, context=transforms),
         evaluator(),
         transforms=transforms,
     ).add_observer(EventType.FINISHED_EVALUATION, check_value)
@@ -220,8 +218,7 @@ def test_constraint_with_scaler(
         test_functions[-1](enopt_config["variables"]["initial_values"], None), ndmin=1
     )
     transforms = OptModelTransforms(nonlinear_constraints=ConstraintScaler(scales))
-    context = EnOptContext(transforms=transforms)
-    config = EnOptConfig.model_validate(enopt_config, context=context)
+    config = EnOptConfig.model_validate(enopt_config, context=transforms)
     assert config.nonlinear_constraints is not None
     assert config.nonlinear_constraints.lower_bounds == 0.4 / scales
 
@@ -258,10 +255,9 @@ def test_variables_scale_with_scaler(
     enopt_config["variables"]["upper_bounds"] = upper_bounds
 
     transforms = OptModelTransforms(variables=VariableScaler(scales, offsets))
-    context = EnOptContext(transforms=transforms)
     results = (
         BasicOptimizer(
-            EnOptConfig.model_validate(enopt_config, context=context),
+            EnOptConfig.model_validate(enopt_config, context=transforms),
             evaluator(),
             transforms=transforms,
         )
@@ -278,7 +274,7 @@ def test_variables_scale_with_scaler(
         initial_values = initial_values / scales
         lower_bounds = lower_bounds / scales
         upper_bounds = upper_bounds / scales
-    config = EnOptConfig.model_validate(enopt_config, context=context)
+    config = EnOptConfig.model_validate(enopt_config, context=transforms)
     assert np.allclose(config.variables.initial_values, initial_values)
     assert np.allclose(config.variables.lower_bounds, lower_bounds)
     assert np.allclose(config.variables.upper_bounds, upper_bounds)
@@ -304,8 +300,7 @@ def test_variables_scale_linear_constraints_with_scaler(
     scales = np.array([2.0, 2.1, 2.2])
 
     transforms = OptModelTransforms(variables=VariableScaler(scales, offsets))
-    context = EnOptContext(transforms=transforms)
-    config = EnOptConfig.model_validate(enopt_config, context=context)
+    config = EnOptConfig.model_validate(enopt_config, context=transforms)
     assert config.linear_constraints is not None
     assert np.allclose(config.linear_constraints.coefficients, coefficients * scales)
     offsets = np.matmul(coefficients, offsets)
