@@ -1632,7 +1632,7 @@ cases.</p>
 
 
 <h3 id="ropt.plan.BasicOptimizer.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">evaluator</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">constraint_tolerance</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">evaluator</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">transforms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">constraint_tolerance</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">)</span></code>
 
 </h3>
 
@@ -1685,6 +1685,22 @@ as they define the optimization to perform.</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>transforms</code>
+            </td>
+            <td>
+                  <code><span title="ropt.transforms.OptModelTransforms">OptModelTransforms</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional transforms object.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">

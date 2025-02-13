@@ -1560,7 +1560,7 @@ functions.</p>
 
 
 <h4 id="ropt.ensemble_evaluator.EnsembleEvaluator.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">evaluator</span><span class="p">,</span> <span class="n">plan_id</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">transforms</span><span class="p">,</span> <span class="n">evaluator</span><span class="p">,</span> <span class="n">plan_id</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="p">)</span></code>
 
 </h4>
 
@@ -1591,6 +1591,22 @@ functions.</p>
             <td>
               <div class="doc-md-description">
                 <p>The configuration object.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>transforms</code>
+            </td>
+            <td>
+                  <code><span title="ropt.transforms.OptModelTransforms">OptModelTransforms</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional transforms object.</p>
               </div>
             </td>
             <td>
@@ -2030,6 +2046,17 @@ indicating the realizations requiring evaluation.</p>
             <td>
               <div class="doc-md-description">
                 <p>Configuration of the optimizer.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.evaluator.EvaluatorContext.transforms">transforms</span></code></td>
+            <td>
+                  <code><span title="ropt.transforms.OptModelTransforms">OptModelTransforms</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional tranforms.</p>
               </div>
             </td>
           </tr>
