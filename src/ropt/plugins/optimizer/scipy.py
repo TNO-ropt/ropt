@@ -32,7 +32,7 @@ from ropt.plugins.optimizer.utils import (
 )
 
 from .base import Optimizer, OptimizerCallback, OptimizerPlugin
-from .utils import NormalizedConstraints
+from .utils import NormalizedConstraints, get_masked_linear_constraints
 
 _SUPPORTED_METHODS: Final[set[str]] = {
     name.lower()
@@ -273,30 +273,26 @@ class SciPyOptimizer(Optimizer):
     ) -> list[dict[str, _ConstraintType] | NonlinearConstraint | LinearConstraint]:
         self._normalized_constraints = None
 
+        lin_coef, lin_lower, lin_upper = None, None, None
+        if self._config.linear_constraints is not None:
+            lin_coef, lin_lower, lin_upper = get_masked_linear_constraints(self._config)
+
         if self._method == "differential_evolution":
-            return self._initialize_constraints_object()
+            return self._initialize_constraints_object(lin_coef, lin_lower, lin_upper)
 
         lower_bounds = []
         upper_bounds = []
         if self._config.nonlinear_constraints is not None:
             lower_bounds.append(self._config.nonlinear_constraints.lower_bounds)
             upper_bounds.append(self._config.nonlinear_constraints.upper_bounds)
-        if self._config.linear_constraints is not None:
-            mask = self._config.variables.mask
-            if mask is not None:
-                offsets = np.matmul(
-                    self._config.linear_constraints.coefficients[:, ~mask],
-                    self._config.variables.initial_values[~mask],
-                )
-            else:
-                offsets = 0
-            lower_bounds.append(self._config.linear_constraints.lower_bounds - offsets)
-            upper_bounds.append(self._config.linear_constraints.upper_bounds - offsets)
+        if lin_lower is not None and lin_upper is not None:
+            lower_bounds.append(lin_lower)
+            upper_bounds.append(lin_upper)
         if lower_bounds:
             self._normalized_constraints = NormalizedConstraints(
                 np.concatenate(lower_bounds), np.concatenate(upper_bounds)
             )
-            return self._initialize_constraints_dict()
+            return self._initialize_constraints_dict(lin_coef)
 
         return []
 
@@ -304,15 +300,15 @@ class SciPyOptimizer(Optimizer):
         self,
         variables: NDArray[np.float64],
         index: int,
-        coefficients: NDArray[np.float64] | None,
+        lin_coef: NDArray[np.float64] | None,
     ) -> NDArray[np.float64]:
         assert self._normalized_constraints is not None
         if self._normalized_constraints.constraints is None:
             constraints = []
             if self._config.nonlinear_constraints is not None:
                 constraints.append(self._constraint_functions(variables).transpose())
-            if coefficients is not None:
-                constraints.append(np.matmul(coefficients, variables))
+            if lin_coef is not None:
+                constraints.append(np.matmul(lin_coef, variables))
             self._normalized_constraints.set_constraints(
                 np.concatenate(constraints, axis=0)
             )
@@ -323,67 +319,49 @@ class SciPyOptimizer(Optimizer):
         self,
         variables: NDArray[np.float64],
         index: int,
-        coefficients: NDArray[np.float64] | None,
+        lin_coef: NDArray[np.float64] | None,
     ) -> NDArray[np.float64]:
         assert self._normalized_constraints is not None
         if self._normalized_constraints.gradients is None:
             gradients = []
             if self._config.nonlinear_constraints is not None:
                 gradients.append(self._constraint_gradients(variables))
-            if coefficients is not None:
-                gradients.append(coefficients)
+            if lin_coef is not None:
+                gradients.append(lin_coef)
             self._normalized_constraints.set_gradients(
                 np.concatenate(gradients, axis=0)
             )
         assert self._normalized_constraints.gradients is not None
         return self._normalized_constraints.gradients[index, :]
 
-    def _initialize_constraints_dict(self) -> list[dict[str, _ConstraintType]]:
+    def _initialize_constraints_dict(
+        self,
+        lin_coef: NDArray[np.float64] | None,
+    ) -> list[dict[str, _ConstraintType]]:
         if self._normalized_constraints is None:
             return []
 
-        def _constraint_entry(
-            type_: str, index: int, coefficients: NDArray[np.float64] | None
-        ) -> dict[str, _ConstraintType]:
-            fun = partial(self._fun, index=index, coefficients=coefficients)
+        def _constraint_entry(type_: str, index: int) -> dict[str, _ConstraintType]:
+            fun = partial(self._fun, index=index, lin_coef=lin_coef)
             if self._method == "cobyla":
                 return {"type": type_, "fun": fun}
-            jac = partial(self._jac, index=index, coefficients=coefficients)
+            jac = partial(self._jac, index=index, lin_coef=lin_coef)
             return {"type": type_, "fun": fun, "jac": jac}
 
-        coefficients = None
-        if self._config.linear_constraints is not None:
-            coefficients = self._config.linear_constraints.coefficients
-            if self._config.variables.mask is not None:
-                coefficients = coefficients[:, self._config.variables.mask]
-
         return [
-            _constraint_entry("eq" if is_eq else "ineq", inx, coefficients)
+            _constraint_entry("eq" if is_eq else "ineq", inx)
             for inx, is_eq in enumerate(self._normalized_constraints.is_eq)
         ]
 
     def _initialize_constraints_object(
         self,
+        lin_coef: NDArray[np.float64] | None,
+        lin_lower: NDArray[np.float64] | None,
+        lin_upper: NDArray[np.float64] | None,
     ) -> list[LinearConstraint | NonlinearConstraint]:
         constraints = []
         if self._config.linear_constraints is not None:
-            mask = self._config.variables.mask
-            coefficients = self._config.linear_constraints.coefficients
-            if mask is not None:
-                offsets = np.matmul(
-                    self._config.linear_constraints.coefficients[:, ~mask],
-                    self._config.variables.initial_values[~mask],
-                )
-                coefficients = coefficients[:, mask]
-            else:
-                offsets = 0
-            constraints.append(
-                LinearConstraint(
-                    coefficients,
-                    self._config.linear_constraints.lower_bounds - offsets,
-                    self._config.linear_constraints.upper_bounds - offsets,
-                )
-            )
+            constraints.append(LinearConstraint(lin_coef, lin_lower, lin_upper))
 
         if self._config.nonlinear_constraints is not None:
             lower_bounds = self._config.nonlinear_constraints.lower_bounds

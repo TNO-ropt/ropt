@@ -371,3 +371,35 @@ class NormalizedConstraints:
             self._gradients[idx, :] = values[constraint_idx, :]
             if flip:
                 self._gradients[idx, :] = -self._gradients[idx, :]
+
+
+def get_masked_linear_constraints(
+    config: EnOptConfig,
+) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
+    """Get masked coefficients and bounds for linear constraints.
+
+    If a mask is defined on the variables that defines a sub-set of variables to
+    optimize, any linear constraints must be adapted accordingly. This function
+    does this by removing masked variables from the coefficients, and absorbing
+    the fixed variables in the lower and upper bounds.
+
+    Args:
+        config: The optimization configuration.
+
+    Returns:
+        The corrected linear constraints.
+    """
+    assert config.linear_constraints is not None
+    mask = config.variables.mask
+    coefficients = config.linear_constraints.coefficients
+    if mask is not None:
+        offsets = np.matmul(
+            config.linear_constraints.coefficients[:, ~mask],
+            config.variables.initial_values[~mask],
+        )
+        coefficients = coefficients[:, mask]
+    else:
+        offsets = 0
+    lower_bounds = config.linear_constraints.lower_bounds - offsets
+    upper_bounds = config.linear_constraints.upper_bounds - offsets
+    return coefficients, lower_bounds, upper_bounds
