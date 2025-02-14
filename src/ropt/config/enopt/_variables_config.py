@@ -21,26 +21,6 @@ from ropt.config.validated_types import (  # noqa: TC001
 from ropt.enums import VariableType
 
 
-class OriginalVariables(ImmutableBaseModel):
-    r"""Class to store original values after transformation.
-
-    Attributes:
-        initial_values: The initial values of the variables.
-        lower_bounds:   Lower bound of the variables (default: $-\infty$).
-        upper_bounds:   Upper bound of the variables (default: $+\infty$).
-    """
-
-    initial_values: Array1D
-    lower_bounds: Array1D
-    upper_bounds: Array1D
-
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-        extra="forbid",
-        validate_default=True,
-    )
-
-
 class VariablesConfig(ImmutableBaseModel):
     r"""The configuration class for variables.
 
@@ -66,17 +46,12 @@ class VariablesConfig(ImmutableBaseModel):
     are considered to be free to change. During optimization, only these
     variables should change while others remain fixed.
 
-    The initial values and the bounds may be transformed during initialization.
-    In this case their untransformed values will be stored in the `original`
-    field.
-
     Attributes:
         types:          The type of the variables (optional).
         initial_values: The initial values of the variables.
         lower_bounds:   Lower bound of the variables (default: $-\infty$).
         upper_bounds:   Upper bound of the variables (default: $+\infty$).
         mask:           Optional mask of variables to optimize.
-        original:       Stores the original values in case of a transformation.
     """
 
     types: ArrayEnum | None = None
@@ -84,7 +59,6 @@ class VariablesConfig(ImmutableBaseModel):
     lower_bounds: Array1D = np.array(-np.inf)
     upper_bounds: Array1D = np.array(np.inf)
     mask: Array1DBool | None = None
-    original: OriginalVariables | None = None
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -103,13 +77,7 @@ class VariablesConfig(ImmutableBaseModel):
             self.upper_bounds, "upper_bounds", self.initial_values.size
         )
 
-        self.original = None
         if info.context is not None and info.context.variables is not None:
-            self.original = OriginalVariables(
-                initial_values=self.initial_values,
-                lower_bounds=self.lower_bounds,
-                upper_bounds=self.upper_bounds,
-            )
             self.initial_values = immutable_array(
                 info.context.variables.forward(self.initial_values)
             )
