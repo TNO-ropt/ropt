@@ -2352,6 +2352,7 @@ indices.</p>
 <li>The parameters of the realizations, such as weights for objectives and
    constraints, and realization failures.</li>
 <li>The calculated objective and constraint function values.</li>
+<li>Information on the differences of any constraints to their bounds.</li>
 </ol>
 
 
@@ -2395,6 +2396,39 @@ indices.</p>
             <td>
               <div class="doc-md-description">
                 <p>The calculated functions.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.FunctionResults.bound_constraints">bound_constraints</span></code></td>
+            <td>
+                  <code><span title="ropt.results._bound_constraints.BoundConstraints">BoundConstraints</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Bound constraints.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.FunctionResults.linear_constraints">linear_constraints</span></code></td>
+            <td>
+                  <code><span title="ropt.results._linear_constraints.LinearConstraints">LinearConstraints</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Linear constraints.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.FunctionResults.nonlinear_constraints">nonlinear_constraints</span></code></td>
+            <td>
+                  <code><span title="ropt.results._nonlinear_constraints.NonlinearConstraints">NonlinearConstraints</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Nonlinear constraints.</p>
               </div>
             </td>
           </tr>
