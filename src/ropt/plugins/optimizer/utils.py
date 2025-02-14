@@ -392,14 +392,18 @@ def get_masked_linear_constraints(
     assert config.linear_constraints is not None
     mask = config.variables.mask
     coefficients = config.linear_constraints.coefficients
+    lower_bounds = config.linear_constraints.lower_bounds
+    upper_bounds = config.linear_constraints.upper_bounds
     if mask is not None:
+        # Keep rows that only contain non-zero values for the active variables:
+        keep_rows = np.all(coefficients[:, ~mask] == 0, axis=1)
+        coefficients = coefficients[keep_rows, :]
+        lower_bounds = lower_bounds[keep_rows]
+        upper_bounds = upper_bounds[keep_rows]
         offsets = np.matmul(
-            config.linear_constraints.coefficients[:, ~mask],
-            config.variables.initial_values[~mask],
+            coefficients[:, ~mask], config.variables.initial_values[~mask]
         )
         coefficients = coefficients[:, mask]
     else:
         offsets = 0
-    lower_bounds = config.linear_constraints.lower_bounds - offsets
-    upper_bounds = config.linear_constraints.upper_bounds - offsets
-    return coefficients, lower_bounds, upper_bounds
+    return coefficients, lower_bounds - offsets, upper_bounds - offsets

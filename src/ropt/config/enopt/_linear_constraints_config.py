@@ -15,8 +15,6 @@ from ropt.config.utils import (
 from ropt.config.validated_types import Array1D, Array2D  # noqa: TC001
 
 if TYPE_CHECKING:
-    from numpy.typing import NDArray
-
     from ropt.config.enopt import VariablesConfig
     from ropt.transforms import OptModelTransforms
 
@@ -89,25 +87,12 @@ class LinearConstraintsConfig(ImmutableBaseModel):
             msg = f"the coefficients matrix should have {variable_count} columns"
             raise ValueError(msg)
 
-        coefficients: NDArray[np.float64] | None = None
-        lower_bounds: NDArray[np.float64] | None = None
-        upper_bounds: NDArray[np.float64] | None = None
-
-        if variables.mask is not None:
-            # Keep rows that only contain non-zero values for the active variables:
-            keep_rows = np.all(self.coefficients[:, ~variables.mask] == 0, axis=1)
-            coefficients = self.coefficients[keep_rows, :]
-            lower_bounds = self.lower_bounds[keep_rows]
-            upper_bounds = self.upper_bounds[keep_rows]
-
         if transforms is not None and transforms.variables is not None:
             coefficients, lower_bounds, upper_bounds = (
                 transforms.variables.transform_linear_constraints(
                     self.coefficients, self.lower_bounds, self.upper_bounds
                 )
             )
-
-        if coefficients is not None:
             values = self.model_dump(round_trip=True)
             values.update(
                 coefficients=coefficients,
