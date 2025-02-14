@@ -219,7 +219,7 @@ class GradientConfig(ImmutableBaseModel):
 
         if transforms is not None and transforms.variables is not None:
             absolute = types == PerturbationType.ABSOLUTE
-            transformed = transforms.variables.transform_magnitudes(magnitudes)
+            transformed = transforms.variables.magnitudes_to_optimizer(magnitudes)
             magnitudes[absolute] = transformed[absolute]
 
         return self.model_copy(

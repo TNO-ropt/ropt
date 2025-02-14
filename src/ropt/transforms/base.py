@@ -19,8 +19,8 @@ class VariableTransform(ABC):
     """Abstract base class for variable transformers."""
 
     @abstractmethod
-    def forward(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Implement the forward transformation.
+    def to_optimizer(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
+        """Implement the transformation to optimizer space.
 
         The values may consist of an array with multiple dimensions. It is
         assumed that the last axis contains the variable values. Should this
@@ -35,8 +35,8 @@ class VariableTransform(ABC):
         """
 
     @abstractmethod
-    def backward(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Implement the backward transformation.
+    def from_optimizer(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
+        """Implement the transformation from optimizer space.
 
         The values may consist of an array with multiple dimensions. It is
         assumed that the last axis contains the variable values. Should this
@@ -51,8 +51,10 @@ class VariableTransform(ABC):
         """
 
     @abstractmethod
-    def transform_magnitudes(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Implement the forward transformation of perturbation magnitudes.
+    def magnitudes_to_optimizer(
+        self, values: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
+        """Implement the transformation of perturbation magnitudes.
 
         Args:
             values: The values to be transformed.
@@ -61,13 +63,13 @@ class VariableTransform(ABC):
             The transformed values.
         """
 
-    def transform_linear_constraints(
+    def linear_constraints_to_optimizer(
         self,
         coefficients: NDArray[np.float64],
         lower_bounds: NDArray[np.float64],
         upper_bounds: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
-        """Implement the forward transformation of linear constraints.
+        """Implement the transformation of linear constraints.
 
         Args:
             coefficients: The coefficient matrix of the linear constraints.
@@ -85,8 +87,8 @@ class ObjectiveTransform(ABC):
     """Abstract base class for objective transformers."""
 
     @abstractmethod
-    def forward(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Implement the forward transformation.
+    def to_optimizer(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
+        """Implement the transformation to optimizer space.
 
         The values may consist of an array with multiple dimensions. It is
         assumed that the last axis contains the objective values. Should this
@@ -101,8 +103,8 @@ class ObjectiveTransform(ABC):
         """
 
     @abstractmethod
-    def backward(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Implement the backward transformation.
+    def from_optimizer(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
+        """Implement the transformation from optimizer space.
 
         The values may consist of an array with multiple dimensions. It is
         assumed that the last axis contains the objective values. Should this
@@ -116,16 +118,16 @@ class ObjectiveTransform(ABC):
             The transformed values.
         """
 
-    def transform_weighted_objective(
+    def weighted_objective_from_optimizer(
         self, weighted_objective: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         """Transform the weighted objective value.
 
         The optimizer generates weighted objective values using transformed
         values. This method is called to apply a transformation when
-        transforming backwards. For example when the forward transformation
-        of the objectives involves a sign change to implement maximization,
-        this can be used to change the sign of the weighted objective values.
+        transforming from optimizer space. For example when the transformation
+        of the objectives involves a sign change to implement maximization, this
+        can be used to change the sign of the weighted objective values.
 
         Note:
             This function may be applied to the weighted objective itself,
@@ -144,10 +146,10 @@ class NonLinearConstraintTransform(ABC):
     """Abstract base class for non-linear constraint transformers."""
 
     @abstractmethod
-    def transform_bounds(
+    def bounds_to_optimizer(
         self, lower_bounds: NDArray[np.float64], upper_bounds: NDArray[np.float64]
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Implement the forward transformation of the right-hand side bounds.
+        """Implement the of the right-hand side bounds to optimizer space.
 
         Args:
             lower_bounds: The lower bounds on the right-hand side values.
@@ -158,8 +160,8 @@ class NonLinearConstraintTransform(ABC):
         """
 
     @abstractmethod
-    def forward(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Implement the forward transformation.
+    def to_optimizer(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
+        """Implement the transformation to optimizer space.
 
         The values may consist of an array with multiple dimensions. It is
         assumed that the last axis contains the objective values. Should this
@@ -174,8 +176,8 @@ class NonLinearConstraintTransform(ABC):
         """
 
     @abstractmethod
-    def backward(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Implement the backward transformation.
+    def from_optimizer(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
+        """Implement the transformation from optimizer space.
 
         The values may consist of an array with multiple dimensions. It is
         assumed that the last axis contains the objective values. Should this

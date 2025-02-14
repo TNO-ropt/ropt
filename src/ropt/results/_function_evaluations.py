@@ -103,8 +103,10 @@ class FunctionEvaluations(ResultField):
             evaluation_ids=evaluation_ids,
         )
 
-    def transform_back(self, transforms: OptModelTransforms) -> FunctionEvaluations:
-        """Apply backward transforms to the results.
+    def transform_from_optimizer(
+        self, transforms: OptModelTransforms
+    ) -> FunctionEvaluations:
+        """Apply transformations from optimizer space.
 
         Args:
             transforms: The transforms to apply.
@@ -116,17 +118,17 @@ class FunctionEvaluations(ResultField):
             variables=(
                 self.variables
                 if transforms.variables is None
-                else transforms.variables.backward(self.variables)
+                else transforms.variables.from_optimizer(self.variables)
             ),
             objectives=(
                 self.objectives
                 if transforms.objectives is None
-                else transforms.objectives.backward(self.objectives)
+                else transforms.objectives.from_optimizer(self.objectives)
             ),
             constraints=(
                 self.constraints
                 if self.constraints is None or transforms.nonlinear_constraints is None
-                else transforms.nonlinear_constraints.backward(self.constraints)
+                else transforms.nonlinear_constraints.from_optimizer(self.constraints)
             ),
             evaluation_ids=self.evaluation_ids,
         )

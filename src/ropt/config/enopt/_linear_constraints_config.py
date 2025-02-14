@@ -89,7 +89,7 @@ class LinearConstraintsConfig(ImmutableBaseModel):
 
         if transforms is not None and transforms.variables is not None:
             coefficients, lower_bounds, upper_bounds = (
-                transforms.variables.transform_linear_constraints(
+                transforms.variables.linear_constraints_to_optimizer(
                     self.coefficients, self.lower_bounds, self.upper_bounds
                 )
             )

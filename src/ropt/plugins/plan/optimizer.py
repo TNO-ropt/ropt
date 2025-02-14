@@ -291,7 +291,9 @@ class DefaultOptimizerStep(PlanStep):
             data["exit_code"] = exit_code
             if transforms is not None:
                 data["transformed_results"] = results
-                data["results"] = [item.transform_back(transforms) for item in results]
+                data["results"] = [
+                    item.transform_from_optimizer(transforms) for item in results
+                ]
             else:
                 data["results"] = results
             self.emit_event(

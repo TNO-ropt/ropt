@@ -47,8 +47,10 @@ class FunctionResults(Results):
     linear_constraints: LinearConstraints | None = None
     nonlinear_constraints: NonlinearConstraints | None = None
 
-    def transform_back(self, transforms: OptModelTransforms) -> FunctionResults:
-        """Apply backward transforms to the results.
+    def transform_from_optimizer(
+        self, transforms: OptModelTransforms
+    ) -> FunctionResults:
+        """Apply transformations from optimizer space.
 
         Args:
             transforms: The transforms to apply.
@@ -60,11 +62,11 @@ class FunctionResults(Results):
             plan_id=self.plan_id,
             batch_id=self.batch_id,
             metadata=self.metadata,
-            evaluations=self.evaluations.transform_back(transforms),
+            evaluations=self.evaluations.transform_from_optimizer(transforms),
             realizations=self.realizations,
             functions=(
                 None
                 if self.functions is None
-                else self.functions.transform_back(transforms)
+                else self.functions.transform_from_optimizer(transforms)
             ),
         )

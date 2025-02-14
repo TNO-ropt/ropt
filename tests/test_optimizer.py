@@ -133,10 +133,10 @@ class ObjectiveScaler(ObjectiveTransform):
     def __init__(self, scales: NDArray[np.float64]) -> None:
         self._scales = scales
 
-    def forward(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
+    def to_optimizer(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
         return objectives / self._scales
 
-    def backward(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
+    def from_optimizer(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
         return objectives * self._scales
 
 
@@ -187,15 +187,15 @@ class ConstraintScaler(NonLinearConstraintTransform):
     def __init__(self, scales: NDArray[np.float64]) -> None:
         self._scales = scales
 
-    def transform_bounds(
+    def bounds_to_optimizer(
         self, lower_bounds: NDArray[np.float64], upper_bounds: NDArray[np.float64]
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         return lower_bounds / self._scales, upper_bounds / self._scales
 
-    def forward(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
+    def to_optimizer(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
         return constraints / self._scales
 
-    def backward(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
+    def from_optimizer(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
         return constraints * self._scales
 
 

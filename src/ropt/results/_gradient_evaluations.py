@@ -129,8 +129,10 @@ class GradientEvaluations(ResultField):
             perturbed_evaluation_ids=perturbed_evaluation_ids,
         )
 
-    def transform_back(self, transforms: OptModelTransforms) -> GradientEvaluations:
-        """Apply backward transforms to the results.
+    def transform_from_optimizer(
+        self, transforms: OptModelTransforms
+    ) -> GradientEvaluations:
+        """Apply transformations from optimizer space.
 
         Args:
             transforms: The transforms to apply.
@@ -142,17 +144,17 @@ class GradientEvaluations(ResultField):
             variables=(
                 self.variables
                 if transforms.variables is None
-                else transforms.variables.backward(self.variables)
+                else transforms.variables.from_optimizer(self.variables)
             ),
             perturbed_variables=(
                 self.perturbed_variables
                 if transforms.variables is None
-                else transforms.variables.backward(self.perturbed_variables)
+                else transforms.variables.from_optimizer(self.perturbed_variables)
             ),
             perturbed_objectives=(
                 self.perturbed_objectives
                 if transforms.objectives is None
-                else transforms.objectives.backward(self.perturbed_objectives)
+                else transforms.objectives.from_optimizer(self.perturbed_objectives)
             ),
             perturbed_constraints=(
                 self.perturbed_constraints
@@ -160,7 +162,7 @@ class GradientEvaluations(ResultField):
                     self.perturbed_constraints is None
                     or transforms.nonlinear_constraints is None
                 )
-                else transforms.nonlinear_constraints.backward(
+                else transforms.nonlinear_constraints.from_optimizer(
                     self.perturbed_constraints
                 )
             ),

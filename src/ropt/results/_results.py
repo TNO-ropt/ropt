@@ -123,8 +123,8 @@ class Results(ABC):
         )
 
     @abstractmethod
-    def transform_back(self, transforms: OptModelTransforms) -> Results:
-        """Apply backward transforms to the results.
+    def transform_from_optimizer(self, transforms: OptModelTransforms) -> Results:
+        """Apply transformations from optimizer space.
 
         Args:
             transforms: The transforms to apply.

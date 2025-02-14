@@ -29,8 +29,8 @@ class VariableScaler(VariableTransform):
         self._scales = scales
         self._offsets = offsets
 
-    def forward(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Implement the forward scaling.
+    def to_optimizer(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
+        """Implement the scaling to optimizer space.
 
         The values may consist of an array with multiple dimensions. It is
         assumed that the last axis contains the variable values. Should this
@@ -49,8 +49,8 @@ class VariableScaler(VariableTransform):
             values = values / self._scales
         return values
 
-    def backward(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Implement the backward scaling.
+    def from_optimizer(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
+        """Implement the scaling from optimizer space.
 
         The values may consist of an array with multiple dimensions. It is
         assumed that the last axis contains the variable values. Should this
@@ -69,8 +69,10 @@ class VariableScaler(VariableTransform):
             values = values + self._offsets
         return values
 
-    def transform_magnitudes(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
-        """Implement the forward transformation of perturbation magnitudes.
+    def magnitudes_to_optimizer(
+        self, values: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
+        """Implement the transformation of perturbation magnitudes.
 
         Args:
             values: The values to be transformed.
@@ -82,13 +84,13 @@ class VariableScaler(VariableTransform):
             return values / self._scales
         return values
 
-    def transform_linear_constraints(
+    def linear_constraints_to_optimizer(
         self,
         coefficients: NDArray[np.float64],
         lower_bounds: NDArray[np.float64],
         upper_bounds: NDArray[np.float64],
     ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
-        """Implement the forward transformation of linear constraints.
+        """Implement the transformation of linear constraints.
 
         Args:
             coefficients: The coefficient matrix of the linear constraints.

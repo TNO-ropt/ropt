@@ -80,8 +80,8 @@ class Functions(ResultField):
             constraints=constraints,
         )
 
-    def transform_back(self, transforms: OptModelTransforms) -> Functions:
-        """Apply backward transforms to the results.
+    def transform_from_optimizer(self, transforms: OptModelTransforms) -> Functions:
+        """Apply transformations from optimizer space.
 
         Args:
             transforms: The transforms to apply.
@@ -93,18 +93,18 @@ class Functions(ResultField):
             weighted_objective=(
                 self.weighted_objective
                 if transforms.objectives is None
-                else transforms.objectives.transform_weighted_objective(
+                else transforms.objectives.weighted_objective_from_optimizer(
                     self.weighted_objective
                 )
             ),
             objectives=(
                 self.objectives
                 if transforms.objectives is None
-                else transforms.objectives.backward(self.objectives)
+                else transforms.objectives.from_optimizer(self.objectives)
             ),
             constraints=(
                 self.constraints
                 if self.constraints is None or transforms.nonlinear_constraints is None
-                else transforms.nonlinear_constraints.backward(self.constraints)
+                else transforms.nonlinear_constraints.from_optimizer(self.constraints)
             ),
         )

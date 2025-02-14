@@ -36,8 +36,10 @@ class GradientResults(Results):
     realizations: Realizations
     gradients: Gradients | None
 
-    def transform_back(self, transforms: OptModelTransforms) -> GradientResults:
-        """Apply backward transforms to the results.
+    def transform_from_optimizer(
+        self, transforms: OptModelTransforms
+    ) -> GradientResults:
+        """Apply transformations from optimizer space.
 
         Args:
             transforms: The transforms to apply.
@@ -49,11 +51,11 @@ class GradientResults(Results):
             plan_id=self.plan_id,
             batch_id=self.batch_id,
             metadata=self.metadata,
-            evaluations=self.evaluations.transform_back(transforms),
+            evaluations=self.evaluations.transform_from_optimizer(transforms),
             realizations=self.realizations,
             gradients=(
                 None
                 if self.gradients is None
-                else self.gradients.transform_back(transforms)
+                else self.gradients.transform_from_optimizer(transforms)
             ),
         )

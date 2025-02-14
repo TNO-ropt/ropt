@@ -126,19 +126,21 @@ def _get_function_results(  # noqa: PLR0913
         active_constraints=active_constraints,
     )
     if transforms is not None and transforms.variables:
-        variables = transforms.variables.backward(variables)
+        variables = transforms.variables.from_optimizer(variables)
     evaluator_result = evaluator(np.repeat(variables, realization_num, axis=0), context)
     if transforms is not None:
         if transforms.objectives is not None:
-            evaluator_result.objectives = transforms.objectives.forward(
+            evaluator_result.objectives = transforms.objectives.to_optimizer(
                 evaluator_result.objectives
             )
         if (
             evaluator_result.constraints is not None
             and transforms.nonlinear_constraints is not None
         ):
-            evaluator_result.constraints = transforms.nonlinear_constraints.forward(
-                evaluator_result.constraints
+            evaluator_result.constraints = (
+                transforms.nonlinear_constraints.to_optimizer(
+                    evaluator_result.constraints
+                )
             )
     split_objectives = np.vsplit(evaluator_result.objectives, variables.shape[0])
     split_constraints = (
@@ -188,19 +190,21 @@ def _get_gradient_results(  # noqa: PLR0913
     )
     variables = perturbed_variables.reshape(-1, perturbed_variables.shape[-1])
     if transforms is not None and transforms.variables:
-        variables = transforms.variables.backward(variables)
+        variables = transforms.variables.from_optimizer(variables)
     evaluator_result = evaluator(variables, context)
     if transforms is not None:
         if transforms.objectives is not None:
-            evaluator_result.objectives = transforms.objectives.forward(
+            evaluator_result.objectives = transforms.objectives.to_optimizer(
                 evaluator_result.objectives
             )
         if (
             evaluator_result.constraints is not None
             and transforms.nonlinear_constraints is not None
         ):
-            evaluator_result.constraints = transforms.nonlinear_constraints.forward(
-                evaluator_result.constraints
+            evaluator_result.constraints = (
+                transforms.nonlinear_constraints.to_optimizer(
+                    evaluator_result.constraints
+                )
             )
     return _GradientEvaluatorResults(
         batch_id=evaluator_result.batch_id,
@@ -248,19 +252,21 @@ def _get_function_and_gradient_results(  # noqa: PLR0913
         ),
     )
     if transforms is not None and transforms.variables:
-        all_variables = transforms.variables.backward(all_variables)
+        all_variables = transforms.variables.from_optimizer(all_variables)
     evaluator_result = evaluator(all_variables, context)
     if transforms is not None:
         if transforms.objectives is not None:
-            evaluator_result.objectives = transforms.objectives.forward(
+            evaluator_result.objectives = transforms.objectives.to_optimizer(
                 evaluator_result.objectives
             )
         if (
             evaluator_result.constraints is not None
             and transforms.nonlinear_constraints is not None
         ):
-            evaluator_result.constraints = transforms.nonlinear_constraints.forward(
-                evaluator_result.constraints
+            evaluator_result.constraints = (
+                transforms.nonlinear_constraints.to_optimizer(
+                    evaluator_result.constraints
+                )
             )
     return (
         _FunctionEvaluatorResults(

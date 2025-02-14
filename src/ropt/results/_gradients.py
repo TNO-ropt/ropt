@@ -87,8 +87,8 @@ class Gradients(ResultField):
             constraints=constraints,
         )
 
-    def transform_back(self, transforms: OptModelTransforms) -> Gradients:
-        """Apply backward transforms to the results.
+    def transform_from_optimizer(self, transforms: OptModelTransforms) -> Gradients:
+        """Apply transformations from optimizer space.
 
         Args:
             transforms: The transforms to apply.
@@ -99,7 +99,7 @@ class Gradients(ResultField):
         objectives = self.objectives
         if transforms.objectives is not None:
             objectives = np.moveaxis(self.objectives, 0, -1)
-            objectives = transforms.objectives.backward(objectives)
+            objectives = transforms.objectives.from_optimizer(objectives)
             objectives = np.moveaxis(objectives, 0, -1)
 
         constraints: NDArray[np.float64] | None = self.constraints
@@ -108,14 +108,14 @@ class Gradients(ResultField):
             and transforms.nonlinear_constraints is not None
         ):
             constraints = np.moveaxis(self.constraints, 0, -1)
-            constraints = transforms.nonlinear_constraints.backward(constraints)
+            constraints = transforms.nonlinear_constraints.from_optimizer(constraints)
             constraints = np.moveaxis(constraints, 0, -1)
 
         return Gradients(
             weighted_objective=(
                 self.weighted_objective
                 if transforms.objectives is None
-                else transforms.objectives.transform_weighted_objective(
+                else transforms.objectives.weighted_objective_from_optimizer(
                     self.weighted_objective
                 )
             ),

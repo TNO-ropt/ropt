@@ -79,10 +79,10 @@ class VariablesConfig(ImmutableBaseModel):
 
         if info.context is not None and info.context.variables is not None:
             self.initial_values = immutable_array(
-                info.context.variables.forward(self.initial_values)
+                info.context.variables.to_optimizer(self.initial_values)
             )
-            lower_bounds = info.context.variables.forward(lower_bounds)
-            upper_bounds = info.context.variables.forward(upper_bounds)
+            lower_bounds = info.context.variables.to_optimizer(lower_bounds)
+            upper_bounds = info.context.variables.to_optimizer(upper_bounds)
 
         self.lower_bounds = immutable_array(
             np.where(lower_bounds < upper_bounds, lower_bounds, upper_bounds)

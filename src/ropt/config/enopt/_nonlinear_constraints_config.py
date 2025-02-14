@@ -59,7 +59,7 @@ class NonlinearConstraintsConfig(ImmutableBaseModel):
 
         if info.context is not None and info.context.nonlinear_constraints is not None:
             lower_bounds, upper_bounds = (
-                info.context.nonlinear_constraints.transform_bounds(
+                info.context.nonlinear_constraints.bounds_to_optimizer(
                     lower_bounds, upper_bounds
                 )
             )
