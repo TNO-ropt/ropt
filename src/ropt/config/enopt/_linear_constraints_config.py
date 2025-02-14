@@ -19,6 +19,26 @@ if TYPE_CHECKING:
     from ropt.transforms import OptModelTransforms
 
 
+class OriginalLinearConstraints(ImmutableBaseModel):
+    r"""Class to store original values after transformation.
+
+    Attributes:
+        coefficients: The initial values of the variables.
+        lower_bounds: Lower bound of the variables (default: $-\infty$).
+        upper_bounds: Upper bound of the variables (default: $+\infty$).
+    """
+
+    coefficients: Array2D
+    lower_bounds: Array1D
+    upper_bounds: Array1D
+
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        extra="forbid",
+        validate_default=True,
+    )
+
+
 class LinearConstraintsConfig(ImmutableBaseModel):
     r"""The configuration class for linear constraints.
 
@@ -36,15 +56,21 @@ class LinearConstraintsConfig(ImmutableBaseModel):
     broadcasted to a `numpy` array with a length equal to the number of
     equations.
 
+    The coefficients and the bounds may be transformed during initialization.
+    In this case their untransformed values will be stored in the `original`
+    field.
+
     Attributes:
         coefficients: The matrix of coefficients.
         lower_bounds: The lower bounds on the right-hand-sides of the constraint equations.
         upper_bounds: The upper bounds on the right-hand-sides of the constraint equations.
+        original:     Stores the original values in case of a transformation.
     """
 
     coefficients: Array2D
     lower_bounds: Array1D
     upper_bounds: Array1D
+    original: OriginalLinearConstraints | None = None
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -64,6 +90,7 @@ class LinearConstraintsConfig(ImmutableBaseModel):
         self.upper_bounds = immutable_array(
             np.where(upper_bounds > lower_bounds, upper_bounds, lower_bounds)
         )
+        self.original = None
         self._immutable()
         return self
 
@@ -98,6 +125,11 @@ class LinearConstraintsConfig(ImmutableBaseModel):
                 coefficients=coefficients,
                 lower_bounds=lower_bounds,
                 upper_bounds=upper_bounds,
+                original=OriginalLinearConstraints(
+                    coefficients=self.coefficients,
+                    lower_bounds=self.lower_bounds,
+                    upper_bounds=self.upper_bounds,
+                ),
             )
             return LinearConstraintsConfig.model_construct(**values)
 
