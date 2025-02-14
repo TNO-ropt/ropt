@@ -69,4 +69,19 @@ class FunctionResults(Results):
                 if self.functions is None
                 else self.functions.transform_from_optimizer(transforms)
             ),
+            bound_constraints=(
+                None
+                if self.bound_constraints is None
+                else self.bound_constraints.transform_from_optimizer(transforms)
+            ),
+            linear_constraints=(
+                None
+                if self.linear_constraints is None
+                else self.linear_constraints.transform_from_optimizer(transforms)
+            ),
+            nonlinear_constraints=(
+                None
+                if self.nonlinear_constraints is None
+                else self.nonlinear_constraints.transform_from_optimizer(transforms)
+            ),
         )

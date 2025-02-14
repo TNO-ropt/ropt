@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config.enopt import EnOptConfig
+    from ropt.transforms import OptModelTransforms
 
 
 @dataclass(slots=True)
@@ -59,3 +60,18 @@ class NonlinearConstraints(ResultField):
             lower_diffs=(constraints - config.nonlinear_constraints.lower_bounds),
             upper_diffs=(constraints - config.nonlinear_constraints.upper_bounds),
         )
+
+    def transform_from_optimizer(
+        self, transforms: OptModelTransforms
+    ) -> NonlinearConstraints:
+        if transforms.nonlinear_constraints is not None:
+            lower_diffs, upper_diffs = (
+                transforms.nonlinear_constraints.nonlinear_constraint_diffs_from_optimizer(
+                    self.lower_diffs, self.upper_diffs
+                )
+            )
+            return NonlinearConstraints(
+                lower_diffs=lower_diffs,
+                upper_diffs=upper_diffs,
+            )
+        return self

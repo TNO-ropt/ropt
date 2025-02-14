@@ -28,6 +28,7 @@ class VariableScaler(VariableTransform):
             scales, offsets = np.broadcast_arrays(scales, offsets)
         self._scales = scales
         self._offsets = offsets
+        self._equation_scaling: NDArray[np.float64] | None = None
 
     def to_optimizer(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
         """Implement the scaling to optimizer space.
@@ -106,9 +107,44 @@ class VariableScaler(VariableTransform):
             upper_bounds = upper_bounds - offsets
         if self._scales is not None:
             coefficients = coefficients * self._scales
-        equation_scaling = np.max(np.abs(coefficients), axis=-1)
+        self._equation_scaling = np.max(np.abs(coefficients), axis=-1)
+        assert self._equation_scaling is not None
         return (
-            coefficients / equation_scaling[:, np.newaxis],
-            lower_bounds / equation_scaling,
-            upper_bounds / equation_scaling,
+            coefficients / self._equation_scaling[:, np.newaxis],
+            lower_bounds / self._equation_scaling,
+            upper_bounds / self._equation_scaling,
         )
+
+    def bound_constraint_diffs_from_optimizer(
+        self, lower_diffs: NDArray[np.float64], upper_diffs: NDArray[np.float64]
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Implement the transformation of bound constraint diffs from optimizer space.
+
+        Args:
+            lower_diffs: The lower differences to be transformed.
+            upper_diffs: The upper differences to be transformed.
+
+        Returns:
+            The transformed values.
+        """
+        if self._scales is not None:
+            lower_diffs = lower_diffs * self._scales
+            upper_diffs = upper_diffs * self._scales
+        return lower_diffs, upper_diffs
+
+    def linear_constraints_diffs_from_optimizer(
+        self, lower_diffs: NDArray[np.float64], upper_diffs: NDArray[np.float64]
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Implement the transformation of bound constraint diffs from optimizer space.
+
+        Args:
+            lower_diffs: The lower differences to be transformed.
+            upper_diffs: The upper differences to be transformed.
+
+        Returns:
+            The transformed values.
+        """
+        if self._equation_scaling is not None:
+            lower_diffs = lower_diffs * self._equation_scaling
+            upper_diffs = upper_diffs * self._equation_scaling
+        return lower_diffs, upper_diffs

@@ -63,6 +63,20 @@ class VariableTransform(ABC):
             The transformed values.
         """
 
+    @abstractmethod
+    def bound_constraint_diffs_from_optimizer(
+        self, lower_diffs: NDArray[np.float64], upper_diffs: NDArray[np.float64]
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Implement the transformation of bound constraint diffs from optimizer space.
+
+        Args:
+            lower_diffs: The lower differences to be transformed.
+            upper_diffs: The upper differences to be transformed.
+
+        Returns:
+            The transformed values.
+        """
+
     def linear_constraints_to_optimizer(
         self,
         coefficients: NDArray[np.float64],
@@ -78,6 +92,21 @@ class VariableTransform(ABC):
 
         Returns:
             The transformed coefficient matrix and right-hand side bounds.
+        """
+        msg = "This transformer does not support linear constraints."
+        raise NotImplementedError(msg)
+
+    def linear_constraints_diffs_from_optimizer(
+        self, lower_diffs: NDArray[np.float64], upper_diffs: NDArray[np.float64]
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Implement the transformation of bound constraint diffs from optimizer space.
+
+        Args:
+            lower_diffs: The lower differences to be transformed.
+            upper_diffs: The upper differences to be transformed.
+
+        Returns:
+            The transformed values.
         """
         msg = "This transformer does not support linear constraints."
         raise NotImplementedError(msg)
@@ -186,6 +215,20 @@ class NonLinearConstraintTransform(ABC):
 
         Args:
             constraints: The values to be transformed.
+
+        Returns:
+            The transformed values.
+        """
+
+    @abstractmethod
+    def nonlinear_constraint_diffs_from_optimizer(
+        self, lower_diffs: NDArray[np.float64], upper_diffs: NDArray[np.float64]
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        """Implement the transformation of bound constraint diffs from optimizer space.
+
+        Args:
+            lower_diffs: The lower differences to be transformed.
+            upper_diffs: The upper differences to be transformed.
 
         Returns:
             The transformed values.

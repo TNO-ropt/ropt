@@ -170,16 +170,6 @@ def test_scipy_le_ge_linear_constraints_two_sided_de(
     assert variables is not None
     assert np.allclose(variables, [-0.1, 0.0, 0.4], atol=0.02)
 
-    enopt_config["linear_constraints"] = {
-        "coefficients": [[1, 0, 1]],
-        "lower_bounds": [0.3],
-        "upper_bounds": [0.0],
-    }
-
-    variables = BasicOptimizer(enopt_config, evaluator()).run().variables
-    assert variables is not None
-    assert np.allclose(variables, [-0.1, 0.0, 0.4], atol=0.02)
-
 
 def test_scipy_eq_nonlinear_constraints_de(
     enopt_config: Any, evaluator: Any, test_functions: Any

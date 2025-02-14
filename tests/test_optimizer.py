@@ -198,6 +198,11 @@ class ConstraintScaler(NonLinearConstraintTransform):
     def from_optimizer(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
         return constraints * self._scales
 
+    def nonlinear_constraint_diffs_from_optimizer(
+        self, lower_diffs: NDArray[np.float64], upper_diffs: NDArray[np.float64]
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        return lower_diffs * self._scales, upper_diffs * self._scales
+
 
 @pytest.mark.parametrize("speculative", [True, False])
 def test_constraint_with_scaler(
