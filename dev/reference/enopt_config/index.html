@@ -1937,6 +1937,9 @@ all variables are assumed to be continuous and of real data type
 <p>The boolean entries of the optional <code>mask</code> field indicates which variables
 are considered to be free to change. During optimization, only these
 variables should change while others remain fixed.</p>
+<p>The initial values and the bounds may be transformed during initialization.
+In this case their untransformed values will be stored in the <code>original</code>
+field.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2001,6 +2004,17 @@ variables should change while others remain fixed.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional mask of variables to optimize.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.VariablesConfig.original">original</span></code></td>
+            <td>
+                  <code><span title="ropt.config.enopt._variables_config.OriginalVariables">OriginalVariables</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Stores the original values in case of a transformation.</p>
               </div>
             </td>
           </tr>
@@ -2159,6 +2173,9 @@ variables.</p>
 the <code>lower_bounds</code> and <code>upper_bounds fields, which will be converted and
 broadcasted to a</code>numpy` array with a length equal to the number of
 equations.</p>
+<p>The coefficients and the bounds may be transformed during initialization.
+In this case their untransformed values will be stored in the <code>original</code>
+field.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2201,6 +2218,17 @@ equations.</p>
             <td>
               <div class="doc-md-description">
                 <p>The upper bounds on the right-hand-sides of the constraint equations.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.LinearConstraintsConfig.original">original</span></code></td>
+            <td>
+                  <code><span title="ropt.config.enopt._linear_constraints_config.OriginalLinearConstraints">OriginalLinearConstraints</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Stores the original values in case of a transformation.</p>
               </div>
             </td>
           </tr>
@@ -2352,6 +2380,8 @@ function estimators. The <code>realization_filters</code> and <code>function_est
 fields contain indices to the realization filter or function estimator
 objects to use. These objects are configured in the parent
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+<p>The  bounds may be transformed during initialization. In this case their
+untransformed values will be stored in the <code>original</code> field.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2405,6 +2435,17 @@ objects to use. These objects are configured in the parent
             <td>
               <div class="doc-md-description">
                 <p>Optional function estimator indices.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.original">original</span></code></td>
+            <td>
+                  <code><span title="ropt.config.enopt._nonlinear_constraints_config.OriginalNonlinearConstraints">OriginalNonlinearConstraints</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Stores the original values in case of a transformation.</p>
               </div>
             </td>
           </tr>
