@@ -11,8 +11,6 @@ from ropt.results import FunctionResults, Results
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt.config.enopt import EnOptConfig
-
 
 def _get_new_optimal_result(
     optimal_result: FunctionResults | None, results: FunctionResults
@@ -28,93 +26,37 @@ def _get_new_optimal_result(
     return None
 
 
-def _check_bounds(
-    variables: NDArray[np.float64], bounds: NDArray[np.float64], tolerance: float
-) -> bool:
-    return bool(
-        np.any(np.logical_and(np.isfinite(bounds), variables - bounds > tolerance))
-    )
-
-
-def _check_linear_constraints(
-    config: EnOptConfig,
-    variables: NDArray[np.float64],
-    bounds: NDArray[np.float64],
-    tolerance: float,
-) -> bool:
-    if config.linear_constraints is None:
-        return False
-    assert config.linear_constraints is not None
-    coefficients = config.linear_constraints.coefficients
-    constraint_values = np.empty(
-        variables.shape[:-1] + (bounds.size,), dtype=np.float64
-    )
-    for idx in np.ndindex(*variables.shape[:-1]):
-        constraint_values[idx] = np.matmul(coefficients, variables[idx])
-    return bool(np.any(constraint_values - bounds > tolerance))
-
-
-def _check_nonlinear_constraints(
-    constraints: NDArray[np.float64],
-    bounds: NDArray[np.float64],
-    tolerance: float,
-) -> bool:
-    return bool(np.any(constraints - bounds > tolerance))
-
-
-def _check_constraints(
-    config: EnOptConfig, results: Results, tolerance: float | None
-) -> bool:
+def _check_constraints(results: Results, tolerance: float | None) -> bool:
     if tolerance is None:
         return True
 
     assert isinstance(results, FunctionResults)
 
-    if _check_bounds(
-        -results.evaluations.variables,
-        -config.variables.lower_bounds,
-        tolerance,
-    ) or _check_bounds(
-        results.evaluations.variables,
-        config.variables.upper_bounds,
-        tolerance,
+    def _check(diffs: NDArray[np.float64]) -> bool:
+        return bool(np.any(diffs > tolerance))
+
+    if results.bound_constraints is not None and (
+        _check(-results.bound_constraints.lower_diffs)
+        or _check(results.bound_constraints.upper_diffs)
     ):
         return False
 
-    if config.linear_constraints is not None and (
-        _check_linear_constraints(
-            config,
-            -results.evaluations.variables,
-            -config.linear_constraints.lower_bounds,
-            tolerance,
-        )
-        or _check_linear_constraints(
-            config,
-            results.evaluations.variables,
-            config.linear_constraints.upper_bounds,
-            tolerance,
-        )
+    if results.linear_constraints is not None and (
+        _check(-results.linear_constraints.lower_diffs)
+        or _check(results.linear_constraints.upper_diffs)
     ):
         return False
 
-    if config.nonlinear_constraints is not None and results.functions is not None:
-        assert results.functions.constraints is not None
-        if _check_nonlinear_constraints(
-            -results.functions.constraints,
-            -config.nonlinear_constraints.lower_bounds,
-            tolerance,
-        ) or _check_nonlinear_constraints(
-            results.functions.constraints,
-            config.nonlinear_constraints.upper_bounds,
-            tolerance,
-        ):
-            return False
+    if results.nonlinear_constraints is not None and (  # noqa: SIM103
+        _check(-results.nonlinear_constraints.lower_diffs)
+        or _check(results.nonlinear_constraints.upper_diffs)
+    ):
+        return False
 
     return True
 
 
 def _get_last_result(
-    config: EnOptConfig,
     results: tuple[Results, ...],
     transformed_results: tuple[Results, ...],
     constraint_tolerance: float | None,
@@ -128,7 +70,7 @@ def _get_last_result(
             if (
                 isinstance(item, FunctionResults)
                 and item.functions is not None
-                and _check_constraints(config, transformed_item, constraint_tolerance)
+                and _check_constraints(transformed_item, constraint_tolerance)
             )
         ),
         None,
@@ -136,7 +78,6 @@ def _get_last_result(
 
 
 def _update_optimal_result(
-    config: EnOptConfig,
     optimal_result: FunctionResults | None,
     results: tuple[Results, ...],
     transformed_results: tuple[Results, ...],
@@ -147,7 +88,7 @@ def _update_optimal_result(
         if (
             isinstance(transformed_item, FunctionResults)
             and transformed_item.functions is not None
-            and _check_constraints(config, transformed_item, constraint_tolerance)
+            and _check_constraints(transformed_item, constraint_tolerance)
         ):
             assert isinstance(item, FunctionResults)
             new_optimal_result = _get_new_optimal_result(optimal_result, item)
@@ -158,7 +99,6 @@ def _update_optimal_result(
 
 
 def _get_all_results(
-    config: EnOptConfig,
     results: tuple[Results, ...],
     transformed_results: tuple[Results, ...],
     constraint_tolerance: float | None,
@@ -169,6 +109,6 @@ def _get_all_results(
         if (
             isinstance(item, FunctionResults)
             and item.functions is not None
-            and _check_constraints(config, transformed_item, constraint_tolerance)
+            and _check_constraints(transformed_item, constraint_tolerance)
         )
     )

@@ -6,12 +6,15 @@ import numpy as np
 from numpy.random import default_rng
 
 from ropt.results import (
+    BoundConstraints,
     FunctionEvaluations,
     FunctionResults,
     Functions,
     GradientEvaluations,
     GradientResults,
     Gradients,
+    LinearConstraints,
+    NonlinearConstraints,
     Realizations,
     Results,
 )
@@ -207,6 +210,17 @@ class EnsembleEvaluator:
                 constraint_weights=constraint_weights,
             ),
             functions=functions,
+            bound_constraints=BoundConstraints.create(
+                self._config, evaluations.variables
+            ),
+            linear_constraints=LinearConstraints.create(
+                self._config, evaluations.variables
+            ),
+            nonlinear_constraints=(
+                None
+                if functions is None
+                else NonlinearConstraints.create(self._config, functions.constraints)
+            ),
         )
 
     def _calculate_gradients(
@@ -355,6 +369,17 @@ class EnsembleEvaluator:
                 constraint_weights=constraint_weights,
             ),
             functions=functions,
+            bound_constraints=BoundConstraints.create(
+                self._config, evaluations.variables
+            ),
+            linear_constraints=LinearConstraints.create(
+                self._config, evaluations.variables
+            ),
+            nonlinear_constraints=(
+                None
+                if functions is None
+                else NonlinearConstraints.create(self._config, functions.constraints)
+            ),
         )
 
         assert self._config.gradient.perturbation_min_success is not None

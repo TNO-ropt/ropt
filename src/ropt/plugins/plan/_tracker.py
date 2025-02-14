@@ -108,7 +108,6 @@ class DefaultTrackerHandler(ResultHandler):
             match self._with.type_:
                 case "all":
                     filtered_results = _get_all_results(
-                        event.config,
                         results,
                         transformed_results,
                         self._with.constraint_tolerance,
@@ -116,7 +115,6 @@ class DefaultTrackerHandler(ResultHandler):
                     self.plan[self._with.var] = deepcopy(filtered_results)
                 case "best":
                     filtered_results = _update_optimal_result(
-                        event.config,
                         self.plan[self._with.var],
                         results,
                         transformed_results,
@@ -124,7 +122,6 @@ class DefaultTrackerHandler(ResultHandler):
                     )
                 case "last":
                     filtered_results = _get_last_result(
-                        event.config,
                         results,
                         transformed_results,
                         self._with.constraint_tolerance,

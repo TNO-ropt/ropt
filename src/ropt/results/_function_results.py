@@ -8,8 +8,11 @@ from ._results import Results
 if TYPE_CHECKING:
     from ropt.transforms import OptModelTransforms
 
+    from ._bound_constraints import BoundConstraints
     from ._function_evaluations import FunctionEvaluations
     from ._functions import Functions
+    from ._linear_constraints import LinearConstraints
+    from ._nonlinear_constraints import NonlinearConstraints
     from ._realizations import Realizations
 
 
@@ -26,16 +29,23 @@ class FunctionResults(Results):
     2. The parameters of the realizations, such as weights for objectives and
        constraints, and realization failures.
     3. The calculated objective and constraint function values.
+    4. Information on the differences of any constraints to their bounds.
 
     Attributes:
         evaluations:           Results of the function evaluations.
         realizations:          The calculated parameters of the realizations.
         functions:             The calculated functions.
+        bound_constraints:     Bound constraints.
+        linear_constraints:    Linear constraints.
+        nonlinear_constraints: Nonlinear constraints.
     """
 
     evaluations: FunctionEvaluations
     realizations: Realizations
     functions: Functions | None
+    bound_constraints: BoundConstraints | None = None
+    linear_constraints: LinearConstraints | None = None
+    nonlinear_constraints: NonlinearConstraints | None = None
 
     def transform_back(self, transforms: OptModelTransforms) -> FunctionResults:
         """Apply backward transforms to the results.
