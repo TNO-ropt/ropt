@@ -64,13 +64,13 @@ class NonlinearConstraintsConfig(ImmutableBaseModel):
                 )
             )
 
+        if np.any(lower_bounds > upper_bounds):
+            msg = "The non-linear constraint lower bounds are larger than the upper bounds."
+            raise ValueError(msg)
+
         self._mutable()
-        self.lower_bounds = immutable_array(
-            np.where(lower_bounds < upper_bounds, lower_bounds, upper_bounds)
-        )
-        self.upper_bounds = immutable_array(
-            np.where(upper_bounds > lower_bounds, upper_bounds, lower_bounds)
-        )
+        self.lower_bounds = immutable_array(lower_bounds)
+        self.upper_bounds = immutable_array(upper_bounds)
         self._immutable()
 
         return self

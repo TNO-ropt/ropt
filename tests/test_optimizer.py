@@ -333,8 +333,8 @@ def test_check_linear_constraints(enopt_config: Any, evaluator: Any) -> None:
     results1 = BasicOptimizer(enopt_config, evaluator()).run().results
     assert results1 is not None
 
-    enopt_config["linear_constraints"]["lower_bounds"] = [0.0, 1.0, np.inf]
-    enopt_config["linear_constraints"]["upper_bounds"] = [0.0, -np.inf, -1.0]
+    enopt_config["linear_constraints"]["lower_bounds"] = [0.0, -np.inf, -1.0]
+    enopt_config["linear_constraints"]["upper_bounds"] = [0.0, 1.0, np.inf]
     results2 = BasicOptimizer(enopt_config, evaluator()).run().results
     assert results2 is not None
     assert np.allclose(results1.evaluations.variables, results2.evaluations.variables)
@@ -365,8 +365,8 @@ def test_check_nonlinear_constraints(
     assert results1 is not None
 
     # Flipping the bounds should still work:
-    enopt_config["nonlinear_constraints"]["lower_bounds"] = [0.0, 0.0, np.inf]
-    enopt_config["nonlinear_constraints"]["upper_bounds"] = [0.0, -np.inf, 0.0]
+    enopt_config["nonlinear_constraints"]["lower_bounds"] = [0.0, -np.inf, 0.0]
+    enopt_config["nonlinear_constraints"]["upper_bounds"] = [0.0, 0.0, np.inf]
     results2 = BasicOptimizer(enopt_config, evaluator(test_functions)).run().results
     assert results2 is not None
     assert np.allclose(results1.evaluations.variables, results2.evaluations.variables)

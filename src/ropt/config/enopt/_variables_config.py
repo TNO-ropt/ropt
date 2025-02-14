@@ -84,12 +84,12 @@ class VariablesConfig(ImmutableBaseModel):
             lower_bounds = info.context.variables.to_optimizer(lower_bounds)
             upper_bounds = info.context.variables.to_optimizer(upper_bounds)
 
-        self.lower_bounds = immutable_array(
-            np.where(lower_bounds < upper_bounds, lower_bounds, upper_bounds)
-        )
-        self.upper_bounds = immutable_array(
-            np.where(upper_bounds > lower_bounds, upper_bounds, lower_bounds)
-        )
+        if np.any(lower_bounds > upper_bounds):
+            msg = "The lower bounds are larger than the upper bounds."
+            raise ValueError(msg)
+
+        self.lower_bounds = immutable_array(lower_bounds)
+        self.upper_bounds = immutable_array(upper_bounds)
 
         if self.types is not None:
             check_enum_values(self.types, VariableType)

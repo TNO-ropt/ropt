@@ -277,8 +277,8 @@ def test_scipy_le_ge_linear_constraints_two_sided(
 
     enopt_config["linear_constraints"] = {
         "coefficients": [[1, 0, 1]],
-        "lower_bounds": [0.3],
-        "upper_bounds": [0.0],
+        "lower_bounds": [0.0],
+        "upper_bounds": [0.3],
     }
 
     variables = BasicOptimizer(enopt_config, evaluator()).run().variables

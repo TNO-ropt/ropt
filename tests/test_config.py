@@ -141,8 +141,8 @@ def test_perturbation_types(enopt_config: Any) -> None:
         "perturbation_magnitudes": [0.1, 0.01],
         "perturbation_types": [PerturbationType.ABSOLUTE, PerturbationType.RELATIVE],
     }
-    enopt_config["variables"]["lower_bounds"] = [0.0, np.inf]
-    enopt_config["variables"]["upper_bounds"] = [1.0, 600.0]
+    enopt_config["variables"]["lower_bounds"] = [0.0, 600]
+    enopt_config["variables"]["upper_bounds"] = [1.0, np.inf]
     with pytest.raises(
         ValueError,
         match="The variable bounds must be finite to use relative perturbations",
@@ -169,8 +169,8 @@ def test_perturbation_types_with_scaler(enopt_config: Any) -> None:
         "perturbation_magnitudes": [0.1, 0.01],
         "perturbation_types": [PerturbationType.ABSOLUTE, PerturbationType.RELATIVE],
     }
-    enopt_config["variables"]["lower_bounds"] = [0.0, np.inf]
-    enopt_config["variables"]["upper_bounds"] = [1.0, 600.0]
+    enopt_config["variables"]["lower_bounds"] = [0.0, 600]
+    enopt_config["variables"]["upper_bounds"] = [1.0, np.inf]
     with pytest.raises(
         ValueError,
         match="The variable bounds must be finite to use relative perturbations",

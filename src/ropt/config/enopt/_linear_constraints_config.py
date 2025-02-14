@@ -57,13 +57,13 @@ class LinearConstraintsConfig(ImmutableBaseModel):
         size = 0 if self.coefficients is None else self.coefficients.shape[0]
         lower_bounds = broadcast_1d_array(self.lower_bounds, "lower_bounds", size)
         upper_bounds = broadcast_1d_array(self.upper_bounds, "upper_bounds", size)
+        if np.any(lower_bounds > upper_bounds):
+            msg = "The lower bounds are larger than the upper bounds."
+            raise ValueError(msg)
+
         self._mutable()
-        self.lower_bounds = immutable_array(
-            np.where(lower_bounds < upper_bounds, lower_bounds, upper_bounds)
-        )
-        self.upper_bounds = immutable_array(
-            np.where(upper_bounds > lower_bounds, upper_bounds, lower_bounds)
-        )
+        self.lower_bounds = immutable_array(lower_bounds)
+        self.upper_bounds = immutable_array(upper_bounds)
         self._immutable()
         return self
 
