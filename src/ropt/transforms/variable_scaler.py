@@ -104,4 +104,9 @@ class VariableScaler(VariableTransform):
             upper_bounds = upper_bounds - offsets
         if self._scales is not None:
             coefficients = coefficients * self._scales
-        return coefficients, lower_bounds, upper_bounds
+        equation_scaling = np.max(np.abs(coefficients), axis=-1)
+        return (
+            coefficients / equation_scaling[:, np.newaxis],
+            lower_bounds / equation_scaling,
+            upper_bounds / equation_scaling,
+        )

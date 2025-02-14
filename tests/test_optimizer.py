@@ -302,10 +302,21 @@ def test_variables_scale_linear_constraints_with_scaler(
     transforms = OptModelTransforms(variables=VariableScaler(scales, offsets))
     config = EnOptConfig.model_validate(enopt_config, context=transforms)
     assert config.linear_constraints is not None
-    assert np.allclose(config.linear_constraints.coefficients, coefficients * scales)
+    transformed_coefficients = coefficients * scales
+    transformed_scales = np.max(np.abs(transformed_coefficients), axis=-1)
+    assert np.allclose(
+        config.linear_constraints.coefficients,
+        transformed_coefficients / transformed_scales[:, np.newaxis],
+    )
     offsets = np.matmul(coefficients, offsets)
-    assert np.allclose(config.linear_constraints.lower_bounds, lower_bounds - offsets)
-    assert np.allclose(config.linear_constraints.upper_bounds, upper_bounds - offsets)
+    assert np.allclose(
+        config.linear_constraints.lower_bounds,
+        (lower_bounds - offsets) / transformed_scales,
+    )
+    assert np.allclose(
+        config.linear_constraints.upper_bounds,
+        (upper_bounds - offsets) / transformed_scales,
+    )
 
     results = BasicOptimizer(config, evaluator(), transforms=transforms).run().results
     assert results is not None
