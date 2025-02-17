@@ -89,6 +89,9 @@ class Functions(ResultField):
         Returns:
             The transformed results.
         """
+        if transforms.objectives is None and transforms.nonlinear_constraints is None:
+            return self
+
         return Functions(
             weighted_objective=(
                 self.weighted_objective

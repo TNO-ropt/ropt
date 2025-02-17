@@ -8,11 +8,9 @@ from ._results import Results
 if TYPE_CHECKING:
     from ropt.transforms import OptModelTransforms
 
-    from ._bound_constraints import BoundConstraints
+    from ._constraint_diffs import ConstraintDiffs
     from ._function_evaluations import FunctionEvaluations
     from ._functions import Functions
-    from ._linear_constraints import LinearConstraints
-    from ._nonlinear_constraints import NonlinearConstraints
     from ._realizations import Realizations
 
 
@@ -35,17 +33,13 @@ class FunctionResults(Results):
         evaluations:           Results of the function evaluations.
         realizations:          The calculated parameters of the realizations.
         functions:             The calculated functions.
-        bound_constraints:     Bound constraints.
-        linear_constraints:    Linear constraints.
-        nonlinear_constraints: Nonlinear constraints.
+        constraint_diffs:      Bound constraints.
     """
 
     evaluations: FunctionEvaluations
     realizations: Realizations
     functions: Functions | None
-    bound_constraints: BoundConstraints | None = None
-    linear_constraints: LinearConstraints | None = None
-    nonlinear_constraints: NonlinearConstraints | None = None
+    constraint_diffs: ConstraintDiffs | None = None
 
     def transform_from_optimizer(
         self, transforms: OptModelTransforms
@@ -69,19 +63,9 @@ class FunctionResults(Results):
                 if self.functions is None
                 else self.functions.transform_from_optimizer(transforms)
             ),
-            bound_constraints=(
+            constraint_diffs=(
                 None
-                if self.bound_constraints is None
-                else self.bound_constraints.transform_from_optimizer(transforms)
-            ),
-            linear_constraints=(
-                None
-                if self.linear_constraints is None
-                else self.linear_constraints.transform_from_optimizer(transforms)
-            ),
-            nonlinear_constraints=(
-                None
-                if self.nonlinear_constraints is None
-                else self.nonlinear_constraints.transform_from_optimizer(transforms)
+                if self.constraint_diffs is None
+                else self.constraint_diffs.transform_from_optimizer(transforms)
             ),
         )

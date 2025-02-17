@@ -26,34 +26,27 @@ def _get_new_optimal_result(
     return None
 
 
-def _check_constraints(results: Results, tolerance: float | None) -> bool:
+def _violates_constraint(results: Results, tolerance: float | None) -> bool:
     if tolerance is None:
-        return True
+        return False
 
     assert isinstance(results, FunctionResults)
-
-    def _check(diffs: NDArray[np.float64]) -> bool:
-        return bool(np.any(diffs > tolerance))
-
-    if results.bound_constraints is not None and (
-        _check(-results.bound_constraints.lower_diffs)
-        or _check(results.bound_constraints.upper_diffs)
-    ):
+    if results.constraint_diffs is None:
         return False
 
-    if results.linear_constraints is not None and (
-        _check(-results.linear_constraints.lower_diffs)
-        or _check(results.linear_constraints.upper_diffs)
-    ):
-        return False
+    def _check(diffs: NDArray[np.float64] | None, *, flip: bool) -> bool:
+        if diffs is None:
+            return False
+        return bool(np.any((-diffs if flip else diffs) > tolerance))
 
-    if results.nonlinear_constraints is not None and (  # noqa: SIM103
-        _check(-results.nonlinear_constraints.lower_diffs)
-        or _check(results.nonlinear_constraints.upper_diffs)
-    ):
-        return False
-
-    return True
+    return (
+        _check(results.constraint_diffs.bound_lower, flip=True)
+        or _check(results.constraint_diffs.bound_upper, flip=False)
+        or _check(results.constraint_diffs.linear_lower, flip=True)
+        or _check(results.constraint_diffs.linear_upper, flip=False)
+        or _check(results.constraint_diffs.nonlinear_lower, flip=True)
+        or _check(results.constraint_diffs.nonlinear_upper, flip=False)
+    )
 
 
 def _get_last_result(
@@ -70,7 +63,7 @@ def _get_last_result(
             if (
                 isinstance(item, FunctionResults)
                 and item.functions is not None
-                and _check_constraints(transformed_item, constraint_tolerance)
+                and not _violates_constraint(transformed_item, constraint_tolerance)
             )
         ),
         None,
@@ -88,7 +81,7 @@ def _update_optimal_result(
         if (
             isinstance(transformed_item, FunctionResults)
             and transformed_item.functions is not None
-            and _check_constraints(transformed_item, constraint_tolerance)
+            and not _violates_constraint(transformed_item, constraint_tolerance)
         ):
             assert isinstance(item, FunctionResults)
             new_optimal_result = _get_new_optimal_result(optimal_result, item)
@@ -109,6 +102,6 @@ def _get_all_results(
         if (
             isinstance(item, FunctionResults)
             and item.functions is not None
-            and _check_constraints(transformed_item, constraint_tolerance)
+            and not _violates_constraint(transformed_item, constraint_tolerance)
         )
     )

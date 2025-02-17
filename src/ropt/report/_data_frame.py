@@ -162,6 +162,18 @@ def _get_function_results(
         names=names,
     ).rename(columns=partial(_add_prefix, prefix="evaluations"))
 
+    if results.constraint_diffs is not None:
+        constraint_diffs = results.to_dataframe(
+            "constraint_diffs",
+            select=_get_select(results, "constraint_diffs", sub_fields),
+            unstack=[
+                ResultAxis.VARIABLE,
+            ],
+            names=names,
+        ).rename(columns=partial(_add_prefix, prefix="constraint_diffs"))
+
+        return _join_frames(functions, evaluations, constraint_diffs)
+
     return _join_frames(functions, evaluations)
 
 
