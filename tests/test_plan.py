@@ -15,7 +15,6 @@ from ropt.plan import (
     OptimizerContext,
     Plan,
 )
-from ropt.report import ResultsTable
 from ropt.results import FunctionResults, Results
 
 if TYPE_CHECKING:
@@ -1277,46 +1276,6 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
 
     assert results is not None
     assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
-
-
-def test_table(enopt_config: dict[str, Any], evaluator: Any, tmp_path: Path) -> None:
-    enopt_config["optimizer"]["max_functions"] = 5
-
-    path1 = tmp_path / "results1.txt"
-    table = ResultsTable(
-        columns={
-            "evaluations.variables": "Variables",
-        },
-        path=path1,
-    )
-    plan_config = {
-        "variables": {
-            "enopt_config": enopt_config,
-        },
-        "steps": [
-            {
-                "optimizer": {"config": "$enopt_config"},
-            },
-        ],
-    }
-
-    def handle_results(event: Event) -> None:
-        added = False
-        for item in event.data["results"]:
-            if isinstance(item, FunctionResults) and table.add_results(item):
-                added = True
-        if added:
-            table.save()
-
-    context = OptimizerContext(evaluator=evaluator()).add_observer(
-        EventType.FINISHED_EVALUATION, handle_results
-    )
-    plan = Plan(PlanConfig.model_validate(plan_config), context)
-    plan.run()
-
-    assert path1.exists()
-    with path1.open() as fp:
-        assert len(fp.readlines()) == 8
 
 
 @pytest.mark.parametrize("file_format", ["json", "pickle"])

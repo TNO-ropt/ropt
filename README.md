@@ -23,7 +23,7 @@ From PyPI:
 pip install ropt
 ```
 
-To eables support for `pandas` export and tabular output, you can install the `pandas` dependency:
+To enable support for `pandas` export, you can install the `pandas` dependency:
 ```bash
 pip install ropt[pandas]
 ```
