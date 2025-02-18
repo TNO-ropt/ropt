@@ -2161,6 +2161,23 @@ broadcasted to a</code>numpy` array with a length equal to the number of
 equations.</p>
 
 
+<details class="note" open>
+  <summary>Linear transformation of variables.</summary>
+  <p>The set of linear constraints can be represented by a matrix equation:
+<span class="arithmatex">\(\mathbf{A} \mathbf{x} = \mathbf{b}\)</span>.</p>
+<p>When linearly transforming variables to the optimizer domain, the
+coefficients (<span class="arithmatex">\(\mathbf{A}\)</span>) and right-hand-side values (<span class="arithmatex">\(\mathbf{b}\)</span>)
+must be converted to remain valid. If the linear transformation of the
+variables to the optimizer domain is given by:</p>
+<div class="arithmatex">\[ \hat{\mathbf{x}} = \mathbf{S} \mathbf{x} + \mathbf{o}\]</div>
+<p>then the coefficients and right-hand-side values must be transformed as
+follows:</p>
+<div class="arithmatex">\[ \begin{align}
+    \hat{\mathbf{A}} &amp;= \mathbf{A} \mathbf{S}^{-1} \\ \hat{\mathbf{b}}
+    &amp;= \mathbf{b} + \mathbf{A}\mathbf{S}^{-1}\mathbf{o}
+\end{align}\]</div>
+</details>
+
 <p><span class="doc-section-title">Attributes:</span></p>
     <table>
       <thead>
