@@ -827,34 +827,10 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-        
           <li class="md-nav__item">
-  <a href="#ropt.report.ResultsTable" class="md-nav__link">
+  <a href="#ropt.report.ResultsDataFrame.get_table" class="md-nav__link">
     <span class="md-ellipsis">
-      ResultsTable
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ResultsTable">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.report.ResultsTable.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.report.ResultsTable.save" class="md-nav__link">
-    <span class="md-ellipsis">
-      save
+      get_table
     </span>
   </a>
   
@@ -1393,34 +1369,10 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-        
           <li class="md-nav__item">
-  <a href="#ropt.report.ResultsTable" class="md-nav__link">
+  <a href="#ropt.report.ResultsDataFrame.get_table" class="md-nav__link">
     <span class="md-ellipsis">
-      ResultsTable
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ResultsTable">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.report.ResultsTable.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.report.ResultsTable.save" class="md-nav__link">
-    <span class="md-ellipsis">
-      save
+      get_table
     </span>
   </a>
   
@@ -1473,8 +1425,7 @@
 <p>The classes in this module are designed to gather multiple results generated
 during the execution of an optimization plan. Currently, the results can
 be reported as a <a href="https://pandas.pydata.org/"><code>pandas</code></a> DataFrame using the
-<a class="autorefs autorefs-internal" href="#ropt.report.ResultsDataFrame"><code>ResultsDataFrame</code></a> class, or as a text file in
-a tabular format using the <a class="autorefs autorefs-internal" href="#ropt.report.ResultsTable"><code>ResultsTable</code></a> class.</p>
+<a class="autorefs autorefs-internal" href="#ropt.report.ResultsDataFrame"><code>ResultsDataFrame</code></a> class.</p>
 
 
 
@@ -1511,10 +1462,13 @@ a tabular format using the <a class="autorefs autorefs-internal" href="#ropt.rep
 <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a> objects and storing them as a
 <a href="https://pandas.pydata.org/"><code>pandas</code></a> DataFrame.</p>
 <p>New results can be added to the stored DataFrame as they become available
-using the <code>add_results</code> method. The content of the DataFrame is taken from the
-fields of the <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a> object passed during each call
-to <code>add_results</code>. The updated table can be retrieved at any time via the
-<a class="autorefs autorefs-internal" href="#ropt.report.ResultsDataFrame.frame"><code>frame</code></a> property.</p>
+using the <code>add_results</code> method. The content of the DataFrame is taken from
+the fields of the <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a> object passed during
+each call to <code>add_results</code>. The updated table can be retrieved at any time
+via the <a class="autorefs autorefs-internal" href="#ropt.report.ResultsDataFrame.frame"><code>frame</code></a> property.</p>
+<p>To transform the data frame into a tabular form that is more suited for
+human inspection, the <code>get_table</code> method can be used. To succeed, the class
+must be initialized with a dictionary mapping fields to column names.</p>
 
 
 
@@ -1590,24 +1544,30 @@ to <code>add_results</code>. The updated table can be retrieved at any time via 
     <div class="doc doc-contents ">
 
         <p>Initialize a ResultsDataFrame object.</p>
-<p>The set of fields used is determined by the <code>results_fields</code> argument
-passed when initializing the object. These can be any of the fields
-defined in a <a class="autorefs autorefs-internal" href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> or a
+<p>The set of fields used is determined by the <code>fields</code> argument passed
+when initializing the object. These can be any of the fields defined in
+a <a class="autorefs autorefs-internal" href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> or a
 <a class="autorefs autorefs-internal" href="../results/#ropt.results.GradientResults"><code>GradientResults</code></a>. Most of the fields in
 these objects are nested, and the fields to export must be specified
 specifically in the form <code>field.subfield</code>. For instance, to specify the
-<code>variables</code> field of the <code>evaluations</code> field from a function result,
-the specification would be <code>evaluations.variables</code>.</p>
+<code>variables</code> field of the <code>evaluations</code> field from a function result, the
+specification would be <code>evaluations.variables</code>.</p>
 <p>Note that many fields may, in fact, generate multiple columns in the
 resulting data frame. For instance, when specifying
 <code>evaluations.variables</code>, a column will be generated for each variable.
-If available, variable names, will be used as column labels. Because
-the exported fields may be multi-dimensional with names defined along
-each axis, for instance, realizations and objectives, which both
-can be named, the final name may consist of a tuple of names.</p>
+If available, variable names, will be used as column labels. Because the
+exported fields may be multi-dimensional with names defined along each
+axis, for instance, realizations and objectives, which both can be
+named, the final name may consist of a tuple of names.</p>
 <p>The <code>table_type</code> argument is used to determine which type of results
 should be reported: either function evaluation results (<code>functions</code>) or
 gradient results (<code>gradients</code>).</p>
+<p>Instead of passing a set of field specifiers via the <code>fields</code> argument,
+a dictionary mapping the field specifiers to column names can be passed.
+In this case the class will function exactly the same, using the set of
+keys of the dictionary as field specifiers. However, now the <code>get_table</code>
+method can be used to retrieve a data frame where all columns are sorted
+and renamed according to the dictionary's content.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1626,7 +1586,7 @@ gradient results (<code>gradients</code>).</p>
                 <code>fields</code>
             </td>
             <td>
-                  <code>set[str]</code>
+                  <code>set[str] | dict[str, str]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1752,174 +1712,27 @@ data frame. If not provided, numerical indices are used.</p>
 
 </div>
 
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.report.ResultsTable" class="doc doc-heading">
-            <code>ResultsTable</code>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.report._data_frame.ResultsDataFrame" href="#ropt.report.ResultsDataFrame">ResultsDataFrame</a></code></p>
-
-
-        <p>Generate files containing tables of optimization results.</p>
-<p>This class derives from the
-<a class="autorefs autorefs-internal" href="#ropt.report.ResultsDataFrame"><code>ResultsDataFrame</code></a> class and writes the
-generated data frame in a tabular format to a text file.</p>
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.report.ResultsTable.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">table_type</span><span class="o">=</span><span class="s1">&#39;functions&#39;</span><span class="p">,</span> <span class="n">min_header_len</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<h4 id="ropt.report.ResultsDataFrame.get_table" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_table</span><span class="p">()</span></code>
 
 </h4>
 
 
     <div class="doc doc-contents ">
 
-        <p>Initialize a results table.</p>
-<p>The <code>columns</code> parameter specifies which results are to be exported. The
-keys of the <code>columns</code> dictionary correspond to the <code>fields</code> parameter of
-the <a class="autorefs autorefs-internal" href="#ropt.report.ResultsDataFrame"><code>ResultsDataFrame</code></a> parent class. The
-values are the corresponding titles of the columns of the table that is
-generated. As described in the documentation of the parent class, a
-single field may generate multiple columns, each with unique names
-(i.e., variable names). These are handled by adding the name to the
-column name below the main title. As a result, the header may consist of
-multiple lines, and the number of lines may vary according to requested
-fields. For a consistent result, the minimum number of header lines can
-be specified via the <code>min_header_len</code> argument. When needed, blank lines
-will be added to reach the specified minimum number of header lines.</p>
-
-
-<details class="tip" open>
-  <summary>Reading the generated file.</summary>
-  <p>The resulting table can be read using a reader that can handle
-fixed-width columns, such as the read_fwf function of pandas. However,
-the header will need to skip a number of header lines. The
-min_header_len argument can be used to set the minimum number of lines
-in the header. If the generated header has fewer lines than
-min_header_len, empty lines will be added. For example:</p>
-<div class="language-py highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># For a table generated with `min_header_len=3`:</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_fwf</span><span class="p">(</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">&quot;results.txt&quot;</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">header</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)),</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">skip_blank_lines</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">skiprows</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span>
-</span></code></pre></div>
-</details>
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>columns</code>
-            </td>
-            <td>
-                  <code>dict[str, str]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Mapping of column names for the results table.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>path</code>
-            </td>
-            <td>
-                  <code><span title="pathlib.Path">Path</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Path of the result file.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>table_type</code>
-            </td>
-            <td>
-                  <code><span title="typing.Literal">Literal</span>[&#39;functions&#39;, &#39;gradients&#39;]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Type of the table.</p>
-              </div>
-            </td>
-            <td>
-                  <code>&#39;functions&#39;</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>min_header_len</code>
-            </td>
-            <td>
-                  <code>int | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Minimal number of header lines.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Return the results in a table format.</p>
+<p>This property will only be valid if the fields argument of the
+constructor is a dictionary mapping the fields to column names. If so,
+the index of the data frame will be reset, and the columns will be
+re-shuffled and renamed to align with the field dictionary.</p>
+<p>Renaming is done as follow: If a column name is a tuple, only the first
+element will be renamed, and the tuples will be joined by a new-line.</p>
+<p>Note that is possible to specify indices such as <code>batch_id</code>, with a
+corresponding column name through the fields argument of the
+constructor. These will converted to columns in the result accordingly.</p>
 
 
 <p><span class="doc-section-title">Raises:</span></p>
@@ -1933,34 +1746,39 @@ min_header_len, empty lines will be added. For example:</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code>NotImplementedError</code>
+                  <code>TypeError</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the pandas or tabulate modules are not
-                 available</p>
+                <p>raised if no column to name mapping was provided.</p>
               </div>
             </td>
           </tr>
       </tbody>
     </table>
 
-    </div>
 
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.report.ResultsTable.save" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">save</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Write the table to a file.</p>
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The converted data frame.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
     </div>
 
