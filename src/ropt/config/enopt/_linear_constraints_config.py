@@ -36,6 +36,25 @@ class LinearConstraintsConfig(ImmutableBaseModel):
     broadcasted to a `numpy` array with a length equal to the number of
     equations.
 
+    Note: Linear transformation of variables.
+        The set of linear constraints can be represented by a matrix equation:
+        $\mathbf{A} \mathbf{x} = \mathbf{b}$.
+
+        When linearly transforming variables to the optimizer domain, the
+        coefficients ($\mathbf{A}$) and right-hand-side values ($\mathbf{b}$)
+        must be converted to remain valid. If the linear transformation of the
+        variables to the optimizer domain is given by:
+
+        $$ \hat{\mathbf{x}} = \mathbf{S} \mathbf{x} + \mathbf{o}$$
+
+        then the coefficients and right-hand-side values must be transformed as
+        follows:
+
+        $$ \begin{align}
+            \hat{\mathbf{A}} &= \mathbf{A} \mathbf{S}^{-1} \\ \hat{\mathbf{b}}
+            &= \mathbf{b} + \mathbf{A}\mathbf{S}^{-1}\mathbf{o}
+        \end{align}$$
+
     Attributes:
         coefficients: The matrix of coefficients.
         lower_bounds: The lower bounds on the right-hand-sides of the constraint equations.
