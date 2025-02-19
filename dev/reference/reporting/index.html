@@ -827,15 +827,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.report.ResultsDataFrame.get_table" class="md-nav__link">
-    <span class="md-ellipsis">
-      get_table
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1369,15 +1360,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.report.ResultsDataFrame.get_table" class="md-nav__link">
-    <span class="md-ellipsis">
-      get_table
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1466,9 +1448,6 @@ using the <code>add_results</code> method. The content of the DataFrame is taken
 the fields of the <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a> object passed during
 each call to <code>add_results</code>. The updated table can be retrieved at any time
 via the <a class="autorefs autorefs-internal" href="#ropt.report.ResultsDataFrame.frame"><code>frame</code></a> property.</p>
-<p>To transform the data frame into a tabular form that is more suited for
-human inspection, the <code>get_table</code> method can be used. To succeed, the class
-must be initialized with a dictionary mapping fields to column names.</p>
 
 
 
@@ -1586,7 +1565,7 @@ and renamed according to the dictionary's content.</p>
                 <code>fields</code>
             </td>
             <td>
-                  <code>set[str] | dict[str, str]</code>
+                  <code>set[str]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1702,78 +1681,6 @@ data frame. If not provided, numerical indices are used.</p>
             <td>
               <div class="doc-md-description">
                 <p>True if a result was added, else False</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.report.ResultsDataFrame.get_table" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">get_table</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Return the results in a table format.</p>
-<p>This property will only be valid if the fields argument of the
-constructor is a dictionary mapping the fields to column names. If so,
-the index of the data frame will be reset, and the columns will be
-re-shuffled and renamed to align with the field dictionary.</p>
-<p>Renaming is done as follow: If a column name is a tuple, only the first
-element will be renamed, and the tuples will be joined by a new-line.</p>
-<p>Note that is possible to specify indices such as <code>batch_id</code>, with a
-corresponding column name through the fields argument of the
-constructor. These will converted to columns in the result accordingly.</p>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code>TypeError</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>raised if no column to name mapping was provided.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="pandas.DataFrame">DataFrame</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The converted data frame.</p>
               </div>
             </td>
           </tr>
