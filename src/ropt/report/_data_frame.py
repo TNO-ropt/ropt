@@ -34,15 +34,11 @@ class ResultsDataFrame:
     the fields of the [`Results`][ropt.results.Results] object passed during
     each call to `add_results`. The updated table can be retrieved at any time
     via the [`frame`][ropt.report.ResultsDataFrame.frame] property.
-
-    To transform the data frame into a tabular form that is more suited for
-    human inspection, the `get_table` method can be used. To succeed, the class
-    must be initialized with a dictionary mapping fields to column names.
     """
 
     def __init__(
         self,
-        fields: set[str] | dict[str, str],
+        fields: set[str],
         *,
         table_type: Literal["functions", "gradients"] = "functions",
     ) -> None:
@@ -119,15 +115,15 @@ class ResultsDataFrame:
             and isinstance(results, FunctionResults)
             and results.functions is not None
         ):
-            frame = _get_function_results(results, set(self._fields), names)
+            frame = _get_function_results(results, self._fields, names)
         elif (
             self._table_type == "gradients"
             and isinstance(results, GradientResults)
             and results.gradients is not None
         ):
-            frame = _get_gradient_results(results, set(self._fields), names)
+            frame = _get_gradient_results(results, self._fields, names)
         if frame is not None:
-            frame = _add_metadata(frame, results, set(self._fields))
+            frame = _add_metadata(frame, results, self._fields)
             self._frame = pd.concat([self._frame, frame])
             return True
 
@@ -141,33 +137,6 @@ class ResultsDataFrame:
             A pandas data frame with the results.
         """
         return self._frame
-
-    def get_table(self) -> pd.DataFrame:
-        """Return the results in a table format.
-
-        This property will only be valid if the fields argument of the
-        constructor is a dictionary mapping the fields to column names. If so,
-        the index of the data frame will be reset, and the columns will be
-        re-shuffled and renamed to align with the field dictionary.
-
-        Renaming is done as follow: If a column name is a tuple, only the first
-        element will be renamed, and the tuples will be joined by a new-line.
-
-        Note that is possible to specify indices such as `batch_id`, with a
-        corresponding column name through the fields argument of the
-        constructor. These will converted to columns in the result accordingly.
-
-        Raises:
-            TypeError: raised if no column to name mapping was provided.
-
-        Returns:
-            The converted data frame.
-        """
-        if not isinstance(self._fields, dict):
-            msg = "The table was not initialized with a column mapping."
-            raise TypeError(msg)
-        frame = self._frame.reset_index()
-        return _extract_columns(frame, mapping=self._fields)
 
 
 def _get_function_results(
@@ -297,33 +266,3 @@ def _get_value(data: dict[str, Any], keys: list[str]) -> Any | None:  # noqa: AN
         else:
             break
     return data
-
-
-def _extract_columns(data_frame: pd.DataFrame, mapping: dict[str, str]) -> pd.DataFrame:
-    # Columns need to be reordered to follow the ordering of the mapping keys.
-    # Column names may be tuples, where the first element indicates column type
-    # (e.g. `variable` or `objective`) and the rest variable or function names.
-    # Hence, sets of columns exist where the first element of the column name
-    # tuple is identical. Re-ordering is done according to the first element of
-    # these sets of columns, ordering within the set is unchanged.
-    reordered_columns = [
-        name
-        for key in mapping
-        for name in data_frame.columns.to_numpy()
-        if name == key or (isinstance(name, tuple) and name[0] == key)
-    ]
-    data_frame = data_frame.reindex(columns=reordered_columns)
-
-    # Columns are renamed according to the mapping. If the column name is a
-    # tuple the first element is renamed. Tuples are joined by newlines, as a
-    # result column type (e.g. `variable` or `objective`) will be on the first
-    # line, whereas the name of the variable or the function will be on the
-    # second. Columns names that are not a tuple may contain new lines in the
-    # mapped file, to split long names over multiple lines.
-    renamed_columns = [
-        "\n".join([mapping[name[0]]] + [str(item) for item in name[1:]])
-        if isinstance(name, tuple)
-        else mapping[name]
-        for name in reordered_columns
-    ]
-    return data_frame.set_axis(renamed_columns, axis="columns")

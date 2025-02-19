@@ -144,39 +144,3 @@ def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
     assert list(reporter.frame.columns.get_level_values(level=0)) == [
         ("evaluations.variables", idx) for idx in range(3)
     ] + ["metadata.foo.bar"]
-
-
-def test_data_frame_table(enopt_config: Any, evaluator: Any) -> None:
-    optimizer = BasicOptimizer(enopt_config, evaluator())
-    reporter = ResultsDataFrame({"evaluations.variables": "Variables"})
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION, partial(_handle_results, reporter=reporter)
-    )
-    optimizer.run()
-    results = reporter.get_table()
-    assert results.columns.to_list() == ["Variables\n0", "Variables\n1", "Variables\n2"]
-    assert len(results) == 3
-
-
-def test_data_frame_table_gradient(enopt_config: Any, evaluator: Any) -> None:
-    optimizer = BasicOptimizer(enopt_config, evaluator())
-    reporter = ResultsDataFrame(
-        {"gradients.weighted_objective": "Total Objective"},
-        table_type="gradients",
-    )
-    optimizer.add_observer(
-        EventType.FINISHED_EVALUATION,
-        partial(
-            _handle_results,
-            reporter=reporter,
-            variable_names=tuple(f"a:{idx + 1}" for idx in range(3)),
-        ),
-    )
-    optimizer.run()
-    gradients = reporter.get_table()
-    assert gradients.columns.to_list() == [
-        "Total Objective\na:1",
-        "Total Objective\na:2",
-        "Total Objective\na:3",
-    ]
-    assert len(gradients) == 3
