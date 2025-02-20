@@ -1,17 +1,12 @@
 """This module implements the SciPy optimization plugin."""
 
 import copy
-import os
-import sys
-from contextlib import redirect_stdout
 from functools import partial
-from pathlib import Path
 from typing import (
     Any,
     Callable,
     ClassVar,
     Final,
-    TextIO,
 )
 
 import numpy as np
@@ -26,10 +21,7 @@ from scipy.optimize import (
 
 from ropt.config.enopt import EnOptConfig
 from ropt.enums import VariableType
-from ropt.plugins.optimizer.utils import (
-    create_output_path,
-    validate_supported_constraints,
-)
+from ropt.plugins.optimizer.utils import validate_supported_constraints
 
 from .base import Optimizer, OptimizerCallback, OptimizerPlugin
 from .utils import NormalizedConstraints, get_masked_linear_constraints
@@ -86,7 +78,6 @@ _NO_GRADIENT: Final = {
     for name in ["Nelder-Mead", "Powell", "COBYLA", "differential_evolution"]
 }
 
-_OUTPUT_FILE: Final = "optimizer_output"
 
 _ConstraintType = str | Callable[..., float] | Callable[..., NDArray[np.float64]]
 
@@ -180,7 +171,6 @@ class SciPyOptimizer(Optimizer):
         self._cached_variables: NDArray[np.float64] | None = None
         self._cached_function: NDArray[np.float64] | None = None
         self._cached_gradient: NDArray[np.float64] | None = None
-        self._stdout: TextIO
 
     def start(self, initial_values: NDArray[np.float64]) -> None:
         """Start the optimization.
@@ -196,44 +186,30 @@ class SciPyOptimizer(Optimizer):
         if self._config.variables.mask is not None:
             initial_values = initial_values[..., self._config.variables.mask]
 
-        output_dir = self._config.optimizer.output_dir
-        output_file: str | Path
-        if output_dir is None:
-            output_file = os.devnull
+        if self._method == "differential_evolution":
+            if self._parallel:
+                self._options["updating"] = "deferred"
+                self._options["workers"] = 1
+            differential_evolution(
+                func=self._function,
+                x0=initial_values,
+                bounds=self._bounds,
+                constraints=self._constraints,
+                polish=False,
+                vectorized=self._parallel,
+                **self._options,
+            )
         else:
-            output_file = create_output_path(_OUTPUT_FILE, output_dir, suffix=".txt")
-
-        self._stdout = sys.stdout
-        with (
-            Path(output_file).open("a", encoding="utf-8") as output,
-            redirect_stdout(
-                output,
-            ),
-        ):
-            if self._method == "differential_evolution":
-                if self._parallel:
-                    self._options["updating"] = "deferred"
-                    self._options["workers"] = 1
-                differential_evolution(
-                    func=self._function,
-                    x0=initial_values,
-                    bounds=self._bounds,
-                    constraints=self._constraints,
-                    polish=False,
-                    vectorized=self._parallel,
-                    **self._options,
-                )
-            else:
-                minimize(
-                    fun=self._function,
-                    x0=initial_values,
-                    tol=self._config.optimizer.tolerance,
-                    method=self._method,
-                    bounds=self._bounds,
-                    jac=(False if self._method in _NO_GRADIENT else self._gradient),
-                    constraints=self._constraints,
-                    options=self._options if self._options else None,
-                )
+            minimize(
+                fun=self._function,
+                x0=initial_values,
+                tol=self._config.optimizer.tolerance,
+                method=self._method,
+                bounds=self._bounds,
+                jac=(False if self._method in _NO_GRADIENT else self._gradient),
+                constraints=self._constraints,
+                options=self._options if self._options else None,
+            )
 
     @property
     def allow_nan(self) -> bool:
@@ -483,24 +459,22 @@ class SciPyOptimizer(Optimizer):
             and compute_gradients
             and self._config.optimizer.split_evaluations
         ):
-            with redirect_stdout(self._stdout):
-                new_function, _ = self._optimizer_callback(
-                    variables,
-                    return_functions=True,
-                    return_gradients=False,
-                )
-                _, new_gradient = self._optimizer_callback(
-                    variables,
-                    return_functions=False,
-                    return_gradients=True,
-                )
+            new_function, _ = self._optimizer_callback(
+                variables,
+                return_functions=True,
+                return_gradients=False,
+            )
+            _, new_gradient = self._optimizer_callback(
+                variables,
+                return_functions=False,
+                return_gradients=True,
+            )
         else:
-            with redirect_stdout(self._stdout):
-                new_function, new_gradient = self._optimizer_callback(
-                    variables,
-                    return_functions=compute_functions,
-                    return_gradients=compute_gradients,
-                )
+            new_function, new_gradient = self._optimizer_callback(
+                variables,
+                return_functions=compute_functions,
+                return_gradients=compute_gradients,
+            )
         if self.allow_nan:
             new_function = np.where(np.isnan(new_function), np.inf, new_function)
         return new_function, new_gradient

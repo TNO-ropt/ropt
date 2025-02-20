@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Any, cast
 
 import numpy as np
@@ -447,20 +446,3 @@ def test_scipy_speculative(
     )
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
-
-
-def test_scipy_output_dir(tmp_path: Path, enopt_config: Any, evaluator: Any) -> None:
-    output_dir = tmp_path / "outputdir"
-    output_dir.mkdir()
-    enopt_config["optimizer"]["output_dir"] = output_dir
-    enopt_config["optimizer"]["method"] = "slsqp"
-    enopt_config["optimizer"]["max_functions"] = 1
-
-    BasicOptimizer(enopt_config, evaluator()).run()
-    assert (output_dir / "optimizer_output.txt").exists()
-
-    BasicOptimizer(enopt_config, evaluator()).run()
-    assert (output_dir / "optimizer_output-001.txt").exists()
-
-    BasicOptimizer(enopt_config, evaluator()).run()
-    assert (output_dir / "optimizer_output-002.txt").exists()
