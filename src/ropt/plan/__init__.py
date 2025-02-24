@@ -1,10 +1,6 @@
 r"""Code for executing optimization plans.
 
-The [`Plan`][ropt.plan.Plan] class is responsible for executing optimization
-plans, accepting optional input values and returning output values. The plan's
-configuration is managed by the [`PlanConfig`][ropt.config.plan.PlanConfig]
-class, which specifies the inputs, outputs, variables, steps, and result
-handlers.
+The [`Plan`][ropt.plan.Plan] class is responsible managing steps and result handlers.
 
 A plan comprises [`PlanStep`][ropt.plugins.plan.base.PlanStep] objects that define
 individual actions, as well as
@@ -12,7 +8,9 @@ individual actions, as well as
 store data generated during execution. Both steps and result handlers are
 implemented through a [`plugin`][ropt.plugins.plan] mechanism, making it easy to
 extend the range of supported steps and result handlers. The `ropt` library also
-includes a [default plan plugin][ropt.plugins.plan.default.DefaultPlanPlugin]
+includes [default plan handler][ropt.plugins.plan.default.DefaultPlanHandlerPlugin] and
+[default plan step][ropt.plugins.plan.default.DefaultPlanStepPlugin]
+
 that provides various steps and result handlers to support a broad range of
 optimization workflows.
 
@@ -30,13 +28,11 @@ involving a single optimization.
 from ._basic_optimizer import BasicOptimizer
 from ._context import OptimizerContext
 from ._events import Event
-from ._expr import ExpressionEvaluator
 from ._plan import Plan
 
 __all__ = [
     "BasicOptimizer",
     "Event",
-    "ExpressionEvaluator",
     "OptimizerContext",
     "Plan",
 ]

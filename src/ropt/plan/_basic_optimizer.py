@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-from copy import deepcopy
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Callable, NoReturn, Self
 
 from ropt.config.enopt import EnOptConfig
-from ropt.config.plan import PlanConfig
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
 
@@ -20,6 +18,7 @@ if TYPE_CHECKING:
 
     from ropt.evaluator import Evaluator
     from ropt.plan import Event
+    from ropt.plugins.plan.base import ResultHandler
     from ropt.results import FunctionResults
     from ropt.transforms import OptModelTransforms
 
@@ -43,8 +42,6 @@ class BasicOptimizer:
 
     - Start a single optimization.
     - Add observer functions connected to various optimization events.
-    - Attach metadata to each result generated during the optimization.
-    - Generate tables summarizing the optimization results.
     """
 
     def __init__(
@@ -54,6 +51,7 @@ class BasicOptimizer:
         *,
         transforms: OptModelTransforms | None = None,
         constraint_tolerance: float = 1e-10,
+        **kwargs: dict[str, Any],
     ) -> None:
         """Initialize an `BasicOptimizer` object.
 
@@ -65,6 +63,7 @@ class BasicOptimizer:
             evaluator:            The evaluator object used to evaluate functions.
             transforms:           Optional transforms object.
             constraint_tolerance: The tolerance level used to detect constraint violations.
+            kwargs:               Optional keywords that may be passed to optimization code.
         """
         self._config = EnOptConfig.model_validate(enopt_config)
         self._transforms = transforms
@@ -72,7 +71,7 @@ class BasicOptimizer:
         self._optimizer_context = OptimizerContext(evaluator=evaluator)
         self._observers: list[tuple[EventType, Callable[[Event], None]]] = []
         self._results: _Results
-        self._event_data: dict[str, Any] = {}
+        self._metadata: dict[str, Any] = kwargs
 
     @property
     def results(self) -> FunctionResults | None:
@@ -120,76 +119,47 @@ class BasicOptimizer:
         self._observers.append((event_type, function))
         return self
 
-    def add_event_data(self, data: dict[str, Any]) -> Self:
-        """Add data that will be merged into event data.
-
-        The given data will be merged into the event data dictionary that
-        is passed via events emitted by the optimizer.
-
-        Args:
-            data: The data to add.
-
-        Returns:
-            The `BasicOptimizer` instance, allowing for method chaining.
-        """
-        self._event_data.update(deepcopy(data))
-        return self
-
     def run(self) -> Self:
         """Run the optimization.
 
         Returns:
             The `BasicOptimizer` instance, allowing for method chaining.
         """
-        steps = [
-            {
-                "run": "optimizer",
-                "with": {
-                    "config": "$__config__",
-                    "exit_code_var": "__exit_code__",
-                    "tags": "__optimizer_tag__",
-                    "data": self._event_data,
-                },
-            }
-        ]
-        config = (
-            self._config
-            if self._transforms is None
-            else [self._config, self._transforms]
-        )
-        plan = Plan(
-            PlanConfig.model_validate(
-                {
-                    "variables": {
-                        "__config__": config,
-                        "__optimum_tracker__": None,
-                        "__exit_code__": OptimizerExitCode.UNKNOWN,
-                    },
-                    "steps": steps,
-                    "handlers": [
-                        {
-                            "run": "tracker",
-                            "with": {
-                                "var": "__optimum_tracker__",
-                                "constraint_tolerance": self._constraint_tolerance,
-                                "tags": "__optimizer_tag__",
-                            },
-                        },
-                    ],
-                }
-            ),
-            self._optimizer_context,
-        )
+        plan = Plan(self._optimizer_context)
+        plan.add_function(self._run_func)
+        for key, value in self._metadata.items():
+            if plan.handler_exists(key):
+                plan.add_handler(key, tags="__optimizer_tag__", **{key: value})
+        for key, value in self._metadata.items():
+            if plan.step_exists(key):
+                step = plan.add_step(key)
+                plan.run_step(step, **{key: value})
         for event_type, function in self._observers:
             self._optimizer_context.add_observer(event_type, function)
-        plan.run()
-        results = plan["__optimum_tracker__"]
+        result, exit_code = plan.run_function(self._transforms)
         self._results = _Results(
-            results=results,
-            variables=None if results is None else results.evaluations.variables,
-            exit_code=plan["__exit_code__"],
+            results=None if result is None else result["results"],
+            variables=None if result is None else result["variables"],
+            exit_code=exit_code,
         )
         return self
+
+    def _run_func(
+        self, plan: Plan, transforms: OptModelTransforms | None
+    ) -> tuple[ResultHandler | None, OptimizerExitCode | None]:
+        optimizer = plan.add_step(
+            "optimizer",
+            config=self._config,
+            transforms=transforms,
+            tags="__optimizer_tag__",
+        )
+        tracker = plan.add_handler(
+            "tracker",
+            constraint_tolerance=self._constraint_tolerance,
+            tags="__optimizer_tag__",
+        )
+        plan.run_step(optimizer)
+        return tracker, optimizer["exit_code"]
 
     @staticmethod
     def abort_optimization() -> NoReturn:

@@ -34,8 +34,9 @@ module to implement various optimization algorithms.
 
 [`plan`][ropt.plugins.plan]:
 : Plan plugins implement the objects that execute an optimization plan.
-  The built-in [`default`][ropt.plugins.plan.default.DefaultPlanPlugin] plugin
-  offers a full set of optimization plan objects for executing complex
+  The built-in [`default`][ropt.plugins.plan.default.DefaultPlanHandlerPlugin]
+  handler and [`default`][ropt.plugins.plan.default.DefaultPlanStepPlugin] step
+  plugins offer a full set of optimization plan objects for executing complex
   optimization plans.
 
 Plugins are managed by the [`PluginManager`][ropt.plugins.PluginManager] class.
@@ -50,7 +51,9 @@ base class defining the required functionality for each plugin type:
     Abstract base class for realization filter plugins.
 4. [`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.base.FunctionEstimatorPlugin]:
     Abstract base class for function estimator plugins.
-5. [`PlanPlugin`][ropt.plugins.plan.base.PlanPlugin]:
+5. [`PlanHandlerPlugin`][ropt.plugins.plan.base.PlanHandlerPlugin]:
+    Abstract base class for optimization plan object plugins.
+5. [`PlanStepPlugin`][ropt.plugins.plan.base.PlanStepPlugin]:
     Abstract base class for optimization plan object plugins.
 
 Plugins can be built-in, installed separately using the standard entry points

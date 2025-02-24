@@ -2,32 +2,21 @@
 
 from __future__ import annotations
 
-from functools import singledispatchmethod
-from typing import Final, Type
+from typing import TYPE_CHECKING, Any, Final, Type
 
-from ropt.config.plan import PlanStepConfig, ResultHandlerConfig
-from ropt.plan import Plan
-from ropt.plugins.plan.base import PlanStep, ResultHandler
-
-from ._load_data import DefaultLoadStep
 from ._metadata import DefaultMetadataHandler
-from ._print import DefaultPrintStep
-from ._repeat import DefaultRepeatStep
-from ._save import DefaultSaveStep
-from ._set import DefaultSetStep
 from ._tracker import DefaultTrackerHandler
-from .base import PlanPlugin
+from .base import PlanHandlerPlugin, PlanStepPlugin
 from .evaluator import DefaultEvaluatorStep
 from .optimizer import DefaultOptimizerStep
 
+if TYPE_CHECKING:
+    from ropt.plan import Plan
+    from ropt.plugins.plan.base import PlanStep, ResultHandler
+
 _STEP_OBJECTS: Final[dict[str, Type[PlanStep]]] = {
     "evaluator": DefaultEvaluatorStep,
-    "load": DefaultLoadStep,
     "optimizer": DefaultOptimizerStep,
-    "save": DefaultSaveStep,
-    "print": DefaultPrintStep,
-    "repeat": DefaultRepeatStep,
-    "set": DefaultSetStep,
 }
 
 _RESULT_HANDLER_OBJECTS: Final[dict[str, Type[ResultHandler]]] = {
@@ -36,26 +25,10 @@ _RESULT_HANDLER_OBJECTS: Final[dict[str, Type[ResultHandler]]] = {
 }
 
 
-class DefaultPlanPlugin(PlanPlugin):
+class DefaultPlanHandlerPlugin(PlanHandlerPlugin):
     """The default plan plugin class.
 
-    This class provides a number of steps and result handlers:
-
-    `Steps`:
-    : - A step that modifies one or more variables
-        ([`set`][ropt.plugins.plan._set.DefaultSetStep]).
-    : - A step that loads data from a file
-        ([`load`][ropt.plugins.plan._load_data.DefaultLoadStep]).
-    : - A step that saves data to a file
-        ([`save`][ropt.plugins.plan._save.DefaultSaveStep]).
-    : - A step that performs a single ensemble evaluation
-        ([`evaluator`][ropt.plugins.plan.evaluator.DefaultEvaluatorStep]).
-    : - A step that runs an optimization
-        ([`optimizer`][ropt.plugins.plan.optimizer.DefaultOptimizerStep]).
-    : - A step that prints a message to the console
-        ([`print`][ropt.plugins.plan._print.DefaultPrintStep]).
-    : - A step that repeats a number of steps
-        ([`repeat`][ropt.plugins.plan._repeat.DefaultRepeatStep]).
+    This class provides a number of result handlers:
 
     `Result Handlers`:
     : - A handler that adds metadata to results
@@ -64,39 +37,19 @@ class DefaultPlanPlugin(PlanPlugin):
         ([`tracker`][ropt.plugins.plan._tracker.DefaultTrackerHandler]).
     """
 
-    @singledispatchmethod
-    def create(  # type: ignore[override]
-        self, config: PlanStepConfig | ResultHandlerConfig, plan: Plan
-    ) -> ResultHandler | PlanStep:
-        """Initialize the plan plugin.
+    def create(self, name: str, plan: Plan, **kwargs: dict[str, Any]) -> ResultHandler:
+        """Create a result  handler.
 
         See the [ropt.plugins.plan.base.PlanPlugin][] abstract base class.
 
         # noqa
         """
-        msg = "Plan config type not implemented."
-        raise NotImplementedError(msg)
-
-    @create.register
-    def _create_step(self, config: PlanStepConfig, plan: Plan) -> PlanStep:
-        _, _, step_name = config.run.lower().rpartition("/")
-        step_obj = _STEP_OBJECTS.get(step_name)
-        if step_obj is not None:
-            return step_obj(config, plan)
-
-        msg = f"Unknown step type: {config.run}"
-        raise TypeError(msg)
-
-    @create.register
-    def _create_result_handler(
-        self, config: ResultHandlerConfig, plan: Plan
-    ) -> ResultHandler:
-        _, _, name = config.run.lower().rpartition("/")
+        _, _, name = name.lower().rpartition("/")
         obj = _RESULT_HANDLER_OBJECTS.get(name)
         if obj is not None:
-            return obj(config, plan)
+            return obj(plan, **kwargs)
 
-        msg = f"Unknown results handler object type: {config.run}"
+        msg = f"Unknown results handler object type: {name}"
         raise TypeError(msg)
 
     def is_supported(self, method: str) -> bool:
@@ -106,6 +59,41 @@ class DefaultPlanPlugin(PlanPlugin):
 
         # noqa
         """
-        return (method.lower() in _RESULT_HANDLER_OBJECTS) or (
-            method.lower() in _STEP_OBJECTS
-        )
+        return method.lower() in _RESULT_HANDLER_OBJECTS
+
+
+class DefaultPlanStepPlugin(PlanStepPlugin):
+    """The default plan plugin class.
+
+    This class provides a number of steps:
+
+    `Steps`:
+    : - A step that performs a single ensemble evaluation
+        ([`evaluator`][ropt.plugins.plan.evaluator.DefaultEvaluatorStep]).
+    : - A step that runs an optimization
+        ([`optimizer`][ropt.plugins.plan.optimizer.DefaultOptimizerStep]).
+    """
+
+    def create(self, name: str, plan: Plan, **kwargs: Any) -> PlanStep:  # noqa: ANN401
+        """Create a step.
+
+        See the [ropt.plugins.plan.base.PlanPlugin][] abstract base class.
+
+        # noqa
+        """
+        _, _, name = name.lower().rpartition("/")
+        step_obj = _STEP_OBJECTS.get(name)
+        if step_obj is not None:
+            return step_obj(plan, **kwargs)
+
+        msg = f"Unknown step type: {name}"
+        raise TypeError(msg)
+
+    def is_supported(self, method: str) -> bool:
+        """Check if a method is supported.
+
+        See the [ropt.plugins.base.Plugin][] abstract base class.
+
+        # noqa
+        """
+        return method.lower() in _STEP_OBJECTS

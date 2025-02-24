@@ -46,8 +46,11 @@ default = "ropt.plugins.realization_filter.default:DefaultRealizationFilterPlugi
 [project.entry-points."ropt.plugins.function_estimator"]
 default = "ropt.plugins.function_estimator.default:DefaultFunctionEstimatorPlugin"
 
-[project.entry-points."ropt.plugins.plan"]
-default = "ropt.plugins.plan.default:DefaultPlanPlugin"
+[project.entry-points."ropt.plugins.plan_handler"]
+default = "ropt.plugins.plan.default:DefaultPlanHandlerPlugin"
+
+[project.entry-points."ropt.plugins.plan_step"]
+default = "ropt.plugins.plan.default:DefaultPlanStepPlugin"
 
 [project.scripts]
 ropt_plugin_optimizer = "ropt.plugins.optimizer.external:ropt_plugin_optimizer"
@@ -70,6 +73,7 @@ filterwarnings = [
     "error",
     'ignore:\nPyarrow will become a required dependency of pandas.*:DeprecationWarning',
     'ignore:datetime.datetime.utcfromtimestamp\(\) is deprecated.*:DeprecationWarning',  # 3.12
+    'ignore:numpy.ndarray size changed, may indicate binary incompatibility.*:RuntimeWarning',
 ]
 
 [tool.ruff.format]

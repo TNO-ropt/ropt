@@ -10,7 +10,7 @@ from ropt.exceptions import ConfigError
 
 from .function_estimator.base import FunctionEstimatorPlugin
 from .optimizer.base import OptimizerPlugin
-from .plan.base import PlanPlugin
+from .plan.base import PlanHandlerPlugin, PlanStepPlugin
 from .realization_filter.base import RealizationFilterPlugin
 from .sampler.base import SamplerPlugin
 
@@ -23,7 +23,8 @@ _PLUGIN_TYPES: Final = {
     "optimizer": OptimizerPlugin,
     "sampler": SamplerPlugin,
     "realization_filter": RealizationFilterPlugin,
-    "plan": PlanPlugin,
+    "plan_handler": PlanHandlerPlugin,
+    "plan_step": PlanStepPlugin,
 }
 
 PluginType = Literal[
@@ -31,7 +32,8 @@ PluginType = Literal[
     "sampler",
     "realization_filter",
     "function_estimator",
-    "plan",
+    "plan_handler",
+    "plan_step",
 ]
 """ Plugin Types Supported by `ropt`"""
 
@@ -69,7 +71,8 @@ class PluginManager:
             "sampler": {},
             "realization_filter": {},
             "function_estimator": {},
-            "plan": {},
+            "plan_handler": {},
+            "plan_step": {},
         }
 
         for plugin_type in self._plugins:
