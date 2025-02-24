@@ -2,17 +2,10 @@
 
 from __future__ import annotations
 
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Self,
-)
+from typing import TYPE_CHECKING, Callable, Self
 
 from ropt.enums import EventType
 from ropt.plugins import PluginManager
-
-from ._expr import ExpressionEvaluator
 
 if TYPE_CHECKING:
     from ropt.evaluator import Evaluator
@@ -27,19 +20,15 @@ class OptimizerContext:
 
     - An [`Evaluator`][ropt.evaluator.Evaluator] callable for evaluating
       functions.
-    - An expression evaluator object for processing expressions.
     - A plugin manager to retrieve plugins used by the plan and optimizers.
     - Event callbacks that are triggered in response to specific events,
       executed after the plan has processed them.
-    - Variables with a constant value that are copied into each plan created
-      with the context.
     """
 
     def __init__(
         self,
         evaluator: Evaluator,
         plugin_manager: PluginManager | None = None,
-        variables: dict[str, Any] | None = None,
     ) -> None:
         """Initialize the optimization context.
 
@@ -50,21 +39,14 @@ class OptimizerContext:
         Args:
             evaluator:      A callable used to evaluate functions within the plan.
             plugin_manager: Optional plugin manager.
-            variables:      Optional constant plan variable definitions.
         """
         self.evaluator = evaluator
-        self.expr = ExpressionEvaluator()
         self.plugin_manager = (
             PluginManager() if plugin_manager is None else plugin_manager
         )
-        for _, plugin in self.plugin_manager.plugins("plan"):
-            functions = getattr(plugin, "functions", None)
-            if functions is not None:
-                self.expr.add_functions(functions)
         self._subscribers: dict[EventType, list[Callable[[Event], None]]] = {
             event: [] for event in EventType
         }
-        self.variables = {} if variables is None else variables
 
     def add_observer(
         self,

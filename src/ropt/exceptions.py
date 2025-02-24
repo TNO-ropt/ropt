@@ -23,3 +23,11 @@ class OptimizationAborted(Exception):  # noqa: N818
         """
         self.exit_code = exit_code
         super().__init__()
+
+
+class PlanAborted(Exception):  # noqa: N818
+    """Raised when an optimization plan is aborted.
+
+    Steps within a plan may abort a plan by setting its `aborted` attribute. Any
+    attemps to run steps after this, will raise this exception.
+    """

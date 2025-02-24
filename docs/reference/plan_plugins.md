@@ -5,5 +5,6 @@
         members:
             - PlanStep
             - ResultHandler
-            - PlanPlugin
+            - PlanHandlerPlugin
+            - PlanStepPlugin
 

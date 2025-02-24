@@ -2,16 +2,13 @@
 
 from __future__ import annotations
 
-from copy import deepcopy
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from pydantic import BaseModel, ConfigDict
+from numpy.typing import NDArray  # noqa: TC002
 
 from ropt.config.enopt import EnOptConfig
-from ropt.config.plan import PlanConfig  # noqa: TC001
-from ropt.config.validated_types import Array1D, ItemOrSet, ItemOrTuple  # noqa: TC001
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.optimization import EnsembleOptimizer
@@ -19,10 +16,9 @@ from ropt.plan import Event, Plan
 from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
 
-if TYPE_CHECKING:
-    from numpy.typing import NDArray
+from ._utils import _get_set
 
-    from ropt.config.plan import PlanStepConfig
+if TYPE_CHECKING:
     from ropt.results import Results
     from ropt.transforms import OptModelTransforms
 
@@ -56,135 +52,57 @@ class DefaultOptimizerStep(PlanStep):
       specified in the plan will respond to this signal to process those results.
 
     The optimizer step supports nested optimizations, where each function
-    evaluation in the optimization triggers a nested optimization plan that
-    should produce the result for the function evaluation.
-
-    The optimizer step utilizes the
-    [`DefaultOptimizerStepWith`]
-    [ropt.plugins.plan.optimizer.DefaultOptimizerStep.DefaultOptimizerStepWith]
-    configuration class to parse the `with` field of the
-    [`PlanStepConfig`][ropt.config.plan.PlanStepConfig] used to specify this step
-    in a plan configuration.
+    evaluation in the optimization calls a function that should run the nested
+    optimization and produce the result for the function evaluation.
     """
 
-    class NestedPlanConfig(BaseModel):
-        """Parameters needed by a nested plan.
-
-        A nested plan will be executed by its parent plan each time it evaluates
-        a function. While a nested plan is a standard [`Plan`][ropt.plan.Plan],
-        it must adhere to certain rules:
-
-        - It must accept at least one input variable that holds the variable
-          values at which the parent plan intends to evaluate a function.
-        - It must return one result, which the parent plan will accept as the
-          result of the function evaluation.
-
-        Extra inputs to the nested plan can be specified using the
-        `extra_inputs` field. The nested plan must account for these extra
-        inputs accordingly.
-
-        Nested plans run independently, similar to a standard plan. They
-        typically produce [`Results`][ropt.results.Results], which may be
-        processed using result handlers defined in the nested plan. Once these
-        handlers have executed, the results are also 'bubbled' up to the parent
-        plan, where they are processed with its own handlers.
-
-        Attributes:
-            plan:         The nested plan.
-            extra_inputs: Extra inputs passed to the plan.
-        """
-
-        plan: PlanConfig
-        extra_inputs: ItemOrTuple[Any] = ()
-
-        model_config = ConfigDict(
-            extra="forbid",
-            validate_default=True,
-            arbitrary_types_allowed=True,
-            frozen=True,
-        )
-
-    class DefaultOptimizerStepWith(BaseModel):
-        """Parameters used by the default optimizer step.
-
-        The [`DefaultOptimizerStep`][ropt.plugins.plan.optimizer.DefaultOptimizerStep]
-        requires an optimizer configuration; all other parameters are optional.
-        The configuration object must be an
-        [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object or a dictionary
-        that can be parsed into such an object. Initial values can be provided
-        optionally; if not specified, the initial values defined by the
-        optimizer configuration will be used.
-
-        The `exit_code_var` field can be used to specify the name of a plan
-        variable where the [`exit code`][ropt.enums.OptimizerExitCode] is
-        stored, which the optimizer returns upon completion.
-
-        The `tags` field allows optional labels to be attached to each result,
-        assisting result handlers in filtering relevant results.
-
-        The `data` field can be used to pass additional information via the `data`
-        field of the events emitted by the optimizer step. Avoid the use of `results`
-        and `exit_code` in this field, as these are already passed in the event data.
-
-        The `nested_optimization_plan` is parsed as a [`NestedPlanConfig`]
-        [ropt.plugins.plan.optimizer.DefaultOptimizerStep.NestedPlanConfig] to
-        define an optional nested optimization procedure.
-
-        Attributes:
-            config:                The optimizer configuration.
-            tags:                  Tags to add to the emitted events.
-            initial_values:        The initial values for the optimizer.
-            exit_code_var:         Name of the variable to store the exit code.
-            data:                  Data to pass via events.
-            nested_optimization:   Optional nested optimization plan configuration.
-        """
-
-        config: Any
-        tags: ItemOrSet[str] = set()
-        initial_values: str | Array1D | None = None
-        exit_code_var: str | None = None
-        nested_optimization: DefaultOptimizerStep.NestedPlanConfig | None = None
-        data: dict[str, Any] = {}
-
-        model_config = ConfigDict(
-            extra="forbid",
-            validate_default=True,
-            arbitrary_types_allowed=True,
-            frozen=True,
-        )
-
-    def __init__(self, config: PlanStepConfig, plan: Plan) -> None:
+    def __init__(
+        self,
+        plan: Plan,
+        *,
+        config: dict[str, Any] | EnOptConfig,
+        transforms: OptModelTransforms | None = None,
+        tags: str | set[str] | None = None,
+        nested_optimization: Plan | None = None,
+    ) -> None:
         """Initialize a default optimizer step.
 
         Args:
-            config: The configuration of the step.
-            plan:   The plan that runs this step.
+            plan:                The plan that runs this step.
+            config:              The optimizer configuration.
+            transforms:          Optional transforms object.
+            tags:                Tags to add to the emitted events.
+            nested_optimization: Optional nested plan.
         """
-        super().__init__(config, plan)
+        super().__init__(plan)
 
-        self._with = self.DefaultOptimizerStepWith.model_validate(config.with_)
+        self._config = EnOptConfig.model_validate(config)
+        self._transforms = transforms
+        self._tags = _get_set(tags)
+        self._nested_optimization = nested_optimization
+        self._nested_run_index = 0
+        self["exit_code"] = None
 
-    def run(self) -> None:
-        """Run the optimizer step.
-
-        Returns:
-            Whether a user abort occurred.
-        """
-        variables = self._get_initial_variables()
-        config = self.plan.eval(self._with.config)
-        match config:
-            case dict():
-                enopt_config, transforms = EnOptConfig.model_validate(config), None
-            case EnOptConfig():
-                enopt_config, transforms = config, None
-            case list():
-                enopt_config, transforms = config
+    def run(  # type: ignore[override]
+        self,
+        *,
+        variables: FunctionResults | NDArray[np.float64] | list[float] | None = None,
+    ) -> None:
+        """Run the optimizer step."""
+        match variables:
+            case FunctionResults():
+                variables = variables.evaluations.variables
+            case np.ndarray() | list():
+                variables = np.asarray(variables, dtype=np.float64)
+            case None:
+                variables = None
             case _:
-                msg = "No valid EnOpt configuration provided"
-                raise TypeError(msg)
+                msg = "Invalid initial variables."
+                raise ValueError(msg)
+
         if variables is None:
-            variables = enopt_config.variables.initial_values
-        self._run(enopt_config, transforms, variables)
+            variables = self._config.variables.initial_values
+        self._run(self._config, self._transforms, variables)
 
     def _run(
         self,
@@ -196,8 +114,7 @@ class DefaultOptimizerStep(PlanStep):
             Event(
                 event_type=EventType.START_OPTIMIZER_STEP,
                 config=enopt_config,
-                tags=self._with.tags,
-                data=deepcopy(self._with.data),
+                tags=self._tags,
             )
         )
 
@@ -214,35 +131,26 @@ class DefaultOptimizerStep(PlanStep):
             ensemble_evaluator=ensemble_evaluator,
             plugin_manager=self.plan.optimizer_context.plugin_manager,
             nested_optimizer=(
-                self._run_nested_plan
-                if self._with.nested_optimization is not None
-                else None
+                self._run_nested_plan if self._nested_optimization is not None else None
             ),
             signal_evaluation=partial(
                 self._signal_evaluation, enopt_config, transforms
             ),
         )
 
-        if (
-            ensemble_optimizer.is_parallel
-            and self._with.nested_optimization is not None
-        ):
+        if ensemble_optimizer.is_parallel and self._nested_optimization is not None:
             msg = "Nested optimization detected: parallel evaluation not supported. "
             raise RuntimeError(msg)
 
         exit_code = ensemble_optimizer.start(variables)
+        self["exit_code"] = exit_code
 
-        if self._with.exit_code_var is not None:
-            self.plan[self._with.exit_code_var] = exit_code
-
-        data = deepcopy(self._with.data)
-        data["exit_code"] = exit_code
         self.emit_event(
             Event(
                 event_type=EventType.FINISHED_OPTIMIZER_STEP,
                 config=enopt_config,
-                tags=self._with.tags,
-                data=data,
+                tags=self._tags,
+                data={"exit_code": exit_code},
             )
         )
 
@@ -282,13 +190,11 @@ class DefaultOptimizerStep(PlanStep):
                 Event(
                     event_type=EventType.START_EVALUATION,
                     config=enopt_config,
-                    tags=self._with.tags,
-                    data=deepcopy(self._with.data),
+                    tags=self._tags,
                 )
             )
         else:
-            data = deepcopy(self._with.data)
-            data["exit_code"] = exit_code
+            data: dict[str, Any] = {"exit_code": exit_code}
             if transforms is not None:
                 data["transformed_results"] = results
                 data["results"] = [
@@ -300,7 +206,7 @@ class DefaultOptimizerStep(PlanStep):
                 Event(
                     event_type=EventType.FINISHED_EVALUATION,
                     config=enopt_config,
-                    tags=self._with.tags,
+                    tags=self._tags,
                     data=data,
                 ),
             )
@@ -311,36 +217,19 @@ class DefaultOptimizerStep(PlanStep):
         """Run a  nested plan.
 
         Args:
-            variables: variables to set in the nested plan.
+            variables:     Variables to set in the nested plan.
 
         Returns:
             The variables generated by the nested plan.
         """
-        if self._with.nested_optimization is None:
+        if self._nested_optimization is None:
             return None, False
-        plan = self.plan.spawn(self._with.nested_optimization.plan)
-        extra_inputs = [
-            self._plan.eval(item)
-            for item in self._with.nested_optimization.extra_inputs
-        ]
-        results = plan.run(variables, *extra_inputs)
-        assert len(results) == 1
-        assert results[0] is None or isinstance(results[0], FunctionResults)
-        if plan.aborted:
+        self._nested_optimization.set_parent(self.plan, self._nested_run_index)
+        self._nested_run_index += 1
+        results = self._nested_optimization.run_function(variables)
+        if self._nested_optimization.aborted:
             self.plan.abort()
-        return results[0], plan.aborted
-
-    def _get_initial_variables(self) -> NDArray[np.float64] | None:
-        if self._with.initial_values is not None:
-            parsed_variables = self.plan.eval(self._with.initial_values)
-            match parsed_variables:
-                case FunctionResults():
-                    return parsed_variables.evaluations.variables
-                case np.ndarray() | list():
-                    return np.asarray(parsed_variables, dtype=np.float64)
-                case None:
-                    return None
-                case _:
-                    msg = f"`{self._with.initial_values}` does not contain variables."
-                    raise ValueError(msg)
-        return None
+        if not isinstance(results, FunctionResults):
+            msg = "Nested optimization must return a FunctionResults object."
+            raise TypeError(msg)
+        return results, self._nested_optimization.aborted

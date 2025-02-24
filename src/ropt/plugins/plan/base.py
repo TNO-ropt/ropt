@@ -1,11 +1,10 @@
 """This module defines the base classes for optimization plan plugins.
 
 Optimization plan steps and result handlers can be added via the plugin
-mechanism to implement additional functionality. This is done by creating a
-plugin class that derives from the
-[`PlanPlugin`][ropt.plugins.plan.base.PlanPlugin] class. It needs to define a
-[`create`][ropt.plugins.plan.base.PlanPlugin.create] method that generates the
-plan objects.
+mechanism to implement additional functionality. This is done by creating plugin
+classes that derive from the
+[`PlanHandlerPlugin`][ropt.plugins.plan.base.PlanHandlerPlugin] and
+[`PlanStepPlugin`][ropt.plugins.plan.base.PlanStepPlugin] classes.
 """
 
 from __future__ import annotations
@@ -16,57 +15,69 @@ from typing import TYPE_CHECKING, Any
 from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
-    from ropt.config.plan import PlanStepConfig, ResultHandlerConfig
-    from ropt.plan import Event, OptimizerContext, Plan
+    from ropt.plan import Event, Plan
 
 
-class PlanPlugin(Plugin):
-    """Abstract base class for plan plugins.
+class PlanHandlerPlugin(Plugin):
+    """Abstract base class for plan handler plugins.
 
-    This base class serves as the foundation for all plugins used in an
-    optimization plan, including plan steps and result handlers. Any plugin
-    derived from this class can be built-in, installed via a plugin mechanism,
-    or dynamically loaded. During the execution of an optimization plan, the
-    required plugin is located through the
-    [`PluginManager`][ropt.plugins.PluginManager], which then uses the plugin's
-    `create` function to instantiate either a
-    [`PlanStep`][ropt.plugins.plan.base.PlanStep] or a
-    [`ResultHandler`][ropt.plugins.plan.base.ResultHandler] as needed.
-
-    Note: Plan functions
-        A plan plugin can also provide functions to be used by the plan`s
-        expression evaluator. To achieve this, the plugin should override the
-        `functions` property of the
-        [`PlanPlugin`][ropt.plugins.plan.base.PlanPlugin] class. This property
-        should return a dictionary that maps function names to callables, which
-        are subsequently added to the expression evaluator.
+    This base class serves as the foundation for handler plugins used in an
+    optimization plan. Any plugin derived from this class can be built-in,
+    installed via a plugin mechanism, or dynamically loaded. During the
+    execution of an optimization plan, the required plugin is located through
+    the [`PluginManager`][ropt.plugins.PluginManager], which then uses the
+    plugin's `create_*` functions to instantiate  a
+    [`ResultHandler`][ropt.plugins.plan.base.ResultHandler].
     """
 
     @abstractmethod
     def create(
         self,
-        config: ResultHandlerConfig | PlanStepConfig,
-        context: OptimizerContext,
-    ) -> ResultHandler | PlanStep:
-        """Create a step or result handler.
+        name: str,
+        plan: Plan,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> ResultHandler:
+        """Create a result handler.
 
-        This factory function instantiates either a step or a result handler
-        object based on the provided configuration. The configuration determines
-        which type of object to return—either a step or a result handler.
+        This factory function instantiates result handler
+        object based on the provided configuration.
 
         Args:
-            config:  The configuration for the plan object.
-            context: The context in which the plan operates.
+            name:   The name of the handler.
+            plan:   The plan in which the handler operates.
+            kwargs: Additional arguments to pass to the handler.
         """
 
-    @property
-    def functions(self) -> dict[str, Any]:
-        """Return plan functions implemented by the plugin.
 
-        Returns:
-            The functions.
+class PlanStepPlugin(Plugin):
+    """Abstract base class for plan step plugins.
+
+    This base class serves as the foundation for step plugins used in an
+    optimization plan. Any plugin derived from this class can be built-in,
+    installed via a plugin mechanism, or dynamically loaded. During the
+    execution of an optimization plan, the required plugin is located through
+    the [`PluginManager`][ropt.plugins.PluginManager], which then uses the
+    plugin's `create_*` functions to instantiate a
+    [`PlanStep`][ropt.plugins.plan.base.PlanStep].
+    """
+
+    @abstractmethod
+    def create(
+        self,
+        name: str,
+        plan: Plan,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> PlanStep:
+        """Create a result handler.
+
+        This factory function instantiates result handler
+        object based on the provided configuration.
+
+        Args:
+            name: The name of the step.
+            plan: The plan in which the step operates.
+            kwargs: Additional arguments to pass to the step.
         """
-        return {}
 
 
 class PlanStep(ABC):
@@ -74,32 +85,19 @@ class PlanStep(ABC):
 
     steps loaded and created by the plugin manager must inherit from this
     abstract base class. It defines a `run` method that must be overridden to
-    implement the specific functionality of each step. The class also provides
-    default properties for accessing the configuration and the plan that
-    executes the step.
+    implement the specific functionality of each step.
     """
 
-    def __init__(self, config: PlanStepConfig, plan: Plan) -> None:
+    def __init__(self, plan: Plan) -> None:
         """Initialize the step.
 
-        The `config` and `plan` arguments are accessible as `step_config`
-        and `plan` properties.
+        The `plan` argument is accessible as the `plan` property.
 
         Args:
-            config: The configuration for this step.
             plan:   The parent plan that manages this step.
         """
-        self._step_config = config
-        self._plan = plan
-
-    @property
-    def step_config(self) -> PlanStepConfig:
-        """Return the step object's configuration.
-
-        Returns:
-            The configuration object.
-        """
-        return self._step_config
+        self.__stored_plan = plan
+        self.__stored_values: dict[str, Any] = {}
 
     @property
     def plan(self) -> Plan:
@@ -108,15 +106,50 @@ class PlanStep(ABC):
         Returns:
             The plan object.
         """
-        return self._plan
+        return self.__stored_plan
 
     @abstractmethod
-    def run(self) -> None:
+    def run(self, **kwargs: Any) -> None:  # noqa: ANN401
         """Execute the step object.
 
         This method must be overloaded to implement the functionality of the
         step.
+
+        Args:
+            kwargs: Optional keyword arguments.
         """
+
+    def __getitem__(self, key: str) -> Any:  # noqa: ANN401
+        """Get the value of a plan variable.
+
+        This method implements the `[]` operator on the step object to retrieve
+        the value associated with a specific key.
+
+        Args:
+            key: The key to retrieve.
+
+        Returns:
+            The value corresponding to the key.
+        """
+        if key in self.__stored_values:
+            return self.__stored_values[key]
+        msg = f"Unknown plan variable: `{key}`"
+        raise AttributeError(msg)
+
+    def __setitem__(self, key: str, value: Any) -> None:  # noqa: ANN401
+        """Set a plan variable to the given value.
+
+        This method implements the `[]` operator on the step object to store
+        arbitrary values.
+
+        Args:
+            key:   The key to set.
+            value: The value to store.
+        """
+        if not key.isidentifier():
+            msg = f"Not a valid variable name: `{key}`"
+            raise AttributeError(msg)
+        self.__stored_values[key] = value
 
 
 class ResultHandler(ABC):
@@ -124,32 +157,19 @@ class ResultHandler(ABC):
 
     Result handlers loaded and created by the plugin manager must inherit from
     this abstract base class. It defines a `handle_event` method that must be
-    overridden to implement specific functionality and provides default
-    properties for accessing the handler's configuration and the plan that runs
-    it.
+    overridden to implement specific functionality.
     """
 
-    def __init__(self, config: ResultHandlerConfig, plan: Plan) -> None:
+    def __init__(self, plan: Plan) -> None:
         """Initialize a results handler.
 
-        The `config` and `plan` arguments are accessible as `handler_config`
-        and `plan` properties.
+        The `plan` argument is accessible as the `plan` property.
 
         Args:
-            config: The configuration of the handler object.
             plan:   The parent plan that contains the object.
         """
-        self._handler_config = config
-        self._plan = plan
-
-    @property
-    def handler_config(self) -> ResultHandlerConfig:
-        """Return the configuration of the handler object.
-
-        Returns:
-            The configuration object.
-        """
-        return self._handler_config
+        self.__stored_plan = plan
+        self.__stored_values: dict[str, Any] = {}
 
     @property
     def plan(self) -> Plan:
@@ -158,7 +178,7 @@ class ResultHandler(ABC):
         Returns:
             The plan object.
         """
-        return self._plan
+        return self.__stored_plan
 
     @abstractmethod
     def handle_event(self, event: Event) -> Event:
@@ -172,3 +192,35 @@ class ResultHandler(ABC):
         Returns:
             The event, possibly modified.
         """
+
+    def __getitem__(self, key: str) -> Any:  # noqa: ANN401
+        """Get the value of a plan variable.
+
+        This method implements the `[]` operator on the handler object to retrieve
+        the value associated with a specific key.
+
+        Args:
+            key: The key to retrieve.
+
+        Returns:
+            The value corresponding to the key.
+        """
+        if key in self.__stored_values:
+            return self.__stored_values[key]
+        msg = f"Unknown plan variable: `{key}`"
+        raise AttributeError(msg)
+
+    def __setitem__(self, key: str, value: Any) -> None:  # noqa: ANN401
+        """Set a plan variable to the given value.
+
+        This method implements the `[]` operator on the handler object to store
+        arbitrary values.
+
+        Args:
+            key:   The key to set.
+            value: The value to store.
+        """
+        if not key.isidentifier():
+            msg = f"Not a valid variable name: `{key}`"
+            raise AttributeError(msg)
+        self.__stored_values[key] = value

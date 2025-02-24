@@ -79,9 +79,7 @@ nav:
       - "Introduction": usage/robust_optimization.md
       - "Running Optimizations": usage/running.md
   - Reference:
-      - "Configuration":
-          - "Optimization Plan Configuration": reference/plan_config.md
-          - "Optimizer Configuration": reference/enopt_config.md
+      - "Configuration": reference/enopt_config.md
       - "Optimization":
           - "Optimization Plans": reference/plan.md
           - "Basic Plan runner": reference/plan_runner.md

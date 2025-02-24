@@ -2,14 +2,11 @@
 
 from __future__ import annotations
 
-from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from pydantic import BaseModel, ConfigDict
 
 from ropt.config.enopt import EnOptConfig
-from ropt.config.validated_types import Array2D, ItemOrSet  # noqa: TC001
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
@@ -17,10 +14,11 @@ from ropt.plan import Event
 from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
 
+from ._utils import _get_set
+
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt.config.plan import PlanStepConfig
     from ropt.plan import Plan
     from ropt.transforms import OptModelTransforms
 
@@ -39,16 +37,17 @@ class DefaultEvaluatorStep(PlanStep):
     [`FINISHED_EVALUATOR_STEP`][ropt.enums.EventType.FINISHED_EVALUATOR_STEP]
     event is emitted. Result handlers should respond to the latter event to
     process the generated results.
-
-    The evaluator step uses the [`DefaultEvaluatorStepWith`]
-    [ropt.plugins.plan.evaluator.DefaultEvaluatorStep.DefaultEvaluatorStepWith]
-    configuration class to parse the `with` field of the
-    [`PlanStepConfig`][ropt.config.plan.PlanStepConfig] used to specify this step
-    in a plan configuration.
     """
 
-    class DefaultEvaluatorStepWith(BaseModel):
-        """Parameters used by the default evaluator step.
+    def __init__(
+        self,
+        plan: Plan,
+        *,
+        config: Any,  # noqa: ANN401
+        transforms: OptModelTransforms | None = None,
+        tags: str | set[str] | None = None,
+    ) -> None:
+        """Initialize a default evaluator step.
 
         The
         [`DefaultEvaluatorStep`][ropt.plugins.plan.evaluator.DefaultEvaluatorStep]
@@ -64,58 +63,41 @@ class DefaultEvaluatorStep(PlanStep):
         The `tags` field allows optional labels to be attached to each result,
         which can assist result handlers in filtering relevant results.
 
-        The `data` field can be used to pass additional information via the `data`
-        field of the events emitted by the optimizer step. Avoid the use of `results`
-        and `exit_code` in this field, as these are already passed in the event data.
-
-        Attributes:
-            config: The optimizer configuration.
-            tags:   Tags to add to the emitted events.
-            values: Values to evaluate at.
-            data:   Data to pass via events.
-        """
-
-        config: str
-        tags: ItemOrSet[str] = set()
-        values: str | Array2D | None = None
-        data: dict[str, Any] = {}
-
-        model_config = ConfigDict(
-            extra="forbid",
-            validate_default=True,
-            arbitrary_types_allowed=True,
-            frozen=True,
-        )
-
-    def __init__(self, config: PlanStepConfig, plan: Plan) -> None:
-        """Initialize a default evaluator step.
-
         Args:
-            config: The configuration of the step.
-            plan:   The optimization plan that runs this step.
+            plan:       The plan that runs this step.
+            config:     The optimizer configuration.
+            transforms: Optional transforms object.
+            tags:       Tags to add to the emitted events.
         """
-        super().__init__(config, plan)
+        super().__init__(plan)
+        self._config = EnOptConfig.model_validate(config)
+        self._transforms = transforms
+        self._tags = _get_set(tags)
 
-        self._with = self.DefaultEvaluatorStepWith.model_validate(config.with_)
-
-    def run(self) -> None:
+    def run(  # type: ignore[override]
+        self,
+        *,
+        variables: FunctionResults
+        | NDArray[np.float64]
+        | list[float]
+        | list[list[float]]
+        | None = None,
+    ) -> None:
         """Run the evaluator step."""
-        variables = self._get_variables()
-        config = self.plan.eval(self._with.config)
-        match config:
-            case dict():
-                enopt_config, transforms = EnOptConfig.model_validate(config), None
-            case EnOptConfig():
-                enopt_config, transforms = config, None
-            case list():
-                enopt_config, transforms = config
+        match variables:
+            case FunctionResults():
+                variables = variables.evaluations.variables
+            case np.ndarray() | list():
+                variables = np.asarray(variables, dtype=np.float64)
+            case None:
+                variables = None
             case _:
-                msg = "No valid EnOpt configuration provided"
-                raise TypeError(msg)
-        enopt_config = EnOptConfig.model_validate(config)
+                msg = "Invalid initial variables."
+                raise ValueError(msg)
+
         if variables is None:
-            variables = enopt_config.variables.initial_values
-        self._run(enopt_config, transforms, variables)
+            variables = self._config.variables.initial_values
+        self._run(self._config, self._transforms, variables)
 
     def _run(
         self,
@@ -128,8 +110,7 @@ class DefaultEvaluatorStep(PlanStep):
                 Event(
                     event_type=event_type,
                     config=enopt_config,
-                    tags=self._with.tags,
-                    data=deepcopy(self._with.data),
+                    tags=self._tags,
                 )
             )
 
@@ -155,8 +136,7 @@ class DefaultEvaluatorStep(PlanStep):
         if results[0].functions is None:
             exit_code = OptimizerExitCode.TOO_FEW_REALIZATIONS
 
-        data = deepcopy(self._with.data)
-        data["exit_code"] = exit_code
+        data: dict[str, Any] = {"exit_code": exit_code}
         if transforms is not None:
             data["transformed_results"] = results
             data["results"] = [
@@ -172,7 +152,7 @@ class DefaultEvaluatorStep(PlanStep):
                 Event(
                     event_type=event_type,
                     config=enopt_config,
-                    tags=self._with.tags,
+                    tags=self._tags,
                     data=data,
                 )
             )
@@ -187,18 +167,3 @@ class DefaultEvaluatorStep(PlanStep):
             event: The event to emit.
         """
         self.plan.emit_event(event)
-
-    def _get_variables(self) -> NDArray[np.float64] | None:
-        if self._with.values is not None:
-            parsed_variables = self.plan.eval(self._with.values)
-            match parsed_variables:
-                case FunctionResults():
-                    return parsed_variables.evaluations.variables
-                case np.ndarray() | list():
-                    return np.asarray(parsed_variables, dtype=np.float64)
-                case None:
-                    return None
-                case _:
-                    msg = f"`{self._with.values}` does not contain variables."
-                    raise ValueError(msg)
-        return None

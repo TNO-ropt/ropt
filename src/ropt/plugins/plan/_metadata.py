@@ -4,70 +4,45 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from pydantic import BaseModel, ConfigDict
-
-from ropt.config.validated_types import ItemOrSet  # noqa: TC001
 from ropt.enums import EventType
 from ropt.plugins.plan.base import ResultHandler
 
+from ._utils import _get_set
+
 if TYPE_CHECKING:
-    from ropt.config.plan import ResultHandlerConfig
     from ropt.plan import Event, Plan
 
 
 class DefaultMetadataHandler(ResultHandler):
     """The default metadata results handler.
 
-    This handler adds arbitrary metadata to results produced by steps by
-    merging them into the `metadata` field of the
-    [`Results`][ropt.results.Results] objects that it receives. It is configured
-    using a dictionary that maps keys to the data to store. These data entries
-    can be of any type; however, if they are strings, they will be evaluated
-    using the [`eval`][ropt.plan.Plan.eval] method of the executing
-    [`Plan`][ropt.plan.Plan] object. This evaluation occurs when the metadata
-    handler processes an event, enabling dynamic data insertion based on the
-    current content of plan variables.
-
-    The metadata step uses the [`DefaultMetadataHandlerWith`]
-    [ropt.plugins.plan._metadata.DefaultMetadataHandler.DefaultMetadataHandlerWith]
-    configuration class to parse the `with` field of the
-    [`ResultHandler`][ropt.config.plan.ResultHandlerConfig] used to specify this
-    handler in a plan configuration.
+    This handler adds arbitrary metadata to results produced by steps by merging
+    them into the `metadata` field of the [`Results`][ropt.results.Results]
+    objects that it receives. It is configured using a dictionary that maps keys
+    to the data to store. These data entries can be of any type; however, if
+    they the values is string starting with a single `$` it is assumed to be the
+    key to value stored in the plan that should be inserted into the metadata.
     """
 
-    class DefaultMetadataHandlerWith(BaseModel):
-        """Parameters used by the default metadata results handler.
+    def __init__(
+        self, plan: Plan, *, data: dict[str, Any], tags: str | set[str] | None = None
+    ) -> None:
+        """Initialize a default metadata results handler.
 
         The data to merge into the metadata of a result are required.
 
         The `tags` field allows optional labels to be attached to each result,
         which can assist result handlers in filtering relevant results.
 
-        Attributes:
+        Args:
+            plan: The plan that runs this step.
             data: Data to merge into the metadata of the results.
             tags: Optional tags specifying which result sources to modify.
         """
+        super().__init__(plan)
 
-        data: dict[str, Any]
-        tags: ItemOrSet[str]
-
-        model_config = ConfigDict(
-            extra="forbid",
-            validate_default=True,
-            arbitrary_types_allowed=True,
-            frozen=True,
-        )
-
-    def __init__(self, config: ResultHandlerConfig, plan: Plan) -> None:
-        """Initialize a default metadata results handler.
-
-        Args:
-            config: The configuration of the step.
-            plan:   The plan that runs this step.
-        """
-        super().__init__(config, plan)
-
-        self._with = self.DefaultMetadataHandlerWith.model_validate(config.with_)
+        self._data = data
+        self._tags = _get_set(tags)
 
     def handle_event(self, event: Event) -> Event:
         """Handle an event.
@@ -85,9 +60,17 @@ class DefaultMetadataHandler(ResultHandler):
                 EventType.FINISHED_EVALUATOR_STEP,
             }
             and "results" in event.data
-            and (event.tags & self._with.tags)
+            and (event.tags & self._tags)
         ):
             for results in event.data["results"]:
-                for key, expr in self._with.data.items():
-                    results.metadata[key] = self._plan.eval(expr)
+                for key, value in self._data.items():
+                    results.metadata[key] = (
+                        self.plan[value[1:]]
+                        if (
+                            isinstance(value, str)
+                            and value.startswith("$")
+                            and not value[1:].startswith("$")
+                        )
+                        else value
+                    )
         return event
