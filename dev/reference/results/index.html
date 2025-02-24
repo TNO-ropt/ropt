@@ -255,25 +255,14 @@
   
     
     
-      
-  
-  
-    
-  
-  
-    
-    
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../plan_config/" class="md-tabs__link">
+        <a href="../enopt_config/" class="md-tabs__link">
           
   
   Reference
 
         </a>
       </li>
-    
-  
-
     
   
 
@@ -492,24 +481,9 @@
   
   
   
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
+    <li class="md-nav__item">
+      <a href="../enopt_config/" class="md-nav__link">
         
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
-            
   
   <span class="md-ellipsis">
     Configuration
@@ -517,63 +491,7 @@
   </span>
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_1">
-            <span class="md-nav__icon md-icon"></span>
-            Configuration
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../plan_config/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Optimization Plan Configuration
-    
-  </span>
-  
-
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../enopt_config/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Optimizer Configuration
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -1753,7 +1671,7 @@ classes:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.results.Results.plan_id">plan_id</span></code></td>
             <td>
-                  <code>tuple[int, ...]</code>
+                  <code><span title="tuple">tuple</span>[<span title="int">int</span>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1764,7 +1682,7 @@ classes:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.results.Results.batch_id">batch_id</span></code></td>
             <td>
-                  <code>int | None</code>
+                  <code><span title="int">int</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1775,7 +1693,7 @@ classes:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.results.Results.metadata">metadata</span></code></td>
             <td>
-                  <code>dict[str, <span title="typing.Any">Any</span>]</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1854,7 +1772,7 @@ are also prepended to the index of the resulting frame.</p>
                 <code>field_name</code>
             </td>
             <td>
-                  <code>str</code>
+                  <code><span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1870,7 +1788,7 @@ are also prepended to the index of the resulting frame.</p>
                 <code>select</code>
             </td>
             <td>
-                  <code><span title="typing.Iterable">Iterable</span>[str] | None</code>
+                  <code><span title="typing.Iterable">Iterable</span>[<span title="str">str</span>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1902,7 +1820,7 @@ are also prepended to the index of the resulting frame.</p>
                 <code>names</code>
             </td>
             <td>
-                  <code>dict[str, <span title="typing.Sequence">Sequence</span>[str | int] | None] | None</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Sequence">Sequence</span>[<span title="str">str</span> | <span title="int">int</span>] | None] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1928,7 +1846,7 @@ are also prepended to the index of the resulting frame.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code>NotImplementedError</code>
+                  <code><span title="NotImplementedError">NotImplementedError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1938,7 +1856,7 @@ are also prepended to the index of the resulting frame.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                  <code>ValueError</code>
+                  <code><span title="ValueError">ValueError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2139,7 +2057,7 @@ array from the metadata and return them.</p>
                 <code>name</code>
             </td>
             <td>
-                  <code>str</code>
+                  <code><span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2165,7 +2083,7 @@ array from the metadata and return them.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code>ValueError</code>
+                  <code><span title="ValueError">ValueError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2188,7 +2106,7 @@ array from the metadata and return them.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code>tuple[<a class="autorefs autorefs-internal" title="ropt.enums.ResultAxis" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a>, ...]</code>
+                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="ropt.enums.ResultAxis" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2244,7 +2162,7 @@ indices.</p>
                 <code>name</code>
             </td>
             <td>
-                  <code>str</code>
+                  <code><span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2276,7 +2194,7 @@ indices.</p>
                 <code>names</code>
             </td>
             <td>
-                  <code>dict[<a class="autorefs autorefs-internal" title="ropt.enums.ResultAxis" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a>, tuple[str, ...]] | None</code>
+                  <code><span title="dict">dict</span>[<a class="autorefs autorefs-internal" title="ropt.enums.ResultAxis" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a>, <span title="tuple">tuple</span>[<span title="str">str</span>, ...]] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2302,7 +2220,7 @@ indices.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code>dict[str | int, <span title="typing.Any">Any</span>]</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span> | <span title="int">int</span>, <span title="typing.Any">Any</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">

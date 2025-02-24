@@ -255,25 +255,14 @@
   
     
     
-      
-  
-  
-    
-  
-  
-    
-    
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../plan_config/" class="md-tabs__link">
+        <a href="../enopt_config/" class="md-tabs__link">
           
   
   Reference
 
         </a>
       </li>
-    
-  
-
     
   
 
@@ -492,24 +481,9 @@
   
   
   
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
+    <li class="md-nav__item">
+      <a href="../enopt_config/" class="md-nav__link">
         
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
-            
   
   <span class="md-ellipsis">
     Configuration
@@ -517,63 +491,7 @@
   </span>
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_1">
-            <span class="md-nav__icon md-icon"></span>
-            Configuration
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../plan_config/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Optimization Plan Configuration
-    
-  </span>
-  
-
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../enopt_config/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Optimizer Configuration
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -742,15 +660,6 @@
   <a href="#ropt.plan.BasicOptimizer.add_observer" class="md-nav__link">
     <span class="md-ellipsis">
       add_observer
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.BasicOptimizer.add_event_data" class="md-nav__link">
-    <span class="md-ellipsis">
-      add_event_data
     </span>
   </a>
   
@@ -1399,15 +1308,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.BasicOptimizer.add_event_data" class="md-nav__link">
-    <span class="md-ellipsis">
-      add_event_data
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plan.BasicOptimizer.run" class="md-nav__link">
     <span class="md-ellipsis">
       run
@@ -1474,8 +1374,6 @@ cases.</p>
 <ul>
 <li>Start a single optimization.</li>
 <li>Add observer functions connected to various optimization events.</li>
-<li>Attach metadata to each result generated during the optimization.</li>
-<li>Generate tables summarizing the optimization results.</li>
 </ul>
 
 
@@ -1660,7 +1558,7 @@ as they define the optimization to perform.</p>
                 <code>enopt_config</code>
             </td>
             <td>
-                  <code>dict[str, <span title="typing.Any">Any</span>] | <a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>] | <a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1708,7 +1606,7 @@ as they define the optimization to perform.</p>
                 <code>constraint_tolerance</code>
             </td>
             <td>
-                  <code>float</code>
+                  <code><span title="float">float</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1780,79 +1678,6 @@ type.</p>
             <td>
               <div class="doc-md-description">
                 <p>The callable to invoke when the event is emitted.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="typing.Self">Self</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The <code>BasicOptimizer</code> instance, allowing for method chaining.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plan.BasicOptimizer.add_event_data" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">add_event_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></code>
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Add data that will be merged into event data.</p>
-<p>The given data will be merged into the event data dictionary that
-is passed via events emitted by the optimizer.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>data</code>
-            </td>
-            <td>
-                  <code>dict[str, <span title="typing.Any">Any</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The data to add.</p>
               </div>
             </td>
             <td>

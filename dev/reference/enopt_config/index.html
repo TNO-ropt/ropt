@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../plan_config/">
+        <link rel="prev" href="../../usage/running/">
       
       
         <link rel="next" href="../plan/">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Optimizer Configuration - ropt Documentation</title>
+        <title>Configuration - ropt Documentation</title>
       
     
     
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Optimizer Configuration
+              Configuration
             
           </span>
         </div>
@@ -255,25 +255,14 @@
   
     
     
-      
-  
-  
-    
-  
-  
-    
-    
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../plan_config/" class="md-tabs__link">
+        <a href="./" class="md-tabs__link">
           
   
   Reference
 
         </a>
       </li>
-    
-  
-
     
   
 
@@ -494,69 +483,6 @@
   
   
   
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
-            
-  
-  <span class="md-ellipsis">
-    Configuration
-    
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_1">
-            <span class="md-nav__icon md-icon"></span>
-            Configuration
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../plan_config/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Optimization Plan Configuration
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
     <li class="md-nav__item md-nav__item--active">
       
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
@@ -567,7 +493,7 @@
           
   
   <span class="md-ellipsis">
-    Optimizer Configuration
+    Configuration
     
   </span>
   
@@ -579,7 +505,7 @@
         
   
   <span class="md-ellipsis">
-    Optimizer Configuration
+    Configuration
     
   </span>
   
@@ -806,14 +732,6 @@
     </ul>
   
 </nav>
-      
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
       
     </li>
   
@@ -1683,7 +1601,7 @@
   
 
 
-  <h1>Optimizer Configuration</h1>
+  <h1>Configuration</h1>
 
 <div class="doc doc-object doc-module">
 
@@ -1845,7 +1763,7 @@ used for all variables.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.realization_filters">realization_filters</span></code></td>
             <td>
-                  <code>tuple[<a class="autorefs autorefs-internal" title="ropt.config.enopt._realization_filter_config.RealizationFilterConfig" href="#ropt.config.enopt.RealizationFilterConfig">RealizationFilterConfig</a>, ...]</code>
+                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="ropt.config.enopt._realization_filter_config.RealizationFilterConfig" href="#ropt.config.enopt.RealizationFilterConfig">RealizationFilterConfig</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1856,7 +1774,7 @@ used for all variables.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.function_estimators">function_estimators</span></code></td>
             <td>
-                  <code>tuple[<a class="autorefs autorefs-internal" title="ropt.config.enopt._function_estimator_config.FunctionEstimatorConfig" href="#ropt.config.enopt.FunctionEstimatorConfig">FunctionEstimatorConfig</a>, ...]</code>
+                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="ropt.config.enopt._function_estimator_config.FunctionEstimatorConfig" href="#ropt.config.enopt.FunctionEstimatorConfig">FunctionEstimatorConfig</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1867,7 +1785,7 @@ used for all variables.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.samplers">samplers</span></code></td>
             <td>
-                  <code>tuple[<a class="autorefs autorefs-internal" title="ropt.config.enopt._sampler_config.SamplerConfig" href="#ropt.config.enopt.SamplerConfig">SamplerConfig</a>, ...]</code>
+                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="ropt.config.enopt._sampler_config.SamplerConfig" href="#ropt.config.enopt.SamplerConfig">SamplerConfig</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2622,7 +2540,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.method">method</span></code></td>
             <td>
-                  <code>str</code>
+                  <code><span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2666,7 +2584,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.speculative">speculative</span></code></td>
             <td>
-                  <code>bool</code>
+                  <code><span title="bool">bool</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2678,7 +2596,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.split_evaluations">split_evaluations</span></code></td>
             <td>
-                  <code>bool</code>
+                  <code><span title="bool">bool</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2690,7 +2608,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.parallel">parallel</span></code></td>
             <td>
-                  <code>bool</code>
+                  <code><span title="bool">bool</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2712,7 +2630,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.options">options</span></code></td>
             <td>
-                  <code>dict[str, <span title="typing.Any">Any</span>] | list[str] | None</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>] | <span title="list">list</span>[<span title="str">str</span>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2899,7 +2817,7 @@ gradient.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.GradientConfig.seed">seed</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.ItemOrTuple" href="../utilities/#ropt.config.validated_types.ItemOrTuple">ItemOrTuple</a>[int]</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.config.validated_types.ItemOrTuple" href="../utilities/#ropt.config.validated_types.ItemOrTuple">ItemOrTuple</a>[<span title="int">int</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2910,7 +2828,7 @@ gradient.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.GradientConfig.merge_realizations">merge_realizations</span></code></td>
             <td>
-                  <code>bool</code>
+                  <code><span title="bool">bool</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3100,7 +3018,7 @@ interpretation of these options depends on the chosen method.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.FunctionEstimatorConfig.method">method</span></code></td>
             <td>
-                  <code>str</code>
+                  <code><span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3111,7 +3029,7 @@ interpretation of these options depends on the chosen method.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.FunctionEstimatorConfig.options">options</span></code></td>
             <td>
-                  <code>dict[str, <span title="typing.Any">Any</span>]</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3193,7 +3111,7 @@ method.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.RealizationFilterConfig.method">method</span></code></td>
             <td>
-                  <code>str</code>
+                  <code><span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3204,7 +3122,7 @@ method.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.RealizationFilterConfig.options">options</span></code></td>
             <td>
-                  <code>dict[str, <span title="typing.Any">Any</span>]</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3289,7 +3207,7 @@ directed to use the same set of perturbed values for each realization.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.SamplerConfig.method">method</span></code></td>
             <td>
-                  <code>str</code>
+                  <code><span title="str">str</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3300,7 +3218,7 @@ directed to use the same set of perturbed values for each realization.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.SamplerConfig.options">options</span></code></td>
             <td>
-                  <code>dict[str, <span title="typing.Any">Any</span>]</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3311,7 +3229,7 @@ directed to use the same set of perturbed values for each realization.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.SamplerConfig.shared">shared</span></code></td>
             <td>
-                  <code>bool</code>
+                  <code><span title="bool">bool</span></code>
             </td>
             <td>
               <div class="doc-md-description">

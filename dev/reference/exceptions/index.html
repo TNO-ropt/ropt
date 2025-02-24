@@ -255,25 +255,14 @@
   
     
     
-      
-  
-  
-    
-  
-  
-    
-    
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../plan_config/" class="md-tabs__link">
+        <a href="../enopt_config/" class="md-tabs__link">
           
   
   Reference
 
         </a>
       </li>
-    
-  
-
     
   
 
@@ -492,24 +481,9 @@
   
   
   
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
+    <li class="md-nav__item">
+      <a href="../enopt_config/" class="md-nav__link">
         
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
-            
   
   <span class="md-ellipsis">
     Configuration
@@ -517,63 +491,7 @@
   </span>
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_1">
-            <span class="md-nav__icon md-icon"></span>
-            Configuration
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../plan_config/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Optimization Plan Configuration
-    
-  </span>
-  
-
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../enopt_config/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Optimizer Configuration
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -1237,6 +1155,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.exceptions.PlanAborted" class="md-nav__link">
+    <span class="md-ellipsis">
+      PlanAborted
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1347,6 +1274,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.exceptions.PlanAborted" class="md-nav__link">
+    <span class="md-ellipsis">
+      PlanAborted
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1416,7 +1352,7 @@
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code>Exception</code></p>
+              Bases: <code><span title="Exception">Exception</span></code></p>
 
 
         <p>Raised when an configuration error occurs.</p>
@@ -1444,7 +1380,7 @@
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code>Exception</code></p>
+              Bases: <code><span title="Exception">Exception</span></code></p>
 
 
         <p>Raised when an optimization is aborted.</p>
@@ -1521,6 +1457,36 @@ indicates the reason for aborting (see
 
 
   </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.exceptions.PlanAborted" class="doc doc-heading">
+            <code>PlanAborted</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="Exception">Exception</span></code></p>
+
+
+        <p>Raised when an optimization plan is aborted.</p>
+<p>Steps within a plan may abort a plan by setting its <code>aborted</code> attribute. Any
+attemps to run steps after this, will raise this exception.</p>
+
+
+
+
+
+
 
     </div>
 

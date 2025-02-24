@@ -255,25 +255,14 @@
   
     
     
-      
-  
-  
-    
-  
-  
-    
-    
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../plan_config/" class="md-tabs__link">
+        <a href="../enopt_config/" class="md-tabs__link">
           
   
   Reference
 
         </a>
       </li>
-    
-  
-
     
   
 
@@ -492,24 +481,9 @@
   
   
   
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
+    <li class="md-nav__item">
+      <a href="../enopt_config/" class="md-nav__link">
         
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
-            
   
   <span class="md-ellipsis">
     Configuration
@@ -517,63 +491,7 @@
   </span>
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_1">
-            <span class="md-nav__icon md-icon"></span>
-            Configuration
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../plan_config/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Optimization Plan Configuration
-    
-  </span>
-  
-
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../enopt_config/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Optimizer Configuration
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -1485,7 +1403,7 @@ configuration of the optimizer.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.realization_filter.default.SortObjectiveOptions.sort">sort</span></code></td>
             <td>
-                  <code>list[<span title="pydantic.NonNegativeInt">NonNegativeInt</span>]</code>
+                  <code><span title="list">list</span>[<span title="pydantic.NonNegativeInt">NonNegativeInt</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1679,7 +1597,7 @@ maximizing.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.realization_filter.default.CVaRObjectiveOptions.sort">sort</span></code></td>
             <td>
-                  <code>list[<span title="pydantic.NonNegativeInt">NonNegativeInt</span>]</code>
+                  <code><span title="list">list</span>[<span title="pydantic.NonNegativeInt">NonNegativeInt</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1690,7 +1608,7 @@ maximizing.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.realization_filter.default.CVaRObjectiveOptions.percentile">percentile</span></code></td>
             <td>
-                  <code><span title="typing.Annotated">Annotated</span>[float, <span title="pydantic.Field">Field</span>(gt=0.0, le=1.0)]</code>
+                  <code><span title="typing.Annotated">Annotated</span>[<span title="float">float</span>, <span title="pydantic.Field">Field</span>(gt=0.0, le=1.0)]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1781,7 +1699,7 @@ subtracting the right-hand-side value the following applies:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.realization_filter.default.CVaRConstraintOptions.percentile">percentile</span></code></td>
             <td>
-                  <code><span title="typing.Annotated">Annotated</span>[float, <span title="pydantic.Field">Field</span>(gt=0.0, le=1.0)]</code>
+                  <code><span title="typing.Annotated">Annotated</span>[<span title="float">float</span>, <span title="pydantic.Field">Field</span>(gt=0.0, le=1.0)]</code>
             </td>
             <td>
               <div class="doc-md-description">
