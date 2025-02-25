@@ -175,6 +175,8 @@ def _get_function_results(
             select=_get_select(results, "constraint_diffs", sub_fields),
             unstack=[
                 ResultAxis.VARIABLE,
+                ResultAxis.LINEAR_CONSTRAINT,
+                ResultAxis.NONLINEAR_CONSTRAINT,
             ],
             names=names,
         ).rename(columns=partial(_add_prefix, prefix="constraint_diffs"))

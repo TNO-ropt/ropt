@@ -37,16 +37,16 @@ class ConstraintDiffs(ResultField):
         default=None, metadata={"__axes__": (ResultAxis.VARIABLE,)}
     )
     linear_lower: NDArray[np.float64] | None = field(
-        default=None, metadata={"__axes__": (ResultAxis.VARIABLE,)}
+        default=None, metadata={"__axes__": (ResultAxis.LINEAR_CONSTRAINT,)}
     )
     linear_upper: NDArray[np.float64] | None = field(
-        default=None, metadata={"__axes__": (ResultAxis.VARIABLE,)}
+        default=None, metadata={"__axes__": (ResultAxis.LINEAR_CONSTRAINT,)}
     )
     nonlinear_lower: NDArray[np.float64] | None = field(
-        default=None, metadata={"__axes__": (ResultAxis.VARIABLE,)}
+        default=None, metadata={"__axes__": (ResultAxis.NONLINEAR_CONSTRAINT,)}
     )
     nonlinear_upper: NDArray[np.float64] | None = field(
-        default=None, metadata={"__axes__": (ResultAxis.VARIABLE,)}
+        default=None, metadata={"__axes__": (ResultAxis.NONLINEAR_CONSTRAINT,)}
     )
 
     def __post_init__(self) -> None:
