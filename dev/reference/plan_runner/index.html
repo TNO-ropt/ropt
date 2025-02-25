@@ -1530,7 +1530,7 @@ cases.</p>
 
 
 <h3 id="ropt.plan.BasicOptimizer.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">evaluator</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">transforms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">constraint_tolerance</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">evaluator</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">transforms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">constraint_tolerance</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 </h3>
 
@@ -1615,6 +1615,22 @@ as they define the optimization to perform.</p>
             </td>
             <td>
                   <code>1e-10</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>kwargs</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional keywords that may be passed to optimization code.</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
             </td>
           </tr>
       </tbody>

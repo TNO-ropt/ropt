@@ -1472,8 +1472,9 @@ module to implement various optimization algorithms.</dd>
   values.</dd>
 <dt><a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan"><code>plan</code></a>:</dt>
 <dd>Plan plugins implement the objects that execute an optimization plan.
-  The built-in <a class="autorefs autorefs-internal" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanPlugin"><code>default</code></a> plugin
-  offers a full set of optimization plan objects for executing complex
+  The built-in <a class="autorefs autorefs-internal" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanHandlerPlugin"><code>default</code></a>
+  handler and <a class="autorefs autorefs-internal" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanStepPlugin"><code>default</code></a> step
+  plugins offer a full set of optimization plan objects for executing complex
   optimization plans.</dd>
 </dl>
 <p>Plugins are managed by the <a class="autorefs autorefs-internal" href="#ropt.plugins.PluginManager"><code>PluginManager</code></a> class.
@@ -1488,7 +1489,9 @@ base class defining the required functionality for each plugin type:</p>
     Abstract base class for realization filter plugins.</li>
 <li><a class="autorefs autorefs-internal" href="../function_estimator_plugins/#ropt.plugins.function_estimator.base.FunctionEstimatorPlugin"><code>FunctionEstimatorPlugin</code></a>:
     Abstract base class for function estimator plugins.</li>
-<li><a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.PlanPlugin"><code>PlanPlugin</code></a>:
+<li><a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandlerPlugin"><code>PlanHandlerPlugin</code></a>:
+    Abstract base class for optimization plan object plugins.</li>
+<li><a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a>:
     Abstract base class for optimization plan object plugins.</li>
 </ol>
 <p>Plugins can be built-in, installed separately using the standard entry points
@@ -1946,7 +1949,7 @@ form "<em>plugin-name/method-name</em>", <code>True</code> will be returned if t
 
 
 <h3 id="ropt.plugins.PluginType" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">PluginType</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">,</span> <span class="s1">&#39;sampler&#39;</span><span class="p">,</span> <span class="s1">&#39;realization_filter&#39;</span><span class="p">,</span> <span class="s1">&#39;function_estimator&#39;</span><span class="p">,</span> <span class="s1">&#39;plan&#39;</span><span class="p">]</span></code>
+            <code class="highlight language-python"><span class="n">PluginType</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">,</span> <span class="s1">&#39;sampler&#39;</span><span class="p">,</span> <span class="s1">&#39;realization_filter&#39;</span><span class="p">,</span> <span class="s1">&#39;function_estimator&#39;</span><span class="p">,</span> <span class="s1">&#39;plan_handler&#39;</span><span class="p">,</span> <span class="s1">&#39;plan_step&#39;</span><span class="p">]</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>

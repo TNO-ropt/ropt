@@ -654,9 +654,27 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.has_handler" class="md-nav__link">
+    <span class="md-ellipsis">
+      has_handler
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.add_step" class="md-nav__link">
     <span class="md-ellipsis">
       add_step
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.has_step" class="md-nav__link">
+    <span class="md-ellipsis">
+      has_step
     </span>
   </a>
   
@@ -1447,9 +1465,27 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.has_handler" class="md-nav__link">
+    <span class="md-ellipsis">
+      has_handler
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.add_step" class="md-nav__link">
     <span class="md-ellipsis">
       add_step
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.has_step" class="md-nav__link">
+    <span class="md-ellipsis">
+      has_step
     </span>
   </a>
   
@@ -1629,8 +1665,9 @@ individual actions, as well as
 store data generated during execution. Both steps and result handlers are
 implemented through a <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan"><code>plugin</code></a> mechanism, making it easy to
 extend the range of supported steps and result handlers. The <code>ropt</code> library also
-includes a <a class="autorefs autorefs-internal" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanPlugin">default plan plugin</a>
-that provides various steps and result handlers to support a broad range of
+includes <a class="autorefs autorefs-internal" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanHandlerPlugin">default plan handler</a> and
+<a class="autorefs autorefs-internal" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanStepPlugin">default plan step</a></p>
+<p>that provides various steps and result handlers to support a broad range of
 optimization workflows.</p>
 <p>Most optimization plans require shared state across all steps, such as a
 callable for function evaluations or a random number generator. This shared
@@ -2010,6 +2047,77 @@ across both sequential and nested plan workflows.</p>
 <div class="doc doc-object doc-function">
 
 
+<h4 id="ropt.plan.Plan.has_handler" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">has_handler</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Check if a handler exists.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>name</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the handler to check.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether the handler exists.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h4 id="ropt.plan.Plan.add_step" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">add_step</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
@@ -2084,6 +2192,77 @@ across both sequential and nested plan workflows.</p>
             <td>
               <div class="doc-md-description">
                 <p>The step that was executed.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plan.Plan.has_step" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">has_step</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Check if a step exists.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>name</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the step to check.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether the step exists.</p>
               </div>
             </td>
           </tr>

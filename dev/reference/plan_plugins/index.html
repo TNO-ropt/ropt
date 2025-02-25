@@ -931,28 +931,43 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.PlanPlugin" class="md-nav__link">
+  <a href="#ropt.plugins.plan.base.PlanHandlerPlugin" class="md-nav__link">
     <span class="md-ellipsis">
-      PlanPlugin
+      PlanHandlerPlugin
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="PlanPlugin">
+    <nav class="md-nav" aria-label="PlanHandlerPlugin">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.PlanPlugin.create_result_handler" class="md-nav__link">
+  <a href="#ropt.plugins.plan.base.PlanHandlerPlugin.create" class="md-nav__link">
     <span class="md-ellipsis">
-      create_result_handler
+      create
     </span>
   </a>
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+        
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.PlanPlugin.create_step" class="md-nav__link">
+  <a href="#ropt.plugins.plan.base.PlanStepPlugin" class="md-nav__link">
     <span class="md-ellipsis">
-      create_step
+      PlanStepPlugin
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PlanStepPlugin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.PlanStepPlugin.create" class="md-nav__link">
+    <span class="md-ellipsis">
+      create
     </span>
   </a>
   
@@ -1491,28 +1506,43 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.PlanPlugin" class="md-nav__link">
+  <a href="#ropt.plugins.plan.base.PlanHandlerPlugin" class="md-nav__link">
     <span class="md-ellipsis">
-      PlanPlugin
+      PlanHandlerPlugin
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="PlanPlugin">
+    <nav class="md-nav" aria-label="PlanHandlerPlugin">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.PlanPlugin.create_result_handler" class="md-nav__link">
+  <a href="#ropt.plugins.plan.base.PlanHandlerPlugin.create" class="md-nav__link">
     <span class="md-ellipsis">
-      create_result_handler
+      create
     </span>
   </a>
   
 </li>
         
+      </ul>
+    </nav>
+  
+</li>
+        
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.PlanPlugin.create_step" class="md-nav__link">
+  <a href="#ropt.plugins.plan.base.PlanStepPlugin" class="md-nav__link">
     <span class="md-ellipsis">
-      create_step
+      PlanStepPlugin
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PlanStepPlugin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.PlanStepPlugin.create" class="md-nav__link">
+    <span class="md-ellipsis">
+      create
     </span>
   </a>
   
@@ -1602,9 +1632,10 @@
 
         <p>This module defines the base classes for optimization plan plugins.</p>
 <p>Optimization plan steps and result handlers can be added via the plugin
-mechanism to implement additional functionality. This is done by creating a
-plugin class that derives from the
-<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.PlanPlugin"><code>PlanPlugin</code></a> class.</p>
+mechanism to implement additional functionality. This is done by creating plugin
+classes that derive from the
+<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.PlanHandlerPlugin"><code>PlanHandlerPlugin</code></a> and
+<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a> classes.</p>
 
 
 
@@ -1758,7 +1789,7 @@ implement the specific functionality of each step.</p>
 
 
 <h4 id="ropt.plugins.plan.base.PlanStep.run" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">run</span><span class="p">()</span></code>
+            <code class="highlight language-python"><span class="n">run</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -1772,6 +1803,37 @@ implement the specific functionality of each step.</p>
         <p>Execute the step object.</p>
 <p>This method must be overloaded to implement the functionality of the
 step.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>kwargs</code>
+            </td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional keyword arguments.</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
     </div>
 
@@ -2255,8 +2317,8 @@ arbitrary values.</p>
 
 
 
-<h3 id="ropt.plugins.plan.base.PlanPlugin" class="doc doc-heading">
-            <code>PlanPlugin</code>
+<h3 id="ropt.plugins.plan.base.PlanHandlerPlugin" class="doc doc-heading">
+            <code>PlanHandlerPlugin</code>
 
 
 </h3>
@@ -2267,16 +2329,14 @@ arbitrary values.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.base.Plugin" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
 
 
-        <p>Abstract base class for plan plugins.</p>
-<p>This base class serves as the foundation for all plugins used in an
-optimization plan, including plan steps and result handlers. Any plugin
-derived from this class can be built-in, installed via a plugin mechanism,
-or dynamically loaded. During the execution of an optimization plan, the
-required plugin is located through the
-<a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>, which then uses the plugin's
-<code>create_*</code> functions to instantiate either a
-<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a> or a
-<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.ResultHandler"><code>ResultHandler</code></a> as needed.</p>
+        <p>Abstract base class for plan handler plugins.</p>
+<p>This base class serves as the foundation for handler plugins used in an
+optimization plan. Any plugin derived from this class can be built-in,
+installed via a plugin mechanism, or dynamically loaded. During the
+execution of an optimization plan, the required plugin is located through
+the <a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>, which then uses the
+plugin's <code>create_*</code> functions to instantiate  a
+<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.ResultHandler"><code>ResultHandler</code></a>.</p>
 
 
 
@@ -2299,8 +2359,8 @@ required plugin is located through the
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.plan.base.PlanPlugin.create_result_handler" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">create_result_handler</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">plan</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<h4 id="ropt.plugins.plan.base.PlanHandlerPlugin.create" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">plan</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -2382,11 +2442,62 @@ object based on the provided configuration.</p>
 
 </div>
 
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.plugins.plan.base.PlanStepPlugin" class="doc doc-heading">
+            <code>PlanStepPlugin</code>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.base.Plugin" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
+
+
+        <p>Abstract base class for plan step plugins.</p>
+<p>This base class serves as the foundation for step plugins used in an
+optimization plan. Any plugin derived from this class can be built-in,
+installed via a plugin mechanism, or dynamically loaded. During the
+execution of an optimization plan, the required plugin is located through
+the <a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>, which then uses the
+plugin's <code>create_*</code> functions to instantiate a
+<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a>.</p>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.plan.base.PlanPlugin.create_step" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">create_step</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">plan</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<h4 id="ropt.plugins.plan.base.PlanStepPlugin.create" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">plan</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
