@@ -89,6 +89,7 @@ class DefaultOptimizerStep(PlanStep):
         variables: FunctionResults | NDArray[np.float64] | list[float] | None = None,
     ) -> None:
         """Run the optimizer step."""
+        self["exit_code"] = None
         match variables:
             case FunctionResults():
                 variables = variables.evaluations.variables
@@ -143,19 +144,18 @@ class DefaultOptimizerStep(PlanStep):
             raise RuntimeError(msg)
 
         exit_code = ensemble_optimizer.start(variables)
-        self["exit_code"] = exit_code
 
         self.emit_event(
             Event(
                 event_type=EventType.FINISHED_OPTIMIZER_STEP,
                 config=enopt_config,
                 tags=self._tags,
-                data={"exit_code": exit_code},
             )
         )
 
         if exit_code == OptimizerExitCode.USER_ABORT:
             self.plan.abort()
+        self["exit_code"] = exit_code
 
     def emit_event(self, event: Event) -> None:
         """Emit an event.
@@ -170,8 +170,6 @@ class DefaultOptimizerStep(PlanStep):
         enopt_config: EnOptConfig,
         transforms: OptModelTransforms | None,
         results: tuple[Results, ...] | None = None,
-        *,
-        exit_code: OptimizerExitCode | None = None,
     ) -> None:
         """Called before and after the optimizer finishes an evaluation.
 
@@ -183,7 +181,6 @@ class DefaultOptimizerStep(PlanStep):
             enopt_config: The configuration object.
             transforms:   Optional transforms object.
             results:      The results produced by the evaluation.
-            exit_code:    An exit code if that may be set if the evaluation completed.
         """
         if results is None:
             self.emit_event(
@@ -194,7 +191,7 @@ class DefaultOptimizerStep(PlanStep):
                 )
             )
         else:
-            data: dict[str, Any] = {"exit_code": exit_code}
+            data: dict[str, Any] = {}
             if transforms is not None:
                 data["transformed_results"] = results
                 data["results"] = [

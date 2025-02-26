@@ -73,6 +73,7 @@ class DefaultEvaluatorStep(PlanStep):
         self._config = EnOptConfig.model_validate(config)
         self._transforms = transforms
         self._tags = _get_set(tags)
+        self["exit_code"] = None
 
     def run(  # type: ignore[override]
         self,
@@ -84,6 +85,7 @@ class DefaultEvaluatorStep(PlanStep):
         | None = None,
     ) -> None:
         """Run the evaluator step."""
+        self["exit_code"] = None
         match variables:
             case FunctionResults():
                 variables = variables.evaluations.variables
@@ -136,7 +138,7 @@ class DefaultEvaluatorStep(PlanStep):
         if results[0].functions is None:
             exit_code = OptimizerExitCode.TOO_FEW_REALIZATIONS
 
-        data: dict[str, Any] = {"exit_code": exit_code}
+        data: dict[str, Any] = {}
         if transforms is not None:
             data["transformed_results"] = results
             data["results"] = [
@@ -159,6 +161,7 @@ class DefaultEvaluatorStep(PlanStep):
 
         if exit_code == OptimizerExitCode.USER_ABORT:
             self.plan.abort()
+        self["exit_code"] = exit_code
 
     def emit_event(self, event: Event) -> None:
         """Emit an event.

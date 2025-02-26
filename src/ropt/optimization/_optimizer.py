@@ -30,8 +30,6 @@ class SignalEvaluationCallback(Protocol):
     def __call__(
         self,
         results: tuple[Results, ...] | None = None,
-        *,
-        exit_code: OptimizerExitCode | None = None,
     ) -> None:
         """Callback protocol for signaling the start and end of evaluations.
 
@@ -44,7 +42,6 @@ class SignalEvaluationCallback(Protocol):
         Args:
             results:   The results produced by the evaluation, or `None` if the
                        evaluation has not yet completed.
-            exit_code: An exit code if that may be set if the evaluation completed.
         """
 
 
@@ -277,7 +274,7 @@ class EnsembleOptimizer:
                 break
 
         if self._signal_evaluation:
-            self._signal_evaluation(results, exit_code=exit_code)
+            self._signal_evaluation(results)
 
         if exit_code is not None:
             raise OptimizationAborted(exit_code=exit_code)
