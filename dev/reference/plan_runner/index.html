@@ -674,15 +674,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plan.BasicOptimizer.abort_optimization" class="md-nav__link">
-    <span class="md-ellipsis">
-      abort_optimization
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1316,15 +1307,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plan.BasicOptimizer.abort_optimization" class="md-nav__link">
-    <span class="md-ellipsis">
-      abort_optimization
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1765,32 +1747,6 @@ type.</p>
           </tr>
       </tbody>
     </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plan.BasicOptimizer.abort_optimization" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">abort_optimization</span><span class="p">()</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
-  </span>
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Abort the current optimization run.</p>
-<p>This method can be called from within callbacks to interrupt the ongoing
-optimization plan. The exact point at which the optimization is aborted
-depends on the step that is executing at that point. For example, within
-a running optimizer, the process will be interrupted after completing
-the current function evaluation.</p>
 
     </div>
 
