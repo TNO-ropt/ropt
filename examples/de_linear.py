@@ -9,10 +9,10 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.enums import EventType, VariableType
+from ropt.enums import VariableType
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.plan import BasicOptimizer, Event
-from ropt.results import FunctionResults
+from ropt.plan import BasicOptimizer
+from ropt.results import FunctionResults, Results
 
 CONFIG: dict[str, Any] = {
     "variables": {
@@ -51,13 +51,13 @@ def function(variables: NDArray[np.float64], _: EvaluatorContext) -> EvaluatorRe
     return EvaluatorResult(objectives=objectives)
 
 
-def report(event: Event) -> None:
+def report(results: tuple[Results, ...]) -> None:
     """Report results of an evaluation.
 
     Args:
-        event: event data.
+        results: The results.
     """
-    for item in event.data["results"]:
+    for item in results:
         if isinstance(item, FunctionResults) and item.functions is not None:
             print(f"  variables: {item.evaluations.variables}")
             print(f"  objective: {item.functions.weighted_objective}\n")
@@ -66,10 +66,7 @@ def report(event: Event) -> None:
 def run_optimization() -> None:
     """Run the optimization."""
     optimal_result = (
-        BasicOptimizer(CONFIG, function)
-        .add_observer(EventType.FINISHED_EVALUATION, report)
-        .run()
-        .results
+        BasicOptimizer(CONFIG, function).set_results_callback(report).run().results
     )
     assert optimal_result is not None
     assert optimal_result.functions is not None

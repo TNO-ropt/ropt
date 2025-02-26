@@ -4,9 +4,10 @@ from typing import Any, Sequence
 import pytest
 
 from ropt.config.enopt import EnOptConfig
-from ropt.enums import EventType, ResultAxis
-from ropt.plan import BasicOptimizer, Event
+from ropt.enums import ResultAxis
+from ropt.plan import BasicOptimizer
 from ropt.report import ResultsDataFrame
+from ropt.results import Results
 
 # Requires pandas:
 pd = pytest.importorskip("pandas")
@@ -35,22 +36,21 @@ def enopt_config_fixture() -> dict[str, Any]:
 
 
 def _handle_results(
-    event: Event,
+    results: tuple[Results, ...],
     reporter: ResultsDataFrame,
     variable_names: Sequence[str | int] | None = None,
 ) -> None:
     names: dict[str, Sequence[str | int] | None] | None = (
         None if variable_names is None else {ResultAxis.VARIABLE: variable_names}
     )
-    for item in event.data["results"]:
+    for item in results:
         reporter.add_results(item, names=names)
 
 
 def test_dataframe_results_no_results(enopt_config: Any, evaluator: Any) -> None:
     config = EnOptConfig.model_validate(enopt_config)
     reporter = ResultsDataFrame(set())
-    BasicOptimizer(config, evaluator()).add_observer(
-        EventType.FINISHED_EVALUATION,
+    BasicOptimizer(config, evaluator()).set_results_callback(
         partial(_handle_results, reporter=reporter),
     ).run()
     assert reporter.frame.empty
@@ -63,8 +63,7 @@ def test_dataframe_results_function_results(enopt_config: Any, evaluator: Any) -
             "evaluations.variables",
         },
     )
-    BasicOptimizer(config, evaluator()).add_observer(
-        EventType.FINISHED_EVALUATION,
+    BasicOptimizer(config, evaluator()).set_results_callback(
         partial(_handle_results, reporter=reporter),
     ).run()
 
@@ -83,8 +82,7 @@ def test_dataframe_results_function_results_formatted_names(
             "evaluations.variables",
         },
     )
-    BasicOptimizer(config, evaluator()).add_observer(
-        EventType.FINISHED_EVALUATION,
+    BasicOptimizer(config, evaluator()).set_results_callback(
         partial(
             _handle_results,
             reporter=reporter,
@@ -106,8 +104,7 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
         },
         table_type="gradients",
     )
-    BasicOptimizer(config, evaluator()).add_observer(
-        EventType.FINISHED_EVALUATION,
+    BasicOptimizer(config, evaluator()).set_results_callback(
         partial(
             _handle_results,
             reporter=reporter,
@@ -130,15 +127,13 @@ def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
         },
     )
 
-    def even_handler(event: Event) -> None:
-        for item in event.data["results"]:
+    def even_handler(results: tuple[Results, ...]) -> None:
+        for item in results:
             item.metadata["foo"] = {"bar": 1}
-        for item in event.data["results"]:
+        for item in results:
             reporter.add_results(item)
 
-    BasicOptimizer(enopt_config, evaluator()).add_observer(
-        EventType.FINISHED_EVALUATION, even_handler
-    ).run()
+    BasicOptimizer(enopt_config, evaluator()).set_results_callback(even_handler).run()
 
     assert len(reporter.frame) == 3
     assert list(reporter.frame.columns.get_level_values(level=0)) == [

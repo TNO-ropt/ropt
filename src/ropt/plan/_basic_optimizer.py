@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from ropt.evaluator import Evaluator
     from ropt.plan import Event
     from ropt.plugins.plan.base import ResultHandler
-    from ropt.results import FunctionResults
+    from ropt.results import FunctionResults, Results
     from ropt.transforms import OptModelTransforms
 
 
@@ -162,9 +162,42 @@ class BasicOptimizer:
         return tracker, optimizer["exit_code"]
 
     def set_abort_callback(self, callback: Callable[[], bool]) -> Self:
+        """Set an abort callback.
+
+        The callback will be called repeated during optimization. If it returns `True`,
+        the optimization will be aborted.
+
+        Args:
+            callback: The callable that will be used to check for abort conditions.
+
+        Returns:
+            The `BasicOptimizer` instance, allowing for method chaining.
+        """
+
         def _check_abort_callback(_: Event) -> None:
             if callback():
                 raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
 
         self.add_observer(EventType.START_EVALUATION, _check_abort_callback)
+        return self
+
+    def set_results_callback(
+        self, callback: Callable[[tuple[Results, ...]], None]
+    ) -> Self:
+        """Set a callback to report results.
+
+        The callback will be called whenever new results become available.
+
+        Args:
+            callback: The callable that will be used to report results.
+
+        Returns:
+            The `BasicOptimizer` instance, allowing for method chaining.
+        """
+
+        def _results_callback(event: Event) -> None:
+            if event.data.get("results", ()):
+                callback(event.data["results"])
+
+        self.add_observer(EventType.FINISHED_EVALUATION, _results_callback)
         return self

@@ -3,9 +3,9 @@ from typing import Any
 import numpy as np
 import pytest
 
-from ropt.enums import EventType, OptimizerExitCode
-from ropt.plan import BasicOptimizer, Event
-from ropt.results import FunctionResults
+from ropt.enums import OptimizerExitCode
+from ropt.plan import BasicOptimizer
+from ropt.results import FunctionResults, Results
 
 pytestmark = [pytest.mark.slow]
 
@@ -39,15 +39,15 @@ def test_external_run(enopt_config: Any, evaluator: Any) -> None:
 def test_external_max_functions_exceeded(enopt_config: Any, evaluator: Any) -> None:
     last_evaluation = 0
 
-    def track_results(_: Event) -> None:
+    def track_results(_: tuple[Results, ...]) -> None:
         nonlocal last_evaluation
 
         last_evaluation += 1
 
     max_functions = 2
     enopt_config["optimizer"]["max_functions"] = max_functions
-    optimizer = BasicOptimizer(enopt_config, evaluator()).add_observer(
-        EventType.FINISHED_EVALUATION, track_results
+    optimizer = BasicOptimizer(enopt_config, evaluator()).set_results_callback(
+        track_results
     )
     optimizer.run()
     assert last_evaluation == max_functions + 1
@@ -55,13 +55,13 @@ def test_external_max_functions_exceeded(enopt_config: Any, evaluator: Any) -> N
 
 
 def test_external_failed_realizations(enopt_config: Any, evaluator: Any) -> None:
-    def _observer(event: Event) -> None:
-        assert isinstance(event.data["results"][0], FunctionResults)
-        assert event.data["results"][0].functions is None
+    def _observer(results: tuple[Results, ...]) -> None:
+        assert isinstance(results[0], FunctionResults)
+        assert results[0].functions is None
 
     functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
-    optimizer = BasicOptimizer(enopt_config, evaluator(functions)).add_observer(
-        EventType.FINISHED_EVALUATION, _observer
+    optimizer = BasicOptimizer(enopt_config, evaluator(functions)).set_results_callback(
+        _observer
     )
     optimizer.run()
     assert optimizer.exit_code == OptimizerExitCode.TOO_FEW_REALIZATIONS

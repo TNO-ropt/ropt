@@ -4,8 +4,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from ropt.enums import EventType
-from ropt.plan import BasicOptimizer, Event
+from ropt.plan import BasicOptimizer
 from ropt.plugins.optimizer.scipy import (
     _CONSTRAINT_REQUIRES_BOUNDS,
     _CONSTRAINT_SUPPORT_BOUNDS,
@@ -15,6 +14,7 @@ from ropt.plugins.optimizer.scipy import (
     _CONSTRAINT_SUPPORT_NONLINEAR_INEQ,
     _SUPPORTED_METHODS,
 )
+from ropt.results import Results
 
 _REQUIRES_BOUNDS = _CONSTRAINT_REQUIRES_BOUNDS - {"differential_evolution"}
 _SUPPORTS_BOUNDS = _CONSTRAINT_SUPPORT_BOUNDS - {"differential_evolution"}
@@ -435,12 +435,12 @@ def test_scipy_speculative(
     enopt_config["optimizer"]["method"] = "slsqp"
     enopt_config["optimizer"]["speculative"] = speculative
 
-    def _observer(event: Event) -> None:
-        assert len(event.data["results"]) == 2 if speculative else 1
+    def _observer(results: tuple[Results, ...]) -> None:
+        assert len(results) == 2 if speculative else 1
 
     variables = (
         BasicOptimizer(enopt_config, evaluator())
-        .add_observer(EventType.FINISHED_EVALUATION, _observer)
+        .set_results_callback(_observer)
         .run()
         .variables
     )

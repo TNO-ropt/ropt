@@ -5,8 +5,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from ropt.enums import EventType
-from ropt.plan import BasicOptimizer, Event
+from ropt.plan import BasicOptimizer
 from ropt.plugins.realization_filter.default import (
     _get_cvar_weights_from_percentile,
     _sort_and_select,
@@ -105,8 +104,8 @@ def _constraint_function(variables: NDArray[np.float64], context: Any) -> float:
     return float(result)
 
 
-def _track_results(event: Event, result_list: list[Results]) -> None:
-    result_list.extend(event.data["results"])
+def _track_results(results: tuple[Results, ...], result_list: list[Results]) -> None:
+    result_list.extend(results)
 
 
 @pytest.mark.parametrize("split_evaluations", [True, False])
@@ -144,10 +143,7 @@ def test_sort_filter_on_objectives(
             enopt_config,
             evaluator(functions),
         )
-        .add_observer(
-            EventType.FINISHED_EVALUATION,
-            partial(_track_results, result_list=result_list),
-        )
+        .set_results_callback(partial(_track_results, result_list=result_list))
         .run()
         .results
     )
@@ -206,10 +202,7 @@ def test_sort_filter_on_objectives_with_constraints(
             enopt_config,
             evaluator(functions),
         )
-        .add_observer(
-            EventType.FINISHED_EVALUATION,
-            partial(_track_results, result_list=result_list),
-        )
+        .set_results_callback(partial(_track_results, result_list=result_list))
         .run()
         .results
     )
@@ -274,8 +267,7 @@ def test_sort_filter_on_constraints(
             enopt_config,
             evaluator(functions),
         )
-        .add_observer(
-            EventType.FINISHED_EVALUATION,
+        .set_results_callback(
             partial(_track_results, result_list=result_list),
         )
         .run()
@@ -325,13 +317,13 @@ def test_sort_filter_mixed(  # noqa: C901
 
     objective_values: list[NDArray[np.float64]] = []
 
-    def _add_objective(event: Event) -> None:
-        if event.data["results"]:
-            for item in event.data["results"]:
+    def _add_objective(results: tuple[Results, ...]) -> None:
+        if results:
+            for item in results:
                 if isinstance(item, FunctionResults):
                     assert item.functions is not None
                     objective_values.append(item.functions.weighted_objective)
-        _track_results(event, result_list=result_list)
+        _track_results(results, result_list=result_list)
 
     # Apply the filtering to all objectives, giving the expected result.
     enopt_config["realization_filters"] = [
@@ -349,7 +341,7 @@ def test_sort_filter_mixed(  # noqa: C901
     result_list: list[Results] = []
     results = (
         BasicOptimizer(enopt_config, evaluator(functions))
-        .add_observer(EventType.FINISHED_EVALUATION, _add_objective)
+        .set_results_callback(_add_objective)
         .run()
         .results
     )
@@ -387,7 +379,7 @@ def test_sort_filter_mixed(  # noqa: C901
     result_list = []
     results = (
         BasicOptimizer(enopt_config, evaluator(functions))
-        .add_observer(EventType.FINISHED_EVALUATION, _add_objective)
+        .set_results_callback(_add_objective)
         .run()
         .results
     )
@@ -449,8 +441,7 @@ def test_cvar_filter_on_objectives(
             enopt_config,
             evaluator(functions),
         )
-        .add_observer(
-            EventType.FINISHED_EVALUATION,
+        .set_results_callback(
             partial(_track_results, result_list=result_list),
         )
         .run()
@@ -510,8 +501,7 @@ def test_cvar_filter_on_objectives_with_constraints(
             enopt_config,
             evaluator(functions),
         )
-        .add_observer(
-            EventType.FINISHED_EVALUATION,
+        .set_results_callback(
             partial(_track_results, result_list=result_list),
         )
         .run()
@@ -578,8 +568,7 @@ def test_cvar_filter_on_constraints(
             enopt_config,
             evaluator(functions),
         )
-        .add_observer(
-            EventType.FINISHED_EVALUATION,
+        .set_results_callback(
             partial(_track_results, result_list=result_list),
         )
         .run()
@@ -629,13 +618,12 @@ def test_cvar_filter_mixed(  # noqa: C901
 
     objective_values: list[NDArray[np.float64]] = []
 
-    def _add_objective(event: Event) -> None:
-        if "results" in event.data:
-            for item in event.data["results"]:
-                if isinstance(item, FunctionResults):
-                    assert item.functions is not None
-                    objective_values.append(item.functions.weighted_objective)
-        _track_results(event, result_list=result_list)
+    def _add_objective(results: tuple[Results, ...]) -> None:
+        for item in results:
+            if isinstance(item, FunctionResults):
+                assert item.functions is not None
+                objective_values.append(item.functions.weighted_objective)
+        _track_results(results, result_list=result_list)
 
     # Apply the filtering to all objectives, giving the expected result.
     enopt_config["realization_filters"] = [
@@ -652,7 +640,7 @@ def test_cvar_filter_mixed(  # noqa: C901
     result_list: list[Results] = []
     results = (
         BasicOptimizer(enopt_config, evaluator(functions))
-        .add_observer(EventType.FINISHED_EVALUATION, _add_objective)
+        .set_results_callback(_add_objective)
         .run()
         .results
     )
@@ -689,7 +677,7 @@ def test_cvar_filter_mixed(  # noqa: C901
     result_list = []
     results = (
         BasicOptimizer(enopt_config, evaluator(functions))
-        .add_observer(EventType.FINISHED_EVALUATION, _add_objective)
+        .set_results_callback(_add_objective)
         .run()
         .results
     )

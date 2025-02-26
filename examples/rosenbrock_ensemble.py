@@ -13,10 +13,9 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt.enums import EventType
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.plan import BasicOptimizer, Event
-from ropt.results import FunctionResults
+from ropt.plan import BasicOptimizer
+from ropt.results import FunctionResults, Results
 
 DIM = 5
 UNCERTAINTY = 0.1
@@ -60,13 +59,13 @@ def rosenbrock(
     return EvaluatorResult(objectives=objectives)
 
 
-def report(event: Event) -> None:
+def report(results: tuple[Results, ...]) -> None:
     """Report results of an evaluation.
 
     Args:
-        event: event data.
+        results: The results.
     """
-    for item in event.data["results"]:
+    for item in results:
         if isinstance(item, FunctionResults) and item.functions is not None:
             print(f"  variables: {item.evaluations.variables}")
             print(f"  objective: {item.functions.weighted_objective}\n")
@@ -89,7 +88,7 @@ def run_optimization(config: dict[str, Any]) -> FunctionResults:
 
     optimal_result = (
         BasicOptimizer(CONFIG, partial(rosenbrock, a=a, b=b))
-        .add_observer(EventType.FINISHED_EVALUATION, report)
+        .set_results_callback(report)
         .run()
         .results
     )

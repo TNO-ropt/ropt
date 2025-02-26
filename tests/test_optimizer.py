@@ -10,7 +10,7 @@ from ropt.config.enopt import EnOptConfig
 from ropt.config.enopt.constants import DEFAULT_SEED
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.plan import BasicOptimizer
-from ropt.results import FunctionResults, GradientResults
+from ropt.results import FunctionResults, GradientResults, Results
 from ropt.transforms import OptModelTransforms, VariableScaler
 from ropt.transforms.base import NonLinearConstraintTransform, ObjectiveTransform
 
@@ -40,14 +40,14 @@ def enopt_config_fixture() -> dict[str, Any]:
 def test_max_functions_exceeded(enopt_config: Any, evaluator: Any) -> None:
     last_evaluation = 0
 
-    def track_results(_: Event) -> None:
+    def track_results(_: tuple[Results, ...]) -> None:
         nonlocal last_evaluation
         last_evaluation += 1
 
     max_functions = 2
     enopt_config["optimizer"]["max_functions"] = max_functions
-    optimizer = BasicOptimizer(enopt_config, evaluator()).add_observer(
-        EventType.FINISHED_EVALUATION, track_results
+    optimizer = BasicOptimizer(enopt_config, evaluator()).set_results_callback(
+        track_results
     )
     optimizer.run()
     assert last_evaluation == max_functions + 1
@@ -57,15 +57,15 @@ def test_max_functions_exceeded(enopt_config: Any, evaluator: Any) -> None:
 def test_max_functions_not_exceeded(enopt_config: Any, evaluator: Any) -> None:
     last_evaluation = 0
 
-    def track_results(_: Event) -> None:
+    def track_results(_: tuple[Results, ...]) -> None:
         nonlocal last_evaluation
         last_evaluation += 1
 
     max_functions = 100
     enopt_config["optimizer"]["max_functions"] = max_functions
     enopt_config["optimizer"]["split_evaluations"] = True
-    optimizer = BasicOptimizer(enopt_config, evaluator()).add_observer(
-        EventType.FINISHED_EVALUATION, track_results
+    optimizer = BasicOptimizer(enopt_config, evaluator()).set_results_callback(
+        track_results
     )
     optimizer.run()
     assert last_evaluation + 1 < 2 * max_functions
@@ -73,13 +73,13 @@ def test_max_functions_not_exceeded(enopt_config: Any, evaluator: Any) -> None:
 
 
 def test_failed_realizations(enopt_config: Any, evaluator: Any) -> None:
-    def _observer(event: Event) -> None:
-        assert isinstance(event.data["results"][0], FunctionResults)
-        assert event.data["results"][0].functions is None
+    def _observer(results: tuple[Results, ...]) -> None:
+        assert isinstance(results[0], FunctionResults)
+        assert results[0].functions is None
 
     functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
-    optimizer = BasicOptimizer(enopt_config, evaluator(functions)).add_observer(
-        EventType.FINISHED_EVALUATION, _observer
+    optimizer = BasicOptimizer(enopt_config, evaluator(functions)).set_results_callback(
+        _observer
     )
     optimizer.run()
     assert optimizer.exit_code == OptimizerExitCode.TOO_FEW_REALIZATIONS
@@ -388,8 +388,8 @@ def test_optimizer_variables_subset(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["variables"]["initial_values"] = [0.0, 1.0, 0.1]
     enopt_config["variables"]["mask"] = [True, False, True]
 
-    def assert_gradient(event: Event) -> None:
-        for item in event.data["results"]:
+    def assert_gradient(results: tuple[Results, ...]) -> None:
+        for item in results:
             if isinstance(item, GradientResults):
                 assert item.gradients is not None
                 assert item.gradients.weighted_objective[1] == 0.0
@@ -397,7 +397,7 @@ def test_optimizer_variables_subset(enopt_config: Any, evaluator: Any) -> None:
 
     variables = (
         BasicOptimizer(enopt_config, evaluator())
-        .add_observer(EventType.FINISHED_EVALUATION, assert_gradient)
+        .set_results_callback(assert_gradient)
         .run()
         .variables
     )
