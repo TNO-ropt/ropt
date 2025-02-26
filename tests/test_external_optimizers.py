@@ -70,16 +70,15 @@ def test_external_failed_realizations(enopt_config: Any, evaluator: Any) -> None
 def test_external_user_abort(enopt_config: Any, evaluator: Any) -> None:
     last_evaluation = 0
 
-    def _observer(_: Event) -> None:
+    def _abort() -> bool:
         nonlocal last_evaluation
 
-        last_evaluation += 1
         if last_evaluation == 1:
-            optimizer.abort_optimization()
+            return True
+        last_evaluation += 1
+        return False
 
-    optimizer = BasicOptimizer(enopt_config, evaluator()).add_observer(
-        EventType.FINISHED_EVALUATION, _observer
-    )
+    optimizer = BasicOptimizer(enopt_config, evaluator()).set_abort_callback(_abort)
     optimizer.run()
     assert optimizer.results is not None
     assert last_evaluation == 1

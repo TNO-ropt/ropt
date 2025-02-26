@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable, NoReturn, Self
+from typing import TYPE_CHECKING, Any, Callable, Self
 
 from ropt.config.enopt import EnOptConfig
 from ropt.enums import EventType, OptimizerExitCode
@@ -161,14 +161,10 @@ class BasicOptimizer:
         plan.run_step(optimizer)
         return tracker, optimizer["exit_code"]
 
-    @staticmethod
-    def abort_optimization() -> NoReturn:
-        """Abort the current optimization run.
+    def set_abort_callback(self, callback: Callable[[], bool]) -> Self:
+        def _check_abort_callback(_: Event) -> None:
+            if callback():
+                raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
 
-        This method can be called from within callbacks to interrupt the ongoing
-        optimization plan. The exact point at which the optimization is aborted
-        depends on the step that is executing at that point. For example, within
-        a running optimizer, the process will be interrupted after completing
-        the current function evaluation.
-        """
-        raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
+        self.add_observer(EventType.START_EVALUATION, _check_abort_callback)
+        return self
