@@ -51,7 +51,7 @@ class BasicOptimizer:
         *,
         transforms: OptModelTransforms | None = None,
         constraint_tolerance: float = 1e-10,
-        **kwargs: dict[str, Any],
+        **kwargs: Any,  # noqa: ANN401
     ) -> None:
         """Initialize an `BasicOptimizer` object.
 
