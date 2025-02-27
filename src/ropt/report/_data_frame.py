@@ -169,19 +169,19 @@ def _get_function_results(
         names=names,
     ).rename(columns=partial(_add_prefix, prefix="evaluations"))
 
-    if results.constraint_diffs is not None:
-        constraint_diffs = results.to_dataframe(
-            "constraint_diffs",
-            select=_get_select(results, "constraint_diffs", sub_fields),
+    if results.constraint_info is not None:
+        constraint_info = results.to_dataframe(
+            "constraint_info",
+            select=_get_select(results, "constraint_info", sub_fields),
             unstack=[
                 ResultAxis.VARIABLE,
                 ResultAxis.LINEAR_CONSTRAINT,
                 ResultAxis.NONLINEAR_CONSTRAINT,
             ],
             names=names,
-        ).rename(columns=partial(_add_prefix, prefix="constraint_diffs"))
+        ).rename(columns=partial(_add_prefix, prefix="constraint_info"))
 
-        return _join_frames(functions, evaluations, constraint_diffs)
+        return _join_frames(functions, evaluations, constraint_info)
 
     return _join_frames(functions, evaluations)
 

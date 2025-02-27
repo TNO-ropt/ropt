@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 
 @dataclass(slots=True)
-class ConstraintDiffs(ResultField):
+class ConstraintInfo(ResultField):
     """This class stores constraint differences.
 
     Attributes:
@@ -48,6 +48,15 @@ class ConstraintDiffs(ResultField):
     nonlinear_upper: NDArray[np.float64] | None = field(
         default=None, metadata={"__axes__": (ResultAxis.NONLINEAR_CONSTRAINT,)}
     )
+    bound_violation: NDArray[np.float64] | None = field(
+        default=None, metadata={"__axes__": (ResultAxis.VARIABLE,)}
+    )
+    linear_violation: NDArray[np.float64] | None = field(
+        default=None, metadata={"__axes__": (ResultAxis.LINEAR_CONSTRAINT,)}
+    )
+    nonlinear_violation: NDArray[np.float64] | None = field(
+        default=None, metadata={"__axes__": (ResultAxis.NONLINEAR_CONSTRAINT,)}
+    )
 
     def __post_init__(self) -> None:
         """Make all array fields immutable copies.
@@ -60,6 +69,27 @@ class ConstraintDiffs(ResultField):
         self.linear_upper = _immutable_copy(self.linear_upper)
         self.nonlinear_lower = _immutable_copy(self.nonlinear_lower)
         self.nonlinear_upper = _immutable_copy(self.nonlinear_upper)
+        if self.bound_lower is not None and self.bound_upper is not None:
+            self.bound_violation = _immutable_copy(
+                np.maximum(
+                    np.where(self.bound_lower < 0.0, -self.bound_lower, 0.0),
+                    np.where(self.bound_upper > 0.0, self.bound_upper, 0.0),
+                )
+            )
+        if self.linear_lower is not None and self.linear_upper is not None:
+            self.linear_violation = _immutable_copy(
+                np.maximum(
+                    np.where(self.linear_lower < 0.0, -self.linear_lower, 0.0),
+                    np.where(self.linear_upper > 0.0, self.linear_upper, 0.0),
+                )
+            )
+        if self.nonlinear_lower is not None and self.nonlinear_upper is not None:
+            self.nonlinear_violation = _immutable_copy(
+                np.maximum(
+                    np.where(self.nonlinear_lower < 0.0, -self.nonlinear_lower, 0.0),
+                    np.where(self.nonlinear_upper > 0.0, self.nonlinear_upper, 0.0),
+                )
+            )
 
     @classmethod
     def create(
@@ -67,7 +97,7 @@ class ConstraintDiffs(ResultField):
         config: EnOptConfig,
         variables: NDArray[np.float64],
         constraints: NDArray[np.float64] | None,
-    ) -> ConstraintDiffs | None:
+    ) -> ConstraintInfo | None:
         """Add constraint difference information.
 
         This stores the following constraint differences:
@@ -83,7 +113,7 @@ class ConstraintDiffs(ResultField):
             constraints: The constraints to check (optional).
 
         Returns:
-            A newly created ConstraintDiffs object or None.
+            A newly created ConstraintInfo object or None.
         """
         diffs: dict[str, NDArray[np.float64] | None] = {}
 
@@ -108,13 +138,13 @@ class ConstraintDiffs(ResultField):
             )
 
         if diffs:
-            return ConstraintDiffs(**diffs)
+            return ConstraintInfo(**diffs)
 
         return None
 
     def transform_from_optimizer(
         self, transforms: OptModelTransforms
-    ) -> ConstraintDiffs:
+    ) -> ConstraintInfo:
         if transforms.variables is None and transforms.nonlinear_constraints is None:
             return self
 
@@ -145,4 +175,4 @@ class ConstraintDiffs(ResultField):
                 )
             )
 
-        return ConstraintDiffs(**diffs)
+        return ConstraintInfo(**diffs)

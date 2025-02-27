@@ -6,7 +6,7 @@ import numpy as np
 from numpy.random import default_rng
 
 from ropt.results import (
-    ConstraintDiffs,
+    ConstraintInfo,
     FunctionEvaluations,
     FunctionResults,
     Functions,
@@ -208,7 +208,7 @@ class EnsembleEvaluator:
                 constraint_weights=constraint_weights,
             ),
             functions=functions,
-            constraint_diffs=ConstraintDiffs.create(
+            constraint_info=ConstraintInfo.create(
                 self._config,
                 evaluations.variables,
                 functions.constraints if functions is not None else None,
@@ -361,7 +361,7 @@ class EnsembleEvaluator:
                 constraint_weights=constraint_weights,
             ),
             functions=functions,
-            constraint_diffs=ConstraintDiffs.create(
+            constraint_info=ConstraintInfo.create(
                 self._config,
                 evaluations.variables,
                 functions.constraints if functions is not None else None,

@@ -35,7 +35,7 @@ generated DataFrame and may also unstack such multi-dimensional data into
 multiple columns.
 """
 
-from ._constraint_diffs import ConstraintDiffs
+from ._constraint_info import ConstraintInfo
 from ._function_evaluations import FunctionEvaluations
 from ._function_results import FunctionResults
 from ._functions import Functions
@@ -47,7 +47,7 @@ from ._result_field import ResultField
 from ._results import Results
 
 __all__ = [
-    "ConstraintDiffs",
+    "ConstraintInfo",
     "FunctionEvaluations",
     "FunctionResults",
     "Functions",

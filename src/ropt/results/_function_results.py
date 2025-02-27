@@ -8,7 +8,7 @@ from ._results import Results
 if TYPE_CHECKING:
     from ropt.transforms import OptModelTransforms
 
-    from ._constraint_diffs import ConstraintDiffs
+    from ._constraint_info import ConstraintInfo
     from ._function_evaluations import FunctionEvaluations
     from ._functions import Functions
     from ._realizations import Realizations
@@ -27,19 +27,19 @@ class FunctionResults(Results):
     2. The parameters of the realizations, such as weights for objectives and
        constraints, and realization failures.
     3. The calculated objective and constraint function values.
-    4. Information on the differences of any constraints to their bounds.
+    4. Information on the differences and violations of any constraints.
 
     Attributes:
-        evaluations:           Results of the function evaluations.
-        realizations:          The calculated parameters of the realizations.
-        functions:             The calculated functions.
-        constraint_diffs:      Bound constraints.
+        evaluations:     Results of the function evaluations.
+        realizations:    The calculated parameters of the realizations.
+        functions:       The calculated functions.
+        constraint_info: Bound constraint info.
     """
 
     evaluations: FunctionEvaluations
     realizations: Realizations
     functions: Functions | None
-    constraint_diffs: ConstraintDiffs | None = None
+    constraint_info: ConstraintInfo | None = None
 
     def transform_from_optimizer(
         self, transforms: OptModelTransforms
@@ -63,9 +63,9 @@ class FunctionResults(Results):
                 if self.functions is None
                 else self.functions.transform_from_optimizer(transforms)
             ),
-            constraint_diffs=(
+            constraint_info=(
                 None
-                if self.constraint_diffs is None
-                else self.constraint_diffs.transform_from_optimizer(transforms)
+                if self.constraint_info is None
+                else self.constraint_info.transform_from_optimizer(transforms)
             ),
         )

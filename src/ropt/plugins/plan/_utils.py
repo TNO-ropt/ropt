@@ -2,14 +2,9 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import numpy as np
 
 from ropt.results import FunctionResults, Results
-
-if TYPE_CHECKING:
-    from numpy.typing import NDArray
 
 
 def _get_new_optimal_result(
@@ -31,22 +26,18 @@ def _violates_constraint(results: Results, tolerance: float | None) -> bool:
         return False
 
     assert isinstance(results, FunctionResults)
-    if results.constraint_diffs is None:
+    if results.constraint_info is None:
         return False
 
-    def _check(diffs: NDArray[np.float64] | None, *, flip: bool) -> bool:
-        if diffs is None:
-            return False
-        return bool(np.any((-diffs if flip else diffs) > tolerance))
+    for violations in (
+        results.constraint_info.bound_violation,
+        results.constraint_info.linear_violation,
+        results.constraint_info.nonlinear_violation,
+    ):
+        if violations is not None and np.any(violations > tolerance):
+            return True
 
-    return (
-        _check(results.constraint_diffs.bound_lower, flip=True)
-        or _check(results.constraint_diffs.bound_upper, flip=False)
-        or _check(results.constraint_diffs.linear_lower, flip=True)
-        or _check(results.constraint_diffs.linear_upper, flip=False)
-        or _check(results.constraint_diffs.nonlinear_lower, flip=True)
-        or _check(results.constraint_diffs.nonlinear_upper, flip=False)
-    )
+    return False
 
 
 def _get_last_result(
