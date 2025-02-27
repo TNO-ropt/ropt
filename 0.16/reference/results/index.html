@@ -2270,7 +2270,7 @@ indices.</p>
 <li>The parameters of the realizations, such as weights for objectives and
    constraints, and realization failures.</li>
 <li>The calculated objective and constraint function values.</li>
-<li>Information on the differences of any constraints to their bounds.</li>
+<li>Information on the differences and violations of any constraints.</li>
 </ol>
 
 
@@ -2318,13 +2318,13 @@ indices.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.results.FunctionResults.constraint_diffs">constraint_diffs</span></code></td>
+            <td><code><span title="ropt.results.FunctionResults.constraint_info">constraint_info</span></code></td>
             <td>
-                  <code><span title="ropt.results._constraint_diffs.ConstraintDiffs">ConstraintDiffs</span> | None</code>
+                  <code><span title="ropt.results._constraint_info.ConstraintInfo">ConstraintInfo</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Bound constraints.</p>
+                <p>Bound constraint info.</p>
               </div>
             </td>
           </tr>
