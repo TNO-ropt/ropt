@@ -399,8 +399,8 @@ def test_exit_code(enopt_config: dict[str, Any], evaluator: Any) -> None:
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(context)
     step = plan.add_step("optimizer", config=enopt_config)
-    plan.run_step(step)
-    assert step["exit_code"] == OptimizerExitCode.MAX_FUNCTIONS_REACHED
+    exit_code = plan.run_step(step)
+    assert exit_code == OptimizerExitCode.MAX_FUNCTIONS_REACHED
 
 
 def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:

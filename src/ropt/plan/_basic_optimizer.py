@@ -158,8 +158,8 @@ class BasicOptimizer:
             constraint_tolerance=self._constraint_tolerance,
             tags="__optimizer_tag__",
         )
-        plan.run_step(optimizer)
-        return tracker, optimizer["exit_code"]
+        exit_code = plan.run_step(optimizer)
+        return tracker, exit_code
 
     def set_abort_callback(self, callback: Callable[[], bool]) -> Self:
         """Set an abort callback.

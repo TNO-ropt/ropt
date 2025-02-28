@@ -73,7 +73,6 @@ class DefaultEvaluatorStep(PlanStep):
         self._config = EnOptConfig.model_validate(config)
         self._transforms = transforms
         self._tags = _get_set(tags)
-        self["exit_code"] = None
 
     def run(  # type: ignore[override]
         self,
@@ -83,9 +82,8 @@ class DefaultEvaluatorStep(PlanStep):
         | list[float]
         | list[list[float]]
         | None = None,
-    ) -> None:
+    ) -> OptimizerExitCode:
         """Run the evaluator step."""
-        self["exit_code"] = None
         match variables:
             case FunctionResults():
                 variables = variables.evaluations.variables
@@ -99,14 +97,14 @@ class DefaultEvaluatorStep(PlanStep):
 
         if variables is None:
             variables = self._config.variables.initial_values
-        self._run(self._config, self._transforms, variables)
+        return self._run(self._config, self._transforms, variables)
 
     def _run(
         self,
         enopt_config: EnOptConfig,
         transforms: OptModelTransforms | None,
         variables: NDArray[np.float64],
-    ) -> None:
+    ) -> OptimizerExitCode:
         for event_type in (EventType.START_EVALUATOR_STEP, EventType.START_EVALUATION):
             self.emit_event(
                 Event(
@@ -161,7 +159,8 @@ class DefaultEvaluatorStep(PlanStep):
 
         if exit_code == OptimizerExitCode.USER_ABORT:
             self.plan.abort()
-        self["exit_code"] = exit_code
+
+        return exit_code
 
     def emit_event(self, event: Event) -> None:
         """Emit an event.

@@ -127,7 +127,7 @@ class Plan:
         """
         self._function = func
 
-    def run_step(self, step: PlanStep, **kwargs: Any) -> None:  # noqa: ANN401
+    def run_step(self, step: PlanStep, **kwargs: Any) -> Any:  # noqa: ANN401
         """Run a step in the plan.
 
         Args:
@@ -140,7 +140,7 @@ class Plan:
         if self._aborted:
             msg = "Plan was aborted by the previous step."
             raise PlanAborted(msg)
-        step.run(**kwargs)
+        return step.run(**kwargs)
 
     def run_function(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
         """Run a function in the plan.

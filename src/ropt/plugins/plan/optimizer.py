@@ -81,15 +81,13 @@ class DefaultOptimizerStep(PlanStep):
         self._tags = _get_set(tags)
         self._nested_optimization = nested_optimization
         self._nested_run_index = 0
-        self["exit_code"] = None
 
     def run(  # type: ignore[override]
         self,
         *,
         variables: FunctionResults | NDArray[np.float64] | list[float] | None = None,
-    ) -> None:
+    ) -> OptimizerExitCode:
         """Run the optimizer step."""
-        self["exit_code"] = None
         match variables:
             case FunctionResults():
                 variables = variables.evaluations.variables
@@ -103,14 +101,14 @@ class DefaultOptimizerStep(PlanStep):
 
         if variables is None:
             variables = self._config.variables.initial_values
-        self._run(self._config, self._transforms, variables)
+        return self._run(self._config, self._transforms, variables)
 
     def _run(
         self,
         enopt_config: EnOptConfig,
         transforms: OptModelTransforms | None,
         variables: NDArray[np.float64],
-    ) -> None:
+    ) -> OptimizerExitCode:
         self.emit_event(
             Event(
                 event_type=EventType.START_OPTIMIZER_STEP,
@@ -155,7 +153,8 @@ class DefaultOptimizerStep(PlanStep):
 
         if exit_code == OptimizerExitCode.USER_ABORT:
             self.plan.abort()
-        self["exit_code"] = exit_code
+
+        return exit_code
 
     def emit_event(self, event: Event) -> None:
         """Emit an event.
