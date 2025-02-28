@@ -19,8 +19,11 @@ from ropt.results import FunctionResults
 from ._utils import _get_set
 
 if TYPE_CHECKING:
+    from numpy.typing import ArrayLike
+
     from ropt.results import Results
     from ropt.transforms import OptModelTransforms
+
 
 MetaDataType = dict[str, int | float | bool | str]
 
@@ -85,22 +88,14 @@ class DefaultOptimizerStep(PlanStep):
     def run(  # type: ignore[override]
         self,
         *,
-        variables: FunctionResults | NDArray[np.float64] | list[float] | None = None,
+        variables: ArrayLike | None = None,
     ) -> OptimizerExitCode:
         """Run the optimizer step."""
-        match variables:
-            case FunctionResults():
-                variables = variables.evaluations.variables
-            case np.ndarray() | list():
-                variables = np.asarray(variables, dtype=np.float64)
-            case None:
-                variables = None
-            case _:
-                msg = "Invalid initial variables."
-                raise ValueError(msg)
-
-        if variables is None:
-            variables = self._config.variables.initial_values
+        variables = (
+            self._config.variables.initial_values
+            if variables is None
+            else np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
+        )
         return self._run(self._config, self._transforms, variables)
 
     def _run(
