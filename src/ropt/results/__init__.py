@@ -36,6 +36,7 @@ multiple columns.
 """
 
 from ._constraint_info import ConstraintInfo
+from ._data_frame import results_to_dataframe
 from ._function_evaluations import FunctionEvaluations
 from ._function_results import FunctionResults
 from ._functions import Functions
@@ -57,4 +58,5 @@ __all__ = [
     "Realizations",
     "ResultField",
     "Results",
+    "results_to_dataframe",
 ]

@@ -86,7 +86,6 @@ nav:
           - "Optimization": reference/optimization.md
           - "Function Evaluations": reference/evaluator.md
           - "Optimization Results": reference/results.md
-          - "Reporting": reference/reporting.md
       - "Plugins":
           - "Plugins": reference/plugin_manager.md
           - "Plan Plugins": reference/plan_plugins.md

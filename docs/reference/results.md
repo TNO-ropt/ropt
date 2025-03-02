@@ -1,7 +1,3 @@
-::: ropt.results
-    options:
-        members: False
-
 ::: ropt.results.Results
     options:
         heading_level: 3
@@ -42,3 +38,7 @@
     options:
         heading_level: 3
         members: False
+
+::: ropt.results
+    options:
+        members: [results_to_dataframe]

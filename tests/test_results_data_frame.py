@@ -1,16 +1,17 @@
 from functools import partial
-from typing import Any, Sequence
+from typing import Any, Literal, Sequence
 
 import pytest
 
 from ropt.config.enopt import EnOptConfig
 from ropt.enums import ResultAxis
 from ropt.plan import BasicOptimizer
-from ropt.report import ResultsDataFrame
-from ropt.results import Results
+from ropt.results import Results, results_to_dataframe
 
 # Requires pandas:
-pd = pytest.importorskip("pandas")
+pytest.importorskip("pandas")
+
+import pandas as pd
 
 
 @pytest.fixture(name="enopt_config")
@@ -37,38 +38,48 @@ def enopt_config_fixture() -> dict[str, Any]:
 
 def _handle_results(
     results: tuple[Results, ...],
-    reporter: ResultsDataFrame,
+    frames: list[pd.DataFrame],
+    fields: set[str],
+    result_type: Literal["functions", "gradients"],
     variable_names: Sequence[str | int] | None = None,
+    metadata: dict[str, Any] | None = None,
 ) -> None:
     names: dict[str, Sequence[str | int] | None] | None = (
         None if variable_names is None else {ResultAxis.VARIABLE: variable_names}
     )
-    for item in results:
-        reporter.add_results(item, names=names)
+    if metadata is not None:
+        for item in results:
+            item.metadata = metadata
+    frame = results_to_dataframe(results, fields, result_type=result_type, names=names)
+    if not frame.empty:
+        frames.append(frame)
 
 
 def test_dataframe_results_no_results(enopt_config: Any, evaluator: Any) -> None:
     config = EnOptConfig.model_validate(enopt_config)
-    reporter = ResultsDataFrame(set())
+    frames: list[pd.DataFrame] = []
     BasicOptimizer(config, evaluator()).set_results_callback(
-        partial(_handle_results, reporter=reporter),
+        partial(_handle_results, frames=frames, fields=set(), result_type="functions"),
     ).run()
-    assert reporter.frame.empty
+    assert not frames
 
 
 def test_dataframe_results_function_results(enopt_config: Any, evaluator: Any) -> None:
     config = EnOptConfig.model_validate(enopt_config)
-    reporter = ResultsDataFrame(
-        {
-            "evaluations.variables",
-        },
-    )
+    frames: list[pd.DataFrame] = []
     BasicOptimizer(config, evaluator()).set_results_callback(
-        partial(_handle_results, reporter=reporter),
+        partial(
+            _handle_results,
+            frames=frames,
+            fields={
+                "evaluations.variables",
+            },
+            result_type="functions",
+        ),
     ).run()
-
-    assert len(reporter.frame) == 3
-    assert list(reporter.frame.columns.get_level_values(level=0)) == [
+    frame = pd.concat(frames)
+    assert len(frame) == 3
+    assert list(frame.columns.get_level_values(level=0)) == [
         ("evaluations.variables", idx) for idx in range(3)
     ]
 
@@ -77,65 +88,64 @@ def test_dataframe_results_function_results_formatted_names(
     enopt_config: Any, evaluator: Any
 ) -> None:
     config = EnOptConfig.model_validate(enopt_config)
-    reporter = ResultsDataFrame(
-        {
-            "evaluations.variables",
-        },
-    )
+    frames: list[pd.DataFrame] = []
     BasicOptimizer(config, evaluator()).set_results_callback(
         partial(
             _handle_results,
-            reporter=reporter,
+            frames=frames,
+            fields={
+                "evaluations.variables",
+            },
+            result_type="functions",
             variable_names=[f"a:{idx}" for idx in range(1, 4)],
         ),
     ).run()
-
-    assert len(reporter.frame) == 3
-    assert list(reporter.frame.columns.get_level_values(level=0)) == [
+    frame = pd.concat(frames)
+    assert len(frame) == 3
+    assert list(frame.columns.get_level_values(level=0)) == [
         ("evaluations.variables", f"a:{idx}") for idx in range(1, 4)
     ]
 
 
 def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -> None:
     config = EnOptConfig.model_validate(enopt_config)
-    reporter = ResultsDataFrame(
-        {
-            "gradients.weighted_objective",
-        },
-        table_type="gradients",
-    )
+    frames: list[pd.DataFrame] = []
     BasicOptimizer(config, evaluator()).set_results_callback(
         partial(
             _handle_results,
-            reporter=reporter,
+            frames=frames,
+            fields={
+                "gradients.weighted_objective",
+            },
+            result_type="gradients",
             variable_names=[f"a:{idx}" for idx in range(1, 4)],
         ),
     ).run()
-
-    assert len(reporter.frame) == 3
-    assert list(reporter.frame.columns.get_level_values(level=0)) == [
+    frame = pd.concat(frames)
+    assert len(frame) == 3
+    assert list(frame.columns.get_level_values(level=0)) == [
         ("gradients.weighted_objective", f"a:{idx}") for idx in range(1, 4)
     ]
 
 
 def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
-    reporter = ResultsDataFrame(
-        {
-            "evaluations.variables",
-            "metadata.foo.bar",
-            "metadata.not.existing",
-        },
-    )
-
-    def even_handler(results: tuple[Results, ...]) -> None:
-        for item in results:
-            item.metadata["foo"] = {"bar": 1}
-        for item in results:
-            reporter.add_results(item)
-
-    BasicOptimizer(enopt_config, evaluator()).set_results_callback(even_handler).run()
-
-    assert len(reporter.frame) == 3
-    assert list(reporter.frame.columns.get_level_values(level=0)) == [
+    config = EnOptConfig.model_validate(enopt_config)
+    frames: list[pd.DataFrame] = []
+    BasicOptimizer(config, evaluator()).set_results_callback(
+        partial(
+            _handle_results,
+            frames=frames,
+            fields={
+                "evaluations.variables",
+                "metadata.foo.bar",
+                "metadata.not.existing",
+            },
+            result_type="functions",
+            metadata={"foo": {"bar": 1}},
+        ),
+    ).run()
+    frame = pd.concat(frames)
+    assert len(frame) == 3
+    assert list(frame.columns.get_level_values(level=0)) == [
         ("evaluations.variables", idx) for idx in range(3)
     ] + ["metadata.foo.bar"]
