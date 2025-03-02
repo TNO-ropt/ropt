@@ -117,6 +117,7 @@ class DefaultOptimizerStep(PlanStep):
             transforms,
             self.plan.optimizer_context.evaluator,
             self.plan.plan_id,
+            self.plan.optimizer_context.eval_id_iter,
             self.plan.optimizer_context.plugin_manager,
         )
 

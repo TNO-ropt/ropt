@@ -40,6 +40,7 @@ def function_result_fixture() -> FunctionResults:
     )
     return FunctionResults(
         plan_id=(0,),
+        eval_id=0,
         batch_id=1,
         metadata={},
         evaluations=evaluations,

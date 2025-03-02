@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from itertools import count
 from typing import TYPE_CHECKING, Callable, Self
 
 from ropt.enums import EventType
@@ -23,6 +24,7 @@ class OptimizerContext:
     - A plugin manager to retrieve plugins used by the plan and optimizers.
     - Event callbacks that are triggered in response to specific events,
       executed after the plan has processed them.
+    - An iterator producing unique evaluation ID's.
     """
 
     def __init__(
@@ -47,6 +49,7 @@ class OptimizerContext:
         self._subscribers: dict[EventType, list[Callable[[Event], None]]] = {
             event: [] for event in EventType
         }
+        self.eval_id_iter = count()
 
     def add_observer(
         self,
