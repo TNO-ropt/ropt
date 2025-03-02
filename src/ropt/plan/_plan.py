@@ -187,8 +187,7 @@ class Plan:
 
         When this method is called, the following steps are executed:
 
-        1. All event handlers associated with the plan are invoked, which may
-           modify the event.
+        1. All event handlers associated with the plan are invoked.
         2. If the plan has no parent, all observer functions registered for the
            specified event type via the `add_observer` method are called.
         3. If the plan has a parent, the `emit_event` method of the parent plan
@@ -198,7 +197,7 @@ class Plan:
             event: The event object to emit.
         """
         for handler in self._handlers:
-            event = handler.handle_event(event)
+            handler.handle_event(event)
         if self._parent is None:
             self._optimizer_context.call_observers(event)
         else:

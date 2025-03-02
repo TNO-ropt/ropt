@@ -61,14 +61,11 @@ class DefaultTrackerHandler(ResultHandler):
         self["results"] = None
         self["variables"] = None
 
-    def handle_event(self, event: Event) -> Event:
+    def handle_event(self, event: Event) -> None:
         """Handle an event.
 
         Args:
             event: The event to handle.
-
-        Returns:
-            The (possibly modified) event.
         """
         if (
             event.event_type
@@ -112,4 +109,3 @@ class DefaultTrackerHandler(ResultHandler):
                     else filtered_results.evaluations.variables
                 )
                 self["variables"] = variables
-        return event

@@ -181,16 +181,11 @@ class ResultHandler(ABC):
         return self.__stored_plan
 
     @abstractmethod
-    def handle_event(self, event: Event) -> Event:
+    def handle_event(self, event: Event) -> None:
         """Handle and propagate an event.
 
         This method must be overloaded to implement the functionality of the
-        handler, based on the information passed via the event object. The
-        handler may modify the event, which may be propagated further to other
-        handlers or to callbacks that react to the event.
-
-        Returns:
-            The event, possibly modified.
+        handler, based on the information passed via the event object.
         """
 
     def __getitem__(self, key: str) -> Any:  # noqa: ANN401
