@@ -1071,39 +1071,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._metadata.DefaultMetadataHandler" class="md-nav__link">
-    <span class="md-ellipsis">
-      DefaultMetadataHandler
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DefaultMetadataHandler">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._metadata.DefaultMetadataHandler.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._metadata.DefaultMetadataHandler.handle_event" class="md-nav__link">
-    <span class="md-ellipsis">
-      handle_event
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#ropt.plugins.plan._tracker.DefaultTrackerHandler" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultTrackerHandler
@@ -1481,39 +1448,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._metadata.DefaultMetadataHandler" class="md-nav__link">
-    <span class="md-ellipsis">
-      DefaultMetadataHandler
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="DefaultMetadataHandler">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._metadata.DefaultMetadataHandler.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._metadata.DefaultMetadataHandler.handle_event" class="md-nav__link">
-    <span class="md-ellipsis">
-      handle_event
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#ropt.plugins.plan._tracker.DefaultTrackerHandler" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultTrackerHandler
@@ -1649,12 +1583,6 @@
 <dt><code>Result Handlers</code>:</dt>
 <dd>
 <ul>
-<li>A handler that adds metadata to results
-(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._metadata.DefaultMetadataHandler"><code>metadata</code></a>).</li>
-</ul>
-</dd>
-<dd>
-<ul>
 <li>A handler that tracks optimal results
 (<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._tracker.DefaultTrackerHandler"><code>tracker</code></a>).</li>
 </ul>
@@ -1737,7 +1665,7 @@ process the generated results.</p>
 
 
 <h3 id="ropt.plugins.plan.evaluator.DefaultEvaluatorStep.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">transforms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">transforms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h3>
 
@@ -1828,6 +1756,22 @@ which can assist result handlers in filtering relevant results.</p>
             <td>
               <div class="doc-md-description">
                 <p>Tags to add to the emitted events.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>metadata</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional metadata to add to events.</p>
               </div>
             </td>
             <td>
@@ -1978,7 +1922,7 @@ optimization and produce the result for the function evaluation.</p>
 
 
 <h3 id="ropt.plugins.plan.optimizer.DefaultOptimizerStep.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">transforms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nested_optimization</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">transforms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nested_optimization</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h3>
 
@@ -2073,6 +2017,22 @@ optimization and produce the result for the function evaluation.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional nested plan.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>metadata</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional metadata to add to events.</p>
               </div>
             </td>
             <td>
@@ -2295,210 +2255,6 @@ with <code>results</code> set to the results of the evaluation.</p>
             <td>
               <div class="doc-md-description">
                 <p>The variables generated by the nested plan.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ropt.plugins.plan._metadata.DefaultMetadataHandler" class="doc doc-heading">
-            <code>ropt.plugins.plan._metadata.DefaultMetadataHandler</code>
-
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.ResultHandler" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler">ResultHandler</a></code></p>
-
-
-        <p>The default metadata results handler.</p>
-<p>This handler adds arbitrary metadata to results produced by steps by merging
-them into the <code>metadata</code> field of the <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a>
-objects that it receives. It is configured using a dictionary that maps keys
-to the data to store. These data entries can be of any type; however, if
-they the values is string starting with a single <code>$</code> it is assumed to be the
-key to value stored in the plan that should be inserted into the metadata.</p>
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plugins.plan._metadata.DefaultMetadataHandler.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Initialize a default metadata results handler.</p>
-<p>The data to merge into the metadata of a result are required.</p>
-<p>The <code>tags</code> field allows optional labels to be attached to each result,
-which can assist result handlers in filtering relevant results.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>plan</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Plan" href="../plan/#ropt.plan.Plan">Plan</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The plan that runs this step.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>data</code>
-            </td>
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Data to merge into the metadata of the results.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>tags</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span> | <span title="set">set</span>[<span title="str">str</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional tags specifying which result sources to modify.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plugins.plan._metadata.DefaultMetadataHandler.handle_event" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></code>
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Handle an event.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>event</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Event" href="../plan/#ropt.plan.Event">Event</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The event to handle.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Event" href="../plan/#ropt.plan.Event">Event</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The (possibly modified) event.</p>
               </div>
             </td>
           </tr>
