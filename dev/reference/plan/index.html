@@ -2481,8 +2481,7 @@ if a step fails or if the user decides to stop the optimization.</p>
         <p>Emit an event of the specified type with the provided data.</p>
 <p>When this method is called, the following steps are executed:</p>
 <ol>
-<li>All event handlers associated with the plan are invoked, which may
-   modify the event.</li>
+<li>All event handlers associated with the plan are invoked.</li>
 <li>If the plan has no parent, all observer functions registered for the
    specified event type via the <code>add_observer</code> method are called.</li>
 <li>If the plan has a parent, the <code>emit_event</code> method of the parent plan
