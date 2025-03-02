@@ -59,7 +59,7 @@ class DefaultOptimizerStep(PlanStep):
     optimization and produce the result for the function evaluation.
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         plan: Plan,
         *,
@@ -67,6 +67,7 @@ class DefaultOptimizerStep(PlanStep):
         transforms: OptModelTransforms | None = None,
         tags: str | set[str] | None = None,
         nested_optimization: Plan | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         """Initialize a default optimizer step.
 
@@ -76,6 +77,7 @@ class DefaultOptimizerStep(PlanStep):
             transforms:          Optional transforms object.
             tags:                Tags to add to the emitted events.
             nested_optimization: Optional nested plan.
+            metadata:            Optional metadata to add to events.
         """
         super().__init__(plan)
 
@@ -83,6 +85,7 @@ class DefaultOptimizerStep(PlanStep):
         self._transforms = transforms
         self._tags = _get_set(tags)
         self._nested_optimization = nested_optimization
+        self._metadata = metadata
 
     def run(  # type: ignore[override]
         self,
@@ -184,6 +187,7 @@ class DefaultOptimizerStep(PlanStep):
                 )
             )
         else:
+            self._set_metadata(results)
             data: dict[str, Any] = {}
             if transforms is not None:
                 data["transformed_results"] = results
@@ -222,3 +226,18 @@ class DefaultOptimizerStep(PlanStep):
             msg = "Nested optimization must return a FunctionResults object."
             raise TypeError(msg)
         return results, self._nested_optimization.aborted
+
+    def _set_metadata(self, results: tuple[Results, ...]) -> None:
+        if self._metadata is None:
+            return
+        for item in results:
+            for key, value in self._metadata.items():
+                item.metadata[key] = (
+                    self.plan[value[1:]]
+                    if (
+                        isinstance(value, str)
+                        and value.startswith("$")
+                        and not value[1:].startswith("$")
+                    )
+                    else value
+                )

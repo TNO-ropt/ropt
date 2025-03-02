@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Final, Type
 
-from ._metadata import DefaultMetadataHandler
 from ._tracker import DefaultTrackerHandler
 from .base import PlanHandlerPlugin, PlanStepPlugin
 from .evaluator import DefaultEvaluatorStep
@@ -20,7 +19,6 @@ _STEP_OBJECTS: Final[dict[str, Type[PlanStep]]] = {
 }
 
 _RESULT_HANDLER_OBJECTS: Final[dict[str, Type[ResultHandler]]] = {
-    "metadata": DefaultMetadataHandler,
     "tracker": DefaultTrackerHandler,
 }
 
@@ -31,8 +29,6 @@ class DefaultPlanHandlerPlugin(PlanHandlerPlugin):
     This class provides a number of result handlers:
 
     `Result Handlers`:
-    : - A handler that adds metadata to results
-        ([`metadata`][ropt.plugins.plan._metadata.DefaultMetadataHandler]).
     : - A handler that tracks optimal results
         ([`tracker`][ropt.plugins.plan._tracker.DefaultTrackerHandler]).
     """

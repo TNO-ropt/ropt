@@ -12,7 +12,7 @@ from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
 from ropt.plan import Event
 from ropt.plugins.plan.base import PlanStep
-from ropt.results import FunctionResults
+from ropt.results import FunctionResults, Results
 
 from ._utils import _get_set
 
@@ -46,6 +46,7 @@ class DefaultEvaluatorStep(PlanStep):
         config: Any,  # noqa: ANN401
         transforms: OptModelTransforms | None = None,
         tags: str | set[str] | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         """Initialize a default evaluator step.
 
@@ -68,11 +69,13 @@ class DefaultEvaluatorStep(PlanStep):
             config:     The optimizer configuration.
             transforms: Optional transforms object.
             tags:       Tags to add to the emitted events.
+            metadata:   Optional metadata to add to events.
         """
         super().__init__(plan)
         self._config = EnOptConfig.model_validate(config)
         self._transforms = transforms
         self._tags = _get_set(tags)
+        self._metadata = metadata
 
     def run(  # type: ignore[override]
         self,
@@ -124,6 +127,7 @@ class DefaultEvaluatorStep(PlanStep):
         if results[0].functions is None:
             exit_code = OptimizerExitCode.TOO_FEW_REALIZATIONS
 
+        self._set_metadata(results)
         data: dict[str, Any] = {}
         if transforms is not None:
             data["transformed_results"] = results
@@ -157,3 +161,18 @@ class DefaultEvaluatorStep(PlanStep):
             event: The event to emit.
         """
         self.plan.emit_event(event)
+
+    def _set_metadata(self, results: tuple[Results, ...]) -> None:
+        if self._metadata is None:
+            return
+        for item in results:
+            for key, value in self._metadata.items():
+                item.metadata[key] = (
+                    self.plan[value[1:]]
+                    if (
+                        isinstance(value, str)
+                        and value.startswith("$")
+                        and not value[1:].startswith("$")
+                    )
+                    else value
+                )

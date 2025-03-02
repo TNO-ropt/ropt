@@ -9,6 +9,4 @@
 
 ::: ropt.plugins.plan.optimizer.DefaultOptimizerStep
 
-::: ropt.plugins.plan._metadata.DefaultMetadataHandler
-
 ::: ropt.plugins.plan._tracker.DefaultTrackerHandler

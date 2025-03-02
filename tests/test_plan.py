@@ -351,8 +351,9 @@ def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
         EventType.FINISHED_EVALUATION, _track_results
     )
     plan = Plan(context)
-    plan.add_handler("metadata", data=metadata, tags="opt")
-    step = plan.add_step("optimizer", config=enopt_config, tags="opt")
+    step = plan.add_step(
+        "optimizer", config=enopt_config, tags="opt", metadata=metadata
+    )
     for idx in range(2):
         plan["counter"] = idx
         plan.run_step(step)
@@ -461,7 +462,8 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
     def _track_evaluations(event: Event) -> None:
         for item in event.data["results"]:
             if isinstance(item, FunctionResults):
-                assert item.metadata.get("outer") == 1
+                if "outer" in event.tags:
+                    assert item.metadata.get("outer") == 1
                 if "inner" in event.tags:
                     assert item.metadata.get("inner") == "inner_meta_data"
 
@@ -478,9 +480,13 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
     )
 
     inner_plan = Plan(context)
-    inner_plan.add_handler("metadata", data={"inner": "inner_meta_data"}, tags="inner")
     inner_tracker = inner_plan.add_handler("tracker", tags="inner")
-    inner_step = inner_plan.add_step("optimizer", config=nested_config, tags="inner")
+    inner_step = inner_plan.add_step(
+        "optimizer",
+        config=nested_config,
+        tags="inner",
+        metadata={"inner": "inner_meta_data"},
+    )
 
     def _inner_optimization(
         plan: Plan, variables: NDArray[np.float64]
@@ -493,20 +499,19 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
     inner_plan.add_function(_inner_optimization)
 
     outer_plan = Plan(context)
-    outer_plan.add_handler("metadata", data={"outer": 1}, tags={"inner", "outer"})
     outer_tracker = outer_plan.add_handler("tracker", tags="outer")
     outer_step = outer_plan.add_step(
         "optimizer",
         config=enopt_config,
         tags="outer",
         nested_optimization=inner_plan,
+        metadata={"outer": 1},
     )
     outer_plan.run_step(outer_step)
 
     assert inner_tracker["results"] is not None
     assert np.allclose(outer_tracker["variables"], [0.0, 0.0, 0.5], atol=0.02)
     assert outer_tracker["results"].metadata["outer"] == 1
-    assert inner_tracker["results"].metadata["outer"] == 1
     assert inner_tracker["results"].metadata["inner"] == "inner_meta_data"
 
 
