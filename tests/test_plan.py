@@ -410,10 +410,6 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
     def _track_evaluations(event: Event) -> None:
         nonlocal completed_functions
-        if "outer" in event.tags:
-            assert event.plan_id == (0,)
-        if "inner" in event.tags:
-            assert event.plan_id == (0, completed_functions // 5)
 
         for item in event.data["results"]:
             if isinstance(item, FunctionResults):

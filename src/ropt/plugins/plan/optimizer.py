@@ -83,7 +83,6 @@ class DefaultOptimizerStep(PlanStep):
         self._transforms = transforms
         self._tags = _get_set(tags)
         self._nested_optimization = nested_optimization
-        self._nested_run_index = 0
 
     def run(  # type: ignore[override]
         self,
@@ -116,7 +115,6 @@ class DefaultOptimizerStep(PlanStep):
             enopt_config,
             transforms,
             self.plan.optimizer_context.evaluator,
-            self.plan.plan_id,
             self.plan.optimizer_context.eval_id_iter,
             self.plan.optimizer_context.plugin_manager,
         )
@@ -216,8 +214,7 @@ class DefaultOptimizerStep(PlanStep):
         """
         if self._nested_optimization is None:
             return None, False
-        self._nested_optimization.set_parent(self.plan, self._nested_run_index)
-        self._nested_run_index += 1
+        self._nested_optimization.set_parent(self.plan)
         results = self._nested_optimization.run_function(variables)
         if self._nested_optimization.aborted:
             self.plan.abort()

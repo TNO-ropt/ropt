@@ -20,7 +20,6 @@ class Plan:
         self,
         optimizer_context: OptimizerContext,
         parent: Plan | None = None,
-        plan_id: tuple[int, ...] | None = None,
     ) -> None:
         """Initialize a plan object.
 
@@ -31,26 +30,17 @@ class Plan:
         within the plan. If omitted, only plugins installed through Python's
         standard entry points are used.
 
-        Plan hierarchies are tracked using the `plan_id` attribute, a tuple of
-        integers. By default a plan has `plan_id == (0,)`. A plan may set a
-        parent plan using the `set_parent` method, which may add an new index at
-        the end of the `plan_id` tuple. This structure enables efficient tracing
-        across both sequential and nested plan workflows.
-
         Args:
             optimizer_context: The context in which the plan will execute,
                                providing shared resources across steps.
             parent:            Optional reference to a parent plan.
-            plan_id:           The ID of the plan, reflecting its hierarchy.
         """
         self._optimizer_context = optimizer_context
         self._vars: dict[str, Any] = {}
-        self._plan_id: tuple[int, ...] = (0,) if plan_id is None else plan_id
 
         self._aborted = False
         self._parent = parent
         self._handlers: list[ResultHandler] = []
-        self["plan_id"] = list(self.plan_id)
         self._function: Callable[..., Any] | None = None
 
     def add_handler(self, name: str, **kwargs: Any) -> ResultHandler:  # noqa: ANN401
@@ -178,19 +168,6 @@ class Plan:
         return self._aborted
 
     @property
-    def plan_id(self) -> tuple[int, ...]:
-        """Return the ID of the plan.
-
-        Each plan has a unique ID, stored as a tuple of integers, which reflects
-        creation order and any nesting structure within the plan
-        hierarchy.
-
-        Returns:
-            tuple: The unique tuple-based ID for this plan.
-        """
-        return self._plan_id
-
-    @property
     def optimizer_context(self) -> OptimizerContext:
         """Return the optimizer context associated with the plan.
 
@@ -202,8 +179,7 @@ class Plan:
         """
         return self._optimizer_context
 
-    def set_parent(self, parent: Plan, add_id: int) -> None:
-        self._plan_id = (*parent.plan_id, add_id)
+    def set_parent(self, parent: Plan) -> None:
         self._parent = parent
 
     def emit_event(self, event: Event) -> None:
@@ -221,8 +197,6 @@ class Plan:
         Args:
             event: The event object to emit.
         """
-        if not event.plan_id:
-            event.plan_id = self.plan_id
         for handler in self._handlers:
             event = handler.handle_event(event)
         if self._parent is None:

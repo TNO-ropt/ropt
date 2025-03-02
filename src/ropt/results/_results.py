@@ -26,7 +26,6 @@ class Results(ABC):
 
     This class contains the following generic information:
 
-    1. The plan ID, a tuple of integer values.
     1. An evaluation ID that uniquely identifies the result. These ID's are
        numeric values that are assigned in order to results that are created.
        Function and gradient results for the same set of controls receive the
@@ -54,13 +53,11 @@ class Results(ABC):
        [`pandas`](https://pandas.pydata.org/) data frame.
 
     Attributes:
-        plan_id:   The plan ID.
         eval_id:   The evaluation ID of the result.
         batch_id:  The ID of the evaluation batch that contains the result.
         metadata:  The metadata.
     """
 
-    plan_id: tuple[int, ...]
     eval_id: int
     batch_id: int | None
     metadata: dict[str, Any]
@@ -91,8 +88,8 @@ class Results(ABC):
         Info: The data frame index
             As noted above, the index of the resulting data frame may be a
             multi-index constructed from axis indices or labels. In addition,
-            the `plan_id`, `eval_id` and the `batch_id` (if not None) fields,
-            are also prepended to the index of the resulting frame.
+            the `eval_id` and the `batch_id` (if not None) fields, are also
+            prepended to the index of the resulting frame.
 
         Args:
             field_name: The field to export.
@@ -121,7 +118,6 @@ class Results(ABC):
 
         return _to_dataframe(
             result_field,
-            self.plan_id,
             self.eval_id,
             self.batch_id,
             select,

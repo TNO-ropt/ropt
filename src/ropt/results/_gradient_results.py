@@ -48,7 +48,6 @@ class GradientResults(Results):
             The transformed results.
         """
         return GradientResults(
-            plan_id=self.plan_id,
             eval_id=self.eval_id,
             batch_id=self.batch_id,
             metadata=self.metadata,

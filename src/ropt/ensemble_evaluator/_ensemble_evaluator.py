@@ -55,12 +55,11 @@ class EnsembleEvaluator:
     functions.
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         config: EnOptConfig,
         transforms: OptModelTransforms | None,
         evaluator: Evaluator,
-        plan_id: tuple[int, ...],
         eval_id_iter: Iterator[int],
         plugin_manager: PluginManager,
     ) -> None:
@@ -70,14 +69,12 @@ class EnsembleEvaluator:
             config:         The configuration object.
             transforms:     Optional transforms object.
             evaluator:      The callable for evaluation individual functions.
-            plan_id:        A tuple identifying the plan running this evaluator.
             eval_id_iter:   An iterator to generate unique evaluation ID's.
             plugin_manager: A plugin manager to load required plugins.
         """
         self._config = config
         self._transforms = transforms
         self._evaluator = evaluator
-        self._plan_id = plan_id
         self._eval_id_iter = eval_id_iter
         self._realization_filters = self._init_realization_filters(plugin_manager)
         self._function_estimators = self._init_function_estimators(plugin_manager)
@@ -201,7 +198,6 @@ class EnsembleEvaluator:
         )
 
         return FunctionResults(
-            plan_id=self._plan_id,
             eval_id=next(self._eval_id_iter),
             batch_id=f_eval_results.batch_id,
             metadata={},
@@ -282,7 +278,6 @@ class EnsembleEvaluator:
         return (
             GradientResults(
                 eval_id=self._cache_for_gradient.eval_id,
-                plan_id=self._plan_id,
                 batch_id=g_eval_results.batch_id,
                 metadata={},
                 evaluations=GradientEvaluations.create(
@@ -358,7 +353,6 @@ class EnsembleEvaluator:
         eval_id = next(self._eval_id_iter)
 
         function_results = FunctionResults(
-            plan_id=self._plan_id,
             eval_id=eval_id,
             batch_id=f_eval_results.batch_id,
             metadata={},
@@ -403,7 +397,6 @@ class EnsembleEvaluator:
             gradients = None
 
         gradient_results = GradientResults(
-            plan_id=self._plan_id,
             eval_id=eval_id,
             batch_id=g_eval_results.batch_id,
             metadata={},

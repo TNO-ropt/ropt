@@ -50,7 +50,6 @@ def function_result_fixture() -> FunctionResults:
         weighted_objective=np.array(1.0), objectives=np.array([1.0, 2.0])
     )
     return FunctionResults(
-        plan_id=(0,),
         eval_id=0,
         batch_id=1,
         metadata={},
@@ -72,7 +71,6 @@ def gradient_result_fixture() -> GradientResults:
         objectives=np.arange(4, dtype=np.float64).reshape((2, 2)),
     )
     return GradientResults(
-        plan_id=(0,),
         eval_id=0,
         batch_id=1,
         metadata={},
@@ -89,13 +87,10 @@ def test__to_series(gradient_result: GradientResults) -> None:
         ResultAxis.VARIABLE: ("v1", "v2"),
         ResultAxis.REALIZATION: ("ra", "rb", "rc"),
     }
-    series = _to_series(
-        gradient_result.evaluations, (0,), 0, 1, "perturbed_variables", names
-    )
+    series = _to_series(gradient_result.evaluations, 0, 1, "perturbed_variables", names)
     assert series is not None
     assert len(series) == gradient_result.evaluations.perturbed_variables.size
     assert series.index.names == [
-        "plan_id",
         "eval_id",
         "batch_id",
         "realization",
@@ -106,7 +101,7 @@ def test__to_series(gradient_result: GradientResults) -> None:
         for r_idx, real in enumerate(names[ResultAxis.REALIZATION]):
             for pert in range(gradient_result.evaluations.perturbed_variables.shape[1]):
                 assert (
-                    series.loc[((0,), 0, 1, real, pert, var)]
+                    series.loc[(0, 1, real, pert, var)]
                     == gradient_result.evaluations.perturbed_variables[
                         r_idx,
                         pert,
@@ -124,7 +119,6 @@ def test_to_dataframe(gradient_result: GradientResults) -> None:
     frame = gradient_result.to_dataframe("evaluations", names=names)
     assert len(frame) == gradient_result.evaluations.perturbed_variables.size * 2
     assert frame.index.names == [
-        "plan_id",
         "eval_id",
         "batch_id",
         "variable",
@@ -137,7 +131,7 @@ def test_to_dataframe(gradient_result: GradientResults) -> None:
         for real in names[ResultAxis.REALIZATION]:
             for pert in range(gradient_result.evaluations.perturbed_variables.shape[1]):
                 for fnc in names[ResultAxis.OBJECTIVE]:
-                    assert frame.index[idx] == ((0,), 0, 1, var, real, pert, fnc)
+                    assert frame.index[idx] == (0, 1, var, real, pert, fnc)
                     idx += 1
 
 
@@ -152,7 +146,7 @@ def test_to_dataframe_unstack1(gradient_result: GradientResults) -> None:
         unstack=[ResultAxis.REALIZATION, ResultAxis.VARIABLE],
         names=names,
     )
-    assert frame.index.names == ["plan_id", "eval_id", "batch_id", "perturbation"]
+    assert frame.index.names == ["eval_id", "batch_id", "perturbation"]
     assert list(frame.columns.values) == [
         ("perturbed_variables", 2, "x"),
         ("perturbed_variables", 2, "y"),
@@ -194,7 +188,6 @@ def test_to_dataframe_unstack_only_variable(gradient_result: GradientResults) ->
         names=names,
     )
     assert frame.index.names == [
-        "plan_id",
         "eval_id",
         "batch_id",
         "realization",
