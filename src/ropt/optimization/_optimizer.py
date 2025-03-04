@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Protocol
+import os
+import sys
+from contextlib import contextmanager
+from typing import TYPE_CHECKING, Generator, Protocol
 
 import numpy as np
 
@@ -124,6 +127,9 @@ class EnsembleOptimizer:
         ).create(self._enopt_config, self._optimizer_callback)
         self._allow_nan = self._optimizer.allow_nan
 
+        # Optional redirection of standard output:
+        self._redirector = _Redirector(self._enopt_config)
+
     @property
     def is_parallel(self) -> bool:
         """Check if the optimization is parallelized.
@@ -145,7 +151,8 @@ class EnsembleOptimizer:
         self._fixed_variables = variables.copy()
         exit_code = OptimizerExitCode.OPTIMIZER_STEP_FINISHED
         try:
-            self._optimizer.start(variables)
+            with self._redirector.start():
+                self._optimizer.start(variables)
         except OptimizationAborted as exc:
             exit_code = exc.exit_code
         return exit_code
@@ -244,40 +251,46 @@ class EnsembleOptimizer:
         compute_functions: bool = False,
         compute_gradients: bool = False,
     ) -> tuple[Results, ...]:
-        assert compute_functions or compute_gradients
-        if self._signal_evaluation:
-            self._signal_evaluation()
-        results = self._function_evaluator.calculate(
-            variables,
-            compute_functions=compute_functions,
-            compute_gradients=compute_gradients,
-        )
+        with self._redirector.suspend():
+            assert compute_functions or compute_gradients
+            if self._signal_evaluation:
+                self._signal_evaluation()
+            results = self._function_evaluator.calculate(
+                variables,
+                compute_functions=compute_functions,
+                compute_gradients=compute_gradients,
+            )
 
-        # If the configuration allows for zero successful realizations, there
-        # will always be results. However, they may all be equal to `np.nan`. If
-        # the optimizer does not set the allow_nan flag, it cannot handle such a
-        # case, and we need to check for it:
-        assert self._enopt_config.realizations.realization_min_success is not None
-        check_failures = (
-            self._enopt_config.realizations.realization_min_success < 1
-            and not self._allow_nan
-        )
-        exit_code: OptimizerExitCode | None = None
-        for result in results:
-            assert isinstance(result, FunctionResults | GradientResults)
-            if (
-                (isinstance(result, FunctionResults) and result.functions is None)
-                or (isinstance(result, GradientResults) and result.gradients is None)
-                or (check_failures and np.all(result.realizations.failed_realizations))
-            ):
-                exit_code = OptimizerExitCode.TOO_FEW_REALIZATIONS
-                break
+            # If the configuration allows for zero successful realizations, there
+            # will always be results. However, they may all be equal to `np.nan`. If
+            # the optimizer does not set the allow_nan flag, it cannot handle such a
+            # case, and we need to check for it:
+            assert self._enopt_config.realizations.realization_min_success is not None
+            check_failures = (
+                self._enopt_config.realizations.realization_min_success < 1
+                and not self._allow_nan
+            )
+            exit_code: OptimizerExitCode | None = None
+            for result in results:
+                assert isinstance(result, FunctionResults | GradientResults)
+                if (
+                    (isinstance(result, FunctionResults) and result.functions is None)
+                    or (
+                        isinstance(result, GradientResults) and result.gradients is None
+                    )
+                    or (
+                        check_failures
+                        and np.all(result.realizations.failed_realizations)
+                    )
+                ):
+                    exit_code = OptimizerExitCode.TOO_FEW_REALIZATIONS
+                    break
 
-        if self._signal_evaluation:
-            self._signal_evaluation(results)
+            if self._signal_evaluation:
+                self._signal_evaluation(results)
 
-        if exit_code is not None:
-            raise OptimizationAborted(exit_code=exit_code)
+            if exit_code is not None:
+                raise OptimizationAborted(exit_code=exit_code)
 
         return results
 
@@ -314,3 +327,61 @@ class EnsembleOptimizer:
             if constraint_gradients is None
             else np.vstack((weighted_objective_gradient, constraint_gradients))
         )
+
+
+class _Redirector:
+    def __init__(self, config: EnOptConfig) -> None:
+        output_dir = config.optimizer.output_dir
+        stdout = config.optimizer.stdout
+        stderr = config.optimizer.stderr
+
+        if stdout is not None:
+            self._redirect = True
+            if stderr is None:
+                stderr = stdout
+            if not stdout.is_absolute() and output_dir is not None:
+                stdout = output_dir / stdout
+            if not stderr.is_absolute() and output_dir is not None:
+                stderr = output_dir / stderr
+            sys.stdout.flush()
+            sys.stderr.flush()
+            self._old_stdout = os.dup(1)
+            self._old_stderr = os.dup(2)
+            self._new_stdout = os.open(stdout, os.O_WRONLY | os.O_CREAT)
+            self._new_stderr = os.open(stderr, os.O_WRONLY | os.O_CREAT)
+        else:
+            self._redirect = False
+
+    @contextmanager
+    def start(self) -> Generator[None, None, None]:
+        if self._redirect:
+            try:
+                sys.stdout.flush()
+                sys.stderr.flush()
+                os.dup2(self._new_stdout, 1)
+                os.dup2(self._new_stderr, 2)
+                yield
+            finally:
+                os.dup2(self._old_stdout, 1)
+                os.dup2(self._old_stderr, 2)
+                os.close(self._new_stdout)
+                os.close(self._new_stderr)
+        else:
+            yield
+
+    @contextmanager
+    def suspend(self) -> Generator[None, None, None]:
+        if self._redirect:
+            try:
+                os.fsync(self._new_stdout)
+                os.fsync(self._new_stderr)
+                os.dup2(self._old_stdout, 1)
+                os.dup2(self._old_stderr, 2)
+                yield
+            finally:
+                sys.stdout.flush()
+                sys.stderr.flush()
+                os.dup2(self._new_stdout, 1)
+                os.dup2(self._new_stderr, 2)
+        else:
+            yield

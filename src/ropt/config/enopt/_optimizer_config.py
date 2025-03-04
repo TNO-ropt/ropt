@@ -65,6 +65,8 @@ class OptimizerConfig(ImmutableBaseModel):
         parallel:          Allow for parallelized evaluation (default: `False`).
         output_dir:        Optional output directory for use by the optimizer.
         options:           Optional generic options for use by the optimizer.
+        stdout:            Redirect optimizer std output to the given file.
+        stderr:            Redirect optimizer std error to the given file.
     """
 
     method: str = "scipy/default"
@@ -76,6 +78,8 @@ class OptimizerConfig(ImmutableBaseModel):
     parallel: bool = False
     output_dir: Path | None = None
     options: dict[str, Any] | list[str] | None = None
+    stdout: Path | None = None
+    stderr: Path | None = None
 
     model_config = ConfigDict(
         extra="forbid",
