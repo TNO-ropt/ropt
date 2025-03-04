@@ -6,12 +6,12 @@ from typing import TYPE_CHECKING, Literal
 
 from ropt.enums import EventType
 from ropt.plugins.plan.base import ResultHandler
+from ropt.results import FunctionResults
 
 from ._utils import _get_all_results, _get_last_result, _get_set, _update_optimal_result
 
 if TYPE_CHECKING:
     from ropt.plan import Event, Plan
-    from ropt.results import FunctionResults
 
 
 class DefaultTrackerHandler(ResultHandler):
@@ -68,11 +68,7 @@ class DefaultTrackerHandler(ResultHandler):
             event: The event to handle.
         """
         if (
-            event.event_type
-            in {
-                EventType.FINISHED_EVALUATION,
-                EventType.FINISHED_EVALUATOR_STEP,
-            }
+            event.event_type == EventType.FINISHED_EVALUATION
             and "results" in event.data
             and (event.tags & self._tags)
         ):
@@ -102,10 +98,23 @@ class DefaultTrackerHandler(ResultHandler):
                         self._constraint_tolerance,
                     )
             if filtered_results is not None:
-                self["results"] = filtered_results
-                variables = (
-                    (item.evaluations.variables for item in filtered_results)
-                    if isinstance(filtered_results, tuple)
-                    else filtered_results.evaluations.variables
-                )
-                self["variables"] = variables
+                match self._what:
+                    case "all":
+                        assert isinstance(filtered_results, tuple)
+                        self["results"] = (
+                            filtered_results
+                            if self["results"] is None
+                            else (*self["results"], *filtered_results)
+                        )
+                        variables = tuple(
+                            item.evaluations.variables for item in filtered_results
+                        )
+                        self["variables"] = (
+                            variables
+                            if self["variables"] is None
+                            else (*self["variables"], *variables)
+                        )
+                    case "best" | "last":
+                        assert isinstance(filtered_results, FunctionResults)
+                        self["results"] = filtered_results
+                        self["variables"] = filtered_results.evaluations.variables
