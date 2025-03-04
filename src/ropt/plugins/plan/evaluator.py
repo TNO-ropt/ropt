@@ -96,14 +96,13 @@ class DefaultEvaluatorStep(PlanStep):
         transforms: OptModelTransforms | None,
         variables: NDArray[np.float64],
     ) -> OptimizerExitCode:
-        for event_type in (EventType.START_EVALUATOR_STEP, EventType.START_EVALUATION):
-            self.emit_event(
-                Event(
-                    event_type=event_type,
-                    config=enopt_config,
-                    tags=self._tags,
-                )
+        self.emit_event(
+            Event(
+                event_type=EventType.START_EVALUATOR_STEP,
+                config=enopt_config,
+                tags=self._tags,
             )
+        )
 
         ensemble_evaluator = EnsembleEvaluator(
             enopt_config,
@@ -115,6 +114,13 @@ class DefaultEvaluatorStep(PlanStep):
 
         exit_code = OptimizerExitCode.EVALUATION_STEP_FINISHED
 
+        self.emit_event(
+            Event(
+                event_type=EventType.START_EVALUATION,
+                config=enopt_config,
+                tags=self._tags,
+            )
+        )
         try:
             results = ensemble_evaluator.calculate(
                 variables, compute_functions=True, compute_gradients=False
@@ -136,21 +142,26 @@ class DefaultEvaluatorStep(PlanStep):
             ]
         else:
             data["results"] = results
-        for event_type in (
-            EventType.FINISHED_EVALUATION,
-            EventType.FINISHED_EVALUATOR_STEP,
-        ):
-            self.emit_event(
-                Event(
-                    event_type=event_type,
-                    config=enopt_config,
-                    tags=self._tags,
-                    data=data,
-                )
+
+        self.emit_event(
+            Event(
+                event_type=EventType.FINISHED_EVALUATION,
+                config=enopt_config,
+                tags=self._tags,
+                data=data,
             )
+        )
 
         if exit_code == OptimizerExitCode.USER_ABORT:
             self.plan.abort()
+
+        self.emit_event(
+            Event(
+                event_type=EventType.FINISHED_EVALUATOR_STEP,
+                config=enopt_config,
+                tags=self._tags,
+            )
+        )
 
         return exit_code
 

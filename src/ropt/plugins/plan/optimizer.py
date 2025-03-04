@@ -140,6 +140,9 @@ class DefaultOptimizerStep(PlanStep):
 
         exit_code = ensemble_optimizer.start(variables)
 
+        if exit_code == OptimizerExitCode.USER_ABORT:
+            self.plan.abort()
+
         self.emit_event(
             Event(
                 event_type=EventType.FINISHED_OPTIMIZER_STEP,
@@ -147,9 +150,6 @@ class DefaultOptimizerStep(PlanStep):
                 tags=self._tags,
             )
         )
-
-        if exit_code == OptimizerExitCode.USER_ABORT:
-            self.plan.abort()
 
         return exit_code
 
