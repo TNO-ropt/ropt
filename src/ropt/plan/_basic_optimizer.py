@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any, Callable, Self
 from ropt.config.enopt import EnOptConfig
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
+from ropt.results import Results
 
 from ._context import OptimizerContext
 from ._plan import Plan
@@ -19,7 +20,7 @@ if TYPE_CHECKING:
     from ropt.evaluator import Evaluator
     from ropt.plan import Event
     from ropt.plugins.plan.base import ResultHandler
-    from ropt.results import FunctionResults, Results
+    from ropt.results import FunctionResults
     from ropt.transforms import OptModelTransforms
 
 
@@ -137,13 +138,22 @@ class BasicOptimizer:
         for event_type, function in self._observers:
             self._optimizer_context.add_observer(event_type, function)
         result, exit_code = plan.run_function(self._transforms)
-        results = None if result is None else result["results"]
-        variables = None if results is None else results.evaluations.variables
-        self._results = _Results(
-            results=results,
-            variables=variables,
-            exit_code=exit_code,
-        )
+        if result is None or result["results"] is None:
+            self._results = _Results(
+                results=None,
+                variables=None,
+                exit_code=exit_code,
+            )
+        else:
+            results = result["results"]
+            if not isinstance(results, Results):
+                results = results[0]
+            variables = None if results is None else results.evaluations.variables
+            self._results = _Results(
+                results=results,
+                variables=variables,
+                exit_code=exit_code,
+            )
         return self
 
     def _run_func(
