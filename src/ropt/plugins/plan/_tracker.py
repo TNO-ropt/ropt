@@ -59,7 +59,6 @@ class DefaultTrackerHandler(ResultHandler):
         self._constraint_tolerance = constraint_tolerance
         self._tags = set() if tags is None else tags
         self["results"] = None
-        self["variables"] = None
 
     def handle_event(self, event: Event) -> None:
         """Handle an event.
@@ -106,15 +105,6 @@ class DefaultTrackerHandler(ResultHandler):
                             if self["results"] is None
                             else (*self["results"], *filtered_results)
                         )
-                        variables = tuple(
-                            item.evaluations.variables for item in filtered_results
-                        )
-                        self["variables"] = (
-                            variables
-                            if self["variables"] is None
-                            else (*self["variables"], *variables)
-                        )
                     case "best" | "last":
                         assert isinstance(filtered_results, FunctionResults)
                         self["results"] = filtered_results
-                        self["variables"] = filtered_results.evaluations.variables

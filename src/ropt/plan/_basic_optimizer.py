@@ -137,9 +137,11 @@ class BasicOptimizer:
         for event_type, function in self._observers:
             self._optimizer_context.add_observer(event_type, function)
         result, exit_code = plan.run_function(self._transforms)
+        results = None if result is None else result["results"]
+        variables = None if results is None else results.evaluations.variables
         self._results = _Results(
-            results=None if result is None else result["results"],
-            variables=None if result is None else result["variables"],
+            results=results,
+            variables=variables,
             exit_code=exit_code,
         )
         return self
