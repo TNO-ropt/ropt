@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from functools import partial
+from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -59,79 +59,72 @@ class DefaultOptimizerStep(PlanStep):
     optimization and produce the result for the function evaluation.
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         plan: Plan,
         *,
-        config: dict[str, Any] | EnOptConfig,
-        transforms: OptModelTransforms | None = None,
         tags: str | set[str] | None = None,
-        nested_optimization: Plan | None = None,
-        metadata: dict[str, Any] | None = None,
     ) -> None:
         """Initialize a default optimizer step.
 
         Args:
             plan:                The plan that runs this step.
-            config:              The optimizer configuration.
-            transforms:          Optional transforms object.
             tags:                Tags to add to the emitted events.
-            nested_optimization: Optional nested plan.
-            metadata:            Optional metadata to add to events.
         """
         super().__init__(plan)
 
-        self._config = EnOptConfig.model_validate(config)
-        self._transforms = transforms
         self._tags = _get_set(tags)
-        self._nested_optimization = nested_optimization
-        self._metadata = metadata
 
     def run(  # type: ignore[override]
         self,
-        *,
+        config: dict[str, Any] | EnOptConfig,
+        transforms: OptModelTransforms | None = None,
         variables: ArrayLike | None = None,
+        nested_optimization: Plan | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> OptimizerExitCode:
-        """Run the optimizer step."""
-        variables = (
-            self._config.variables.initial_values
-            if variables is None
-            else np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
-        )
-        return self._run(self._config, self._transforms, variables)
+        """Run the optimizer step.
 
-    def _run(
-        self,
-        enopt_config: EnOptConfig,
-        transforms: OptModelTransforms | None,
-        variables: NDArray[np.float64],
-    ) -> OptimizerExitCode:
+        Args:
+            config:              The optimizer configuration.
+            transforms:          Optional transforms object.
+            variables: Variables to evaluate.
+            nested_optimization: Optional nested plan.
+            metadata:            Optional metadata to add to events.
+        """
+        self._config = EnOptConfig.model_validate(config, context=transforms)
+        self._transforms = transforms
+        self._nested_optimization = nested_optimization
+        self._metadata = metadata
+
         self.emit_event(
             Event(
                 event_type=EventType.START_OPTIMIZER_STEP,
-                config=enopt_config,
+                config=self._config,
                 tags=self._tags,
             )
         )
 
+        if variables is None:
+            variables = self._config.variables.initial_values
+        variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
+
         ensemble_evaluator = EnsembleEvaluator(
-            enopt_config,
-            transforms,
+            self._config,
+            self._transforms,
             self.plan.optimizer_context.evaluator,
             self.plan.optimizer_context.eval_id_iter,
             self.plan.optimizer_context.plugin_manager,
         )
 
         ensemble_optimizer = EnsembleOptimizer(
-            enopt_config=enopt_config,
+            enopt_config=self._config,
             ensemble_evaluator=ensemble_evaluator,
             plugin_manager=self.plan.optimizer_context.plugin_manager,
             nested_optimizer=(
                 self._run_nested_plan if self._nested_optimization is not None else None
             ),
-            signal_evaluation=partial(
-                self._signal_evaluation, enopt_config, transforms
-            ),
+            signal_evaluation=self._signal_evaluation,
         )
 
         if ensemble_optimizer.is_parallel and self._nested_optimization is not None:
@@ -146,7 +139,7 @@ class DefaultOptimizerStep(PlanStep):
         self.emit_event(
             Event(
                 event_type=EventType.FINISHED_OPTIMIZER_STEP,
-                config=enopt_config,
+                config=self._config,
                 tags=self._tags,
             )
         )
@@ -161,45 +154,32 @@ class DefaultOptimizerStep(PlanStep):
         """
         self.plan.emit_event(event)
 
-    def _signal_evaluation(
-        self,
-        enopt_config: EnOptConfig,
-        transforms: OptModelTransforms | None,
-        results: tuple[Results, ...] | None = None,
-    ) -> None:
-        """Called before and after the optimizer finishes an evaluation.
-
-        Before the evaluation starts, this method is called with the `results`
-        argument set to `None`. When an evaluation is has finished, it is called
-        with `results` set to the results of the evaluation.
-
-        Args:
-            enopt_config: The configuration object.
-            transforms:   Optional transforms object.
-            results:      The results produced by the evaluation.
-        """
+    def _signal_evaluation(self, results: tuple[Results, ...] | None = None) -> None:
         if results is None:
             self.emit_event(
                 Event(
                     event_type=EventType.START_EVALUATION,
-                    config=enopt_config,
+                    config=self._config,
                     tags=self._tags,
                 )
             )
         else:
-            self._set_metadata(results)
+            if self._metadata is not None:
+                for item in results:
+                    item.metadata = deepcopy(self._metadata)
+
             data: dict[str, Any] = {}
-            if transforms is not None:
+            if self._transforms is not None:
                 data["transformed_results"] = results
                 data["results"] = [
-                    item.transform_from_optimizer(transforms) for item in results
+                    item.transform_from_optimizer(self._transforms) for item in results
                 ]
             else:
                 data["results"] = results
             self.emit_event(
                 Event(
                     event_type=EventType.FINISHED_EVALUATION,
-                    config=enopt_config,
+                    config=self._config,
                     tags=self._tags,
                     data=data,
                 ),
@@ -208,14 +188,6 @@ class DefaultOptimizerStep(PlanStep):
     def _run_nested_plan(
         self, variables: NDArray[np.float64]
     ) -> tuple[FunctionResults | None, bool]:
-        """Run a  nested plan.
-
-        Args:
-            variables:     Variables to set in the nested plan.
-
-        Returns:
-            The variables generated by the nested plan.
-        """
         if self._nested_optimization is None:
             return None, False
         self._nested_optimization.set_parent(self.plan)
@@ -226,18 +198,3 @@ class DefaultOptimizerStep(PlanStep):
             msg = "Nested optimization must return a FunctionResults object."
             raise TypeError(msg)
         return results, self._nested_optimization.aborted
-
-    def _set_metadata(self, results: tuple[Results, ...]) -> None:
-        if self._metadata is None:
-            return
-        for item in results:
-            for key, value in self._metadata.items():
-                item.metadata[key] = (
-                    self.plan[value[1:]]
-                    if (
-                        isinstance(value, str)
-                        and value.startswith("$")
-                        and not value[1:].startswith("$")
-                    )
-                    else value
-                )

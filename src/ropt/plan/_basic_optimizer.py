@@ -147,18 +147,13 @@ class BasicOptimizer:
     def _run_func(
         self, plan: Plan, transforms: OptModelTransforms | None
     ) -> tuple[ResultHandler | None, OptimizerExitCode | None]:
-        optimizer = plan.add_step(
-            "optimizer",
-            config=self._config,
-            transforms=transforms,
-            tags="__optimizer_tag__",
-        )
+        optimizer = plan.add_step("optimizer", tags="__optimizer_tag__")
         tracker = plan.add_handler(
             "tracker",
             constraint_tolerance=self._constraint_tolerance,
             tags="__optimizer_tag__",
         )
-        exit_code = plan.run_step(optimizer)
+        exit_code = plan.run_step(optimizer, config=self._config, transforms=transforms)
         return tracker, exit_code
 
     def set_abort_callback(self, callback: Callable[[], bool]) -> Self:

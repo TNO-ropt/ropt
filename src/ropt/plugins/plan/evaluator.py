@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -12,12 +13,12 @@ from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
 from ropt.plan import Event
 from ropt.plugins.plan.base import PlanStep
-from ropt.results import FunctionResults, Results
+from ropt.results import FunctionResults
 
 from ._utils import _get_set
 
 if TYPE_CHECKING:
-    from numpy.typing import ArrayLike, NDArray
+    from numpy.typing import ArrayLike
 
     from ropt.plan import Plan
     from ropt.transforms import OptModelTransforms
@@ -43,69 +44,62 @@ class DefaultEvaluatorStep(PlanStep):
         self,
         plan: Plan,
         *,
-        config: Any,  # noqa: ANN401
-        transforms: OptModelTransforms | None = None,
         tags: str | set[str] | None = None,
-        metadata: dict[str, Any] | None = None,
     ) -> None:
         """Initialize a default evaluator step.
-
-        The
-        [`DefaultEvaluatorStep`][ropt.plugins.plan.evaluator.DefaultEvaluatorStep]
-        requires an optimizer configuration; the `tags` and `values` parameters
-        are optional. The configuration  object must be an
-        [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object, or a dictionary
-        that can be parsed into such an object. If no `values` are provided, the
-        initial values specified by the optimizer configuration are used. If
-        `values` is given, it may be a single vector or a two-dimensional array.
-        In the latter case, each row of the matrix is treated as a separate set
-        of values to be evaluated.
 
         The `tags` field allows optional labels to be attached to each result,
         which can assist result handlers in filtering relevant results.
 
         Args:
             plan:       The plan that runs this step.
-            config:     The optimizer configuration.
-            transforms: Optional transforms object.
             tags:       Tags to add to the emitted events.
-            metadata:   Optional metadata to add to events.
         """
         super().__init__(plan)
-        self._config = EnOptConfig.model_validate(config)
-        self._transforms = transforms
         self._tags = _get_set(tags)
-        self._metadata = metadata
 
     def run(  # type: ignore[override]
         self,
-        *,
+        config: Any,  # noqa: ANN401
+        transforms: OptModelTransforms | None = None,
         variables: ArrayLike | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> OptimizerExitCode:
-        """Run the evaluator step."""
-        variables = (
-            self._config.variables.initial_values
-            if variables is None
-            else np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
-        )
-        return self._run(self._config, self._transforms, variables)
+        """Run the evaluator step.
 
-    def _run(
-        self,
-        enopt_config: EnOptConfig,
-        transforms: OptModelTransforms | None,
-        variables: NDArray[np.float64],
-    ) -> OptimizerExitCode:
+        The
+        [`DefaultEvaluatorStep`][ropt.plugins.plan.evaluator.DefaultEvaluatorStep]
+        requires an optimizer configuration; the `variables` parameter is
+        optional. The configuration  object must be an
+        [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object, or a dictionary
+        that can be parsed into such an object. If no `variables` are provided,
+        the initial values specified by the optimizer configuration are used. If
+        `values` is given, it may be a single vector or a two-dimensional array.
+        In the latter case, each row of the matrix is treated as a separate set
+        of values to be evaluated.
+
+        Args:
+            config:     The optimizer configuration.
+            transforms: Optional transforms object.
+            variables: Variables to evaluate.
+            metadata:   Optional metadata to add to events.
+        """
+        config = EnOptConfig.model_validate(config, context=transforms)
+
         self.emit_event(
             Event(
                 event_type=EventType.START_EVALUATOR_STEP,
-                config=enopt_config,
+                config=config,
                 tags=self._tags,
             )
         )
 
+        if variables is None:
+            variables = config.variables.initial_values
+        variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
+
         ensemble_evaluator = EnsembleEvaluator(
-            enopt_config,
+            config,
             transforms,
             self.plan.optimizer_context.evaluator,
             self.plan.optimizer_context.eval_id_iter,
@@ -117,7 +111,7 @@ class DefaultEvaluatorStep(PlanStep):
         self.emit_event(
             Event(
                 event_type=EventType.START_EVALUATION,
-                config=enopt_config,
+                config=config,
                 tags=self._tags,
             )
         )
@@ -133,7 +127,10 @@ class DefaultEvaluatorStep(PlanStep):
         if results[0].functions is None:
             exit_code = OptimizerExitCode.TOO_FEW_REALIZATIONS
 
-        self._set_metadata(results)
+        if metadata is not None:
+            for item in results:
+                item.metadata = deepcopy(metadata)
+
         data: dict[str, Any] = {}
         if transforms is not None:
             data["transformed_results"] = results
@@ -146,7 +143,7 @@ class DefaultEvaluatorStep(PlanStep):
         self.emit_event(
             Event(
                 event_type=EventType.FINISHED_EVALUATION,
-                config=enopt_config,
+                config=config,
                 tags=self._tags,
                 data=data,
             )
@@ -158,7 +155,7 @@ class DefaultEvaluatorStep(PlanStep):
         self.emit_event(
             Event(
                 event_type=EventType.FINISHED_EVALUATOR_STEP,
-                config=enopt_config,
+                config=config,
                 tags=self._tags,
             )
         )
@@ -172,18 +169,3 @@ class DefaultEvaluatorStep(PlanStep):
             event: The event to emit.
         """
         self.plan.emit_event(event)
-
-    def _set_metadata(self, results: tuple[Results, ...]) -> None:
-        if self._metadata is None:
-            return
-        for item in results:
-            for key, value in self._metadata.items():
-                item.metadata[key] = (
-                    self.plan[value[1:]]
-                    if (
-                        isinstance(value, str)
-                        and value.startswith("$")
-                        and not value[1:].startswith("$")
-                    )
-                    else value
-                )

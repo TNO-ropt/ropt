@@ -109,13 +109,14 @@ class PlanStep(ABC):
         return self.__stored_plan
 
     @abstractmethod
-    def run(self, **kwargs: Any) -> None:  # noqa: ANN401
+    def run(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
         """Execute the step object.
 
         This method must be overloaded to implement the functionality of the
         step.
 
         Args:
+            args:   Optional positional arguments.
             kwargs: Optional keyword arguments.
         """
 
