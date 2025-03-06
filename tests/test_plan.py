@@ -62,22 +62,20 @@ def test_plan_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(context)
-    tracker1 = plan.add_handler("tracker", tags={"optimal1"})
-    tracker2 = plan.add_handler("tracker", tags={"optimal2"})
-    tracker3 = plan.add_handler("tracker", tags={"optimal3"})
-    step1 = plan.add_step("optimizer", tag="optimal1")
-    step2 = plan.add_step("optimizer", tag="optimal2")
-    step3 = plan.add_step("optimizer", tag="optimal3")
-    plan.run_step(step1, config=enopt_config)
-    plan.run_step(step2, config=enopt_config)
-    plan.run_step(step3, config=config2)
+    tracker = plan.add_handler("tracker", tags={"optimal"})
+    step = plan.add_step("optimizer", tag="optimal")
 
-    assert tracker1["results"] is not None
-    assert tracker2["results"] is not None
-    assert tracker3["results"] is not None
+    plan.run_step(step, config=enopt_config)
+    variables1 = tracker["variables"]
+    tracker["results"] = None
+    plan.run_step(step, config=enopt_config)
+    variables2 = tracker["variables"]
+    tracker["results"] = None
+    plan.run_step(step, config=config2)
+    variables3 = tracker["variables"]
 
-    assert np.all(tracker1["variables"] == tracker2["variables"])
-    assert not np.all(tracker1["variables"] == tracker3["variables"])
+    assert np.all(variables1 == variables2)
+    assert not np.all(variables2 == variables3)
 
 
 def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> None:
@@ -148,12 +146,11 @@ def test_two_optimizers_alternating(
     plan = Plan(context)
     tracker1 = plan.add_handler("tracker", tags={"opt"})
     tracker2 = plan.add_handler("tracker", tags={"opt"}, what="last")
-    step1 = plan.add_step("optimizer", tag="opt")
-    step2 = plan.add_step("optimizer", tag="opt")
-    plan.run_step(step1, config=enopt_config1)
-    plan.run_step(step2, config=enopt_config2, variables=tracker2["variables"])
-    plan.run_step(step1, config=enopt_config1, variables=tracker2["variables"])
-    plan.run_step(step2, config=enopt_config2, variables=tracker2["variables"])
+    step = plan.add_step("optimizer", tag="opt")
+    plan.run_step(step, config=enopt_config1)
+    plan.run_step(step, config=enopt_config2, variables=tracker2["variables"])
+    plan.run_step(step, config=enopt_config1, variables=tracker2["variables"])
+    plan.run_step(step, config=enopt_config2, variables=tracker2["variables"])
     assert completed_functions == 14
     assert tracker1["results"] is not None
     assert np.allclose(tracker1["variables"], [0.0, 0.0, 0.5], atol=0.02)
@@ -180,10 +177,9 @@ def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -
     )
     plan = Plan(context)
     tracker = plan.add_handler("tracker", tags={"last"}, what="last")
-    step1 = plan.add_step("optimizer", tag="last")
-    step2 = plan.add_step("optimizer", tag="last")
-    plan.run_step(step1, config=enopt_config)
-    plan.run_step(step2, config=enopt_config2, variables=tracker["variables"])
+    step = plan.add_step("optimizer", tag="last")
+    plan.run_step(step, config=enopt_config)
+    plan.run_step(step, config=enopt_config2, variables=tracker["variables"])
 
     assert not np.allclose(
         completed[1].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
@@ -366,10 +362,7 @@ def test_evaluator_step(enopt_config: dict[str, Any], evaluator: Any) -> None:
     assert tracker["results"].functions is not None
     assert np.allclose(tracker["results"].functions.weighted_objective, 1.66)
 
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(context)
-    tracker = plan.add_handler("tracker", tags={"eval"})
-    step = plan.add_step("evaluator", tag="eval")
+    tracker["results"] = None
     plan.run_step(step, config=enopt_config, variables=[0, 0, 0])
     assert tracker["results"].functions is not None
     assert np.allclose(tracker["results"].functions.weighted_objective, 1.75)
