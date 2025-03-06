@@ -96,15 +96,3 @@ def _get_all_results(
             and not _violates_constraint(transformed_item, constraint_tolerance)
         )
     )
-
-
-def _get_set(values: str | set[str] | list[str] | tuple[str, ...] | None) -> set[str]:
-    match values:
-        case str():
-            return {values}
-        case set() | list() | tuple():
-            return set(values)
-        case None:
-            return set()
-    msg = f"Invalid type for values: {type(values)}"
-    raise TypeError(msg)

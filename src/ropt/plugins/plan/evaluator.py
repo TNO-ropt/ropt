@@ -15,8 +15,6 @@ from ropt.plan import Event
 from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
 
-from ._utils import _get_set
-
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
@@ -44,19 +42,19 @@ class DefaultEvaluatorStep(PlanStep):
         self,
         plan: Plan,
         *,
-        tags: str | set[str] | None = None,
+        tag: str | None = None,
     ) -> None:
         """Initialize a default evaluator step.
 
-        The `tags` field allows optional labels to be attached to each result,
+        The `tag` field allows an optional label to be attached to each result,
         which can assist result handlers in filtering relevant results.
 
         Args:
-            plan:       The plan that runs this step.
-            tags:       Tags to add to the emitted events.
+            plan: The plan that runs this step.
+            tag:  Tag to add to the emitted events.
         """
         super().__init__(plan)
-        self._tags = _get_set(tags)
+        self._tag = tag
 
     def run(  # type: ignore[override]
         self,
@@ -90,7 +88,7 @@ class DefaultEvaluatorStep(PlanStep):
             Event(
                 event_type=EventType.START_EVALUATOR_STEP,
                 config=config,
-                tags=self._tags,
+                tag=self._tag,
             )
         )
 
@@ -112,7 +110,7 @@ class DefaultEvaluatorStep(PlanStep):
             Event(
                 event_type=EventType.START_EVALUATION,
                 config=config,
-                tags=self._tags,
+                tag=self._tag,
             )
         )
         try:
@@ -144,7 +142,7 @@ class DefaultEvaluatorStep(PlanStep):
             Event(
                 event_type=EventType.FINISHED_EVALUATION,
                 config=config,
-                tags=self._tags,
+                tag=self._tag,
                 data=data,
             )
         )
@@ -156,7 +154,7 @@ class DefaultEvaluatorStep(PlanStep):
             Event(
                 event_type=EventType.FINISHED_EVALUATOR_STEP,
                 config=config,
-                tags=self._tags,
+                tag=self._tag,
             )
         )
 

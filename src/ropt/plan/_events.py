@@ -24,11 +24,11 @@ class Event:
 
     Attributes:
         event_type: The type of the event.
-        tags:       Optional tags added to the results.
+        tag:        Optional tag added to the results.
         data:       Optional data passed with the event.
     """
 
     event_type: EventType
     config: EnOptConfig
-    tags: set[str] = field(default_factory=set)
+    tag: str | None = None
     data: dict[str, Any] = field(default_factory=dict)

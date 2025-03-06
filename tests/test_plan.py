@@ -44,8 +44,8 @@ def enopt_config_fixture() -> dict[str, Any]:
 def test_run_basic(enopt_config: dict[str, Any], evaluator: Any) -> None:
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(context)
-    tracker = plan.add_handler("tracker", tags="opt")
-    step = plan.add_step("optimizer", tags="opt")
+    tracker = plan.add_handler("tracker", tags={"opt"})
+    step = plan.add_step("optimizer", tag="opt")
     plan.run_step(step, config=enopt_config)
     assert tracker["results"] is not None
     assert np.allclose(tracker["variables"], [0.0, 0.0, 0.5], atol=0.02)
@@ -62,12 +62,12 @@ def test_plan_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(context)
-    tracker1 = plan.add_handler("tracker", tags="optimal1")
-    tracker2 = plan.add_handler("tracker", tags="optimal2")
-    tracker3 = plan.add_handler("tracker", tags="optimal3")
-    step1 = plan.add_step("optimizer", tags="optimal1")
-    step2 = plan.add_step("optimizer", tags="optimal2")
-    step3 = plan.add_step("optimizer", tags="optimal3")
+    tracker1 = plan.add_handler("tracker", tags={"optimal1"})
+    tracker2 = plan.add_handler("tracker", tags={"optimal2"})
+    tracker3 = plan.add_handler("tracker", tags={"optimal3"})
+    step1 = plan.add_step("optimizer", tag="optimal1")
+    step2 = plan.add_step("optimizer", tag="optimal2")
+    step3 = plan.add_step("optimizer", tag="optimal3")
     plan.run_step(step1, config=enopt_config)
     plan.run_step(step2, config=enopt_config)
     plan.run_step(step3, config=config2)
@@ -83,8 +83,8 @@ def test_plan_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:
 def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> None:
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(context)
-    tracker = plan.add_handler("tracker", tags="optimal")
-    step = plan.add_step("optimizer", tags="optimal")
+    tracker = plan.add_handler("tracker", tags={"optimal"})
+    step = plan.add_step("optimizer", tag="optimal")
     plan.run_step(step, config=enopt_config)
     variables1 = tracker["variables"]
     tracker["variables"] = None
@@ -103,8 +103,8 @@ def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> Non
 def test_reset_results(enopt_config: dict[str, Any], evaluator: Any) -> None:
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(context)
-    tracker = plan.add_handler("tracker", tags="opt")
-    step = plan.add_step("optimizer", tags="opt")
+    tracker = plan.add_handler("tracker", tags={"opt"})
+    step = plan.add_step("optimizer", tag="opt")
     plan.run_step(step, config=enopt_config)
     saved_results = deepcopy(tracker["results"])
     tracker["results"] = None
@@ -146,10 +146,10 @@ def test_two_optimizers_alternating(
         EventType.FINISHED_EVALUATION, _track_evaluations
     )
     plan = Plan(context)
-    tracker1 = plan.add_handler("tracker", tags="opt")
-    tracker2 = plan.add_handler("tracker", tags="opt", what="last")
-    step1 = plan.add_step("optimizer", tags="opt")
-    step2 = plan.add_step("optimizer", tags="opt")
+    tracker1 = plan.add_handler("tracker", tags={"opt"})
+    tracker2 = plan.add_handler("tracker", tags={"opt"}, what="last")
+    step1 = plan.add_step("optimizer", tag="opt")
+    step2 = plan.add_step("optimizer", tag="opt")
     plan.run_step(step1, config=enopt_config1)
     plan.run_step(step2, config=enopt_config2, variables=tracker2["variables"])
     plan.run_step(step1, config=enopt_config1, variables=tracker2["variables"])
@@ -179,9 +179,9 @@ def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -
         EventType.FINISHED_EVALUATION, _track_evaluations
     )
     plan = Plan(context)
-    tracker = plan.add_handler("tracker", tags="last", what="last")
-    step1 = plan.add_step("optimizer", tags="last")
-    step2 = plan.add_step("optimizer", tags="last")
+    tracker = plan.add_handler("tracker", tags={"last"}, what="last")
+    step1 = plan.add_step("optimizer", tag="last")
+    step2 = plan.add_step("optimizer", tag="last")
     plan.run_step(step1, config=enopt_config)
     plan.run_step(step2, config=enopt_config2, variables=tracker["variables"])
 
@@ -238,8 +238,8 @@ def test_restart_last(enopt_config: dict[str, Any], evaluator: Any) -> None:
         EventType.FINISHED_EVALUATION, _track_evaluations
     )
     plan = Plan(context)
-    tracker = plan.add_handler("tracker", tags="last", what="last")
-    step = plan.add_step("optimizer", tags="last")
+    tracker = plan.add_handler("tracker", tags={"last"}, what="last")
+    step = plan.add_step("optimizer", tag="last")
     for _ in range(2):
         plan.run_step(step, config=enopt_config, variables=tracker["variables"])
 
@@ -265,8 +265,8 @@ def test_restart_optimum(enopt_config: dict[str, Any], evaluator: Any) -> None:
         EventType.FINISHED_EVALUATION, _track_evaluations
     )
     plan = Plan(context)
-    tracker = plan.add_handler("tracker", tags="optimum")
-    step = plan.add_step("optimizer", tags="optimum")
+    tracker = plan.add_handler("tracker", tags={"optimum"})
+    step = plan.add_step("optimizer", tag="optimum")
     for _ in range(2):
         plan.run_step(step, config=enopt_config, variables=tracker["variables"])
 
@@ -311,8 +311,8 @@ def test_restart_optimum_with_reset(
         EventType.FINISHED_EVALUATION, _track_evaluations
     )
     plan = Plan(context)
-    tracker = plan.add_handler("tracker", tags="opt")
-    step = plan.add_step("optimizer", tags="opt")
+    tracker = plan.add_handler("tracker", tags={"opt"})
+    step = plan.add_step("optimizer", tag="opt")
     for _ in range(3):
         initial = tracker["variables"]
         tracker["results"] = None
@@ -350,7 +350,7 @@ def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
         EventType.FINISHED_EVALUATION, _track_results
     )
     plan = Plan(context)
-    step = plan.add_step("optimizer", tags="opt")
+    step = plan.add_step("optimizer", tag="opt")
     for idx in range(2):
         metadata["restart"] = idx
         plan.run_step(step, config=enopt_config, metadata=metadata)
@@ -360,16 +360,16 @@ def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
 def test_evaluator_step(enopt_config: dict[str, Any], evaluator: Any) -> None:
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(context)
-    tracker = plan.add_handler("tracker", tags="eval")
-    step = plan.add_step("evaluator", tags="eval")
+    tracker = plan.add_handler("tracker", tags={"eval"})
+    step = plan.add_step("evaluator", tag="eval")
     plan.run_step(step, config=enopt_config)
     assert tracker["results"].functions is not None
     assert np.allclose(tracker["results"].functions.weighted_objective, 1.66)
 
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(context)
-    tracker = plan.add_handler("tracker", tags="eval")
-    step = plan.add_step("evaluator", tags="eval")
+    tracker = plan.add_handler("tracker", tags={"eval"})
+    step = plan.add_step("evaluator", tag="eval")
     plan.run_step(step, config=enopt_config, variables=[0, 0, 0])
     assert tracker["results"].functions is not None
     assert np.allclose(tracker["results"].functions.weighted_objective, 1.75)
@@ -381,8 +381,8 @@ def test_evaluator_step_multi(enopt_config: dict[str, Any], evaluator: Any) -> N
 
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(context)
-    tracker = plan.add_handler("tracker", tags="eval", what="all")
-    step = plan.add_step("evaluator", tags="eval")
+    tracker = plan.add_handler("tracker", tags={"eval"}, what="all")
+    step = plan.add_step("evaluator", tag="eval")
     plan.run_step(step, config=enopt_config, variables=[[0, 0, 0.1], [0, 0, 0]])
     values = [
         results.functions.weighted_objective.item() for results in tracker["results"]
@@ -426,8 +426,8 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
     )
 
     inner_plan = Plan(context)
-    inner_tracker = inner_plan.add_handler("tracker", tags="inner")
-    inner_step = inner_plan.add_step("optimizer", tags="inner")
+    inner_tracker = inner_plan.add_handler("tracker", tags={"inner"})
+    inner_step = inner_plan.add_step("optimizer", tag="inner")
 
     def _inner_optimization(
         plan: Plan, variables: NDArray[np.float64]
@@ -440,8 +440,8 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
     inner_plan.add_function(_inner_optimization)
 
     outer_plan = Plan(context)
-    outer_tracker = outer_plan.add_handler("tracker", tags="outer")
-    outer_step = outer_plan.add_step("optimizer", tags="outer")
+    outer_tracker = outer_plan.add_handler("tracker", tags={"outer"})
+    outer_step = outer_plan.add_step("optimizer", tag="outer")
     outer_plan.run_step(outer_step, config=enopt_config, nested_optimization=inner_plan)
     assert outer_tracker["results"] is not None
     assert np.allclose(outer_tracker["variables"], [0.0, 0.0, 0.5], atol=0.02)
@@ -454,9 +454,9 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
     def _track_evaluations(event: Event) -> None:
         for item in event.data["results"]:
             if isinstance(item, FunctionResults):
-                if "outer" in event.tags:
+                if event.tag == "outer":
                     assert item.metadata.get("outer") == 1
-                if "inner" in event.tags:
+                if event.tag == "inner":
                     assert item.metadata.get("inner") == "inner_meta_data"
 
     enopt_config["optimizer"]["tolerance"] = 1e-10
@@ -472,8 +472,8 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
     )
 
     inner_plan = Plan(context)
-    inner_tracker = inner_plan.add_handler("tracker", tags="inner")
-    inner_step = inner_plan.add_step("optimizer", tags="inner")
+    inner_tracker = inner_plan.add_handler("tracker", tags={"inner"})
+    inner_step = inner_plan.add_step("optimizer", tag="inner")
 
     def _inner_optimization(
         plan: Plan, variables: NDArray[np.float64]
@@ -491,8 +491,8 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
     inner_plan.add_function(_inner_optimization)
 
     outer_plan = Plan(context)
-    outer_tracker = outer_plan.add_handler("tracker", tags="outer")
-    outer_step = outer_plan.add_step("optimizer", tags="outer")
+    outer_tracker = outer_plan.add_handler("tracker", tags={"outer"})
+    outer_step = outer_plan.add_step("optimizer", tag="outer")
     outer_plan.run_step(
         outer_step,
         config=enopt_config,
@@ -520,13 +520,13 @@ def test_plan_abort(enopt_config: Any, evaluator: Any) -> None:
         EventType.FINISHED_EVALUATION, _observer
     )
     plan = Plan(context)
-    tracker = plan.add_handler("tracker", tags="opt")
-    step = plan.add_step("optimizer", tags="opt")
+    tracker = plan.add_handler("tracker", tags={"opt"})
+    step = plan.add_step("optimizer", tag="opt")
     plan.run_step(step, config=enopt_config)
     assert tracker["results"] is not None
     assert last_evaluation == 1
     assert plan.aborted
 
-    step = plan.add_step("optimizer", tags="opt")
+    step = plan.add_step("optimizer", tag="opt")
     with pytest.raises(PlanAborted, match="Plan was aborted by the previous step."):
         plan.run_step(step, config=enopt_config)

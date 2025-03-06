@@ -8,7 +8,7 @@ from ropt.enums import EventType
 from ropt.plugins.plan.base import ResultHandler
 from ropt.results import FunctionResults
 
-from ._utils import _get_all_results, _get_last_result, _get_set, _update_optimal_result
+from ._utils import _get_all_results, _get_last_result, _update_optimal_result
 
 if TYPE_CHECKING:
     from ropt.plan import Event, Plan
@@ -32,7 +32,7 @@ class DefaultTrackerHandler(ResultHandler):
         *,
         what: Literal["best", "last", "all"] = "best",
         constraint_tolerance: float | None = 1e-10,
-        tags: str | set[str] | None = None,
+        tags: set[str] | None = None,
     ) -> None:
         """Initialize a default tracker results handler object.
 
@@ -57,7 +57,7 @@ class DefaultTrackerHandler(ResultHandler):
         super().__init__(plan)
         self._what = what
         self._constraint_tolerance = constraint_tolerance
-        self._tags = _get_set(tags)
+        self._tags = set() if tags is None else tags
         self["results"] = None
         self["variables"] = None
 
@@ -70,7 +70,7 @@ class DefaultTrackerHandler(ResultHandler):
         if (
             event.event_type == EventType.FINISHED_EVALUATION
             and "results" in event.data
-            and (event.tags & self._tags)
+            and event.tag in self._tags
         ):
             results = event.data["results"]
             transformed_results = event.data.get("transformed_results", results)

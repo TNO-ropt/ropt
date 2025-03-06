@@ -16,8 +16,6 @@ from ropt.plan import Event, Plan
 from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
 
-from ._utils import _get_set
-
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
@@ -63,17 +61,17 @@ class DefaultOptimizerStep(PlanStep):
         self,
         plan: Plan,
         *,
-        tags: str | set[str] | None = None,
+        tag: str | None = None,
     ) -> None:
         """Initialize a default optimizer step.
 
         Args:
-            plan:                The plan that runs this step.
-            tags:                Tags to add to the emitted events.
+            plan: The plan that runs this step.
+            tag : Tag to add to the emitted events.
         """
         super().__init__(plan)
 
-        self._tags = _get_set(tags)
+        self._tag = tag
 
     def run(  # type: ignore[override]
         self,
@@ -101,7 +99,7 @@ class DefaultOptimizerStep(PlanStep):
             Event(
                 event_type=EventType.START_OPTIMIZER_STEP,
                 config=self._config,
-                tags=self._tags,
+                tag=self._tag,
             )
         )
 
@@ -140,7 +138,7 @@ class DefaultOptimizerStep(PlanStep):
             Event(
                 event_type=EventType.FINISHED_OPTIMIZER_STEP,
                 config=self._config,
-                tags=self._tags,
+                tag=self._tag,
             )
         )
 
@@ -160,7 +158,7 @@ class DefaultOptimizerStep(PlanStep):
                 Event(
                     event_type=EventType.START_EVALUATION,
                     config=self._config,
-                    tags=self._tags,
+                    tag=self._tag,
                 )
             )
         else:
@@ -180,7 +178,7 @@ class DefaultOptimizerStep(PlanStep):
                 Event(
                     event_type=EventType.FINISHED_EVALUATION,
                     config=self._config,
-                    tags=self._tags,
+                    tag=self._tag,
                     data=data,
                 ),
             )
