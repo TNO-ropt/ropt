@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Final, Type
 
+from ._store import DefaultStoreHandler
 from ._tracker import DefaultTrackerHandler
 from .base import PlanHandlerPlugin, PlanStepPlugin
 from .evaluator import DefaultEvaluatorStep
@@ -20,6 +21,7 @@ _STEP_OBJECTS: Final[dict[str, Type[PlanStep]]] = {
 
 _RESULT_HANDLER_OBJECTS: Final[dict[str, Type[ResultHandler]]] = {
     "tracker": DefaultTrackerHandler,
+    "store": DefaultStoreHandler,
 }
 
 

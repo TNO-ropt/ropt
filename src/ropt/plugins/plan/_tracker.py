@@ -6,12 +6,12 @@ from typing import TYPE_CHECKING, Literal
 
 from ropt.enums import EventType
 from ropt.plugins.plan.base import ResultHandler
-from ropt.results import FunctionResults
 
-from ._utils import _get_all_results, _get_last_result, _update_optimal_result
+from ._utils import _get_last_result, _update_optimal_result
 
 if TYPE_CHECKING:
     from ropt.plan import Event, Plan
+    from ropt.results import FunctionResults
 
 
 class DefaultTrackerHandler(ResultHandler):
@@ -30,7 +30,7 @@ class DefaultTrackerHandler(ResultHandler):
         self,
         plan: Plan,
         *,
-        what: Literal["best", "last", "all"] = "best",
+        what: Literal["best", "last"] = "best",
         constraint_tolerance: float | None = 1e-10,
         tags: set[str] | None = None,
     ) -> None:
@@ -40,7 +40,6 @@ class DefaultTrackerHandler(ResultHandler):
 
         - `"best"`: Tracks the best result added.
         - `"last"`: Tracks the last result added.
-        - `"all"`:  Store a tuple with all results.
 
         If `constraint_tolerance` is set, results that exceed this tolerance on
         constraint values are not tracked.
@@ -73,16 +72,8 @@ class DefaultTrackerHandler(ResultHandler):
         ):
             results = event.data["results"]
             transformed_results = event.data.get("transformed_results", results)
-            filtered_results: FunctionResults | tuple[FunctionResults, ...] | None = (
-                None
-            )
+            filtered_results: FunctionResults | None = None
             match self._what:
-                case "all":
-                    filtered_results = _get_all_results(
-                        results,
-                        transformed_results,
-                        self._constraint_tolerance,
-                    )
                 case "best":
                     filtered_results = _update_optimal_result(
                         self["results"],
@@ -97,14 +88,4 @@ class DefaultTrackerHandler(ResultHandler):
                         self._constraint_tolerance,
                     )
             if filtered_results is not None:
-                match self._what:
-                    case "all":
-                        assert isinstance(filtered_results, tuple)
-                        self["results"] = (
-                            filtered_results
-                            if self["results"] is None
-                            else (*self["results"], *filtered_results)
-                        )
-                    case "best" | "last":
-                        assert isinstance(filtered_results, FunctionResults)
-                        self["results"] = filtered_results
+                self["results"] = filtered_results

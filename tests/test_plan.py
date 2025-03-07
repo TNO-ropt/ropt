@@ -409,11 +409,11 @@ def test_evaluator_step_multi(enopt_config: dict[str, Any], evaluator: Any) -> N
 
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(context)
-    tracker = plan.add_handler("tracker", tags={"eval"}, what="all")
+    store = plan.add_handler("store", tags={"eval"})
     step = plan.add_step("evaluator", tag="eval")
     plan.run_step(step, config=enopt_config, variables=[[0, 0, 0.1], [0, 0, 0]])
     values = [
-        results.functions.weighted_objective.item() for results in tracker["results"]
+        results.functions.weighted_objective.item() for results in store["results"]
     ]
     assert np.allclose(values, [1.66, 1.75])
 

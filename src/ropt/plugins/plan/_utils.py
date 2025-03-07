@@ -80,19 +80,3 @@ def _update_optimal_result(
                 optimal_result = new_optimal_result
                 return_result = new_optimal_result
     return return_result
-
-
-def _get_all_results(
-    results: tuple[Results, ...],
-    transformed_results: tuple[Results, ...],
-    constraint_tolerance: float | None,
-) -> tuple[FunctionResults, ...]:
-    return tuple(
-        item
-        for item, transformed_item in zip(results, transformed_results, strict=False)
-        if (
-            isinstance(item, FunctionResults)
-            and item.functions is not None
-            and not _violates_constraint(transformed_item, constraint_tolerance)
-        )
-    )
