@@ -657,15 +657,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.BasicOptimizer.add_observer" class="md-nav__link">
-    <span class="md-ellipsis">
-      add_observer
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plan.BasicOptimizer.run" class="md-nav__link">
     <span class="md-ellipsis">
       run
@@ -1286,15 +1277,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.BasicOptimizer.add_observer" class="md-nav__link">
-    <span class="md-ellipsis">
-      add_observer
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plan.BasicOptimizer.run" class="md-nav__link">
     <span class="md-ellipsis">
       run
@@ -1639,96 +1621,6 @@ as they define the optimization to perform.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plan.BasicOptimizer.add_observer" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">add_observer</span><span class="p">(</span><span class="n">event_type</span><span class="p">,</span> <span class="n">function</span><span class="p">)</span></code>
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Add an observer.</p>
-<p>Observers are callables that are triggered when an optimization event
-occurs. This method adds an observer that responds to a specified event
-type.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>event_type</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The type of event to observe.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>function</code>
-            </td>
-            <td>
-                  <code><span title="typing.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="ropt.plan.Event" href="../plan/#ropt.plan.Event">Event</a>], None]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The callable to invoke when the event is emitted.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="typing.Self">Self</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The <code>BasicOptimizer</code> instance, allowing for method chaining.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
 <h3 id="ropt.plan.BasicOptimizer.run" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">run</span><span class="p">()</span></code>
 
@@ -1843,7 +1735,7 @@ the optimization will be aborted.</p>
 
 
 <h3 id="ropt.plan.BasicOptimizer.set_results_callback" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">set_results_callback</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">set_results_callback</span><span class="p">(</span><span class="n">callback</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">transformed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 </h3>
 
@@ -1852,6 +1744,14 @@ the optimization will be aborted.</p>
 
         <p>Set a callback to report results.</p>
 <p>The callback will be called whenever new results become available.</p>
+<p>If <code>transformed</code> is <code>False</code> the callback should have this signature:</p>
+<div class="language-text highlight"><pre><span></span><code>`def callback(results: tuple[Results, ...]) -&gt; None: ...`
+</code></pre></div>
+<p>If <code>transformed</code> is <code>True</code>, the signature should be:</p>
+<div class="language-text highlight"><pre><span></span><code>def callback(
+    results: tuple[Results, ...], transformed_results: tuple[Results, ...]
+) -&gt; None: ...`
+</code></pre></div>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1870,7 +1770,7 @@ the optimization will be aborted.</p>
                 <code>callback</code>
             </td>
             <td>
-                  <code><span title="typing.Callable">Callable</span>[[<span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]], None]</code>
+                  <code><span title="typing.Callable">Callable</span>[..., None]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1879,6 +1779,22 @@ the optimization will be aborted.</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>transformed</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If true also pass the transformed results.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
             </td>
           </tr>
       </tbody>
