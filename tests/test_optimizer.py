@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from typing import Any, cast
 
 import numpy as np
 import pytest
@@ -8,14 +8,11 @@ from numpy.typing import NDArray
 
 from ropt.config.enopt import EnOptConfig
 from ropt.config.enopt.constants import DEFAULT_SEED
-from ropt.enums import EventType, OptimizerExitCode
+from ropt.enums import OptimizerExitCode
 from ropt.plan import BasicOptimizer
 from ropt.results import FunctionResults, GradientResults, Results
 from ropt.transforms import OptModelTransforms, VariableScaler
 from ropt.transforms.base import NonLinearConstraintTransform, ObjectiveTransform
-
-if TYPE_CHECKING:
-    from ropt.plan import Event
 
 
 @pytest.fixture(name="enopt_config")
@@ -145,9 +142,11 @@ def test_objective_with_scaler(
 ) -> None:
     checked = False
 
-    def check_value(event: Event) -> None:
+    def check_value(
+        _: tuple[Results, ...], transformed_results: tuple[Results, ...]
+    ) -> None:
         nonlocal checked
-        for item in event.data["transformed_results"]:
+        for item in transformed_results:
             if isinstance(item, FunctionResults) and not checked:
                 checked = True
                 assert item.functions is not None
@@ -174,7 +173,7 @@ def test_objective_with_scaler(
         EnOptConfig.model_validate(enopt_config, context=transforms),
         evaluator(),
         transforms=transforms,
-    ).add_observer(EventType.FINISHED_EVALUATION, check_value)
+    ).set_results_callback(check_value, transformed=True)
     results2 = optimizer.run().results
     assert results2 is not None
     assert np.allclose(results2.evaluations.variables, variables1, atol=0.02)
@@ -228,9 +227,11 @@ def test_constraint_with_scaler(
 
     check = True
 
-    def check_constraints(event: Event) -> None:
+    def check_constraints(
+        _: tuple[Results, ...], transformed_results: tuple[Results, ...]
+    ) -> None:
         nonlocal check
-        for item in event.data["transformed_results"]:
+        for item in transformed_results:
             if isinstance(item, FunctionResults) and check:
                 check = False
                 assert item.functions is not None
@@ -239,7 +240,7 @@ def test_constraint_with_scaler(
 
     BasicOptimizer(
         config, evaluator(test_functions), transforms=transforms
-    ).add_observer(EventType.FINISHED_EVALUATION, check_constraints).run()
+    ).set_results_callback(check_constraints, transformed=True).run()
 
 
 @pytest.mark.parametrize("offsets", [None, np.array([1.0, 1.1, 1.2])])

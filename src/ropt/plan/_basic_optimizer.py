@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from ropt.evaluator import Evaluator
     from ropt.plan import Event
     from ropt.plugins.plan.base import ResultHandler
-    from ropt.results import FunctionResults, Results
+    from ropt.results import FunctionResults
     from ropt.transforms import OptModelTransforms
 
 
@@ -100,25 +100,6 @@ class BasicOptimizer:
         """
         return self._results.exit_code
 
-    def add_observer(
-        self, event_type: EventType, function: Callable[[Event], None]
-    ) -> Self:
-        """Add an observer.
-
-        Observers are callables that are triggered when an optimization event
-        occurs. This method adds an observer that responds to a specified event
-        type.
-
-        Args:
-            event_type: The type of event to observe.
-            function:   The callable to invoke when the event is emitted.
-
-        Returns:
-            The `BasicOptimizer` instance, allowing for method chaining.
-        """
-        self._observers.append((event_type, function))
-        return self
-
     def run(self) -> Self:
         """Run the optimization.
 
@@ -175,26 +156,45 @@ class BasicOptimizer:
             if callback():
                 raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
 
-        self.add_observer(EventType.START_EVALUATION, _check_abort_callback)
+        self._observers.append((EventType.START_EVALUATION, _check_abort_callback))
         return self
 
     def set_results_callback(
-        self, callback: Callable[[tuple[Results, ...]], None]
+        self,
+        callback: Callable[..., None],
+        *,
+        transformed: bool = False,
     ) -> Self:
         """Set a callback to report results.
 
         The callback will be called whenever new results become available.
 
+        If `transformed` is `False` the callback should have this signature:
+
+            `def callback(results: tuple[Results, ...]) -> None: ...`
+
+        If `transformed` is `True`, the signature should be:
+
+            def callback(
+                results: tuple[Results, ...], transformed_results: tuple[Results, ...]
+            ) -> None: ...`
+
         Args:
-            callback: The callable that will be used to report results.
+            callback:    The callable that will be used to report results.
+            transformed: If true also pass the transformed results.
 
         Returns:
             The `BasicOptimizer` instance, allowing for method chaining.
         """
 
         def _results_callback(event: Event) -> None:
-            if event.data.get("results", ()):
-                callback(event.data["results"])
+            results = event.data.get("results", ())
+            if transformed:
+                transformed_results = event.data.get("transformed_results", ())
+                if results or transformed_results:
+                    callback(results, transformed_results)
+            elif results:
+                callback(results)
 
-        self.add_observer(EventType.FINISHED_EVALUATION, _results_callback)
+        self._observers.append((EventType.FINISHED_EVALUATION, _results_callback))
         return self
