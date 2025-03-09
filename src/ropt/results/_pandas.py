@@ -11,9 +11,8 @@ if TYPE_CHECKING:
     from ._result_field import ResultField
 
 
-def _to_dataframe(  # noqa: PLR0913
+def _to_dataframe(
     result_field: ResultField,
-    eval_id: int,
     batch_id: int | None,
     select: Iterable[str] | None,
     unstack: Iterable[ResultAxis] | None,
@@ -25,7 +24,7 @@ def _to_dataframe(  # noqa: PLR0913
         unstack = []
     joined_frame = pd.DataFrame()
     for field in select:
-        series = _to_series(result_field, eval_id, batch_id, field, names)
+        series = _to_series(result_field, batch_id, field, names)
         if series is not None:
             frame = series.to_frame()
             for axis in unstack:
@@ -44,7 +43,6 @@ def _to_dataframe(  # noqa: PLR0913
 
 def _to_series(
     result_field: ResultField,
-    eval_id: int,
     batch_id: int | None,
     field: str,
     names: dict[str, Sequence[str | int] | None] | None = None,
@@ -64,8 +62,8 @@ def _to_series(
         for idx, index in enumerate(names.get(axis, None) for axis in axes)
     ]
     series: pd.Series[Any]
-    index: tuple[Any, ...] = (eval_id, 0 if batch_id is None else batch_id)
-    index_names = ["eval_id", "batch_id"]
+    index: tuple[Any, ...] = (0 if batch_id is None else batch_id,)
+    index_names = ["batch_id"]
     if indices:
         multi_index = pd.MultiIndex.from_product(
             indices, names=(axis.value for axis in axes)

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from itertools import count
 from typing import TYPE_CHECKING, Callable, Self
 
 from ropt.enums import EventType
@@ -49,7 +48,6 @@ class OptimizerContext:
         self._subscribers: dict[EventType, list[Callable[[Event], None]]] = {
             event: [] for event in EventType
         }
-        self.eval_id_iter = count()
 
     def add_observer(
         self,

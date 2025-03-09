@@ -39,7 +39,6 @@ def function_result_fixture() -> FunctionResults:
         weighted_objective=np.array(1.0), objectives=np.array([1.0, 2.0])
     )
     return FunctionResults(
-        eval_id=0,
         batch_id=1,
         metadata={},
         evaluations=evaluations,
