@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.8">
     
     
       
@@ -1683,10 +1683,11 @@ from an optimizer step in the optimization plan.</p>
 <p>To support the implementation of the optimizer classes, the
 <a class="autorefs autorefs-internal" href="#ropt.plugins.optimizer.utils"><code>ropt.plugins.optimizer.utils</code></a> module provides
 some utilities.</p>
-<p>By default the <a class="autorefs autorefs-internal" href="../scipy_optimizer_plugin/#ropt.plugins.optimizer.scipy.SciPyOptimizer"><code>SciPyOptimizer</code></a>
+<p>By default the <a class="autorefs autorefs-internal" title="ropt.plugins.optimizer.scipy.SciPyOptimizer" href="../scipy_optimizer_plugin/#ropt.plugins.optimizer.scipy.SciPyOptimizer"><code>SciPyOptimizer</code></a>
 plugin is installed which provides a number of methods from the
 <a href="https://docs.scipy.org/doc/scipy/tutorial/optimize.html"><code>scipy.optimize</code></a>
 package.</p>
+
 
 
 
@@ -1734,6 +1735,7 @@ package.</p>
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -1773,6 +1775,7 @@ the optimization process.</p>
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -1802,7 +1805,7 @@ the optimization process.</p>
 <p>If the optimizer can handle <code>NaN</code> function values, it may implement this
 method to return <code>True</code>. This enables handling cases where all function
 evaluations in an ensemble fail. By setting the
-<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.RealizationsConfig"><code>realization_min_success</code></a>
+<a class="autorefs autorefs-internal" title="RealizationsConfig" href="../enopt_config/#ropt.config.enopt.RealizationsConfig"><code>realization_min_success</code></a>
 configuration parameter to zero, the ensemble optimization plan can then
 be allowed to return a <code>NaN</code> value instead of raising an error.</p>
 
@@ -1828,6 +1831,7 @@ be allowed to return a <code>NaN</code> value instead of raising an error.</p>
           </tr>
       </tbody>
     </table>
+
     </div>
 
 </div>
@@ -1873,6 +1877,7 @@ be allowed to return a <code>NaN</code> value instead of raising an error.</p>
           </tr>
       </tbody>
     </table>
+
     </div>
 
 </div>
@@ -1921,7 +1926,7 @@ forwarded to the optimizer.</p>
                 <code>config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1937,7 +1942,7 @@ forwarded to the optimizer.</p>
                 <code>optimizer_callback</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.optimizer.base.OptimizerCallback" href="#ropt.plugins.optimizer.base.OptimizerCallback">OptimizerCallback</a></code>
+                  <code><a class="autorefs autorefs-internal" title="OptimizerCallback (ropt.plugins.optimizer.base.OptimizerCallback)" href="#ropt.plugins.optimizer.base.OptimizerCallback">OptimizerCallback</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1950,6 +1955,7 @@ forwarded to the optimizer.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -2007,6 +2013,7 @@ argument during initialization.</p>
       </tbody>
     </table>
 
+
     </div>
 
 </div>
@@ -2041,6 +2048,7 @@ argument during initialization.</p>
 Objects of these classes are initialized with a callback function that
 follows the call signature defined here. This callback should be used to
 request the function and gradient evaluations that the optimizer needs.</p>
+
 
 
 
@@ -2178,6 +2186,7 @@ only a single evaluation, hence there is also only a single result.</p>
       </tbody>
     </table>
 
+
     </div>
 
 </div>
@@ -2203,7 +2212,7 @@ only a single evaluation, hence there is also only a single result.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.base.Plugin" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="Plugin (ropt.plugins.base.Plugin)" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
 
 
         <p>Abstract base class for optimizer plugins.</p>
@@ -2214,6 +2223,7 @@ required optimizer plugin will be located via the
 <a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> and used to create
 <a class="autorefs autorefs-internal" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> objects via its
 <code>create</code> function.</p>
+
 
 
 
@@ -2269,7 +2279,7 @@ implemented in the plugin.</p>
                 <code>config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2285,7 +2295,7 @@ implemented in the plugin.</p>
                 <code>optimizer_callback</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.optimizer.base.OptimizerCallback" href="#ropt.plugins.optimizer.base.OptimizerCallback">OptimizerCallback</a></code>
+                  <code><a class="autorefs autorefs-internal" title="OptimizerCallback (ropt.plugins.optimizer.base.OptimizerCallback)" href="#ropt.plugins.optimizer.base.OptimizerCallback">OptimizerCallback</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2298,6 +2308,7 @@ implemented in the plugin.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -2335,6 +2346,7 @@ implemented in the plugin.</p>
         <p>Utility functions for use by optimizer plugins.</p>
 <p>This module provides utility functions to validate supported constraints, filter
 linear constraints, and to retrieve the list of supported optimizers.</p>
+
 
 
 
@@ -2423,6 +2435,7 @@ multiple gradients is not supported.</p>
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -2448,6 +2461,7 @@ multiple gradients is not supported.</p>
     <div class="doc doc-contents ">
 
         <p>Return the flags that indicate equality transforms.</p>
+
     </div>
 
 </div>
@@ -2492,6 +2506,7 @@ multiple gradients is not supported.</p>
           </tr>
       </tbody>
     </table>
+
     </div>
 
 </div>
@@ -2536,6 +2551,7 @@ multiple gradients is not supported.</p>
           </tr>
       </tbody>
     </table>
+
     </div>
 
 </div>
@@ -2618,6 +2634,7 @@ multiple gradients is not supported.</p>
       </tbody>
     </table>
 
+
     </div>
 
 </div>
@@ -2634,6 +2651,7 @@ multiple gradients is not supported.</p>
     <div class="doc doc-contents ">
 
         <p>Reset the constraints and its gradients.</p>
+
 
     </div>
 
@@ -2683,6 +2701,7 @@ multiple gradients is not supported.</p>
       </tbody>
     </table>
 
+
     </div>
 
 </div>
@@ -2730,6 +2749,7 @@ multiple gradients is not supported.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -2786,7 +2806,7 @@ specified by the key.</p>
                 <code>config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2847,6 +2867,7 @@ specified by the key.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -2968,6 +2989,7 @@ specified by the key.</p>
       </tbody>
     </table>
 
+
     </div>
 
 </div>
@@ -3006,7 +3028,7 @@ the fixed variables in the lower and upper bounds.</p>
                 <code>config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3042,6 +3064,7 @@ the fixed variables in the lower and upper bounds.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 

@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.8">
     
     
       
@@ -1276,7 +1276,7 @@
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.realization_filter.base.RealizationFilter" href="../realization_filter_plugins/#ropt.plugins.realization_filter.base.RealizationFilter">RealizationFilter</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="RealizationFilter (ropt.plugins.realization_filter.base.RealizationFilter)" href="../realization_filter_plugins/#ropt.plugins.realization_filter.base.RealizationFilter">RealizationFilter</a></code></p>
 
 
         <p>The default realization filter plugin class.</p>
@@ -1286,7 +1286,7 @@
 <dd>Filter realizations by selecting a range of objective values. This filter
    requires additional configuration using an options dict that can be
    parsed into a
-   <a class="autorefs autorefs-internal" href="#ropt.plugins.realization_filter.default.SortObjectiveOptions"><code>SortObjectiveOptions</code></a>
+   <a class="autorefs autorefs-internal" title="ropt.plugins.realization_filter.default.SortObjectiveOptions" href="#ropt.plugins.realization_filter.default.SortObjectiveOptions"><code>SortObjectiveOptions</code></a>
    class. This method sorts realizations according to the weighted sum of
    the values of objective functions specified in the options. It then
    selects the set of realizations from a given index range.</dd>
@@ -1294,7 +1294,7 @@
 <dd>Filter realizations by selecting a range of constraint values. This
    filter requires additional configuration using an options dict that can
    be parsed into a
-   <a class="autorefs autorefs-internal" href="#ropt.plugins.realization_filter.default.SortConstraintOptions"><code>SortConstraintOptions</code></a>
+   <a class="autorefs autorefs-internal" title="ropt.plugins.realization_filter.default.SortConstraintOptions" href="#ropt.plugins.realization_filter.default.SortConstraintOptions"><code>SortConstraintOptions</code></a>
    class. This method sorts realizations according to the values of
    constraint functions specified in the options. It then selects the set of
    realizations from a given index range.</dd>
@@ -1302,7 +1302,7 @@
 <dd>Filter realizations by selecting a range of objective values. This filter
    requires additional configuration using an options dict that can be
    parsed into a
-   <a class="autorefs autorefs-internal" href="#ropt.plugins.realization_filter.default.CVaRObjectiveOptions"><code>CVaRObjectiveOptions</code></a>
+   <a class="autorefs autorefs-internal" title="ropt.plugins.realization_filter.default.CVaRObjectiveOptions" href="#ropt.plugins.realization_filter.default.CVaRObjectiveOptions"><code>CVaRObjectiveOptions</code></a>
    class. This method sorts realizations according to the weighted sum of
    the values of objective functions specified in the options. It then
    selects a percentile of the realizations, applying interpolation whenever
@@ -1311,12 +1311,13 @@
 <dd>Filter realizations by selecting a range of constraint values. This
    filter requires additional configuration using an options dict that can
    be parsed into a
-   <a class="autorefs autorefs-internal" href="#ropt.plugins.realization_filter.default.CVaRConstraintOptions"><code>CVaRConstraintOptions</code></a>
+   <a class="autorefs autorefs-internal" title="ropt.plugins.realization_filter.default.CVaRConstraintOptions" href="#ropt.plugins.realization_filter.default.CVaRConstraintOptions"><code>CVaRConstraintOptions</code></a>
    class. This method sorts realizations according to the values of
    constraint functions specified in the options. It then selects a
    percentile of the realizations, applying interpolation whenever the
    number of selected realizations is not an integer number.</dd>
 </dl>
+
 
 
 
@@ -1422,6 +1423,7 @@ configuration of the optimizer.</p>
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -1507,6 +1509,7 @@ in the sorted list.</p>
           </tr>
       </tbody>
     </table>
+
 
 
 
@@ -1605,6 +1608,7 @@ maximizing.</p>
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -1687,6 +1691,7 @@ subtracting the right-hand-side value the following applies:</p>
           </tr>
       </tbody>
     </table>
+
 
 
 

@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.8">
     
     
       
@@ -1399,8 +1399,9 @@
 <p>The <a class="autorefs autorefs-internal" href="#ropt.optimization.EnsembleOptimizer"><code>EnsembleOptimizer</code></a> class provides
 the core functionality for running ensemble-based optimizations. Direct use of
 this class is generally discouraged; instead, the <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> or
-<a class="autorefs autorefs-internal" href="../plan_runner/#ropt.plan.BasicOptimizer"><code>BasicOptimizer</code></a> classes are recommended for more
+<a class="autorefs autorefs-internal" title="ropt.plan.BasicOptimizer" href="../plan_runner/#ropt.plan.BasicOptimizer"><code>BasicOptimizer</code></a> classes are recommended for more
 flexibility and ease of use.</p>
+
 
 
 
@@ -1433,6 +1434,7 @@ flexibility and ease of use.</p>
 
 
         <p>Optimizer class for running ensemble optimizations.</p>
+
 
 
 
@@ -1490,6 +1492,7 @@ flexibility and ease of use.</p>
           </tr>
       </tbody>
     </table>
+
     </div>
 
 </div>
@@ -1543,7 +1546,7 @@ single optimization run:</p>
                 <code>enopt_config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1559,7 +1562,7 @@ single optimization run:</p>
                 <code>ensemble_evaluator</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.ensemble_evaluator.EnsembleEvaluator" href="../evaluator/#ropt.ensemble_evaluator.EnsembleEvaluator">EnsembleEvaluator</a></code>
+                  <code><a class="autorefs autorefs-internal" title="EnsembleEvaluator (ropt.ensemble_evaluator.EnsembleEvaluator)" href="../evaluator/#ropt.ensemble_evaluator.EnsembleEvaluator">EnsembleEvaluator</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1575,7 +1578,7 @@ single optimization run:</p>
                 <code>plugin_manager</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a></code>
+                  <code><a class="autorefs autorefs-internal" title="PluginManager (ropt.plugins.PluginManager)" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1591,7 +1594,7 @@ single optimization run:</p>
                 <code>signal_evaluation</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.optimization._optimizer.SignalEvaluationCallback" href="#ropt.optimization.SignalEvaluationCallback">SignalEvaluationCallback</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="SignalEvaluationCallback (ropt.optimization._optimizer.SignalEvaluationCallback)" href="#ropt.optimization.SignalEvaluationCallback">SignalEvaluationCallback</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1607,7 +1610,7 @@ single optimization run:</p>
                 <code>nested_optimizer</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.optimization._optimizer.NestedOptimizerCallback" href="#ropt.optimization.NestedOptimizerCallback">NestedOptimizerCallback</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="NestedOptimizerCallback (ropt.optimization._optimizer.NestedOptimizerCallback)" href="#ropt.optimization.NestedOptimizerCallback">NestedOptimizerCallback</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1620,6 +1623,7 @@ single optimization run:</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -1681,7 +1685,7 @@ single optimization run:</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.enums.OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a></code>
+                  <code><a class="autorefs autorefs-internal" title="OptimizerExitCode (ropt.enums.OptimizerExitCode)" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1691,6 +1695,7 @@ single optimization run:</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -1723,6 +1728,7 @@ single optimization run:</p>
         <p>Protocol for a callback signaling the occurrence of an evaluation.</p>
 <p>This callback is invoked whenever an evaluation occurs, enabling custom
 handling or tracking of evaluation events.</p>
+
 
 
 
@@ -1777,7 +1783,12 @@ output.</p>
                 <code>results</code>
             </td>
             <td>
-                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...] | None</code>
+                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.Results">Results</a>, ...] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1791,6 +1802,7 @@ output.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -1821,6 +1833,7 @@ output.</p>
 
 
         <p>Protocol for functions that start a nested optimization.</p>
+
 
 
 
@@ -1902,7 +1915,12 @@ aborted by the user.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.FunctionResults" href="../results/#ropt.results.FunctionResults">FunctionResults</a> | None, <span title="bool">bool</span>]</code>
+                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults">FunctionResults</a> | None, <span title="bool">bool</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1912,6 +1930,7 @@ aborted by the user.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 

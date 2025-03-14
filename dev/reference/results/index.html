@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.8">
     
     
       
@@ -1574,13 +1574,23 @@
 <p>The <code>Results</code> class is an abstract base class that is not intended to be
 instantiated by itself. Most data of interest will be stored in additional
 fields in one of the derived classes:
-<a class="autorefs autorefs-internal" href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> or
-<a class="autorefs autorefs-internal" href="#ropt.results.GradientResults"><code>GradientResults</code></a>. In addition to the
+<a class="autorefs autorefs-internal" title="ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> or
+<a class="autorefs autorefs-internal" title="ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="#ropt.results.GradientResults"><code>GradientResults</code></a>. In addition to the
 attributes containing the data, a few methods are provided to export the
 data. These functions will only be useful when used with one of the derived
 classes:</p>
 <ol>
-<li>The <a class="autorefs autorefs-internal" href="#ropt.results.Results.to_dataframe"><code>to_dataframe</code></a> method can be
+<li>The <a class="autorefs autorefs-internal" title="to_dataframe(field_name, select, unstack=None, names=None)" href="#ropt.results.Results.to_dataframe"><code>to_dataframe</code></a> method can be
    used to export the contents, or a sub-set, of a single field to a
    <a href="https://pandas.pydata.org/"><code>pandas</code></a> data frame.</li>
 </ol>
@@ -1629,6 +1639,7 @@ classes:</p>
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -1643,7 +1654,7 @@ classes:</p>
 
 
 <h4 id="ropt.results.Results.to_dataframe" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">to_dataframe</span><span class="p">(</span><span class="n">field_name</span><span class="p">,</span> <span class="n">select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">unstack</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">to_dataframe</span><span class="p">(</span><span class="n">field_name</span><span class="p">,</span> <span class="n">select</span><span class="p">,</span> <span class="n">unstack</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h4>
 
@@ -1705,7 +1716,7 @@ index of the resulting frame.</p>
                 <code>select</code>
             </td>
             <td>
-                  <code><span title="typing.Iterable">Iterable</span>[<span title="str">str</span>] | None</code>
+                  <code><span title="typing.Iterable">Iterable</span>[<span title="str">str</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1713,7 +1724,7 @@ index of the resulting frame.</p>
               </div>
             </td>
             <td>
-                  <code>None</code>
+                <em>required</em>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -1721,7 +1732,7 @@ index of the resulting frame.</p>
                 <code>unstack</code>
             </td>
             <td>
-                  <code><span title="typing.Iterable">Iterable</span>[<a class="autorefs autorefs-internal" title="ropt.enums.ResultAxis" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a>] | None</code>
+                  <code><span title="typing.Iterable">Iterable</span>[<a class="autorefs autorefs-internal" title="ResultAxis (ropt.enums.ResultAxis)" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1812,6 +1823,7 @@ index of the resulting frame.</p>
   <summary>Warning</summary>
   <p>This function is only available if <code>pandas</code> is installed.</p>
 </details>
+
     </div>
 
 </div>
@@ -1876,7 +1888,12 @@ index of the resulting frame.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.results._results.Results" href="#ropt.results.Results">Results</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.results.Results
+
+
+  
+      dataclass
+   (ropt.results._results.Results)" href="#ropt.results.Results">Results</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1886,6 +1903,7 @@ index of the resulting frame.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -1918,6 +1936,7 @@ index of the resulting frame.</p>
 
 
         <p>Base class for <code>Results</code> fields.</p>
+
 
 
 
@@ -2023,7 +2042,7 @@ array from the metadata and return them.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="ropt.enums.ResultAxis" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a>, ...]</code>
+                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="ResultAxis (ropt.enums.ResultAxis)" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2033,6 +2052,7 @@ array from the metadata and return them.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -2095,7 +2115,7 @@ indices.</p>
                 <code>axis</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.enums.ResultAxis" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="ResultAxis (ropt.enums.ResultAxis)" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2111,7 +2131,7 @@ indices.</p>
                 <code>names</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span>[<a class="autorefs autorefs-internal" title="ropt.enums.ResultAxis" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a>, <span title="tuple">tuple</span>[<span title="str">str</span>, ...]] | None</code>
+                  <code><span title="dict">dict</span>[<a class="autorefs autorefs-internal" title="ResultAxis (ropt.enums.ResultAxis)" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a>, <span title="tuple">tuple</span>[<span title="str">str</span>, ...]] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2148,6 +2168,7 @@ indices.</p>
       </tbody>
     </table>
 
+
     </div>
 
 </div>
@@ -2177,7 +2198,12 @@ indices.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.results._results.Results" href="#ropt.results.Results">Results</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.results.Results
+
+
+  
+      dataclass
+   (ropt.results._results.Results)" href="#ropt.results.Results">Results</a></code></p>
 
 
         <p>The <code>FunctionResults</code> class stores function related results.</p>
@@ -2204,7 +2230,12 @@ indices.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.results.FunctionResults.evaluations">evaluations</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.results._function_evaluations.FunctionEvaluations" href="#ropt.results.FunctionEvaluations">FunctionEvaluations</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.results.FunctionEvaluations
+
+
+  
+      dataclass
+   (ropt.results._function_evaluations.FunctionEvaluations)" href="#ropt.results.FunctionEvaluations">FunctionEvaluations</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2215,7 +2246,12 @@ indices.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.results.FunctionResults.realizations">realizations</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.results._realizations.Realizations" href="#ropt.results.Realizations">Realizations</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.results.Realizations
+
+
+  
+      dataclass
+   (ropt.results._realizations.Realizations)" href="#ropt.results.Realizations">Realizations</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2226,7 +2262,12 @@ indices.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.results.FunctionResults.functions">functions</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.results._functions.Functions" href="#ropt.results.Functions">Functions</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.results.Functions
+
+
+  
+      dataclass
+   (ropt.results._functions.Functions)" href="#ropt.results.Functions">Functions</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2247,6 +2288,7 @@ indices.</p>
           </tr>
       </tbody>
     </table>
+
 
 
 
@@ -2322,7 +2364,12 @@ indices.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.results._function_results.FunctionResults" href="#ropt.results.FunctionResults">FunctionResults</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.results.FunctionResults
+
+
+  
+      dataclass
+   (ropt.results._function_results.FunctionResults)" href="#ropt.results.FunctionResults">FunctionResults</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2332,6 +2379,7 @@ indices.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -2362,7 +2410,12 @@ indices.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.results._result_field.ResultField" href="#ropt.results.ResultField">ResultField</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.results.ResultField
+
+
+  
+      dataclass
+   (ropt.results._result_field.ResultField)" href="#ropt.results.ResultField">ResultField</a></code></p>
 
 
         <p>This class contains the results of evaluations for function calculation.</p>
@@ -2423,18 +2476,19 @@ functions. It contains the following information:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.results.FunctionEvaluations.evaluation_ids">evaluation_ids</span></code></td>
+            <td><code><span title="ropt.results.FunctionEvaluations.evaluation_info">evaluation_info</span></code></td>
             <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>] | None</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="typing.Any">Any</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional id of each evaluated realization.</p>
+                <p>Optional info for each evaluated realization.</p>
               </div>
             </td>
           </tr>
       </tbody>
     </table>
+
 
 
 
@@ -2479,7 +2533,12 @@ functions. It contains the following information:</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.results._result_field.ResultField" href="#ropt.results.ResultField">ResultField</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.results.ResultField
+
+
+  
+      dataclass
+   (ropt.results._result_field.ResultField)" href="#ropt.results.ResultField">ResultField</a></code></p>
 
 
         <p>This class stores information on the realizations.</p>
@@ -2546,6 +2605,7 @@ the function or constraint. The second axis index denotes the realization.</p>
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -2581,7 +2641,12 @@ the function or constraint. The second axis index denotes the realization.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.results._result_field.ResultField" href="#ropt.results.ResultField">ResultField</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.results.ResultField
+
+
+  
+      dataclass
+   (ropt.results._result_field.ResultField)" href="#ropt.results.ResultField">ResultField</a></code></p>
 
 
         <p>Store the calculated objective and constraint functions.</p>
@@ -2647,6 +2712,7 @@ optimizer.</p>
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -2682,7 +2748,12 @@ optimizer.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.results._results.Results" href="#ropt.results.Results">Results</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.results.Results
+
+
+  
+      dataclass
+   (ropt.results._results.Results)" href="#ropt.results.Results">Results</a></code></p>
 
 
         <p>The <code>GradientResults</code> class stores gradient related results.</p>
@@ -2708,7 +2779,12 @@ optimizer.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.results.GradientResults.evaluations">evaluations</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.results._gradient_evaluations.GradientEvaluations" href="#ropt.results.GradientEvaluations">GradientEvaluations</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.results.GradientEvaluations
+
+
+  
+      dataclass
+   (ropt.results._gradient_evaluations.GradientEvaluations)" href="#ropt.results.GradientEvaluations">GradientEvaluations</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2719,7 +2795,12 @@ optimizer.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.results.GradientResults.realizations">realizations</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.results._realizations.Realizations" href="#ropt.results.Realizations">Realizations</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.results.Realizations
+
+
+  
+      dataclass
+   (ropt.results._realizations.Realizations)" href="#ropt.results.Realizations">Realizations</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2730,7 +2811,12 @@ optimizer.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.results.GradientResults.gradients">gradients</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.results._gradients.Gradients" href="#ropt.results.Gradients">Gradients</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.results.Gradients
+
+
+  
+      dataclass
+   (ropt.results._gradients.Gradients)" href="#ropt.results.Gradients">Gradients</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2740,6 +2826,7 @@ optimizer.</p>
           </tr>
       </tbody>
     </table>
+
 
 
 
@@ -2815,7 +2902,12 @@ optimizer.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.results._gradient_results.GradientResults" href="#ropt.results.GradientResults">GradientResults</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ropt.results.GradientResults
+
+
+  
+      dataclass
+   (ropt.results._gradient_results.GradientResults)" href="#ropt.results.GradientResults">GradientResults</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2825,6 +2917,7 @@ optimizer.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -2855,7 +2948,12 @@ optimizer.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.results._result_field.ResultField" href="#ropt.results.ResultField">ResultField</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.results.ResultField
+
+
+  
+      dataclass
+   (ropt.results._result_field.ResultField)" href="#ropt.results.ResultField">ResultField</a></code></p>
 
 
         <p>This class contains the results of evaluations for gradient calculation.</p>
@@ -2872,8 +2970,8 @@ constraints gradients. It contains the following information:</p>
    constraint values arranged along the third axis. The second axis index
    indicates the perturbation number, whereas the first axis index
    represents the realization number.</li>
-<li>Optional evaluation IDs that may have been passed from the evaluator,
-   identifying each calculated realization and perturbation.</li>
+<li>Optional info for each evaluations that may have been passed from the
+   evaluator.</li>
 </ol>
 
 
@@ -2917,7 +3015,7 @@ constraints gradients. It contains the following information:</p>
             <td>
               <div class="doc-md-description">
                 <p>The objective functions for each realization and
-                      perturbation.</p>
+                   perturbation.</p>
               </div>
             </td>
           </tr>
@@ -2929,23 +3027,24 @@ constraints gradients. It contains the following information:</p>
             <td>
               <div class="doc-md-description">
                 <p>The constraint functions for each realization and
-                      perturbation.</p>
+                   perturbation.</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.results.GradientEvaluations.perturbed_evaluation_ids">perturbed_evaluation_ids</span></code></td>
+            <td><code><span title="ropt.results.GradientEvaluations.evaluation_info">evaluation_info</span></code></td>
             <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>] | None</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="typing.Any">Any</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional id of each evaluated realization.</p>
+                <p>Optional info for each evaluated realization.</p>
               </div>
             </td>
           </tr>
       </tbody>
     </table>
+
 
 
 
@@ -2990,7 +3089,12 @@ constraints gradients. It contains the following information:</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.results._result_field.ResultField" href="#ropt.results.ResultField">ResultField</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="ropt.results.ResultField
+
+
+  
+      dataclass
+   (ropt.results._result_field.ResultField)" href="#ropt.results.ResultField">ResultField</a></code></p>
 
 
         <p>This class stores the calculated objective and constraint gradients.</p>
@@ -3056,6 +3160,7 @@ handled by the optimizer.</p>
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -3089,20 +3194,54 @@ handled by the optimizer.</p>
         <p>Data classes for storing intermediate optimization results.</p>
 <p>During the optimization process, functions and gradients are calculated and need
 to be reported. To streamline this process, new results are passed to callbacks
-as a tuple of <a class="autorefs autorefs-internal" href="#ropt.results.Results"><code>Results</code></a> objects. These may be instances
-of the derived <a class="autorefs autorefs-internal" href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> or
-<a class="autorefs autorefs-internal" href="#ropt.results.GradientResults"><code>GradientResults</code></a> classes, which contain results
+as a tuple of <a class="autorefs autorefs-internal" title="ropt.results.Results
+
+
+  
+      dataclass
+  " href="#ropt.results.Results"><code>Results</code></a> objects. These may be instances
+of the derived <a class="autorefs autorefs-internal" title="ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> or
+<a class="autorefs autorefs-internal" title="ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="#ropt.results.GradientResults"><code>GradientResults</code></a> classes, which contain results
 for function and gradient evaluations, respectively.</p>
 <p>Much of the data stored in the result objects is multi-dimensional. For example,
 the <code>objectives</code> field, which is part of the nested
-<a class="autorefs autorefs-internal" href="#ropt.results.FunctionEvaluations"><code>evaluations</code></a> object in the
-<a class="autorefs autorefs-internal" href="#ropt.results.FunctionResults"><code>FunctionResults</code></a>, is a two-dimensional <code>numpy</code>
+<a class="autorefs autorefs-internal" title="ropt.results.FunctionEvaluations
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionEvaluations"><code>evaluations</code></a> object in the
+<a class="autorefs autorefs-internal" title="ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a>, is a two-dimensional <code>numpy</code>
 array. In this array, columns correspond to the objectives, and rows correspond
 to the realization numbers.</p>
 <p>To facilitate exporting and reporting results, the identity of the axes in such
 multi-dimensional arrays is stored in metadata associated with the corresponding
-field. These fields derive from the <a class="autorefs autorefs-internal" href="#ropt.results.ResultField"><code>ResultField</code></a>
-class, which includes a <a class="autorefs autorefs-internal" href="#ropt.results.ResultField.get_axes"><code>get_axes</code></a> class
+field. These fields derive from the <a class="autorefs autorefs-internal" title="ropt.results.ResultField
+
+
+  
+      dataclass
+  " href="#ropt.results.ResultField"><code>ResultField</code></a>
+class, which includes a <a class="autorefs autorefs-internal" title="get_axes(name)
+
+  
+      classmethod
+  " href="#ropt.results.ResultField.get_axes"><code>get_axes</code></a> class
 method to retrieve the axes. For example, for the <code>objectives</code> field, this
 method retrieves the axes:</p>
 <div class="language-py highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">ropt.results</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionEvaluations</span>
@@ -3115,6 +3254,7 @@ result matrix. For instance, the <a href="https://pandas.pydata.org/"><code>pand
 exporting code will utilize this information to construct a multi-index for the
 generated DataFrame and may also unstack such multi-dimensional data into
 multiple columns.</p>
+
 
 
 
@@ -3149,8 +3289,18 @@ multiple columns.</p>
 that produce results.</p>
 <p>The set of fields used is determined by the <code>fields</code> argument passed when
 initializing the object. These can be any of the fields defined in a
-<a class="autorefs autorefs-internal" href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> or a
-<a class="autorefs autorefs-internal" href="#ropt.results.GradientResults"><code>GradientResults</code></a>. Most of the fields in
+<a class="autorefs autorefs-internal" title="ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> or a
+<a class="autorefs autorefs-internal" title="ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="#ropt.results.GradientResults"><code>GradientResults</code></a>. Most of the fields in
 these objects are nested, and the fields to export must be specified
 specifically in the form <code>field.subfield</code>. For instance, to specify the
 <code>variables</code> field of the <code>evaluations</code> field from a function result, the
@@ -3186,7 +3336,12 @@ frame. If not provided, numerical indices are used.</p>
                 <code>results</code>
             </td>
             <td>
-                  <code><span title="typing.Sequence">Sequence</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="#ropt.results.Results">Results</a>]</code>
+                  <code><span title="typing.Sequence">Sequence</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results
+
+
+  
+      dataclass
+  " href="#ropt.results.Results">Results</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3270,6 +3425,7 @@ frame. If not provided, numerical indices are used.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 

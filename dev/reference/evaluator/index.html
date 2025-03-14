@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.8">
     
     
       
@@ -1404,6 +1404,7 @@
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -1433,6 +1434,7 @@ ensemble of functions, based on the settings defined in an
 <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> configuration object. It uses
 an <a class="autorefs autorefs-internal" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a> callable to evaluate the individual
 functions.</p>
+
 
 
 
@@ -1482,7 +1484,7 @@ functions.</p>
                 <code>config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1514,7 +1516,7 @@ functions.</p>
                 <code>evaluator</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.evaluator.Evaluator" href="#ropt.evaluator.Evaluator">Evaluator</a></code>
+                  <code><a class="autorefs autorefs-internal" title="Evaluator (ropt.evaluator.Evaluator)" href="#ropt.evaluator.Evaluator">Evaluator</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1530,7 +1532,7 @@ functions.</p>
                 <code>plugin_manager</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a></code>
+                  <code><a class="autorefs autorefs-internal" title="PluginManager (ropt.plugins.PluginManager)" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1543,6 +1545,7 @@ functions.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -1640,7 +1643,12 @@ results are returned: functions, gradients, or both.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results" href="../results/#ropt.results.Results">Results</a>, ...]</code>
+                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.Results">Results</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1650,6 +1658,7 @@ results are returned: functions, gradients, or both.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -1693,6 +1702,7 @@ results are returned: functions, gradients, or both.</p>
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -1723,9 +1733,20 @@ results are returned: functions, gradients, or both.</p>
 requires a function evaluator callback that conforms to the
 <a class="autorefs autorefs-internal" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a> signature. This callback accepts
 one or more variable vectors to evaluate, along with an
-<a class="autorefs autorefs-internal" href="#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a> object that provides
+<a class="autorefs autorefs-internal" title="EvaluatorContext
+
+
+  
+      dataclass
+  " href="#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a> object that provides
 relevant information for the evaluation. It returns an
-<a class="autorefs autorefs-internal" href="#ropt.evaluator.EvaluatorResult"><code>EvaluatorResult</code></a> object containing the results.</p>
+<a class="autorefs autorefs-internal" title="EvaluatorResult
+
+
+  
+      dataclass
+  " href="#ropt.evaluator.EvaluatorResult"><code>EvaluatorResult</code></a> object containing the results.</p>
+
 
 
 
@@ -1761,9 +1782,19 @@ relevant information for the evaluation. It returns an
 variable vector. Depending on the information passed by the second argument, all
 objective and constraint functions for all vectors or for a subset are to be
 calculated.</p>
-<p>The second argument is an <a class="autorefs autorefs-internal" href="#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a>
+<p>The second argument is an <a class="autorefs autorefs-internal" title="EvaluatorContext
+
+
+  
+      dataclass
+  " href="#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a>
 object that provides supplementary information to the evaluation function.</p>
-<p>The return value should be an <a class="autorefs autorefs-internal" href="#ropt.evaluator.EvaluatorResult"><code>EvaluatorResult</code></a>
+<p>The return value should be an <a class="autorefs autorefs-internal" title="EvaluatorResult
+
+
+  
+      dataclass
+  " href="#ropt.evaluator.EvaluatorResult"><code>EvaluatorResult</code></a>
 object containing the calculated values of the objective and constraint functions for
 all variable vectors and realizations, along with any additional metadata.</p>
 
@@ -1800,7 +1831,12 @@ all variable vectors and realizations, along with any additional metadata.</p>
                 <code>context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.evaluator._evaluator.EvaluatorContext" href="#ropt.evaluator.EvaluatorContext">EvaluatorContext</a></code>
+                  <code><a class="autorefs autorefs-internal" title="EvaluatorContext
+
+
+  
+      dataclass
+   (ropt.evaluator._evaluator.EvaluatorContext)" href="#ropt.evaluator.EvaluatorContext">EvaluatorContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1826,7 +1862,12 @@ all variable vectors and realizations, along with any additional metadata.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.evaluator._evaluator.EvaluatorResult" href="#ropt.evaluator.EvaluatorResult">EvaluatorResult</a></code>
+                  <code><a class="autorefs autorefs-internal" title="EvaluatorResult
+
+
+  
+      dataclass
+   (ropt.evaluator._evaluator.EvaluatorResult)" href="#ropt.evaluator.EvaluatorResult">EvaluatorResult</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1851,6 +1892,7 @@ realizations. To prevent redundant calculations, the evaluator should
 compute the results of the realizations once and return them for both
 objectives.</p>
 </details>
+
     </div>
 
 </div>
@@ -1921,7 +1963,7 @@ indicating the realizations requiring evaluation.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.evaluator.EvaluatorContext.config">config</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1997,6 +2039,7 @@ indicating the realizations requiring evaluation.</p>
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -2044,10 +2087,10 @@ corresponding entries should contain zeros. Entries may also contain
 <p>Optionally, a batch ID can be returned to identify the batch of
 calculations. This can be useful for tracking or managing evaluations
 performed together.</p>
-<p>Additionally, evaluation IDs are provided as an option. These IDs can be
-used to uniquely identify the results calculated for each variable vector,
-offering a way to link specific evaluations back to their corresponding
-input vectors.</p>
+<p>Optionally, additional information be stored on each evaluation. For
+instance, this can be used to uniquely identify the results calculated for
+each variable vector, offering a way to link specific evaluations back to
+their corresponding input vectors.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2094,18 +2137,19 @@ input vectors.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.evaluator.EvaluatorResult.evaluation_ids">evaluation_ids</span></code></td>
+            <td><code><span title="ropt.evaluator.EvaluatorResult.evaluation_info">evaluation_info</span></code></td>
             <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>] | None</code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="numpy.typing.NDArray">NDArray</span>[<span title="typing.Any">Any</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional ID for each evaluation.</p>
+                <p>Optional info for each evaluation.</p>
               </div>
             </td>
           </tr>
       </tbody>
     </table>
+
 
 
 

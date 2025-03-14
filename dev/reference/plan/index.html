@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.8">
     
     
       
@@ -1641,10 +1641,10 @@
 individual actions, as well as
 <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler"><code>ResultHandler</code></a> objects that process and
 store data generated during execution. Both steps and result handlers are
-implemented through a <a class="autorefs autorefs-internal" href="../plan_plugins/#ropt.plugins.plan"><code>plugin</code></a> mechanism, making it easy to
+implemented through a <a class="autorefs autorefs-internal" title="ropt.plugins.plan" href="../plan_plugins/#ropt.plugins.plan"><code>plugin</code></a> mechanism, making it easy to
 extend the range of supported steps and result handlers. The <code>ropt</code> library also
-includes <a class="autorefs autorefs-internal" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanHandlerPlugin">default plan handler</a> and
-<a class="autorefs autorefs-internal" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanStepPlugin">default plan step</a></p>
+includes <a class="autorefs autorefs-internal" title="ropt.plugins.plan.default.DefaultPlanHandlerPlugin" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanHandlerPlugin">default plan handler</a> and
+<a class="autorefs autorefs-internal" title="ropt.plugins.plan.default.DefaultPlanStepPlugin" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanStepPlugin">default plan step</a></p>
 <p>that provides various steps and result handlers to support a broad range of
 optimization workflows.</p>
 <p>Most optimization plans require shared state across all steps, such as a
@@ -1652,9 +1652,10 @@ callable for function evaluations or a random number generator. This shared
 state is provided through an <a class="autorefs autorefs-internal" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a>
 object, which is supplied when creating the plan.</p>
 <p>Setting up and executing a plan object for simple optimization cases can be
-complex. The <a class="autorefs autorefs-internal" href="../plan_runner/#ropt.plan.BasicOptimizer"><code>BasicOptimizer</code></a> class simplifies this
+complex. The <a class="autorefs autorefs-internal" title="ropt.plan.BasicOptimizer" href="../plan_runner/#ropt.plan.BasicOptimizer"><code>BasicOptimizer</code></a> class simplifies this
 process by providing a convenient way to build and execute straightforward plans
 involving a single optimization.</p>
+
 
 
 
@@ -1687,6 +1688,7 @@ involving a single optimization.</p>
 
 
         <p>The plan class for executing optimization workflows.</p>
+
 
 
 
@@ -1744,6 +1746,7 @@ involving a single optimization.</p>
           </tr>
       </tbody>
     </table>
+
     </div>
 
 </div>
@@ -1780,7 +1783,7 @@ state and functionality for executing the optimization plan.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plan._context.OptimizerContext" href="#ropt.plan.OptimizerContext">OptimizerContext</a></code>
+                  <code><a class="autorefs autorefs-internal" title="OptimizerContext (ropt.plan._context.OptimizerContext)" href="#ropt.plan.OptimizerContext">OptimizerContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1790,6 +1793,7 @@ state and functionality for executing the optimization plan.</p>
           </tr>
       </tbody>
     </table>
+
     </div>
 
 </div>
@@ -1810,7 +1814,7 @@ state and functionality for executing the optimization plan.</p>
         <p>Initialize a plan object.</p>
 <p>This method initializes a plan using
 an <a class="autorefs autorefs-internal" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a> object. An optional
-<a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>plugin_manager</code></a> argument allows for the
+<a class="autorefs autorefs-internal" title="PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>plugin_manager</code></a> argument allows for the
 specification of custom plugins for result handlers and step objects
 within the plan. If omitted, only plugins installed through Python's
 standard entry points are used.</p>
@@ -1832,7 +1836,7 @@ standard entry points are used.</p>
                 <code>optimizer_context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plan._context.OptimizerContext" href="#ropt.plan.OptimizerContext">OptimizerContext</a></code>
+                  <code><a class="autorefs autorefs-internal" title="OptimizerContext (ropt.plan._context.OptimizerContext)" href="#ropt.plan.OptimizerContext">OptimizerContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1849,7 +1853,7 @@ standard entry points are used.</p>
                 <code>parent</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plan._plan.Plan" href="#ropt.plan.Plan">Plan</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="Plan (ropt.plan._plan.Plan)" href="#ropt.plan.Plan">Plan</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1862,6 +1866,7 @@ standard entry points are used.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -1939,7 +1944,7 @@ standard entry points are used.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.ResultHandler" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler">ResultHandler</a></code>
+                  <code><a class="autorefs autorefs-internal" title="ResultHandler (ropt.plugins.plan.base.ResultHandler)" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler">ResultHandler</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1949,6 +1954,7 @@ standard entry points are used.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -2021,6 +2027,7 @@ standard entry points are used.</p>
       </tbody>
     </table>
 
+
     </div>
 
 </div>
@@ -2037,6 +2044,7 @@ standard entry points are used.</p>
     <div class="doc doc-contents ">
 
         <p>Clear all handlers from the plan.</p>
+
 
     </div>
 
@@ -2114,7 +2122,7 @@ standard entry points are used.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code>
+                  <code><a class="autorefs autorefs-internal" title="PlanStep (ropt.plugins.plan.base.PlanStep)" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2124,6 +2132,7 @@ standard entry points are used.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -2196,6 +2205,7 @@ standard entry points are used.</p>
       </tbody>
     </table>
 
+
     </div>
 
 </div>
@@ -2246,6 +2256,7 @@ generally used to execute one or more steps in the plan.</p>
       </tbody>
     </table>
 
+
     </div>
 
 </div>
@@ -2280,7 +2291,7 @@ generally used to execute one or more steps in the plan.</p>
                 <code>step</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code>
+                  <code><a class="autorefs autorefs-internal" title="PlanStep (ropt.plugins.plan.base.PlanStep)" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2322,7 +2333,7 @@ generally used to execute one or more steps in the plan.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.exceptions.PlanAborted" href="../exceptions/#ropt.exceptions.PlanAborted">PlanAborted</a></code>
+                  <code><a class="autorefs autorefs-internal" title="PlanAborted (ropt.exceptions.PlanAborted)" href="../exceptions/#ropt.exceptions.PlanAborted">PlanAborted</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2332,6 +2343,7 @@ generally used to execute one or more steps in the plan.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -2420,6 +2432,7 @@ generally used to execute one or more steps in the plan.</p>
       </tbody>
     </table>
 
+
     </div>
 
 </div>
@@ -2440,6 +2453,7 @@ generally used to execute one or more steps in the plan.</p>
 from being executed. This can be used to stop the plan from continuing
 if a step fails or if the user decides to stop the optimization.</p>
 <p>The <code>aborted</code> method can be used to check if the plan was aborted.</p>
+
 
     </div>
 
@@ -2483,7 +2497,12 @@ if a step fails or if the user decides to stop the optimization.</p>
                 <code>event</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Event" href="#ropt.plan.Event">Event</a></code>
+                  <code><a class="autorefs autorefs-internal" title="Event
+
+
+  
+      dataclass
+   (ropt.plan.Event)" href="#ropt.plan.Event">Event</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2496,6 +2515,7 @@ if a step fails or if the user decides to stop the optimization.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -2570,6 +2590,7 @@ the value associated with a specific plan variable.</p>
       </tbody>
     </table>
 
+
     </div>
 
 </div>
@@ -2635,6 +2656,7 @@ value of a specific plan variable.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -2709,6 +2731,7 @@ if a plan variable exists.</p>
       </tbody>
     </table>
 
+
     </div>
 
 </div>
@@ -2746,6 +2769,7 @@ all steps in an optimization plan. This currently includes the following:</p>
   executed after the plan has processed them.</li>
 <li>An iterator producing unique evaluation ID's.</li>
 </ul>
+
 
 
 
@@ -2798,7 +2822,7 @@ evaluator for processing plan-specific expressions.</p>
                 <code>evaluator</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.evaluator.Evaluator" href="../evaluator/#ropt.evaluator.Evaluator">Evaluator</a></code>
+                  <code><a class="autorefs autorefs-internal" title="Evaluator (ropt.evaluator.Evaluator)" href="../evaluator/#ropt.evaluator.Evaluator">Evaluator</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2814,7 +2838,7 @@ evaluator for processing plan-specific expressions.</p>
                 <code>plugin_manager</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plugins.PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="PluginManager (ropt.plugins.PluginManager)" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2827,6 +2851,7 @@ evaluator for processing plan-specific expressions.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -2846,7 +2871,12 @@ evaluator for processing plan-specific expressions.</p>
         <p>Add an observer function.</p>
 <p>Observer functions are called during optimization when an event of the
 specified type occurs. The provided callable must accept a single
-argument of the <a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> class, which contains
+argument of the <a class="autorefs autorefs-internal" title="Event
+
+
+  
+      dataclass
+  " href="#ropt.plan.Event"><code>Event</code></a> class, which contains
 information about the occurred event.</p>
 
 
@@ -2872,7 +2902,7 @@ executed, which may potentially modify the event.</p>
                 <code>event</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
+                  <code><a class="autorefs autorefs-internal" title="EventType (ropt.enums.EventType)" href="../enums/#ropt.enums.EventType">EventType</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2888,13 +2918,23 @@ executed, which may potentially modify the event.</p>
                 <code>callback</code>
             </td>
             <td>
-                  <code><span title="typing.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="ropt.plan.Event" href="#ropt.plan.Event">Event</a>], None]</code>
+                  <code><span title="typing.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="Event
+
+
+  
+      dataclass
+   (ropt.plan.Event)" href="#ropt.plan.Event">Event</a>], None]</code>
             </td>
             <td>
               <div class="doc-md-description">
                 <p>The function to call when the specified event is received.
       This function should accept one argument, which will be
-      an instance of the <a class="autorefs autorefs-internal" href="#ropt.plan.Event"><code>Event</code></a> class.</p>
+      an instance of the <a class="autorefs autorefs-internal" title="Event
+
+
+  
+      dataclass
+  " href="#ropt.plan.Event"><code>Event</code></a> class.</p>
               </div>
             </td>
             <td>
@@ -2926,6 +2966,7 @@ executed, which may potentially modify the event.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -2963,7 +3004,12 @@ type of event passed as an argument.</p>
                 <code>event</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Event" href="#ropt.plan.Event">Event</a></code>
+                  <code><a class="autorefs autorefs-internal" title="Event
+
+
+  
+      dataclass
+   (ropt.plan.Event)" href="#ropt.plan.Event">Event</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2976,6 +3022,7 @@ type of event passed as an argument.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -3029,7 +3076,7 @@ enumeration for more details.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plan.Event.event_type">event_type</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.enums.EventType" href="../enums/#ropt.enums.EventType">EventType</a></code>
+                  <code><a class="autorefs autorefs-internal" title="EventType (ropt.enums.EventType)" href="../enums/#ropt.enums.EventType">EventType</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3061,6 +3108,7 @@ enumeration for more details.</p>
           </tr>
       </tbody>
     </table>
+
 
 
 

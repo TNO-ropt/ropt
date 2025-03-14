@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.8">
     
     
       
@@ -1354,9 +1354,10 @@ implement one or more sampling methods to produce perturbations. These objects
 must adhere to the <a class="autorefs autorefs-internal" href="#ropt.plugins.sampler.base.Sampler"><code>Sampler</code></a> abstract base
 class.</p>
 <p>Samplers can be added via the plugin manager, by default the
-<a class="autorefs autorefs-internal" href="../scipy_sampler_plugin/#ropt.plugins.sampler.scipy.SciPySampler"><code>SciPySampler</code></a> plugin is installed
+<a class="autorefs autorefs-internal" title="ropt.plugins.sampler.scipy.SciPySampler" href="../scipy_sampler_plugin/#ropt.plugins.sampler.scipy.SciPySampler"><code>SciPySampler</code></a> plugin is installed
 which provides a number of methods from the
 <a href="https://docs.scipy.org/doc/scipy/reference/stats.html"><code>scipy.stats</code></a> package.</p>
+
 
 
 
@@ -1408,6 +1409,7 @@ installed as a plugin.</p>
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -1448,6 +1450,7 @@ method used to generate samples used to create perturbed values.</p>
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -1475,7 +1478,7 @@ method used to generate samples used to create perturbed values.</p>
 
         <p>Initialize the sampler object.</p>
 <p>The <code>samplers</code> field in the
-<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>enopt_config</code></a> configuration used by
+<a class="autorefs autorefs-internal" title="EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>enopt_config</code></a> configuration used by
 the optimization is a tuple of sampler configurations (see
 <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.SamplerConfig"><code>SamplerConfig</code></a>). The <code>sampler_index</code>
 field is used to identify the configuration to use to initialize this
@@ -1500,7 +1503,7 @@ sampler.</p>
                 <code>enopt_config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1562,6 +1565,7 @@ sampler.</p>
       </tbody>
     </table>
 
+
     </div>
 
 </div>
@@ -1600,7 +1604,7 @@ be set, while other values should be zero.</p>
   <summary>Sample scaling</summary>
   <p>Samples will be multiplied by the values given by the
 <code>perturbation_magnitudes</code> field in the
-<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.GradientConfig"><code>gradients</code></a> section of the
+<a class="autorefs autorefs-internal" title="GradientConfig" href="../enopt_config/#ropt.config.enopt.GradientConfig"><code>gradients</code></a> section of the
 optimizer configuration. It makes therefore sense to generate
 samples that have an order of magnitude around one. For instance, by
 generating them on a <code>[-1, 1]</code> range, or with a unit standard
@@ -1629,6 +1633,7 @@ deviation.</p>
       </tbody>
     </table>
 
+
     </div>
 
 </div>
@@ -1654,10 +1659,11 @@ deviation.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.base.Plugin" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="Plugin (ropt.plugins.base.Plugin)" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
 
 
         <p>Abtract base class for sampler plugins.</p>
+
 
 
 
@@ -1711,7 +1717,7 @@ deviation.</p>
                 <code>enopt_config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1772,6 +1778,7 @@ deviation.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 

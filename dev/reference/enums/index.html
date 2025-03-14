@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.8">
     
     
       
@@ -1872,6 +1872,7 @@
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -1899,9 +1900,10 @@
 
         <p>Enumerates the variable types.</p>
 <p>The variable types are configured in the
-<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.VariablesConfig"><code>variables</code></a> section of the optimizer
+<a class="autorefs autorefs-internal" title="VariablesConfig" href="../enopt_config/#ropt.config.enopt.VariablesConfig"><code>variables</code></a> section of the optimizer
 configuration. The optimization backends may make us of this information to
 modify their behavior accordingly.</p>
+
 
 
 
@@ -1937,6 +1939,7 @@ modify their behavior accordingly.</p>
     <div class="doc doc-contents ">
 
         <p>Continuous variables represented by real values.</p>
+
     </div>
 
 </div>
@@ -1959,6 +1962,7 @@ modify their behavior accordingly.</p>
     <div class="doc doc-contents ">
 
         <p>Discrete variables represented by integer values.</p>
+
     </div>
 
 </div>
@@ -2001,6 +2005,7 @@ This enumeration lists the ways these values can be modified to fix this.</p>
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -2027,6 +2032,7 @@ This enumeration lists the ways these values can be modified to fix this.</p>
     <div class="doc doc-contents ">
 
         <p>Do not modify the value.</p>
+
     </div>
 
 </div>
@@ -2056,6 +2062,7 @@ This enumeration lists the ways these values can be modified to fix this.</p>
     v_i &amp; \text{otherwise}
 \end{cases}
 \]</div>
+
     </div>
 
 </div>
@@ -2085,6 +2092,7 @@ This enumeration lists the ways these values can be modified to fix this.</p>
     v_i        &amp; \text{otherwise}
 \end{cases}
 \]</div>
+
     </div>
 
 </div>
@@ -2129,6 +2137,7 @@ be modified before being added to the unperturbed variable.</p>
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -2155,6 +2164,7 @@ be modified before being added to the unperturbed variable.</p>
     <div class="doc doc-contents ">
 
         <p>Use the perturbation value as is.</p>
+
     </div>
 
 </div>
@@ -2180,6 +2190,7 @@ be modified before being added to the unperturbed variable.</p>
 of the variables <span class="arithmatex">\(c_i\)</span>: <span class="arithmatex">\(\hat{p}_i = (c_{i,\text{max}} - c_{i,\text{min}})
 \times p_i\)</span>. The bounds will generally be defined in the configuration for
 the variables (see <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.VariablesConfig"><code>VariablesConfig</code></a>).</p>
+
     </div>
 
 </div>
@@ -2213,12 +2224,18 @@ the variables (see <a class="autorefs autorefs-internal" href="../enopt_config/#
         <p>Enumerates the events handled by the event broker.</p>
 <p>During the execution of the optimization plan, events may be emitted and
 callbacks can be connected to these events . When triggered by an event, the
-callbacks receive an <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Event"><code>Event</code></a> object. This object
+callbacks receive an <a class="autorefs autorefs-internal" title="Event
+
+
+  
+      dataclass
+  " href="../plan/#ropt.plan.Event"><code>Event</code></a> object. This object
 contains at least the type of the event (a value of this enumeration) and
 the current configuration of the step that is executing. If the step has a
 name it is also added to the event. Additionally, depending on the event
 type, a tuple of result objects, an exit code  may be present. Refer to the
 documentation of the individual event types for details.</p>
+
 
 
 
@@ -2254,6 +2271,7 @@ documentation of the individual event types for details.</p>
     <div class="doc doc-contents ">
 
         <p>Emitted before evaluating new functions.</p>
+
     </div>
 
 </div>
@@ -2277,6 +2295,7 @@ documentation of the individual event types for details.</p>
 
         <p>Emitted after finishing the evaluation.</p>
 <p>Results may be passed to callback reacting to this event.</p>
+
     </div>
 
 </div>
@@ -2299,6 +2318,7 @@ documentation of the individual event types for details.</p>
     <div class="doc doc-contents ">
 
         <p>Emitted just before starting an optimizer step.</p>
+
     </div>
 
 </div>
@@ -2322,6 +2342,7 @@ documentation of the individual event types for details.</p>
 
         <p>Emitted immediately after an optimizer step finishes.</p>
 <p>Results and an exit code may be passed via the event object.</p>
+
     </div>
 
 </div>
@@ -2344,6 +2365,7 @@ documentation of the individual event types for details.</p>
     <div class="doc doc-contents ">
 
         <p>Emitted just before starting an evaluation step.</p>
+
     </div>
 
 </div>
@@ -2367,6 +2389,7 @@ documentation of the individual event types for details.</p>
 
         <p>Emitted immediately after an evaluation step finishes.</p>
 <p>Results and an exit code may be passed via the event object.</p>
+
     </div>
 
 </div>
@@ -2407,6 +2430,7 @@ documentation of the individual event types for details.</p>
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -2433,6 +2457,7 @@ documentation of the individual event types for details.</p>
     <div class="doc doc-contents ">
 
         <p>Unknown cause of termination.</p>
+
     </div>
 
 </div>
@@ -2455,6 +2480,7 @@ documentation of the individual event types for details.</p>
     <div class="doc doc-contents ">
 
         <p>Returned when too few realizations are evaluated successfully.</p>
+
     </div>
 
 </div>
@@ -2477,6 +2503,7 @@ documentation of the individual event types for details.</p>
     <div class="doc doc-contents ">
 
         <p>Returned when the maximum number of function evaluations is reached.</p>
+
     </div>
 
 </div>
@@ -2499,6 +2526,7 @@ documentation of the individual event types for details.</p>
     <div class="doc doc-contents ">
 
         <p>Returned when a nested optimization fails to find an optimal value.</p>
+
     </div>
 
 </div>
@@ -2521,6 +2549,7 @@ documentation of the individual event types for details.</p>
     <div class="doc doc-contents ">
 
         <p>Returned when the optimization is aborted by the user.</p>
+
     </div>
 
 </div>
@@ -2543,6 +2572,7 @@ documentation of the individual event types for details.</p>
     <div class="doc doc-contents ">
 
         <p>Returned when an optimization step terminates normally.</p>
+
     </div>
 
 </div>
@@ -2565,6 +2595,7 @@ documentation of the individual event types for details.</p>
     <div class="doc doc-contents ">
 
         <p>Returned when an evaluation step terminates normally.</p>
+
     </div>
 
 </div>
@@ -2596,15 +2627,25 @@ documentation of the individual event types for details.</p>
 
 
         <p>Enumerates the possible axes in a Results data object.</p>
-<p>Result objects (see <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a>) contain
+<p>Result objects (see <a class="autorefs autorefs-internal" title="ropt.results.Results
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.Results"><code>Results</code></a>) contain
 multidimensional arrays where the axes represent particular quantities, for
 instance variables, function objects, or realization numbers. The result
 objects contain metadata that identify the axes by values of this
 enumeration. These can be retrieved by the
-<a class="autorefs autorefs-internal" href="../results/#ropt.results.ResultField.get_axes"><code>get_axes</code></a> method of the
+<a class="autorefs autorefs-internal" title="get_axes(name)
+
+  
+      classmethod
+  " href="../results/#ropt.results.ResultField.get_axes"><code>get_axes</code></a> method of the
 attributes of a results object. They are used internally when exporting data
 to determine the type of the array axes, for instance to retrieve the names
 of the variables from the configuration.</p>
+
 
 
 
@@ -2640,6 +2681,7 @@ of the variables from the configuration.</p>
     <div class="doc doc-contents ">
 
         <p>The axis index corresponds to the index of the variable.</p>
+
     </div>
 
 </div>
@@ -2662,6 +2704,7 @@ of the variables from the configuration.</p>
     <div class="doc doc-contents ">
 
         <p>The axis index corresponds to the index of the objective function.</p>
+
     </div>
 
 </div>
@@ -2684,6 +2727,7 @@ of the variables from the configuration.</p>
     <div class="doc doc-contents ">
 
         <p>The axis index corresponds to the index of the linear constraint.</p>
+
     </div>
 
 </div>
@@ -2706,6 +2750,7 @@ of the variables from the configuration.</p>
     <div class="doc doc-contents ">
 
         <p>The axis index corresponds to the index of the constraint function.</p>
+
     </div>
 
 </div>
@@ -2728,6 +2773,7 @@ of the variables from the configuration.</p>
     <div class="doc doc-contents ">
 
         <p>The axis index corresponds to the index of the realization.</p>
+
     </div>
 
 </div>
@@ -2750,6 +2796,7 @@ of the variables from the configuration.</p>
     <div class="doc doc-contents ">
 
         <p>The axis index corresponds to the index of the perturbation.</p>
+
     </div>
 
 </div>

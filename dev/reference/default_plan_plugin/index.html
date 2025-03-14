@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.8">
     
     
       
@@ -1456,7 +1456,7 @@
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.PlanStepPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanStepPlugin">PlanStepPlugin</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="PlanStepPlugin (ropt.plugins.plan.base.PlanStepPlugin)" href="../plan_plugins/#ropt.plugins.plan.base.PlanStepPlugin">PlanStepPlugin</a></code></p>
 
 
         <p>The default plan plugin class.</p>
@@ -1466,16 +1466,17 @@
 <dd>
 <ul>
 <li>A step that performs a single ensemble evaluation
-(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep"><code>evaluator</code></a>).</li>
+(<a class="autorefs autorefs-internal" title="ropt.plugins.plan.evaluator.DefaultEvaluatorStep" href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep"><code>evaluator</code></a>).</li>
 </ul>
 </dd>
 <dd>
 <ul>
 <li>A step that runs an optimization
-(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep"><code>optimizer</code></a>).</li>
+(<a class="autorefs autorefs-internal" title="ropt.plugins.plan.optimizer.DefaultOptimizerStep" href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep"><code>optimizer</code></a>).</li>
 </ul>
 </dd>
 </dl>
+
 
 
 
@@ -1516,7 +1517,7 @@
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.PlanHandlerPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandlerPlugin">PlanHandlerPlugin</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="PlanHandlerPlugin (ropt.plugins.plan.base.PlanHandlerPlugin)" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandlerPlugin">PlanHandlerPlugin</a></code></p>
 
 
         <p>The default plan plugin class.</p>
@@ -1526,10 +1527,11 @@
 <dd>
 <ul>
 <li>A handler that tracks optimal results
-(<a class="autorefs autorefs-internal" href="#ropt.plugins.plan._tracker.DefaultTrackerHandler"><code>tracker</code></a>).</li>
+(<a class="autorefs autorefs-internal" title="ropt.plugins.plan._tracker.DefaultTrackerHandler" href="#ropt.plugins.plan._tracker.DefaultTrackerHandler"><code>tracker</code></a>).</li>
 </ul>
 </dd>
 </dl>
+
 
 
 
@@ -1570,20 +1572,36 @@
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="PlanStep (ropt.plugins.plan.base.PlanStep)" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code></p>
 
 
         <p>The default evaluator step.</p>
 <p>This step performs a single ensemble evaluation, yielding one or more
-<a class="autorefs autorefs-internal" href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> objects. The evaluation
+<a class="autorefs autorefs-internal" title="ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> objects. The evaluation
 can process multiple variable vectors, each of which is evaluated
 separately, producing an individual results object for each vector.</p>
 <p>Before executing the evaluator step, a
-<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType.START_EVALUATOR_STEP"><code>START_EVALUATOR_STEP</code></a> event is
+<a class="autorefs autorefs-internal" title="START_EVALUATOR_STEP = 5
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.START_EVALUATOR_STEP"><code>START_EVALUATOR_STEP</code></a> event is
 emitted. After the evaluator step finishes, an
-<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType.FINISHED_EVALUATOR_STEP"><code>FINISHED_EVALUATOR_STEP</code></a>
+<a class="autorefs autorefs-internal" title="FINISHED_EVALUATOR_STEP = 6
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATOR_STEP"><code>FINISHED_EVALUATOR_STEP</code></a>
 event is emitted. Result handlers should respond to the latter event to
 process the generated results.</p>
+
 
 
 
@@ -1635,7 +1653,7 @@ which can assist result handlers in filtering relevant results.</p>
                 <code>plan</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Plan" href="../plan/#ropt.plan.Plan">Plan</a></code>
+                  <code><a class="autorefs autorefs-internal" title="Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1665,6 +1683,7 @@ which can assist result handlers in filtering relevant results.</p>
       </tbody>
     </table>
 
+
     </div>
 
 </div>
@@ -1682,7 +1701,7 @@ which can assist result handlers in filtering relevant results.</p>
 
         <p>Run the evaluator step.</p>
 <p>The
-<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep"><code>DefaultEvaluatorStep</code></a>
+<a class="autorefs autorefs-internal" title="ropt.plugins.plan.evaluator.DefaultEvaluatorStep" href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep"><code>DefaultEvaluatorStep</code></a>
 requires an optimizer configuration; the <code>variables</code> parameter is
 optional. The configuration  object must be an
 <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object, or a dictionary
@@ -1771,6 +1790,7 @@ of values to be evaluated.</p>
       </tbody>
     </table>
 
+
     </div>
 
 </div>
@@ -1805,7 +1825,12 @@ of values to be evaluated.</p>
                 <code>event</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Event" href="../plan/#ropt.plan.Event">Event</a></code>
+                  <code><a class="autorefs autorefs-internal" title="Event
+
+
+  
+      dataclass
+   (ropt.plan.Event)" href="../plan/#ropt.plan.Event">Event</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1818,6 +1843,7 @@ of values to be evaluated.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -1844,34 +1870,70 @@ of values to be evaluated.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="PlanStep (ropt.plugins.plan.base.PlanStep)" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code></p>
 
 
         <p>The default optimizer step.</p>
 <p>The optimizer step performs an optimization, yielding a sequence of
-<a class="autorefs autorefs-internal" href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> and
-<a class="autorefs autorefs-internal" href="../results/#ropt.results.GradientResults"><code>GradientResults</code></a> objects. The optimizer is
+<a class="autorefs autorefs-internal" title="ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> and
+<a class="autorefs autorefs-internal" title="ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.GradientResults"><code>GradientResults</code></a> objects. The optimizer is
 configured using an <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object or
 a dictionary that can be parsed into such an object. While the initial values
 for optimization are typically specified in the configuration, they can be
 overridden by providing them directly.</p>
 <p>The optimizer step emits several signals:</p>
 <ul>
-<li><a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType.START_OPTIMIZER_STEP"><code>START_OPTIMIZER_STEP</code></a>:
+<li><a class="autorefs autorefs-internal" title="START_OPTIMIZER_STEP = 3
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.START_OPTIMIZER_STEP"><code>START_OPTIMIZER_STEP</code></a>:
   Emitted before the optimization starts.</li>
-<li><a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType.FINISHED_OPTIMIZER_STEP"><code>FINISHED_OPTIMIZER_STEP</code></a>:
+<li><a class="autorefs autorefs-internal" title="FINISHED_OPTIMIZER_STEP = 4
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.FINISHED_OPTIMIZER_STEP"><code>FINISHED_OPTIMIZER_STEP</code></a>:
   Emitted after the optimization finishes.</li>
-<li><a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType.START_EVALUATION"><code>START_EVALUATION</code></a>: Emitted
+<li><a class="autorefs autorefs-internal" title="START_EVALUATION = 1
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.START_EVALUATION"><code>START_EVALUATION</code></a>: Emitted
   before a function or gradient evaluation.</li>
-<li><a class="autorefs autorefs-internal" href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a>: Emitted
+<li><a class="autorefs autorefs-internal" title="FINISHED_EVALUATION = 2
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a>: Emitted
   after a function or gradient evaluation.</li>
 </ul>
 <p>The <code>FINISHED_EVALUATION</code> signal is particularly important as it passes
-  the generated <a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a> objects. Result handlers
+  the generated <a class="autorefs autorefs-internal" title="ropt.results.Results
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.Results"><code>Results</code></a> objects. Result handlers
   specified in the plan will respond to this signal to process those results.</p>
 <p>The optimizer step supports nested optimizations, where each function
 evaluation in the optimization calls a function that should run the nested
 optimization and produce the result for the function evaluation.</p>
+
 
 
 
@@ -1921,7 +1983,7 @@ optimization and produce the result for the function evaluation.</p>
                 <code>plan</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Plan" href="../plan/#ropt.plan.Plan">Plan</a></code>
+                  <code><a class="autorefs autorefs-internal" title="Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1949,6 +2011,7 @@ optimization and produce the result for the function evaluation.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -1984,7 +2047,7 @@ optimization and produce the result for the function evaluation.</p>
                 <code>config</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>] | <a class="autorefs autorefs-internal" title="ropt.config.enopt.EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>] | <a class="autorefs autorefs-internal" title="EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2032,7 +2095,7 @@ optimization and produce the result for the function evaluation.</p>
                 <code>nested_optimization</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Plan" href="../plan/#ropt.plan.Plan">Plan</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2061,6 +2124,7 @@ optimization and produce the result for the function evaluation.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -2096,7 +2160,12 @@ optimization and produce the result for the function evaluation.</p>
                 <code>event</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Event" href="../plan/#ropt.plan.Event">Event</a></code>
+                  <code><a class="autorefs autorefs-internal" title="Event
+
+
+  
+      dataclass
+   (ropt.plan.Event)" href="../plan/#ropt.plan.Event">Event</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2109,6 +2178,7 @@ optimization and produce the result for the function evaluation.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
@@ -2135,17 +2205,23 @@ optimization and produce the result for the function evaluation.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ropt.plugins.plan.base.ResultHandler" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler">ResultHandler</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="ResultHandler (ropt.plugins.plan.base.ResultHandler)" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler">ResultHandler</a></code></p>
 
 
         <p>The default tracker results handler object.</p>
 <p>This handler tracks the
-<a class="autorefs autorefs-internal" href="../results/#ropt.results.Results"><code>Results</code></a> objects that it receives and selects one
+<a class="autorefs autorefs-internal" title="ropt.results.Results
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.Results"><code>Results</code></a> objects that it receives and selects one
 to retain in a variable. Currently it tracks either the last result it
 receives, or the best result. The best result is defined as the result that
 has the lowest weighted objective value. Optionally, results may be filtered
 by checking for violations of constraints, by comparing constraint values to
 a threshold.</p>
+
 
 
 
@@ -2204,7 +2280,7 @@ assisting result handlers in filtering relevant results.</p>
                 <code>plan</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Plan" href="../plan/#ropt.plan.Plan">Plan</a></code>
+                  <code><a class="autorefs autorefs-internal" title="Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2266,6 +2342,7 @@ assisting result handlers in filtering relevant results.</p>
       </tbody>
     </table>
 
+
     </div>
 
 </div>
@@ -2300,7 +2377,12 @@ assisting result handlers in filtering relevant results.</p>
                 <code>event</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ropt.plan.Event" href="../plan/#ropt.plan.Event">Event</a></code>
+                  <code><a class="autorefs autorefs-internal" title="Event
+
+
+  
+      dataclass
+   (ropt.plan.Event)" href="../plan/#ropt.plan.Event">Event</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2313,6 +2395,7 @@ assisting result handlers in filtering relevant results.</p>
           </tr>
       </tbody>
     </table>
+
 
     </div>
 
