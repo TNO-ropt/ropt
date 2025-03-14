@@ -64,6 +64,7 @@ def gradient_result_fixture() -> GradientResults:
         variables=np.array([1.0, 2.0]),
         perturbed_variables=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
         perturbed_objectives=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
+        evaluation_info={"foo": np.arange(15, dtype=np.float64).reshape((3, 5))},
     )
     gradients = Gradients(
         weighted_objective=np.array([1.0, 2.0]),
@@ -85,11 +86,10 @@ def test__to_series(gradient_result: GradientResults) -> None:
         ResultAxis.VARIABLE: ("v1", "v2"),
         ResultAxis.REALIZATION: ("ra", "rb", "rc"),
     }
-    series = _to_series(gradient_result.evaluations, 1, "perturbed_variables", names)
+    series = _to_series(gradient_result.evaluations, "perturbed_variables", None, names)
     assert series is not None
     assert len(series) == gradient_result.evaluations.perturbed_variables.size
     assert series.index.names == [
-        "batch_id",
         "realization",
         "perturbation",
         "variable",
@@ -98,22 +98,67 @@ def test__to_series(gradient_result: GradientResults) -> None:
         for r_idx, real in enumerate(names[ResultAxis.REALIZATION]):
             for pert in range(gradient_result.evaluations.perturbed_variables.shape[1]):
                 assert (
-                    series.loc[(1, real, pert, var)]
+                    series.loc[(real, pert, var)]
                     == gradient_result.evaluations.perturbed_variables[
-                        r_idx,
-                        pert,
-                        v_idx,
+                        r_idx, pert, v_idx
                     ]
                 )
 
 
-def test_to_dataframe(gradient_result: GradientResults) -> None:
+def test__to_series_evaluation_info(gradient_result: GradientResults) -> None:
+    names: dict[str, Any] = {
+        ResultAxis.VARIABLE: ("v1", "v2"),
+        ResultAxis.REALIZATION: ("ra", "rb", "rc"),
+    }
+    series = _to_series(gradient_result.evaluations, "evaluation_info", "foo", names)
+    assert series is not None
+    info = np.array(gradient_result.evaluations.evaluation_info["foo"])
+    assert len(series) == info.size
+    assert series.index.names == [
+        "realization",
+        "perturbation",
+    ]
+    for r_idx, real in enumerate(names[ResultAxis.REALIZATION]):
+        for pert in range(gradient_result.evaluations.perturbed_variables.shape[1]):
+            assert series.loc[(real, pert)] == info[r_idx, pert]
+
+
+def test_to_dataframe_function(function_result: FunctionResults) -> None:
     names: dict[str, Any] = {
         ResultAxis.VARIABLE: ("v1", "v2"),
         ResultAxis.REALIZATION: ("ra", "rb", "rc"),
         ResultAxis.OBJECTIVE: ("fa", "fb"),
     }
-    frame = gradient_result.to_dataframe("evaluations", names=names)
+    frame = function_result.to_dataframe(
+        "functions",
+        [
+            "weighted_objective",
+            "objectives",
+        ],
+        names=names,
+    )
+    assert len(frame) == 2
+    assert frame.index.names == ["batch_id", "objective"]
+    assert frame.index[0] == (1, "fa")
+    assert frame.index[1] == (1, "fb")
+
+
+def test_to_dataframe_gradient(gradient_result: GradientResults) -> None:
+    names: dict[str, Any] = {
+        ResultAxis.VARIABLE: ("v1", "v2"),
+        ResultAxis.REALIZATION: ("ra", "rb", "rc"),
+        ResultAxis.OBJECTIVE: ("fa", "fb"),
+    }
+    frame = gradient_result.to_dataframe(
+        "evaluations",
+        [
+            "variables",
+            "perturbed_variables",
+            "perturbed_objectives",
+            "evaluation_info.foo",
+        ],
+        names=names,
+    )
     assert len(frame) == gradient_result.evaluations.perturbed_variables.size * 2
     assert frame.index.names == [
         "batch_id",
@@ -197,8 +242,10 @@ def test_to_dataframe_unstack_only_variable(gradient_result: GradientResults) ->
 
 
 def test_to_dataframe_join(function_result: FunctionResults) -> None:
-    frame1 = function_result.to_dataframe("evaluations")
-    frame2 = function_result.to_dataframe("functions")
+    frame1 = function_result.to_dataframe("evaluations", ["variables", "objectives"])
+    frame2 = function_result.to_dataframe(
+        "functions", ["weighted_objective", "objectives"]
+    )
     frame1.columns = pandas.Index(
         "_".join(column) if isinstance(column, tuple) else column
         for column in frame1.columns.to_numpy()

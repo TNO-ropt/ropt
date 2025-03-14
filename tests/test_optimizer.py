@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import pytest
-from numpy.typing import NDArray
 
 from ropt.config.enopt import EnOptConfig
 from ropt.config.enopt.constants import DEFAULT_SEED
@@ -13,6 +12,9 @@ from ropt.plan import BasicOptimizer
 from ropt.results import FunctionResults, GradientResults, Results
 from ropt.transforms import OptModelTransforms, VariableScaler
 from ropt.transforms.base import NonLinearConstraintTransform, ObjectiveTransform
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 
 @pytest.fixture(name="enopt_config")
@@ -214,7 +216,7 @@ def test_constraint_with_scaler(
 
     test_functions = (
         *test_functions,
-        lambda variables, _: cast(NDArray[np.float64], variables[0] + variables[2]),
+        lambda variables, _: cast("NDArray[np.float64]", variables[0] + variables[2]),
     )
 
     scales = np.array(
@@ -361,9 +363,9 @@ def test_check_nonlinear_constraints(
 
     test_functions = (
         *test_functions,
-        lambda variables, _: cast(NDArray[np.float64], variables[0]),
-        lambda variables, _: cast(NDArray[np.float64], variables[0]),
-        lambda variables, _: cast(NDArray[np.float64], variables[0]),
+        lambda variables, _: cast("NDArray[np.float64]", variables[0]),
+        lambda variables, _: cast("NDArray[np.float64]", variables[0]),
+        lambda variables, _: cast("NDArray[np.float64]", variables[0]),
     )
 
     results1 = BasicOptimizer(enopt_config, evaluator(test_functions)).run().results

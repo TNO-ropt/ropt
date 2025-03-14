@@ -140,13 +140,13 @@ T = TypeVar("T")
 
 def _convert_set(value: T | set[T] | Sequence[T]) -> set[T]:
     if isinstance(value, str):
-        return {cast(T, value)}
+        return {cast("T", value)}
     return set(value) if isinstance(value, AbstractSequence | AbstractSet) else {value}
 
 
 def _convert_tuple(value: T | Sequence[T]) -> tuple[T, ...]:
     if isinstance(value, str):
-        return (cast(T, value),)
+        return (cast("T", value),)
     return tuple(value) if isinstance(value, AbstractSequence) else (value,)
 
 

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Protocol
+from typing import Any, Protocol
 
 import numpy as np
 from numpy.typing import NDArray
@@ -90,22 +90,22 @@ class EvaluatorResult:
     calculations. This can be useful for tracking or managing evaluations
     performed together.
 
-    Additionally, evaluation IDs are provided as an option. These IDs can be
-    used to uniquely identify the results calculated for each variable vector,
-    offering a way to link specific evaluations back to their corresponding
-    input vectors.
+    Optionally, additional information be stored on each evaluation. For
+    instance, this can be used to uniquely identify the results calculated for
+    each variable vector, offering a way to link specific evaluations back to
+    their corresponding input vectors.
 
     Attributes:
-        objectives:     The calculated objective values.
-        constraints:    Optional calculated constraint values.
-        batch_id:       Optional batch ID.
-        evaluation_ids: Optional ID for each evaluation.
+        objectives:      The calculated objective values.
+        constraints:     Optional calculated constraint values.
+        batch_id:        Optional batch ID.
+        evaluation_info: Optional info for each evaluation.
     """
 
     objectives: NDArray[np.float64]
     constraints: NDArray[np.float64] | None = None
     batch_id: int | None = None
-    evaluation_ids: NDArray[np.intc] | None = None
+    evaluation_info: dict[str, NDArray[Any]] = field(default_factory=dict)
 
 
 class Evaluator(Protocol):

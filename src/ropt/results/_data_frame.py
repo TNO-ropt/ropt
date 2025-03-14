@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from dataclasses import fields
 from functools import partial
 from importlib.util import find_spec
 from typing import TYPE_CHECKING, Any, Final, Literal, Sequence
@@ -38,14 +37,14 @@ def _get_function_results(
 
     functions = results.to_dataframe(
         "functions",
-        select=_get_select(results, "functions", sub_fields),
+        select=_get_select("functions", sub_fields),
         unstack=[ResultAxis.OBJECTIVE, ResultAxis.NONLINEAR_CONSTRAINT],
         names=names,
     ).rename(columns=partial(_add_prefix, prefix="functions"))
 
     evaluations = results.to_dataframe(
         "evaluations",
-        select=_get_select(results, "evaluations", sub_fields),
+        select=_get_select("evaluations", sub_fields),
         unstack=[
             ResultAxis.VARIABLE,
             ResultAxis.OBJECTIVE,
@@ -57,7 +56,7 @@ def _get_function_results(
     if results.constraint_info is not None:
         constraint_info = results.to_dataframe(
             "constraint_info",
-            select=_get_select(results, "constraint_info", sub_fields),
+            select=_get_select("constraint_info", sub_fields),
             unstack=[
                 ResultAxis.VARIABLE,
                 ResultAxis.LINEAR_CONSTRAINT,
@@ -85,7 +84,7 @@ def _get_gradient_results(
 
     gradients = results.to_dataframe(
         "gradients",
-        select=_get_select(results, "gradients", sub_fields),
+        select=_get_select("gradients", sub_fields),
         unstack=[
             ResultAxis.OBJECTIVE,
             ResultAxis.NONLINEAR_CONSTRAINT,
@@ -96,7 +95,7 @@ def _get_gradient_results(
 
     evaluations = results.to_dataframe(
         "evaluations",
-        select=_get_select(results, "evaluations", sub_fields),
+        select=_get_select("evaluations", sub_fields),
         unstack=[
             ResultAxis.VARIABLE,
             ResultAxis.OBJECTIVE,
@@ -115,12 +114,11 @@ def _join_frames(*args: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def _get_select(results: Results, field_name: str, sub_fields: set[str]) -> list[str]:
-    results_field = getattr(results, field_name)
+def _get_select(field_name: str, sub_fields: set[str]) -> list[str]:
     return [
-        name
-        for name in {field.name for field in fields(results_field)}
-        if f"{field_name}.{name}" in sub_fields
+        item.removeprefix(f"{field_name}.")
+        for item in sub_fields
+        if item.startswith(f"{field_name}.")
     ]
 
 

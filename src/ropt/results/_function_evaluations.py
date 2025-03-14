@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from ropt.enums import ResultAxis
 
@@ -31,10 +31,10 @@ class FunctionEvaluations(ResultField):
        identifying each calculated realization.
 
     Attributes:
-        variables:      The unperturbed variable vector.
-        objectives:     The objective functions for each realization.
-        constraints:    The constraint functions for each realization.
-        evaluation_ids: Optional id of each evaluated realization.
+        variables:       The unperturbed variable vector.
+        objectives:      The objective functions for each realization.
+        constraints:     The constraint functions for each realization.
+        evaluation_info: Optional info for each evaluated realization.
     """
 
     variables: NDArray[np.float64] = field(
@@ -59,8 +59,8 @@ class FunctionEvaluations(ResultField):
             ),
         },
     )
-    evaluation_ids: NDArray[np.intc] | None = field(
-        default=None,
+    evaluation_info: dict[str, NDArray[Any]] = field(
+        default_factory=dict,
         metadata={
             "__axes__": (ResultAxis.REALIZATION,),
         },
@@ -74,7 +74,6 @@ class FunctionEvaluations(ResultField):
         self.variables = _immutable_copy(self.variables)
         self.objectives = _immutable_copy(self.objectives)
         self.constraints = _immutable_copy(self.constraints)
-        self.evaluation_ids = _immutable_copy(self.evaluation_ids)
 
     @classmethod
     def create(
@@ -82,16 +81,16 @@ class FunctionEvaluations(ResultField):
         variables: NDArray[np.float64],
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None = None,
-        evaluation_ids: NDArray[np.intc] | None = None,
+        evaluation_info: dict[str, NDArray[Any]] | None = None,
     ) -> FunctionEvaluations:
         """Create a FunctionEvaluations object with the given information.
 
         Args:
-            config:                 Configuration object.
-            variables:              The unperturbed variable vector.
-            objectives:             The objective functions for each realization.
-            constraints:            The constraint functions for each realization.
-            evaluation_ids:         Optional IDs of the objective calculations.
+            config:          Configuration object.
+            variables:       The unperturbed variable vector.
+            objectives:      The objective functions for each realization.
+            constraints:     The constraint functions for each realization.
+            evaluation_info: Optional info for each evaluation.
 
         Returns:
             A new FunctionEvaluations object.
@@ -100,7 +99,7 @@ class FunctionEvaluations(ResultField):
             variables=variables,
             objectives=objectives,
             constraints=constraints,
-            evaluation_ids=evaluation_ids,
+            evaluation_info={} if evaluation_info is None else evaluation_info,
         )
 
     def transform_from_optimizer(
@@ -130,5 +129,5 @@ class FunctionEvaluations(ResultField):
                 if self.constraints is None or transforms.nonlinear_constraints is None
                 else transforms.nonlinear_constraints.from_optimizer(self.constraints)
             ),
-            evaluation_ids=self.evaluation_ids,
+            evaluation_info=self.evaluation_info,
         )

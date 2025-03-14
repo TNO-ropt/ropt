@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import fields
 from typing import TYPE_CHECKING, Any, Iterable, Sequence, cast
 
 import pandas as pd
@@ -14,23 +13,29 @@ if TYPE_CHECKING:
 def _to_dataframe(
     result_field: ResultField,
     batch_id: int | None,
-    select: Iterable[str] | None,
+    select: Iterable[str],
     unstack: Iterable[ResultAxis] | None,
     names: dict[str, Sequence[str | int] | None] | None = None,
 ) -> pd.DataFrame:
-    if select is None:
-        select = (field.name for field in fields(result_field))
     if unstack is None:
         unstack = []
     joined_frame = pd.DataFrame()
     for field in select:
-        series = _to_series(result_field, batch_id, field, names)
+        split_field, sep, key = field.partition(".")
+        if sep and not key:
+            msg = f"Not a correct field name: {field}"
+            raise ValueError(msg)
+        series = _to_series(result_field, split_field if key else field, key, names)
         if series is not None:
+            series = pd.concat(
+                {(0 if batch_id is None else batch_id): series}, names=["batch_id"]
+            )
+            assert series is not None
             frame = series.to_frame()
             for axis in unstack:
                 if axis.value in frame.index.names:
                     frame = cast(
-                        pd.DataFrame,
+                        "pd.DataFrame",
                         frame.unstack(axis.value, sort=False),  # type:ignore[call-arg]  # noqa: PD010
                     )
             frame.columns = frame.columns.to_flat_index()  # type:ignore[no-untyped-call]
@@ -38,13 +43,15 @@ def _to_dataframe(
                 joined_frame = frame
             else:
                 joined_frame = joined_frame.join(frame, how="inner")
+    if not joined_frame.empty and "_dummy_" in joined_frame.index.names:
+        return joined_frame.droplevel("_dummy_")
     return joined_frame
 
 
 def _to_series(
     result_field: ResultField,
-    batch_id: int | None,
     field: str,
+    key: str | None,
     names: dict[str, Sequence[str | int] | None] | None = None,
 ) -> pd.Series[Any] | None:
     try:
@@ -54,6 +61,8 @@ def _to_series(
         raise ValueError(msg) from exc
     if data is None:
         return None
+    if key:
+        data = data[key]
     axes = result_field.get_axes(field)
     if names is None:
         names = {}
@@ -62,18 +71,15 @@ def _to_series(
         for idx, index in enumerate(names.get(axis, None) for axis in axes)
     ]
     series: pd.Series[Any]
-    index: tuple[Any, ...] = (0 if batch_id is None else batch_id,)
-    index_names = ["batch_id"]
     if indices:
         multi_index = pd.MultiIndex.from_product(
             indices, names=(axis.value for axis in axes)
         )
-        series = pd.Series(data.flatten(), index=multi_index, name=field)
-        series = pd.concat({index: series}, names=index_names)
-    else:
         series = pd.Series(
-            data,
-            index=pd.MultiIndex.from_tuples([index], names=index_names),
-            name=field,
+            data.flatten(), index=multi_index, name=f"{field}.{key}" if key else field
         )
+    else:
+        series = pd.Series(data, name=f"{field}.{key}" if key else field)
+        series.index.name = "_dummy_"
+
     return series

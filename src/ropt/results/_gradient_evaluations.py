@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from ropt.enums import ResultAxis
 
@@ -32,17 +32,17 @@ class GradientEvaluations(ResultField):
        constraint values arranged along the third axis. The second axis index
        indicates the perturbation number, whereas the first axis index
        represents the realization number.
-    4. Optional evaluation IDs that may have been passed from the evaluator,
-       identifying each calculated realization and perturbation.
+    4. Optional info for each evaluations that may have been passed from the
+       evaluator.
 
     Attributes:
-        variables:                The unperturbed variable vector.
-        perturbed_variables:      The variables for each realization and perturbation.
-        perturbed_objectives:     The objective functions for each realization and
-                                  perturbation.
-        perturbed_constraints:    The constraint functions for each realization and
-                                  perturbation.
-        perturbed_evaluation_ids: Optional id of each evaluated realization.
+        variables:             The unperturbed variable vector.
+        perturbed_variables:   The variables for each realization and perturbation.
+        perturbed_objectives:  The objective functions for each realization and
+                               perturbation.
+        perturbed_constraints: The constraint functions for each realization and
+                               perturbation.
+        evaluation_info:       Optional info for each evaluated realization.
     """
 
     variables: NDArray[np.float64] = field(
@@ -78,8 +78,8 @@ class GradientEvaluations(ResultField):
             ),
         },
     )
-    perturbed_evaluation_ids: NDArray[np.intc] | None = field(
-        default=None,
+    evaluation_info: dict[str, NDArray[Any]] = field(
+        default_factory=dict,
         metadata={
             "__axes__": (
                 ResultAxis.REALIZATION,
@@ -97,7 +97,6 @@ class GradientEvaluations(ResultField):
         self.perturbed_variables = _immutable_copy(self.perturbed_variables)
         self.perturbed_objectives = _immutable_copy(self.perturbed_objectives)
         self.perturbed_constraints = _immutable_copy(self.perturbed_constraints)
-        self.perturbed_evaluation_ids = _immutable_copy(self.perturbed_evaluation_ids)
 
     @classmethod
     def create(
@@ -106,17 +105,17 @@ class GradientEvaluations(ResultField):
         perturbed_variables: NDArray[np.float64],
         perturbed_objectives: NDArray[np.float64],
         perturbed_constraints: NDArray[np.float64] | None = None,
-        perturbed_evaluation_ids: NDArray[np.intc] | None = None,
+        evaluation_info: dict[str, NDArray[Any]] | None = None,
     ) -> GradientEvaluations:
         """Create a FunctionEvaluations object with the given information.
 
         Args:
-            config:                   Configuration object.
-            variables:                The unperturbed variable vector.
-            perturbed_variables:      The unperturbed variable vector.
-            perturbed_objectives:     The objective functions for each realization.
-            perturbed_constraints:    The constraint functions for each realization.
-            perturbed_evaluation_ids: Optional IDs of the objective calculations.
+            config:                Configuration object.
+            variables:             The unperturbed variable vector.
+            perturbed_variables:   The unperturbed variable vector.
+            perturbed_objectives:  The objective functions for each realization.
+            perturbed_constraints: The constraint functions for each realization.
+            evaluation_info:       Optional info for each evaluation.
 
         Returns:
             A new FunctionEvaluations object.
@@ -126,7 +125,7 @@ class GradientEvaluations(ResultField):
             perturbed_variables=perturbed_variables,
             perturbed_objectives=perturbed_objectives,
             perturbed_constraints=perturbed_constraints,
-            perturbed_evaluation_ids=perturbed_evaluation_ids,
+            evaluation_info={} if evaluation_info is None else evaluation_info,
         )
 
     def transform_from_optimizer(
@@ -166,5 +165,5 @@ class GradientEvaluations(ResultField):
                     self.perturbed_constraints
                 )
             ),
-            perturbed_evaluation_ids=self.perturbed_evaluation_ids,
+            evaluation_info=self.evaluation_info,
         )

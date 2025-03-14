@@ -59,7 +59,7 @@ class Results(ABC):
     def to_dataframe(
         self,
         field_name: str,
-        select: Iterable[str] | None = None,
+        select: Iterable[str],
         unstack: Iterable[ResultAxis] | None = None,
         names: dict[str, Sequence[str | int] | None] | None = None,
     ) -> pd.DataFrame:

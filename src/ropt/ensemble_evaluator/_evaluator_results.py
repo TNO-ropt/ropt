@@ -1,6 +1,6 @@
 from dataclasses import InitVar, dataclass
 from itertools import zip_longest
-from typing import Generator
+from typing import Any, Generator
 
 import numpy as np
 from numpy.typing import NDArray
@@ -15,12 +15,16 @@ class _FunctionEvaluatorResults:
     batch_id: int | None
     objectives: NDArray[np.float64]
     constraints: NDArray[np.float64] | None
-    evaluation_ids: NDArray[np.intc] | None
+    evaluation_info: dict[str, NDArray[Any]]
 
     def __post_init__(self) -> None:
         self.objectives, self.constraints = _propagate_nan_values(
             self.objectives, self.constraints
         )
+        for key, value in self.evaluation_info.items():
+            if value.ndim != 1 and value.size != self.objectives.shape[1]:
+                msg = f"Evaluation info has incorrect size: {key}"
+                raise ValueError(msg)
 
 
 @dataclass(slots=True)
@@ -28,7 +32,7 @@ class _GradientEvaluatorResults:
     batch_id: int | None
     perturbed_objectives: NDArray[np.float64]
     perturbed_constraints: NDArray[np.float64] | None
-    perturbed_evaluation_ids: NDArray[np.intc] | None
+    evaluation_info: dict[str, NDArray[Any]]
     realization_count: InitVar[int]
     perturbation_count: InitVar[int]
 
@@ -44,11 +48,13 @@ class _GradientEvaluatorResults:
             if self.perturbed_constraints is None
             else self.perturbed_constraints.reshape(shape)
         )
-        self.perturbed_evaluation_ids = (
-            None
-            if self.perturbed_evaluation_ids is None
-            else self.perturbed_evaluation_ids.reshape(shape[:2])
-        )
+        for key, value in self.evaluation_info.items():
+            if value.ndim != 1 and value.size != realization_count * perturbation_count:
+                msg = f"Evaluation info has incorrect size: {key}"
+                raise ValueError(msg)
+        self.evaluation_info = {
+            key: value.reshape(shape[:2]) for key, value in self.evaluation_info.items()
+        }
 
 
 def _propagate_nan_values(
@@ -148,17 +154,12 @@ def _get_function_results(  # noqa: PLR0913
         if evaluator_result.constraints is None
         else np.vsplit(evaluator_result.constraints, variables.shape[0])
     )
-    split_evaluation_ids = (
-        []
-        if evaluator_result.evaluation_ids is None
-        else np.split(evaluator_result.evaluation_ids, variables.shape[0])
-    )
-    for idx, (objectives, constraints, evaluation_ids) in enumerate(
-        zip_longest(
-            split_objectives,
-            split_constraints,
-            split_evaluation_ids,
-        )
+    split_infos = {
+        key: np.split(value, variables.shape[0])
+        for key, value in evaluator_result.evaluation_info.items()
+    }
+    for idx, (objectives, constraints) in enumerate(
+        zip_longest(split_objectives, split_constraints)
     ):
         yield (
             idx,
@@ -166,7 +167,7 @@ def _get_function_results(  # noqa: PLR0913
                 batch_id=evaluator_result.batch_id,
                 objectives=objectives,
                 constraints=constraints,
-                evaluation_ids=evaluation_ids,
+                evaluation_info={key: value[idx] for key, value in split_infos.items()},
             ),
         )
 
@@ -210,7 +211,7 @@ def _get_gradient_results(  # noqa: PLR0913
         batch_id=evaluator_result.batch_id,
         perturbed_objectives=evaluator_result.objectives,
         perturbed_constraints=evaluator_result.constraints,
-        perturbed_evaluation_ids=evaluator_result.evaluation_ids,
+        evaluation_info=evaluator_result.evaluation_info,
         realization_count=config.realizations.weights.size,
         perturbation_count=config.gradient.number_of_perturbations,
     )
@@ -277,11 +278,10 @@ def _get_function_and_gradient_results(  # noqa: PLR0913
                 if evaluator_result.constraints is None
                 else evaluator_result.constraints[:realization_num]
             ),
-            evaluation_ids=(
-                None
-                if evaluator_result.evaluation_ids is None
-                else evaluator_result.evaluation_ids[:realization_num]
-            ),
+            evaluation_info={
+                key: value[:realization_num]
+                for key, value in evaluator_result.evaluation_info.items()
+            },
         ),
         _GradientEvaluatorResults(
             batch_id=evaluator_result.batch_id,
@@ -291,11 +291,10 @@ def _get_function_and_gradient_results(  # noqa: PLR0913
                 if evaluator_result.constraints is None
                 else evaluator_result.constraints[realization_num:, :]
             ),
-            perturbed_evaluation_ids=(
-                None
-                if evaluator_result.evaluation_ids is None
-                else evaluator_result.evaluation_ids[realization_num:]
-            ),
+            evaluation_info={
+                key: value[realization_num:]
+                for key, value in evaluator_result.evaluation_info.items()
+            },
             realization_count=config.realizations.weights.size,
             perturbation_count=config.gradient.number_of_perturbations,
         ),

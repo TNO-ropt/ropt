@@ -1,8 +1,7 @@
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import pytest
-from numpy.typing import NDArray
 
 from ropt.plan import BasicOptimizer
 from ropt.plugins.optimizer.scipy import (
@@ -15,6 +14,9 @@ from ropt.plugins.optimizer.scipy import (
     _SUPPORTED_METHODS,
 )
 from ropt.results import Results
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 _REQUIRES_BOUNDS = _CONSTRAINT_REQUIRES_BOUNDS - {"differential_evolution"}
 _SUPPORTS_BOUNDS = _CONSTRAINT_SUPPORT_BOUNDS - {"differential_evolution"}
@@ -292,7 +294,7 @@ def test_scipy_eq_nonlinear_constraints(
 
     test_functions = (
         *test_functions,
-        lambda variables, _: cast(NDArray[np.float64], variables[0] + variables[2]),
+        lambda variables, _: cast("NDArray[np.float64]", variables[0] + variables[2]),
     )
 
     variables = BasicOptimizer(enopt_config, evaluator(test_functions)).run().variables
@@ -324,7 +326,7 @@ def test_scipy_ineq_nonlinear_constraints(
     test_functions = (
         *test_functions,
         lambda variables, _: cast(
-            NDArray[np.float64], weight * variables[0] + weight * variables[2]
+            "NDArray[np.float64]", weight * variables[0] + weight * variables[2]
         ),
     )
 
@@ -350,7 +352,7 @@ def test_scipy_ineq_nonlinear_constraints_two_sided(
     }
     test_functions = (
         *test_functions,
-        lambda variables, _: cast(NDArray[np.float64], variables[0] + variables[2]),
+        lambda variables, _: cast("NDArray[np.float64]", variables[0] + variables[2]),
     )
 
     variables = BasicOptimizer(enopt_config, evaluator(test_functions)).run().variables
@@ -383,11 +385,11 @@ def test_scipy_le_ge_nonlinear_constraints(
 
     test_functions = (
         *test_functions,
-        lambda variables, _: cast(NDArray[np.float64], variables[0] + variables[2]),
+        lambda variables, _: cast("NDArray[np.float64]", variables[0] + variables[2]),
     )
     test_functions = (
         *test_functions,
-        lambda variables, _: cast(NDArray[np.float64], variables[0] - variables[1]),
+        lambda variables, _: cast("NDArray[np.float64]", variables[0] - variables[1]),
     )
 
     variables = BasicOptimizer(enopt_config, evaluator(test_functions)).run().variables

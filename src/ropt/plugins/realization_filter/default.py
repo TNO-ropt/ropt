@@ -232,7 +232,7 @@ class DefaultRealizationFilter(RealizationFilter):
             raise ConfigError(msg)
 
     def _sort_objectives(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
-        options = cast(SortObjectiveOptions, self._filter_options)
+        options = cast("SortObjectiveOptions", self._filter_options)
         objective_config = self._enopt_config.objectives
         failed_realizations = np.isnan(objectives[..., 0])
         objectives = np.nan_to_num(objectives[..., options.sort])
@@ -251,7 +251,7 @@ class DefaultRealizationFilter(RealizationFilter):
         self,
         constraints: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        options = cast(SortConstraintOptions, self._filter_options)
+        options = cast("SortConstraintOptions", self._filter_options)
         failed_realizations = np.isnan(constraints[..., 0])
         constraints = np.nan_to_num(constraints[..., options.sort])
         return _sort_and_select(
@@ -266,7 +266,7 @@ class DefaultRealizationFilter(RealizationFilter):
         self,
         objectives: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        options = cast(CVaRObjectiveOptions, self._filter_options)
+        options = cast("CVaRObjectiveOptions", self._filter_options)
         objective_config = self._enopt_config.objectives
         failed_realizations = np.isnan(objectives[..., 0])
         objectives = np.nan_to_num(objectives[..., options.sort])
@@ -281,7 +281,7 @@ class DefaultRealizationFilter(RealizationFilter):
         self,
         constraints: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        options = cast(CVaRConstraintOptions, self._filter_options)
+        options = cast("CVaRConstraintOptions", self._filter_options)
         failed_realizations = np.isnan(constraints[..., 0])
         constraints = np.nan_to_num(constraints[..., options.sort])
         assert self._enopt_config.nonlinear_constraints is not None
