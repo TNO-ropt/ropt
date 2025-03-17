@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pytest
@@ -216,7 +216,7 @@ def test_constraint_with_scaler(
 
     test_functions = (
         *test_functions,
-        lambda variables, _: cast("NDArray[np.float64]", variables[0] + variables[2]),
+        lambda variables, _: variables[0] + variables[2],
     )
 
     scales = np.array(
@@ -363,9 +363,9 @@ def test_check_nonlinear_constraints(
 
     test_functions = (
         *test_functions,
-        lambda variables, _: cast("NDArray[np.float64]", variables[0]),
-        lambda variables, _: cast("NDArray[np.float64]", variables[0]),
-        lambda variables, _: cast("NDArray[np.float64]", variables[0]),
+        lambda variables, _: variables[0],
+        lambda variables, _: variables[0],
+        lambda variables, _: variables[0],
     )
 
     results1 = BasicOptimizer(enopt_config, evaluator(test_functions)).run().results

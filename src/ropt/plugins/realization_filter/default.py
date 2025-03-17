@@ -1,6 +1,6 @@
 """This plugin contains realization filters that are installed by default."""
 
-from typing import Annotated, cast
+from typing import Annotated
 
 import numpy as np
 from numpy.typing import NDArray
@@ -232,61 +232,65 @@ class DefaultRealizationFilter(RealizationFilter):
             raise ConfigError(msg)
 
     def _sort_objectives(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
-        options = cast("SortObjectiveOptions", self._filter_options)
+        assert isinstance(self._filter_options, SortObjectiveOptions)
         objective_config = self._enopt_config.objectives
         failed_realizations = np.isnan(objectives[..., 0])
-        objectives = np.nan_to_num(objectives[..., options.sort])
+        objectives = np.nan_to_num(objectives[..., self._filter_options.sort])
         if objective_config.weights.size > 1:
-            objectives = np.dot(objectives, objective_config.weights[options.sort])
+            objectives = np.dot(
+                objectives, objective_config.weights[self._filter_options.sort]
+            )
         objectives = objectives.flatten()
         return _sort_and_select(
             objectives,
             self._enopt_config.realizations.weights,
             failed_realizations,
-            options.first,
-            options.last,
+            self._filter_options.first,
+            self._filter_options.last,
         )
 
     def _sort_constraint(
         self,
         constraints: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        options = cast("SortConstraintOptions", self._filter_options)
+        assert isinstance(self._filter_options, SortConstraintOptions)
         failed_realizations = np.isnan(constraints[..., 0])
-        constraints = np.nan_to_num(constraints[..., options.sort])
+        constraints = np.nan_to_num(constraints[..., self._filter_options.sort])
         return _sort_and_select(
             constraints,
             self._enopt_config.realizations.weights,
             failed_realizations,
-            options.first,
-            options.last,
+            self._filter_options.first,
+            self._filter_options.last,
         )
 
     def _cvar_objectives(
         self,
         objectives: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        options = cast("CVaRObjectiveOptions", self._filter_options)
+        assert isinstance(self._filter_options, CVaRObjectiveOptions)
         objective_config = self._enopt_config.objectives
         failed_realizations = np.isnan(objectives[..., 0])
-        objectives = np.nan_to_num(objectives[..., options.sort])
+        objectives = np.nan_to_num(objectives[..., self._filter_options.sort])
         if objective_config.weights.size > 1:
-            objectives = np.dot(objectives, objective_config.weights[options.sort])
+            objectives = np.dot(
+                objectives, objective_config.weights[self._filter_options.sort]
+            )
         objectives = -objectives.flatten()
         return _get_cvar_weights_from_percentile(
-            objectives, failed_realizations, options.percentile
+            objectives, failed_realizations, self._filter_options.percentile
         )
 
     def _cvar_constraint(
         self,
         constraints: NDArray[np.float64],
     ) -> NDArray[np.float64]:
-        options = cast("CVaRConstraintOptions", self._filter_options)
+        assert isinstance(self._filter_options, CVaRConstraintOptions)
         failed_realizations = np.isnan(constraints[..., 0])
-        constraints = np.nan_to_num(constraints[..., options.sort])
+        constraints = np.nan_to_num(constraints[..., self._filter_options.sort])
         assert self._enopt_config.nonlinear_constraints is not None
         return _get_cvar_weights_from_percentile(
-            -constraints, failed_realizations, options.percentile
+            -constraints, failed_realizations, self._filter_options.percentile
         )
 
 

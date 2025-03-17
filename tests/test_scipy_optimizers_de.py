@@ -1,12 +1,9 @@
-from typing import TYPE_CHECKING, Any, cast
+from typing import Any
 
 import numpy as np
 import pytest
 
 from ropt.plan import BasicOptimizer
-
-if TYPE_CHECKING:
-    from numpy.typing import NDArray
 
 pytestmark = [pytest.mark.slow]
 
@@ -190,7 +187,7 @@ def test_scipy_eq_nonlinear_constraints_de(
 
     test_functions = (
         *test_functions,
-        lambda variables, _: cast("NDArray[np.float64]", variables[0] + variables[2]),
+        lambda variables, _: variables[0] + variables[2],
     )
 
     variables = BasicOptimizer(enopt_config, evaluator(test_functions)).run().variables
@@ -220,9 +217,7 @@ def test_scipy_ineq_nonlinear_constraints_de(
     weight = 1.0 if upper_bounds == 0.4 else -1.0
     test_functions = (
         *test_functions,
-        lambda variables, _: cast(
-            "NDArray[np.float64]", weight * variables[0] + weight * variables[2]
-        ),
+        lambda variables, _: weight * variables[0] + weight * variables[2],
     )
 
     variables = BasicOptimizer(enopt_config, evaluator(test_functions)).run().variables
@@ -244,7 +239,7 @@ def test_scipy_ineq_nonlinear_constraints_two_sided_de(
     enopt_config["optimizer"]["options"] = {"seed": 1}
     test_functions = (
         *test_functions,
-        lambda variables, _: cast("NDArray[np.float64]", variables[0] + variables[2]),
+        lambda variables, _: variables[0] + variables[2],
     )
 
     variables = BasicOptimizer(enopt_config, evaluator(test_functions)).run().variables
@@ -270,11 +265,11 @@ def test_scipy_le_ge_nonlinear_constraints_de(
 
     test_functions = (
         *test_functions,
-        lambda variables, _: cast("NDArray[np.float64]", variables[0] + variables[2]),
+        lambda variables, _: variables[0] + variables[2],
     )
     test_functions = (
         *test_functions,
-        lambda variables, _: cast("NDArray[np.float64]", variables[0] - variables[1]),
+        lambda variables, _: variables[0] - variables[1],
     )
 
     variables = BasicOptimizer(enopt_config, evaluator(test_functions)).run().variables
