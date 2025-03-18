@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.8">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.9">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.8608ea7d.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.4af4bdda.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -720,33 +720,6 @@
   <a href="#ropt.plan.Plan.emit_event" class="md-nav__link">
     <span class="md-ellipsis">
       emit_event
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.__getitem__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __getitem__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.__setitem__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __setitem__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.__contains__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __contains__
     </span>
   </a>
   
@@ -1514,33 +1487,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.__getitem__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __getitem__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.__setitem__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __setitem__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.__contains__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __contains__
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1812,8 +1758,8 @@ state and functionality for executing the optimization plan.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize a plan object.</p>
-<p>This method initializes a plan using
-an <a class="autorefs autorefs-internal" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a> object. An optional
+<p>This method initializes a plan using an
+<a class="autorefs autorefs-internal" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a> object. An optional
 <a class="autorefs autorefs-internal" title="PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>plugin_manager</code></a> argument allows for the
 specification of custom plugins for result handlers and step objects
 within the plan. If omitted, only plugins installed through Python's
@@ -2511,221 +2457,6 @@ if a step fails or if the user decides to stop the optimization.</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plan.Plan.__getitem__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__getitem__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Get the value of a plan variable.</p>
-<p>This method implements the <code>[]</code> operator on the plan object to retrieve
-the value associated with a specific plan variable.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>name</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The name of the variable whose value is to be retrieved.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="typing.Any">Any</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The value of the specified variable, which can be of any type.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plan.Plan.__setitem__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__setitem__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Set a plan variable to the given value.</p>
-<p>This method implements the <code>[]</code> operator on the plan object to set the
-value of a specific plan variable.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>name</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The name of the variable to set.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>value</code>
-            </td>
-            <td>
-                  <code><span title="typing.Any">Any</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The value to assign to the variable.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plan.Plan.__contains__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__contains__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Check if a variable exists.</p>
-<p>This method implements the <code>in</code> operator on the plan object to determine
-if a plan variable exists.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>name</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The name of the variable.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="bool">bool</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p><code>True</code> if the variable exists; otherwise, <code>False</code>.</p>
-              </div>
             </td>
           </tr>
       </tbody>
