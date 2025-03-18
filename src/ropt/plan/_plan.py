@@ -23,8 +23,8 @@ class Plan:
     ) -> None:
         """Initialize a plan object.
 
-        This method initializes a plan using
-        an [`OptimizerContext`][ropt.plan.OptimizerContext] object. An optional
+        This method initializes a plan using an
+        [`OptimizerContext`][ropt.plan.OptimizerContext] object. An optional
         [`plugin_manager`][ropt.plugins.PluginManager] argument allows for the
         specification of custom plugins for result handlers and step objects
         within the plan. If omitted, only plugins installed through Python's
@@ -36,7 +36,6 @@ class Plan:
             parent:            Optional reference to a parent plan.
         """
         self._optimizer_context = optimizer_context
-        self._vars: dict[str, Any] = {}
 
         self._aborted = False
         self._parent = parent
@@ -202,49 +201,3 @@ class Plan:
             self._optimizer_context.call_observers(event)
         else:
             self._parent.emit_event(event)
-
-    def __getitem__(self, name: str) -> Any:  # noqa: ANN401
-        """Get the value of a plan variable.
-
-        This method implements the `[]` operator on the plan object to retrieve
-        the value associated with a specific plan variable.
-
-        Args:
-            name: The name of the variable whose value is to be retrieved.
-
-        Returns:
-            The value of the specified variable, which can be of any type.
-        """
-        if name in self._vars:
-            return self._vars[name]
-        msg = f"Unknown plan variable: `{name}`"
-        raise AttributeError(msg)
-
-    def __setitem__(self, name: str, value: Any) -> None:  # noqa: ANN401
-        """Set a plan variable to the given value.
-
-        This method implements the `[]` operator on the plan object to set the
-        value of a specific plan variable.
-
-        Args:
-            name:  The name of the variable to set.
-            value: The value to assign to the variable.
-        """
-        if not name.isidentifier():
-            msg = f"Not a valid variable name: `{name}`"
-            raise AttributeError(msg)
-        self._vars[name] = value
-
-    def __contains__(self, name: str) -> bool:
-        """Check if a variable exists.
-
-        This method implements the `in` operator on the plan object to determine
-        if a plan variable exists.
-
-        Args:
-            name: The name of the variable.
-
-        Returns:
-            `True` if the variable exists; otherwise, `False`.
-        """
-        return name in self._vars
