@@ -49,10 +49,9 @@ is to calculate gradients efficiently using stochastic methods.
 
 `ropt` is responsible for configuring and executing the optimization algorithm,
 building the overall function and gradient values from individual realizations,
-and monitoring both intermediate and final optimization results. It also offers
-the flexibility to delegate the actual calculations of functions to external
-code, for example, utilizing distributed resources like HPC clusters. `ropt`
-optionally provides its own code for this purpose.
+and monitoring both intermediate and final optimization results. It delegates
+the actual calculations of functions to external code that is provided by the
+user.
 
 While many optimization scenarios involve a single run of a particular
 method, there are cases where it proves beneficial to conduct multiple runs

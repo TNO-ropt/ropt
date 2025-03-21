@@ -15,28 +15,28 @@ from ropt.config.validated_types import (  # noqa: TC001
 
 
 class ObjectiveFunctionsConfig(ImmutableBaseModel):
-    """The configuration class for objective functions.
+    """Configuration class for objective functions.
 
-    This configuration class defines objective functions configured by the
-    `objectives` field in an [`EnOptConfig`][ropt.config.enopt.EnOptConfig]
-    object.
-
-    `ropt` supports optimization over multiple objectives, which are summed after
-    weighting with values passed via the `weights` field. This field is a
-    `numpy` array, with a length that determines the number of objective functions.
-    Its values will be normalized to have a sum equal to 1. For example, when
-    `weights` is set to `[1, 1]`, the stored values will be `[0.5, 0.5]`.
-
-    The objective functions may be subject to realization filters and function
-    estimators. The `realization_filters` and `function_estimators` fields
-    contain indices to the realization filter or function estimator objects to
-    use. The objects referred to are configured in the parent
+    This class, `ObjectiveFunctionsConfig`, defines the configuration for
+    objective functions used in an
     [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
 
+    `ropt` supports multi-objective optimization. Multiple objectives are
+    combined into a single value by summing them after weighting. The `weights`
+    field, a `numpy` array, determines the weight of each objective function.
+    The length of this array defines the number of objective functions. The
+    weights are automatically normalized to sum to 1 (e.g., `[1, 1]` becomes
+    `[0.5, 0.5]`).
+
+    Objective functions can be processed by realization filters and function
+    estimators. The `realization_filters` and `function_estimators` fields
+    contain indices that refer to the corresponding configuration objects in the
+    parent [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
+
     Attributes:
-        weights:             Objective functions weights (default: 1.0).
-        realization_filters: Optional realization filter indices.
-        function_estimators: Optional function estimator indices.
+        weights:             Weights for the objective functions (default: 1.0).
+        realization_filters: Optional indices of realization filters.
+        function_estimators: Optional indices of function estimators.
     """
 
     weights: Array1D = np.array(1.0)

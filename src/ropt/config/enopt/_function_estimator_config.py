@@ -10,25 +10,24 @@ from pydantic import BaseModel, ConfigDict
 class FunctionEstimatorConfig(BaseModel):
     """Configuration class for function estimators.
 
-    This class defines the configuration for function estimators, which are
-    configured by the `function_estimators` field in an
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object. That field contains a
-    tuple of configuration objects that define which function estimators are
-    available during the optimization.
+    This class, `FunctionEstimatorConfig`, defines the configuration for
+    function estimators used in an
+    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object. Function estimators
+    are configured as a tuple in the `function_estimators` field of the
+    `EnOptConfig`, defining the available estimators for the optimization.
 
-    By default, the final objective and constraint functions and their gradients
-    are calculated from the individual realizations by a weighted sum. Function
-    estimators are optionally used to modify this calculation.
+    By default, objective and constraint functions, as well as their gradients,
+    are calculated from individual realizations using a weighted sum. Function
+    estimators provide a way to modify this default calculation.
 
-    The `method` field determines which method will be used to implement the
-    calculation of the final function or gradient from the individual
-    realizations. To further specify how such a method should function, the
-    `options` field can be used to pass a dictionary of key-value pairs. The
-    interpretation of these options depends on the chosen method.
+    The `method` field specifies the function estimator method to use for
+    combining the individual realizations. The `options` field allows passing a
+    dictionary of key-value pairs to further configure the chosen method. The
+    interpretation of these options depends on the selected method.
 
     Attributes:
-        method:  The function estimator method.
-        options: Options to be passed to the estimator.
+        method:  Name of the function estimator method.
+        options: Dictionary of options for the function estimator.
     """
 
     method: str = "default/default"

@@ -15,29 +15,32 @@ from ropt.config.validated_types import (  # noqa: TC001
 
 
 class NonlinearConstraintsConfig(ImmutableBaseModel):
-    r"""The configuration class for non-linear constraints.
+    r"""Configuration class for non-linear constraints.
 
-    This class defines non-linear constraints configured by the
-    `nonlinear_constraints` field in an
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
+    This class, `NonlinearConstraintsConfig`, defines non-linear constraints used
+    in an [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
 
-    Non-linear constraints require that some constraint function is compared to
-    a right-hand-side value, either for equality or inequality. The
-    `lower_bounds` and `upper_bounds` fields, which is a `numpy` arrays with a
-    length equal to the number of constraint functions, provides the bounds on
-    the right-hand-side values.
+    Non-linear constraints are defined by comparing a constraint function to a
+    right-hand-side value, allowing for equality or inequality constraints. The
+    `lower_bounds` and `upper_bounds` fields, which are `numpy` arrays, specify the
+    bounds on these right-hand-side values. The length of these arrays determines
+    the number of constraint functions.
 
-    The non-linear constraints may be subject to realization filters and
-    function estimators. The `realization_filters` and `function_estimator`
-    fields contain indices to the realization filter or function estimator
-    objects to use. These objects are configured in the parent
+    Less-than and greater-than inequality constraints can be specified by
+    setting the lower bounds to $-\infty$, or the upper bounds to $+\infty$,
+    respectively. Equality constraints are specified by setting the lower bounds
+    equal to the upper bounds.
+
+    Non-linear constraints can be processed by realization filters and function
+    estimators. The `realization_filters` and `function_estimators` fields contain
+    indices that refer to the corresponding objects configured in the parent
     [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
 
     Attributes:
-        lower_bounds:        The lower bounds on the right-hand-side values.
-        upper_bounds:        The upper bounds on the right-hand-side values.
-        realization_filters: Optional realization filter indices.
-        function_estimators: Optional function estimator indices.
+        lower_bounds:        Lower bounds for the right-hand-side values.
+        upper_bounds:        Upper bounds for the right-hand-side values.
+        realization_filters: Optional indices of realization filters.
+        function_estimators: Optional indices of function estimators.
     """
 
     lower_bounds: Array1D

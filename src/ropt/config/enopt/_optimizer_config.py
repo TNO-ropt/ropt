@@ -16,57 +16,52 @@ from ropt.config.utils import ImmutableBaseModel
 
 
 class OptimizerConfig(ImmutableBaseModel):
-    """The configuration class for optimizers used in the optimization.
+    """Configuration class for the optimization algorithm.
 
-    This class defines the configuration for optimizers, configured by the
-    `optimizer` field in an [`EnOptConfig`][ropt.config.enopt.EnOptConfig]
-    object.
+    This class, `OptimizerConfig`, defines the configuration for the optimization
+    algorithm used in an [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
 
-    Although there may be significant differences in the parameters that can be
-    used for different optimization methods, there are a few standard settings
-    defined in this configuration object, which are forwarded to the optimizer:
+    While optimization methods can have diverse parameters, this class provides a
+    standardized set of settings that are commonly used and forwarded to the
+    optimizer:
 
-    - The maximum number of iterations allowed before the optimization should be
-      aborted by this optimizer. The optimizer may choose to ignore this option.
-    - The maximum number of function evaluations allowed before the optimization
-      is aborted.
-    - The convergence tolerance used as a stopping criterion. The exact
-      definition of the criterion depends on the optimizer. The optimizer may
-      choose to ignore this option.
-    - Whether gradients should be evaluated early, even if the optimizer does
-      not strictly need it yet. When evaluating on a distributed HPC cluster,
-      this may lead to better load-balancing for some methods. This option is
-      only applied if the optimization algorithm knows how to make use of it.
-    - Whether calculations for functions and gradients should be done
-      separately, even if the optimizer requests them to be evaluated together.
-      This option is useful when a filter is specified that deactivates some
-      realizations (see
+    - **`max_iterations`**: The maximum number of iterations allowed. The
+      optimizer may choose to ignore this.
+    - **`max_functions`**: The maximum number of function evaluations allowed.
+    - **`tolerance`**: The convergence tolerance used as a stopping criterion.
+      The exact definition depends on the optimizer, and it may be ignored.
+    - **`speculative`**: If `True`, forces early gradient evaluations, even if
+      not strictly required. This can improve load balancing on HPC clusters but
+      is only effective if the optimizer supports it. This is disabled if
+      `split_evaluations` is `True`.
+    - **`split_evaluations`**: If `True`, forces separate function and gradient
+      evaluations, even if the optimizer requests them together. This is useful
+      with realization filters that completerly disable some realizations, to
+      potentially reduce the number of evaluations for gradients (see
       [`RealizationFilterConfig`][ropt.config.enopt.RealizationFilterConfig]).
-      In this case, after evaluation of the functions, it may be possible to
-      reduce the number of evaluations for a following gradient calculation.
-    - Whether the optimizer may use parallelized function evaluations. This
-      option currently only applies to gradient-free methods and may be ignored
-      by the optimizer.
-    - An optional location of an output directory, where the optimizer may store
-      files.
-    - Generic optimizer options that may be passed as an arbitrary dictionary,
-      or as a list of strings. It depends on the method what form is required
-      and how it is interpreted.
+    - **`parallel`**: If `True`, allows the optimizer to use parallelized
+      function evaluations. This typically applies to gradient-free methods and
+      may be ignored.
+    - **`output_dir`**: An optional output directory where the optimizer can
+      store files.
+    - **`options`**: A dictionary or list of strings for generic optimizer
+      options. The required format and interpretation depend on the specific
+      optimization method.
+    - **`stdout`**: Redirect optimizer standard output to the given file.
+    - **`stderr`**: Redirect optimizer standard error to the given file.
 
     Attributes:
-        method:            Name of the optimization method used.
-        max_iterations:    Optional maximum number of iterations.
-        max_functions:     Optional maximum number of function evaluations.
-        tolerance:         Optional tolerance for convergence.
-        speculative:       Force gradient evaluations; disabled if
-                           split_evaluations is True (default `False`).
-        split_evaluations: Evaluate function and gradient separately
-                           (default: `False`).
-        parallel:          Allow for parallelized evaluation (default: `False`).
-        output_dir:        Optional output directory for use by the optimizer.
-        options:           Optional generic options for use by the optimizer.
-        stdout:            Redirect optimizer std output to the given file.
-        stderr:            Redirect optimizer std error to the given file.
+        method:            Name of the optimization method.
+        max_iterations:    Maximum number of iterations (optional).
+        max_functions:     Maximum number of function evaluations (optional).
+        tolerance:         Convergence tolerance (optional).
+        speculative:       Force early gradient evaluations (default: `False`).
+        split_evaluations: Force separate function/gradient evaluations (default: `False`).
+        parallel:          Allow parallelized function evaluations (default: `False`).
+        output_dir:        Output directory for the optimizer (optional).
+        options:           Generic options for the optimizer (optional).
+        stdout:            File to redirect optimizer standard output (optional).
+        stderr:            File to redirect optimizer standard error (optional).
     """
 
     method: str = "scipy/default"
