@@ -654,15 +654,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.clear_handlers" class="md-nav__link">
-    <span class="md-ellipsis">
-      clear_handlers
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.add_step" class="md-nav__link">
     <span class="md-ellipsis">
       add_step
@@ -684,6 +675,15 @@
   <a href="#ropt.plan.Plan.add_function" class="md-nav__link">
     <span class="md-ellipsis">
       add_function
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.has_function" class="md-nav__link">
+    <span class="md-ellipsis">
+      has_function
     </span>
   </a>
   
@@ -1434,15 +1434,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.clear_handlers" class="md-nav__link">
-    <span class="md-ellipsis">
-      clear_handlers
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.add_step" class="md-nav__link">
     <span class="md-ellipsis">
       add_step
@@ -1464,6 +1455,15 @@
   <a href="#ropt.plan.Plan.add_function" class="md-nav__link">
     <span class="md-ellipsis">
       add_function
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.has_function" class="md-nav__link">
+    <span class="md-ellipsis">
+      has_function
     </span>
   </a>
   
@@ -2017,24 +2017,6 @@ standard entry points are used.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.clear_handlers" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">clear_handlers</span><span class="p">()</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Clear all handlers from the plan.</p>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
 <h4 id="ropt.plan.Plan.add_step" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">add_step</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
@@ -2246,6 +2228,47 @@ generally used to execute one or more steps in the plan.</p>
 <div class="doc doc-object doc-function">
 
 
+<h4 id="ropt.plan.Plan.has_function" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">has_function</span><span class="p">()</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Check if a function has been added to the plan.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if a function has been added to the plan.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h4 id="ropt.plan.Plan.run_step" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">run_step</span><span class="p">(</span><span class="n">step</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
@@ -2298,29 +2321,6 @@ generally used to execute one or more steps in the plan.</p>
             </td>
             <td>
                   <code>{}</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="PlanAborted (ropt.exceptions.PlanAborted)" href="../exceptions/#ropt.exceptions.PlanAborted">PlanAborted</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p><em>description</em></p>
-              </div>
             </td>
           </tr>
       </tbody>
