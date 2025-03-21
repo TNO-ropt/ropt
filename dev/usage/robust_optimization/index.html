@@ -1181,10 +1181,9 @@ are not easily differentiated analytically. One of the core functions of <code>r
 is to calculate gradients efficiently using stochastic methods.</p>
 <p><code>ropt</code> is responsible for configuring and executing the optimization algorithm,
 building the overall function and gradient values from individual realizations,
-and monitoring both intermediate and final optimization results. It also offers
-the flexibility to delegate the actual calculations of functions to external
-code, for example, utilizing distributed resources like HPC clusters. <code>ropt</code>
-optionally provides its own code for this purpose.</p>
+and monitoring both intermediate and final optimization results. It delegates
+the actual calculations of functions to external code that is provided by the
+user.</p>
 <p>While many optimization scenarios involve a single run of a particular
 method, there are cases where it proves beneficial to conduct multiple runs
 using the same or different algorithms. For example, when dealing with a mix of
