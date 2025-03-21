@@ -569,21 +569,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="LinearConstraintsConfig">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.config.enopt.LinearConstraintsConfig.apply_transformation" class="md-nav__link">
-    <span class="md-ellipsis">
-      apply_transformation
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -619,21 +604,6 @@
       GradientConfig
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="GradientConfig">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.config.enopt.GradientConfig.fix_perturbations" class="md-nav__link">
-    <span class="md-ellipsis">
-      fix_perturbations
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1400,21 +1370,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="LinearConstraintsConfig">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.config.enopt.LinearConstraintsConfig.apply_transformation" class="md-nav__link">
-    <span class="md-ellipsis">
-      apply_transformation
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
         
           <li class="md-nav__item">
@@ -1450,21 +1405,6 @@
       GradientConfig
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="GradientConfig">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.config.enopt.GradientConfig.fix_perturbations" class="md-nav__link">
-    <span class="md-ellipsis">
-      fix_perturbations
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1593,7 +1533,58 @@
 
     <div class="doc doc-contents first">
 
-        <p>The <code>ropt.config.enopt</code> module contains optimization configuration classes.</p>
+        <p>The <code>ropt.config.enopt</code> module provides configuration classes for optimization workflows.</p>
+<p>This module defines a set of classes that are used to configure various aspects
+of an optimization process, including variables, objectives, constraints,
+realizations, samplers, and more.</p>
+<p>The central configuration class is
+<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>, which encapsulates the complete
+configuration for a single optimization step. It is designed to be flexible and
+extensible, allowing users to customize the optimization process to their
+specific needs.</p>
+<p>These configuration classes are built using
+<a href="https://docs.pydantic.dev/"><code>pydantic</code></a>, which provides robust data validation
+and parsing capabilities. This ensures that the configuration data is consistent
+and adheres to the expected structure.</p>
+<p>Configuration objects are typically created from dictionaries of configuration
+values using the <code>model_validate</code> method provided by <code>pydantic</code>.</p>
+<p>Key Features:</p>
+<ul>
+<li><strong>Modular Design:</strong> The configuration is broken down into smaller, manageable
+  components, each represented by a dedicated class.</li>
+<li><strong>Validation:</strong> <code>pydantic</code> ensures that the configuration data is valid and
+  consistent.</li>
+<li><strong>Extensibility:</strong> The modular design allows for easy extension and
+  customization of the optimization process.</li>
+<li><strong>Centralized Configuration:</strong> The
+  <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> class provides a single point
+  of entry for configuring an optimization step.</li>
+</ul>
+<p><strong>Classes:</strong></p>
+<ul>
+<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>: The main configuration class
+  for an optimization step.</li>
+<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.VariablesConfig"><code>VariablesConfig</code></a>: Configuration for
+  variables.</li>
+<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.ObjectiveFunctionsConfig"><code>ObjectiveFunctionsConfig</code></a>:
+  Configuration for objective functions.</li>
+<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.LinearConstraintsConfig"><code>LinearConstraintsConfig</code></a>:
+  Configuration for linear constraints.</li>
+<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.NonlinearConstraintsConfig"><code>NonlinearConstraintsConfig</code></a>:
+  Configuration for non-linear constraints.</li>
+<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.RealizationsConfig"><code>RealizationsConfig</code></a>: Configuration
+  for realizations.</li>
+<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.OptimizerConfig"><code>OptimizerConfig</code></a>: Configuration for the
+  optimizer.</li>
+<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.GradientConfig"><code>GradientConfig</code></a>: Configuration for
+  gradient calculations.</li>
+<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a>:
+  Configuration for function estimators.</li>
+<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>:
+  Configuration for realization filters.</li>
+<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.SamplerConfig"><code>SamplerConfig</code></a>: Configuration for
+  samplers.</li>
+</ul>
 
 
 
@@ -1625,31 +1616,28 @@
     <div class="doc doc-contents ">
 
 
-        <p>The primary configuration class for a single optimization step.</p>
-<p>The fields of the <code>EnOptConfig</code> class are nested configuration classes that
-specify specific aspects of a single optimization run.</p>
-<p>The <code>realization_filters</code>, <code>function_estimators</code>, and <code>samplers</code> fields are
-defined as tuples of configurations for realization filter, function
-estimator, and sampler objects, respectively. Other configuration fields
-will refer to these objects by their index into these tuples. For example,
-the <code>gradient</code> field is implemented by the
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.GradientConfig"><code>GradientConfig</code></a> class, which contains a
-<code>samplers</code> field that is an array of indices, indicating for each variable
-which sampler should be used.</p>
+        <p>The primary configuration class for an optimization step.</p>
+<p><code>EnOptConfig</code> orchestrates the configuration of an entire optimization
+workflow. It contains nested configuration classes that define specific
+aspects of the optimization, such as variables, objectives, constraints,
+realizations, and the optimizer itself.</p>
+<p><code>realization_filters</code>, <code>function_estimators</code>, and <code>samplers</code> are configured
+as tuples. Other configuration fields reference these objects by their index
+within the tuples. For example,
+<a class="autorefs autorefs-internal" href="#ropt.config.enopt.GradientConfig"><code>GradientConfig</code></a> uses a <code>samplers</code>
+field, which is an array of indices specifying the sampler to use for each
+variable.</p>
 
 
 <details class="info" open>
   <summary>Info</summary>
-  <p>Many of these nested classes contain fields that are
-<a href="https://np.org"><code>numpy</code></a> arrays of values. In general, these arrays
-must have a given size defined by the configured property or a size of
-one. For instance, the <code>variables</code> field must be an object of the
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.VariablesConfig"><code>VariablesConfig</code></a> class, which
-contains information about the variables to be optimized. This includes
-such properties as initial values, bounds, and so on, which are defined
-as <code>numpy</code> arrays. The size of these arrays must be either equal to the
-number of variables or equal to one, in which case that single value is
-used for all variables.</p>
+  <p>Many nested configuration classes use <code>numpy</code> arrays. These arrays
+typically have a size determined by a configured property (e.g., the
+number of variables) or a size of one. In the latter case, the single
+value is broadcasted to all relevant elements. For example,
+<a class="autorefs autorefs-internal" href="#ropt.config.enopt.VariablesConfig"><code>VariablesConfig</code></a> defines
+properties like initial values and bounds as <code>numpy</code> arrays, which must
+either match the number of variables or have a size of one.</p>
 </details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -1669,7 +1657,7 @@ used for all variables.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Configuration of the variables.</p>
+                <p>Configuration for the optimization variables.</p>
               </div>
             </td>
           </tr>
@@ -1680,7 +1668,7 @@ used for all variables.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Configuration of the objective functions.</p>
+                <p>Configuration for the objective functions.</p>
               </div>
             </td>
           </tr>
@@ -1691,7 +1679,7 @@ used for all variables.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Configuration of linear constraints.</p>
+                <p>Configuration for linear constraints.</p>
               </div>
             </td>
           </tr>
@@ -1702,7 +1690,7 @@ used for all variables.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Configuration of non-linear constraints.</p>
+                <p>Configuration for non-linear constraints.</p>
               </div>
             </td>
           </tr>
@@ -1713,7 +1701,7 @@ used for all variables.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Configuration of the realizations.</p>
+                <p>Configuration for the realizations.</p>
               </div>
             </td>
           </tr>
@@ -1724,7 +1712,7 @@ used for all variables.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Configuration of the optimizer.</p>
+                <p>Configuration for the optimization algorithm.</p>
               </div>
             </td>
           </tr>
@@ -1746,7 +1734,7 @@ used for all variables.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Configuration of realization filters.</p>
+                <p>Configuration for realization filters.</p>
               </div>
             </td>
           </tr>
@@ -1757,7 +1745,7 @@ used for all variables.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Configuration of function estimators.</p>
+                <p>Configuration for function estimators.</p>
               </div>
             </td>
           </tr>
@@ -1768,7 +1756,7 @@ used for all variables.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Configuration of samplers.</p>
+                <p>Configuration for samplers.</p>
               </div>
             </td>
           </tr>
@@ -1815,31 +1803,33 @@ used for all variables.</p>
     <div class="doc doc-contents ">
 
 
-        <p>The configuration class for variables.</p>
-<p>This configuration class, configured by the <code>variables</code> field in an
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object defines essential
-aspects of the variables: the initial values and the bounds. These are given
-by the <code>initial_values</code>, <code>lower_bounds</code>, and <code>upper_bounds</code> fields, which
-are <a href="https://numpy.org"><code>numpy</code></a> arrays. Initial values must be provided,
-and its length determines the number of variables. The lower and upper
-bounds, are broadcasted to the number of variables, and are set to
-<span class="arithmatex">\(-\infty\)</span> and <span class="arithmatex">\(+\infty\)</span> by default. They may contain <code>numpy.nan</code> values,
-indicating that corresponding variables have no lower or upper bounds,
-respectively. These values are converted to <code>numpy.inf</code> values with an
-appropriate sign.</p>
-<p>The optional <code>types</code> field can be used to assign types to each variable,
-according to the <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.VariableType"><code>VariableType</code></a> enumeration. The
-values can be used to configure the optimizer accordingly. If not provided,
-all variables are assumed to be continuous and of real data type
-(corresponding to <a class="autorefs autorefs-internal" title="REAL = 1
+        <p>Configuration class for optimization variables.</p>
+<p>This class, <code>VariablesConfig</code>, defines the configuration for the
+optimization variables used in an
+<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. It specifies the
+initial values, bounds, types, and an optional mask for the variables.</p>
+<p>The <code>initial_values</code> field is a required <code>numpy</code> array that sets the
+starting values for the variables. The number of variables is determined by
+the length of this array.</p>
+<p>The <code>lower_bounds</code> and <code>upper_bounds</code> fields define the bounds for each
+variable. These are also <code>numpy</code> arrays and are broadcasted to match the
+number of variables. By default, they are set to negative and positive
+infinity, respectively. <code>numpy.nan</code> values in these arrays indicate
+unbounded variables and are converted to <code>numpy.inf</code> with the appropriate
+sign.</p>
+<p>The optional <code>types</code> field allows assigning a
+<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.VariableType"><code>VariableType</code></a> to each variable. If not provided,
+all variables are assumed to be continuous real-valued
+(<a class="autorefs autorefs-internal" title="REAL = 1
 
   
       class-attribute
       instance-attribute
-  " href="../enums/#ropt.enums.VariableType.REAL"><code>VariableType.REAL</code></a>)</p>
-<p>The boolean entries of the optional <code>mask</code> field indicates which variables
-are considered to be free to change. During optimization, only these
-variables should change while others remain fixed.</p>
+  " href="../enums/#ropt.enums.VariableType.REAL"><code>VariableType.REAL</code></a>).</p>
+<p>The optional <code>mask</code> field is a boolean <code>numpy</code> array that indicates which
+variables are free to change during optimization. <code>True</code> values in the mask
+indicate that the corresponding variable is free, while <code>False</code> indicates a
+fixed variable.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -1863,7 +1853,7 @@ variables should change while others remain fixed.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The type of the variables (optional).</p>
+                <p>Optional variable types.</p>
               </div>
             </td>
           </tr>
@@ -1878,7 +1868,7 @@ variables should change while others remain fixed.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The initial values of the variables.</p>
+                <p>Initial values for the variables.</p>
               </div>
             </td>
           </tr>
@@ -1893,7 +1883,7 @@ variables should change while others remain fixed.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Lower bound of the variables (default: <span class="arithmatex">\(-\infty\)</span>).</p>
+                <p>Lower bounds for the variables (default: <span class="arithmatex">\(-\infty\)</span>).</p>
               </div>
             </td>
           </tr>
@@ -1908,7 +1898,7 @@ variables should change while others remain fixed.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Upper bound of the variables (default: <span class="arithmatex">\(+\infty\)</span>).</p>
+                <p>Upper bounds for the variables (default: <span class="arithmatex">\(+\infty\)</span>).</p>
               </div>
             </td>
           </tr>
@@ -1923,7 +1913,7 @@ variables should change while others remain fixed.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional mask of variables to optimize.</p>
+                <p>Optional boolean mask indicating free variables.</p>
               </div>
             </td>
           </tr>
@@ -1970,20 +1960,20 @@ variables should change while others remain fixed.</p>
     <div class="doc doc-contents ">
 
 
-        <p>The configuration class for objective functions.</p>
-<p>This configuration class defines objective functions configured by the
-<code>objectives</code> field in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>
-object.</p>
-<p><code>ropt</code> supports optimization over multiple objectives, which are summed after
-weighting with values passed via the <code>weights</code> field. This field is a
-<code>numpy</code> array, with a length that determines the number of objective functions.
-Its values will be normalized to have a sum equal to 1. For example, when
-<code>weights</code> is set to <code>[1, 1]</code>, the stored values will be <code>[0.5, 0.5]</code>.</p>
-<p>The objective functions may be subject to realization filters and function
-estimators. The <code>realization_filters</code> and <code>function_estimators</code> fields
-contain indices to the realization filter or function estimator objects to
-use. The objects referred to are configured in the parent
+        <p>Configuration class for objective functions.</p>
+<p>This class, <code>ObjectiveFunctionsConfig</code>, defines the configuration for
+objective functions used in an
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+<p><code>ropt</code> supports multi-objective optimization. Multiple objectives are
+combined into a single value by summing them after weighting. The <code>weights</code>
+field, a <code>numpy</code> array, determines the weight of each objective function.
+The length of this array defines the number of objective functions. The
+weights are automatically normalized to sum to 1 (e.g., <code>[1, 1]</code> becomes
+<code>[0.5, 0.5]</code>).</p>
+<p>Objective functions can be processed by realization filters and function
+estimators. The <code>realization_filters</code> and <code>function_estimators</code> fields
+contain indices that refer to the corresponding configuration objects in the
+parent <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2007,7 +1997,7 @@ use. The objects referred to are configured in the parent
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Objective functions weights (default: 1.0).</p>
+                <p>Weights for the objective functions (default: 1.0).</p>
               </div>
             </td>
           </tr>
@@ -2022,7 +2012,7 @@ use. The objects referred to are configured in the parent
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional realization filter indices.</p>
+                <p>Optional indices of realization filters.</p>
               </div>
             </td>
           </tr>
@@ -2037,7 +2027,7 @@ use. The objects referred to are configured in the parent
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional function estimator indices.</p>
+                <p>Optional indices of function estimators.</p>
               </div>
             </td>
           </tr>
@@ -2084,36 +2074,22 @@ use. The objects referred to are configured in the parent
     <div class="doc doc-contents ">
 
 
-        <p>The configuration class for linear constraints.</p>
-<p>This class defines linear constraints configured by the <code>linear_constraints</code>
-field in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
-<p>Linear constraints can be described by a set of linear equations on the
-variables, including equality or non-equality constraints. The
-<code>coefficients</code> field is a 2D <code>numpy</code> array where the number of rows equals
-the number of constraints, and the number of columns equals the number of
-variables.</p>
-<p>Lower and upper bounds on he right-hand sides of the equations are given in
-the <code>lower_bounds</code> and <code>upper_bounds fields, which will be converted and
-broadcasted to a</code>numpy` array with a length equal to the number of
-equations.</p>
+        <p>Configuration class for linear constraints.</p>
+<p>This class, <code>LinearConstraintsConfig</code>, defines linear constraints used in an
+<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+<p>Linear constraints are defined by a set of linear equations involving the
+optimization variables. These equations can represent equality or inequality
+constraints. The <code>coefficients</code> field is a 2D <code>numpy</code> array where each row
+represents a constraint, and each column corresponds to a variable.</p>
+<p>The <code>lower_bounds</code> and <code>upper_bounds</code> fields specify the bounds on the
+right-hand side of each constraint equation. These fields are converted and
+broadcasted to <code>numpy</code> arrays with a length equal to the number of
+constraint equations.</p>
+<p>Less-than and greater-than inequality constraints can be specified by
+setting the lower bounds to <span class="arithmatex">\(-\infty\)</span>, or the upper bounds to <span class="arithmatex">\(+\infty\)</span>,
+respectively. Equality constraints are specified by setting the lower bounds
+equal to the upper bounds.</p>
 
-
-<details class="note" open>
-  <summary>Linear transformation of variables.</summary>
-  <p>The set of linear constraints can be represented by a matrix equation:
-<span class="arithmatex">\(\mathbf{A} \mathbf{x} = \mathbf{b}\)</span>.</p>
-<p>When linearly transforming variables to the optimizer domain, the
-coefficients (<span class="arithmatex">\(\mathbf{A}\)</span>) and right-hand-side values (<span class="arithmatex">\(\mathbf{b}\)</span>)
-must be converted to remain valid. If the linear transformation of the
-variables to the optimizer domain is given by:</p>
-<div class="arithmatex">\[ \hat{\mathbf{x}} = \mathbf{S} \mathbf{x} + \mathbf{o}\]</div>
-<p>then the coefficients and right-hand-side values must be transformed as
-follows:</p>
-<div class="arithmatex">\[ \begin{align}
-    \hat{\mathbf{A}} &amp;= \mathbf{A} \mathbf{S}^{-1} \\ \hat{\mathbf{b}}
-    &amp;= \mathbf{b} + \mathbf{A}\mathbf{S}^{-1}\mathbf{o}
-\end{align}\]</div>
-</details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
     <table>
@@ -2136,7 +2112,7 @@ follows:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The matrix of coefficients.</p>
+                <p>Matrix of coefficients for the linear constraints.</p>
               </div>
             </td>
           </tr>
@@ -2151,7 +2127,7 @@ follows:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The lower bounds on the right-hand-sides of the constraint equations.</p>
+                <p>Lower bounds for the right-hand side of the constraint equations.</p>
               </div>
             </td>
           </tr>
@@ -2166,13 +2142,30 @@ follows:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The upper bounds on the right-hand-sides of the constraint equations.</p>
+                <p>Upper bounds for the right-hand side of the constraint equations.</p>
               </div>
             </td>
           </tr>
       </tbody>
     </table>
 
+
+<details class="note" open>
+  <summary>Linear transformation of variables.</summary>
+  <p>The set of linear constraints can be represented by a matrix equation:
+<span class="arithmatex">\(\mathbf{A} \mathbf{x} = \mathbf{b}\)</span>.</p>
+<p>When linearly transforming variables to the optimizer domain, the
+coefficients (<span class="arithmatex">\(\mathbf{A}\)</span>) and right-hand-side values (<span class="arithmatex">\(\mathbf{b}\)</span>)
+must be converted to remain valid. If the linear transformation of the
+variables to the optimizer domain is given by:</p>
+<div class="arithmatex">\[ \hat{\mathbf{x}} = \mathbf{S} \mathbf{x} + \mathbf{o}\]</div>
+<p>then the coefficients and right-hand-side values must be transformed as
+follows:</p>
+<div class="arithmatex">\[ \begin{align}
+    \hat{\mathbf{A}} &amp;= \mathbf{A} \mathbf{S}^{-1} \\ \hat{\mathbf{b}}
+    &amp;= \mathbf{b} + \mathbf{A}\mathbf{S}^{-1}\mathbf{o}
+\end{align}\]</div>
+</details>
 
 
 
@@ -2184,99 +2177,6 @@ follows:</p>
 
   <div class="doc doc-children">
 
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.config.enopt.LinearConstraintsConfig.apply_transformation" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">apply_transformation</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">transforms</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Transform linear constraints.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>variables</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="VariablesConfig (ropt.config.enopt.VariablesConfig)" href="#ropt.config.enopt.VariablesConfig">VariablesConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A variables configuration object specifying.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>transforms</code>
-            </td>
-            <td>
-                  <code><span title="ropt.transforms.OptModelTransforms">OptModelTransforms</span> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>An optional transforms object.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="LinearConstraintsConfig (ropt.config.enopt._linear_constraints_config.LinearConstraintsConfig)" href="#ropt.config.enopt.LinearConstraintsConfig">LinearConstraintsConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A modified configuration if transformations are applied; otherwise, self.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
 
 
 
@@ -2306,19 +2206,21 @@ follows:</p>
     <div class="doc doc-contents ">
 
 
-        <p>The configuration class for non-linear constraints.</p>
-<p>This class defines non-linear constraints configured by the
-<code>nonlinear_constraints</code> field in an
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
-<p>Non-linear constraints require that some constraint function is compared to
-a right-hand-side value, either for equality or inequality. The
-<code>lower_bounds</code> and <code>upper_bounds</code> fields, which is a <code>numpy</code> arrays with a
-length equal to the number of constraint functions, provides the bounds on
-the right-hand-side values.</p>
-<p>The non-linear constraints may be subject to realization filters and
-function estimators. The <code>realization_filters</code> and <code>function_estimator</code>
-fields contain indices to the realization filter or function estimator
-objects to use. These objects are configured in the parent
+        <p>Configuration class for non-linear constraints.</p>
+<p>This class, <code>NonlinearConstraintsConfig</code>, defines non-linear constraints used
+in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+<p>Non-linear constraints are defined by comparing a constraint function to a
+right-hand-side value, allowing for equality or inequality constraints. The
+<code>lower_bounds</code> and <code>upper_bounds</code> fields, which are <code>numpy</code> arrays, specify the
+bounds on these right-hand-side values. The length of these arrays determines
+the number of constraint functions.</p>
+<p>Less-than and greater-than inequality constraints can be specified by
+setting the lower bounds to <span class="arithmatex">\(-\infty\)</span>, or the upper bounds to <span class="arithmatex">\(+\infty\)</span>,
+respectively. Equality constraints are specified by setting the lower bounds
+equal to the upper bounds.</p>
+<p>Non-linear constraints can be processed by realization filters and function
+estimators. The <code>realization_filters</code> and <code>function_estimators</code> fields contain
+indices that refer to the corresponding objects configured in the parent
 <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 
 
@@ -2343,7 +2245,7 @@ objects to use. These objects are configured in the parent
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The lower bounds on the right-hand-side values.</p>
+                <p>Lower bounds for the right-hand-side values.</p>
               </div>
             </td>
           </tr>
@@ -2358,7 +2260,7 @@ objects to use. These objects are configured in the parent
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The upper bounds on the right-hand-side values.</p>
+                <p>Upper bounds for the right-hand-side values.</p>
               </div>
             </td>
           </tr>
@@ -2373,7 +2275,7 @@ objects to use. These objects are configured in the parent
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional realization filter indices.</p>
+                <p>Optional indices of realization filters.</p>
               </div>
             </td>
           </tr>
@@ -2388,7 +2290,7 @@ objects to use. These objects are configured in the parent
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional function estimator indices.</p>
+                <p>Optional indices of function estimators.</p>
               </div>
             </td>
           </tr>
@@ -2435,34 +2337,31 @@ objects to use. These objects are configured in the parent
     <div class="doc doc-contents ">
 
 
-        <p>The configuration class for realizations.</p>
-<p>This class defines realizations configured by the <code>realizations</code> field in an
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+        <p>Configuration class for realizations.</p>
+<p>This class, <code>RealizationsConfig</code>, defines the configuration for realizations
+used in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 <p>To optimize an ensemble of functions, a set of realizations is defined. When
-the optimizer requests a function value or a gradient, the functions and
-gradients are calculated for each realization and combined into a single
-function or gradient. Usually, this will be a (weighted) sum, but other ways
-of combining realizations are possible.</p>
-<p>The <code>weights</code> field is a <code>numpy</code> array, with a length that determines the number
-of realizations. Its values will be normalized to have a sum equal to 1. For
-example, when <code>weights</code> is set to <code>[1, 1]</code>, the stored values will be <code>[0.5,
-0.5]</code>.</p>
-<p>If during the calculation of the function values for each realization one or
-more values are missing, for instance due to failure of a complex
-simulation, the total function and gradient values can still be calculated
-by leaving the missing values out. However, this may be undesirable, or
-there may be a hard minimum to the amount of values that is needed. The
-<code>realization_min_success</code> field can be set to the minimum number of
-successful realizations. By default, it is set equal to the number of
-realizations, i.e., there are no missing values allowed by default.</p>
+the optimizer requests a function value or a gradient, these are calculated for
+each realization and then combined into a single value. Typically, this
+combination is a weighted sum, but other methods are possible.</p>
+<p>The <code>weights</code> field, a <code>numpy</code> array, determines the weight of each
+realization. The length of this array defines the number of realizations. The
+weights are automatically normalized to sum to 1 (e.g., <code>[1, 1]</code> becomes
+<code>[0.5, 0.5]</code>).</p>
+<p>If function value calculations for some realizations fail (e.g., due to a
+simulation error), the total function and gradient values can still be
+calculated by excluding the missing values. However, a minimum number of
+successful realizations may be required. The <code>realization_min_success</code> field
+specifies this minimum. By default, it is set equal to the number of
+realizations, meaning no missing values are allowed.</p>
 
 
 <details class="note" open>
   <summary>Note</summary>
-  <p>The value of <code>realization_min_success</code> can be set to zero. Some
-optimizers can handle this and will proceed with the optimization even
-if all realizations fail. However, most optimizers cannot handle this
-and will behave as if the value is set to one.</p>
+  <p>Setting <code>realization_min_success</code> to zero allows the optimization to
+proceed even if all realizations fail. While some optimizers can handle
+this, most will treat it as if the value were one, requiring at least
+one successful realization.</p>
 </details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2486,7 +2385,7 @@ and will behave as if the value is set to one.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The weights of the realizations (default: 1).</p>
+                <p>Weights for the realizations (default: 1.0).</p>
               </div>
             </td>
           </tr>
@@ -2497,8 +2396,8 @@ and will behave as if the value is set to one.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The minimum number of successful realizations
-                     (default: equal to the number of realizations).</p>
+                <p>Minimum number of successful realizations (default:
+                    equal to the number of realizations).</p>
               </div>
             </td>
           </tr>
@@ -2545,40 +2444,37 @@ and will behave as if the value is set to one.</p>
     <div class="doc doc-contents ">
 
 
-        <p>The configuration class for optimizers used in the optimization.</p>
-<p>This class defines the configuration for optimizers, configured by the
-<code>optimizer</code> field in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>
-object.</p>
-<p>Although there may be significant differences in the parameters that can be
-used for different optimization methods, there are a few standard settings
-defined in this configuration object, which are forwarded to the optimizer:</p>
+        <p>Configuration class for the optimization algorithm.</p>
+<p>This class, <code>OptimizerConfig</code>, defines the configuration for the optimization
+algorithm used in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+<p>While optimization methods can have diverse parameters, this class provides a
+standardized set of settings that are commonly used and forwarded to the
+optimizer:</p>
 <ul>
-<li>The maximum number of iterations allowed before the optimization should be
-  aborted by this optimizer. The optimizer may choose to ignore this option.</li>
-<li>The maximum number of function evaluations allowed before the optimization
-  is aborted.</li>
-<li>The convergence tolerance used as a stopping criterion. The exact
-  definition of the criterion depends on the optimizer. The optimizer may
-  choose to ignore this option.</li>
-<li>Whether gradients should be evaluated early, even if the optimizer does
-  not strictly need it yet. When evaluating on a distributed HPC cluster,
-  this may lead to better load-balancing for some methods. This option is
-  only applied if the optimization algorithm knows how to make use of it.</li>
-<li>Whether calculations for functions and gradients should be done
-  separately, even if the optimizer requests them to be evaluated together.
-  This option is useful when a filter is specified that deactivates some
-  realizations (see
-  <a class="autorefs autorefs-internal" href="#ropt.config.enopt.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>).
-  In this case, after evaluation of the functions, it may be possible to
-  reduce the number of evaluations for a following gradient calculation.</li>
-<li>Whether the optimizer may use parallelized function evaluations. This
-  option currently only applies to gradient-free methods and may be ignored
-  by the optimizer.</li>
-<li>An optional location of an output directory, where the optimizer may store
-  files.</li>
-<li>Generic optimizer options that may be passed as an arbitrary dictionary,
-  or as a list of strings. It depends on the method what form is required
-  and how it is interpreted.</li>
+<li><strong><code>max_iterations</code></strong>: The maximum number of iterations allowed. The
+  optimizer may choose to ignore this.</li>
+<li><strong><code>max_functions</code></strong>: The maximum number of function evaluations allowed.</li>
+<li><strong><code>tolerance</code></strong>: The convergence tolerance used as a stopping criterion.
+  The exact definition depends on the optimizer, and it may be ignored.</li>
+<li><strong><code>speculative</code></strong>: If <code>True</code>, forces early gradient evaluations, even if
+  not strictly required. This can improve load balancing on HPC clusters but
+  is only effective if the optimizer supports it. This is disabled if
+  <code>split_evaluations</code> is <code>True</code>.</li>
+<li><strong><code>split_evaluations</code></strong>: If <code>True</code>, forces separate function and gradient
+  evaluations, even if the optimizer requests them together. This is useful
+  with realization filters that completerly disable some realizations, to
+  potentially reduce the number of evaluations for gradients (see
+  <a class="autorefs autorefs-internal" href="#ropt.config.enopt.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>).</li>
+<li><strong><code>parallel</code></strong>: If <code>True</code>, allows the optimizer to use parallelized
+  function evaluations. This typically applies to gradient-free methods and
+  may be ignored.</li>
+<li><strong><code>output_dir</code></strong>: An optional output directory where the optimizer can
+  store files.</li>
+<li><strong><code>options</code></strong>: A dictionary or list of strings for generic optimizer
+  options. The required format and interpretation depend on the specific
+  optimization method.</li>
+<li><strong><code>stdout</code></strong>: Redirect optimizer standard output to the given file.</li>
+<li><strong><code>stderr</code></strong>: Redirect optimizer standard error to the given file.</li>
 </ul>
 
 
@@ -2599,7 +2495,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Name of the optimization method used.</p>
+                <p>Name of the optimization method.</p>
               </div>
             </td>
           </tr>
@@ -2610,7 +2506,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional maximum number of iterations.</p>
+                <p>Maximum number of iterations (optional).</p>
               </div>
             </td>
           </tr>
@@ -2621,7 +2517,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional maximum number of function evaluations.</p>
+                <p>Maximum number of function evaluations (optional).</p>
               </div>
             </td>
           </tr>
@@ -2632,7 +2528,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional tolerance for convergence.</p>
+                <p>Convergence tolerance (optional).</p>
               </div>
             </td>
           </tr>
@@ -2643,8 +2539,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Force gradient evaluations; disabled if
-               split_evaluations is True (default <code>False</code>).</p>
+                <p>Force early gradient evaluations (default: <code>False</code>).</p>
               </div>
             </td>
           </tr>
@@ -2655,8 +2550,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Evaluate function and gradient separately
-               (default: <code>False</code>).</p>
+                <p>Force separate function/gradient evaluations (default: <code>False</code>).</p>
               </div>
             </td>
           </tr>
@@ -2667,7 +2561,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Allow for parallelized evaluation (default: <code>False</code>).</p>
+                <p>Allow parallelized function evaluations (default: <code>False</code>).</p>
               </div>
             </td>
           </tr>
@@ -2678,7 +2572,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional output directory for use by the optimizer.</p>
+                <p>Output directory for the optimizer (optional).</p>
               </div>
             </td>
           </tr>
@@ -2689,7 +2583,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional generic options for use by the optimizer.</p>
+                <p>Generic options for the optimizer (optional).</p>
               </div>
             </td>
           </tr>
@@ -2700,7 +2594,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Redirect optimizer std output to the given file.</p>
+                <p>File to redirect optimizer standard output (optional).</p>
               </div>
             </td>
           </tr>
@@ -2711,7 +2605,7 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Redirect optimizer std error to the given file.</p>
+                <p>File to redirect optimizer standard error (optional).</p>
               </div>
             </td>
           </tr>
@@ -2758,52 +2652,48 @@ defined in this configuration object, which are forwarded to the optimizer:</p>
     <div class="doc doc-contents ">
 
 
-        <p>The configuration class for gradient calculations.</p>
-<p>This class defines the configuration for gradient calculations, configured
-by the <code>gradients</code> field in an
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
-<p>If the optimizer requires gradient information, it is estimated from a set
-of function values calculated from perturbed variables and from the
-unperturbed variables. The number of perturbations is determined by the
-<code>number_of_perturbations</code> field, which should be at least one and may be
-larger than the number of variables.</p>
-<p>Some function evaluations for the perturbed variables may fail, for instance
-due to an error in a long-running simulation. As long as not too many
-evaluations fail, the gradient may still be estimated. The
-<code>perturbation_min_success</code> field determines how many perturbed variables
-should be successfully evaluated. By default, this parameter is set equal to
-the number of perturbations.</p>
-<p>Perturbations are generally produced by sampler objects configured in the
-parent <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. The <code>samplers</code>
-field contains, for each variable, an index into the tuple of these
-configured samplers, indicating which sampler should be used to generate
-perturbation values for that variable. To support samplers that need random number,
-a random number generator object is created</p>
-<p>The generated perturbation values are added to the unperturbed variables
-after multiplication with the perturbation magnitudes given by the
-<code>perturbation_magnitudes</code> field. The perturbation values may be used
-directly or first modified in various ways. The <code>perturbation_types</code> field
-determines if and how this is done for each variable (see the
-<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a> enumeration for details).</p>
-<p>The perturbed variables can occasionally violate the bound constraints
-defined for the variables. This may be undesirable, for instance if the
-function evaluation may fail for variables that violate these constraints.
-The <code>boundary_types</code> array determines what action is taken to rectify such a
-situation (see the <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a> enumeration for
-more details).</p>
-<p>Both the <code>perturbation_types</code> and <code>boundary_types</code> fields are defined as
-integer arrays, but their values are limited to the values of the
+        <p>Configuration class for gradient calculations.</p>
+<p>This class, <code>GradientConfig</code>, defines the configuration for gradient
+calculations used in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>
+object.</p>
+<p>Gradients are estimated using function values calculated from perturbed
+variables and the unperturbed variables. The <code>number_of_perturbations</code> field
+determines the number of perturbed variables used, which must be at least
+one.</p>
+<p>If function evaluations for some perturbed variables fail, the gradient may
+still be estimated as long as a minimum number of evaluations succeed. The
+<code>perturbation_min_success</code> field specifies this minimum. By default, it
+equals <code>number_of_perturbations</code>.</p>
+<p>Perturbations are generated by sampler objects configured in the parent
+<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. The <code>samplers</code> field
+specifies, for each variable, the index of the sampler to use. A random
+number generator is created to support samplers that require random numbers.</p>
+<p>The generated perturbation values are scaled by the
+<code>perturbation_magnitudes</code> and can be modified based on the
+<code>perturbation_types</code>. See <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>
+for details on available perturbation types.</p>
+<p>Perturbed variables may violate the defined variable bounds. The
+<code>boundary_types</code> field specifies how to handle such violations. See
+<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a> for details on available boundary
+handling methods.</p>
+<p>The <code>perturbation_types</code> and <code>boundary_types</code> fields use values from the
 <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a> and
 <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a> enumerations, respectively.</p>
-<p>The gradient is calculated for each realization individually, and the
-resulting gradients are afterwards combined into a total gradient. If the
-number of perturbations is low, the calculation of the individual gradients
-may be unreliable. In particular, in the case of a single perturbation, the
-result is likely inaccurate. In such a case, the <code>merge_realizations</code> flag
-can be set to direct the optimizer to use a different calculation to combine
-the results of all realizations directly into an estimation of the total
-gradient.</p>
+<p>Gradients are calculated for each realization individually and then combined
+into a total gradient. If <code>number_of_perturbations</code> is low, or even just
+one, individual gradient calculations may be unreliable. In this case,
+setting <code>merge_realizations</code> to <code>True</code> directs the optimizer to combine the
+results of all realizations directly into a single gradient estimate.</p>
 
+
+<details class="note" open>
+  <summary>Seed for Samplers</summary>
+  <p>The <code>seed</code> value ensures consistent results across repeated runs with
+the same configuration. To obtain unique results for each optimization
+run, modify the seed. A common approach is to use a tuple with a unique
+ID as the first element, ensuring reproducibility across nested and
+parallel plan evaluations.</p>
+</details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
     <table>
@@ -2822,7 +2712,7 @@ gradient.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The number of perturbations (default:
+                <p>Number of perturbations (default:
 <a class="autorefs autorefs-internal" title="DEFAULT_NUMBER_OF_PERTURBATIONS = 5
 
   
@@ -2838,9 +2728,8 @@ gradient.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The minimum number of successful function
-                      evaluations for perturbed variables (default:
-                      equal to the number of perturbations).</p>
+                <p>Minimum number of successful function evaluations
+for perturbed variables (default: equal to <code>number_of_perturbations</code>).</p>
               </div>
             </td>
           </tr>
@@ -2855,8 +2744,8 @@ gradient.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The magnitudes of the perturbations for each variable
-                      (default:
+                <p>Magnitudes of the perturbations for each variable
+(default:
 <a class="autorefs autorefs-internal" title="DEFAULT_PERTURBATION_MAGNITUDE = 0.005
 
   
@@ -2876,9 +2765,8 @@ gradient.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The type of perturbation for each variable
-                      (<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>,
-                      default:
+                <p>Type of perturbation for each variable (see
+<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>, default:
 <a class="autorefs autorefs-internal" title="DEFAULT_PERTURBATION_TYPE = PerturbationType.ABSOLUTE
 
   
@@ -2898,9 +2786,8 @@ gradient.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>How perturbations that violate boundary conditions
-                      are treated (see <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>),
-                      default:
+                <p>How to handle perturbations that violate boundary
+conditions (see <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>, default:
 <a class="autorefs autorefs-internal" title="DEFAULT_PERTURBATION_BOUNDARY_TYPE = BoundaryType.MIRROR_BOTH
 
   
@@ -2920,7 +2807,7 @@ gradient.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The index of the sampler to use for each variable.</p>
+                <p>Indices of the samplers to use for each variable.</p>
               </div>
             </td>
           </tr>
@@ -2935,7 +2822,7 @@ gradient.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The seed for the random number generator passed to each sampler.</p>
+                <p>Seed for the random number generator used by the samplers.</p>
               </div>
             </td>
           </tr>
@@ -2946,26 +2833,14 @@ gradient.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If all realizations should be merged for the final
-                      gradient calculation (default: <code>False</code>).</p>
+                <p>Merge all realizations for the final gradient
+calculation (default: <code>False</code>).</p>
               </div>
             </td>
           </tr>
       </tbody>
     </table>
 
-
-<details class="note" open>
-  <summary>The seed for samples</summary>
-  <p>The seed controls consistency in results across repeated runs within the
-same plan, as long as the seed remains unchanged. To obtain unique
-results for each optimization run, the seed should be modified. The
-<code>numpy</code> manual suggests converting the seed to a tuple and pre-pending
-one or more unique integers.</p>
-<p>A suitable approach is to use the unique plan ID of the optimizer as the
-pre-pended value, which ensures reproducibility across nested and
-parallel plan evaluations.</p>
-</details>
 
 
 
@@ -2977,105 +2852,6 @@ parallel plan evaluations.</p>
 
   <div class="doc doc-children">
 
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.config.enopt.GradientConfig.fix_perturbations" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">fix_perturbations</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="n">transforms</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Adjust the gradient perturbation configuration.</p>
-<p>This method modifies the gradient's perturbation settings to account for
-variable bounds, as defined in the <code>variables</code> configuration. If bounds
-are set on the variables, the perturbations in the gradient
-configuration may need adjustment to reflect these constraints. This
-method returns an updated copy of the gradient configuration with the
-necessary modifications.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>variables</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="VariablesConfig (ropt.config.enopt.VariablesConfig)" href="#ropt.config.enopt.VariablesConfig">VariablesConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The configuration of variables.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>transforms</code>
-            </td>
-            <td>
-                  <code><span title="ropt.transforms.OptModelTransforms">OptModelTransforms</span> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>An optional transform object.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="GradientConfig (ropt.config.enopt._gradient_config.GradientConfig)" href="#ropt.config.enopt.GradientConfig">GradientConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A modified gradient configuration.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
 
 
 
@@ -3106,19 +2882,18 @@ necessary modifications.</p>
 
 
         <p>Configuration class for function estimators.</p>
-<p>This class defines the configuration for function estimators, which are
-configured by the <code>function_estimators</code> field in an
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. That field contains a
-tuple of configuration objects that define which function estimators are
-available during the optimization.</p>
-<p>By default, the final objective and constraint functions and their gradients
-are calculated from the individual realizations by a weighted sum. Function
-estimators are optionally used to modify this calculation.</p>
-<p>The <code>method</code> field determines which method will be used to implement the
-calculation of the final function or gradient from the individual
-realizations. To further specify how such a method should function, the
-<code>options</code> field can be used to pass a dictionary of key-value pairs. The
-interpretation of these options depends on the chosen method.</p>
+<p>This class, <code>FunctionEstimatorConfig</code>, defines the configuration for
+function estimators used in an
+<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. Function estimators
+are configured as a tuple in the <code>function_estimators</code> field of the
+<code>EnOptConfig</code>, defining the available estimators for the optimization.</p>
+<p>By default, objective and constraint functions, as well as their gradients,
+are calculated from individual realizations using a weighted sum. Function
+estimators provide a way to modify this default calculation.</p>
+<p>The <code>method</code> field specifies the function estimator method to use for
+combining the individual realizations. The <code>options</code> field allows passing a
+dictionary of key-value pairs to further configure the chosen method. The
+interpretation of these options depends on the selected method.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3138,7 +2913,7 @@ interpretation of these options depends on the chosen method.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The function estimator method.</p>
+                <p>Name of the function estimator method.</p>
               </div>
             </td>
           </tr>
@@ -3149,7 +2924,7 @@ interpretation of these options depends on the chosen method.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Options to be passed to the estimator.</p>
+                <p>Dictionary of options for the function estimator.</p>
               </div>
             </td>
           </tr>
@@ -3196,23 +2971,22 @@ interpretation of these options depends on the chosen method.</p>
     <div class="doc doc-contents ">
 
 
-        <p>The configuration class for realization filters.</p>
-<p>This class defines the configuration for realization filters, which are
-configured by the <code>realization_filters</code> field in an
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. This field contains a
-tuple of configuration objects that define which realization filters are
-available during optimization.</p>
-<p>By default, the final objective and constraint functions and their gradients
-are calculated as a weighted function from all realizations. Realization
-filters are optionally used to change the weights of the individual
-realizations. For instance, this can be used to determine which subset of
-realizations should be used in calculating the final objective and
-constraint functions and their gradients by setting some weights to zero.</p>
-<p>The <code>method</code> field determines which method will be used to adjust the
-weights of the individual realizations. To further specify how such a method
-should function, the <code>options</code> field can be used to pass a dictionary of
-key-value pairs. The interpretation of these options depends on the| chosen
-method.</p>
+        <p>Configuration class for realization filters.</p>
+<p>This class, <code>RealizationFilterConfig</code>, defines the configuration for
+realization filters used in an
+<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. Realization filters
+are configured as a tuple in the <code>realization_filters</code> field of the
+<code>EnOptConfig</code>, defining the available filters for the optimization.</p>
+<p>By default, objective and constraint functions, as well as their gradients,
+are calculated as a weighted function of all realizations. Realization
+filters provide a way to modify the weights of individual realizations. For
+example, they can be used to select a subset of realizations for calculating
+the final objective and constraint functions and their gradients by setting
+the weights of the other realizations to zero.</p>
+<p>The <code>method</code> field specifies the realization filter method to use for
+adjusting the weights. The <code>options</code> field allows passing a dictionary of
+key-value pairs to further configure the chosen method. The interpretation
+of these options depends on the selected method.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3232,7 +3006,7 @@ method.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The realization filter method.</p>
+                <p>Name of the realization filter method.</p>
               </div>
             </td>
           </tr>
@@ -3243,7 +3017,7 @@ method.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Options to be passed to the filter.</p>
+                <p>Dictionary of options for the realization filter.</p>
               </div>
             </td>
           </tr>
@@ -3290,26 +3064,22 @@ method.</p>
     <div class="doc doc-contents ">
 
 
-        <p>The sampler configuration class.</p>
-<p>This class defines the configuration for samplers, which are configured by
-the <code>samplers</code> field in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>
-object. That field contains a tuple of configuration objects that define
-which samplers are available during the optimization. The <code>samplers</code> field
-in the gradient configuration
-(<a class="autorefs autorefs-internal" href="#ropt.config.enopt.GradientConfig"><code>GradientConfig</code></a>) is used to specify
-the index of the sampler for each variable.</p>
-<p>Gradients are calculated from a set of perturbed variables, which may be
-deterministic or stochastic in nature. These perturbations are generally
-produced by sampler objects that produce perturbation values to add to the
-unperturbed variables.</p>
-<p>Perturbation values are produced by a sampler, which provides the methods
-that can be used. The <code>method</code> field determines which sampler method will be
-used. To further specify how such a method should function, the <code>options</code>
-field can be used to pass a dictionary of key-value pairs. The
-interpretation of these options depends on the chosen method.</p>
-<p>By default, a different set of perturbed variables is generated for each
-realization. By setting the <code>shared</code> flag to <code>True</code>, the sampler can be
-directed to use the same set of perturbed values for each realization.</p>
+        <p>Configuration class for samplers.</p>
+<p>This class, <code>SamplerConfig</code>, defines the configuration for samplers used in
+an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. Samplers are
+configured as a tuple in the <code>samplers</code> field of the <code>EnOptConfig</code>, defining
+the available samplers for the optimization. The <code>samplers</code> field in the
+<a class="autorefs autorefs-internal" href="#ropt.config.enopt.GradientConfig"><code>GradientConfig</code></a> specifies the index of
+the sampler to use for each variable.</p>
+<p>Samplers generate perturbations added to variables for gradient
+calculations. These perturbations can be deterministic or stochastic.</p>
+<p>The <code>method</code> field specifies the sampler method to use for generating
+perturbations. The <code>options</code> field allows passing a dictionary of key-value
+pairs to further configure the chosen method. The interpretation of these
+options depends on the selected method.</p>
+<p>By default, each realization uses a different set of perturbed variables.
+Setting the <code>shared</code> flag to <code>True</code> directs the sampler to use the same set
+of perturbed values for all realizations.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3329,7 +3099,7 @@ directed to use the same set of perturbed values for each realization.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The sampler method.</p>
+                <p>Name of the sampler method.</p>
               </div>
             </td>
           </tr>
@@ -3340,7 +3110,7 @@ directed to use the same set of perturbed values for each realization.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Options to be passed to the sampler.</p>
+                <p>Dictionary of options for the sampler.</p>
               </div>
             </td>
           </tr>
@@ -3351,8 +3121,7 @@ directed to use the same set of perturbed values for each realization.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether perturbation values should be shared between realizations
-     (default: <code>False</code>).</p>
+                <p>Whether to share perturbation values between realizations (default: <code>False</code>).</p>
               </div>
             </td>
           </tr>
@@ -3435,7 +3204,11 @@ directed to use the same set of perturbed values for each realization.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Default random generator seed.</p>
+        <p>Default seed for random number generators.</p>
+<p>The seed is used as the base value for random number generators within various
+components of the optimization process, such as samplers. Using a consistent
+seed ensures reproducibility across multiple runs with the same configuration.
+To obtain unique results for each optimization run, modify this seed.</p>
 
     </div>
 
@@ -3457,7 +3230,10 @@ directed to use the same set of perturbed values for each realization.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Default number of perturbations.</p>
+        <p>Default number of perturbations for gradient estimation.</p>
+<p>This value defines the default number of perturbed variables used to estimate
+gradients. A higher number of perturbations can lead to more accurate gradient
+estimates but also increases the number of function evaluations required.</p>
 
     </div>
 
@@ -3479,7 +3255,12 @@ directed to use the same set of perturbed values for each realization.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Default perturbation magnitude.</p>
+        <p>Default magnitude for variable perturbations.</p>
+<p>This value specifies the default value of the scaling factor applied to the
+perturbation values generated by samplers. The magnitude can be interpreted as
+an absolute value or as a relative value, depending on the selected perturbation
+type.</p>
+<p>See also: <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>.</p>
 
     </div>
 
@@ -3502,6 +3283,9 @@ directed to use the same set of perturbed values for each realization.</p>
     <div class="doc doc-contents ">
 
         <p>Default perturbation boundary handling type.</p>
+<p>This value determines how perturbations that violate the defined variable bounds
+are handled. The default, <code>BoundaryType.MIRROR_BOTH</code>, mirrors perturbations back
+into the valid range if they exceed either the lower or upper bound.</p>
 <p>See also: <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>.</p>
 
     </div>
@@ -3525,6 +3309,11 @@ directed to use the same set of perturbed values for each realization.</p>
     <div class="doc doc-contents ">
 
         <p>Default perturbation type.</p>
+<p>This value determines how the perturbation magnitude is interpreted. The
+default, <code>PerturbationType.ABSOLUTE</code>, means that the perturbation magnitude is
+added directly to the variable value. Other options, such as
+<code>PerturbationType.RELATIVE</code>, scale the perturbation magnitude based on the
+variable's bounds.</p>
 <p>See also: <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>.</p>
 
     </div>
