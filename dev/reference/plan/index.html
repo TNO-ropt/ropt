@@ -725,6 +725,24 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.get" class="md-nav__link">
+    <span class="md-ellipsis">
+      get
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.set" class="md-nav__link">
+    <span class="md-ellipsis">
+      set
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1487,6 +1505,24 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.get" class="md-nav__link">
+    <span class="md-ellipsis">
+      get
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.set" class="md-nav__link">
+    <span class="md-ellipsis">
+      set
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1890,7 +1926,7 @@ standard entry points are used.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ResultHandler (ropt.plugins.plan.base.ResultHandler)" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler">ResultHandler</a></code>
+                  <code><span title="uuid.UUID">UUID</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2068,7 +2104,7 @@ standard entry points are used.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="PlanStep (ropt.plugins.plan.base.PlanStep)" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code>
+                  <code><span title="uuid.UUID">UUID</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2237,7 +2273,7 @@ generally used to execute one or more steps in the plan.</p>
                 <code>step</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="PlanStep (ropt.plugins.plan.base.PlanStep)" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code>
+                  <code><span title="uuid.UUID">UUID</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2457,6 +2493,227 @@ if a step fails or if the user decides to stop the optimization.</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plan.Plan.get" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get</span><span class="p">(</span><span class="n">id_</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Retrieve a value stored in a handler or a step.</p>
+<p>This method allows access to values stored within a specific result
+handler or step. It uses the <code>[]</code> operator to retrieve the value
+associated with the given key.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>id_</code>
+            </td>
+            <td>
+                  <code><span title="uuid.UUID">UUID</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The unique identifier of the handler or step.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>key</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The key associated with the value to retrieve.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The value associated with the key in the specified handler or step.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="AttributeError">AttributeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the provided ID is not valid.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plan.Plan.set" class="doc doc-heading">
+            <code class="highlight language-python"><span class="nb">set</span><span class="p">(</span><span class="n">id_</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></code>
+
+</h4>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Set a value stored in a handler or a step.</p>
+<p>This method allows setting values stored within a specific result
+handler or step. It uses the <code>[]</code> operator to set the value
+associated with the given key.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>id_</code>
+            </td>
+            <td>
+                  <code><span title="uuid.UUID">UUID</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The unique identifier of the handler or step.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>key</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The key associated with the value to retrieve.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>value</code>
+            </td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The value to assign to the specified key.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="AttributeError">AttributeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the provided ID is not valid.</p>
+              </div>
             </td>
           </tr>
       </tbody>
@@ -2816,13 +3073,13 @@ enumeration for more details.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plan.Event.tag">tag</span></code></td>
+            <td><code><span title="ropt.plan.Event.source">source</span></code></td>
             <td>
-                  <code><span title="str">str</span> | None</code>
+                  <code><span title="uuid.UUID">UUID</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional tag added to the results.</p>
+                <p>ID of the source step.</p>
               </div>
             </td>
           </tr>

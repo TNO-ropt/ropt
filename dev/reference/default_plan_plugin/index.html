@@ -1625,7 +1625,7 @@ process the generated results.</p>
 
 
 <h3 id="ropt.plugins.plan.evaluator.DefaultEvaluatorStep.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span></code>
 
 </h3>
 
@@ -1633,8 +1633,6 @@ process the generated results.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize a default evaluator step.</p>
-<p>The <code>tag</code> field allows an optional label to be attached to each result,
-which can assist result handlers in filtering relevant results.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1662,22 +1660,6 @@ which can assist result handlers in filtering relevant results.</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>tag</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Tag to add to the emitted events.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -1957,7 +1939,7 @@ optimization and produce the result for the function evaluation.</p>
 
 
 <h3 id="ropt.plugins.plan.optimizer.DefaultOptimizerStep.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span></code>
 
 </h3>
 
@@ -1992,21 +1974,6 @@ optimization and produce the result for the function evaluation.</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>tag</code>
-            </td>
-            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Tag to add to the emitted events.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -2245,23 +2212,25 @@ a threshold.</p>
 
 
 <h3 id="ropt.plugins.plan._tracker.DefaultTrackerHandler.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">what</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">,</span> <span class="n">constraint_tolerance</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">what</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">,</span> <span class="n">constraint_tolerance</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 </h3>
 
 
     <div class="doc doc-contents ">
 
-        <p>Initialize a default tracker results handler object.</p>
-<p>The <code>what</code> parameter determines which result is tracked:</p>
-<ul>
-<li><code>"best"</code>: Tracks the best result added.</li>
-<li><code>"last"</code>: Tracks the last result added.</li>
-</ul>
-<p>If <code>constraint_tolerance</code> is set, results that exceed this tolerance on
-constraint values are not tracked.</p>
-<p>The <code>tags</code> field allows optional labels to be attached to each result,
-assisting result handlers in filtering relevant results.</p>
+        <p>Initialize a default tracker results handler.</p>
+<p>This handler monitors <code>Results</code> objects from specified sources and
+selects a single result to retain based on the specified criteria. It
+can track either the best result encountered so far or the most recent
+result. The "best" result is determined by the lowest weighted
+objective value.</p>
+<p>Results can optionally be filtered based on constraint violations. If a
+<code>constraint_tolerance</code> is provided, results that violate constraints
+beyond this tolerance will be discarded and not tracked.</p>
+<p>The <code>sources</code> parameter allows you to specify which steps' results
+should be tracked. Only results from steps whose IDs are included in
+this set will be considered.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2284,27 +2253,11 @@ assisting result handlers in filtering relevant results.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The plan that runs this step.</p>
+                <p>The plan this handler is part of.</p>
               </div>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>tags</code>
-            </td>
-            <td>
-                  <code><span title="set">set</span>[<span title="str">str</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Tags to filter the sources to track.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -2316,7 +2269,7 @@ assisting result handlers in filtering relevant results.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Specifies the type of result to store.</p>
+                <p>Specifies whether to track the "best" or "last" result.</p>
               </div>
             </td>
             <td>
@@ -2332,11 +2285,27 @@ assisting result handlers in filtering relevant results.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional constraint tolerance level.</p>
+                <p>Constraint tolerance for filtering results.</p>
               </div>
             </td>
             <td>
                   <code>1e-10</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sources</code>
+            </td>
+            <td>
+                  <code><span title="set">set</span>[<span title="uuid.UUID">UUID</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A set of UUIDs of steps whose results to track.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
