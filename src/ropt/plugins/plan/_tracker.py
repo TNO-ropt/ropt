@@ -10,6 +10,8 @@ from ropt.plugins.plan.base import ResultHandler
 from ._utils import _get_last_result, _update_optimal_result
 
 if TYPE_CHECKING:
+    import uuid
+
     from ropt.plan import Event, Plan
     from ropt.results import FunctionResults
 
@@ -32,31 +34,34 @@ class DefaultTrackerHandler(ResultHandler):
         *,
         what: Literal["best", "last"] = "best",
         constraint_tolerance: float | None = 1e-10,
-        tags: set[str] | None = None,
+        sources: set[uuid.UUID] | None = None,
     ) -> None:
-        """Initialize a default tracker results handler object.
+        """Initialize a default tracker results handler.
 
-        The `what` parameter determines which result is tracked:
+        This handler monitors `Results` objects from specified sources and
+        selects a single result to retain based on the specified criteria. It
+        can track either the best result encountered so far or the most recent
+        result. The "best" result is determined by the lowest weighted
+        objective value.
 
-        - `"best"`: Tracks the best result added.
-        - `"last"`: Tracks the last result added.
+        Results can optionally be filtered based on constraint violations. If a
+        `constraint_tolerance` is provided, results that violate constraints
+        beyond this tolerance will be discarded and not tracked.
 
-        If `constraint_tolerance` is set, results that exceed this tolerance on
-        constraint values are not tracked.
-
-        The `tags` field allows optional labels to be attached to each result,
-        assisting result handlers in filtering relevant results.
+        The `sources` parameter allows you to specify which steps' results
+        should be tracked. Only results from steps whose IDs are included in
+        this set will be considered.
 
         Args:
-            plan:                 The plan that runs this step.
-            tags:                 Tags to filter the sources to track.
-            what:                 Specifies the type of result to store.
-            constraint_tolerance: An optional constraint tolerance level.
+            plan:                 The plan this handler is part of.
+            what:                 Specifies whether to track the "best" or "last" result.
+            constraint_tolerance: Constraint tolerance for filtering results.
+            sources:              A set of UUIDs of steps whose results to track.
         """
         super().__init__(plan)
         self._what = what
         self._constraint_tolerance = constraint_tolerance
-        self._tags = set() if tags is None else tags
+        self._sources = set() if sources is None else sources
         self["results"] = None
 
     def handle_event(self, event: Event) -> None:
@@ -68,7 +73,7 @@ class DefaultTrackerHandler(ResultHandler):
         if (
             event.event_type == EventType.FINISHED_EVALUATION
             and "results" in event.data
-            and event.tag in self._tags
+            and event.source in self._sources
         ):
             results = event.data["results"]
             transformed_results = event.data.get("transformed_results", results)

@@ -9,6 +9,7 @@ classes that derive from the
 
 from __future__ import annotations
 
+import uuid
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
@@ -98,6 +99,19 @@ class PlanStep(ABC):
         """
         self.__stored_plan = plan
         self.__stored_values: dict[str, Any] = {}
+        self.__id: uuid.UUID = uuid.uuid4()
+
+    @property
+    def id(self) -> uuid.UUID:
+        """Return the unique identifier of the handler.
+
+        Each handler instance is assigned a unique ID upon creation. This ID
+        can be used to distinguish between different handler instances.
+
+        Returns:
+            A UUID object representing the unique identifier of the handler.
+        """
+        return self.__id
 
     @property
     def plan(self) -> Plan:
@@ -171,6 +185,19 @@ class ResultHandler(ABC):
         """
         self.__stored_plan = plan
         self.__stored_values: dict[str, Any] = {}
+        self.__id: uuid.UUID = uuid.uuid4()
+
+    @property
+    def id(self) -> uuid.UUID:
+        """Return the unique identifier of the handler.
+
+        Each handler instance is assigned a unique ID upon creation. This ID
+        can be used to distinguish between different handler instances.
+
+        Returns:
+            A UUID object representing the unique identifier of the handler.
+        """
+        return self.__id
 
     @property
     def plan(self) -> Plan:

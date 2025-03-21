@@ -8,6 +8,8 @@ from ropt.enums import EventType
 from ropt.plugins.plan.base import ResultHandler
 
 if TYPE_CHECKING:
+    import uuid
+
     from ropt.plan import Event, Plan
 
 
@@ -23,19 +25,28 @@ class DefaultStoreHandler(ResultHandler):
         self,
         plan: Plan,
         *,
-        tags: set[str] | None = None,
+        sources: set[uuid.UUID] | None = None,
     ) -> None:
         """Initialize a default store results handler object.
 
-        The `tags` field allows optional labels to be attached to each result,
-        assisting result handlers in filtering relevant results.
+        This handler stores a collection of `Results` objects from specified
+        sources. It accumulates results from `FINISHED_EVALUATION` events
+        emitted by the designated sources.
+
+        The `sources` parameter determines which steps' results are tracked.
+        Only results from steps whose IDs are included in this set will be
+        stored. If `sources` is not provided or is `None`, results from all
+        sources are tracked.
+
+        The stored results can be accessed via the `"results"` key. The
+        results are stored as a tuple of `Results` objects.
 
         Args:
-            plan:                 The plan that runs this step.
-            tags:                 Tags to filter the sources to track.
+            plan:    The plan that this handler is part of.
+            sources: The IDs of the steps whose results should be tracked.
         """
         super().__init__(plan)
-        self._tags = set() if tags is None else tags
+        self._sources = set() if sources is None else sources
         self["results"] = None
 
     def handle_event(self, event: Event) -> None:
@@ -46,7 +57,7 @@ class DefaultStoreHandler(ResultHandler):
         """
         if (
             event.event_type == EventType.FINISHED_EVALUATION
-            and event.tag in self._tags
+            and event.source in self._sources
         ):
             results = event.data.get("results", None)
             transformed_results = event.data.get("transformed_results", results)

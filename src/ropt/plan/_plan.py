@@ -8,6 +8,8 @@ from ropt.exceptions import PlanAborted
 from ropt.plugins.plan.base import PlanStep, ResultHandler
 
 if TYPE_CHECKING:
+    import uuid
+
     from ropt.plan import Event
 
     from ._context import OptimizerContext
@@ -39,14 +41,15 @@ class Plan:
 
         self._aborted = False
         self._parent = parent
-        self._handlers: list[ResultHandler] = []
+        self._handlers: dict[uuid.UUID, ResultHandler] = {}
+        self._steps: dict[uuid.UUID, PlanStep] = {}
         self._function: Callable[..., Any] | None = None
 
-    def add_handler(self, name: str, **kwargs: Any) -> ResultHandler:  # noqa: ANN401
+    def add_handler(self, name: str, **kwargs: Any) -> uuid.UUID:  # noqa: ANN401
         """Add a handler to the plan.
 
         Args:
-            name: The name of the handler to add.
+            name:   The name of the handler to add.
             kwargs: Additional arguments to pass to the handler.
 
         Returns:
@@ -55,9 +58,9 @@ class Plan:
         handler = self._optimizer_context.plugin_manager.get_plugin(
             "plan_handler", method=name
         ).create(name, self, **kwargs)
-        self._handlers.append(handler)
         assert isinstance(handler, ResultHandler)
-        return handler
+        self._handlers[handler.id] = handler
+        return handler.id
 
     def handler_exists(self, name: str) -> bool:
         """Check if a handler exists.
@@ -72,11 +75,7 @@ class Plan:
             "plan_handler", method=name
         )
 
-    def clear_handlers(self) -> None:
-        """Clear all handlers from the plan."""
-        self._handlers.clear()
-
-    def add_step(self, name: str, **kwargs: Any) -> PlanStep:  # noqa: ANN401
+    def add_step(self, name: str, **kwargs: Any) -> uuid.UUID:  # noqa: ANN401
         """Add a step to the plan.
 
         Args:
@@ -90,7 +89,8 @@ class Plan:
             "plan_step", method=name
         ).create(name, self, **kwargs)
         assert isinstance(step, PlanStep)
-        return step
+        self._steps[step.id] = step
+        return step.id
 
     def step_exists(self, name: str) -> bool:
         """Check if a step exists.
@@ -116,20 +116,28 @@ class Plan:
         """
         self._function = func
 
-    def run_step(self, step: PlanStep, **kwargs: Any) -> Any:  # noqa: ANN401
+    def has_function(self) -> bool:
+        """Check if a function has been added to the plan.
+
+        Returns:
+            `True` if a function has been added to the plan.
+        """
+        return self._function is not None
+
+    def run_step(self, step: uuid.UUID, **kwargs: Any) -> Any:  # noqa: ANN401
         """Run a step in the plan.
 
         Args:
             step:   The step to run
             kwargs: Additional arguments to pass to the step.
-
-        Raises:
-            PlanAborted: _description_
         """
+        if step not in self._steps:
+            msg = "not a valid step"
+            raise AttributeError(msg)
         if self._aborted:
             msg = "Plan was aborted by the previous step."
             raise PlanAborted(msg)
-        return step.run(**kwargs)
+        return self._steps[step].run(**kwargs)
 
     def run_function(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
         """Run a function in the plan.
@@ -195,9 +203,51 @@ class Plan:
         Args:
             event: The event object to emit.
         """
-        for handler in self._handlers:
+        for handler in self._handlers.values():
             handler.handle_event(event)
         if self._parent is None:
             self._optimizer_context.call_observers(event)
         else:
             self._parent.emit_event(event)
+
+    def get(self, id_: uuid.UUID, /, key: str) -> Any:  # noqa: ANN401
+        """Retrieve a value stored in a handler or a step.
+
+        This method allows access to values stored within a specific result
+        handler or step. It uses the `[]` operator to retrieve the value
+        associated with the given key.
+
+        Args:
+            id_: The unique identifier of the handler or step.
+            key: The key associated with the value to retrieve.
+
+        Returns:
+            The value associated with the key in the specified handler or step.
+
+        Raises:
+            AttributeError: If the provided ID is not valid.
+        """
+        if id_ not in self._handlers:
+            msg = "not a valid handler"
+            raise AttributeError(msg)
+        return self._handlers[id_][key]
+
+    def set(self, id_: uuid.UUID, /, key: str, value: Any) -> None:  # noqa: ANN401
+        """Set a value stored in a handler or a step.
+
+        This method allows setting values stored within a specific result
+        handler or step. It uses the `[]` operator to set the value
+        associated with the given key.
+
+        Args:
+            id_:   The unique identifier of the handler or step.
+            key:   The key associated with the value to retrieve.
+            value: The value to assign to the specified key.
+
+        Raises:
+            AttributeError: If the provided ID is not valid.
+        """
+        if id_ not in self._handlers:
+            msg = "not a valid handler"
+            raise AttributeError(msg)
+        self._handlers[id_][key] = value

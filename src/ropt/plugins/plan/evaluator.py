@@ -41,20 +41,13 @@ class DefaultEvaluatorStep(PlanStep):
     def __init__(
         self,
         plan: Plan,
-        *,
-        tag: str | None = None,
     ) -> None:
         """Initialize a default evaluator step.
 
-        The `tag` field allows an optional label to be attached to each result,
-        which can assist result handlers in filtering relevant results.
-
         Args:
             plan: The plan that runs this step.
-            tag:  Tag to add to the emitted events.
         """
         super().__init__(plan)
-        self._tag = tag
 
     def run(  # type: ignore[override]
         self,
@@ -88,7 +81,7 @@ class DefaultEvaluatorStep(PlanStep):
             Event(
                 event_type=EventType.START_EVALUATOR_STEP,
                 config=config,
-                tag=self._tag,
+                source=self.id,
             )
         )
 
@@ -109,7 +102,7 @@ class DefaultEvaluatorStep(PlanStep):
             Event(
                 event_type=EventType.START_EVALUATION,
                 config=config,
-                tag=self._tag,
+                source=self.id,
             )
         )
         try:
@@ -141,7 +134,7 @@ class DefaultEvaluatorStep(PlanStep):
             Event(
                 event_type=EventType.FINISHED_EVALUATION,
                 config=config,
-                tag=self._tag,
+                source=self.id,
                 data=data,
             )
         )
@@ -153,7 +146,7 @@ class DefaultEvaluatorStep(PlanStep):
             Event(
                 event_type=EventType.FINISHED_EVALUATOR_STEP,
                 config=config,
-                tag=self._tag,
+                source=self.id,
             )
         )
 

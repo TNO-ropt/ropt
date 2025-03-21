@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    import uuid
+
     from ropt.config.enopt import EnOptConfig
     from ropt.enums import EventType
 
@@ -24,11 +26,11 @@ class Event:
 
     Attributes:
         event_type: The type of the event.
-        tag:        Optional tag added to the results.
+        source:     ID of the source step.
         data:       Optional data passed with the event.
     """
 
     event_type: EventType
     config: EnOptConfig
-    tag: str | None = None
+    source: uuid.UUID
     data: dict[str, Any] = field(default_factory=dict)

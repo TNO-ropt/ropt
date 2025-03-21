@@ -71,7 +71,7 @@ class BasicOptimizer:
         self._optimizer_context = OptimizerContext(evaluator=evaluator)
         self._observers: list[tuple[EventType, Callable[[Event], None]]] = []
         self._results: _Results
-        self._metadata: dict[str, Any] = kwargs
+        self._kwargs: dict[str, Any] = kwargs
 
     @property
     def results(self) -> FunctionResults | None:
@@ -106,19 +106,36 @@ class BasicOptimizer:
         Returns:
             The `BasicOptimizer` instance, allowing for method chaining.
         """
+
+        def _run_func(
+            plan: Plan, transforms: OptModelTransforms | None
+        ) -> tuple[ResultHandler | None, OptimizerExitCode | None]:
+            exit_code = plan.run_step(
+                optimizer, config=self._config, transforms=transforms
+            )
+            return plan.get(tracker, "results"), exit_code
+
         plan = Plan(self._optimizer_context)
-        plan.add_function(self._run_func)
-        for key, value in self._metadata.items():
-            if plan.handler_exists(key):
-                plan.add_handler(key, tags={"__optimizer_tag__"}, **{key: value})
-        for key, value in self._metadata.items():
+
+        for key, value in self._kwargs.items():
             if plan.step_exists(key):
-                step = plan.add_step(key)
-                plan.run_step(step, **{key: value})
-        for event_type, function in self._observers:
-            self._optimizer_context.add_observer(event_type, function)
-        result, exit_code = plan.run_function(self._transforms)
-        results = None if result is None else result["results"]
+                plan.run_step(plan.add_step(key), **{key: value})
+
+        if not plan.has_function():
+            optimizer = plan.add_step("optimizer")
+            tracker = plan.add_handler(
+                "tracker",
+                constraint_tolerance=self._constraint_tolerance,
+                sources={optimizer},
+            )
+            plan.add_function(_run_func)
+            for key, value in self._kwargs.items():
+                if plan.handler_exists(key):
+                    plan.add_handler(key, sources={optimizer}, **{key: value})
+            for event_type, function in self._observers:
+                self._optimizer_context.add_observer(event_type, function)
+
+        results, exit_code = plan.run_function(self._transforms)
         variables = None if results is None else results.evaluations.variables
         self._results = _Results(
             results=results,
@@ -126,18 +143,6 @@ class BasicOptimizer:
             exit_code=exit_code,
         )
         return self
-
-    def _run_func(
-        self, plan: Plan, transforms: OptModelTransforms | None
-    ) -> tuple[ResultHandler | None, OptimizerExitCode | None]:
-        optimizer = plan.add_step("optimizer", tag="__optimizer_tag__")
-        tracker = plan.add_handler(
-            "tracker",
-            constraint_tolerance=self._constraint_tolerance,
-            tags={"__optimizer_tag__"},
-        )
-        exit_code = plan.run_step(optimizer, config=self._config, transforms=transforms)
-        return tracker, exit_code
 
     def set_abort_callback(self, callback: Callable[[], bool]) -> Self:
         """Set an abort callback.
