@@ -98,7 +98,6 @@ class PlanStep(ABC):
             plan:   The parent plan that manages this step.
         """
         self.__stored_plan = plan
-        self.__stored_values: dict[str, Any] = {}
         self.__id: uuid.UUID = uuid.uuid4()
 
     @property
@@ -133,38 +132,6 @@ class PlanStep(ABC):
             args:   Optional positional arguments.
             kwargs: Optional keyword arguments.
         """
-
-    def __getitem__(self, key: str) -> Any:  # noqa: ANN401
-        """Get the value of a plan variable.
-
-        This method implements the `[]` operator on the step object to retrieve
-        the value associated with a specific key.
-
-        Args:
-            key: The key to retrieve.
-
-        Returns:
-            The value corresponding to the key.
-        """
-        if key in self.__stored_values:
-            return self.__stored_values[key]
-        msg = f"Unknown plan variable: `{key}`"
-        raise AttributeError(msg)
-
-    def __setitem__(self, key: str, value: Any) -> None:  # noqa: ANN401
-        """Set a plan variable to the given value.
-
-        This method implements the `[]` operator on the step object to store
-        arbitrary values.
-
-        Args:
-            key:   The key to set.
-            value: The value to store.
-        """
-        if not key.isidentifier():
-            msg = f"Not a valid variable name: `{key}`"
-            raise AttributeError(msg)
-        self.__stored_values[key] = value
 
 
 class ResultHandler(ABC):
