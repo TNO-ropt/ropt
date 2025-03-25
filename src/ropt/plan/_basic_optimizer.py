@@ -132,8 +132,9 @@ class BasicOptimizer:
             for key, value in self._kwargs.items():
                 if plan.handler_exists(key):
                     plan.add_handler(key, sources={optimizer}, **{key: value})
-            for event_type, function in self._observers:
-                self._optimizer_context.add_observer(event_type, function)
+
+        for event_type, function in self._observers:
+            self._optimizer_context.add_observer(event_type, function)
 
         results, exit_code = plan.run_function(self._transforms)
         variables = None if results is None else results.evaluations.variables
