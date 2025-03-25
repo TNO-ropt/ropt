@@ -1664,7 +1664,7 @@
 
 
 <h2 id="ropt.plugins.optimizer" class="doc doc-heading">
-            <code>ropt.plugins.optimizer</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.plugins.optimizer</span>
 
 
 </h2>
@@ -1673,17 +1673,17 @@
 
         <p>Plugin functionality for adding optimization plugins.</p>
 <p>Optimization plugins are managed by a
-<a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> object, which returns classes or
+<a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> object, which returns classes or
 factory functions to create objects that implement one or more optimization
 methods. These objects must adhere to the
-<a class="autorefs autorefs-internal" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> abstract base class.
+<a class="autorefs autorefs-internal" title="            Optimizer" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> abstract base class.
 This abstract base class allows <code>ropt</code> to provide the optimizer with the
 callback used for evaluating functions and gradients and allows it to be started
 from an optimizer step in the optimization plan.</p>
 <p>To support the implementation of the optimizer classes, the
-<a class="autorefs autorefs-internal" href="#ropt.plugins.optimizer.utils"><code>ropt.plugins.optimizer.utils</code></a> module provides
+<a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.utils" href="#ropt.plugins.optimizer.utils"><code>ropt.plugins.optimizer.utils</code></a> module provides
 some utilities.</p>
-<p>By default the <a class="autorefs autorefs-internal" title="ropt.plugins.optimizer.scipy.SciPyOptimizer" href="../scipy_optimizer_plugin/#ropt.plugins.optimizer.scipy.SciPyOptimizer"><code>SciPyOptimizer</code></a>
+<p>By default the <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.scipy.SciPyOptimizer" href="../scipy_optimizer_plugin/#ropt.plugins.optimizer.scipy.SciPyOptimizer"><code>SciPyOptimizer</code></a>
 plugin is installed which provides a number of methods from the
 <a href="https://docs.scipy.org/doc/scipy/tutorial/optimize.html"><code>scipy.optimize</code></a>
 package.</p>
@@ -1719,7 +1719,7 @@ package.</p>
 
 
 <h2 id="ropt.plugins.optimizer.base" class="doc doc-heading">
-            <code>ropt.plugins.optimizer.base</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.plugins.optimizer.base</span>
 
 
 </h2>
@@ -1750,7 +1750,7 @@ package.</p>
 
 
 <h3 id="ropt.plugins.optimizer.base.Optimizer" class="doc doc-heading">
-            <code>Optimizer</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">Optimizer</span>
 
 
 </h3>
@@ -1789,7 +1789,8 @@ the optimization process.</p>
 
 
 <h4 id="ropt.plugins.optimizer.base.Optimizer.allow_nan" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">allow_nan</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">allow_nan</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -1797,7 +1798,8 @@ the optimization process.</p>
   </span>
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">allow_nan</span><span class="p">:</span> <span class="nb">bool</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1805,7 +1807,7 @@ the optimization process.</p>
 <p>If the optimizer can handle <code>NaN</code> function values, it may implement this
 method to return <code>True</code>. This enables handling cases where all function
 evaluations in an ensemble fail. By setting the
-<a class="autorefs autorefs-internal" title="RealizationsConfig" href="../enopt_config/#ropt.config.enopt.RealizationsConfig"><code>realization_min_success</code></a>
+<a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../enopt_config/#ropt.config.enopt.RealizationsConfig"><code>realization_min_success</code></a>
 configuration parameter to zero, the ensemble optimization plan can then
 be allowed to return a <code>NaN</code> value instead of raising an error.</p>
 
@@ -1841,7 +1843,8 @@ be allowed to return a <code>NaN</code> value instead of raising an error.</p>
 
 
 <h4 id="ropt.plugins.optimizer.base.Optimizer.is_parallel" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">is_parallel</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">is_parallel</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
@@ -1849,7 +1852,8 @@ be allowed to return a <code>NaN</code> value instead of raising an error.</p>
   </span>
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">is_parallel</span><span class="p">:</span> <span class="nb">bool</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1888,14 +1892,19 @@ be allowed to return a <code>NaN</code> value instead of raising an error.</p>
 
 
 <h4 id="ropt.plugins.optimizer.base.Optimizer.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">optimizer_callback</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">optimizer_callback</span><span class="p">:</span> <span class="n">OptimizerCallback</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1926,7 +1935,7 @@ forwarded to the optimizer.</p>
                 <code>config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1942,7 +1951,7 @@ forwarded to the optimizer.</p>
                 <code>optimizer_callback</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="OptimizerCallback (ropt.plugins.optimizer.base.OptimizerCallback)" href="#ropt.plugins.optimizer.base.OptimizerCallback">OptimizerCallback</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            OptimizerCallback (ropt.plugins.optimizer.base.OptimizerCallback)" href="#ropt.plugins.optimizer.base.OptimizerCallback">OptimizerCallback</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1965,14 +1974,16 @@ forwarded to the optimizer.</p>
 
 
 <h4 id="ropt.plugins.optimizer.base.Optimizer.start" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">start</span><span class="p">(</span><span class="n">initial_values</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">start</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">start</span><span class="p">(</span><span class="n">initial_values</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2031,7 +2042,7 @@ argument during initialization.</p>
 
 
 <h3 id="ropt.plugins.optimizer.base.OptimizerCallback" class="doc doc-heading">
-            <code>OptimizerCallback</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">OptimizerCallback</span>
 
 
 </h3>
@@ -2044,7 +2055,7 @@ argument during initialization.</p>
 
         <p>Protocol for the optimizer callback.</p>
 <p>Optimization plugins implement optimizer classes derived from the
-<a class="autorefs autorefs-internal" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> abstract base class.
+<a class="autorefs autorefs-internal" title="            Optimizer" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> abstract base class.
 Objects of these classes are initialized with a callback function that
 follows the call signature defined here. This callback should be used to
 request the function and gradient evaluations that the optimizer needs.</p>
@@ -2072,10 +2083,18 @@ request the function and gradient evaluations that the optimizer needs.</p>
 
 
 <h4 id="ropt.plugins.optimizer.base.OptimizerCallback.__call__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">return_functions</span><span class="p">,</span> <span class="n">return_gradients</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__call__</span>
+
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">/</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">return_functions</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">return_gradients</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2204,7 +2223,7 @@ only a single evaluation, hence there is also only a single result.</p>
 
 
 <h3 id="ropt.plugins.optimizer.base.OptimizerPlugin" class="doc doc-heading">
-            <code>OptimizerPlugin</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">OptimizerPlugin</span>
 
 
 </h3>
@@ -2212,7 +2231,7 @@ only a single evaluation, hence there is also only a single result.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="Plugin (ropt.plugins.base.Plugin)" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            Plugin (ropt.plugins.base.Plugin)" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
 
 
         <p>Abstract base class for optimizer plugins.</p>
@@ -2220,8 +2239,8 @@ only a single evaluation, hence there is also only a single result.</p>
 this base class. Plugins can be built-in, installed via a plugin mechanism,
 or loaded dynamically. During execution of an optimization plan, the
 required optimizer plugin will be located via the
-<a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> and used to create
-<a class="autorefs autorefs-internal" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> objects via its
+<a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> and used to create
+<a class="autorefs autorefs-internal" title="            Optimizer" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> objects via its
 <code>create</code> function.</p>
 
 
@@ -2247,14 +2266,19 @@ required optimizer plugin will be located via the
 
 
 <h4 id="ropt.plugins.optimizer.base.OptimizerPlugin.create" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">optimizer_callback</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">create</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">optimizer_callback</span><span class="p">:</span> <span class="n">OptimizerCallback</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optimizer</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2279,7 +2303,7 @@ implemented in the plugin.</p>
                 <code>config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2295,7 +2319,7 @@ implemented in the plugin.</p>
                 <code>optimizer_callback</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="OptimizerCallback (ropt.plugins.optimizer.base.OptimizerCallback)" href="#ropt.plugins.optimizer.base.OptimizerCallback">OptimizerCallback</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            OptimizerCallback (ropt.plugins.optimizer.base.OptimizerCallback)" href="#ropt.plugins.optimizer.base.OptimizerCallback">OptimizerCallback</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2336,7 +2360,7 @@ implemented in the plugin.</p>
 
 
 <h2 id="ropt.plugins.optimizer.utils" class="doc doc-heading">
-            <code>ropt.plugins.optimizer.utils</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.plugins.optimizer.utils</span>
 
 
 </h2>
@@ -2369,7 +2393,7 @@ linear constraints, and to retrieve the list of supported optimizers.</p>
 
 
 <h3 id="ropt.plugins.optimizer.utils.NormalizedConstraints" class="doc doc-heading">
-            <code>NormalizedConstraints</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">NormalizedConstraints</span>
 
 
 </h3>
@@ -2449,14 +2473,16 @@ multiple gradients is not supported.</p>
 
 
 <h4 id="ropt.plugins.optimizer.utils.NormalizedConstraints.is_eq" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">is_eq</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">is_eq</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">is_eq</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2471,14 +2497,16 @@ multiple gradients is not supported.</p>
 
 
 <h4 id="ropt.plugins.optimizer.utils.NormalizedConstraints.constraints" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">constraints</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">constraints</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">constraints</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2516,14 +2544,16 @@ multiple gradients is not supported.</p>
 
 
 <h4 id="ropt.plugins.optimizer.utils.NormalizedConstraints.gradients" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">gradients</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">gradients</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">gradients</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2562,10 +2592,17 @@ multiple gradients is not supported.</p>
 
 
 <h4 id="ropt.plugins.optimizer.utils.NormalizedConstraints.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">lower_bounds</span><span class="p">,</span> <span class="n">upper_bounds</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">flip</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">lower_bounds</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">upper_bounds</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">flip</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2643,10 +2680,12 @@ multiple gradients is not supported.</p>
 
 
 <h4 id="ropt.plugins.optimizer.utils.NormalizedConstraints.reset" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">reset</span><span class="p">()</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">reset</span>
+
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">reset</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2661,10 +2700,12 @@ multiple gradients is not supported.</p>
 
 
 <h4 id="ropt.plugins.optimizer.utils.NormalizedConstraints.set_constraints" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">set_constraints</span><span class="p">(</span><span class="n">values</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">set_constraints</span>
+
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_constraints</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2710,10 +2751,12 @@ multiple gradients is not supported.</p>
 
 
 <h4 id="ropt.plugins.optimizer.utils.NormalizedConstraints.set_gradients" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">set_gradients</span><span class="p">(</span><span class="n">values</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">set_gradients</span>
+
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_gradients</span><span class="p">(</span><span class="n">values</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2768,10 +2811,17 @@ multiple gradients is not supported.</p>
 
 
 <h3 id="ropt.plugins.optimizer.utils.validate_supported_constraints" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">validate_supported_constraints</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">supported_constraints</span><span class="p">,</span> <span class="n">required_constraints</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">validate_supported_constraints</span>
+
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">validate_supported_constraints</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">supported_constraints</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">required_constraints</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2806,7 +2856,7 @@ specified by the key.</p>
                 <code>config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2877,10 +2927,17 @@ specified by the key.</p>
 
 
 <h3 id="ropt.plugins.optimizer.utils.create_output_path" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">create_output_path</span><span class="p">(</span><span class="n">base_name</span><span class="p">,</span> <span class="n">base_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">create_output_path</span>
+
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create_output_path</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">base_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">base_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2998,10 +3055,18 @@ specified by the key.</p>
 
 
 <h3 id="ropt.plugins.optimizer.utils.get_masked_linear_constraints" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">get_masked_linear_constraints</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">get_masked_linear_constraints</span>
+
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_masked_linear_constraints</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">]</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -3028,7 +3093,7 @@ the fixed variables in the lower and upper bounds.</p>
                 <code>config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">

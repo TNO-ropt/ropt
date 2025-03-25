@@ -1388,7 +1388,7 @@
 
 
 <h2 id="ropt.optimization" class="doc doc-heading">
-            <code>ropt.optimization</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.optimization</span>
 
 
 </h2>
@@ -1396,10 +1396,10 @@
     <div class="doc doc-contents first">
 
         <p>The main functionality for ensemble-based optimizations.</p>
-<p>The <a class="autorefs autorefs-internal" href="#ropt.optimization.EnsembleOptimizer"><code>EnsembleOptimizer</code></a> class provides
+<p>The <a class="autorefs autorefs-internal" title="            EnsembleOptimizer" href="#ropt.optimization.EnsembleOptimizer"><code>EnsembleOptimizer</code></a> class provides
 the core functionality for running ensemble-based optimizations. Direct use of
-this class is generally discouraged; instead, the <a class="autorefs autorefs-internal" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> or
-<a class="autorefs autorefs-internal" title="ropt.plan.BasicOptimizer" href="../plan_runner/#ropt.plan.BasicOptimizer"><code>BasicOptimizer</code></a> classes are recommended for more
+this class is generally discouraged; instead, the <a class="autorefs autorefs-internal" title="            Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> or
+<a class="autorefs autorefs-internal" title="            ropt.plan.BasicOptimizer" href="../plan_runner/#ropt.plan.BasicOptimizer"><code>BasicOptimizer</code></a> classes are recommended for more
 flexibility and ease of use.</p>
 
 
@@ -1424,7 +1424,7 @@ flexibility and ease of use.</p>
 
 
 <h3 id="ropt.optimization.EnsembleOptimizer" class="doc doc-heading">
-            <code>EnsembleOptimizer</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">EnsembleOptimizer</span>
 
 
 </h3>
@@ -1457,14 +1457,16 @@ flexibility and ease of use.</p>
 
 
 <h4 id="ropt.optimization.EnsembleOptimizer.is_parallel" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">is_parallel</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">is_parallel</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">is_parallel</span><span class="p">:</span> <span class="nb">bool</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1503,10 +1505,19 @@ flexibility and ease of use.</p>
 
 
 <h4 id="ropt.optimization.EnsembleOptimizer.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">,</span> <span class="n">ensemble_evaluator</span><span class="p">,</span> <span class="n">plugin_manager</span><span class="p">,</span> <span class="n">signal_evaluation</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nested_optimizer</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">enopt_config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">ensemble_evaluator</span><span class="p">:</span> <span class="n">EnsembleEvaluator</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">plugin_manager</span><span class="p">:</span> <span class="n">PluginManager</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">signal_evaluation</span><span class="p">:</span> <span class="n">SignalEvaluationCallback</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">nested_optimizer</span><span class="p">:</span> <span class="n">NestedOptimizerCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1514,18 +1525,18 @@ flexibility and ease of use.</p>
 <p>This class requires at least three arguments that together define a
 single optimization run:</p>
 <ol>
-<li>An <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> that contains all
+<li>An <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> that contains all
    configuration settings for the optimization.</li>
-<li>An <a class="autorefs autorefs-internal" href="../evaluator/#ropt.ensemble_evaluator.EnsembleEvaluator"><code>EnsembleEvaluator</code></a>
+<li>An <a class="autorefs autorefs-internal" title="            EnsembleEvaluator" href="../evaluator/#ropt.ensemble_evaluator.EnsembleEvaluator"><code>EnsembleEvaluator</code></a>
    object responsible for evaluating functions.</li>
-<li>A <a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> object that provides
+<li>A <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> object that provides
    access to optimizer plugins.</li>
 </ol>
 <p>Additionally, two optional callbacks can be provided:</p>
 <ol>
-<li>A <a class="autorefs autorefs-internal" href="#ropt.optimization.SignalEvaluationCallback"><code>SignalEvaluationCallback</code></a>
+<li>A <a class="autorefs autorefs-internal" title="            SignalEvaluationCallback" href="#ropt.optimization.SignalEvaluationCallback"><code>SignalEvaluationCallback</code></a>
    that is called before and after each function evaluation.</li>
-<li>A <a class="autorefs autorefs-internal" href="#ropt.optimization.NestedOptimizerCallback"><code>NestedOptimizerCallback</code></a>
+<li>A <a class="autorefs autorefs-internal" title="            NestedOptimizerCallback" href="#ropt.optimization.NestedOptimizerCallback"><code>NestedOptimizerCallback</code></a>
    that is called at each function evaluation to run a nested optimization.</li>
 </ol>
 
@@ -1546,7 +1557,7 @@ single optimization run:</p>
                 <code>enopt_config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1562,7 +1573,7 @@ single optimization run:</p>
                 <code>ensemble_evaluator</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="EnsembleEvaluator (ropt.ensemble_evaluator.EnsembleEvaluator)" href="../evaluator/#ropt.ensemble_evaluator.EnsembleEvaluator">EnsembleEvaluator</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnsembleEvaluator (ropt.ensemble_evaluator.EnsembleEvaluator)" href="../evaluator/#ropt.ensemble_evaluator.EnsembleEvaluator">EnsembleEvaluator</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1578,7 +1589,7 @@ single optimization run:</p>
                 <code>plugin_manager</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="PluginManager (ropt.plugins.PluginManager)" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            PluginManager (ropt.plugins.PluginManager)" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1594,7 +1605,7 @@ single optimization run:</p>
                 <code>signal_evaluation</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="SignalEvaluationCallback (ropt.optimization._optimizer.SignalEvaluationCallback)" href="#ropt.optimization.SignalEvaluationCallback">SignalEvaluationCallback</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="            SignalEvaluationCallback (ropt.optimization._optimizer.SignalEvaluationCallback)" href="#ropt.optimization.SignalEvaluationCallback">SignalEvaluationCallback</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1610,7 +1621,7 @@ single optimization run:</p>
                 <code>nested_optimizer</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="NestedOptimizerCallback (ropt.optimization._optimizer.NestedOptimizerCallback)" href="#ropt.optimization.NestedOptimizerCallback">NestedOptimizerCallback</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="            NestedOptimizerCallback (ropt.optimization._optimizer.NestedOptimizerCallback)" href="#ropt.optimization.NestedOptimizerCallback">NestedOptimizerCallback</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1633,10 +1644,12 @@ single optimization run:</p>
 
 
 <h4 id="ropt.optimization.EnsembleOptimizer.start" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">start</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">start</span>
+
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">start</span><span class="p">(</span><span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">OptimizerExitCode</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1685,7 +1698,7 @@ single optimization run:</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="OptimizerExitCode (ropt.enums.OptimizerExitCode)" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            OptimizerExitCode (ropt.enums.OptimizerExitCode)" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1714,7 +1727,7 @@ single optimization run:</p>
 
 
 <h3 id="ropt.optimization.SignalEvaluationCallback" class="doc doc-heading">
-            <code>SignalEvaluationCallback</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">SignalEvaluationCallback</span>
 
 
 </h3>
@@ -1752,10 +1765,14 @@ handling or tracking of evaluation events.</p>
 
 
 <h4 id="ropt.optimization.SignalEvaluationCallback.__call__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">results</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__call__</span>
+
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">results</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Results</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1783,7 +1800,7 @@ output.</p>
                 <code>results</code>
             </td>
             <td>
-                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.Results
+                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="            ropt.results.Results
 
 
   
@@ -1821,7 +1838,7 @@ output.</p>
 
 
 <h3 id="ropt.optimization.NestedOptimizerCallback" class="doc doc-heading">
-            <code>NestedOptimizerCallback</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">NestedOptimizerCallback</span>
 
 
 </h3>
@@ -1857,10 +1874,14 @@ output.</p>
 
 
 <h4 id="ropt.optimization.NestedOptimizerCallback.__call__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">variables</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__call__</span>
+
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">FunctionResults</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1915,7 +1936,7 @@ aborted by the user.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="ropt.results.FunctionResults
+                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   

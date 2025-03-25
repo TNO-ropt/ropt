@@ -1500,7 +1500,7 @@
 
 
 <h2 id="ropt.config.utils" class="doc doc-heading">
-            <code>ropt.config.utils</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.config.utils</span>
 
 
 </h2>
@@ -1532,7 +1532,7 @@
 
 
 <h3 id="ropt.config.utils.ImmutableBaseModel" class="doc doc-heading">
-            <code>ImmutableBaseModel</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ImmutableBaseModel</span>
 
 
 </h3>
@@ -1571,10 +1571,12 @@ these validators may not function properly with frozen Pydantic classes.</p>
 
 
 <h4 id="ropt.config.utils.ImmutableBaseModel.__setattr__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__setattr__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__setattr__</span>
+
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__setattr__</span><span class="p">(</span><span class="nf">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1669,10 +1671,12 @@ these validators may not function properly with frozen Pydantic classes.</p>
 
 
 <h3 id="ropt.config.utils.normalize" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">normalize</span><span class="p">(</span><span class="n">array</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">normalize</span>
+
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">normalize</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1742,10 +1746,14 @@ these validators may not function properly with frozen Pydantic classes.</p>
 
 
 <h3 id="ropt.config.utils.immutable_array" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">immutable_array</span><span class="p">(</span><span class="n">array_like</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">immutable_array</span>
+
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">immutable_array</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">array_like</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1831,10 +1839,12 @@ these validators may not function properly with frozen Pydantic classes.</p>
 
 
 <h3 id="ropt.config.utils.broadcast_arrays" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">broadcast_arrays</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">broadcast_arrays</span>
+
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">broadcast_arrays</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1903,10 +1913,14 @@ these validators may not function properly with frozen Pydantic classes.</p>
 
 
 <h3 id="ropt.config.utils.broadcast_1d_array" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">broadcast_1d_array</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">broadcast_1d_array</span>
+
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">broadcast_1d_array</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">array</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2007,10 +2021,14 @@ these validators may not function properly with frozen Pydantic classes.</p>
 
 
 <h3 id="ropt.config.utils.check_enum_values" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">check_enum_values</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">enum_type</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">check_enum_values</span>
+
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">check_enum_values</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">value</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">ubyte</span><span class="p">],</span> <span class="n">enum_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">IntEnum</span><span class="p">]</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2106,7 +2124,7 @@ values of the given enum.</p>
 
 
 <h2 id="ropt.config.validated_types" class="doc doc-heading">
-            <code>ropt.config.validated_types</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.config.validated_types</span>
 
 
 </h2>
@@ -2118,31 +2136,36 @@ values of the given enum.</p>
 certain properties. They include types that convert inputs to immutable NumPy
 arrays of specified dimension and type:</p>
 <ul>
-<li><a class="autorefs autorefs-internal" title="Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
+<li><a class="autorefs autorefs-internal" title="            Array1D
+
 
   
       module-attribute
   " href="#ropt.config.validated_types.Array1D"><code>Array1D</code></a>: For converting sequences to
   immutable one-dimensional floating-point arrays.</li>
-<li><a class="autorefs autorefs-internal" title="Array2D = Annotated[NDArray[np.float64], BeforeValidator(_convert_2d_array)]
+<li><a class="autorefs autorefs-internal" title="            Array2D
+
 
   
       module-attribute
   " href="#ropt.config.validated_types.Array2D"><code>Array2D</code></a>: For converting sequences to
   immutable two-dimensional floating-point arrays.</li>
-<li><a class="autorefs autorefs-internal" title="ArrayEnum = Annotated[NDArray[np.ubyte], BeforeValidator(_convert_enum_array)]
+<li><a class="autorefs autorefs-internal" title="            ArrayEnum
+
 
   
       module-attribute
   " href="#ropt.config.validated_types.ArrayEnum"><code>ArrayEnum</code></a>: For converting
   sequences to values of numerical enumerations of any dimension.</li>
-<li><a class="autorefs autorefs-internal" title="Array1DInt = Annotated[NDArray[np.intc], BeforeValidator(_convert_1d_array_intc)]
+<li><a class="autorefs autorefs-internal" title="            Array1DInt
+
 
   
       module-attribute
   " href="#ropt.config.validated_types.Array1DInt"><code>Array1DInt</code></a>: For converting
   sequences to immutable one-dimensional integer arrays.</li>
-<li><a class="autorefs autorefs-internal" title="Array1DBool = Annotated[NDArray[np.bool_], BeforeValidator(_convert_1d_array_bool)]
+<li><a class="autorefs autorefs-internal" title="            Array1DBool
+
 
   
       module-attribute
@@ -2152,12 +2175,14 @@ arrays of specified dimension and type:</p>
 <p>Additionally, the following convenience types create sets or tuples, ensuring
 that single values are embedded in a set or tuple, respectively:</p>
 <ul>
-<li><a class="autorefs autorefs-internal" title="ItemOrSet = Annotated[set[T], BeforeValidator(_convert_set)]
+<li><a class="autorefs autorefs-internal" title="            ItemOrSet
+
 
   
       module-attribute
   " href="#ropt.config.validated_types.ItemOrSet"><code>ItemOrSet[T]</code></a>: Create a set of type <code>T</code>.</li>
-<li><a class="autorefs autorefs-internal" title="ItemOrTuple = Annotated[tuple[T, ...], BeforeValidator(_convert_tuple)]
+<li><a class="autorefs autorefs-internal" title="            ItemOrTuple
+
 
   
       module-attribute
@@ -2185,14 +2210,18 @@ that single values are embedded in a set or tuple, respectively:</p>
 
 
 <h3 id="ropt.config.validated_types.Array1D" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">Array1D</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">BeforeValidator</span><span class="p">(</span><span class="n">_convert_1d_array</span><span class="p">)]</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">Array1D</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">Array1D</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">BeforeValidator</span><span class="p">(</span><span class="n">_convert_1d_array</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">]</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2207,14 +2236,18 @@ that single values are embedded in a set or tuple, respectively:</p>
 
 
 <h3 id="ropt.config.validated_types.Array2D" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">Array2D</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">BeforeValidator</span><span class="p">(</span><span class="n">_convert_2d_array</span><span class="p">)]</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">Array2D</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">Array2D</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">BeforeValidator</span><span class="p">(</span><span class="n">_convert_2d_array</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">]</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2229,14 +2262,18 @@ that single values are embedded in a set or tuple, respectively:</p>
 
 
 <h3 id="ropt.config.validated_types.ArrayEnum" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">ArrayEnum</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ubyte</span><span class="p">],</span> <span class="n">BeforeValidator</span><span class="p">(</span><span class="n">_convert_enum_array</span><span class="p">)]</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ArrayEnum</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ArrayEnum</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">NDArray</span><span class="p">[</span><span class="n">ubyte</span><span class="p">],</span> <span class="n">BeforeValidator</span><span class="p">(</span><span class="n">_convert_enum_array</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">]</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2251,14 +2288,18 @@ that single values are embedded in a set or tuple, respectively:</p>
 
 
 <h3 id="ropt.config.validated_types.Array1DInt" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">Array1DInt</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">intc</span><span class="p">],</span> <span class="n">BeforeValidator</span><span class="p">(</span><span class="n">_convert_1d_array_intc</span><span class="p">)]</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">Array1DInt</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">Array1DInt</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">NDArray</span><span class="p">[</span><span class="n">intc</span><span class="p">],</span> <span class="n">BeforeValidator</span><span class="p">(</span><span class="n">_convert_1d_array_intc</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">]</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2273,14 +2314,18 @@ that single values are embedded in a set or tuple, respectively:</p>
 
 
 <h3 id="ropt.config.validated_types.Array1DBool" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">Array1DBool</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">],</span> <span class="n">BeforeValidator</span><span class="p">(</span><span class="n">_convert_1d_array_bool</span><span class="p">)]</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">Array1DBool</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">Array1DBool</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">NDArray</span><span class="p">[</span><span class="n">bool_</span><span class="p">],</span> <span class="n">BeforeValidator</span><span class="p">(</span><span class="n">_convert_1d_array_bool</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">]</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2295,14 +2340,16 @@ that single values are embedded in a set or tuple, respectively:</p>
 
 
 <h3 id="ropt.config.validated_types.ItemOrSet" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">ItemOrSet</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">set</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">BeforeValidator</span><span class="p">(</span><span class="n">_convert_set</span><span class="p">)]</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ItemOrSet</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ItemOrSet</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">set</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">BeforeValidator</span><span class="p">(</span><span class="n">_convert_set</span><span class="p">)]</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2317,14 +2364,18 @@ that single values are embedded in a set or tuple, respectively:</p>
 
 
 <h3 id="ropt.config.validated_types.ItemOrTuple" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">ItemOrTuple</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">BeforeValidator</span><span class="p">(</span><span class="n">_convert_tuple</span><span class="p">)]</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ItemOrTuple</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ItemOrTuple</span> <span class="o">=</span> <span class="n">Annotated</span><span class="p">[</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nb">tuple</span><span class="p">[</span><span class="n">T</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">BeforeValidator</span><span class="p">(</span><span class="n">_convert_tuple</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">]</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 

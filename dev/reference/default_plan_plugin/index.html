@@ -1448,7 +1448,7 @@
 
 
 <h2 id="ropt.plugins.plan.default.DefaultPlanStepPlugin" class="doc doc-heading">
-            <code>ropt.plugins.plan.default.DefaultPlanStepPlugin</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan.default.DefaultPlanStepPlugin</span>
 
 
 </h2>
@@ -1456,7 +1456,7 @@
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="PlanStepPlugin (ropt.plugins.plan.base.PlanStepPlugin)" href="../plan_plugins/#ropt.plugins.plan.base.PlanStepPlugin">PlanStepPlugin</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            PlanStepPlugin (ropt.plugins.plan.base.PlanStepPlugin)" href="../plan_plugins/#ropt.plugins.plan.base.PlanStepPlugin">PlanStepPlugin</a></code></p>
 
 
         <p>The default plan plugin class.</p>
@@ -1466,13 +1466,13 @@
 <dd>
 <ul>
 <li>A step that performs a single ensemble evaluation
-(<a class="autorefs autorefs-internal" title="ropt.plugins.plan.evaluator.DefaultEvaluatorStep" href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep"><code>evaluator</code></a>).</li>
+(<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.evaluator.DefaultEvaluatorStep" href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep"><code>evaluator</code></a>).</li>
 </ul>
 </dd>
 <dd>
 <ul>
 <li>A step that runs an optimization
-(<a class="autorefs autorefs-internal" title="ropt.plugins.plan.optimizer.DefaultOptimizerStep" href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep"><code>optimizer</code></a>).</li>
+(<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.optimizer.DefaultOptimizerStep" href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep"><code>optimizer</code></a>).</li>
 </ul>
 </dd>
 </dl>
@@ -1509,7 +1509,7 @@
 
 
 <h2 id="ropt.plugins.plan.default.DefaultPlanHandlerPlugin" class="doc doc-heading">
-            <code>ropt.plugins.plan.default.DefaultPlanHandlerPlugin</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan.default.DefaultPlanHandlerPlugin</span>
 
 
 </h2>
@@ -1517,7 +1517,7 @@
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="PlanHandlerPlugin (ropt.plugins.plan.base.PlanHandlerPlugin)" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandlerPlugin">PlanHandlerPlugin</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            PlanHandlerPlugin (ropt.plugins.plan.base.PlanHandlerPlugin)" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandlerPlugin">PlanHandlerPlugin</a></code></p>
 
 
         <p>The default plan plugin class.</p>
@@ -1527,7 +1527,7 @@
 <dd>
 <ul>
 <li>A handler that tracks optimal results
-(<a class="autorefs autorefs-internal" title="ropt.plugins.plan._tracker.DefaultTrackerHandler" href="#ropt.plugins.plan._tracker.DefaultTrackerHandler"><code>tracker</code></a>).</li>
+(<a class="autorefs autorefs-internal" title="            ropt.plugins.plan._tracker.DefaultTrackerHandler" href="#ropt.plugins.plan._tracker.DefaultTrackerHandler"><code>tracker</code></a>).</li>
 </ul>
 </dd>
 </dl>
@@ -1564,7 +1564,7 @@
 
 
 <h2 id="ropt.plugins.plan.evaluator.DefaultEvaluatorStep" class="doc doc-heading">
-            <code>ropt.plugins.plan.evaluator.DefaultEvaluatorStep</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan.evaluator.DefaultEvaluatorStep</span>
 
 
 </h2>
@@ -1572,12 +1572,12 @@
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="PlanStep (ropt.plugins.plan.base.PlanStep)" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            PlanStep (ropt.plugins.plan.base.PlanStep)" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code></p>
 
 
         <p>The default evaluator step.</p>
 <p>This step performs a single ensemble evaluation, yielding one or more
-<a class="autorefs autorefs-internal" title="ropt.results.FunctionResults
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
@@ -1586,14 +1586,16 @@
 can process multiple variable vectors, each of which is evaluated
 separately, producing an individual results object for each vector.</p>
 <p>Before executing the evaluator step, a
-<a class="autorefs autorefs-internal" title="START_EVALUATOR_STEP = 5
+<a class="autorefs autorefs-internal" title="            START_EVALUATOR_STEP
+
 
   
       class-attribute
       instance-attribute
   " href="../enums/#ropt.enums.EventType.START_EVALUATOR_STEP"><code>START_EVALUATOR_STEP</code></a> event is
 emitted. After the evaluator step finishes, an
-<a class="autorefs autorefs-internal" title="FINISHED_EVALUATOR_STEP = 6
+<a class="autorefs autorefs-internal" title="            FINISHED_EVALUATOR_STEP
+
 
   
       class-attribute
@@ -1625,10 +1627,12 @@ process the generated results.</p>
 
 
 <h3 id="ropt.plugins.plan.evaluator.DefaultEvaluatorStep.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span><span class="nf">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1651,7 +1655,7 @@ process the generated results.</p>
                 <code>plan</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1674,19 +1678,26 @@ process the generated results.</p>
 
 
 <h3 id="ropt.plugins.plan.evaluator.DefaultEvaluatorStep.run" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">run</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">transforms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
+
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">transforms</span><span class="p">:</span> <span class="n">OptModelTransforms</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizerExitCode</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Run the evaluator step.</p>
 <p>The
-<a class="autorefs autorefs-internal" title="ropt.plugins.plan.evaluator.DefaultEvaluatorStep" href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep"><code>DefaultEvaluatorStep</code></a>
+<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.evaluator.DefaultEvaluatorStep" href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep"><code>DefaultEvaluatorStep</code></a>
 requires an optimizer configuration; the <code>variables</code> parameter is
 optional. The configuration  object must be an
-<a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object, or a dictionary
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object, or a dictionary
 that can be parsed into such an object. If no <code>variables</code> are provided,
 the initial values specified by the optimizer configuration are used. If
 <code>values</code> is given, it may be a single vector or a two-dimensional array.
@@ -1781,10 +1792,12 @@ of values to be evaluated.</p>
 
 
 <h3 id="ropt.plugins.plan.evaluator.DefaultEvaluatorStep.emit_event" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">emit_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">emit_event</span>
+
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">emit_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1807,7 +1820,7 @@ of values to be evaluated.</p>
                 <code>event</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Event
+                  <code><a class="autorefs autorefs-internal" title="            Event
 
 
   
@@ -1844,7 +1857,7 @@ of values to be evaluated.</p>
 
 
 <h2 id="ropt.plugins.plan.optimizer.DefaultOptimizerStep" class="doc doc-heading">
-            <code>ropt.plugins.plan.optimizer.DefaultOptimizerStep</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan.optimizer.DefaultOptimizerStep</span>
 
 
 </h2>
@@ -1852,51 +1865,55 @@ of values to be evaluated.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="PlanStep (ropt.plugins.plan.base.PlanStep)" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            PlanStep (ropt.plugins.plan.base.PlanStep)" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code></p>
 
 
         <p>The default optimizer step.</p>
 <p>The optimizer step performs an optimization, yielding a sequence of
-<a class="autorefs autorefs-internal" title="ropt.results.FunctionResults
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
       dataclass
   " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> and
-<a class="autorefs autorefs-internal" title="ropt.results.GradientResults
+<a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
 
 
   
       dataclass
   " href="../results/#ropt.results.GradientResults"><code>GradientResults</code></a> objects. The optimizer is
-configured using an <a class="autorefs autorefs-internal" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object or
+configured using an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object or
 a dictionary that can be parsed into such an object. While the initial values
 for optimization are typically specified in the configuration, they can be
 overridden by providing them directly.</p>
 <p>The optimizer step emits several signals:</p>
 <ul>
-<li><a class="autorefs autorefs-internal" title="START_OPTIMIZER_STEP = 3
+<li><a class="autorefs autorefs-internal" title="            START_OPTIMIZER_STEP
+
 
   
       class-attribute
       instance-attribute
   " href="../enums/#ropt.enums.EventType.START_OPTIMIZER_STEP"><code>START_OPTIMIZER_STEP</code></a>:
   Emitted before the optimization starts.</li>
-<li><a class="autorefs autorefs-internal" title="FINISHED_OPTIMIZER_STEP = 4
+<li><a class="autorefs autorefs-internal" title="            FINISHED_OPTIMIZER_STEP
+
 
   
       class-attribute
       instance-attribute
   " href="../enums/#ropt.enums.EventType.FINISHED_OPTIMIZER_STEP"><code>FINISHED_OPTIMIZER_STEP</code></a>:
   Emitted after the optimization finishes.</li>
-<li><a class="autorefs autorefs-internal" title="START_EVALUATION = 1
+<li><a class="autorefs autorefs-internal" title="            START_EVALUATION
+
 
   
       class-attribute
       instance-attribute
   " href="../enums/#ropt.enums.EventType.START_EVALUATION"><code>START_EVALUATION</code></a>: Emitted
   before a function or gradient evaluation.</li>
-<li><a class="autorefs autorefs-internal" title="FINISHED_EVALUATION = 2
+<li><a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
+
 
   
       class-attribute
@@ -1905,7 +1922,7 @@ overridden by providing them directly.</p>
   after a function or gradient evaluation.</li>
 </ul>
 <p>The <code>FINISHED_EVALUATION</code> signal is particularly important as it passes
-  the generated <a class="autorefs autorefs-internal" title="ropt.results.Results
+  the generated <a class="autorefs autorefs-internal" title="            ropt.results.Results
 
 
   
@@ -1939,10 +1956,12 @@ optimization and produce the result for the function evaluation.</p>
 
 
 <h3 id="ropt.plugins.plan.optimizer.DefaultOptimizerStep.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span><span class="nf">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1965,7 +1984,7 @@ optimization and produce the result for the function evaluation.</p>
                 <code>plan</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1988,10 +2007,18 @@ optimization and produce the result for the function evaluation.</p>
 
 
 <h3 id="ropt.plugins.plan.optimizer.DefaultOptimizerStep.run" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">run</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">transforms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nested_optimization</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
+
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">EnOptConfig</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">transforms</span><span class="p">:</span> <span class="n">OptModelTransforms</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">nested_optimization</span><span class="p">:</span> <span class="n">Plan</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizerExitCode</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2014,7 +2041,7 @@ optimization and produce the result for the function evaluation.</p>
                 <code>config</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>] | <a class="autorefs autorefs-internal" title="EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>] | <a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2062,7 +2089,7 @@ optimization and produce the result for the function evaluation.</p>
                 <code>nested_optimization</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="            Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2101,10 +2128,12 @@ optimization and produce the result for the function evaluation.</p>
 
 
 <h3 id="ropt.plugins.plan.optimizer.DefaultOptimizerStep.emit_event" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">emit_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">emit_event</span>
+
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">emit_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2127,7 +2156,7 @@ optimization and produce the result for the function evaluation.</p>
                 <code>event</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Event
+                  <code><a class="autorefs autorefs-internal" title="            Event
 
 
   
@@ -2164,7 +2193,7 @@ optimization and produce the result for the function evaluation.</p>
 
 
 <h2 id="ropt.plugins.plan._tracker.DefaultTrackerHandler" class="doc doc-heading">
-            <code>ropt.plugins.plan._tracker.DefaultTrackerHandler</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan._tracker.DefaultTrackerHandler</span>
 
 
 </h2>
@@ -2172,12 +2201,12 @@ optimization and produce the result for the function evaluation.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="ResultHandler (ropt.plugins.plan.base.ResultHandler)" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler">ResultHandler</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            ResultHandler (ropt.plugins.plan.base.ResultHandler)" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler">ResultHandler</a></code></p>
 
 
         <p>The default tracker results handler object.</p>
 <p>This handler tracks the
-<a class="autorefs autorefs-internal" title="ropt.results.Results
+<a class="autorefs autorefs-internal" title="            ropt.results.Results
 
 
   
@@ -2212,10 +2241,18 @@ a threshold.</p>
 
 
 <h3 id="ropt.plugins.plan._tracker.DefaultTrackerHandler.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">what</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">,</span> <span class="n">constraint_tolerance</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">sources</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">what</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;best&quot;</span><span class="p">,</span> <span class="s2">&quot;last&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;best&quot;</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">constraint_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">sources</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">UUID</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2249,7 +2286,7 @@ this set will be considered.</p>
                 <code>plan</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2320,10 +2357,12 @@ this set will be considered.</p>
 
 
 <h3 id="ropt.plugins.plan._tracker.DefaultTrackerHandler.handle_event" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">handle_event</span>
+
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2346,7 +2385,7 @@ this set will be considered.</p>
                 <code>event</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Event
+                  <code><a class="autorefs autorefs-internal" title="            Event
 
 
   

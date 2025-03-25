@@ -834,24 +834,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.PlanStep.__getitem__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __getitem__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.PlanStep.__setitem__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __setitem__
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1427,24 +1409,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.PlanStep.__getitem__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __getitem__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.PlanStep.__setitem__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __setitem__
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1598,7 +1562,7 @@
 
 
 <h2 id="ropt.plugins.plan" class="doc doc-heading">
-            <code>ropt.plugins.plan</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.plugins.plan</span>
 
 
 </h2>
@@ -1638,7 +1602,7 @@
 
 
 <h2 id="ropt.plugins.plan.base" class="doc doc-heading">
-            <code>ropt.plugins.plan.base</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.plugins.plan.base</span>
 
 
 </h2>
@@ -1649,8 +1613,8 @@
 <p>Optimization plan steps and result handlers can be added via the plugin
 mechanism to implement additional functionality. This is done by creating plugin
 classes that derive from the
-<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.PlanHandlerPlugin"><code>PlanHandlerPlugin</code></a> and
-<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a> classes.</p>
+<a class="autorefs autorefs-internal" title="            PlanHandlerPlugin" href="#ropt.plugins.plan.base.PlanHandlerPlugin"><code>PlanHandlerPlugin</code></a> and
+<a class="autorefs autorefs-internal" title="            PlanStepPlugin" href="#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a> classes.</p>
 
 
 
@@ -1674,7 +1638,7 @@ classes that derive from the
 
 
 <h3 id="ropt.plugins.plan.base.PlanStep" class="doc doc-heading">
-            <code>PlanStep</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">PlanStep</span>
 
 
 </h3>
@@ -1712,14 +1676,16 @@ implement the specific functionality of each step.</p>
 
 
 <h4 id="ropt.plugins.plan.base.PlanStep.id" class="doc doc-heading">
-            <code class="highlight language-python"><span class="nb">id</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">id</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">id</span><span class="p">:</span> <span class="n">UUID</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1759,14 +1725,16 @@ can be used to distinguish between different handler instances.</p>
 
 
 <h4 id="ropt.plugins.plan.base.PlanStep.plan" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">plan</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">plan</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1784,7 +1752,7 @@ can be used to distinguish between different handler instances.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1805,10 +1773,12 @@ can be used to distinguish between different handler instances.</p>
 
 
 <h4 id="ropt.plugins.plan.base.PlanStep.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span><span class="nf">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1832,7 +1802,7 @@ can be used to distinguish between different handler instances.</p>
                 <code>plan</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1855,14 +1825,16 @@ can be used to distinguish between different handler instances.</p>
 
 
 <h4 id="ropt.plugins.plan.base.PlanStep.run" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1922,147 +1894,6 @@ step.</p>
 
 </div>
 
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plugins.plan.base.PlanStep.__getitem__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__getitem__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Get the value of a plan variable.</p>
-<p>This method implements the <code>[]</code> operator on the step object to retrieve
-the value associated with a specific key.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>key</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The key to retrieve.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="typing.Any">Any</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The value corresponding to the key.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plugins.plan.base.PlanStep.__setitem__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__setitem__</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></code>
-
-</h4>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Set a plan variable to the given value.</p>
-<p>This method implements the <code>[]</code> operator on the step object to store
-arbitrary values.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>key</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The key to set.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>value</code>
-            </td>
-            <td>
-                  <code><span title="typing.Any">Any</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The value to store.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
 
 
   </div>
@@ -2076,7 +1907,7 @@ arbitrary values.</p>
 
 
 <h3 id="ropt.plugins.plan.base.ResultHandler" class="doc doc-heading">
-            <code>ResultHandler</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ResultHandler</span>
 
 
 </h3>
@@ -2114,14 +1945,16 @@ overridden to implement specific functionality.</p>
 
 
 <h4 id="ropt.plugins.plan.base.ResultHandler.id" class="doc doc-heading">
-            <code class="highlight language-python"><span class="nb">id</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">id</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">id</span><span class="p">:</span> <span class="n">UUID</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2161,14 +1994,16 @@ can be used to distinguish between different handler instances.</p>
 
 
 <h4 id="ropt.plugins.plan.base.ResultHandler.plan" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">plan</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">plan</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2186,7 +2021,7 @@ can be used to distinguish between different handler instances.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2207,10 +2042,12 @@ can be used to distinguish between different handler instances.</p>
 
 
 <h4 id="ropt.plugins.plan.base.ResultHandler.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span><span class="nf">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2234,7 +2071,7 @@ can be used to distinguish between different handler instances.</p>
                 <code>plan</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2257,14 +2094,16 @@ can be used to distinguish between different handler instances.</p>
 
 
 <h4 id="ropt.plugins.plan.base.ResultHandler.handle_event" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">handle_event</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2281,10 +2120,12 @@ handler, based on the information passed via the event object.</p>
 
 
 <h4 id="ropt.plugins.plan.base.ResultHandler.__getitem__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__getitem__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__getitem__</span>
+
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__getitem__</span><span class="p">(</span><span class="nf">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2355,10 +2196,12 @@ the value associated with a specific key.</p>
 
 
 <h4 id="ropt.plugins.plan.base.ResultHandler.__setitem__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__setitem__</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__setitem__</span>
+
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__setitem__</span><span class="p">(</span><span class="nf">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2431,7 +2274,7 @@ arbitrary values.</p>
 
 
 <h3 id="ropt.plugins.plan.base.PlanHandlerPlugin" class="doc doc-heading">
-            <code>PlanHandlerPlugin</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">PlanHandlerPlugin</span>
 
 
 </h3>
@@ -2439,7 +2282,7 @@ arbitrary values.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="Plugin (ropt.plugins.base.Plugin)" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            Plugin (ropt.plugins.base.Plugin)" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
 
 
         <p>Abstract base class for plan handler plugins.</p>
@@ -2447,9 +2290,9 @@ arbitrary values.</p>
 optimization plan. Any plugin derived from this class can be built-in,
 installed via a plugin mechanism, or dynamically loaded. During the
 execution of an optimization plan, the required plugin is located through
-the <a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>, which then uses the
+the <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>, which then uses the
 plugin's <code>create_*</code> functions to instantiate  a
-<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.ResultHandler"><code>ResultHandler</code></a>.</p>
+<a class="autorefs autorefs-internal" title="            ResultHandler" href="#ropt.plugins.plan.base.ResultHandler"><code>ResultHandler</code></a>.</p>
 
 
 
@@ -2474,14 +2317,18 @@ plugin's <code>create_*</code> functions to instantiate  a
 
 
 <h4 id="ropt.plugins.plan.base.PlanHandlerPlugin.create" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">plan</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">create</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResultHandler</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2522,7 +2369,7 @@ object based on the provided configuration.</p>
                 <code>plan</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2570,7 +2417,7 @@ object based on the provided configuration.</p>
 
 
 <h3 id="ropt.plugins.plan.base.PlanStepPlugin" class="doc doc-heading">
-            <code>PlanStepPlugin</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">PlanStepPlugin</span>
 
 
 </h3>
@@ -2578,7 +2425,7 @@ object based on the provided configuration.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="Plugin (ropt.plugins.base.Plugin)" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            Plugin (ropt.plugins.base.Plugin)" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
 
 
         <p>Abstract base class for plan step plugins.</p>
@@ -2586,9 +2433,9 @@ object based on the provided configuration.</p>
 optimization plan. Any plugin derived from this class can be built-in,
 installed via a plugin mechanism, or dynamically loaded. During the
 execution of an optimization plan, the required plugin is located through
-the <a class="autorefs autorefs-internal" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>, which then uses the
+the <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>, which then uses the
 plugin's <code>create_*</code> functions to instantiate a
-<a class="autorefs autorefs-internal" href="#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a>.</p>
+<a class="autorefs autorefs-internal" title="            PlanStep" href="#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a>.</p>
 
 
 
@@ -2613,14 +2460,16 @@ plugin's <code>create_*</code> functions to instantiate a
 
 
 <h4 id="ropt.plugins.plan.base.PlanStepPlugin.create" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">plan</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">create</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
 
 </h4>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlanStep</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -2661,7 +2510,7 @@ object based on the provided configuration.</p>
                 <code>plan</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            Plan (ropt.plan.Plan)" href="../plan/#ropt.plan.Plan">Plan</a></code>
             </td>
             <td>
               <div class="doc-md-description">

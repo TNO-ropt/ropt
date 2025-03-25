@@ -1526,7 +1526,7 @@
 
 
 <h2 id="ropt.config.enopt" class="doc doc-heading">
-            <code>ropt.config.enopt</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.config.enopt</span>
 
 
 </h2>
@@ -1538,7 +1538,7 @@
 of an optimization process, including variables, objectives, constraints,
 realizations, samplers, and more.</p>
 <p>The central configuration class is
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>, which encapsulates the complete
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>, which encapsulates the complete
 configuration for a single optimization step. It is designed to be flexible and
 extensible, allowing users to customize the optimization process to their
 specific needs.</p>
@@ -1557,32 +1557,32 @@ values using the <code>model_validate</code> method provided by <code>pydantic</
 <li><strong>Extensibility:</strong> The modular design allows for easy extension and
   customization of the optimization process.</li>
 <li><strong>Centralized Configuration:</strong> The
-  <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> class provides a single point
+  <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> class provides a single point
   of entry for configuring an optimization step.</li>
 </ul>
 <p><strong>Classes:</strong></p>
 <ul>
-<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>: The main configuration class
+<li><a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>: The main configuration class
   for an optimization step.</li>
-<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.VariablesConfig"><code>VariablesConfig</code></a>: Configuration for
+<li><a class="autorefs autorefs-internal" title="            VariablesConfig" href="#ropt.config.enopt.VariablesConfig"><code>VariablesConfig</code></a>: Configuration for
   variables.</li>
-<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.ObjectiveFunctionsConfig"><code>ObjectiveFunctionsConfig</code></a>:
+<li><a class="autorefs autorefs-internal" title="            ObjectiveFunctionsConfig" href="#ropt.config.enopt.ObjectiveFunctionsConfig"><code>ObjectiveFunctionsConfig</code></a>:
   Configuration for objective functions.</li>
-<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.LinearConstraintsConfig"><code>LinearConstraintsConfig</code></a>:
+<li><a class="autorefs autorefs-internal" title="            LinearConstraintsConfig" href="#ropt.config.enopt.LinearConstraintsConfig"><code>LinearConstraintsConfig</code></a>:
   Configuration for linear constraints.</li>
-<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.NonlinearConstraintsConfig"><code>NonlinearConstraintsConfig</code></a>:
+<li><a class="autorefs autorefs-internal" title="            NonlinearConstraintsConfig" href="#ropt.config.enopt.NonlinearConstraintsConfig"><code>NonlinearConstraintsConfig</code></a>:
   Configuration for non-linear constraints.</li>
-<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.RealizationsConfig"><code>RealizationsConfig</code></a>: Configuration
+<li><a class="autorefs autorefs-internal" title="            RealizationsConfig" href="#ropt.config.enopt.RealizationsConfig"><code>RealizationsConfig</code></a>: Configuration
   for realizations.</li>
-<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.OptimizerConfig"><code>OptimizerConfig</code></a>: Configuration for the
+<li><a class="autorefs autorefs-internal" title="            OptimizerConfig" href="#ropt.config.enopt.OptimizerConfig"><code>OptimizerConfig</code></a>: Configuration for the
   optimizer.</li>
-<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.GradientConfig"><code>GradientConfig</code></a>: Configuration for
+<li><a class="autorefs autorefs-internal" title="            GradientConfig" href="#ropt.config.enopt.GradientConfig"><code>GradientConfig</code></a>: Configuration for
   gradient calculations.</li>
-<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a>:
+<li><a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="#ropt.config.enopt.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a>:
   Configuration for function estimators.</li>
-<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>:
+<li><a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="#ropt.config.enopt.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>:
   Configuration for realization filters.</li>
-<li><a class="autorefs autorefs-internal" href="#ropt.config.enopt.SamplerConfig"><code>SamplerConfig</code></a>: Configuration for
+<li><a class="autorefs autorefs-internal" title="            SamplerConfig" href="#ropt.config.enopt.SamplerConfig"><code>SamplerConfig</code></a>: Configuration for
   samplers.</li>
 </ul>
 
@@ -1607,7 +1607,7 @@ values using the <code>model_validate</code> method provided by <code>pydantic</
 
 
 <h3 id="ropt.config.enopt.EnOptConfig" class="doc doc-heading">
-            <code>EnOptConfig</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">EnOptConfig</span>
 
 
 </h3>
@@ -1624,7 +1624,7 @@ realizations, and the optimizer itself.</p>
 <p><code>realization_filters</code>, <code>function_estimators</code>, and <code>samplers</code> are configured
 as tuples. Other configuration fields reference these objects by their index
 within the tuples. For example,
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.GradientConfig"><code>GradientConfig</code></a> uses a <code>samplers</code>
+<a class="autorefs autorefs-internal" title="            GradientConfig" href="#ropt.config.enopt.GradientConfig"><code>GradientConfig</code></a> uses a <code>samplers</code>
 field, which is an array of indices specifying the sampler to use for each
 variable.</p>
 
@@ -1635,7 +1635,7 @@ variable.</p>
 typically have a size determined by a configured property (e.g., the
 number of variables) or a size of one. In the latter case, the single
 value is broadcasted to all relevant elements. For example,
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.VariablesConfig"><code>VariablesConfig</code></a> defines
+<a class="autorefs autorefs-internal" title="            VariablesConfig" href="#ropt.config.enopt.VariablesConfig"><code>VariablesConfig</code></a> defines
 properties like initial values and bounds as <code>numpy</code> arrays, which must
 either match the number of variables or have a size of one.</p>
 </details>
@@ -1653,7 +1653,7 @@ either match the number of variables or have a size of one.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.variables">variables</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="VariablesConfig (ropt.config.enopt._variables_config.VariablesConfig)" href="#ropt.config.enopt.VariablesConfig">VariablesConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            VariablesConfig (ropt.config.enopt._variables_config.VariablesConfig)" href="#ropt.config.enopt.VariablesConfig">VariablesConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1664,7 +1664,7 @@ either match the number of variables or have a size of one.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.objectives">objectives</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ObjectiveFunctionsConfig (ropt.config.enopt._objective_functions_config.ObjectiveFunctionsConfig)" href="#ropt.config.enopt.ObjectiveFunctionsConfig">ObjectiveFunctionsConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ObjectiveFunctionsConfig (ropt.config.enopt._objective_functions_config.ObjectiveFunctionsConfig)" href="#ropt.config.enopt.ObjectiveFunctionsConfig">ObjectiveFunctionsConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1675,7 +1675,7 @@ either match the number of variables or have a size of one.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.linear_constraints">linear_constraints</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="LinearConstraintsConfig (ropt.config.enopt._linear_constraints_config.LinearConstraintsConfig)" href="#ropt.config.enopt.LinearConstraintsConfig">LinearConstraintsConfig</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="            LinearConstraintsConfig (ropt.config.enopt._linear_constraints_config.LinearConstraintsConfig)" href="#ropt.config.enopt.LinearConstraintsConfig">LinearConstraintsConfig</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1686,7 +1686,7 @@ either match the number of variables or have a size of one.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.nonlinear_constraints">nonlinear_constraints</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="NonlinearConstraintsConfig (ropt.config.enopt._nonlinear_constraints_config.NonlinearConstraintsConfig)" href="#ropt.config.enopt.NonlinearConstraintsConfig">NonlinearConstraintsConfig</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="            NonlinearConstraintsConfig (ropt.config.enopt._nonlinear_constraints_config.NonlinearConstraintsConfig)" href="#ropt.config.enopt.NonlinearConstraintsConfig">NonlinearConstraintsConfig</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1697,7 +1697,7 @@ either match the number of variables or have a size of one.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.realizations">realizations</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="RealizationsConfig (ropt.config.enopt._realizations_config.RealizationsConfig)" href="#ropt.config.enopt.RealizationsConfig">RealizationsConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            RealizationsConfig (ropt.config.enopt._realizations_config.RealizationsConfig)" href="#ropt.config.enopt.RealizationsConfig">RealizationsConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1708,7 +1708,7 @@ either match the number of variables or have a size of one.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.optimizer">optimizer</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="OptimizerConfig (ropt.config.enopt._optimizer_config.OptimizerConfig)" href="#ropt.config.enopt.OptimizerConfig">OptimizerConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            OptimizerConfig (ropt.config.enopt._optimizer_config.OptimizerConfig)" href="#ropt.config.enopt.OptimizerConfig">OptimizerConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1719,7 +1719,7 @@ either match the number of variables or have a size of one.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.gradient">gradient</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="GradientConfig (ropt.config.enopt._gradient_config.GradientConfig)" href="#ropt.config.enopt.GradientConfig">GradientConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            GradientConfig (ropt.config.enopt._gradient_config.GradientConfig)" href="#ropt.config.enopt.GradientConfig">GradientConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1730,7 +1730,7 @@ either match the number of variables or have a size of one.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.realization_filters">realization_filters</span></code></td>
             <td>
-                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="RealizationFilterConfig (ropt.config.enopt._realization_filter_config.RealizationFilterConfig)" href="#ropt.config.enopt.RealizationFilterConfig">RealizationFilterConfig</a>, ...]</code>
+                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="            RealizationFilterConfig (ropt.config.enopt._realization_filter_config.RealizationFilterConfig)" href="#ropt.config.enopt.RealizationFilterConfig">RealizationFilterConfig</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1741,7 +1741,7 @@ either match the number of variables or have a size of one.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.function_estimators">function_estimators</span></code></td>
             <td>
-                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="FunctionEstimatorConfig (ropt.config.enopt._function_estimator_config.FunctionEstimatorConfig)" href="#ropt.config.enopt.FunctionEstimatorConfig">FunctionEstimatorConfig</a>, ...]</code>
+                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig (ropt.config.enopt._function_estimator_config.FunctionEstimatorConfig)" href="#ropt.config.enopt.FunctionEstimatorConfig">FunctionEstimatorConfig</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1752,7 +1752,7 @@ either match the number of variables or have a size of one.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.samplers">samplers</span></code></td>
             <td>
-                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="SamplerConfig (ropt.config.enopt._sampler_config.SamplerConfig)" href="#ropt.config.enopt.SamplerConfig">SamplerConfig</a>, ...]</code>
+                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="            SamplerConfig (ropt.config.enopt._sampler_config.SamplerConfig)" href="#ropt.config.enopt.SamplerConfig">SamplerConfig</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1794,7 +1794,7 @@ either match the number of variables or have a size of one.</p>
 
 
 <h3 id="ropt.config.enopt.VariablesConfig" class="doc doc-heading">
-            <code>VariablesConfig</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">VariablesConfig</span>
 
 
 </h3>
@@ -1806,7 +1806,7 @@ either match the number of variables or have a size of one.</p>
         <p>Configuration class for optimization variables.</p>
 <p>This class, <code>VariablesConfig</code>, defines the configuration for the
 optimization variables used in an
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. It specifies the
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. It specifies the
 initial values, bounds, types, and an optional mask for the variables.</p>
 <p>The <code>initial_values</code> field is a required <code>numpy</code> array that sets the
 starting values for the variables. The number of variables is determined by
@@ -1818,9 +1818,10 @@ infinity, respectively. <code>numpy.nan</code> values in these arrays indicate
 unbounded variables and are converted to <code>numpy.inf</code> with the appropriate
 sign.</p>
 <p>The optional <code>types</code> field allows assigning a
-<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.VariableType"><code>VariableType</code></a> to each variable. If not provided,
+<a class="autorefs autorefs-internal" title="            VariableType" href="../enums/#ropt.enums.VariableType"><code>VariableType</code></a> to each variable. If not provided,
 all variables are assumed to be continuous real-valued
-(<a class="autorefs autorefs-internal" title="REAL = 1
+(<a class="autorefs autorefs-internal" title="            REAL
+
 
   
       class-attribute
@@ -1845,7 +1846,8 @@ fixed variable.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.VariablesConfig.types">types</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ArrayEnum = Annotated[NDArray[np.ubyte], BeforeValidator(_convert_enum_array)]
+                  <code><a class="autorefs autorefs-internal" title="            ArrayEnum
+
 
   
       module-attribute
@@ -1860,7 +1862,8 @@ fixed variable.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.VariablesConfig.initial_values">initial_values</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
+                  <code><a class="autorefs autorefs-internal" title="            Array1D
+
 
   
       module-attribute
@@ -1875,7 +1878,8 @@ fixed variable.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.VariablesConfig.lower_bounds">lower_bounds</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
+                  <code><a class="autorefs autorefs-internal" title="            Array1D
+
 
   
       module-attribute
@@ -1890,7 +1894,8 @@ fixed variable.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.VariablesConfig.upper_bounds">upper_bounds</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
+                  <code><a class="autorefs autorefs-internal" title="            Array1D
+
 
   
       module-attribute
@@ -1905,7 +1910,8 @@ fixed variable.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.VariablesConfig.mask">mask</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Array1DBool = Annotated[NDArray[np.bool_], BeforeValidator(_convert_1d_array_bool)]
+                  <code><a class="autorefs autorefs-internal" title="            Array1DBool
+
 
   
       module-attribute
@@ -1951,7 +1957,7 @@ fixed variable.</p>
 
 
 <h3 id="ropt.config.enopt.ObjectiveFunctionsConfig" class="doc doc-heading">
-            <code>ObjectiveFunctionsConfig</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ObjectiveFunctionsConfig</span>
 
 
 </h3>
@@ -1963,7 +1969,7 @@ fixed variable.</p>
         <p>Configuration class for objective functions.</p>
 <p>This class, <code>ObjectiveFunctionsConfig</code>, defines the configuration for
 objective functions used in an
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 <p><code>ropt</code> supports multi-objective optimization. Multiple objectives are
 combined into a single value by summing them after weighting. The <code>weights</code>
 field, a <code>numpy</code> array, determines the weight of each objective function.
@@ -1973,7 +1979,7 @@ weights are automatically normalized to sum to 1 (e.g., <code>[1, 1]</code> beco
 <p>Objective functions can be processed by realization filters and function
 estimators. The <code>realization_filters</code> and <code>function_estimators</code> fields
 contain indices that refer to the corresponding configuration objects in the
-parent <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+parent <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -1989,7 +1995,8 @@ parent <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfi
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.weights">weights</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
+                  <code><a class="autorefs autorefs-internal" title="            Array1D
+
 
   
       module-attribute
@@ -2004,7 +2011,8 @@ parent <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfi
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.realization_filters">realization_filters</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Array1DInt = Annotated[NDArray[np.intc], BeforeValidator(_convert_1d_array_intc)]
+                  <code><a class="autorefs autorefs-internal" title="            Array1DInt
+
 
   
       module-attribute
@@ -2019,7 +2027,8 @@ parent <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfi
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.ObjectiveFunctionsConfig.function_estimators">function_estimators</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Array1DInt = Annotated[NDArray[np.intc], BeforeValidator(_convert_1d_array_intc)]
+                  <code><a class="autorefs autorefs-internal" title="            Array1DInt
+
 
   
       module-attribute
@@ -2065,7 +2074,7 @@ parent <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfi
 
 
 <h3 id="ropt.config.enopt.LinearConstraintsConfig" class="doc doc-heading">
-            <code>LinearConstraintsConfig</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">LinearConstraintsConfig</span>
 
 
 </h3>
@@ -2076,7 +2085,7 @@ parent <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfi
 
         <p>Configuration class for linear constraints.</p>
 <p>This class, <code>LinearConstraintsConfig</code>, defines linear constraints used in an
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 <p>Linear constraints are defined by a set of linear equations involving the
 optimization variables. These equations can represent equality or inequality
 constraints. The <code>coefficients</code> field is a 2D <code>numpy</code> array where each row
@@ -2104,7 +2113,8 @@ equal to the upper bounds.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.LinearConstraintsConfig.coefficients">coefficients</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Array2D = Annotated[NDArray[np.float64], BeforeValidator(_convert_2d_array)]
+                  <code><a class="autorefs autorefs-internal" title="            Array2D
+
 
   
       module-attribute
@@ -2119,7 +2129,8 @@ equal to the upper bounds.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.LinearConstraintsConfig.lower_bounds">lower_bounds</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
+                  <code><a class="autorefs autorefs-internal" title="            Array1D
+
 
   
       module-attribute
@@ -2134,7 +2145,8 @@ equal to the upper bounds.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.LinearConstraintsConfig.upper_bounds">upper_bounds</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
+                  <code><a class="autorefs autorefs-internal" title="            Array1D
+
 
   
       module-attribute
@@ -2197,7 +2209,7 @@ follows:</p>
 
 
 <h3 id="ropt.config.enopt.NonlinearConstraintsConfig" class="doc doc-heading">
-            <code>NonlinearConstraintsConfig</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">NonlinearConstraintsConfig</span>
 
 
 </h3>
@@ -2208,7 +2220,7 @@ follows:</p>
 
         <p>Configuration class for non-linear constraints.</p>
 <p>This class, <code>NonlinearConstraintsConfig</code>, defines non-linear constraints used
-in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+in an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 <p>Non-linear constraints are defined by comparing a constraint function to a
 right-hand-side value, allowing for equality or inequality constraints. The
 <code>lower_bounds</code> and <code>upper_bounds</code> fields, which are <code>numpy</code> arrays, specify the
@@ -2221,7 +2233,7 @@ equal to the upper bounds.</p>
 <p>Non-linear constraints can be processed by realization filters and function
 estimators. The <code>realization_filters</code> and <code>function_estimators</code> fields contain
 indices that refer to the corresponding objects configured in the parent
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2237,7 +2249,8 @@ indices that refer to the corresponding objects configured in the parent
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.lower_bounds">lower_bounds</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
+                  <code><a class="autorefs autorefs-internal" title="            Array1D
+
 
   
       module-attribute
@@ -2252,7 +2265,8 @@ indices that refer to the corresponding objects configured in the parent
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.upper_bounds">upper_bounds</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
+                  <code><a class="autorefs autorefs-internal" title="            Array1D
+
 
   
       module-attribute
@@ -2267,7 +2281,8 @@ indices that refer to the corresponding objects configured in the parent
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.realization_filters">realization_filters</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Array1DInt = Annotated[NDArray[np.intc], BeforeValidator(_convert_1d_array_intc)]
+                  <code><a class="autorefs autorefs-internal" title="            Array1DInt
+
 
   
       module-attribute
@@ -2282,7 +2297,8 @@ indices that refer to the corresponding objects configured in the parent
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.NonlinearConstraintsConfig.function_estimators">function_estimators</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Array1DInt = Annotated[NDArray[np.intc], BeforeValidator(_convert_1d_array_intc)]
+                  <code><a class="autorefs autorefs-internal" title="            Array1DInt
+
 
   
       module-attribute
@@ -2328,7 +2344,7 @@ indices that refer to the corresponding objects configured in the parent
 
 
 <h3 id="ropt.config.enopt.RealizationsConfig" class="doc doc-heading">
-            <code>RealizationsConfig</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">RealizationsConfig</span>
 
 
 </h3>
@@ -2339,7 +2355,7 @@ indices that refer to the corresponding objects configured in the parent
 
         <p>Configuration class for realizations.</p>
 <p>This class, <code>RealizationsConfig</code>, defines the configuration for realizations
-used in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+used in an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 <p>To optimize an ensemble of functions, a set of realizations is defined. When
 the optimizer requests a function value or a gradient, these are calculated for
 each realization and then combined into a single value. Typically, this
@@ -2377,7 +2393,8 @@ one successful realization.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.RealizationsConfig.weights">weights</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
+                  <code><a class="autorefs autorefs-internal" title="            Array1D
+
 
   
       module-attribute
@@ -2435,7 +2452,7 @@ one successful realization.</p>
 
 
 <h3 id="ropt.config.enopt.OptimizerConfig" class="doc doc-heading">
-            <code>OptimizerConfig</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">OptimizerConfig</span>
 
 
 </h3>
@@ -2446,7 +2463,7 @@ one successful realization.</p>
 
         <p>Configuration class for the optimization algorithm.</p>
 <p>This class, <code>OptimizerConfig</code>, defines the configuration for the optimization
-algorithm used in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+algorithm used in an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 <p>While optimization methods can have diverse parameters, this class provides a
 standardized set of settings that are commonly used and forwarded to the
 optimizer:</p>
@@ -2464,7 +2481,7 @@ optimizer:</p>
   evaluations, even if the optimizer requests them together. This is useful
   with realization filters that completerly disable some realizations, to
   potentially reduce the number of evaluations for gradients (see
-  <a class="autorefs autorefs-internal" href="#ropt.config.enopt.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>).</li>
+  <a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="#ropt.config.enopt.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>).</li>
 <li><strong><code>parallel</code></strong>: If <code>True</code>, allows the optimizer to use parallelized
   function evaluations. This typically applies to gradient-free methods and
   may be ignored.</li>
@@ -2643,7 +2660,7 @@ optimizer:</p>
 
 
 <h3 id="ropt.config.enopt.GradientConfig" class="doc doc-heading">
-            <code>GradientConfig</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">GradientConfig</span>
 
 
 </h3>
@@ -2654,7 +2671,7 @@ optimizer:</p>
 
         <p>Configuration class for gradient calculations.</p>
 <p>This class, <code>GradientConfig</code>, defines the configuration for gradient
-calculations used in an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>
+calculations used in an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>
 object.</p>
 <p>Gradients are estimated using function values calculated from perturbed
 variables and the unperturbed variables. The <code>number_of_perturbations</code> field
@@ -2665,20 +2682,20 @@ still be estimated as long as a minimum number of evaluations succeed. The
 <code>perturbation_min_success</code> field specifies this minimum. By default, it
 equals <code>number_of_perturbations</code>.</p>
 <p>Perturbations are generated by sampler objects configured in the parent
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. The <code>samplers</code> field
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. The <code>samplers</code> field
 specifies, for each variable, the index of the sampler to use. A random
 number generator is created to support samplers that require random numbers.</p>
 <p>The generated perturbation values are scaled by the
 <code>perturbation_magnitudes</code> and can be modified based on the
-<code>perturbation_types</code>. See <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>
+<code>perturbation_types</code>. See <a class="autorefs autorefs-internal" title="            PerturbationType" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>
 for details on available perturbation types.</p>
 <p>Perturbed variables may violate the defined variable bounds. The
 <code>boundary_types</code> field specifies how to handle such violations. See
-<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a> for details on available boundary
+<a class="autorefs autorefs-internal" title="            BoundaryType" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a> for details on available boundary
 handling methods.</p>
 <p>The <code>perturbation_types</code> and <code>boundary_types</code> fields use values from the
-<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a> and
-<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a> enumerations, respectively.</p>
+<a class="autorefs autorefs-internal" title="            PerturbationType" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a> and
+<a class="autorefs autorefs-internal" title="            BoundaryType" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a> enumerations, respectively.</p>
 <p>Gradients are calculated for each realization individually and then combined
 into a total gradient. If <code>number_of_perturbations</code> is low, or even just
 one, individual gradient calculations may be unreliable. In this case,
@@ -2713,7 +2730,8 @@ parallel plan evaluations.</p>
             <td>
               <div class="doc-md-description">
                 <p>Number of perturbations (default:
-<a class="autorefs autorefs-internal" title="DEFAULT_NUMBER_OF_PERTURBATIONS = 5
+<a class="autorefs autorefs-internal" title="            DEFAULT_NUMBER_OF_PERTURBATIONS
+
 
   
       module-attribute
@@ -2736,7 +2754,8 @@ for perturbed variables (default: equal to <code>number_of_perturbations</code>)
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.GradientConfig.perturbation_magnitudes">perturbation_magnitudes</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Array1D = Annotated[NDArray[np.float64], BeforeValidator(_convert_1d_array)]
+                  <code><a class="autorefs autorefs-internal" title="            Array1D
+
 
   
       module-attribute
@@ -2746,7 +2765,8 @@ for perturbed variables (default: equal to <code>number_of_perturbations</code>)
               <div class="doc-md-description">
                 <p>Magnitudes of the perturbations for each variable
 (default:
-<a class="autorefs autorefs-internal" title="DEFAULT_PERTURBATION_MAGNITUDE = 0.005
+<a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_MAGNITUDE
+
 
   
       module-attribute
@@ -2757,7 +2777,8 @@ for perturbed variables (default: equal to <code>number_of_perturbations</code>)
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.GradientConfig.perturbation_types">perturbation_types</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ArrayEnum = Annotated[NDArray[np.ubyte], BeforeValidator(_convert_enum_array)]
+                  <code><a class="autorefs autorefs-internal" title="            ArrayEnum
+
 
   
       module-attribute
@@ -2766,8 +2787,9 @@ for perturbed variables (default: equal to <code>number_of_perturbations</code>)
             <td>
               <div class="doc-md-description">
                 <p>Type of perturbation for each variable (see
-<a class="autorefs autorefs-internal" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>, default:
-<a class="autorefs autorefs-internal" title="DEFAULT_PERTURBATION_TYPE = PerturbationType.ABSOLUTE
+<a class="autorefs autorefs-internal" title="            PerturbationType" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>, default:
+<a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_TYPE
+
 
   
       module-attribute
@@ -2778,7 +2800,8 @@ for perturbed variables (default: equal to <code>number_of_perturbations</code>)
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.GradientConfig.boundary_types">boundary_types</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ArrayEnum = Annotated[NDArray[np.ubyte], BeforeValidator(_convert_enum_array)]
+                  <code><a class="autorefs autorefs-internal" title="            ArrayEnum
+
 
   
       module-attribute
@@ -2787,8 +2810,9 @@ for perturbed variables (default: equal to <code>number_of_perturbations</code>)
             <td>
               <div class="doc-md-description">
                 <p>How to handle perturbations that violate boundary
-conditions (see <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>, default:
-<a class="autorefs autorefs-internal" title="DEFAULT_PERTURBATION_BOUNDARY_TYPE = BoundaryType.MIRROR_BOTH
+conditions (see <a class="autorefs autorefs-internal" title="            BoundaryType" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>, default:
+<a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_BOUNDARY_TYPE
+
 
   
       module-attribute
@@ -2799,7 +2823,8 @@ conditions (see <a class="autorefs autorefs-internal" href="../enums/#ropt.enums
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.GradientConfig.samplers">samplers</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="Array1DInt = Annotated[NDArray[np.intc], BeforeValidator(_convert_1d_array_intc)]
+                  <code><a class="autorefs autorefs-internal" title="            Array1DInt
+
 
   
       module-attribute
@@ -2814,7 +2839,8 @@ conditions (see <a class="autorefs autorefs-internal" href="../enums/#ropt.enums
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.GradientConfig.seed">seed</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="ItemOrTuple = Annotated[tuple[T, ...], BeforeValidator(_convert_tuple)]
+                  <code><a class="autorefs autorefs-internal" title="            ItemOrTuple
+
 
   
       module-attribute
@@ -2872,7 +2898,7 @@ calculation (default: <code>False</code>).</p>
 
 
 <h3 id="ropt.config.enopt.FunctionEstimatorConfig" class="doc doc-heading">
-            <code>FunctionEstimatorConfig</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">FunctionEstimatorConfig</span>
 
 
 </h3>
@@ -2884,7 +2910,7 @@ calculation (default: <code>False</code>).</p>
         <p>Configuration class for function estimators.</p>
 <p>This class, <code>FunctionEstimatorConfig</code>, defines the configuration for
 function estimators used in an
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. Function estimators
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. Function estimators
 are configured as a tuple in the <code>function_estimators</code> field of the
 <code>EnOptConfig</code>, defining the available estimators for the optimization.</p>
 <p>By default, objective and constraint functions, as well as their gradients,
@@ -2962,7 +2988,7 @@ interpretation of these options depends on the selected method.</p>
 
 
 <h3 id="ropt.config.enopt.RealizationFilterConfig" class="doc doc-heading">
-            <code>RealizationFilterConfig</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">RealizationFilterConfig</span>
 
 
 </h3>
@@ -2974,7 +3000,7 @@ interpretation of these options depends on the selected method.</p>
         <p>Configuration class for realization filters.</p>
 <p>This class, <code>RealizationFilterConfig</code>, defines the configuration for
 realization filters used in an
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. Realization filters
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. Realization filters
 are configured as a tuple in the <code>realization_filters</code> field of the
 <code>EnOptConfig</code>, defining the available filters for the optimization.</p>
 <p>By default, objective and constraint functions, as well as their gradients,
@@ -3055,7 +3081,7 @@ of these options depends on the selected method.</p>
 
 
 <h3 id="ropt.config.enopt.SamplerConfig" class="doc doc-heading">
-            <code>SamplerConfig</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">SamplerConfig</span>
 
 
 </h3>
@@ -3066,10 +3092,10 @@ of these options depends on the selected method.</p>
 
         <p>Configuration class for samplers.</p>
 <p>This class, <code>SamplerConfig</code>, defines the configuration for samplers used in
-an <a class="autorefs autorefs-internal" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. Samplers are
+an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. Samplers are
 configured as a tuple in the <code>samplers</code> field of the <code>EnOptConfig</code>, defining
 the available samplers for the optimization. The <code>samplers</code> field in the
-<a class="autorefs autorefs-internal" href="#ropt.config.enopt.GradientConfig"><code>GradientConfig</code></a> specifies the index of
+<a class="autorefs autorefs-internal" title="            GradientConfig" href="#ropt.config.enopt.GradientConfig"><code>GradientConfig</code></a> specifies the index of
 the sampler to use for each variable.</p>
 <p>Samplers generate perturbations added to variables for gradient
 calculations. These perturbations can be deterministic or stochastic.</p>
@@ -3163,7 +3189,7 @@ of perturbed values for all realizations.</p>
 
 
 <h2 id="ropt.config.enopt.constants" class="doc doc-heading">
-            <code>ropt.config.enopt.constants</code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.config.enopt.constants</span>
 
 
 </h2>
@@ -3193,14 +3219,16 @@ of perturbed values for all realizations.</p>
 
 
 <h3 id="ropt.config.enopt.constants.DEFAULT_SEED" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">DEFAULT_SEED</span> <span class="o">=</span> <span class="mi">1</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">DEFAULT_SEED</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">DEFAULT_SEED</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="mi">1</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -3219,14 +3247,16 @@ To obtain unique results for each optimization run, modify this seed.</p>
 
 
 <h3 id="ropt.config.enopt.constants.DEFAULT_NUMBER_OF_PERTURBATIONS" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">DEFAULT_NUMBER_OF_PERTURBATIONS</span> <span class="o">=</span> <span class="mi">5</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">DEFAULT_NUMBER_OF_PERTURBATIONS</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">DEFAULT_NUMBER_OF_PERTURBATIONS</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="mi">5</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -3244,14 +3274,16 @@ estimates but also increases the number of function evaluations required.</p>
 
 
 <h3 id="ropt.config.enopt.constants.DEFAULT_PERTURBATION_MAGNITUDE" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">DEFAULT_PERTURBATION_MAGNITUDE</span> <span class="o">=</span> <span class="mf">0.005</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">DEFAULT_PERTURBATION_MAGNITUDE</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">DEFAULT_PERTURBATION_MAGNITUDE</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="mf">0.005</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -3260,7 +3292,7 @@ estimates but also increases the number of function evaluations required.</p>
 perturbation values generated by samplers. The magnitude can be interpreted as
 an absolute value or as a relative value, depending on the selected perturbation
 type.</p>
-<p>See also: <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>.</p>
+<p>See also: <a class="autorefs autorefs-internal" title="            PerturbationType" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>.</p>
 
     </div>
 
@@ -3271,14 +3303,16 @@ type.</p>
 
 
 <h3 id="ropt.config.enopt.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">DEFAULT_PERTURBATION_BOUNDARY_TYPE</span> <span class="o">=</span> <span class="n">BoundaryType</span><span class="o">.</span><span class="n">MIRROR_BOTH</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">DEFAULT_PERTURBATION_BOUNDARY_TYPE</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">DEFAULT_PERTURBATION_BOUNDARY_TYPE</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="n">MIRROR_BOTH</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -3286,7 +3320,7 @@ type.</p>
 <p>This value determines how perturbations that violate the defined variable bounds
 are handled. The default, <code>BoundaryType.MIRROR_BOTH</code>, mirrors perturbations back
 into the valid range if they exceed either the lower or upper bound.</p>
-<p>See also: <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>.</p>
+<p>See also: <a class="autorefs autorefs-internal" title="            BoundaryType" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>.</p>
 
     </div>
 
@@ -3297,14 +3331,16 @@ into the valid range if they exceed either the lower or upper bound.</p>
 
 
 <h3 id="ropt.config.enopt.constants.DEFAULT_PERTURBATION_TYPE" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">DEFAULT_PERTURBATION_TYPE</span> <span class="o">=</span> <span class="n">PerturbationType</span><span class="o">.</span><span class="n">ABSOLUTE</span></code>
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">DEFAULT_PERTURBATION_TYPE</span>
+
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
   </span>
 
 </h3>
-
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">DEFAULT_PERTURBATION_TYPE</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="n">ABSOLUTE</span>
+</span></code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -3314,7 +3350,7 @@ default, <code>PerturbationType.ABSOLUTE</code>, means that the perturbation mag
 added directly to the variable value. Other options, such as
 <code>PerturbationType.RELATIVE</code>, scale the perturbation magnitude based on the
 variable's bounds.</p>
-<p>See also: <a class="autorefs autorefs-internal" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>.</p>
+<p>See also: <a class="autorefs autorefs-internal" title="            PerturbationType" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>.</p>
 
     </div>
 
