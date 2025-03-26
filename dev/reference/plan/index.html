@@ -645,15 +645,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.handler_exists" class="md-nav__link">
-    <span class="md-ellipsis">
-      handler_exists
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.add_step" class="md-nav__link">
     <span class="md-ellipsis">
       add_step
@@ -663,9 +654,27 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.handler_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      handler_exists
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.step_exists" class="md-nav__link">
     <span class="md-ellipsis">
       step_exists
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.run_step" class="md-nav__link">
+    <span class="md-ellipsis">
+      run_step
     </span>
   </a>
   
@@ -684,15 +693,6 @@
   <a href="#ropt.plan.Plan.has_function" class="md-nav__link">
     <span class="md-ellipsis">
       has_function
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.run_step" class="md-nav__link">
-    <span class="md-ellipsis">
-      run_step
     </span>
   </a>
   
@@ -1434,15 +1434,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.handler_exists" class="md-nav__link">
-    <span class="md-ellipsis">
-      handler_exists
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.add_step" class="md-nav__link">
     <span class="md-ellipsis">
       add_step
@@ -1452,9 +1443,27 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.handler_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      handler_exists
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.step_exists" class="md-nav__link">
     <span class="md-ellipsis">
       step_exists
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.run_step" class="md-nav__link">
+    <span class="md-ellipsis">
+      run_step
     </span>
   </a>
   
@@ -1473,15 +1482,6 @@
   <a href="#ropt.plan.Plan.has_function" class="md-nav__link">
     <span class="md-ellipsis">
       has_function
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.run_step" class="md-nav__link">
-    <span class="md-ellipsis">
-      run_step
     </span>
   </a>
   
@@ -1798,6 +1798,7 @@ methods.</p>
     <div class="doc doc-contents ">
 
         <p>Check if the plan was aborted.</p>
+<p>Determines whether the plan's execution has been aborted.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -1844,22 +1845,23 @@ methods.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the optimizer context associated with the plan.</p>
-<p>This method retrieves the optimizer context object that provides shared
-state and functionality for executing the optimization plan.</p>
+        <p>Return the optimizer context.</p>
+<p>Retrieves the <a class="autorefs autorefs-internal" title="            OptimizerContext" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a> object
+associated with this plan. The optimizer context provides shared state
+and functionality for executing the optimization plan.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
     <table>
       <thead>
         <tr>
-          <th>Type</th>
+<th>Name</th>          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td>
+<td><code>OptimizerContext</code></td>            <td>
                   <code><a class="autorefs autorefs-internal" title="            OptimizerContext (ropt.plan._context.OptimizerContext)" href="#ropt.plan.OptimizerContext">OptimizerContext</a></code>
             </td>
             <td>
@@ -1894,12 +1896,12 @@ state and functionality for executing the optimization plan.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize a plan object.</p>
-<p>This method initializes a plan using an
-<a class="autorefs autorefs-internal" title="            OptimizerContext" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a> object. An optional
-<a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>plugin_manager</code></a> argument allows for the
-specification of custom plugins for result handlers and step objects
-within the plan. If omitted, only plugins installed through Python's
-standard entry points are used.</p>
+<p>Constructs a new plan, associating it with an
+<a class="autorefs autorefs-internal" title="            OptimizerContext" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a> and an optional parent
+plan.</p>
+<p>The plan will operate within the provided <code>optimizer_context</code>. If a
+<code>parent</code> plan is specified, this plan becomes a child, enabling event
+propagation up the plan hierarchy.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1922,8 +1924,7 @@ standard entry points are used.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The context in which the plan will execute,
-               providing shared resources across steps.</p>
+                <p>The execution context for the plan.</p>
               </div>
             </td>
             <td>
@@ -1939,7 +1940,7 @@ standard entry points are used.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional reference to a parent plan.</p>
+                <p>An optional parent plan.</p>
               </div>
             </td>
             <td>
@@ -1968,6 +1969,10 @@ standard entry points are used.</p>
     <div class="doc doc-contents ">
 
         <p>Add a handler to the plan.</p>
+<p>Constructs and registers a result handler with the plan. The handler's
+type is determined by the provided <code>name</code>, which the plugin system uses
+to locate the corresponding handler class. Any additional keyword
+arguments are passed to the handler's constructor.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2006,7 +2011,7 @@ standard entry points are used.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Additional arguments to pass to the handler.</p>
+                <p>Additional arguments for the handler's constructor.</p>
               </div>
             </td>
             <td>
@@ -2032,7 +2037,101 @@ standard entry points are used.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The new handler.</p>
+                <p>The unique ID of the newly added handler.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plan.Plan.add_step" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">add_step</span>
+
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_step</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Add a step to the plan.</p>
+<p>Registers a step with the plan. The step's type is determined by the
+provided <code>name</code>, which the plugin system uses to locate the
+corresponding step class. Any additional keyword arguments are passed to
+the step's constructor.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>name</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the step to add.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>kwargs</code>
+            </td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Additional arguments for the step's constructor.</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="uuid.UUID">UUID</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>uuid.UUID: The unique ID of the newly added step.</p>
               </div>
             </td>
           </tr>
@@ -2058,6 +2157,8 @@ standard entry points are used.</p>
     <div class="doc doc-contents ">
 
         <p>Check if a handler exists.</p>
+<p>Determines whether a handler with the specified name is supported by the
+plugin system.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2095,108 +2196,18 @@ standard entry points are used.</p>
     <table>
       <thead>
         <tr>
-          <th>Type</th>
+<th>Name</th>          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td>
+<td><code>bool</code></td>            <td>
                   <code><span title="bool">bool</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether the handler exists.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plan.Plan.add_step" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">add_step</span>
-
-
-</h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_step</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Add a step to the plan.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>name</code>
-            </td>
-            <td>
-                  <code><span title="str">str</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The name of the step to run.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>kwargs</code>
-            </td>
-            <td>
-                  <code><span title="typing.Any">Any</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Additional arguments to pass to the step.</p>
-              </div>
-            </td>
-            <td>
-                  <code>{}</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="uuid.UUID">UUID</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The step that was executed.</p>
+                <p><code>True</code> if the handler exists; otherwise, <code>False</code>.</p>
               </div>
             </td>
           </tr>
@@ -2222,6 +2233,8 @@ standard entry points are used.</p>
     <div class="doc doc-contents ">
 
         <p>Check if a step exists.</p>
+<p>Determines whether a step with the specified name is supported by the
+plugin system.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2259,6 +2272,125 @@ standard entry points are used.</p>
     <table>
       <thead>
         <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>bool</code></td>            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the step exists; otherwise, <code>False</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plan.Plan.run_step" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run_step</span>
+
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run_step</span><span class="p">(</span><span class="n">step</span><span class="p">:</span> <span class="n">UUID</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Run a step in the plan.</p>
+<p>Executes a specific step within the plan. The step's <code>run</code> method is
+called with the provided keyword arguments. If the plan has been
+aborted, a <a class="autorefs autorefs-internal" title="            PlanAborted" href="../exceptions/#ropt.exceptions.PlanAborted"><code>PlanAborted</code></a> exception is
+raised before the step is executed.</p>
+<p>The step is executed only once. The value returned by the step's <code>run</code>
+method is returned by this method.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>step</code>
+            </td>
+            <td>
+                  <code><span title="uuid.UUID">UUID</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The unique ID of the step to run.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>kwargs</code>
+            </td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Additional arguments to pass to the step's <code>run</code> method.</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>Any</code></td>            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The value returned by the step's <code>run</code> method.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
           <th>Type</th>
           <th>Description</th>
         </tr>
@@ -2266,11 +2398,21 @@ standard entry points are used.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="bool">bool</span></code>
+                  <code><span title="AttributeError">AttributeError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Whether the step exists.</p>
+                <p>If the provided <code>step</code> ID is not valid.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            PlanAborted (ropt.exceptions.PlanAborted)" href="../exceptions/#ropt.exceptions.PlanAborted">PlanAborted</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the plan has been aborted.</p>
               </div>
             </td>
           </tr>
@@ -2296,8 +2438,9 @@ standard entry points are used.</p>
     <div class="doc doc-contents ">
 
         <p>Add a function to the plan.</p>
-<p>The function can be called using the <code>run_function</code> method, and is
-generally used to execute one or more steps in the plan.</p>
+<p>Registers a user-defined function with the plan. This function can
+encapsulate a sequence of steps or custom logic. It can be executed
+later using the <a class="autorefs autorefs-internal" title="            run_function" href="#ropt.plan.Plan.run_function"><code>run_function</code></a> method.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2320,7 +2463,7 @@ generally used to execute one or more steps in the plan.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The function to add to the plan.</p>
+                <p>The function to register with the plan.</p>
               </div>
             </td>
             <td>
@@ -2349,92 +2492,27 @@ generally used to execute one or more steps in the plan.</p>
     <div class="doc doc-contents ">
 
         <p>Check if a function has been added to the plan.</p>
+<p>Determines whether a user-defined function has been registered with the
+plan.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
     <table>
       <thead>
         <tr>
-          <th>Type</th>
+<th>Name</th>          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td>
+<td><code>bool</code></td>            <td>
                   <code><span title="bool">bool</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>True</code> if a function has been added to the plan.</p>
+                <p><code>True</code> if a function has been added; otherwise, <code>False</code>.</p>
               </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plan.Plan.run_step" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run_step</span>
-
-
-</h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run_step</span><span class="p">(</span><span class="n">step</span><span class="p">:</span> <span class="n">UUID</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Run a step in the plan.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>step</code>
-            </td>
-            <td>
-                  <code><span title="uuid.UUID">UUID</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The step to run</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>kwargs</code>
-            </td>
-            <td>
-                  <code><span title="typing.Any">Any</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Additional arguments to pass to the step.</p>
-              </div>
-            </td>
-            <td>
-                  <code>{}</code>
             </td>
           </tr>
       </tbody>
@@ -2459,6 +2537,8 @@ generally used to execute one or more steps in the plan.</p>
     <div class="doc doc-contents ">
 
         <p>Run a function in the plan.</p>
+<p>Executes the user-defined function that has been registered with the
+plan via the <a class="autorefs autorefs-internal" title="            add_function" href="#ropt.plan.Plan.add_function"><code>add_function</code></a> method.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2512,6 +2592,29 @@ generally used to execute one or more steps in the plan.</p>
     <table>
       <thead>
         <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>Any</code></td>            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The result returned by the function.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
           <th>Type</th>
           <th>Description</th>
         </tr>
@@ -2519,11 +2622,11 @@ generally used to execute one or more steps in the plan.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing.Any">Any</span></code>
+                  <code><span title="AttributeError">AttributeError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The result of the function.</p>
+                <p>If no function has been added to the plan.</p>
               </div>
             </td>
           </tr>
@@ -2549,10 +2652,17 @@ generally used to execute one or more steps in the plan.</p>
     <div class="doc doc-contents ">
 
         <p>Abort the plan.</p>
-<p>This will not abort a running plan, but will prevent any further steps
-from being executed. This can be used to stop the plan from continuing
-if a step fails or if the user decides to stop the optimization.</p>
-<p>The <code>aborted</code> method can be used to check if the plan was aborted.</p>
+<p>Prevents further steps in the plan from being executed. This method does
+not interrupt a currently running step but ensures that no subsequent
+steps will be initiated. It can be used to halt the plan's execution due
+to a step failure or external intervention.</p>
+<p>The <a class="autorefs autorefs-internal" title="            aborted
+
+
+  
+      property
+  " href="#ropt.plan.Plan.aborted"><code>aborted</code></a> property can be used to check if
+the plan has been aborted.</p>
 
 
     </div>
@@ -2573,6 +2683,8 @@ if a step fails or if the user decides to stop the optimization.</p>
     <div class="doc doc-contents ">
 
         <p>Set the parent of the plan.</p>
+<p>Establishes a parent-child relationship between this plan and another
+plan. This enables event propagation up the plan hierarchy.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2623,14 +2735,15 @@ if a step fails or if the user decides to stop the optimization.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Emit an event of the specified type with the provided data.</p>
-<p>When this method is called, the following steps are executed:</p>
+        <p>Emit an event.</p>
+<p>Emits an event, triggering associated handlers and observers.</p>
+<p>When this method is called:</p>
 <ol>
 <li>All event handlers associated with the plan are invoked.</li>
 <li>If the plan has no parent, all observer functions registered for the
-   specified event type via the <code>add_observer</code> method are called.</li>
-<li>If the plan has a parent, the <code>emit_event</code> method of the parent plan
-   is also called.</li>
+    specified event type are called.</li>
+<li>If the plan has a parent, the parent plan's <code>emit_event</code> method is
+    also called, propagating the event up the hierarchy.</li>
 </ol>
 
 
@@ -2687,10 +2800,10 @@ if a step fails or if the user decides to stop the optimization.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Retrieve a value stored in a handler or a step.</p>
-<p>This method allows access to values stored within a specific result
-handler or step. It uses the <code>[]</code> operator to retrieve the value
-associated with the given key.</p>
+        <p>Retrieve a value stored in a handler.</p>
+<p>Retrieves a value stored within a specific result handler. This method
+uses the <code>[]</code> operator to access the value associated with the given
+key.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2713,7 +2826,7 @@ associated with the given key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The unique identifier of the handler or step.</p>
+                <p>The unique identifier of the handler.</p>
               </div>
             </td>
             <td>
@@ -2744,18 +2857,18 @@ associated with the given key.</p>
     <table>
       <thead>
         <tr>
-          <th>Type</th>
+<th>Name</th>          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td>
+<td><code>Any</code></td>            <td>
                   <code><span title="typing.Any">Any</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The value associated with the key in the specified handler or step.</p>
+                <p>The value associated with the key in the specified handler.</p>
               </div>
             </td>
           </tr>
@@ -2778,7 +2891,7 @@ associated with the given key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the provided ID is not valid.</p>
+                <p>If the provided <code>id_</code> is not a valid handler ID.</p>
               </div>
             </td>
           </tr>
@@ -2803,10 +2916,9 @@ associated with the given key.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Set a value stored in a handler or a step.</p>
-<p>This method allows setting values stored within a specific result
-handler or step. It uses the <code>[]</code> operator to set the value
-associated with the given key.</p>
+        <p>Set a value in a handler.</p>
+<p>Stores a value within a specific result handler. This method uses the
+<code>[]</code> operator to assign the value to the specified key.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2829,7 +2941,7 @@ associated with the given key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The unique identifier of the handler or step.</p>
+                <p>The unique identifier of the handler.</p>
               </div>
             </td>
             <td>
@@ -2845,7 +2957,7 @@ associated with the given key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The key associated with the value to retrieve.</p>
+                <p>The key to associate with the value.</p>
               </div>
             </td>
             <td>
@@ -2861,7 +2973,7 @@ associated with the given key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The value to assign to the specified key.</p>
+                <p>The value to store.</p>
               </div>
             </td>
             <td>
@@ -2887,7 +2999,7 @@ associated with the given key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the provided ID is not valid.</p>
+                <p>If the provided <code>id_</code> is not a valid handler ID.</p>
               </div>
             </td>
           </tr>
