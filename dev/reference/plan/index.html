@@ -3033,16 +3033,75 @@ key.</p>
     <div class="doc doc-contents ">
 
 
-        <p>Context class for shared state across a plan.</p>
-<p>An optimizer context object holds the information and state shared across
-all steps in an optimization plan. This currently includes the following:</p>
+        <p>Manages shared state and resources for an optimization plan.</p>
+<p>The OptimizerContext acts as a central hub for managing shared resources and
+state across all steps within an optimization plan. This ensures that
+different parts of the plan can access and interact with the same
+information and tools.</p>
+<p>This context object is responsible for:</p>
 <ul>
-<li>An <a class="autorefs autorefs-internal" title="            Evaluator" href="../evaluator/#ropt.evaluator.Evaluator"><code>Evaluator</code></a> callable for evaluating
-  functions.</li>
-<li>A plugin manager to retrieve plugins used by the plan and optimizers.</li>
-<li>Event callbacks that are triggered in response to specific events,
-  executed after the plan has processed them.</li>
+<li>Providing a callable <code>Evaluator</code> for evaluating functions, which is
+  essential for optimization algorithms to assess the quality of solutions.
+  The evaluator is used to calculate the objective function's value and
+  potentially constraint values for given variables.</li>
+<li>Managing a <code>PluginManager</code> to retrieve and utilize plugins, allowing for
+  extensibility and customization of the optimization workflow. Plugins are
+  modular pieces of code that extend the functionality of the optimization
+  framework, such as new <code>PlanStep</code> or <code>ResultHandler</code> implementations.</li>
+<li>Handling event callbacks that are triggered in response to specific events
+  during the plan's execution. These callbacks are executed after the plan
+  has processed the event, allowing for actions to be taken in response to
+  changes or milestones. This allows you to monitor the optimization, react
+  to changes, or perform custom actions at specific points in the plan's
+  execution.</li>
 </ul>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>evaluator</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Evaluator (ropt.evaluator.Evaluator)" href="../evaluator/#ropt.evaluator.Evaluator">Evaluator</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A callable for evaluating functions in the plan.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>plugin_manager</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            PluginManager (ropt.plugins.PluginManager)" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A plugin manager; a default is created if not provided.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 
@@ -3079,10 +3138,9 @@ all steps in an optimization plan. This currently includes the following:</p>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the optimization context.</p>
-<p>Initializes shared state and resources needed across an optimization
-plan, including a function evaluator and an optional expression
-evaluator for processing plan-specific expressions.</p>
+        <p>Initializes the optimization context.</p>
+<p>Sets up the shared state and resources required for an optimization
+plan. This includes a function evaluator and a plugin manager.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3105,7 +3163,7 @@ evaluator for processing plan-specific expressions.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A callable used to evaluate functions within the plan.</p>
+                <p>A callable for evaluating functions in the plan.</p>
               </div>
             </td>
             <td>
@@ -3121,7 +3179,7 @@ evaluator for processing plan-specific expressions.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional plugin manager.</p>
+                <p>A plugin manager; a default is created if not provided.</p>
               </div>
             </td>
             <td>
@@ -3151,23 +3209,17 @@ evaluator for processing plan-specific expressions.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Add an observer function.</p>
-<p>Observer functions are called during optimization when an event of the
-specified type occurs. The provided callable must accept a single
-argument of the <a class="autorefs autorefs-internal" title="            Event
+        <p>Adds an observer function for a specific event type.</p>
+<p>Observer functions are called when an event of the specified type
+occurs during optimization. The provided callback function will receive
+an <a class="autorefs autorefs-internal" title="            Event
 
 
   
       dataclass
-  " href="#ropt.plan.Event"><code>Event</code></a> class, which contains
-information about the occurred event.</p>
+  " href="#ropt.plan.Event"><code>Event</code></a> object containing information about the
+event.</p>
 
-
-<details class="note" open>
-  <summary>Note</summary>
-  <p>Before the observer functions are called, all result handlers are
-executed, which may potentially modify the event.</p>
-</details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>
@@ -3189,7 +3241,7 @@ executed, which may potentially modify the event.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The type of events that the observer will react to.</p>
+                <p>The type of event to observe.</p>
               </div>
             </td>
             <td>
@@ -3210,14 +3262,7 @@ executed, which may potentially modify the event.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The function to call when the specified event is received.
-      This function should accept one argument, which will be
-      an instance of the <a class="autorefs autorefs-internal" title="            Event
-
-
-  
-      dataclass
-  " href="#ropt.plan.Event"><code>Event</code></a> class.</p>
+                <p>The function to call when the event occurs.</p>
               </div>
             </td>
             <td>
@@ -3243,7 +3288,7 @@ executed, which may potentially modify the event.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Self, to allow for method chaining.</p>
+                <p>The OptimizerContext instance, allowing for method chaining.</p>
               </div>
             </td>
           </tr>
@@ -3268,9 +3313,9 @@ executed, which may potentially modify the event.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Call observers for a specified event.</p>
-<p>This method invokes all observers associated with the context for the
-type of event passed as an argument.</p>
+        <p>Calls all observers for a specific event.</p>
+<p>This method triggers all observer functions registered for the given
+event type.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3298,7 +3343,7 @@ type of event passed as an argument.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The event that is emitted.</p>
+                <p>The event to emit to the observers.</p>
               </div>
             </td>
             <td>
@@ -3339,13 +3384,13 @@ type of event passed as an argument.</p>
     <div class="doc doc-contents ">
 
 
-        <p>The <code>Event</code> class stores optimization event data.</p>
-<p>While running an optimization plan, callbacks can be connected to react to
-events triggered during execution. These callbacks accept a single <code>Event</code>
-object containing information about the event.</p>
-<p>The actual data contained in the object depends on the nature of the event.
-Refer to the documentation of the <a class="autorefs autorefs-internal" title="            EventType" href="../enums/#ropt.enums.EventType"><code>EventType</code></a>
-enumeration for more details.</p>
+        <p>Stores data related to an optimization event.</p>
+<p>During the execution of an optimization plan, events are triggered to signal
+specific occurrences. Callbacks can be registered to react to these events
+and will receive an <code>Event</code> object containing relevant information.</p>
+<p>The specific data within the <code>Event</code> object varies depending on the event
+type. See the <a class="autorefs autorefs-internal" title="            EventType" href="../enums/#ropt.enums.EventType"><code>EventType</code></a> documentation for
+details.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3365,7 +3410,18 @@ enumeration for more details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The type of the event.</p>
+                <p>The type of event that occurred.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plan.Event.config">config</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration used for the optimization.</p>
               </div>
             </td>
           </tr>
@@ -3376,7 +3432,7 @@ enumeration for more details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>ID of the source step.</p>
+                <p>The ID of the step that triggered the event.</p>
               </div>
             </td>
           </tr>
@@ -3387,7 +3443,7 @@ enumeration for more details.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional data passed with the event.</p>
+                <p>A dictionary containing additional event-specific data.</p>
               </div>
             </td>
           </tr>
