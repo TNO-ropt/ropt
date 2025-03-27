@@ -159,44 +159,52 @@ def results_to_dataframe(
     result_type: Literal["functions", "gradients"],
     names: dict[str, Sequence[str | int] | None] | None = None,
 ) -> pd.DataFrame:
-    """Add a sequence of results to a data frame.
+    """Combine a sequence of results into a single pandas DataFrame.
 
-    This method can be called directly from any observers connected to events
-    that produce results.
+    This function aggregates results from multiple
+    [`FunctionResults`][ropt.results.FunctionResults] or
+    [`GradientResults`][ropt.results.GradientResults] objects into a single
+    `pandas` DataFrame. It is designed to be used with observers that produce
+    results during the optimization process.
 
-    The set of fields used is determined by the `fields` argument passed when
-    initializing the object. These can be any of the fields defined in a
-    [`FunctionResults`][ropt.results.FunctionResults] or a
-    [`GradientResults`][ropt.results.GradientResults]. Most of the fields in
-    these objects are nested, and the fields to export must be specified
-    specifically in the form `field.subfield`. For instance, to specify the
-    `variables` field of the `evaluations` field from a function result, the
-    specification would be `evaluations.variables`.
+    The `fields` argument determines which data fields to include in the
+    DataFrame. These fields can be any of the attributes defined within
+    [`FunctionResults`][ropt.results.FunctionResults] or
+    [`GradientResults`][ropt.results.GradientResults]. Nested fields are
+    specified using dot notation (e.g., `evaluations.variables` to include the
+    `variables` field within the `evaluations` object).
 
-    Note that many fields may, in fact, generate multiple columns in the
-    resulting data frame. For instance, when specifying `evaluations.variables`,
-    a column will be generated for each variable. If available, variable names,
-    will be used as column labels. Because the exported fields may be
-    multi-dimensional with names defined along each axis, for instance,
-    realizations and objectives, which both can be named, the final name may
-    consist of a tuple of names.
+    The `evaluation_info` sub-fields, found within the `evaluations` fields of
+    [`functions`][ropt.results.FunctionEvaluations] and
+    [`gradient`][ropt.results.GradientEvaluations] results, respectively, are
+    dictionaries. To include specific keys from these dictionaries, use the
+    format `evaluations.evaluation_info.key`, where `key` is the name of the
+    desired key.
 
-    The `result_type` argument is used to determine which type of results should
-    be reported: either function evaluation results (`functions`) or gradient
-    results (`gradients`).
+    Many fields may result in multiple columns in the DataFrame. For example,
+    `evaluations.variables` will generate a separate column for each variable.
+    If available, variable names will be used as column labels.
+    Multi-dimensional fields, such as those with named realizations and
+    objectives, will have column names that are tuples of the corresponding
+    names.
+
+    The `result_type` argument specifies whether to include function evaluation
+    results (`functions`) or gradient results (`gradients`).
 
     The `names` argument is an optional dictionary that maps axis types to
-    names, that are used to label the multi-index columns in the resulting data
-    frame. If not provided, numerical indices are used.
+    names. These names are used to label the multi-index columns in the
+    resulting DataFrame. If not provided, numerical indices are used.
 
     Args:
-        results:     The results to add.
-        fields:      The fields of the results to store.
-        result_type: The type of the table.
+        results:     A sequence of [`Results`][ropt.results.Results] objects
+                     to combine.
+        fields:      The names of the fields to include in the DataFrame.
+        result_type: The type of results to include ("functions" or
+                     "gradients").
         names:       A dictionary mapping axis types to names.
 
     Returns:
-        The data frame.
+        A `pandas` DataFrame containing the combined results.
     """
     if result_type not in ("functions", "gradients"):
         msg = f"Invalid frame output type: {result_type}"

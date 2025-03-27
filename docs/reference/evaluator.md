@@ -1,10 +1,4 @@
-::: ropt.ensemble_evaluator
-
-::: ropt.evaluator
-    options:
-        members:
-        - Evaluator
-        - EvaluatorContext
-        - EvaluatorResult
-        - ConcurrentEvaluator
-        - ConcurrentTask
+::: ropt.ensemble_evaluator.EnsembleEvaluator
+::: ropt.evaluator.Evaluator
+::: ropt.evaluator.EvaluatorContext
+::: ropt.evaluator.EvaluatorResult

@@ -1,10 +1,9 @@
 ::: ropt.plugins.optimizer
-
 ::: ropt.plugins.optimizer.base
     options:
         members:
+            - OptimizerPlugin
             - Optimizer
             - OptimizerCallback
-            - OptimizerPlugin
-
 ::: ropt.plugins.optimizer.utils
+

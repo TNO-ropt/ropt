@@ -1,5 +1,4 @@
 ::: ropt.plugins.plan
-
 ::: ropt.plugins.plan.base
     options:
         members:
@@ -7,4 +6,3 @@
             - ResultHandler
             - PlanHandlerPlugin
             - PlanStepPlugin
-

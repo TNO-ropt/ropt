@@ -46,13 +46,18 @@ if TYPE_CHECKING:
 
 
 class EnsembleEvaluator:
-    """A class for constructing functions and gradients from an ensemble of functions.
+    """Construct functions and gradients from an ensemble of functions.
 
-    This class implements the calculation of functions and gradients from an
-    ensemble of functions, based on the settings defined in an
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] configuration object. It uses
-    an [`Evaluator`][ropt.evaluator.Evaluator] callable to evaluate the individual
-    functions.
+    The `EnsembleEvaluator` class is responsible for calculating functions and
+    gradients from an ensemble of functions. It leverages the settings defined
+    in an [`EnOptConfig`][ropt.config.enopt.EnOptConfig] configuration object to
+    guide the calculations.
+
+    The core functionality relies on an [`Evaluator`][ropt.evaluator.Evaluator]
+    callable, which is used to evaluate the individual functions within the
+    ensemble. The evaluator provides the raw function values, which are then
+    processed by the `EnsembleEvaluator` to produce the final function and
+    gradient estimates.
     """
 
     def __init__(
@@ -62,12 +67,24 @@ class EnsembleEvaluator:
         evaluator: Evaluator,
         plugin_manager: PluginManager,
     ) -> None:
-        """Initialize the ensemble evaluator.
+        """Initialize the EnsembleEvaluator.
+
+        This method sets up the `EnsembleEvaluator` with the necessary
+        configuration, evaluator, and plugins.
+
+        The `config` object contains all the settings required for the ensemble
+        evaluation, such as the number of realizations, the function estimators,
+        and the gradient settings. The `transforms` object can be used to
+        transform the variables, objectives, and constraints before or after the
+        evaluation. The `evaluator` callable should conform to the
+        [`Evaluator`][ropt.evaluator.Evaluator] protocol. The `plugin_manager`
+        is used to load the realization filters, function estimators, and
+        samplers.
 
         Args:
             config:         The configuration object.
             transforms:     Optional transforms object.
-            evaluator:      The callable for evaluation individual functions.
+            evaluator:      The callable for evaluating individual functions.
             plugin_manager: A plugin manager to load required plugins.
         """
         self._config = config
@@ -88,10 +105,11 @@ class EnsembleEvaluator:
     ) -> tuple[Results, ...]:
         """Evaluate the given variable vectors.
 
-        The `variables` argument may be a single vector of variables or a set
-        of variable vectors represented as row-vectors in a matrix. The
-        `compute_functions` and `compute_gradients` flags determine which
-        results are returned: functions, gradients, or both.
+        This method calculates functions, gradients, or both, based on the
+        provided variable vectors and the specified flags.
+
+        The `variables` argument can be a single vector or a matrix where each
+        row is a variable vector.
 
         Args:
             variables:         The variable vectors to evaluate.

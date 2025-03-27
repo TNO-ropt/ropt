@@ -42,6 +42,9 @@ plugins:
             show_root_members_full_path: false
             heading_level: 2
             members_order: source
+            show_symbol_type_heading: true
+            separate_signature: true
+            show_signature_annotations: True
 
 markdown_extensions:
   - admonition
@@ -80,9 +83,10 @@ nav:
       - "Running Optimizations": usage/running.md
   - Reference:
       - "Configuration": reference/enopt_config.md
+      - "Domain transforms": reference/domain_transforms.md
       - "Optimization":
           - "Optimization Plans": reference/plan.md
-          - "Basic Plan runner": reference/plan_runner.md
+          - "Basic Optimizer": reference/basic_optimizer.md
           - "Optimization": reference/optimization.md
           - "Function Evaluations": reference/evaluator.md
           - "Optimization Results": reference/results.md

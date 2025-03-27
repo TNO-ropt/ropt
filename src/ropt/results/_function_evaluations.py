@@ -17,24 +17,30 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class FunctionEvaluations(ResultField):
-    """This class contains the results of evaluations for function calculation.
+    """Stores the results of function evaluations.
 
-    This class stores the variables with the calculated objective and constraint
-    functions. It contains the following information:
+    The `FunctionEvaluations` class stores the results of evaluating the
+    objective and constraint functions for a set of variables. It includes
+    the following information:
 
-    1. The vector of variables at which the functions are evaluated.
-    2. The calculated objectives and constraints for each realization: A
-       two-dimensional array, with the objective or constraint values arranged
-       along the second axis. The first axis index indicates the realization
-       number.
-    3. Optional evaluation IDs that may have been passed from the evaluator,
-       identifying each calculated realization.
+    * **Variables:** The vector of variable values at which the functions were
+      evaluated.
+    * **Objectives:** The calculated objective function values for each
+      realization. This is a two-dimensional array where each row corresponds to
+      a realization and each column corresponds to an objective.
+    * **Constraints:** The calculated constraint function values for each
+      realization. This is a two-dimensional array where each row corresponds to
+      a realization and each column corresponds to a constraint.
+    * **Evaluation Info:** Optional metadata associated with each realization,
+      potentially provided by the evaluator. If provided, each value in the info
+      dictionary must be a one-dimensional array with a length equal to the
+      number of realizations.
 
     Attributes:
-        variables:       The unperturbed variable vector.
-        objectives:      The objective functions for each realization.
-        constraints:     The constraint functions for each realization.
-        evaluation_info: Optional info for each evaluated realization.
+        variables:       The variable vector.
+        objectives:      The objective function values for each realization.
+        constraints:     The constraint function values for each realization.
+        evaluation_info: Optional metadata for each evaluated realization.
     """
 
     variables: NDArray[np.float64] = field(
@@ -86,7 +92,6 @@ class FunctionEvaluations(ResultField):
         """Create a FunctionEvaluations object with the given information.
 
         Args:
-            config:          Configuration object.
             variables:       The unperturbed variable vector.
             objectives:      The objective functions for each realization.
             constraints:     The constraint functions for each realization.

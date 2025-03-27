@@ -12,40 +12,46 @@ class EvaluatorContext:
     """Capture additional details for the function evaluator.
 
     Function evaluator callbacks (see [`Evaluator`][ropt.evaluator.Evaluator])
-    mainly require variable vectors to evaluate objective and constraint
-    functions. However, depending on their implementation, evaluators may
-    benefit from additional information. To accommodate this, function
-    evaluators receive a `EvaluatorContext` object with the following details:
+    primarily receive variable vectors to evaluate objective and constraint
+    functions. However, they may also benefit from additional information to
+    optimize their calculations. This `EvaluatorContext` object provides that
+    supplementary information.
 
-    - The configuration object for the ongoing optimization step.
-    - Indices indicating the realization to which each variable vector belongs.
-    - Optional indices indicating which perturbation a variable vector is. This
-      index may be < 0 to indicate that it is not a perturbation.
-    - A matrix indicating, for each function and realization, whether it is
-      active and needs computation.
-    - A matrix indicating, for each constraint and realization, whether it is
-      active and requires computation.
+    Specifically, it provides:
 
-    The `active_objectives` and `active_constraints` fields are boolean
-    matrices, where each column represents one realization, and each row
-    signifies a function or a constraint. Entries marked as `True` are essential
-    for the optimizer, while other combinations do not necessitate evaluation.
+    - The configuration object for the current optimization step.
+    - The realization index for each variable vector.
+    - The perturbation index for each variable vector (if applicable). A value
+      less than 0 indicates that the vector is not a perturbation.
+    - Boolean matrices (`active_objectives` and `active_constraints`) indicating
+      which objective/realization and constraint/realization evaluations are
+      required by the optimizer.
+    - A boolean vector (`active`) indicating which realizations require
+      evaluation.
 
-    In practical scenarios, these matrices may prove overly detailed for
-    function evaluators. Typically, evaluators may only be capable of
-    calculating all objective and constraint functions for a given realization
-    or none at all. In such cases, it suffices to examine the `active` property,
-    indicating the realizations requiring evaluation.
+    The `active_objectives` and `active_constraints` matrices are structured
+    such that each column corresponds to a realization, and each row corresponds
+    to a function or constraint. A `True` value signifies that the corresponding
+    evaluation is essential for the optimizer.
 
-    Attributes:
+    Note: The `active` property
+        In many cases, evaluators may only be able to compute all objectives and
+        constraints for a given realization or none at all. In these scenarios,
+        the `active` property provides a simplified view, indicating only the
+        realizations that need to be evaluated. `active` cannot be set when creating
+        the evaluator context, it is calculated from `active_objectives` and
+        `active_constraints`.
+
+    Args:
         config:             Configuration of the optimizer.
         realizations:       Realization numbers for each requested evaluation.
-        perturbations:      Perturbations numbers for each requested evalation.
-        active_objectives:  Signifies which function/realization evaluations are
+        perturbations:      Perturbation numbers for each requested evaluation.
+                            A value less than 0 indicates that the vector is
+                            not a perturbation.
+        active_objectives:  Indicates which function/realization evaluations are
                             essential for the optimizer.
-        active_constraints: Signifies which constraint/realization evaluations are
-                            essential for the optimizer.
-        active:             Signifies which realizations are active.
+        active_constraints: Indicates which constraint/realization evaluations
+                            are essential for the optimizer.
     """
 
     config: EnOptConfig
@@ -78,27 +84,31 @@ class EvaluatorContext:
 class EvaluatorResult:
     """Store the results of a function evaluation.
 
-    The objectives and constraint values are stored as a matrix, where the
-    columns correspond to the index of the objective or constraint, and the rows
-    correspond to the index of the variable vector for which they were
-    calculated. Depending on context information passed to the evaluation
-    function, not all results may have been calculated, in which case the
-    corresponding entries should contain zeros. Entries may also contain
-    `numpy.nan` values to signify that a calculation failed.
+    This class stores the results of evaluating objective and constraint
+    functions for a set of variable vectors.
 
-    Optionally, a batch ID can be returned to identify the batch of
-    calculations. This can be useful for tracking or managing evaluations
-    performed together.
+    The `objectives` and `constraints` are stored as matrices. Each column in
+    these matrices corresponds to a specific objective or constraint, and each
+    row corresponds to a variable vector.
 
-    Optionally, additional information be stored on each evaluation. For
-    instance, this can be used to uniquely identify the results calculated for
-    each variable vector, offering a way to link specific evaluations back to
-    their corresponding input vectors.
+    When the evaluator is asked to evaluate functions, some variable vectors may
+    be marked as inactive. The results for these inactive vectors should be set
+    to zero. All active variable vectors should be evaluated. If an evaluation
+    fails for any reason, the corresponding values should be set to `numpy.nan`.
 
-    Attributes:
+    A `batch_id` can be set to identify this specific set of evaluation results.
+
+    The `evaluation_info` dictionary can store additional metadata for each
+    evaluation. This information is not used internally by `ropt` and can have
+    an arbitrary structure, to be interpreted by the application. This can be
+    used, for example, to uniquely identify the results calculated for each
+    variable vector, allowing them to be linked back to their corresponding
+    input vectors.
+
+    Args:
         objectives:      The calculated objective values.
         constraints:     Optional calculated constraint values.
-        batch_id:        Optional batch ID.
+        batch_id:        Optional batch ID to identify this set of results.
         evaluation_info: Optional info for each evaluation.
     """
 
@@ -123,36 +133,32 @@ class Evaluator(Protocol):
     def __call__(
         self, variables: NDArray[np.float64], context: EvaluatorContext, /
     ) -> EvaluatorResult:
-        r"""The function evaluator callback signature.
+        r"""Evaluate objective and constraint functions for given variables.
 
-        The first argument of the function should be a matrix where each column is a
-        variable vector. Depending on the information passed by the second argument, all
-        objective and constraint functions for all vectors or for a subset are to be
-        calculated.
-
-        The second argument is an [`EvaluatorContext`][ropt.evaluator.EvaluatorContext]
-        object that provides supplementary information to the evaluation function.
-
-        The return value should be an [`EvaluatorResult`][ropt.evaluator.EvaluatorResult]
-        object containing the calculated values of the objective and constraint functions for
-        all variable vectors and realizations, along with any additional metadata.
+        This method defines the signature for the function evaluator callback.
+        The evaluator calculates objective and constraint functions for a set of
+        variable vectors, potentially for a subset of realizations and
+        perturbations.
 
         Args:
-            variables: The matrix of variables to evaluate.
-            context:   The evaluation context.
+            variables: The matrix of variables to evaluate. Each row represents
+                       a variable vector.
+            context:   The evaluation context, providing additional information
+                       about the evaluation.
 
         Returns:
-            An evaluation results object.
+            An evaluation results object containing the calculated objective and
+                constraint values, along with any additional metadata.
 
         Tip: Reusing Objective
             When defining multiple objectives, there may be a need to reuse the
-            same objective value multiple times. For instance, a total objective could
-            consist of the mean of the objectives for each realization, plus the
-            standard deviation of the same values. This can be implemented by defining
-            two objectives: the first calculated as the mean of the realizations, and
-            the second using a function estimator to compute the standard deviations.
-            The optimizer is unaware that both objectives use the same set of
-            realizations. To prevent redundant calculations, the evaluator should
-            compute the results of the realizations once and return them for both
-            objectives.
+            same objective value multiple times. For instance, a total objective
+            could consist of the mean of the objectives for each realization,
+            plus the standard deviation of the same values. This can be
+            implemented by defining two objectives: the first calculated as the
+            mean of the realizations, and the second using a function estimator
+            to compute the standard deviations. The optimizer is unaware that
+            both objectives use the same set of realizations. To prevent
+            redundant calculations, the evaluator should compute the results of
+            the realizations once and return them for both objectives.
         """

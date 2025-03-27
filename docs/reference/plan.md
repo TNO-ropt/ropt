@@ -1,9 +1,6 @@
 ::: ropt.plan
     options:
-        members: 
-            - Plan
-            - OptimizerContext
-            - ExpressionEvaluator
-            - Event
-            - PlanStep
-            - ResultHandler
+        members: []
+::: ropt.plan.Plan
+::: ropt.plan.OptimizerContext
+::: ropt.plan.Event

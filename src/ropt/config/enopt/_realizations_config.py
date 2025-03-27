@@ -12,41 +12,38 @@ from ropt.config.validated_types import Array1D  # noqa: TC001
 
 
 class RealizationsConfig(ImmutableBaseModel):
-    """The configuration class for realizations.
+    """Configuration class for realizations.
 
-    This class defines realizations configured by the `realizations` field in an
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
+    This class, `RealizationsConfig`, defines the configuration for realizations
+    used in an [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
 
     To optimize an ensemble of functions, a set of realizations is defined. When
-    the optimizer requests a function value or a gradient, the functions and
-    gradients are calculated for each realization and combined into a single
-    function or gradient. Usually, this will be a (weighted) sum, but other ways
-    of combining realizations are possible.
+    the optimizer requests a function value or a gradient, these are calculated for
+    each realization and then combined into a single value. Typically, this
+    combination is a weighted sum, but other methods are possible.
 
-    The `weights` field is a `numpy` array, with a length that determines the number
-    of realizations. Its values will be normalized to have a sum equal to 1. For
-    example, when `weights` is set to `[1, 1]`, the stored values will be `[0.5,
-    0.5]`.
+    The `weights` field, a `numpy` array, determines the weight of each
+    realization. The length of this array defines the number of realizations. The
+    weights are automatically normalized to sum to 1 (e.g., `[1, 1]` becomes
+    `[0.5, 0.5]`).
 
-    If during the calculation of the function values for each realization one or
-    more values are missing, for instance due to failure of a complex
-    simulation, the total function and gradient values can still be calculated
-    by leaving the missing values out. However, this may be undesirable, or
-    there may be a hard minimum to the amount of values that is needed. The
-    `realization_min_success` field can be set to the minimum number of
-    successful realizations. By default, it is set equal to the number of
-    realizations, i.e., there are no missing values allowed by default.
+    If function value calculations for some realizations fail (e.g., due to a
+    simulation error), the total function and gradient values can still be
+    calculated by excluding the missing values. However, a minimum number of
+    successful realizations may be required. The `realization_min_success` field
+    specifies this minimum. By default, it is set equal to the number of
+    realizations, meaning no missing values are allowed.
 
     Note:
-        The value of `realization_min_success` can be set to zero. Some
-        optimizers can handle this and will proceed with the optimization even
-        if all realizations fail. However, most optimizers cannot handle this
-        and will behave as if the value is set to one.
+        Setting `realization_min_success` to zero allows the optimization to
+        proceed even if all realizations fail. While some optimizers can handle
+        this, most will treat it as if the value were one, requiring at least
+        one successful realization.
 
     Attributes:
-        weights:                 The weights of the realizations (default: 1).
-        realization_min_success: The minimum number of successful realizations
-                                 (default: equal to the number of realizations).
+        weights:                 Weights for the realizations (default: 1.0).
+        realization_min_success: Minimum number of successful realizations (default:
+                                equal to the number of realizations).
     """
 
     weights: Array1D = np.array(1.0)

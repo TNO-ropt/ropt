@@ -17,19 +17,20 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class Functions(ResultField):
-    """Store the calculated objective and constraint functions.
+    """Stores the calculated objective and constraint function values.
 
-    The objective and constraint functions used by the optimizer are calculated
-    from their values evaluated for all realizations, for instance by averaging.
-    There may be multiple objectives and constraints. Multiple objectives are
-    handled by the optimizer using a weighted sum, stored in the
-    `weighted_objective` field. Multiple constraints are directly handled by the
-    optimizer.
+    The `Functions` class stores the calculated values of the objective and
+    constraint functions. These values are typically derived from the
+    evaluations performed across all realizations, often through a process like
+    averaging. The optimizer may handle multiple objectives and constraints.
+    Multiple objectives are combined into a single weighted sum, which is stored
+    in the `weighted_objective` field. Multiple constraints are handled
+    individually by the optimizer.
 
     Attributes:
-        weighted_objective: The weighted sum of the objectives.
-        objectives:         The value of each objective.
-        constraints:        The value of each constraint.
+        weighted_objective: The weighted sum of the objective values.
+        objectives:         The value of each individual objective.
+        constraints:        The value of each individual constraint.
     """
 
     weighted_objective: NDArray[np.float64] = field(
@@ -66,7 +67,6 @@ class Functions(ResultField):
         """Create a Functions object with the given information.
 
         Args:
-            config:                 Configuration object.
             weighted_objective:     The weighted objective.
             objectives:             The objective functions for each realization.
             constraints:            The constraint functions for each realization.

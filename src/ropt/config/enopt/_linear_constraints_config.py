@@ -20,21 +20,30 @@ if TYPE_CHECKING:
 
 
 class LinearConstraintsConfig(ImmutableBaseModel):
-    r"""The configuration class for linear constraints.
+    r"""Configuration class for linear constraints.
 
-    This class defines linear constraints configured by the `linear_constraints`
-    field in an [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
+    This class, `LinearConstraintsConfig`, defines linear constraints used in an
+    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
 
-    Linear constraints can be described by a set of linear equations on the
-    variables, including equality or non-equality constraints. The
-    `coefficients` field is a 2D `numpy` array where the number of rows equals
-    the number of constraints, and the number of columns equals the number of
-    variables.
+    Linear constraints are defined by a set of linear equations involving the
+    optimization variables. These equations can represent equality or inequality
+    constraints. The `coefficients` field is a 2D `numpy` array where each row
+    represents a constraint, and each column corresponds to a variable.
 
-    Lower and upper bounds on he right-hand sides of the equations are given in
-    the `lower_bounds` and `upper_bounds fields, which will be converted and
-    broadcasted to a `numpy` array with a length equal to the number of
-    equations.
+    The `lower_bounds` and `upper_bounds` fields specify the bounds on the
+    right-hand side of each constraint equation. These fields are converted and
+    broadcasted to `numpy` arrays with a length equal to the number of
+    constraint equations.
+
+    Less-than and greater-than inequality constraints can be specified by
+    setting the lower bounds to $-\infty$, or the upper bounds to $+\infty$,
+    respectively. Equality constraints are specified by setting the lower bounds
+    equal to the upper bounds.
+
+    Attributes:
+        coefficients: Matrix of coefficients for the linear constraints.
+        lower_bounds: Lower bounds for the right-hand side of the constraint equations.
+        upper_bounds: Upper bounds for the right-hand side of the constraint equations.
 
     Note: Linear transformation of variables.
         The set of linear constraints can be represented by a matrix equation:
@@ -54,11 +63,6 @@ class LinearConstraintsConfig(ImmutableBaseModel):
             \hat{\mathbf{A}} &= \mathbf{A} \mathbf{S}^{-1} \\ \hat{\mathbf{b}}
             &= \mathbf{b} + \mathbf{A}\mathbf{S}^{-1}\mathbf{o}
         \end{align}$$
-
-    Attributes:
-        coefficients: The matrix of coefficients.
-        lower_bounds: The lower bounds on the right-hand-sides of the constraint equations.
-        upper_bounds: The upper bounds on the right-hand-sides of the constraint equations.
     """
 
     coefficients: Array2D
@@ -89,15 +93,6 @@ class LinearConstraintsConfig(ImmutableBaseModel):
     def apply_transformation(
         self, variables: VariablesConfig, transforms: OptModelTransforms | None
     ) -> LinearConstraintsConfig:
-        """Transform linear constraints.
-
-        Args:
-            variables:  A variables configuration object specifying.
-            transforms: An optional transforms object.
-
-        Returns:
-            A modified configuration if transformations are applied; otherwise, self.
-        """
         variable_count = variables.initial_values.size
         if (
             self.coefficients.shape[0] > 0
