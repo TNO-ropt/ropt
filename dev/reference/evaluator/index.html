@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.ensemble_evaluator" class="md-skip">
+        <a href="#ropt.ensemble_evaluator.EnsembleEvaluator" class="md-skip">
           Skip to content
         </a>
       
@@ -655,16 +655,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.ensemble_evaluator" class="md-nav__link">
-    <span class="md-ellipsis">
-      ensemble_evaluator
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ensemble_evaluator">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#ropt.ensemble_evaluator.EnsembleEvaluator" class="md-nav__link">
     <span class="md-ellipsis">
       EnsembleEvaluator
@@ -696,23 +686,8 @@
     </nav>
   
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
       
         <li class="md-nav__item">
-  <a href="#ropt.evaluator" class="md-nav__link">
-    <span class="md-ellipsis">
-      evaluator
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="evaluator">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#ropt.evaluator.Evaluator" class="md-nav__link">
     <span class="md-ellipsis">
       Evaluator
@@ -735,8 +710,8 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#ropt.evaluator.EvaluatorContext" class="md-nav__link">
     <span class="md-ellipsis">
       EvaluatorContext
@@ -744,18 +719,13 @@
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#ropt.evaluator.EvaluatorResult" class="md-nav__link">
     <span class="md-ellipsis">
       EvaluatorResult
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1258,16 +1228,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.ensemble_evaluator" class="md-nav__link">
-    <span class="md-ellipsis">
-      ensemble_evaluator
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="ensemble_evaluator">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#ropt.ensemble_evaluator.EnsembleEvaluator" class="md-nav__link">
     <span class="md-ellipsis">
       EnsembleEvaluator
@@ -1299,23 +1259,8 @@
     </nav>
   
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
       
         <li class="md-nav__item">
-  <a href="#ropt.evaluator" class="md-nav__link">
-    <span class="md-ellipsis">
-      evaluator
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="evaluator">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#ropt.evaluator.Evaluator" class="md-nav__link">
     <span class="md-ellipsis">
       Evaluator
@@ -1338,8 +1283,8 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#ropt.evaluator.EvaluatorContext" class="md-nav__link">
     <span class="md-ellipsis">
       EvaluatorContext
@@ -1347,18 +1292,13 @@
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#ropt.evaluator.EvaluatorResult" class="md-nav__link">
     <span class="md-ellipsis">
       EvaluatorResult
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1383,56 +1323,25 @@
 
   <h1>Function Evaluations</h1>
 
-<div class="doc doc-object doc-module">
-
-
-
-<h2 id="ropt.ensemble_evaluator" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.ensemble_evaluator</span>
-
-
-</h2>
-
-    <div class="doc doc-contents first">
-
-        <p>Functionality for the evaluation of ensembles.</p>
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
 <div class="doc doc-object doc-class">
 
 
 
-<h3 id="ropt.ensemble_evaluator.EnsembleEvaluator" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">EnsembleEvaluator</span>
+<h2 id="ropt.ensemble_evaluator.EnsembleEvaluator" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.ensemble_evaluator.EnsembleEvaluator</span>
 
 
-</h3>
+</h2>
 
 
-    <div class="doc doc-contents ">
+    <div class="doc doc-contents first">
 
 
         <p>A class for constructing functions and gradients from an ensemble of functions.</p>
 <p>This class implements the calculation of functions and gradients from an
 ensemble of functions, based on the settings defined in an
 <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> configuration object. It uses
-an <a class="autorefs autorefs-internal" title="            Evaluator" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a> callable to evaluate the individual
+an <a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a> callable to evaluate the individual
 functions.</p>
 
 
@@ -1457,11 +1366,11 @@ functions.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.ensemble_evaluator.EnsembleEvaluator.__init__" class="doc doc-heading">
+<h3 id="ropt.ensemble_evaluator.EnsembleEvaluator.__init__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">transforms</span><span class="p">:</span> <span class="n">OptModelTransforms</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -1523,7 +1432,7 @@ functions.</p>
                 <code>evaluator</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            Evaluator (ropt.evaluator.Evaluator)" href="#ropt.evaluator.Evaluator">Evaluator</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="#ropt.evaluator.Evaluator">Evaluator</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1561,11 +1470,11 @@ functions.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.ensemble_evaluator.EnsembleEvaluator.calculate" class="doc doc-heading">
+<h3 id="ropt.ensemble_evaluator.EnsembleEvaluator.calculate" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">calculate</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">calculate</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
@@ -1686,75 +1595,35 @@ results are returned: functions, gradients, or both.</p>
 
 </div>
 
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-module">
-
-
-
-<h2 id="ropt.evaluator" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.evaluator</span>
-
-
-</h2>
-
-    <div class="doc doc-contents first">
-
-        <p>Function evaluation protocols and classes.</p>
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
 <div class="doc doc-object doc-class">
 
 
 
-<h3 id="ropt.evaluator.Evaluator" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">Evaluator</span>
+<h2 id="ropt.evaluator.Evaluator" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.evaluator.Evaluator</span>
 
 
-</h3>
+</h2>
 
 
-    <div class="doc doc-contents ">
+    <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
               Bases: <code><span title="typing.Protocol">Protocol</span></code></p>
 
 
         <p>Protocol for evaluator objects or callables.</p>
-<p>The <a class="autorefs autorefs-internal" title="            EnsembleEvaluator" href="#ropt.ensemble_evaluator.EnsembleEvaluator"><code>EnsembleEvaluator</code></a> class
+<p>The <a class="autorefs autorefs-internal" title="            ropt.ensemble_evaluator.EnsembleEvaluator" href="#ropt.ensemble_evaluator.EnsembleEvaluator"><code>EnsembleEvaluator</code></a> class
 requires a function evaluator callback that conforms to the
-<a class="autorefs autorefs-internal" title="            Evaluator" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a> signature. This callback accepts
+<a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a> signature. This callback accepts
 one or more variable vectors to evaluate, along with an
-<a class="autorefs autorefs-internal" title="            EvaluatorContext
+<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
 
 
   
       dataclass
   " href="#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a> object that provides
 relevant information for the evaluation. It returns an
-<a class="autorefs autorefs-internal" title="            EvaluatorResult
+<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
 
 
   
@@ -1783,11 +1652,11 @@ relevant information for the evaluation. It returns an
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.evaluator.Evaluator.__call__" class="doc doc-heading">
+<h3 id="ropt.evaluator.Evaluator.__call__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__call__</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">EvaluatorContext</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluatorResult</span>
@@ -1800,14 +1669,14 @@ relevant information for the evaluation. It returns an
 variable vector. Depending on the information passed by the second argument, all
 objective and constraint functions for all vectors or for a subset are to be
 calculated.</p>
-<p>The second argument is an <a class="autorefs autorefs-internal" title="            EvaluatorContext
+<p>The second argument is an <a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
 
 
   
       dataclass
   " href="#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a>
 object that provides supplementary information to the evaluation function.</p>
-<p>The return value should be an <a class="autorefs autorefs-internal" title="            EvaluatorResult
+<p>The return value should be an <a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
 
 
   
@@ -1849,7 +1718,7 @@ all variable vectors and realizations, along with any additional metadata.</p>
                 <code>context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EvaluatorContext
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
 
 
   
@@ -1880,7 +1749,7 @@ all variable vectors and realizations, along with any additional metadata.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EvaluatorResult
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
 
 
   
@@ -1927,22 +1796,22 @@ objectives.</p>
 
 
 
-<h3 id="ropt.evaluator.EvaluatorContext" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">EvaluatorContext</span>
+<h2 id="ropt.evaluator.EvaluatorContext" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.evaluator.EvaluatorContext</span>
 
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
   </span>
 
-</h3>
+</h2>
 
 
-    <div class="doc doc-contents ">
+    <div class="doc doc-contents first">
 
 
         <p>Capture additional details for the function evaluator.</p>
-<p>Function evaluator callbacks (see <a class="autorefs autorefs-internal" title="            Evaluator" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a>)
+<p>Function evaluator callbacks (see <a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a>)
 mainly require variable vectors to evaluate objective and constraint
 functions. However, depending on their implementation, evaluators may
 benefit from additional information. To accommodate this, function
@@ -2080,18 +1949,18 @@ indicating the realizations requiring evaluation.</p>
 
 
 
-<h3 id="ropt.evaluator.EvaluatorResult" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">EvaluatorResult</span>
+<h2 id="ropt.evaluator.EvaluatorResult" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.evaluator.EvaluatorResult</span>
 
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
   </span>
 
-</h3>
+</h2>
 
 
-    <div class="doc doc-contents ">
+    <div class="doc doc-contents first">
 
 
         <p>Store the results of a function evaluation.</p>
@@ -2185,15 +2054,6 @@ their corresponding input vectors.</p>
 
 
 
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
 
 
 
