@@ -117,10 +117,15 @@ class BasicOptimizer:
 
         plan = Plan(self._optimizer_context)
 
-        for key, value in self._kwargs.items():
-            if plan.step_exists(key):
-                plan.run_step(plan.add_step(key), **{key: value})
+        # Optionally run a custom step defined in the keyword arguments:
+        key, value = next(iter(self._kwargs.items()), (None, None))
+        if key is not None and plan.step_exists(key):
+            if len(self._kwargs) > 1:
+                msg = "Only one custom step is allowed."
+                raise TypeError(msg)
+            plan.run_step(plan.add_step(key), **{key: value})
 
+        # If no custom function was installed, run the default function:
         if not plan.has_function():
             optimizer = plan.add_step("optimizer")
             tracker = plan.add_handler(
@@ -129,6 +134,8 @@ class BasicOptimizer:
                 sources={optimizer},
             )
             plan.add_function(_run_func)
+
+            # Add any optional custom handlers defined in the keyword arguments:
             for key, value in self._kwargs.items():
                 if plan.handler_exists(key):
                     plan.add_handler(key, sources={optimizer}, **{key: value})
