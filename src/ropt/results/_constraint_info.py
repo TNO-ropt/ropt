@@ -19,15 +19,64 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class ConstraintInfo(ResultField):
-    """This class stores constraint differences.
+    """Stores information about constraint differences and violations.
+
+     The `ConstraintInfo` class stores the differences between variable or
+     constraint values and their respective bounds. It also calculates and
+     stores constraint violations. This information is useful for assessing
+     how well the optimization process is satisfying the imposed constraints.
+
+     The class stores the following information:
+
+     * **Bound Differences:** The differences between the variable values and
+       their lower and upper bounds.
+        - `bound_lower`: The difference between the variable values and their
+          lower bounds. A negative value indicates that the variable is below its
+          lower bound.
+        - `bound_upper`: The difference between the variable values and their
+          upper bounds. A positive value indicates that the variable is above its
+          upper bound.
+
+    * **Linear Constraint Differences:** The differences between the linear
+       constraint values and their lower and upper bounds.
+        - `linear_lower`: The difference between the linear constraint values
+          and their lower bounds. A negative value indicates that the constraint
+          is below its lower bound.
+        - `linear_upper`: The difference between the linear constraint values and
+          their upper bounds. A positive value indicates that the constraint is
+          above its upper bound.
+
+     * **Nonlinear Constraint Differences:** The differences between the
+       nonlinear constraint values and their lower and upper bounds.
+        - `nonlinear_lower`: The difference between the nonlinear constraint
+          values and their lower bounds. A negative value indicates that the
+          constraint is below its lower bound.
+        - `nonlinear_upper`: The difference between the nonlinear constraint
+          values and their upper bounds. A positive value indicates that the
+          constraint is above its upper bound.
+
+     * **Constraint Violations:** The magnitude of the constraint violations.
+        - `bound_violation`: The magnitude of the violation of the variable
+          bounds.
+        - `linear_violation`: The magnitude of the violation of the linear
+           constraints.
+        - `nonlinear_violation`: The magnitude of the violation of the nonlinear
+          constraints.
 
     Attributes:
-        bound_lower:     Lower bound differences.
-        bound_upper:     Upper bound differences.
-        linear_lower:    Lower linear constraint differences.
-        linear_upper:    Upper Linear constraint differences.
-        nonlinear_lower: Lower non-linear constraint differences.
-        nonlinear_upper: Upper non-Linear constraint differences.
+         bound_lower:         Difference between variables and their lower bounds.
+         bound_upper:         Difference between variables and their upper bounds.
+         linear_lower:        Difference between linear constraints and their lower
+                              bounds.
+         linear_upper:        Difference between linear constraints and their upper
+                              bounds.
+         nonlinear_lower:     Difference between nonlinear constraints and their
+                              lower bounds.
+         nonlinear_upper:     Difference between nonlinear constraints and their
+                              upper bounds.
+         bound_violation:     Magnitude of the violation of the variable bounds.
+         linear_violation:    Magnitude of the violation of the linear constraints.
+         nonlinear_violation: Magnitude of the violation of the nonlinear constraints.
     """
 
     bound_lower: NDArray[np.float64] | None = field(

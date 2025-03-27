@@ -1,7 +1,6 @@
 # Running a basic optimization script
 
-To demonstrate basic optimization with `ropt`, consider the Rosenbrock function,
-a standard test problem:
+Consider the Rosenbrock function, a standard test problem:
 
 $$ f(x,y) = (a - x)^2 + b (y - x^2)^2, $$
 

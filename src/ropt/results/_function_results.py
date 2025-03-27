@@ -19,21 +19,30 @@ TypeResults = TypeVar("TypeResults", bound="Results")
 
 @dataclass(slots=True)
 class FunctionResults(Results):
-    """The `FunctionResults` class stores function related results.
+    """Stores results related to function evaluations.
 
-    This class contains  the following additional information:
+    The `FunctionResults` class extends the base
+    [`Results`][ropt.results.Results] class to store data specific to function
+    evaluations. This includes:
 
-    1. The results of the function evaluations.
-    2. The parameters of the realizations, such as weights for objectives and
-       constraints, and realization failures.
-    3. The calculated objective and constraint function values.
-    4. Information on the differences and violations of any constraints.
+    * **Evaluations:** The results of the function evaluations, including the
+      variable values, objective values, and constraint values for each
+      realization. See
+      [`FunctionEvaluations`][ropt.results.FunctionEvaluations].
+    * **Realizations:** Information about the realizations, such as weights for
+      objectives and constraints, and whether each realization was successful.
+      See [`Realizations`][ropt.results.Realizations].
+    * **Functions:** The calculated objective and constraint function values,
+      typically aggregated across realizations. See
+      [`Functions`][ropt.results.Functions].
+    * **Constraint Info:** Details about constraint differences and violations.
+      See [`ConstraintInfo`][ropt.results.ConstraintInfo].
 
     Attributes:
         evaluations:     Results of the function evaluations.
         realizations:    The calculated parameters of the realizations.
         functions:       The calculated functions.
-        constraint_info: Bound constraint info.
+        constraint_info: Information on constraint differences and violations.
     """
 
     evaluations: FunctionEvaluations

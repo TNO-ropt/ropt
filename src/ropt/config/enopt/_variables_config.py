@@ -22,36 +22,40 @@ from ropt.enums import VariableType
 
 
 class VariablesConfig(ImmutableBaseModel):
-    r"""The configuration class for variables.
+    r"""Configuration class for optimization variables.
 
-    This configuration class, configured by the `variables` field in an
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object defines essential
-    aspects of the variables: the initial values and the bounds. These are given
-    by the `initial_values`, `lower_bounds`, and `upper_bounds` fields, which
-    are [`numpy`](https://numpy.org) arrays. Initial values must be provided,
-    and its length determines the number of variables. The lower and upper
-    bounds, are broadcasted to the number of variables, and are set to
-    $-\infty$ and $+\infty$ by default. They may contain `numpy.nan` values,
-    indicating that corresponding variables have no lower or upper bounds,
-    respectively. These values are converted to `numpy.inf` values with an
-    appropriate sign.
+    This class, `VariablesConfig`, defines the configuration for the
+    optimization variables used in an
+    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object. It specifies the
+    initial values, bounds, types, and an optional mask for the variables.
 
-    The optional `types` field can be used to assign types to each variable,
-    according to the [`VariableType`][ropt.enums.VariableType] enumeration. The
-    values can be used to configure the optimizer accordingly. If not provided,
-    all variables are assumed to be continuous and of real data type
-    (corresponding to [`VariableType.REAL`][ropt.enums.VariableType.REAL])
+    The `initial_values` field is a required `numpy` array that sets the
+    starting values for the variables. The number of variables is determined by
+    the length of this array.
 
-    The boolean entries of the optional `mask` field indicates which variables
-    are considered to be free to change. During optimization, only these
-    variables should change while others remain fixed.
+    The `lower_bounds` and `upper_bounds` fields define the bounds for each
+    variable. These are also `numpy` arrays and are broadcasted to match the
+    number of variables. By default, they are set to negative and positive
+    infinity, respectively. `numpy.nan` values in these arrays indicate
+    unbounded variables and are converted to `numpy.inf` with the appropriate
+    sign.
+
+    The optional `types` field allows assigning a
+    [`VariableType`][ropt.enums.VariableType] to each variable. If not provided,
+    all variables are assumed to be continuous real-valued
+    ([`VariableType.REAL`][ropt.enums.VariableType.REAL]).
+
+    The optional `mask` field is a boolean `numpy` array that indicates which
+    variables are free to change during optimization. `True` values in the mask
+    indicate that the corresponding variable is free, while `False` indicates a
+    fixed variable.
 
     Attributes:
-        types:          The type of the variables (optional).
-        initial_values: The initial values of the variables.
-        lower_bounds:   Lower bound of the variables (default: $-\infty$).
-        upper_bounds:   Upper bound of the variables (default: $+\infty$).
-        mask:           Optional mask of variables to optimize.
+        types:          Optional variable types.
+        initial_values: Initial values for the variables.
+        lower_bounds:   Lower bounds for the variables (default: $-\infty$).
+        upper_bounds:   Upper bounds for the variables (default: $+\infty$).
+        mask:           Optional boolean mask indicating free variables.
     """
 
     types: ArrayEnum | None = None

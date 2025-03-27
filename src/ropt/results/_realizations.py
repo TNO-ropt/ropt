@@ -15,22 +15,29 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class Realizations(ResultField):
-    """This class stores information on the realizations.
+    """Stores information about the realizations.
 
-    The `failed_realizations` field is a boolean array that indicates for
-    each realization whether the evaluation was successful or not.
+    The `Realizations` class stores data related to the individual realizations
+    used in the optimization process. This includes:
 
-    Depending on the type of objective or constraint calculation, the weights
-    used for the realizations may change during optimization. This class stores
-    for each objective and constraint a vector of weight values.
-
-    All fields are two-dimensional matrices, where the first axis index denotes
-    the function or constraint. The second axis index denotes the realization.
+    * **Failed Realizations:** A boolean array indicating whether each
+      realization's evaluation was successful. `True` indicates a failed
+      realization, while `False` indicates a successful one.
+    * **Objective Weights:** A two-dimensional array of weights used for each
+      objective in each realization. The first axis corresponds to the
+      objectives, and the second axis corresponds to the realizations. These
+      weights may change during optimization, depending on the type of objective
+      calculation.
+    * **Constraint Weights:** A two-dimensional array of weights used for each
+      constraint in each realization. The first axis corresponds to the
+      constraints, and the second axis corresponds to the realizations. These
+      weights may change during optimization, depending on the type of
+      constraint calculation.
 
     Attributes:
-        failed_realizations: Failed realizations.
-        objective_weights:   Realization weights for the objectives.
-        constraint_weights:  Realization weights for the constraints.
+        failed_realizations: Boolean array indicating failed realizations.
+        objective_weights:   Weights for each objective in each realization.
+        constraint_weights:  Weights for each constraint in each realization.
     """
 
     failed_realizations: NDArray[np.bool_] = field(

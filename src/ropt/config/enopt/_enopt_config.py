@@ -21,43 +21,40 @@ from ._variables_config import VariablesConfig  # noqa: TC001
 
 
 class EnOptConfig(ImmutableBaseModel):
-    """The primary configuration class for a single optimization step.
+    """The primary configuration class for an optimization step.
 
-    The fields of the `EnOptConfig` class are nested configuration classes that
-    specify specific aspects of a single optimization run.
+    `EnOptConfig` orchestrates the configuration of an entire optimization
+    workflow. It contains nested configuration classes that define specific
+    aspects of the optimization, such as variables, objectives, constraints,
+    realizations, and the optimizer itself.
 
-    The `realization_filters`, `function_estimators`, and `samplers` fields are
-    defined as tuples of configurations for realization filter, function
-    estimator, and sampler objects, respectively. Other configuration fields
-    will refer to these objects by their index into these tuples. For example,
-    the `gradient` field is implemented by the
-    [`GradientConfig`][ropt.config.enopt.GradientConfig] class, which contains a
-    `samplers` field that is an array of indices, indicating for each variable
-    which sampler should be used.
+    `realization_filters`, `function_estimators`, and `samplers` are configured
+    as tuples. Other configuration fields reference these objects by their index
+    within the tuples. For example,
+    [`GradientConfig`][ropt.config.enopt.GradientConfig] uses a `samplers`
+    field, which is an array of indices specifying the sampler to use for each
+    variable.
 
     Info:
-        Many of these nested classes contain fields that are
-        [`numpy`](https://np.org) arrays of values. In general, these arrays
-        must have a given size defined by the configured property or a size of
-        one. For instance, the `variables` field must be an object of the
-        [`VariablesConfig`][ropt.config.enopt.VariablesConfig] class, which
-        contains information about the variables to be optimized. This includes
-        such properties as initial values, bounds, and so on, which are defined
-        as `numpy` arrays. The size of these arrays must be either equal to the
-        number of variables or equal to one, in which case that single value is
-        used for all variables.
+        Many nested configuration classes use `numpy` arrays. These arrays
+        typically have a size determined by a configured property (e.g., the
+        number of variables) or a size of one. In the latter case, the single
+        value is broadcasted to all relevant elements. For example,
+        [`VariablesConfig`][ropt.config.enopt.VariablesConfig] defines
+        properties like initial values and bounds as `numpy` arrays, which must
+        either match the number of variables or have a size of one.
 
     Attributes:
-        variables:             Configuration of the variables.
-        objectives:            Configuration of the objective functions.
-        linear_constraints:    Configuration of linear constraints.
-        nonlinear_constraints: Configuration of non-linear constraints.
-        realizations:          Configuration of the realizations.
-        optimizer:             Configuration of the optimizer.
+        variables:             Configuration for the optimization variables.
+        objectives:            Configuration for the objective functions.
+        linear_constraints:    Configuration for linear constraints.
+        nonlinear_constraints: Configuration for non-linear constraints.
+        realizations:          Configuration for the realizations.
+        optimizer:             Configuration for the optimization algorithm.
         gradient:              Configuration for gradient calculations.
-        realization_filters:   Configuration of realization filters.
-        function_estimators:   Configuration of function estimators.
-        samplers:              Configuration of samplers.
+        realization_filters:   Configuration for realization filters.
+        function_estimators:   Configuration for function estimators.
+        samplers:              Configuration for samplers.
     """
 
     variables: VariablesConfig

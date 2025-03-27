@@ -13,17 +13,33 @@ if TYPE_CHECKING:
 
 
 class OptimizerContext:
-    """Context class for shared state across a plan.
+    """Manages shared state and resources for an optimization plan.
 
-    An optimizer context object holds the information and state shared across
-    all steps in an optimization plan. This currently includes the following:
+    The OptimizerContext acts as a central hub for managing shared resources and
+    state across all steps within an optimization plan. This ensures that
+    different parts of the plan can access and interact with the same
+    information and tools.
 
-    - An [`Evaluator`][ropt.evaluator.Evaluator] callable for evaluating
-      functions.
-    - A plugin manager to retrieve plugins used by the plan and optimizers.
-    - Event callbacks that are triggered in response to specific events,
-      executed after the plan has processed them.
-    - An iterator producing unique evaluation ID's.
+    This context object is responsible for:
+
+    - Providing a callable `Evaluator` for evaluating functions, which is
+      essential for optimization algorithms to assess the quality of solutions.
+      The evaluator is used to calculate the objective function's value and
+      potentially constraint values for given variables.
+    - Managing a `PluginManager` to retrieve and utilize plugins, allowing for
+      extensibility and customization of the optimization workflow. Plugins are
+      modular pieces of code that extend the functionality of the optimization
+      framework, such as new `PlanStep` or `ResultHandler` implementations.
+    - Handling event callbacks that are triggered in response to specific events
+      during the plan's execution. These callbacks are executed after the plan
+      has processed the event, allowing for actions to be taken in response to
+      changes or milestones. This allows you to monitor the optimization, react
+      to changes, or perform custom actions at specific points in the plan's
+      execution.
+
+    Args:
+        evaluator:      A callable for evaluating functions in the plan.
+        plugin_manager: A plugin manager; a default is created if not provided.
     """
 
     def __init__(
@@ -31,15 +47,14 @@ class OptimizerContext:
         evaluator: Evaluator,
         plugin_manager: PluginManager | None = None,
     ) -> None:
-        """Initialize the optimization context.
+        """Initializes the optimization context.
 
-        Initializes shared state and resources needed across an optimization
-        plan, including a function evaluator and an optional expression
-        evaluator for processing plan-specific expressions.
+        Sets up the shared state and resources required for an optimization
+        plan. This includes a function evaluator and a plugin manager.
 
         Args:
-            evaluator:      A callable used to evaluate functions within the plan.
-            plugin_manager: Optional plugin manager.
+            evaluator:      A callable for evaluating functions in the plan.
+            plugin_manager: A plugin manager; a default is created if not provided.
         """
         self.evaluator = evaluator
         self.plugin_manager = (
@@ -54,37 +69,31 @@ class OptimizerContext:
         event: EventType,
         callback: Callable[[Event], None],
     ) -> Self:
-        """Add an observer function.
+        """Adds an observer function for a specific event type.
 
-        Observer functions are called during optimization when an event of the
-        specified type occurs. The provided callable must accept a single
-        argument of the [`Event`][ropt.plan.Event] class, which contains
-        information about the occurred event.
-
-        Note:
-            Before the observer functions are called, all result handlers are
-            executed, which may potentially modify the event.
+        Observer functions are called when an event of the specified type
+        occurs during optimization. The provided callback function will receive
+        an [`Event`][ropt.plan.Event] object containing information about the
+        event.
 
         Args:
-            event:    The type of events that the observer will react to.
-            callback: The function to call when the specified event is received.
-                      This function should accept one argument, which will be
-                      an instance of the [`Event`][ropt.plan.Event] class.
+            event:    The type of event to observe.
+            callback: The function to call when the event occurs.
 
         Returns:
-            Self, to allow for method chaining.
+            The OptimizerContext instance, allowing for method chaining.
         """
         self._subscribers[event].append(callback)
         return self
 
     def call_observers(self, event: Event) -> None:
-        """Call observers for a specified event.
+        """Calls all observers for a specific event.
 
-        This method invokes all observers associated with the context for the
-        type of event passed as an argument.
+        This method triggers all observer functions registered for the given
+        event type.
 
         Args:
-            event: The event that is emitted.
+            event: The event to emit to the observers.
         """
         for callback in self._subscribers[event.event_type]:
             callback(event)

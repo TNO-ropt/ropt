@@ -17,17 +17,25 @@ TypeResults = TypeVar("TypeResults", bound="Results")
 
 @dataclass(slots=True)
 class GradientResults(Results):
-    """The `GradientResults` class stores gradient related results.
+    """Stores results related to gradient evaluations.
 
-    This contains  the following additional information:
+    The `GradientResults` class extends the base
+    [`Results`][ropt.results.Results] class to store data specific to gradient
+    evaluations. This includes:
 
-    1. The results of the function evaluations for perturbed variables.
-    2. The parameters of the realizations, such as weights for objectives and
-       constraints, and realization failures.
-    3. The gradients of the calculated objectives and constraints.
+    * **Evaluations:** The results of the function evaluations for perturbed
+      variables, including the perturbed variable values, objective values, and
+      constraint values for each realization and perturbation. See
+      [`GradientEvaluations`][ropt.results.GradientEvaluations].
+    * **Realizations:** Information about the realizations, such as weights for
+      objectives and constraints, and whether each realization was successful.
+      See [`Realizations`][ropt.results.Realizations].
+    * **Gradients:** The calculated gradients of the objectives and constraints.
+      See [`Gradients`][ropt.results.Gradients].
 
     Attributes:
-        evaluations:  Results of the function evaluations.
+        evaluations:  Results of the function evaluations for perturbed
+                      variables.
         realizations: The calculated parameters of the realizations.
         gradients:    The calculated gradients.
     """

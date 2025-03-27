@@ -31,17 +31,38 @@ class _Results:
 
 
 class BasicOptimizer:
-    """A class for running optimization plans.
+    """A class for executing single optimization runs.
 
-    `BasicOptimizer` objects are designed for use cases where the optimization
-    workflow comprises a single optimization run. Using this object can be more
-    convenient than defining and running an optimization plan directly in such
-    cases.
+    The `BasicOptimizer` is designed to simplify the process of setting up and
+    executing optimization workflows that consist primarily of a single
+    optimization run. It offers a more streamlined approach compared to directly
+    defining and managing a full `Plan` object, making it ideal for
+    straightforward optimization tasks.
 
-    This class provides the following features:
+    This class provides a user-friendly interface for common optimization
+    operations, including:
 
-    - Start a single optimization.
-    - Add observer functions connected to various optimization events.
+    - **Initiating a Single Optimization:**  Easily start an optimization
+      process with a provided configuration and evaluator.
+    - **Observing Optimization Events:** Register observer functions to monitor
+      and react to various events that occur during the optimization, such as
+      the start of an evaluation or the availability of new results.
+    - **Abort Conditions:** Define a callback function that can be used to check
+      for abort conditions during the optimization.
+    - **Result Reporting:** Define a callback function that will be called
+      whenever new results become available.
+    - **Accessing Results:** After the optimization is complete, the optimal
+      results, corresponding variables, and the optimization's exit code are
+      readily accessible.
+    - **Customizable Steps and Handlers:** While designed for single runs, it
+      allows for the addition of custom steps and handlers to the underlying
+      `Plan` for more complex scenarios. It is possible to pass keyword
+      arguments to the custom steps and handlers.
+
+    By encapsulating the core elements of an optimization run, the
+    `BasicOptimizer` reduces the boilerplate code required for simple
+    optimization tasks, allowing users to focus on defining the optimization
+    problem and analyzing the results.
     """
 
     def __init__(
@@ -53,17 +74,46 @@ class BasicOptimizer:
         constraint_tolerance: float = 1e-10,
         **kwargs: Any,  # noqa: ANN401
     ) -> None:
-        """Initialize an `BasicOptimizer` object.
+        """Initialize a `BasicOptimizer` object.
 
-        An optimization configuration and an evaluation object must be provided,
-        as they define the optimization to perform.
+        This constructor sets up the necessary components for a single
+        optimization run. It requires an optimization configuration and an
+        evaluator, which together define the optimization problem and how to
+        evaluate potential solutions. The `transforms` object can be used to
+        apply transformations to the optimization model, such as scaling or
+        shifting variables. If a constraint value is within the
+        `constraint_tolerance` of zero, it is considered satisfied. The `kwargs`
+        may be used to define custom steps, and handlers to modify the behavior
+        of the optimization process.
+
+        Note: Custom handlers and steps
+            The optional keyword arguments (`kwargs`) provide a mechanism to
+            inject custom steps or handlers into the optimization process. The
+            behavior is as follows:
+
+            1.  **Custom Step Execution:** If a single keyword argument is
+                provided, the `BasicOptimizer` checks if a step with the same
+                name exists. If so, that step is executed immediately, receiving
+                the key-value pair as input. Only one custom step can be
+                executed this way, if other keyword arguments are present an
+                error is raised. The custom step receives the `Plan` object and
+                may install a custom run function to be executed later.
+            2.  **Default Optimization and Custom Handlers:** If no custom step
+                is run, or if the custom step does not install a custom run
+                function, the default optimization process is used. In this
+                case, multiple keyword arguments are allowed. Each keyword is
+                checked to see if a handler with the same name exists. If so,
+                the handler is installed.
+            3.  **Callback Installation and Execution:** Finally, any callbacks
+                added via `set_abort_callback` or `set_results_callback` are
+                installed, and the appropriate run function is executed.
 
         Args:
             enopt_config:         The configuration for the optimization.
-            evaluator:            The evaluator object used to evaluate functions.
-            transforms:           Optional transforms object.
-            constraint_tolerance: The tolerance level used to detect constraint violations.
-            kwargs:               Optional keywords that may be passed to optimization code.
+            evaluator:            The evaluator object.
+            transforms:           Optional transforms.
+            constraint_tolerance: The constraint violation tolerance.
+            kwargs:               Optional keyword arguments.
         """
         self._config = EnOptConfig.model_validate(enopt_config)
         self._transforms = transforms
@@ -75,16 +125,27 @@ class BasicOptimizer:
 
     @property
     def results(self) -> FunctionResults | None:
-        """Return the optimal result.
+        """Return the optimal result found during the optimization.
+
+        This property provides access to the best
+        [`FunctionResults`][ropt.results.FunctionResults] object discovered
+        during the optimization process. It encapsulates the objective function
+        value, constraint values, and other relevant information about the
+        optimal solution.
 
         Returns:
-            The optimal result found during optimization.
+            The optimal result.
         """
         return self._results.results
 
     @property
     def variables(self) -> NDArray[np.float64] | None:
-        """Return the optimal variables.
+        """Return the optimal variables found during the optimization.
+
+        This property provides access to the variable values that correspond to
+        the optimal [`FunctionResults`][ropt.results.FunctionResults] object.
+        These variables represent the solution that yielded the best objective
+        function value found during the optimization process.
 
         Returns:
             The variables corresponding to the optimal result.
@@ -93,7 +154,13 @@ class BasicOptimizer:
 
     @property
     def exit_code(self) -> OptimizerExitCode:
-        """Return the exit code.
+        """Return the exit code of the optimization run.
+
+        This property provides access to the
+        [`OptimizerExitCode`][ropt.enums.OptimizerExitCode] that indicates the
+        outcome of the optimization process. It can be used to determine whether
+        the optimization completed successfully, was aborted, or encountered an
+        error.
 
         Returns:
             The exit code of the optimization run.
@@ -101,7 +168,13 @@ class BasicOptimizer:
         return self._results.exit_code
 
     def run(self) -> Self:
-        """Run the optimization.
+        """Run the optimization process.
+
+        This method initiates the optimization workflow defined by the
+        `BasicOptimizer` object. It executes the underlying `Plan`, which
+        manages the optimization steps, result handling, and event processing.
+        After the optimization is complete, the optimal results, variables, and
+        exit code can be accessed via the corresponding properties.
 
         Returns:
             The `BasicOptimizer` instance, allowing for method chaining.
@@ -153,13 +226,18 @@ class BasicOptimizer:
         return self
 
     def set_abort_callback(self, callback: Callable[[], bool]) -> Self:
-        """Set an abort callback.
+        """Set a callback to check for abort conditions.
 
-        The callback will be called repeated during optimization. If it returns `True`,
-        the optimization will be aborted.
+        The provided callback function will be invoked repeatedly during the
+        optimization process. If the callback returns `True`, the optimization
+        will be aborted, and the `BasicOptimizer` will exit with an
+        [`OptimizerExitCode.USER_ABORT`][ropt.enums.OptimizerExitCode].
+
+        The callback function should have no arguments and return a boolean
+        value.
 
         Args:
-            callback: The callable that will be used to check for abort conditions.
+            callback: The callable to check for abort conditions.
 
         Returns:
             The `BasicOptimizer` instance, allowing for method chaining.
@@ -178,23 +256,43 @@ class BasicOptimizer:
         *,
         transformed: bool = False,
     ) -> Self:
-        """Set a callback to report results.
+        """Set a callback to report new results.
 
-        The callback will be called whenever new results become available.
+        The provided callback function will be invoked whenever new results
+        become available during the optimization process. This allows for
+        real-time monitoring and analysis of the optimization's progress.
 
-        If `transformed` is `False` the callback should have this signature:
+        The required signature of the callback function depends on the
+        `transformed` parameter:
 
-            `def callback(results: tuple[Results, ...]) -> None: ...`
+        -   If `transformed` is `False` (default), the callback should accept a
+            single argument: a tuple of
+            [`FunctionResults`][ropt.results.FunctionResults] objects. The
+            signature should be:
 
-        If `transformed` is `True`, the signature should be:
+            ```python
+            def callback(results: tuple[FunctionResults, ...]) -> None:
+                ...
+            ```
 
+        -   If `transformed` is `True`, the callback should accept two
+            arguments: a tuple of the original
+            [`FunctionResults`][ropt.results.FunctionResults] objects and a
+            tuple of the transformed
+            [`FunctionResults`][ropt.results.FunctionResults] objects. The
+            signature should be:
+
+            ```python
             def callback(
-                results: tuple[Results, ...], transformed_results: tuple[Results, ...]
-            ) -> None: ...`
+                results: tuple[FunctionResults, ...],
+                transformed_results: tuple[FunctionResults, ...],
+            ) -> None:
+                ...
+            ```
 
         Args:
-            callback:    The callable that will be used to report results.
-            transformed: If true also pass the transformed results.
+            callback:    The callable that will be invoked to report new results.
+            transformed: If `True`, also pass the transformed results to the callback.
 
         Returns:
             The `BasicOptimizer` instance, allowing for method chaining.

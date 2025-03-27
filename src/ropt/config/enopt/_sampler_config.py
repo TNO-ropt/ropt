@@ -8,36 +8,31 @@ from pydantic import BaseModel, ConfigDict
 
 
 class SamplerConfig(BaseModel):
-    """The sampler configuration class.
+    """Configuration class for samplers.
 
-    This class defines the configuration for samplers, which are configured by
-    the `samplers` field in an [`EnOptConfig`][ropt.config.enopt.EnOptConfig]
-    object. That field contains a tuple of configuration objects that define
-    which samplers are available during the optimization. The `samplers` field
-    in the gradient configuration
-    ([`GradientConfig`][ropt.config.enopt.GradientConfig]) is used to specify
-    the index of the sampler for each variable.
+    This class, `SamplerConfig`, defines the configuration for samplers used in
+    an [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object. Samplers are
+    configured as a tuple in the `samplers` field of the `EnOptConfig`, defining
+    the available samplers for the optimization. The `samplers` field in the
+    [`GradientConfig`][ropt.config.enopt.GradientConfig] specifies the index of
+    the sampler to use for each variable.
 
-    Gradients are calculated from a set of perturbed variables, which may be
-    deterministic or stochastic in nature. These perturbations are generally
-    produced by sampler objects that produce perturbation values to add to the
-    unperturbed variables.
+    Samplers generate perturbations added to variables for gradient
+    calculations. These perturbations can be deterministic or stochastic.
 
-    Perturbation values are produced by a sampler, which provides the methods
-    that can be used. The `method` field determines which sampler method will be
-    used. To further specify how such a method should function, the `options`
-    field can be used to pass a dictionary of key-value pairs. The
-    interpretation of these options depends on the chosen method.
+    The `method` field specifies the sampler method to use for generating
+    perturbations. The `options` field allows passing a dictionary of key-value
+    pairs to further configure the chosen method. The interpretation of these
+    options depends on the selected method.
 
-    By default, a different set of perturbed variables is generated for each
-    realization. By setting the `shared` flag to `True`, the sampler can be
-    directed to use the same set of perturbed values for each realization.
+    By default, each realization uses a different set of perturbed variables.
+    Setting the `shared` flag to `True` directs the sampler to use the same set
+    of perturbed values for all realizations.
 
     Attributes:
-        method:  The sampler method.
-        options: Options to be passed to the sampler.
-        shared:  Whether perturbation values should be shared between realizations
-                 (default: `False`).
+        method:  Name of the sampler method.
+        options: Dictionary of options for the sampler.
+        shared:  Whether to share perturbation values between realizations (default: `False`).
     """
 
     method: str = "scipy/default"

@@ -17,32 +17,39 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class GradientEvaluations(ResultField):
-    """This class contains the results of evaluations for gradient calculation.
+    """Stores the results of evaluations for gradient calculations.
 
-    This class stores the variables with the calculated objective and
-    constraints gradients. It contains the following information:
+    The `GradientEvaluations` class stores the results of evaluating the
+    objective and constraint functions for perturbed variables, which is
+    necessary for gradient calculations. It contains the following information:
 
-    1. The vector of variables at which the functions are evaluated.
-    2. A three-dimensional array of perturbed variables, with variable values
-       arranged along the third axis. The second axis index indicates the
-       perturbation number, whereas the first axis index represents the
-       realization number.
-    3. The objectives and constraints for each realization and perturbed
-       variable vector:  A three-dimensional array, with the objective or
-       constraint values arranged along the third axis. The second axis index
-       indicates the perturbation number, whereas the first axis index
-       represents the realization number.
-    4. Optional info for each evaluations that may have been passed from the
-       evaluator.
+    * **Variables:** The vector of unperturbed variable values.
+    * **Perturbed Variables:** A three-dimensional array of perturbed variable
+      values. The axes represent (in order): realization, perturbation, and
+      variable.
+    * **Perturbed Objectives:** The calculated objective function values for
+      each realization and perturbation. This is a three-dimensional array where
+      the axes represent (in order): realization, perturbation, and objective.
+    * **Perturbed Constraints:** The calculated constraint function values for
+      each realization and perturbation. This is a three-dimensional array where
+      the axes represent (in order): realization, perturbation, and constraint.
+    * **Evaluation Info:** Optional metadata associated with each realization
+      and perturbation, potentially provided by the evaluator. If provided, each
+      value in the `evaluation_info` dictionary must be a two-dimensional array
+      where the rows correspond to perturbations and the second columns
+      correspond to realizations.
+
 
     Attributes:
         variables:             The unperturbed variable vector.
-        perturbed_variables:   The variables for each realization and perturbation.
-        perturbed_objectives:  The objective functions for each realization and
-                               perturbation.
-        perturbed_constraints: The constraint functions for each realization and
-                               perturbation.
-        evaluation_info:       Optional info for each evaluated realization.
+        perturbed_variables:   The perturbed variable values for each
+                               realization and perturbation.
+        perturbed_objectives:  The objective function values for each
+                               realization and perturbation.
+        perturbed_constraints: The constraint function values for each
+                               realization and perturbation.
+        evaluation_info:       Optional metadata for each evaluated
+                               realization and perturbation.
     """
 
     variables: NDArray[np.float64] = field(
@@ -110,7 +117,6 @@ class GradientEvaluations(ResultField):
         """Create a FunctionEvaluations object with the given information.
 
         Args:
-            config:                Configuration object.
             variables:             The unperturbed variable vector.
             perturbed_variables:   The unperturbed variable vector.
             perturbed_objectives:  The objective functions for each realization.

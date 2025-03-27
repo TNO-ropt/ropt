@@ -14,20 +14,21 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class Event:
-    """The `Event` class stores optimization event data.
+    """Stores data related to an optimization event.
 
-    While running an optimization plan, callbacks can be connected to react to
-    events triggered during execution. These callbacks accept a single `Event`
-    object containing information about the event.
+    During the execution of an optimization plan, events are triggered to signal
+    specific occurrences. Callbacks can be registered to react to these events
+    and will receive an `Event` object containing relevant information.
 
-    The actual data contained in the object depends on the nature of the event.
-    Refer to the documentation of the [`EventType`][ropt.enums.EventType]
-    enumeration for more details.
+    The specific data within the `Event` object varies depending on the event
+    type. See the [`EventType`][ropt.enums.EventType] documentation for
+    details.
 
     Attributes:
-        event_type: The type of the event.
-        source:     ID of the source step.
-        data:       Optional data passed with the event.
+        event_type: The type of event that occurred.
+        config:     The configuration used for the optimization.
+        source:     The ID of the step that triggered the event.
+        data:       A dictionary containing additional event-specific data.
     """
 
     event_type: EventType

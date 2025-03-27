@@ -18,19 +18,20 @@ if TYPE_CHECKING:
 
 @dataclass(slots=True)
 class Gradients(ResultField):
-    """This class stores the calculated objective and constraint gradients.
+    """Stores the calculated objective and constraint gradients.
 
-    The objective and constraint gradients used by the optimizer are calculated
-    from their values evaluated for all realizations, for instance by averaging.
-    There may be multiple objectives and constraints. Multiple objectives are
-    handled by the optimizer using a weighted sum of the individual gradients,
-    stored in the `weighted_objective` field. Multiple constraints are directly
-    handled by the optimizer.
+    The `Gradients` class stores the calculated gradients of the objective and
+    constraint functions. These gradients are typically derived from function
+    evaluations across all realizations, often through a process like averaging.
+    The optimizer may handle multiple objectives and constraints. Multiple
+    objective gradients are combined into a single weighted sum, which is stored
+    in the `weighted_objective` field. Multiple constraint gradients are handled
+    individually by the optimizer.
 
     Attributes:
         weighted_objective: The weighted sum of the objective gradients.
-        objectives:         The value of each objective gradient.
-        constraints:        The value of each constraint gradient.
+        objectives:         The gradient of each individual objective.
+        constraints:        The gradient of each individual constraint.
     """
 
     weighted_objective: NDArray[np.float64] = field(
@@ -73,7 +74,6 @@ class Gradients(ResultField):
         """Create a Gradients object with the given information.
 
         Args:
-            config:             Configuration object.
             weighted_objective: The weighted objective.
             objectives:         The objective gradients for each realization.
             constraints:        The constraint gradients for each realization.
