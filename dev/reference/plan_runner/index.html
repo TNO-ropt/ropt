@@ -1343,16 +1343,36 @@
     <div class="doc doc-contents first">
 
 
-        <p>A class for running optimization plans.</p>
-<p><code>BasicOptimizer</code> objects are designed for use cases where the optimization
-workflow comprises a single optimization run. Using this object can be more
-convenient than defining and running an optimization plan directly in such
-cases.</p>
-<p>This class provides the following features:</p>
+        <p>A class for executing single optimization runs.</p>
+<p>The <code>BasicOptimizer</code> is designed to simplify the process of setting up and
+executing optimization workflows that consist primarily of a single
+optimization run. It offers a more streamlined approach compared to directly
+defining and managing a full <code>Plan</code> object, making it ideal for
+straightforward optimization tasks.</p>
+<p>This class provides a user-friendly interface for common optimization
+operations, including:</p>
 <ul>
-<li>Start a single optimization.</li>
-<li>Add observer functions connected to various optimization events.</li>
+<li><strong>Initiating a Single Optimization:</strong>  Easily start an optimization
+  process with a provided configuration and evaluator.</li>
+<li><strong>Observing Optimization Events:</strong> Register observer functions to monitor
+  and react to various events that occur during the optimization, such as
+  the start of an evaluation or the availability of new results.</li>
+<li><strong>Abort Conditions:</strong> Define a callback function that can be used to check
+  for abort conditions during the optimization.</li>
+<li><strong>Result Reporting:</strong> Define a callback function that will be called
+  whenever new results become available.</li>
+<li><strong>Accessing Results:</strong> After the optimization is complete, the optimal
+  results, corresponding variables, and the optimization's exit code are
+  readily accessible.</li>
+<li><strong>Customizable Steps and Handlers:</strong> While designed for single runs, it
+  allows for the addition of custom steps and handlers to the underlying
+  <code>Plan</code> for more complex scenarios. It is possible to pass keyword
+  arguments to the custom steps and handlers.</li>
 </ul>
+<p>By encapsulating the core elements of an optimization run, the
+<code>BasicOptimizer</code> reduces the boilerplate code required for simple
+optimization tasks, allowing users to focus on defining the optimization
+problem and analyzing the results.</p>
 
 
 
@@ -1389,7 +1409,17 @@ cases.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the optimal result.</p>
+        <p>Return the optimal result found during the optimization.</p>
+<p>This property provides access to the best
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object discovered
+during the optimization process. It encapsulates the objective function
+value, constraint values, and other relevant information about the
+optimal solution.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -1412,7 +1442,7 @@ cases.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The optimal result found during optimization.</p>
+                <p>The optimal result.</p>
               </div>
             </td>
           </tr>
@@ -1441,7 +1471,16 @@ cases.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the optimal variables.</p>
+        <p>Return the optimal variables found during the optimization.</p>
+<p>This property provides access to the variable values that correspond to
+the optimal <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object.
+These variables represent the solution that yielded the best objective
+function value found during the optimization process.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -1488,7 +1527,12 @@ cases.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the exit code.</p>
+        <p>Return the exit code of the optimization run.</p>
+<p>This property provides access to the
+<a class="autorefs autorefs-internal" title="            OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode"><code>OptimizerExitCode</code></a> that indicates the
+outcome of the optimization process. It can be used to determine whether
+the optimization completed successfully, was aborted, or encountered an
+error.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -1539,10 +1583,42 @@ cases.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize an <code>BasicOptimizer</code> object.</p>
-<p>An optimization configuration and an evaluation object must be provided,
-as they define the optimization to perform.</p>
+        <p>Initialize a <code>BasicOptimizer</code> object.</p>
+<p>This constructor sets up the necessary components for a single
+optimization run. It requires an optimization configuration and an
+evaluator, which together define the optimization problem and how to
+evaluate potential solutions. The <code>transforms</code> object can be used to
+apply transformations to the optimization model, such as scaling or
+shifting variables. If a constraint value is within the
+<code>constraint_tolerance</code> of zero, it is considered satisfied. The <code>kwargs</code>
+may be used to define custom steps, and handlers to modify the behavior
+of the optimization process.</p>
 
+
+<details class="note" open>
+  <summary>Custom handlers and steps</summary>
+  <p>The optional keyword arguments (<code>kwargs</code>) provide a mechanism to
+inject custom steps or handlers into the optimization process. The
+behavior is as follows:</p>
+<ol>
+<li><strong>Custom Step Execution:</strong> If a single keyword argument is
+    provided, the <code>BasicOptimizer</code> checks if a step with the same
+    name exists. If so, that step is executed immediately, receiving
+    the key-value pair as input. Only one custom step can be
+    executed this way, if other keyword arguments are present an
+    error is raised. The custom step receives the <code>Plan</code> object and
+    may install a custom run function to be executed later.</li>
+<li><strong>Default Optimization and Custom Handlers:</strong> If no custom step
+    is run, or if the custom step does not install a custom run
+    function, the default optimization process is used. In this
+    case, multiple keyword arguments are allowed. Each keyword is
+    checked to see if a handler with the same name exists. If so,
+    the handler is installed.</li>
+<li><strong>Callback Installation and Execution:</strong> Finally, any callbacks
+    added via <code>set_abort_callback</code> or <code>set_results_callback</code> are
+    installed, and the appropriate run function is executed.</li>
+</ol>
+</details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>
@@ -1580,7 +1656,7 @@ as they define the optimization to perform.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The evaluator object used to evaluate functions.</p>
+                <p>The evaluator object.</p>
               </div>
             </td>
             <td>
@@ -1596,7 +1672,7 @@ as they define the optimization to perform.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional transforms object.</p>
+                <p>Optional transforms.</p>
               </div>
             </td>
             <td>
@@ -1612,7 +1688,7 @@ as they define the optimization to perform.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The tolerance level used to detect constraint violations.</p>
+                <p>The constraint violation tolerance.</p>
               </div>
             </td>
             <td>
@@ -1628,7 +1704,7 @@ as they define the optimization to perform.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional keywords that may be passed to optimization code.</p>
+                <p>Optional keyword arguments.</p>
               </div>
             </td>
             <td>
@@ -1656,7 +1732,12 @@ as they define the optimization to perform.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Run the optimization.</p>
+        <p>Run the optimization process.</p>
+<p>This method initiates the optimization workflow defined by the
+<code>BasicOptimizer</code> object. It executes the underlying <code>Plan</code>, which
+manages the optimization steps, result handling, and event processing.
+After the optimization is complete, the optimal results, variables, and
+exit code can be accessed via the corresponding properties.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -1699,9 +1780,13 @@ as they define the optimization to perform.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Set an abort callback.</p>
-<p>The callback will be called repeated during optimization. If it returns <code>True</code>,
-the optimization will be aborted.</p>
+        <p>Set a callback to check for abort conditions.</p>
+<p>The provided callback function will be invoked repeatedly during the
+optimization process. If the callback returns <code>True</code>, the optimization
+will be aborted, and the <code>BasicOptimizer</code> will exit with an
+<a class="autorefs autorefs-internal" title="            OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode"><code>OptimizerExitCode.USER_ABORT</code></a>.</p>
+<p>The callback function should have no arguments and return a boolean
+value.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1724,7 +1809,7 @@ the optimization will be aborted.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The callable that will be used to check for abort conditions.</p>
+                <p>The callable to check for abort conditions.</p>
               </div>
             </td>
             <td>
@@ -1779,16 +1864,52 @@ the optimization will be aborted.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Set a callback to report results.</p>
-<p>The callback will be called whenever new results become available.</p>
-<p>If <code>transformed</code> is <code>False</code> the callback should have this signature:</p>
-<div class="language-text highlight"><pre><span></span><code>`def callback(results: tuple[Results, ...]) -&gt; None: ...`
-</code></pre></div>
-<p>If <code>transformed</code> is <code>True</code>, the signature should be:</p>
-<div class="language-text highlight"><pre><span></span><code>def callback(
-    results: tuple[Results, ...], transformed_results: tuple[Results, ...]
-) -&gt; None: ...`
-</code></pre></div>
+        <p>Set a callback to report new results.</p>
+<p>The provided callback function will be invoked whenever new results
+become available during the optimization process. This allows for
+real-time monitoring and analysis of the optimization's progress.</p>
+<p>The required signature of the callback function depends on the
+<code>transformed</code> parameter:</p>
+<ul>
+<li>
+<p>If <code>transformed</code> is <code>False</code> (default), the callback should accept a
+    single argument: a tuple of
+    <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> objects. The
+    signature should be:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">callback</span><span class="p">(</span><span class="n">results</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">...</span>
+</span></code></pre></div>
+</li>
+<li>
+<p>If <code>transformed</code> is <code>True</code>, the callback should accept two
+    arguments: a tuple of the original
+    <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> objects and a
+    tuple of the transformed
+    <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> objects. The
+    signature should be:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">callback</span><span class="p">(</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">results</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">transformed_results</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="o">...</span>
+</span></code></pre></div>
+</li>
+</ul>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1811,7 +1932,7 @@ the optimization will be aborted.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The callable that will be used to report results.</p>
+                <p>The callable that will be invoked to report new results.</p>
               </div>
             </td>
             <td>
@@ -1827,7 +1948,7 @@ the optimization will be aborted.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If true also pass the transformed results.</p>
+                <p>If <code>True</code>, also pass the transformed results to the callback.</p>
               </div>
             </td>
             <td>
