@@ -3,7 +3,6 @@ from typing import Any
 import numpy as np
 import pytest
 
-from ropt.enums import ResultAxis
 from ropt.results import FunctionEvaluations, FunctionResults, Functions, Realizations
 
 
@@ -45,13 +44,3 @@ def function_result_fixture() -> FunctionResults:
         realizations=realizations,
         functions=functions,
     )
-
-
-@pytest.mark.parametrize("axis", [ResultAxis.OBJECTIVE, None])
-def test_to_dict(function_result: FunctionResults, axis: ResultAxis) -> None:
-    names: dict[ResultAxis, tuple[str, ...]] = {ResultAxis.OBJECTIVE: ("f1", "f2")}
-    objectives = function_result.evaluations.to_dict(
-        "objectives", axis=axis, names=names
-    )
-    assert np.all(np.equal(objectives["f1"], [0.0, 2.0, 4.0]))
-    assert np.all(np.equal(objectives["f2"], [1.0, 3.0, 5.0]))

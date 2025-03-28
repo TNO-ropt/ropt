@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, fields
-from typing import Any, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
-import numpy as np
-
-from ropt.enums import ResultAxis
+if TYPE_CHECKING:
+    from ropt.enums import ResultAxis
 
 TypeResultField = TypeVar("TypeResultField", bound="ResultField")
 
@@ -38,53 +37,3 @@ class ResultField:
             msg = f"Unknown field name: {name}"
             raise ValueError(msg)
         return metadata.get("__axes__", ())
-
-    def to_dict(
-        self,
-        name: str,
-        axis: ResultAxis | None = None,
-        names: dict[ResultAxis, tuple[str, ...]] | None = None,
-    ) -> dict[str | int, Any]:
-        """Convert a field of ResultsField to a dictionary.
-
-        The keys of the output correspond to the indices of the axis of the
-        field given by `axis`. The values are a slice of the field value at each
-        index. If `names` contains the names of the objects stored along the axis,
-        these are used as keys in the output dictionary rather than the numerical
-        indices.
-
-        If `axis` is `None` (the default), a default is chosen using the following logic:
-
-        1. If the field has a `ResultAxis.OBJECTIVE` axis, it is used.
-        2. If the field has a `ResultAxis.NONLINEAR_CONSTRAINT` axis, it is used.
-        3. Otherwise, use the last axis.
-
-        Args:
-            name:  Name of the field to export.
-            axis:  Axis to use as the keys.
-            names: A dictionary mapping axis types to names.
-
-        Returns:
-            The field converted to a dictionary.
-        """
-        data = getattr(self, name)
-        axes = self.get_axes(name)
-        if axis is None:
-            if ResultAxis.OBJECTIVE in axes:
-                axis = ResultAxis.OBJECTIVE
-            elif ResultAxis.NONLINEAR_CONSTRAINT in axes:
-                axis = ResultAxis.NONLINEAR_CONSTRAINT
-            else:
-                axis = axes[-1]
-        elif axis not in axes:
-            msg = f"invalid key: {axis}"
-            raise ValueError(msg)
-        data = np.swapaxes(data, axes.index(axis), 0)
-        if names is None:
-            names = {}
-        axis_names = names.get(axis, None)
-        return (
-            {idx: data[idx] for idx in range(data.shape[0])}
-            if axis_names is None
-            else {name: data[idx, ...] for idx, name in enumerate(axis_names)}
-        )
