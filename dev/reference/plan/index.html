@@ -595,10 +595,9 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="plan">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.plan.Plan" class="md-nav__link">
     <span class="md-ellipsis">
       Plan
@@ -756,8 +755,8 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#ropt.plan.OptimizerContext" class="md-nav__link">
     <span class="md-ellipsis">
       OptimizerContext
@@ -798,18 +797,13 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#ropt.plan.Event" class="md-nav__link">
     <span class="md-ellipsis">
       Event
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1384,10 +1378,9 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="plan">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.plan.Plan" class="md-nav__link">
     <span class="md-ellipsis">
       Plan
@@ -1545,8 +1538,8 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#ropt.plan.OptimizerContext" class="md-nav__link">
     <span class="md-ellipsis">
       OptimizerContext
@@ -1587,18 +1580,13 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#ropt.plan.Event" class="md-nav__link">
     <span class="md-ellipsis">
       Event
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1636,7 +1624,7 @@
     <div class="doc doc-contents first">
 
         <p>Code for executing optimization plans.</p>
-<p>The <a class="autorefs autorefs-internal" title="            Plan" href="#ropt.plan.Plan"><code>Plan</code></a> class orchestrates optimization workflows by
+<p>The <a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="#ropt.plan.Plan"><code>Plan</code></a> class orchestrates optimization workflows by
 managing steps and result handlers.</p>
 <p>A plan consists of <a class="autorefs autorefs-internal" title="            PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a> objects, which
 define individual actions, and
@@ -1651,9 +1639,9 @@ basic steps and result handlers to support a wide range of optimization
 workflows.</p>
 <p>Most optimization plans require shared state across all steps, such as the
 plugin manager and an evaluator callable for function evaluations. This shared
-state is managed by the <a class="autorefs autorefs-internal" title="            OptimizerContext" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a> object,
+state is managed by the <a class="autorefs autorefs-internal" title="            ropt.plan.OptimizerContext" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a> object,
 which is provided when creating a plan. The <code>OptimizerContext</code> also handles
-<a class="autorefs autorefs-internal" title="            Event
+<a class="autorefs autorefs-internal" title="            ropt.plan.Event
 
 
   
@@ -1682,18 +1670,27 @@ involving a single optimization.</p>
 
 
 
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
 <div class="doc doc-object doc-class">
 
 
 
-<h3 id="ropt.plan.Plan" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">Plan</span>
+<h2 id="ropt.plan.Plan" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plan.Plan</span>
 
 
-</h3>
+</h2>
 
 
-    <div class="doc doc-contents ">
+    <div class="doc doc-contents first">
 
 
         <p>Plan class for executing optimization workflows.</p>
@@ -1725,7 +1722,7 @@ customize its behavior. The <a class="autorefs autorefs-internal" title="       
 method can be used to check if a function has been added to the plan.</p>
 <p><strong>Shared State and Events:</strong></p>
 <p>The plan maintains shared state in an
-<a class="autorefs autorefs-internal" title="            OptimizerContext" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a>, which is provided during
+<a class="autorefs autorefs-internal" title="            ropt.plan.OptimizerContext" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a>, which is provided during
 initialization and can be shared among multiple plans. The
 <a class="autorefs autorefs-internal" title="            optimizer_context
 
@@ -1783,7 +1780,7 @@ methods.</p>
 
 
 
-<h4 id="ropt.plan.Plan.aborted" class="doc doc-heading">
+<h3 id="ropt.plan.Plan.aborted" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">aborted</span>
 
 
@@ -1791,7 +1788,7 @@ methods.</p>
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">aborted</span><span class="p">:</span> <span class="nb">bool</span>
 </span></code></pre></div>
 
@@ -1831,7 +1828,7 @@ methods.</p>
 
 
 
-<h4 id="ropt.plan.Plan.optimizer_context" class="doc doc-heading">
+<h3 id="ropt.plan.Plan.optimizer_context" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">optimizer_context</span>
 
 
@@ -1839,14 +1836,14 @@ methods.</p>
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">optimizer_context</span><span class="p">:</span> <span class="n">OptimizerContext</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Return the optimizer context.</p>
-<p>Retrieves the <a class="autorefs autorefs-internal" title="            OptimizerContext" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a> object
+<p>Retrieves the <a class="autorefs autorefs-internal" title="            ropt.plan.OptimizerContext" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a> object
 associated with this plan. The optimizer context provides shared state
 and functionality for executing the optimization plan.</p>
 
@@ -1862,7 +1859,7 @@ and functionality for executing the optimization plan.</p>
       <tbody>
           <tr class="doc-section-item">
 <td><code>OptimizerContext</code></td>            <td>
-                  <code><a class="autorefs autorefs-internal" title="            OptimizerContext (ropt.plan._context.OptimizerContext)" href="#ropt.plan.OptimizerContext">OptimizerContext</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plan.OptimizerContext (ropt.plan._context.OptimizerContext)" href="#ropt.plan.OptimizerContext">OptimizerContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1882,11 +1879,11 @@ and functionality for executing the optimization plan.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.__init__" class="doc doc-heading">
+<h3 id="ropt.plan.Plan.__init__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">optimizer_context</span><span class="p">:</span> <span class="n">OptimizerContext</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">parent</span><span class="p">:</span> <span class="n">Plan</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1897,7 +1894,7 @@ and functionality for executing the optimization plan.</p>
 
         <p>Initialize a plan object.</p>
 <p>Constructs a new plan, associating it with an
-<a class="autorefs autorefs-internal" title="            OptimizerContext" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a> and an optional parent
+<a class="autorefs autorefs-internal" title="            ropt.plan.OptimizerContext" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a> and an optional parent
 plan.</p>
 <p>The plan will operate within the provided <code>optimizer_context</code>. If a
 <code>parent</code> plan is specified, this plan becomes a child, enabling event
@@ -1920,7 +1917,7 @@ propagation up the plan hierarchy.</p>
                 <code>optimizer_context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            OptimizerContext (ropt.plan._context.OptimizerContext)" href="#ropt.plan.OptimizerContext">OptimizerContext</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plan.OptimizerContext (ropt.plan._context.OptimizerContext)" href="#ropt.plan.OptimizerContext">OptimizerContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1936,7 +1933,7 @@ propagation up the plan hierarchy.</p>
                 <code>parent</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            Plan (ropt.plan._plan.Plan)" href="#ropt.plan.Plan">Plan</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plan.Plan (ropt.plan._plan.Plan)" href="#ropt.plan.Plan">Plan</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1958,11 +1955,11 @@ propagation up the plan hierarchy.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.add_handler" class="doc doc-heading">
+<h3 id="ropt.plan.Plan.add_handler" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">add_handler</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_handler</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span>
 </span></code></pre></div>
 
@@ -2052,11 +2049,11 @@ arguments are passed to the handler's constructor.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.add_step" class="doc doc-heading">
+<h3 id="ropt.plan.Plan.add_step" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">add_step</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_step</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span>
 </span></code></pre></div>
 
@@ -2146,11 +2143,11 @@ the step's constructor.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.handler_exists" class="doc doc-heading">
+<h3 id="ropt.plan.Plan.handler_exists" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">handler_exists</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handler_exists</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
 </span></code></pre></div>
 
@@ -2222,11 +2219,11 @@ plugin system.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.step_exists" class="doc doc-heading">
+<h3 id="ropt.plan.Plan.step_exists" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">step_exists</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">step_exists</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
 </span></code></pre></div>
 
@@ -2298,11 +2295,11 @@ plugin system.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.run_step" class="doc doc-heading">
+<h3 id="ropt.plan.Plan.run_step" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run_step</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run_step</span><span class="p">(</span><span class="n">step</span><span class="p">:</span> <span class="n">UUID</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
 </span></code></pre></div>
 
@@ -2427,11 +2424,11 @@ method is returned by this method.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.add_function" class="doc doc-heading">
+<h3 id="ropt.plan.Plan.add_function" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">add_function</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_function</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
@@ -2481,11 +2478,11 @@ later using the <a class="autorefs autorefs-internal" title="            run_fun
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.has_function" class="doc doc-heading">
+<h3 id="ropt.plan.Plan.has_function" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">has_function</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">has_function</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
 </span></code></pre></div>
 
@@ -2526,11 +2523,11 @@ plan.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.run_function" class="doc doc-heading">
+<h3 id="ropt.plan.Plan.run_function" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run_function</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run_function</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
 </span></code></pre></div>
 
@@ -2641,11 +2638,11 @@ plan via the <a class="autorefs autorefs-internal" title="            add_functi
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.abort" class="doc doc-heading">
+<h3 id="ropt.plan.Plan.abort" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">abort</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">abort</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
@@ -2672,11 +2669,11 @@ the plan has been aborted.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.set_parent" class="doc doc-heading">
+<h3 id="ropt.plan.Plan.set_parent" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">set_parent</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_parent</span><span class="p">(</span><span class="n">parent</span><span class="p">:</span> <span class="n">Plan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
@@ -2703,7 +2700,7 @@ plan. This enables event propagation up the plan hierarchy.</p>
                 <code>parent</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            Plan (ropt.plan._plan.Plan)" href="#ropt.plan.Plan">Plan</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plan.Plan (ropt.plan._plan.Plan)" href="#ropt.plan.Plan">Plan</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2725,11 +2722,11 @@ plan. This enables event propagation up the plan hierarchy.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.emit_event" class="doc doc-heading">
+<h3 id="ropt.plan.Plan.emit_event" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">emit_event</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">emit_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
@@ -2763,12 +2760,12 @@ plan. This enables event propagation up the plan hierarchy.</p>
                 <code>event</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            Event
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plan.Event
 
 
   
       dataclass
-   (ropt.plan.Event)" href="#ropt.plan.Event">Event</a></code>
+  " href="#ropt.plan.Event">Event</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2790,11 +2787,11 @@ plan. This enables event propagation up the plan hierarchy.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.get" class="doc doc-heading">
+<h3 id="ropt.plan.Plan.get" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get</span><span class="p">(</span><span class="n">id_</span><span class="p">:</span> <span class="n">UUID</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
 </span></code></pre></div>
 
@@ -2906,11 +2903,11 @@ key.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.Plan.set" class="doc doc-heading">
+<h3 id="ropt.plan.Plan.set" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">set</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">set</span><span class="p">(</span><span class="nf">id_</span><span class="p">:</span> <span class="n">UUID</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
@@ -3023,14 +3020,14 @@ key.</p>
 
 
 
-<h3 id="ropt.plan.OptimizerContext" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">OptimizerContext</span>
+<h2 id="ropt.plan.OptimizerContext" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plan.OptimizerContext</span>
 
 
-</h3>
+</h2>
 
 
-    <div class="doc doc-contents ">
+    <div class="doc doc-contents first">
 
 
         <p>Manages shared state and resources for an optimization plan.</p>
@@ -3125,11 +3122,11 @@ information and tools.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.OptimizerContext.__init__" class="doc doc-heading">
+<h3 id="ropt.plan.OptimizerContext.__init__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">evaluator</span><span class="p">:</span> <span class="n">Evaluator</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">plugin_manager</span><span class="p">:</span> <span class="n">PluginManager</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3197,11 +3194,11 @@ plan. This includes a function evaluator and a plugin manager.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.OptimizerContext.add_observer" class="doc doc-heading">
+<h3 id="ropt.plan.OptimizerContext.add_observer" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">add_observer</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_observer</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">event</span><span class="p">:</span> <span class="n">EventType</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Event</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span>
@@ -3212,7 +3209,7 @@ plan. This includes a function evaluator and a plugin manager.</p>
         <p>Adds an observer function for a specific event type.</p>
 <p>Observer functions are called when an event of the specified type
 occurs during optimization. The provided callback function will receive
-an <a class="autorefs autorefs-internal" title="            Event
+an <a class="autorefs autorefs-internal" title="            ropt.plan.Event
 
 
   
@@ -3253,12 +3250,12 @@ event.</p>
                 <code>callback</code>
             </td>
             <td>
-                  <code><span title="typing.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="            Event
+                  <code><span title="typing.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="            ropt.plan.Event
 
 
   
       dataclass
-   (ropt.plan.Event)" href="#ropt.plan.Event">Event</a>], None]</code>
+  " href="#ropt.plan.Event">Event</a>], None]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3303,11 +3300,11 @@ event.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plan.OptimizerContext.call_observers" class="doc doc-heading">
+<h3 id="ropt.plan.OptimizerContext.call_observers" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">call_observers</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">call_observers</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
@@ -3334,12 +3331,12 @@ event type.</p>
                 <code>event</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            Event
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plan.Event
 
 
   
       dataclass
-   (ropt.plan.Event)" href="#ropt.plan.Event">Event</a></code>
+  " href="#ropt.plan.Event">Event</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3370,18 +3367,18 @@ event type.</p>
 
 
 
-<h3 id="ropt.plan.Event" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">Event</span>
+<h2 id="ropt.plan.Event" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plan.Event</span>
 
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
   </span>
 
-</h3>
+</h2>
 
 
-    <div class="doc doc-contents ">
+    <div class="doc doc-contents first">
 
 
         <p>Stores data related to an optimization event.</p>
@@ -3467,15 +3464,6 @@ details.</p>
 
 
 
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
 
 
 
