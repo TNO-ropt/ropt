@@ -902,6 +902,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.Plugin.validate_options" class="md-nav__link">
+    <span class="md-ellipsis">
+      validate_options
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1435,6 +1444,15 @@
   <a href="#ropt.plugins.Plugin.allows_discovery" class="md-nav__link">
     <span class="md-ellipsis">
       allows_discovery
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.Plugin.validate_options" class="md-nav__link">
+    <span class="md-ellipsis">
+      validate_options
     </span>
   </a>
   
@@ -2220,6 +2238,95 @@ optimizer plugin does not define its own methods but launches methods
 from other plugins as an external process. Therefore, the <code>external</code>
 optimizer plugin must always be specified explicitly, and this method
 is overloaded to return False.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.plugins.Plugin.validate_options" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">validate_options</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">validate_options</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Validate the generic optimizer options.</p>
+<p>This method validates generic options passed to the plugin. Some plugins
+allow arbitrary options, which are interpreted by the backend and are
+not generally known to the <code>ropt</code> library. This method provides a way to
+optionally validate these options. It calls the [<code>validate_options</code>]
+class method of the specific optimization backend if it exists. An empty
+list is returned if the method does not exist.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>config</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The optimization configuration.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="list">list</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A list of error messages.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
 
     </div>
 
