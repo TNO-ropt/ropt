@@ -33,7 +33,7 @@ class DefaultTrackerHandler(ResultHandler):
         plan: Plan,
         *,
         what: Literal["best", "last"] = "best",
-        constraint_tolerance: float | None = 1e-10,
+        constraint_tolerance: float | None = None,
         sources: set[uuid.UUID] | None = None,
     ) -> None:
         """Initialize a default tracker results handler.
