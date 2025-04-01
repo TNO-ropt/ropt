@@ -343,10 +343,12 @@ class _JSONPipeCommunicator:
         return None
 
     def write(self, data: str | list[Any] | dict[str, Any]) -> bool:
-        class NumpyEncoder(json.JSONEncoder):
+        class CustomEncoder(json.JSONEncoder):
             def default(self, obj: Any) -> Any:  # noqa: ANN401
                 if isinstance(obj, np.ndarray):
                     return obj.tolist()
+                if isinstance(obj, Path):
+                    return str(obj)
                 return super().default(obj)
 
         if self._write_fd is None:
@@ -357,7 +359,7 @@ class _JSONPipeCommunicator:
             if mask & selectors.EVENT_WRITE:
                 os.write(
                     self._write_fd,
-                    f"{json.dumps(data, cls=NumpyEncoder)}\n{self.DELIMITER}\n".encode(),
+                    f"{json.dumps(data, cls=CustomEncoder)}\n{self.DELIMITER}\n".encode(),
                 )
                 return True
         return False
