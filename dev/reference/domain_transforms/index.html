@@ -4028,8 +4028,10 @@ constraints remain valid in the optimizer's space.</p>
 <span class="arithmatex">\(\mathbf{A} \mathbf{x} = \mathbf{b}\)</span>.</p>
 <p>When linearly transforming variables to the optimizer domain, the
 coefficients (<span class="arithmatex">\(\mathbf{A}\)</span>) and right-hand-side values (<span class="arithmatex">\(\mathbf{b}\)</span>)
-must be converted to remain valid. If the linear transformation of the
-variables to the optimizer domain is given by:</p>
+must be converted to remain valid (see also the configuration for
+<a class="autorefs autorefs-internal" title="            LinearConstraintsConfig" href="../enopt_config/#ropt.config.enopt.LinearConstraintsConfig">linear constraints</a>). If the
+linear transformation of the variables to the optimizer domain is given
+by:</p>
 <div class="arithmatex">\[ \hat{\mathbf{x}} = \mathbf{S} \mathbf{x} + \mathbf{o}\]</div>
 <p>then the coefficients and right-hand-side values must be transformed as
 follows:</p>
