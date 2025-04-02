@@ -35,7 +35,8 @@ class DefaultPlanHandlerPlugin(PlanHandlerPlugin):
         ([`tracker`][ropt.plugins.plan._tracker.DefaultTrackerHandler]).
     """
 
-    def create(self, name: str, plan: Plan, **kwargs: dict[str, Any]) -> ResultHandler:
+    @classmethod
+    def create(cls, name: str, plan: Plan, **kwargs: dict[str, Any]) -> ResultHandler:
         """Create a result  handler.
 
         See the [ropt.plugins.plan.base.PlanPlugin][] abstract base class.
@@ -50,7 +51,8 @@ class DefaultPlanHandlerPlugin(PlanHandlerPlugin):
         msg = f"Unknown results handler object type: {name}"
         raise TypeError(msg)
 
-    def is_supported(self, method: str) -> bool:
+    @classmethod
+    def is_supported(cls, method: str) -> bool:
         """Check if a method is supported.
 
         See the [ropt.plugins.base.Plugin][] abstract base class.
@@ -72,7 +74,8 @@ class DefaultPlanStepPlugin(PlanStepPlugin):
         ([`optimizer`][ropt.plugins.plan.optimizer.DefaultOptimizerStep]).
     """
 
-    def create(self, name: str, plan: Plan, **kwargs: Any) -> PlanStep:  # noqa: ANN401
+    @classmethod
+    def create(cls, name: str, plan: Plan, **kwargs: Any) -> PlanStep:  # noqa: ANN401
         """Create a step.
 
         See the [ropt.plugins.plan.base.PlanPlugin][] abstract base class.
@@ -87,7 +90,8 @@ class DefaultPlanStepPlugin(PlanStepPlugin):
         msg = f"Unknown step type: {name}"
         raise TypeError(msg)
 
-    def is_supported(self, method: str) -> bool:
+    @classmethod
+    def is_supported(cls, method: str) -> bool:
         """Check if a method is supported.
 
         See the [ropt.plugins.base.Plugin][] abstract base class.

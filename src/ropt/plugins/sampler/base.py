@@ -1,10 +1,4 @@
-"""This module defines the abstract base class for samplers.
-
-Samplers can be added via the plugin mechanism to implement additional ways to
-generate perturbed variables. Any object that follows the
-[`Sampler`][ropt.plugins.sampler.base.Sampler] abstract base class may be
-installed as a plugin.
-"""
+"""This module defines the abstract base class for samplers."""
 
 from __future__ import annotations
 
@@ -31,8 +25,7 @@ class Sampler(ABC):
     method used to generate samples used to create perturbed values.
     """
 
-    @abstractmethod
-    def __init__(
+    def __init__(  # noqa: B027
         self,
         enopt_config: EnOptConfig,
         sampler_index: int,
@@ -94,9 +87,10 @@ class Sampler(ABC):
 class SamplerPlugin(Plugin):
     """Abtract base class for sampler plugins."""
 
+    @classmethod
     @abstractmethod
     def create(
-        self,
+        cls,
         enopt_config: EnOptConfig,
         sampler_index: int,
         mask: NDArray[np.bool_] | None,

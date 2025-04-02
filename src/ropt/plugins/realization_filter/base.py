@@ -1,11 +1,4 @@
-"""This module defines the abstract base class for realization filters.
-
-Realization filters can be added via the plugin mechanism to implement
-additional ways to filter the realizations that are used to calculate functions
-and gradients. Any object that derives from the
-[`RealizationFilter`][ropt.plugins.realization_filter.base.RealizationFilter]
-abstract base class may be installed as a plugin.
-"""
+"""This module defines the abstract base class for realization filters."""
 
 from __future__ import annotations
 
@@ -24,8 +17,7 @@ if TYPE_CHECKING:
 class RealizationFilter(ABC):
     """Abstract base class for realization filter classes."""
 
-    @abstractmethod
-    def __init__(self, enopt_config: EnOptConfig, filter_index: int) -> None:  # D107
+    def __init__(self, enopt_config: EnOptConfig, filter_index: int) -> None:  # noqa: B027
         """Initialize the realization filter plugin.
 
         Args:
@@ -66,8 +58,9 @@ class RealizationFilter(ABC):
 class RealizationFilterPlugin(Plugin):
     """Abstract base class for realizationFilter plugins."""
 
+    @classmethod
     @abstractmethod
-    def create(self, enopt_config: EnOptConfig, filter_index: int) -> RealizationFilter:
+    def create(cls, enopt_config: EnOptConfig, filter_index: int) -> RealizationFilter:
         """Initialize the realization filter plugin.
 
         Args:

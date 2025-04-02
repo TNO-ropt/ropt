@@ -10,11 +10,13 @@ if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
 
 
-class TestPlugin(OptimizerPlugin):
-    def create(self, _0: EnOptConfig, _1: OptimizerCallback) -> None:  # type: ignore[override]
+class MockedPlugin(OptimizerPlugin):
+    @classmethod
+    def create(cls, _0: EnOptConfig, _1: OptimizerCallback) -> None:  # type: ignore[override]
         pass
 
-    def is_supported(self, method: str) -> bool:
+    @classmethod
+    def is_supported(cls, method: str) -> bool:
         return method.lower() in {"slsqp", "test"}
 
 
@@ -22,39 +24,39 @@ def test_default_plugins() -> None:
     plugin_manager = PluginManager()
 
     plugin = plugin_manager.get_plugin("optimizer", "slsqp")
-    assert isinstance(plugin, SciPyOptimizerPlugin)
+    assert issubclass(plugin, SciPyOptimizerPlugin)
 
 
 def test_default_plugins_full_spec() -> None:
     plugin_manager = PluginManager()
 
     plugin = plugin_manager.get_plugin("optimizer", "scipy/slsqp")
-    assert isinstance(plugin, SciPyOptimizerPlugin)
+    assert issubclass(plugin, SciPyOptimizerPlugin)
 
 
 def test_added_plugin() -> None:
     plugin_manager = PluginManager()
-    plugin_manager.add_plugin("optimizer", "test", TestPlugin())
+    plugin_manager.add_plugin("optimizer", "test", MockedPlugin)
 
     plugin = plugin_manager.get_plugin("optimizer", "test")
-    assert isinstance(plugin, TestPlugin)
+    assert issubclass(plugin, MockedPlugin)
 
     plugin = plugin_manager.get_plugin("optimizer", "slsqp")
-    assert isinstance(plugin, SciPyOptimizerPlugin)
+    assert issubclass(plugin, SciPyOptimizerPlugin)
 
     plugin = plugin_manager.get_plugin("optimizer", "test/slsqp")
-    assert isinstance(plugin, TestPlugin)
+    assert issubclass(plugin, MockedPlugin)
 
 
 def test_added_plugin_prioritize() -> None:
     plugin_manager = PluginManager()
-    plugin_manager.add_plugin("optimizer", "test", TestPlugin(), prioritize=True)
+    plugin_manager.add_plugin("optimizer", "test", MockedPlugin, prioritize=True)
 
     plugin = plugin_manager.get_plugin("optimizer", "test")
-    assert isinstance(plugin, TestPlugin)
+    assert issubclass(plugin, MockedPlugin)
 
     plugin = plugin_manager.get_plugin("optimizer", "slsqp")
-    assert isinstance(plugin, TestPlugin)
+    assert issubclass(plugin, MockedPlugin)
 
     plugin = plugin_manager.get_plugin("optimizer", "scipy/slsqp")
-    assert isinstance(plugin, SciPyOptimizerPlugin)
+    assert issubclass(plugin, SciPyOptimizerPlugin)

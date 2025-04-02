@@ -156,8 +156,9 @@ class DefaultFunctionEstimator(FunctionEstimator):
 class DefaultFunctionEstimatorPlugin(FunctionEstimatorPlugin):
     """Default filter estimator plugin class."""
 
+    @classmethod
     def create(
-        self, enopt_config: EnOptConfig, estimator_index: int
+        cls, enopt_config: EnOptConfig, estimator_index: int
     ) -> DefaultFunctionEstimator:
         """Initialize the realization filter plugin.
 
@@ -168,7 +169,8 @@ class DefaultFunctionEstimatorPlugin(FunctionEstimatorPlugin):
         """
         return DefaultFunctionEstimator(enopt_config, estimator_index)
 
-    def is_supported(self, method: str) -> bool:
+    @classmethod
+    def is_supported(cls, method: str) -> bool:
         """Check if a method is supported.
 
         See the [ropt.plugins.base.Plugin][] abstract base class.

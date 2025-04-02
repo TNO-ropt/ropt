@@ -1,8 +1,11 @@
 """This module implements the SciPy optimization plugin."""
 
+from __future__ import annotations
+
 import copy
 from functools import partial
 from typing import (
+    TYPE_CHECKING,
     Any,
     Callable,
     ClassVar,
@@ -19,12 +22,14 @@ from scipy.optimize import (
     minimize,
 )
 
-from ropt.config.enopt import EnOptConfig
 from ropt.enums import VariableType
 from ropt.plugins.optimizer.utils import validate_supported_constraints
 
 from .base import Optimizer, OptimizerCallback, OptimizerPlugin
 from .utils import NormalizedConstraints, get_masked_linear_constraints
+
+if TYPE_CHECKING:
+    from ropt.config.enopt import EnOptConfig
 
 _SUPPORTED_METHODS: Final[set[str]] = {
     name.lower()
@@ -511,8 +516,9 @@ class SciPyOptimizer(Optimizer):
 class SciPyOptimizerPlugin(OptimizerPlugin):
     """The SciPY optimizer plugin class."""
 
+    @classmethod
     def create(
-        self, config: EnOptConfig, optimizer_callback: OptimizerCallback
+        cls, config: EnOptConfig, optimizer_callback: OptimizerCallback
     ) -> SciPyOptimizer:
         """Initialize the optimizer plugin.
 
@@ -522,7 +528,8 @@ class SciPyOptimizerPlugin(OptimizerPlugin):
         """
         return SciPyOptimizer(config, optimizer_callback)
 
-    def is_supported(self, method: str) -> bool:
+    @classmethod
+    def is_supported(cls, method: str) -> bool:
         """Check if a method is supported.
 
         See the [ropt.plugins.base.Plugin][] abstract base class.

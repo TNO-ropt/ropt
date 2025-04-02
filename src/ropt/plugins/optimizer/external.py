@@ -184,8 +184,9 @@ class ExternalOptimizer(Optimizer):
 class ExternalOptimizerPlugin(OptimizerPlugin):
     """The external optimizer plugin class."""
 
+    @classmethod
     def create(
-        self, config: EnOptConfig, optimizer_callback: OptimizerCallback
+        cls, config: EnOptConfig, optimizer_callback: OptimizerCallback
     ) -> ExternalOptimizer:
         """Initialize the optimizer plugin.
 
@@ -195,7 +196,8 @@ class ExternalOptimizerPlugin(OptimizerPlugin):
         """
         return ExternalOptimizer(config, optimizer_callback)
 
-    def is_supported(self, method: str) -> bool:
+    @classmethod
+    def is_supported(cls, method: str) -> bool:
         """Check if a method is supported.
 
         See the [ropt.plugins.base.Plugin][] abstract base class.
@@ -204,8 +206,8 @@ class ExternalOptimizerPlugin(OptimizerPlugin):
         """
         return PluginManager().is_supported("optimizer", method)
 
-    @property
-    def allows_discovery(self) -> bool:
+    @classmethod
+    def allows_discovery(cls) -> bool:
         """Check if the plugin can be discovered automatically.
 
         See the [ropt.plugins.base.Plugin][] abstract base class.

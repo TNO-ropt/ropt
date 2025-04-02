@@ -1,11 +1,4 @@
-"""This module defines the abstract base classes for function estimators.
-
-Function estimators can be added via the plugin mechanism to implement
-additional ways to functions and gradient ensembles. Any object that adheres to
-the
-[`FunctionEstimator`][ropt.plugins.function_estimator.base.FunctionEstimator]
-base class may be installed as a plugin.
-"""
+"""This module defines the abstract base classes for function estimators."""
 
 from __future__ import annotations
 
@@ -24,8 +17,7 @@ if TYPE_CHECKING:
 class FunctionEstimator(ABC):
     """Abstract base class for function estimators."""
 
-    @abstractmethod
-    def __init__(self, enopt_config: EnOptConfig, estimator_index: int) -> None:
+    def __init__(self, enopt_config: EnOptConfig, estimator_index: int) -> None:  # noqa: B027
         """Initialize the function estimator object.
 
         Args:
@@ -82,9 +74,10 @@ class FunctionEstimator(ABC):
 class FunctionEstimatorPlugin(Plugin):
     """The function estimator plugin base class."""
 
+    @classmethod
     @abstractmethod
     def create(
-        self, enopt_config: EnOptConfig, estimator_index: int
+        cls, enopt_config: EnOptConfig, estimator_index: int
     ) -> FunctionEstimator:
         """Initialize the function estimator object.
 

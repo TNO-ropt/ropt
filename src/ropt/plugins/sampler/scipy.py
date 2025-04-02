@@ -194,8 +194,9 @@ class SciPySampler(Sampler):
 class SciPySamplerPlugin(SamplerPlugin):
     """Default sampler plugin class."""
 
+    @classmethod
     def create(
-        self,
+        cls,
         enopt_config: EnOptConfig,
         sampler_index: int,
         mask: NDArray[np.bool_] | None,
@@ -209,7 +210,8 @@ class SciPySamplerPlugin(SamplerPlugin):
         """
         return SciPySampler(enopt_config, sampler_index, mask, rng)
 
-    def is_supported(self, method: str) -> bool:
+    @classmethod
+    def is_supported(cls, method: str) -> bool:
         """Check if a method is supported.
 
         See the [ropt.plugins.base.Plugin][] abstract base class.

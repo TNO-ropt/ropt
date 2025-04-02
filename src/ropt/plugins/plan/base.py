@@ -31,9 +31,10 @@ class PlanHandlerPlugin(Plugin):
     [`ResultHandler`][ropt.plugins.plan.base.ResultHandler].
     """
 
+    @classmethod
     @abstractmethod
     def create(
-        self,
+        cls,
         name: str,
         plan: Plan,
         **kwargs: Any,  # noqa: ANN401
@@ -62,9 +63,10 @@ class PlanStepPlugin(Plugin):
     [`PlanStep`][ropt.plugins.plan.base.PlanStep].
     """
 
+    @classmethod
     @abstractmethod
     def create(
-        self,
+        cls,
         name: str,
         plan: Plan,
         **kwargs: Any,  # noqa: ANN401

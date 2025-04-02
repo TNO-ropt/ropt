@@ -336,8 +336,9 @@ def _get_cvar_weights_from_percentile(
 class DefaultRealizationFilterPlugin(RealizationFilterPlugin):
     """Default realization filter plugin class."""
 
+    @classmethod
     def create(
-        self, enopt_config: EnOptConfig, filter_index: int
+        cls, enopt_config: EnOptConfig, filter_index: int
     ) -> DefaultRealizationFilter:
         """Initialize the realization filter plugin.
 
@@ -348,7 +349,8 @@ class DefaultRealizationFilterPlugin(RealizationFilterPlugin):
         """
         return DefaultRealizationFilter(enopt_config, filter_index)
 
-    def is_supported(self, method: str) -> bool:
+    @classmethod
+    def is_supported(cls, method: str) -> bool:
         """Check if a method is supported.
 
         See the [ropt.plugins.base.Plugin][] abstract base class.

@@ -76,8 +76,7 @@ class Optimizer(ABC):
     the optimization process.
     """
 
-    @abstractmethod
-    def __init__(
+    def __init__(  # noqa: B027
         self, config: EnOptConfig, optimizer_callback: OptimizerCallback
     ) -> None:
         """Initialize an optimizer object.
@@ -110,7 +109,6 @@ class Optimizer(ABC):
         """
 
     @property
-    @abstractmethod
     def allow_nan(self) -> bool:
         """Return `True` if a `NaN` is a valid function value.
 
@@ -124,15 +122,16 @@ class Optimizer(ABC):
         Returns:
             `True` if `NaN` is allowed.
         """
+        return False
 
     @property
-    @abstractmethod
     def is_parallel(self) -> bool:
-        """Whether the current uses parallel evaluations.
+        """Whether the current method uses parallel evaluations.
 
         Returns:
             `True` if optimization is parallelized.
         """
+        return False
 
 
 class OptimizerPlugin(Plugin):
@@ -147,9 +146,10 @@ class OptimizerPlugin(Plugin):
     `create` function.
     """
 
+    @classmethod
     @abstractmethod
     def create(
-        self, config: EnOptConfig, optimizer_callback: OptimizerCallback
+        cls, config: EnOptConfig, optimizer_callback: OptimizerCallback
     ) -> Optimizer:
         """Create an optimizer.
 

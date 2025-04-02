@@ -59,14 +59,12 @@ class PluginManager:
         This will make the `MyOptimizer` class from the `my_optimizer_pkg`
         package available under the name `my_optimizer`. The `MyOptimizer` class
         will be used to create
-        [`Optimizer`][ropt.plugins.optimizer.base.Optimizer] objects and to
-        facilitate this, it should derive from the
-        [`OptimizerPlugin`][ropt.plugins.optimizer.base.OptimizerPlugin] class.
+        [`OptimizerPlugin`][ropt.plugins.optimizer.base.OptimizerPlugin] objects.
 
         Plugins can also be added dynamically using the `add_plugin` method.
         """
         # Built-in plugins, listed for all possible plugin types:
-        self._plugins: dict[PluginType, dict[str, Plugin]] = {
+        self._plugins: dict[PluginType, dict[str, type[Plugin]]] = {
             "optimizer": {},
             "sampler": {},
             "realization_filter": {},
@@ -83,7 +81,7 @@ class PluginManager:
         self,
         plugin_type: PluginType,
         name: str,
-        plugin: Plugin,
+        plugin: type[Plugin],
         *,
         prioritize: bool = False,
     ) -> None:
@@ -113,6 +111,21 @@ class PluginManager:
         else:
             self._plugins[plugin_type][name_lower] = plugin
 
+    def _get_plugin(self, plugin_type: PluginType, method: str) -> Any | None:  # noqa: ANN401
+        split_method = method.split("/", maxsplit=1)
+        if len(split_method) > 1:
+            plugin = self._plugins[plugin_type].get(split_method[0].lower())
+            if plugin and plugin.is_supported(split_method[1]):
+                return plugin
+        else:
+            if split_method[0] == "default":
+                msg = "Cannot specify 'default' method without a plugin name"
+                raise ConfigError(msg)
+            for plugin in self._plugins[plugin_type].values():
+                if plugin.allows_discovery() and plugin.is_supported(split_method[0]):
+                    return plugin
+        return None
+
     def get_plugin(self, plugin_type: PluginType, method: str) -> Any:  # noqa: ANN401
         """Retrieve a plugin by type and method name.
 
@@ -129,17 +142,8 @@ class PluginManager:
             plugin_type: The type of the plugin to retrieve.
             method:      The name of the method the plugin should provide.
         """
-        split_method = method.split("/", maxsplit=1)
-        if len(split_method) > 1:
-            plugin = self._plugins[plugin_type].get(split_method[0].lower())
-            if plugin and plugin.is_supported(split_method[1]):
-                return plugin
-        else:
-            if split_method[0] == "default":
-                msg = "Cannot specify 'default' method without a plugin name"
-            for plugin in self._plugins[plugin_type].values():
-                if plugin.allows_discovery and plugin.is_supported(split_method[0]):
-                    return plugin
+        if (plugin := self._get_plugin(plugin_type, method)) is not None:
+            return plugin
         msg = f"Method not found: {method}"
         raise ConfigError(msg)
 
@@ -156,15 +160,11 @@ class PluginManager:
             plugin_type: The type of the plugin to retrieve.
             method:      The name of the method the plugin should provide.
         """
-        try:
-            self.get_plugin(plugin_type, method)
-        except ConfigError:
-            return False
-        return True
+        return self._get_plugin(plugin_type, method) is not None
 
     def plugins(
         self, plugin_type: PluginType
-    ) -> Generator[tuple[str, Plugin], None, None]:
+    ) -> Generator[tuple[str, type[Plugin]], None, None]:
         """Generate a sequence of all plugins of a specified type.
 
         Args:
@@ -178,12 +178,12 @@ class PluginManager:
 
 
 @cache  # Without the cache, repeated calls are very slow
-def _from_entry_points(plugin_type: str) -> dict[str, Plugin]:
-    plugins: dict[str, Plugin] = {}
+def _from_entry_points(plugin_type: str) -> dict[str, type[Plugin]]:
+    plugins: dict[str, type[Plugin]] = {}
     for entry_point in entry_points().select(group=f"ropt.plugins.{plugin_type}"):
         plugin = entry_point.load()
-        plugins[entry_point.name] = plugin()
-        if not isinstance(plugins[entry_point.name], _PLUGIN_TYPES[plugin_type]):
+        plugins[entry_point.name] = plugin
+        if not issubclass(plugins[entry_point.name], _PLUGIN_TYPES[plugin_type]):
             msg = (
                 f"Incorrect type for {plugin_type} plugin `{entry_point.name}`"
                 f": {type(plugins[entry_point.name])}"

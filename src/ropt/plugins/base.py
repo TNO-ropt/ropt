@@ -12,8 +12,9 @@ class Plugin(ABC):
     `is_supported` method.
     """
 
+    @classmethod
     @abstractmethod
-    def is_supported(self, method: str) -> bool:
+    def is_supported(cls, method: str) -> bool:
         """Check whether a given method is supported.
 
         This method is called by the
@@ -28,8 +29,8 @@ class Plugin(ABC):
             True if the method is supported; otherwise, False.
         """
 
-    @property
-    def allows_discovery(self) -> bool:
+    @classmethod
+    def allows_discovery(cls) -> bool:
         """Check if the plugin can be discovered automatically.
 
         Normally, plugins may be discovered automatically by the plugin manager
