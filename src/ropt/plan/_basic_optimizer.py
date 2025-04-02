@@ -86,10 +86,10 @@ class BasicOptimizer:
         may be used to define custom steps, and handlers to modify the behavior
         of the optimization process.
 
-        Note: Custom handlers and steps
+        Note: Custom  steps
             The optional keyword arguments (`kwargs`) provide a mechanism to
-            inject custom steps or handlers into the optimization process. The
-            behavior is as follows:
+            inject a custom step into the optimization process. The behavior is
+            as follows:
 
             1.  **Custom Step Execution:** If a single keyword argument is
                 provided, the `BasicOptimizer` checks if a step with the same
@@ -97,13 +97,11 @@ class BasicOptimizer:
                 the key-value pair as input. Only one custom step can be
                 executed this way, if other keyword arguments are present an
                 error is raised. The custom step receives the `Plan` object and
-                may install a custom run function to be executed later.
-            2.  **Default Optimization and Custom Handlers:** If no custom step
-                is run, or if the custom step does not install a custom run
-                function, the default optimization process is used. In this
-                case, multiple keyword arguments are allowed. Each keyword is
-                checked to see if a handler with the same name exists. If so,
-                the handler is installed.
+                may install a custom run function to be executed later, or install
+                custom result handlers.
+            2.  **Default Optimization:** If no custom step is run, or if the
+                custom step does not install a custom run function, the default
+                optimization process is used.
             3.  **Callback Installation and Execution:** Finally, any callbacks
                 added via `set_abort_callback` or `set_results_callback` are
                 installed, and the appropriate run function is executed.
@@ -198,7 +196,7 @@ class BasicOptimizer:
                 raise TypeError(msg)
             plan.run_step(plan.add_step(key), **{key: value})
 
-        # If no custom function was installed, run the default function:
+        # If no custom function was installed, install the default function:
         if not plan.has_function():
             optimizer = plan.add_step("optimizer")
             tracker = plan.add_handler(
@@ -207,11 +205,6 @@ class BasicOptimizer:
                 sources={optimizer},
             )
             plan.add_function(_run_func)
-
-            # Add any optional custom handlers defined in the keyword arguments:
-            for key, value in self._kwargs.items():
-                if plan.handler_exists(key):
-                    plan.add_handler(key, sources={optimizer}, **{key: value})
 
         for event_type, function in self._observers:
             self._optimizer_context.add_observer(event_type, function)
