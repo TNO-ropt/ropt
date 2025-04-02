@@ -1643,7 +1643,8 @@ values using the <code>model_validate</code> method provided by <code>pydantic</
 The primary configuration class is
 <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>, and it contains nested
 configuration classes for various aspects of the optimization. To parse a
-configuration from a dictionary, use the <code>model_validate</code> class method:</p>
+configuration from a dictionary, use the
+<a class="autorefs autorefs-external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel.model_validate"><code>model_validate</code></a> class method:</p>
 <div class="language-py highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.config.enopt</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnOptConfig</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">config_dict</span> <span class="o">=</span> <span class="p">{</span>
@@ -1840,7 +1841,7 @@ either match the number of variables or have a size of one.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.realization_filters">realization_filters</span></code></td>
             <td>
-                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="            RealizationFilterConfig (ropt.config.enopt._realization_filter_config.RealizationFilterConfig)" href="#ropt.config.enopt.RealizationFilterConfig">RealizationFilterConfig</a>, ...]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            RealizationFilterConfig (ropt.config.enopt._realization_filter_config.RealizationFilterConfig)" href="#ropt.config.enopt.RealizationFilterConfig">RealizationFilterConfig</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1851,7 +1852,7 @@ either match the number of variables or have a size of one.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.function_estimators">function_estimators</span></code></td>
             <td>
-                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig (ropt.config.enopt._function_estimator_config.FunctionEstimatorConfig)" href="#ropt.config.enopt.FunctionEstimatorConfig">FunctionEstimatorConfig</a>, ...]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig (ropt.config.enopt._function_estimator_config.FunctionEstimatorConfig)" href="#ropt.config.enopt.FunctionEstimatorConfig">FunctionEstimatorConfig</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1862,7 +1863,7 @@ either match the number of variables or have a size of one.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.EnOptConfig.samplers">samplers</span></code></td>
             <td>
-                  <code><span title="tuple">tuple</span>[<a class="autorefs autorefs-internal" title="            SamplerConfig (ropt.config.enopt._sampler_config.SamplerConfig)" href="#ropt.config.enopt.SamplerConfig">SamplerConfig</a>, ...]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            SamplerConfig (ropt.config.enopt._sampler_config.SamplerConfig)" href="#ropt.config.enopt.SamplerConfig">SamplerConfig</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2519,7 +2520,7 @@ one successful realization.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.RealizationsConfig.realization_min_success">realization_min_success</span></code></td>
             <td>
-                  <code><span title="pydantic.NonNegativeInt">NonNegativeInt</span> | None</code>
+                  <code><a class="autorefs autorefs-external" title="pydantic.NonNegativeInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.NonNegativeInt">NonNegativeInt</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2618,7 +2619,7 @@ optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.method">method</span></code></td>
             <td>
-                  <code><span title="str">str</span></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2629,7 +2630,7 @@ optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.max_iterations">max_iterations</span></code></td>
             <td>
-                  <code><span title="pydantic.PositiveInt">PositiveInt</span> | None</code>
+                  <code><a class="autorefs autorefs-external" title="pydantic.PositiveInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.PositiveInt">PositiveInt</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2640,7 +2641,7 @@ optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.max_functions">max_functions</span></code></td>
             <td>
-                  <code><span title="pydantic.PositiveInt">PositiveInt</span> | None</code>
+                  <code><a class="autorefs autorefs-external" title="pydantic.PositiveInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.PositiveInt">PositiveInt</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2651,7 +2652,7 @@ optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.tolerance">tolerance</span></code></td>
             <td>
-                  <code><span title="pydantic.NonNegativeFloat">NonNegativeFloat</span> | None</code>
+                  <code><a class="autorefs autorefs-external" title="pydantic.NonNegativeFloat" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.NonNegativeFloat">NonNegativeFloat</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2662,7 +2663,7 @@ optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.speculative">speculative</span></code></td>
             <td>
-                  <code><span title="bool">bool</span></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2673,7 +2674,7 @@ optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.split_evaluations">split_evaluations</span></code></td>
             <td>
-                  <code><span title="bool">bool</span></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2684,7 +2685,7 @@ optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.parallel">parallel</span></code></td>
             <td>
-                  <code><span title="bool">bool</span></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2695,7 +2696,7 @@ optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.output_dir">output_dir</span></code></td>
             <td>
-                  <code><span title="pathlib.Path">Path</span> | None</code>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2706,7 +2707,7 @@ optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.options">options</span></code></td>
             <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>] | <span title="list">list</span>[<span title="str">str</span>] | None</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>] | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2717,7 +2718,7 @@ optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.stdout">stdout</span></code></td>
             <td>
-                  <code><span title="pathlib.Path">Path</span> | None</code>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2728,7 +2729,7 @@ optimizer:</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.OptimizerConfig.stderr">stderr</span></code></td>
             <td>
-                  <code><span title="pathlib.Path">Path</span> | None</code>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2835,7 +2836,7 @@ parallel plan evaluations.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.GradientConfig.number_of_perturbations">number_of_perturbations</span></code></td>
             <td>
-                  <code><span title="pydantic.PositiveInt">PositiveInt</span></code>
+                  <code><a class="autorefs autorefs-external" title="pydantic.PositiveInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.PositiveInt">PositiveInt</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2852,7 +2853,7 @@ parallel plan evaluations.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.GradientConfig.perturbation_min_success">perturbation_min_success</span></code></td>
             <td>
-                  <code><span title="pydantic.PositiveInt">PositiveInt</span> | None</code>
+                  <code><a class="autorefs autorefs-external" title="pydantic.PositiveInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.PositiveInt">PositiveInt</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2954,7 +2955,7 @@ conditions (see <a class="autorefs autorefs-internal" title="            Boundar
 
   
       module-attribute
-   (ropt.config.validated_types.ItemOrTuple)" href="../utilities/#ropt.config.validated_types.ItemOrTuple">ItemOrTuple</a>[<span title="int">int</span>]</code>
+   (ropt.config.validated_types.ItemOrTuple)" href="../utilities/#ropt.config.validated_types.ItemOrTuple">ItemOrTuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2965,7 +2966,7 @@ conditions (see <a class="autorefs autorefs-internal" title="            Boundar
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.GradientConfig.merge_realizations">merge_realizations</span></code></td>
             <td>
-                  <code><span title="bool">bool</span></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3045,7 +3046,7 @@ interpretation of these options depends on the selected method.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.FunctionEstimatorConfig.method">method</span></code></td>
             <td>
-                  <code><span title="str">str</span></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3056,7 +3057,7 @@ interpretation of these options depends on the selected method.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.FunctionEstimatorConfig.options">options</span></code></td>
             <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3138,7 +3139,7 @@ of these options depends on the selected method.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.RealizationFilterConfig.method">method</span></code></td>
             <td>
-                  <code><span title="str">str</span></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3149,7 +3150,7 @@ of these options depends on the selected method.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.RealizationFilterConfig.options">options</span></code></td>
             <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3231,7 +3232,7 @@ of perturbed values for all realizations.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.SamplerConfig.method">method</span></code></td>
             <td>
-                  <code><span title="str">str</span></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3242,7 +3243,7 @@ of perturbed values for all realizations.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.SamplerConfig.options">options</span></code></td>
             <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3253,7 +3254,7 @@ of perturbed values for all realizations.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.enopt.SamplerConfig.shared">shared</span></code></td>
             <td>
-                  <code><span title="bool">bool</span></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
             </td>
             <td>
               <div class="doc-md-description">
