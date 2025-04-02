@@ -1663,10 +1663,10 @@ of the optimization process.</p>
 
 
 <details class="note" open>
-  <summary>Custom handlers and steps</summary>
+  <summary>Custom  steps</summary>
   <p>The optional keyword arguments (<code>kwargs</code>) provide a mechanism to
-inject custom steps or handlers into the optimization process. The
-behavior is as follows:</p>
+inject a custom step into the optimization process. The behavior is
+as follows:</p>
 <ol>
 <li><strong>Custom Step Execution:</strong> If a single keyword argument is
     provided, the <code>BasicOptimizer</code> checks if a step with the same
@@ -1674,13 +1674,11 @@ behavior is as follows:</p>
     the key-value pair as input. Only one custom step can be
     executed this way, if other keyword arguments are present an
     error is raised. The custom step receives the <code>Plan</code> object and
-    may install a custom run function to be executed later.</li>
-<li><strong>Default Optimization and Custom Handlers:</strong> If no custom step
-    is run, or if the custom step does not install a custom run
-    function, the default optimization process is used. In this
-    case, multiple keyword arguments are allowed. Each keyword is
-    checked to see if a handler with the same name exists. If so,
-    the handler is installed.</li>
+    may install a custom run function to be executed later, or install
+    custom result handlers.</li>
+<li><strong>Default Optimization:</strong> If no custom step is run, or if the
+    custom step does not install a custom run function, the default
+    optimization process is used.</li>
 <li><strong>Callback Installation and Execution:</strong> Finally, any callbacks
     added via <code>set_abort_callback</code> or <code>set_results_callback</code> are
     installed, and the appropriate run function is executed.</li>
