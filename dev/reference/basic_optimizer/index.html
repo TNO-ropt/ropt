@@ -1671,11 +1671,12 @@ as follows:</p>
 <li><strong>Custom Step Execution:</strong> If a single keyword argument is
     provided, the <code>BasicOptimizer</code> checks if a step with the same
     name exists. If so, that step is executed immediately, receiving
-    the key-value pair as input. Only one custom step can be
-    executed this way, if other keyword arguments are present an
-    error is raised. The custom step receives the <code>Plan</code> object and
-    may install a custom run function to be executed later, or install
-    custom result handlers.</li>
+    the key-value pair as a keyword input, together with the
+    transforms passed via a <code>transforms</code> keyword. Only one custom
+    step can be executed this way, if other keyword arguments are
+    present an error is raised. The custom step receives the <code>Plan</code>
+    object and may install a custom run function to be executed
+    later, or install custom result handlers.</li>
 <li><strong>Default Optimization:</strong> If no custom step is run, or if the
     custom step does not install a custom run function, the default
     optimization process is used.</li>
@@ -1925,11 +1926,7 @@ value.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_results_callback</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">transformed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_results_callback</span><span class="p">(</span><span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1938,48 +1935,10 @@ value.</p>
 <p>The provided callback function will be invoked whenever new results
 become available during the optimization process. This allows for
 real-time monitoring and analysis of the optimization's progress.</p>
-<p>The required signature of the callback function depends on the
-<code>transformed</code> parameter:</p>
-<ul>
-<li>
-<p>If <code>transformed</code> is <code>False</code> (default), the callback should accept a
-    single argument: a tuple of
-    <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> objects. The
-    signature should be:</p>
+<p>The required signature of the callback function should be:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">callback</span><span class="p">(</span><span class="n">results</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">...</span>
 </span></code></pre></div>
-</li>
-<li>
-<p>If <code>transformed</code> is <code>True</code>, the callback should accept two
-    arguments: a tuple of the original
-    <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> objects and a
-    tuple of the transformed
-    <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> objects. The
-    signature should be:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">callback</span><span class="p">(</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">results</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">transformed_results</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">FunctionResults</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="o">...</span>
-</span></code></pre></div>
-</li>
-</ul>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2007,22 +1966,6 @@ real-time monitoring and analysis of the optimization's progress.</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>transformed</code>
-            </td>
-            <td>
-                  <code><span title="bool">bool</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If <code>True</code>, also pass the transformed results to the callback.</p>
-              </div>
-            </td>
-            <td>
-                  <code>False</code>
             </td>
           </tr>
       </tbody>

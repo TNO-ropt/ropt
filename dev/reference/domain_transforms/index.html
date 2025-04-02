@@ -1924,10 +1924,16 @@ for:</p>
     method is used to create new <code>Results</code> objects with the transformed values.
     For example,
     <a class="autorefs autorefs-internal" title="            run" href="../default_plan_plugin/#ropt.plugins.plan.optimizer.DefaultOptimizerStep.run"><code>DefaultOptimizerStep.run</code></a>
-    emits events that include a dictionary with <code>"results"</code> and
-    <code>"transformed_results"</code> keys. The <code>"results"</code> key contains <code>Results</code> objects
-    in the user domain, while <code>"transformed_results"</code> contains the original
-    <code>Results</code> objects in the optimizer domain.</li>
+    emits events that include a dictionary with a <code>"results"</code> key That contains
+    <code>Results</code> objects in the  optimizer domain. To obtain results in the user
+    domain they must be converted using the
+    <a class="autorefs autorefs-internal" title="            transform_from_optimizer
+
+
+  
+      abstractmethod
+  " href="../results/#ropt.results.Results.transform_from_optimizer"><code>transform_from_optimizer</code></a>
+    method.</li>
 </ol>
 <p><strong>Provided Classes:</strong></p>
 <ul>
