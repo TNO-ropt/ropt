@@ -100,7 +100,10 @@ class DefaultOptimizerStep(PlanStep):
 
         if variables is None:
             variables = self._config.variables.initial_values
-        variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
+        else:
+            variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
+            if transforms is not None and transforms.variables is not None:
+                variables = transforms.variables.to_optimizer(variables)
 
         ensemble_evaluator = EnsembleEvaluator(
             self._config,
@@ -160,14 +163,7 @@ class DefaultOptimizerStep(PlanStep):
                 for item in results:
                     item.metadata = deepcopy(self._metadata)
 
-            data: dict[str, Any] = {}
-            if self._transforms is not None:
-                data["transformed_results"] = results
-                data["results"] = [
-                    item.transform_from_optimizer(self._transforms) for item in results
-                ]
-            else:
-                data["results"] = results
+            data: dict[str, Any] = {"results": results}
             self.emit_event(
                 Event(
                     event_type=EventType.FINISHED_EVALUATION,

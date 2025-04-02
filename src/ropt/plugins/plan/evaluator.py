@@ -51,7 +51,7 @@ class DefaultEvaluatorStep(PlanStep):
 
     def run(  # type: ignore[override]
         self,
-        config: Any,  # noqa: ANN401
+        config: dict[str, Any] | EnOptConfig,
         transforms: OptModelTransforms | None = None,
         variables: ArrayLike | None = None,
         metadata: dict[str, Any] | None = None,
@@ -87,7 +87,10 @@ class DefaultEvaluatorStep(PlanStep):
 
         if variables is None:
             variables = config.variables.initial_values
-        variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
+        else:
+            variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
+            if transforms is not None and transforms.variables is not None:
+                variables = transforms.variables.to_optimizer(variables)
 
         ensemble_evaluator = EnsembleEvaluator(
             config,
@@ -121,14 +124,7 @@ class DefaultEvaluatorStep(PlanStep):
             for item in results:
                 item.metadata = deepcopy(metadata)
 
-        data: dict[str, Any] = {}
-        if transforms is not None:
-            data["transformed_results"] = results
-            data["results"] = [
-                item.transform_from_optimizer(transforms) for item in results
-            ]
-        else:
-            data["results"] = results
+        data: dict[str, Any] = {"results": results}
 
         self.emit_event(
             Event(

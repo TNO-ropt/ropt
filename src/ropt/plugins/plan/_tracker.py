@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
     from ropt.plan import Event, Plan
     from ropt.results import FunctionResults
+    from ropt.transforms import OptModelTransforms
 
 
 class DefaultTrackerHandler(ResultHandler):
@@ -35,6 +36,7 @@ class DefaultTrackerHandler(ResultHandler):
         what: Literal["best", "last"] = "best",
         constraint_tolerance: float | None = None,
         sources: set[uuid.UUID] | None = None,
+        transforms: OptModelTransforms | None = None,
     ) -> None:
         """Initialize a default tracker results handler.
 
@@ -52,16 +54,25 @@ class DefaultTrackerHandler(ResultHandler):
         should be tracked. Only results from steps whose IDs are included in
         this set will be considered.
 
+        Tracking of results is based on the results in the optimizer domain, and
+        the tracked results are accessible via the `"results"` key. If the
+        `transforms` argument is not `None`, tracking still occurs in the
+        optimizer domain, but the results accessible via the `"results"` key are
+        transformed to the user domain.
+
         Args:
             plan:                 The plan this handler is part of.
             what:                 Specifies whether to track the "best" or "last" result.
             constraint_tolerance: Constraint tolerance for filtering results.
             sources:              A set of UUIDs of steps whose results to track.
+            transforms:           Optional transforms to apply to the final results.
         """
         super().__init__(plan)
         self._what = what
         self._constraint_tolerance = constraint_tolerance
         self._sources = set() if sources is None else sources
+        self._transforms = transforms
+        self._tracked_results: FunctionResults | None = None
         self["results"] = None
 
     def handle_event(self, event: Event) -> None:
@@ -76,21 +87,25 @@ class DefaultTrackerHandler(ResultHandler):
             and event.source in self._sources
         ):
             results = event.data["results"]
-            transformed_results = event.data.get("transformed_results", results)
+            if self["results"] is None:
+                self._tracked_results = None
             filtered_results: FunctionResults | None = None
             match self._what:
                 case "best":
                     filtered_results = _update_optimal_result(
-                        self["results"],
+                        self._tracked_results,
                         results,
-                        transformed_results,
                         self._constraint_tolerance,
                     )
                 case "last":
                     filtered_results = _get_last_result(
                         results,
-                        transformed_results,
                         self._constraint_tolerance,
                     )
             if filtered_results is not None:
+                self._tracked_results = filtered_results
+                if self._transforms is not None:
+                    filtered_results = filtered_results.transform_from_optimizer(
+                        self._transforms
+                    )
                 self["results"] = filtered_results

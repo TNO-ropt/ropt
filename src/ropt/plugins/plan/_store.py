@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     import uuid
 
     from ropt.plan import Event, Plan
+    from ropt.transforms import OptModelTransforms
 
 
 class DefaultStoreHandler(ResultHandler):
@@ -26,6 +27,7 @@ class DefaultStoreHandler(ResultHandler):
         plan: Plan,
         *,
         sources: set[uuid.UUID] | None = None,
+        transforms: OptModelTransforms | None = None,
     ) -> None:
         """Initialize a default store results handler object.
 
@@ -34,19 +36,21 @@ class DefaultStoreHandler(ResultHandler):
         emitted by the designated sources.
 
         The `sources` parameter determines which steps' results are tracked.
-        Only results from steps whose IDs are included in this set will be
-        stored. If `sources` is not provided or is `None`, results from all
-        sources are tracked.
 
         The stored results can be accessed via the `"results"` key. The
         results are stored as a tuple of `Results` objects.
 
+        If the `transforms` argument is not None, these are applied to transform
+        the results from the optimizer domain to the user domain.
+
         Args:
-            plan:    The plan that this handler is part of.
-            sources: The IDs of the steps whose results should be tracked.
+            plan:       The plan that this handler is part of.
+            sources:    The IDs of the steps whose results should be tracked.
+            transforms: Optional transforms to apply to the results.
         """
         super().__init__(plan)
         self._sources = set() if sources is None else sources
+        self._transforms = transforms
         self["results"] = None
 
     def handle_event(self, event: Event) -> None:
@@ -59,11 +63,12 @@ class DefaultStoreHandler(ResultHandler):
             event.event_type == EventType.FINISHED_EVALUATION
             and event.source in self._sources
         ):
-            results = event.data.get("results", None)
-            transformed_results = event.data.get("transformed_results", results)
-            if transformed_results is not None:
-                self["results"] = (
-                    transformed_results
-                    if self["results"] is None
-                    else (*self["results"], *transformed_results)
+            if (results := event.data.get("results", None)) is None:
+                return
+            if self._transforms is not None:
+                results = (
+                    item.transform_from_optimizer(self._transforms) for item in results
                 )
+            self["results"] = (
+                results if self["results"] is None else (*self["results"], *results)
+            )

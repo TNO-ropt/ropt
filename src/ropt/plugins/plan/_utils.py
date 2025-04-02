@@ -42,19 +42,16 @@ def _violates_constraint(results: Results, tolerance: float | None) -> bool:
 
 def _get_last_result(
     results: tuple[Results, ...],
-    transformed_results: tuple[Results, ...],
     constraint_tolerance: float | None,
 ) -> FunctionResults | None:
     return next(
         (
             item
-            for item, transformed_item in zip(
-                reversed(results), reversed(transformed_results), strict=False
-            )
+            for item in reversed(results)
             if (
                 isinstance(item, FunctionResults)
                 and item.functions is not None
-                and not _violates_constraint(transformed_item, constraint_tolerance)
+                and not _violates_constraint(item, constraint_tolerance)
             )
         ),
         None,
@@ -64,15 +61,14 @@ def _get_last_result(
 def _update_optimal_result(
     optimal_result: FunctionResults | None,
     results: tuple[Results, ...],
-    transformed_results: tuple[Results, ...],
     constraint_tolerance: float | None,
 ) -> FunctionResults | None:
     return_result: FunctionResults | None = None
-    for item, transformed_item in zip(results, transformed_results, strict=False):
+    for item in results:
         if (
-            isinstance(transformed_item, FunctionResults)
-            and transformed_item.functions is not None
-            and not _violates_constraint(transformed_item, constraint_tolerance)
+            isinstance(item, FunctionResults)
+            and item.functions is not None
+            and not _violates_constraint(item, constraint_tolerance)
         ):
             assert isinstance(item, FunctionResults)
             new_optimal_result = _get_new_optimal_result(optimal_result, item)

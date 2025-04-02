@@ -65,10 +65,11 @@ for:
     method is used to create new `Results` objects with the transformed values.
     For example,
     [`DefaultOptimizerStep.run`][ropt.plugins.plan.optimizer.DefaultOptimizerStep.run]
-    emits events that include a dictionary with `"results"` and
-    `"transformed_results"` keys. The `"results"` key contains `Results` objects
-    in the user domain, while `"transformed_results"` contains the original
-    `Results` objects in the optimizer domain.
+    emits events that include a dictionary with a `"results"` key That contains
+    `Results` objects in the  optimizer domain. To obtain results in the user
+    domain they must be converted using the
+    [`transform_from_optimizer`][ropt.results.Results.transform_from_optimizer]
+    method.
 
 
 **Provided Classes:**

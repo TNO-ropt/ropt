@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import partial
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -138,24 +139,20 @@ class ObjectiveScaler(ObjectiveTransform):
         return objectives * self._scales
 
 
-@pytest.mark.parametrize("speculative", [True, False])
 def test_objective_with_scaler(
-    enopt_config: Any, evaluator: Any, test_functions: Any, speculative: bool
+    enopt_config: Any, evaluator: Any, test_functions: Any
 ) -> None:
     checked = False
 
-    def check_value(
-        _: tuple[Results, ...], transformed_results: tuple[Results, ...]
-    ) -> None:
+    def check_value(results: tuple[Results, ...], value: float) -> None:
         nonlocal checked
-        for item in transformed_results:
+        for item in results:
             if isinstance(item, FunctionResults) and not checked:
                 checked = True
                 assert item.functions is not None
                 assert item.functions.objectives is not None
-                assert np.allclose(item.functions.objectives[-1], 1.0)
+                assert np.allclose(item.functions.objectives[-1], value)
 
-    enopt_config["optimizer"]["speculative"] = speculative
     config = EnOptConfig.model_validate(enopt_config)
 
     results1 = BasicOptimizer(enopt_config, evaluator()).run().results
@@ -175,7 +172,7 @@ def test_objective_with_scaler(
         EnOptConfig.model_validate(enopt_config, context=transforms),
         evaluator(),
         transforms=transforms,
-    ).set_results_callback(check_value, transformed=True)
+    ).set_results_callback(partial(check_value, value=init1))
     results2 = optimizer.run().results
     assert results2 is not None
     assert np.allclose(results2.evaluations.variables, variables1, atol=0.02)
@@ -204,11 +201,9 @@ class ConstraintScaler(NonLinearConstraintTransform):
         return lower_diffs * self._scales, upper_diffs * self._scales
 
 
-@pytest.mark.parametrize("speculative", [True, False])
 def test_constraint_with_scaler(
-    enopt_config: Any, evaluator: Any, test_functions: Any, speculative: bool
+    enopt_config: Any, evaluator: Any, test_functions: Any
 ) -> None:
-    enopt_config["optimizer"]["speculative"] = speculative
     enopt_config["nonlinear_constraints"] = {
         "lower_bounds": 0.4,
         "upper_bounds": np.inf,
@@ -230,19 +225,19 @@ def test_constraint_with_scaler(
     check = True
 
     def check_constraints(
-        _: tuple[Results, ...], transformed_results: tuple[Results, ...]
+        results: tuple[Results, ...], values: NDArray[np.float64]
     ) -> None:
         nonlocal check
-        for item in transformed_results:
+        for item in results:
             if isinstance(item, FunctionResults) and check:
                 check = False
                 assert item.functions is not None
                 assert item.functions.constraints is not None
-                assert np.allclose(item.functions.constraints, 1.0)
+                assert np.allclose(item.functions.constraints, values)
 
     BasicOptimizer(
         config, evaluator(test_functions), transforms=transforms
-    ).set_results_callback(check_constraints, transformed=True).run()
+    ).set_results_callback(partial(check_constraints, values=scales)).run()
 
 
 @pytest.mark.parametrize("offsets", [None, np.array([1.0, 1.1, 1.2])])

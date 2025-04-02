@@ -94,11 +94,12 @@ class BasicOptimizer:
             1.  **Custom Step Execution:** If a single keyword argument is
                 provided, the `BasicOptimizer` checks if a step with the same
                 name exists. If so, that step is executed immediately, receiving
-                the key-value pair as input. Only one custom step can be
-                executed this way, if other keyword arguments are present an
-                error is raised. The custom step receives the `Plan` object and
-                may install a custom run function to be executed later, or install
-                custom result handlers.
+                the key-value pair as a keyword input, together with the
+                transforms passed via a `transforms` keyword. Only one custom
+                step can be executed this way, if other keyword arguments are
+                present an error is raised. The custom step receives the `Plan`
+                object and may install a custom run function to be executed
+                later, or install custom result handlers.
             2.  **Default Optimization:** If no custom step is run, or if the
                 custom step does not install a custom run function, the default
                 optimization process is used.
@@ -194,7 +195,9 @@ class BasicOptimizer:
             if len(self._kwargs) > 1:
                 msg = "Only one custom step is allowed."
                 raise TypeError(msg)
-            plan.run_step(plan.add_step(key), **{key: value})
+            plan.run_step(
+                plan.add_step(key), transforms=self._transforms, **{key: value}
+            )
 
         # If no custom function was installed, install the default function:
         if not plan.has_function():
@@ -203,6 +206,7 @@ class BasicOptimizer:
                 "tracker",
                 constraint_tolerance=self._constraint_tolerance,
                 sources={optimizer},
+                transforms=self._transforms,
             )
             plan.add_function(_run_func)
 
@@ -246,8 +250,6 @@ class BasicOptimizer:
     def set_results_callback(
         self,
         callback: Callable[..., None],
-        *,
-        transformed: bool = False,
     ) -> Self:
         """Set a callback to report new results.
 
@@ -255,37 +257,15 @@ class BasicOptimizer:
         become available during the optimization process. This allows for
         real-time monitoring and analysis of the optimization's progress.
 
-        The required signature of the callback function depends on the
-        `transformed` parameter:
+        The required signature of the callback function should be:
 
-        -   If `transformed` is `False` (default), the callback should accept a
-            single argument: a tuple of
-            [`FunctionResults`][ropt.results.FunctionResults] objects. The
-            signature should be:
-
-            ```python
-            def callback(results: tuple[FunctionResults, ...]) -> None:
-                ...
-            ```
-
-        -   If `transformed` is `True`, the callback should accept two
-            arguments: a tuple of the original
-            [`FunctionResults`][ropt.results.FunctionResults] objects and a
-            tuple of the transformed
-            [`FunctionResults`][ropt.results.FunctionResults] objects. The
-            signature should be:
-
-            ```python
-            def callback(
-                results: tuple[FunctionResults, ...],
-                transformed_results: tuple[FunctionResults, ...],
-            ) -> None:
-                ...
-            ```
+        ```python
+        def callback(results: tuple[FunctionResults, ...]) -> None:
+            ...
+        ```
 
         Args:
-            callback:    The callable that will be invoked to report new results.
-            transformed: If `True`, also pass the transformed results to the callback.
+            callback: The callable that will be invoked to report new results.
 
         Returns:
             The `BasicOptimizer` instance, allowing for method chaining.
@@ -293,12 +273,11 @@ class BasicOptimizer:
 
         def _results_callback(event: Event) -> None:
             results = event.data.get("results", ())
-            if transformed:
-                transformed_results = event.data.get("transformed_results", ())
-                if results or transformed_results:
-                    callback(results, transformed_results)
-            elif results:
-                callback(results)
+            if self._transforms is not None:
+                results = tuple(
+                    item.transform_from_optimizer(self._transforms) for item in results
+                )
+            callback(results)
 
         self._observers.append((EventType.FINISHED_EVALUATION, _results_callback))
         return self
