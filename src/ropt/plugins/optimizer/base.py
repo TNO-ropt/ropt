@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 from ropt.plugins.base import Plugin
 
@@ -159,4 +159,24 @@ class OptimizerPlugin(Plugin):
         Args:
             config:             The optimizer configuration to used.
             optimizer_callback: The optimizer callback.
+        """
+
+    @classmethod
+    def validate_options(
+        cls,
+        method: str,
+        options: dict[str, Any] | list[str] | None,
+    ) -> None:
+        """Validate the optimizer options.
+
+        This method validates generic, backend-specific options. This is a
+        default implementation that performs no validation . Subclasses can
+        override this method to provide custom validation logic.
+
+        Args:
+            method:  The optimization method.
+            options: The optimizer options.
+
+        Raises:
+            Exception: An exception detailing the errors.
         """
