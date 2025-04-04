@@ -2,8 +2,10 @@ from typing import Any
 
 import numpy as np
 import pytest
+from pydantic import ValidationError
 
 from ropt.plan import BasicOptimizer
+from ropt.plugins import PluginManager
 from ropt.plugins.optimizer.scipy import (
     _CONSTRAINT_REQUIRES_BOUNDS,
     _CONSTRAINT_SUPPORT_BOUNDS,
@@ -43,6 +45,18 @@ def enopt_config_fixture() -> dict[str, Any]:
             "perturbation_magnitudes": 0.01,
         },
     }
+
+
+def test_scipy_invalid_options(enopt_config: Any) -> None:
+    enopt_config["optimizer"]["options"] = {"foo": 1}
+    enopt_config["optimizer"]["method"] = "slsqp"
+
+    with pytest.raises(
+        ValidationError, match=r"Unknown or unsupported option\(s\): `foo`"
+    ):
+        PluginManager().get_plugin("optimizer", "slsqp").validate_options(
+            "slsqp", enopt_config["optimizer"]["options"]
+        )
 
 
 @pytest.mark.parametrize("method", sorted(_SUPPORTED - _REQUIRES_BOUNDS))

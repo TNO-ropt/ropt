@@ -2,9 +2,11 @@ from typing import Any
 
 import numpy as np
 import pytest
+from pydantic import ValidationError
 
 from ropt.enums import OptimizerExitCode
 from ropt.plan import BasicOptimizer
+from ropt.plugins._manager import PluginManager
 from ropt.results import FunctionResults, Results
 
 pytestmark = [pytest.mark.slow]
@@ -34,6 +36,17 @@ def test_external_run(enopt_config: Any, evaluator: Any) -> None:
     variables = BasicOptimizer(enopt_config, evaluator()).run().variables
     assert variables is not None
     assert np.allclose(variables, [0, 0, 0.5], atol=0.02)
+
+
+def test_external_invalid_options(enopt_config: Any) -> None:
+    enopt_config["optimizer"]["options"] = {"ftol": 0.1, "foo": 1}
+
+    method = enopt_config["optimizer"]["method"]
+    plugin = PluginManager().get_plugin("optimizer", method)
+    with pytest.raises(
+        ValidationError, match=r"Unknown or unsupported option\(s\): `foo`"
+    ):
+        plugin.validate_options(method, enopt_config["optimizer"]["options"])
 
 
 def test_external_max_functions_exceeded(enopt_config: Any, evaluator: Any) -> None:

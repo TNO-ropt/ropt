@@ -210,11 +210,26 @@ class ExternalOptimizerPlugin(OptimizerPlugin):
     def allows_discovery(cls) -> bool:
         """Check if the plugin can be discovered automatically.
 
-        See the [ropt.plugins.base.Plugin][] abstract base class.
+        See the [ropt.plugins.optimizer.base.OptimizerPlugin][] abstract base class.
 
         # noqa
         """
         return False
+
+    @classmethod
+    def validate_options(
+        cls, method: str, options: dict[str, Any] | list[str] | None
+    ) -> None:
+        """Validate the options of a given method.
+
+        See the [ropt.plugins.optimizer.base.OptimizerPlugin][] abstract base class.
+
+        # noqa
+        """
+        method = method.split("/", maxsplit=1)[1]
+        PluginManager().get_plugin("optimizer", method).validate_options(
+            method, options
+        )
 
 
 class _PluginOptimizer:

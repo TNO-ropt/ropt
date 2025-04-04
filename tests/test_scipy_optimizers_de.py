@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 from ropt.plan import BasicOptimizer
+from ropt.plugins import PluginManager
 
 pytestmark = [pytest.mark.slow]
 
@@ -40,6 +41,12 @@ def test_scipy_bound_constraints_de(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["variables"]["upper_bounds"] = [0.5, 0.5, 0.2]
     enopt_config["variables"]["initial_values"][0] = 0.2
     enopt_config["optimizer"]["options"] = {"seed": 1}
+
+    plugin_manager = PluginManager()
+    plugin = plugin_manager.get_plugin("optimizer", "differential_evolution")
+    plugin.validate_options(
+        "differential_evolution", enopt_config["optimizer"]["options"]
+    )
 
     variables = BasicOptimizer(enopt_config, evaluator()).run().variables
     assert variables is not None

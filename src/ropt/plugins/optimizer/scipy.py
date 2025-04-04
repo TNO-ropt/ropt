@@ -4,13 +4,7 @@ from __future__ import annotations
 
 import copy
 from functools import partial
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    ClassVar,
-    Final,
-)
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Final, Literal
 
 import numpy as np
 from numpy.typing import NDArray
@@ -22,6 +16,7 @@ from scipy.optimize import (
     minimize,
 )
 
+from ropt.config.options import OptionsSchemaModel
 from ropt.enums import VariableType
 from ropt.plugins.optimizer.utils import validate_supported_constraints
 
@@ -532,8 +527,174 @@ class SciPyOptimizerPlugin(OptimizerPlugin):
     def is_supported(cls, method: str) -> bool:
         """Check if a method is supported.
 
-        See the [ropt.plugins.base.Plugin][] abstract base class.
+        See the [ropt.plugins.optimizer.base.OptimizerPlugin][] abstract base class.
 
         # noqa
         """
         return method.lower() in (_SUPPORTED_METHODS | {"default"})
+
+    @classmethod
+    def validate_options(
+        cls, method: str, options: dict[str, Any] | list[str] | None
+    ) -> None:
+        """Validate the options of a given method.
+
+        See the [ropt.plugins.optimizer.base.OptimizerPlugin][] abstract base class.
+
+        # noqa
+        """
+        if options is not None:
+            OptionsSchemaModel.model_validate(_OPTIONS_SCHEMA).get_options_model(
+                method
+            ).model_validate(options)
+
+
+_OPTIONS_SCHEMA: dict[str, Any] = {
+    "url": "https://docs.scipy.org/doc/scipy/reference/optimize.html",
+    "methods": {
+        "Nelder-Mead": {
+            "options": {
+                "disp": bool,
+                "maxiter": int,
+                "maxfev": int,
+                "xatol": float,
+                "fatol": float,
+                "adaptive": bool,
+            },
+            "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-neldermead.html",
+        },
+        "Powell": {
+            "options": {
+                "disp": bool,
+                "xtol": float,
+                "ftol": float,
+                "maxiter": int,
+                "maxfev": int,
+            },
+            "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-powell.html",
+        },
+        "CG": {
+            "options": {
+                "disp": bool,
+                "maxiter": int,
+                "gtol": float,
+                "norm": float,
+                "eps": float,
+                "finite_diff_rel_step": float,
+                "c1": float,
+                "c2": float,
+            },
+            "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-cg.html",
+        },
+        "BFGS": {
+            "options": {
+                "disp": bool,
+                "maxiter": int,
+                "gtol": float,
+                "norm": float,
+                "eps": float,
+                "finite_diff_rel_step": float,
+                "xrtol": float,
+                "c1": float,
+                "c2": float,
+            },
+            "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-bfgs.html",
+        },
+        "Newton-CG": {
+            "options": {
+                "disp": bool,
+                "xtol": float,
+                "maxiter": int,
+                "eps": float,
+                "c1": float,
+                "c2": float,
+            },
+            "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-newtoncg.html",
+        },
+        "L-BFGS-B": {
+            "options": {
+                "disp": int,
+                "maxcor": int,
+                "ftol": float,
+                "gtol": float,
+                "eps": float,
+                "maxfun": int,
+                "maxiter": int,
+                "iprint": int,
+                "maxls": int,
+                "finite_diff_rel_step": float,
+            },
+            "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-lbfgsb.html",
+        },
+        "TNC:": {
+            "options": {
+                "eps": float,
+                "scale": list[float],
+                "offset": float,
+                "disp": bool,
+                "maxCGit": int,
+                "eta": float,
+                "stepmx": float,
+                "accuracy": float,
+                "minfev": float,
+                "ftol": float,
+                "xtol": float,
+                "gtol": float,
+                "rescale": float,
+                "finite_diff_rel_step": float,
+                "maxfun": int,
+            },
+            "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-tnc.html",
+        },
+        "COBYLA": {
+            "options": {
+                "rhobeg": float,
+                "tol": float,
+                "disp": bool,
+                "maxiter": int,
+                "catol": float,
+            },
+            "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-cobyla.html",
+        },
+        "SLSQP": {
+            "options": {
+                "ftol": float,
+                "eps": float,
+                "disp": bool,
+                "maxiter": int,
+                "finite_diff_rel_step": float,
+            },
+            "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-slsqp.html",
+        },
+        "differential_evolution": {
+            "options": {
+                "strategy": Literal[
+                    "best1bin"
+                    "best1exp"
+                    "rand1bin"
+                    "rand1exp"
+                    "rand2bin"
+                    "rand2exp"
+                    "randtobest1bin"
+                    "randtobest1exp"
+                    "currenttobest1bin"
+                    "currenttobest1exp"
+                    "best2exp"
+                    "best2bin"
+                ],
+                "maxiter": int,
+                "popsize": int,
+                "tol": float,
+                "mutation": float | tuple[float, float],
+                "recombination": float,
+                "seed": int,
+                "disp": bool,
+                "polish": bool,
+                "init": Literal["latinhypercube", "sobol", "haltonrandom"],
+                "atol": float,
+                "updating": Literal["immediate", "deferred"],
+            },
+            "url": "https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.differential_evolution.html",
+        },
+    },
+}
