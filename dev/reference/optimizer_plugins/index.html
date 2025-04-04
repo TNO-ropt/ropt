@@ -1972,9 +1972,8 @@ implemented in the plugin.</p>
 
         <p>Validate the optimizer options.</p>
 <p>This method validates generic, backend-specific options. This is a
-default implementation that performs no validation and returns an empty
-list. Subclasses can override this method to provide custom validation
-logic.</p>
+default implementation that performs no validation . Subclasses can
+override this method to provide custom validation logic.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2035,11 +2034,11 @@ logic.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ExceptionGroup">ExceptionGroup</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#Exception">Exception</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An exception group containing all errors.</p>
+                <p>An exception detailing the errors.</p>
               </div>
             </td>
           </tr>
