@@ -48,7 +48,8 @@ The configuration classes are built using
 The primary configuration class is
 [`EnOptConfig`][ropt.config.enopt.EnOptConfig], and it contains nested
 configuration classes for various aspects of the optimization. To parse a
-configuration from a dictionary, use the `model_validate` class method:
+configuration from a dictionary, use the
+[`model_validate`][pydantic.BaseModel.model_validate] class method:
 
 ```py
 from ropt.config.enopt import EnOptConfig
@@ -82,30 +83,18 @@ config.variables.initial_values  # [1.0, 2.0]
 ```
 
 
-**Classes:**
-
-- [`EnOptConfig`][ropt.config.enopt.EnOptConfig]: The main configuration class
-  for an optimization step.
-- [`VariablesConfig`][ropt.config.enopt.VariablesConfig]: Configuration for
-  variables.
-- [`ObjectiveFunctionsConfig`][ropt.config.enopt.ObjectiveFunctionsConfig]:
-  Configuration for objective functions.
-- [`LinearConstraintsConfig`][ropt.config.enopt.LinearConstraintsConfig]:
-  Configuration for linear constraints.
-- [`NonlinearConstraintsConfig`][ropt.config.enopt.NonlinearConstraintsConfig]:
-  Configuration for non-linear constraints.
-- [`RealizationsConfig`][ropt.config.enopt.RealizationsConfig]: Configuration
-  for realizations.
-- [`OptimizerConfig`][ropt.config.enopt.OptimizerConfig]: Configuration for the
-  optimizer.
-- [`GradientConfig`][ropt.config.enopt.GradientConfig]: Configuration for
-  gradient calculations.
-- [`FunctionEstimatorConfig`][ropt.config.enopt.FunctionEstimatorConfig]:
-  Configuration for function estimators.
-- [`RealizationFilterConfig`][ropt.config.enopt.RealizationFilterConfig]:
-  Configuration for realization filters.
-- [`SamplerConfig`][ropt.config.enopt.SamplerConfig]: Configuration for
-  samplers.
+Classes:
+    EnOptConfig:                The main configuration class for an optimization step.
+    VariablesConfig:            Configuration for variables.
+    ObjectiveFunctionsConfig:   Configuration for objective functions.
+    LinearConstraintsConfig:    Configuration for linear constraints.
+    NonlinearConstraintsConfig: Configuration for non-linear constraints.
+    RealizationsConfig:         Configuration for realizations.
+    OptimizerConfig:            Configuration for the optimizer.
+    GradientConfig:             Configuration for gradient calculations.
+    FunctionEstimatorConfig:    Configuration for function estimators.
+    RealizationFilterConfig:    Configuration for realization filters.
+    SamplerConfig:              Configuration for samplers.
 """
 
 from ._enopt_config import EnOptConfig

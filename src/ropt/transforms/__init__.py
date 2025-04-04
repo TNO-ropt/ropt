@@ -72,14 +72,11 @@ for:
     method.
 
 
-**Provided Classes:**
-
-- **[`OptModelTransforms`][ropt.transforms.OptModelTransforms]:** A data
-  class for conveniently grouping and passing multiple transformation
-  objects.
-- **[`VariableScaler`][ropt.transforms.VariableScaler]:** A concrete
-  implementation of `VariableTransform` that performs linear scaling and
-  shifting.
+Classes:
+    OptModelTransforms: A data class for conveniently grouping and passing
+                        multiple transformation objects.
+    VariableScaler:     A concrete implementation of `VariableTransform`
+                        that performs linear scaling and shifting.
 """
 
 from ._transforms import OptModelTransforms

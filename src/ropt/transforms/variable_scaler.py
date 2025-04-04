@@ -143,8 +143,10 @@ class VariableScaler(VariableTransform):
 
         When linearly transforming variables to the optimizer domain, the
         coefficients ($\mathbf{A}$) and right-hand-side values ($\mathbf{b}$)
-        must be converted to remain valid. If the linear transformation of the
-        variables to the optimizer domain is given by:
+        must be converted to remain valid (see also the configuration for
+        [linear constraints][ropt.config.enopt.LinearConstraintsConfig]). If the
+        linear transformation of the variables to the optimizer domain is given
+        by:
 
         $$ \hat{\mathbf{x}} = \mathbf{S} \mathbf{x} + \mathbf{o}$$
 

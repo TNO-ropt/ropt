@@ -47,6 +47,5 @@ optimization problems:
   [`pydantic`](https://pydantic-docs.helpmanual.io/).
 - Support for tracking and processing optimization results generated during the
   optimization process.
-- Support for generating formatted tables of the results.
 - Optional support for exporting results as
   [`pandas`](https://pandas.pydata.org/) data frames.
