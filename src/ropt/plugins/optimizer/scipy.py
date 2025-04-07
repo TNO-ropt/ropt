@@ -83,48 +83,42 @@ _ConstraintType = str | Callable[..., float] | Callable[..., NDArray[np.float64]
 
 
 class SciPyOptimizer(Optimizer):
-    """Plugin class for optimization via SciPy.
+    """SciPy optimization backend for ropt.
 
-    This class implements several optimizers provided by SciPy in the
-    [`scipy.optimize`](https://docs.scipy.org/doc/scipy/tutorial/optimize.html)
-    package:
+    This class provides an interface to several optimization algorithms from
+    SciPy's `scipy.optimize` module, enabling their use within `ropt`. The
+    following optimizers are supported:
 
     - Nelder-Mead
     - Powell
-    - CG
-    - BFGS
-    - Newton-CG
-    - L-BFGS-B
-    - TNC
-    - COBYLA
-    - SLSQP
+    - CG (Conjugate Gradient)
+    - BFGS (Broyden-Fletcher-Goldfarb-Shanno)
+    - Newton-CG (Newton Conjugate Gradient)
+    - L-BFGS-B (Limited-memory BFGS with bounds)
+    - TNC (Truncated Newton)
+    - COBYLA (Constrained Optimization BY Linear Approximations)
+    - SLSQP (Sequential Least Squares Programming)
     - differential_evolution
 
-    The optimizer to use is selected by setting the `method` field in the
-    [`optimizer`][ropt.config.enopt.OptimizerConfig] field of
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] to the name of the algorithm.
-    Most of these methods support the general options set in the
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object. However, specific
-    options that are normally passed as arguments in the SciPy functions can be
-    provided via the `options` dictionary in the configuration object. Consult
-    the
+    To select an optimizer, set the `method` field within the
+    [`optimizer`][ropt.config.enopt.OptimizerConfig] section of the
+    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] configuration object to the
+    desired algorithm's name. Most methods support the general options defined
+    in the [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object. For
+    algorithm-specific options, use the `options` dictionary within the
+    configuration. Refer to the
     [`scipy.optimize`](https://docs.scipy.org/doc/scipy/tutorial/optimize.html)
-    manual for details on these options.
+    documentation for details on these options.
 
-    Not all constraints are supported by all optimizers:
+    Constraint Support:
 
-    - Bound constraints: Nelder-Mead, L-BFGS-B, SLSQP, TNC,
-      differential_evolution
-    - Linear constraints: SLSQP, differential_evolution
-    - Nonlinear constraints: COBYLA (only inequality), SLSQP,
-      differential_evolution
+    Not all optimizers support all types of constraints. Here's a breakdown:
 
-    Info:
-        - The Nelder-Mead algorithm only supports bound constraints if SciPy
-          version >= 1.7.
-        - Some SciPy algorithms that require a Hessian or a Hessian-vector
-          product are not supported. These include dogleg, trust-ncg,
-          trust-exact, and trust-krylov.
+    - **Bound Constraints:** Supported by Nelder-Mead, L-BFGS-B, SLSQP, TNC, and
+      differential_evolution.
+    - **Linear Constraints:** Supported by SLSQP and differential_evolution.
+    - **Nonlinear Constraints:** Supported by COBYLA (inequality constraints
+      only), SLSQP, and differential_evolution.
     """
 
     _supported_constraints: ClassVar[dict[str, set[str]]] = {
