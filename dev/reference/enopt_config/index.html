@@ -760,15 +760,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.config.options.OptionSchema" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptionSchema
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1662,15 +1653,6 @@
   <a href="#ropt.config.options.MethodSchemaModel" class="md-nav__link">
     <span class="md-ellipsis">
       MethodSchemaModel
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.config.options.OptionSchema" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptionSchema
     </span>
   </a>
   
@@ -3698,8 +3680,7 @@ plugin options, allowing for structured and type-safe configuration.</p>
             <td><code><a class="autorefs autorefs-internal" title="            OptionsSchemaModel (ropt.config.options.OptionsSchemaModel)" href="#ropt.config.options.OptionsSchemaModel">OptionsSchemaModel</a></code></td>
             <td>
               <div class="doc-md-description">
-                <p>Represents the overall schema for plugin options,
-including metadata like type, description, URL, and a list of methods.</p>
+                <p>Represents the overall schema for plugin options.</p>
               </div>
             </td>
           </tr>
@@ -3708,16 +3689,7 @@ including metadata like type, description, URL, and a list of methods.</p>
             <td>
               <div class="doc-md-description">
                 <p>Represents the schema for a specific method within a
-plugin, including its name, URL, description, and options.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><a class="autorefs autorefs-internal" title="            OptionSchema (ropt.config.options.OptionSchema)" href="#ropt.config.options.OptionSchema">OptionSchema</a></code></td>
-            <td>
-              <div class="doc-md-description">
-                <p>Represents the schema for a single option within a method,
-including its name and type.</p>
+plugin, including its name and options.</p>
               </div>
             </td>
           </tr>
@@ -3777,11 +3749,22 @@ describing a method supported by the plugin.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.options.OptionsSchemaModel.methods">methods</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-internal" title="            MethodSchemaModel (ropt.config.options.MethodSchemaModel)" href="#ropt.config.options.MethodSchemaModel">MethodSchemaModel</a>]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-internal" title="            MethodSchemaModel (ropt.config.options.MethodSchemaModel)" href="#ropt.config.options.MethodSchemaModel">MethodSchemaModel</a>[<a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
                 <p>A list of method schemas.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.options.OptionsSchemaModel.url">url</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An optional URL for the plugin.</p>
               </div>
             </td>
           </tr>
@@ -3794,23 +3777,17 @@ describing a method supported by the plugin.</p>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="p">{</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="s2">&quot;methods&quot;</span><span class="p">:</span> <span class="p">[</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>            <span class="p">{</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;method&quot;</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>                    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">},</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>                <span class="p">],</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">}</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>            <span class="p">},</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>            <span class="p">{</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>                <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span><span class="p">},</span>
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>            <span class="p">},</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>            <span class="p">{</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;method&quot;</span><span class="p">,</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>                <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">[</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>                    <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span><span class="p">},</span>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>                <span class="p">],</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>            <span class="p">},</span>
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>        <span class="p">]</span>
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="p">}</span>
-</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="p">)</span>
-</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>
-</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="n">options</span> <span class="o">=</span> <span class="n">schema</span><span class="o">.</span><span class="n">get_options_model</span><span class="p">(</span><span class="s2">&quot;method&quot;</span><span class="p">)</span>
-</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="nb">print</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">model_validate</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}))</span>  <span class="c1"># a=1.0 b=1</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="p">]</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="p">}</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p">)</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="n">options</span> <span class="o">=</span> <span class="n">schema</span><span class="o">.</span><span class="n">get_options_model</span><span class="p">(</span><span class="s2">&quot;method&quot;</span><span class="p">)</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="nb">print</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">model_validate</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}))</span>  <span class="c1"># a=1.0 b=1</span>
 </span></code></pre></div></p>
 
 
@@ -3851,18 +3828,6 @@ the options associated with a given method. It iterates through the
 defined methods, collecting option schemas from those matching the
 specified <code>method</code> name. The resulting model can then be used to
 validate dictionaries of options against the defined schema.</p>
-<p>The method returns a model that validates these option types:</p>
-<ul>
-<li>Optimizer:   Options that are already handled via optimizer options
-               are marked by the <code>optimizer</code> type. An error is raised if
-               such an option is encountered.</li>
-<li>Unsupported: Options that are not supported are marked by the
-               <code>unsupported</code> type. An error is raised if such an option
-               is encountered.</li>
-<li>Supported:   Regular options with a specified type. The values of
-               these are validated against the specified type.</li>
-<li>Unknown:     Unknown options are reported by raising an error.</li>
-</ul>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3944,14 +3909,13 @@ validate dictionaries of options against the defined schema.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="pydantic.BaseModel" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel">BaseModel</a></code></p>
+              Bases: <code><a class="autorefs autorefs-external" title="pydantic.BaseModel" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel">BaseModel</a></code>, <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="ropt.config.options.T">T</span>]</code></p>
 
 
         <p>Represents the schema for a specific method within a plugin.</p>
 <p>This class defines the structure for describing one or more methods
-supported by a plugin. It contains the name of the method and a list of
-<a class="autorefs autorefs-internal" title="            OptionSchema" href="#ropt.config.options.OptionSchema"><code>OptionSchema</code></a> objects, each describing
-an option for this method.</p>
+supported by a plugin. It contains a dictionary describing an option for
+this method.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3964,108 +3928,25 @@ an option for this method.</p>
         </tr>
       </thead>
       <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.options.MethodSchemaModel.name">name</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, ...]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The name of one or multiple methods that support give options.</p>
-              </div>
-            </td>
-          </tr>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.options.MethodSchemaModel.options">options</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-internal" title="            OptionSchema (ropt.config.options.OptionSchema)" href="#ropt.config.options.OptionSchema">OptionSchema</a>[<a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <span title="ropt.config.options.T">T</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A list of option schemas.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.config.options.OptionSchema" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">OptionSchema</span>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="pydantic.BaseModel" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel">BaseModel</a></code>, <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="ropt.config.options.T">T</span>]</code></p>
-
-
-        <p>Represents the schema for a single option within a method.</p>
-<p>This class defines the structure for describing a single option for a
-method. It includes the option's name and its type.</p>
-
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.options.OptionSchema.name">name</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The name of the option.</p>
+                <p>A list of option dictionaries.</p>
               </div>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.options.OptionSchema.type_">type_</span></code></td>
+            <td><code><span title="ropt.config.options.MethodSchemaModel.url">url</span></code></td>
             <td>
-                  <code><span title="ropt.config.options.T">T</span> | <a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>[&#39;unsupported&#39;, &#39;optimizer&#39;]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The type of the option.</p>
+                <p>An optional URL for the plugin.</p>
               </div>
             </td>
           </tr>
