@@ -1,3 +1,4 @@
+# ruff: noqa: SLF001
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -36,7 +37,7 @@ def test_default_plugins_full_spec() -> None:
 
 def test_added_plugin() -> None:
     plugin_manager = PluginManager()
-    plugin_manager.add_plugin("optimizer", "test", MockedPlugin)
+    plugin_manager._add_plugin("optimizer", "test", MockedPlugin)
 
     plugin = plugin_manager.get_plugin("optimizer", "test")
     assert issubclass(plugin, MockedPlugin)
@@ -50,7 +51,7 @@ def test_added_plugin() -> None:
 
 def test_added_plugin_prioritize() -> None:
     plugin_manager = PluginManager()
-    plugin_manager.add_plugin("optimizer", "test", MockedPlugin, prioritize=True)
+    plugin_manager._add_plugin("optimizer", "test", MockedPlugin, prioritize=True)
 
     plugin = plugin_manager.get_plugin("optimizer", "test")
     assert issubclass(plugin, MockedPlugin)

@@ -56,9 +56,9 @@ base class defining the required functionality for each plugin type:
 5. [`PlanStepPlugin`][ropt.plugins.plan.base.PlanStepPlugin]:
     Abstract base class for optimization plan object plugins.
 
-Plugins can be built-in, installed separately using the standard entry points
-mechanism, or added dynamically using the
-[`add_plugin`][ropt.plugins.PluginManager.add_plugin] method.
+Plugins are installed using the standard
+[entry points](https://packaging.python.org/en/latest/guides/creating-and-discovering-plugins/#using-package-metadata)
+mechanism of python).
 
 The plugin manager object provides the
 [`get_plugin`][ropt.plugins.PluginManager.get_plugin] method, which `ropt` uses

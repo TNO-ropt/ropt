@@ -60,8 +60,6 @@ class PluginManager:
         package available under the name `my_optimizer`. The `MyOptimizer` class
         will be used to create
         [`OptimizerPlugin`][ropt.plugins.optimizer.base.OptimizerPlugin] objects.
-
-        Plugins can also be added dynamically using the `add_plugin` method.
         """
         # Built-in plugins, listed for all possible plugin types:
         self._plugins: dict[PluginType, dict[str, type[Plugin]]] = {
@@ -75,9 +73,9 @@ class PluginManager:
 
         for plugin_type in self._plugins:
             for name, plugin in _from_entry_points(plugin_type).items():
-                self.add_plugin(plugin_type, name, plugin)
+                self._add_plugin(plugin_type, name, plugin)
 
-    def add_plugin(
+    def _add_plugin(
         self,
         plugin_type: PluginType,
         name: str,
@@ -85,21 +83,6 @@ class PluginManager:
         *,
         prioritize: bool = False,
     ) -> None:
-        """Add a plugin at runtime.
-
-        This method adds a plugins of a specific type to the plugin
-        manager. Normally it will be added at the end of the internal list
-        of plugins that may be searched for a method. However, if the `prioritize`
-        keyword is set, it will be added at the beginning of the list.
-
-        The plugin names are case-insensitive.
-
-        Args:
-            plugin_type: Type of the plugin.
-            name:        The name of the plugin.
-            plugin:      The plugin object.
-            prioritize:  If `True`, the plugin will be added to the beginning of list.
-        """
         name_lower = name.lower()
         if name_lower in self._plugins[plugin_type]:
             msg = f"Duplicate plugin name: {name_lower}"
