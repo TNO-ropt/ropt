@@ -1,0 +1,3692 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../evaluator/">
+      
+      
+        <link rel="next" href="../plugin_manager/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
+    
+    
+      
+        <title>Optimization Results - ropt Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.4af4bdda.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ropt.results" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="ropt Documentation" class="md-header__button md-logo" aria-label="ropt Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ropt Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Optimization Results
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="lime"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/TNO-ropt/ropt" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  About
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../usage/robust_optimization/" class="md-tabs__link">
+          
+  
+  
+  Usage
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../enopt_config/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="ropt Documentation" class="md-nav__button md-logo" aria-label="ropt Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    ropt Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/TNO-ropt/ropt" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    About
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Usage
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Usage
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/robust_optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/running/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Running Optimizations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../enopt_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Configuration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../domain_transforms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Domain transforms
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Optimization
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            Optimization
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Optimization Plans
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../basic_optimizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Basic Optimizer
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Optimization
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../evaluator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Function Evaluations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Optimization Results
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Optimization Results
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results" class="md-nav__link">
+    <span class="md-ellipsis">
+      results
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.Results" class="md-nav__link">
+    <span class="md-ellipsis">
+      Results
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Results">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.results.Results.transform_from_optimizer" class="md-nav__link">
+    <span class="md-ellipsis">
+      transform_from_optimizer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.results.Results.to_dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_dataframe
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.ResultField" class="md-nav__link">
+    <span class="md-ellipsis">
+      ResultField
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ResultField">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.results.ResultField.get_axes" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_axes
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.FunctionResults" class="md-nav__link">
+    <span class="md-ellipsis">
+      FunctionResults
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.GradientResults" class="md-nav__link">
+    <span class="md-ellipsis">
+      GradientResults
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.Functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Functions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.Gradients" class="md-nav__link">
+    <span class="md-ellipsis">
+      Gradients
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.FunctionEvaluations" class="md-nav__link">
+    <span class="md-ellipsis">
+      FunctionEvaluations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.GradientEvaluations" class="md-nav__link">
+    <span class="md-ellipsis">
+      GradientEvaluations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.Realizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Realizations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.ConstraintInfo" class="md-nav__link">
+    <span class="md-ellipsis">
+      ConstraintInfo
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.results_to_dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      results_to_dataframe
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Plugins
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Plugins
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plugin_manager/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Plugins
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Plan Plugins
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../optimizer_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Optimizer Plugins
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sampler_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Sampler Plugins
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../realization_filter_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Realization Filter Plugins
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../function_estimator_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Function estimator Plugins
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Default Plugins
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            Default Plugins
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_plan_plugin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Default Plan Plugin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scipy_optimizer_plugin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SciPy Optimizer Plugin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scipy_sampler_plugin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SciPy Sampler Plugin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_realization_filter_plugin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Default Realization Filter Plugin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_function_estimator_plugin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Default Function Estimator Plugin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../external_optimizer_plugin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    External Optimizer Plugin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../enums/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Enumerations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Exceptions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Utilities
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results" class="md-nav__link">
+    <span class="md-ellipsis">
+      results
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.Results" class="md-nav__link">
+    <span class="md-ellipsis">
+      Results
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Results">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.results.Results.transform_from_optimizer" class="md-nav__link">
+    <span class="md-ellipsis">
+      transform_from_optimizer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.results.Results.to_dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_dataframe
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.ResultField" class="md-nav__link">
+    <span class="md-ellipsis">
+      ResultField
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ResultField">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.results.ResultField.get_axes" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_axes
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.FunctionResults" class="md-nav__link">
+    <span class="md-ellipsis">
+      FunctionResults
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.GradientResults" class="md-nav__link">
+    <span class="md-ellipsis">
+      GradientResults
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.Functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Functions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.Gradients" class="md-nav__link">
+    <span class="md-ellipsis">
+      Gradients
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.FunctionEvaluations" class="md-nav__link">
+    <span class="md-ellipsis">
+      FunctionEvaluations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.GradientEvaluations" class="md-nav__link">
+    <span class="md-ellipsis">
+      GradientEvaluations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.Realizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Realizations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.ConstraintInfo" class="md-nav__link">
+    <span class="md-ellipsis">
+      ConstraintInfo
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.results.results_to_dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      results_to_dataframe
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>Optimization Results</h1>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="ropt.results" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.results</span>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Data classes for storing intermediate optimization results.</p>
+<p>During the optimization process, the calculation of functions and gradients
+generates data that needs to be reported. To facilitate this, new results are
+passed to callbacks as a sequence of <a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="#ropt.results.Results"><code>Results</code></a> objects.
+These objects can be instances of either the
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> or
+<a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="#ropt.results.GradientResults"><code>GradientResults</code></a> classes, which store the
+results of function and gradient evaluations, respectively.</p>
+<p>Much of the data within these result objects is multi-dimensional. For example,
+the <code>objectives</code> field, which is part of the nested
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionEvaluations
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionEvaluations"><code>evaluations</code></a> object within
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a>, is a two-dimensional <code>numpy</code>
+array. In this array, each column represents a different objective, and each row
+corresponds to a specific realization number.</p>
+<p>To simplify exporting and reporting, the identity of the axes in these
+multi-dimensional arrays is stored as metadata associated with each field. These
+fields are derived from the <a class="autorefs autorefs-internal" title="            ropt.results.ResultField
+
+
+  
+      dataclass
+  " href="#ropt.results.ResultField"><code>ResultField</code></a> class,
+which provides a <a class="autorefs autorefs-internal" title="            get_axes
+
+
+  
+      classmethod
+  " href="#ropt.results.ResultField.get_axes"><code>get_axes</code></a> class method
+for retrieving the axes. For instance, for the <code>objectives</code> field, this method
+would return:</p>
+<p><div class="language-py highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span><span class="w"> </span><span class="nn">ropt.results</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionEvaluations</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="o">&gt;&gt;&gt;</span> <span class="n">FunctionEvaluations</span><span class="o">.</span><span class="n">get_axes</span><span class="p">(</span><span class="s2">&quot;objectives&quot;</span><span class="p">)</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">(</span><span class="o">&lt;</span><span class="n">ResultAxis</span><span class="o">.</span><span class="n">REALIZATION</span><span class="p">:</span> <span class="s1">&#39;realization&#39;</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">ResultAxis</span><span class="o">.</span><span class="n">OBJECTIVE</span><span class="p">:</span> <span class="s1">&#39;objective&#39;</span><span class="o">&gt;</span><span class="p">)</span>
+</span></code></pre></div>
+Given that the first axis denotes realizations and the second axis denotes
+objectives, each row in the array represents the set of objective values for a
+specific realization. This metadata provides the necessary context for exporting
+and reporting code to associate each element in the result matrix with its
+corresponding realization and objective, as specified in the optimizer
+configuration. The pandas exporting code, for example, utilizes this information
+to construct a multi-index for the output DataFrame and to transform the
+multi-dimensional data into multiple columns.</p>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.results.Results" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.results.Results</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
+
+
+        <p>Abstract base class for storing optimization results.</p>
+<p>The <code>Results</code> class serves as a foundation for storing various types of
+optimization results. It is not intended to be instantiated directly but
+rather serves as a base for derived classes like
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> and
+<a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="#ropt.results.GradientResults"><code>GradientResults</code></a>, which hold the actual
+data.</p>
+<p>This class provides storage for the following generic information:</p>
+<ul>
+<li><strong>Batch ID:</strong> An optional identifier, potentially generated by the
+    function evaluator, that uniquely identifies a group of function
+    evaluations passed to the evaluator by teh optimizer.</li>
+<li><strong>Metadata:</strong> A dictionary for storing additional information generated
+    during optimization. This metadata can include various primitive values
+    that are not directly interpreted by the optimization code but are
+    useful for reporting and analysis.</li>
+</ul>
+<p>The derived classes, <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> and
+<a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="#ropt.results.GradientResults"><code>GradientResults</code></a>, extend this base class
+with specific attributes for storing function evaluation results and
+gradient evaluation results, respectively. These derived classes also
+provide methods for exporting the stored data.</p>
+<p>One key method provided by the <code>Results</code> class is
+<a class="autorefs autorefs-internal" title="            to_dataframe" href="#ropt.results.Results.to_dataframe"><code>to_dataframe</code></a>, which allows exporting
+the contents of a specific field, or a subset of its sub-fields, to a
+<code>pandas</code> DataFrame for further data analysis and reporting.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.Results.batch_id">batch_id</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the evaluation batch.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.Results.metadata">metadata</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary of metadata.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.results.Results.transform_from_optimizer" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">transform_from_optimizer</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">transform_from_optimizer</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">transforms</span><span class="p">:</span> <span class="n">OptModelTransforms</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Results</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Transform results from the optimizer domain to the user domain.</p>
+<p>During optimization, variables, objectives, and constraints are often
+transformed to a different domain (the optimizer domain) to enhance
+the performance and stability of the optimization algorithm. The
+<a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="#ropt.results.Results"><code>Results</code></a> objects produced during optimization
+are initially in the optimizer domain. This method reverses these
+transformations, mapping the results back to the user-defined domain.
+The transformations between the user and optimizer domains are defined
+by the classes in the <a class="autorefs autorefs-internal" title="            ropt.transforms" href="../domain_transforms/#ropt.transforms"><code>ropt.transforms</code></a> module.</p>
+<p>For instance, variables might have been scaled and shifted to a range
+more suitable for the optimizer. This method, using the provided
+<code>OptModelTransforms</code> object, applies the inverse scaling and shifting to
+restore the variables to their original scale and offset. Similarly,
+objectives and constraints are transformed back to the user domain.</p>
+<p>These transformations are defined and managed by the
+<a class="autorefs autorefs-internal" title="            ropt.transforms.OptModelTransforms
+
+
+  
+      dataclass
+  " href="../domain_transforms/#ropt.transforms.OptModelTransforms"><code>OptModelTransforms</code></a> object,
+which encapsulates the specific transformations for variables,
+objectives, and nonlinear constraints.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>transforms</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.transforms.OptModelTransforms
+
+
+  
+      dataclass
+   (ropt.transforms._transforms.OptModelTransforms)" href="../domain_transforms/#ropt.transforms.OptModelTransforms">OptModelTransforms</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The <code>OptModelTransforms</code> object containing the domain
+transformations to apply.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+   (ropt.results._results.Results)" href="#ropt.results.Results">Results</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A new <code>FunctionResults</code> object with all relevant data transformed</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+   (ropt.results._results.Results)" href="#ropt.results.Results">Results</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>back to the user domain.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.results.Results.to_dataframe" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">to_dataframe</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">to_dataframe</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">field_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">select</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">unstack</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ResultAxis</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">names</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Export a field to a pandas DataFrame.</p>
+<p>Exports the values of a single field to a <code>pandas</code> DataFrame.
+The field to export is selected by the <code>field_name</code> argument.
+Typically, such a field contains multiple sub-fields. By default,
+all sub-fields are exported as columns in the DataFrame, but a
+subset can be selected using the <code>select</code> argument.</p>
+<p>Sub-fields may be multi-dimensional arrays, which are exported in a
+stacked manner. Using the axis types found in the metadata, the exporter
+constructs a multi-index labeled with the corresponding names provided
+via the <code>names</code> argument. If <code>names</code> is <code>None</code>, numerical indices are
+used. These multi-indices can optionally be unstacked into multiple
+columns by providing the axis types to unstack via the <code>unstack</code>
+argument.</p>
+
+
+<details class="info" open>
+  <summary>The DataFrame Index</summary>
+  <p>The index of the resulting DataFrame may be a multi-index
+constructed from axis indices or labels. In addition, the <code>batch_id</code>
+(if not <code>None</code>) is prepended to the index.</p>
+</details>
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>field_name</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The field to export.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>select</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Iterable" href="https://docs.python.org/3/library/typing.html#typing.Iterable">Iterable</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Select the sub-fields to export. By default, all
+        sub-fields are exported.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>unstack</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Iterable" href="https://docs.python.org/3/library/typing.html#typing.Iterable">Iterable</a>[<a class="autorefs autorefs-internal" title="            ResultAxis (ropt.enums.ResultAxis)" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Select axes to unstack. By default, no axes are
+        unstacked.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>names</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Sequence" href="https://docs.python.org/3/library/typing.html#typing.Sequence">Sequence</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>] | None] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary mapping axis types to names.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError">NotImplementedError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the <code>pandas</code> module is not installed.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the field name is incorrect.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>pandas</code> DataFrame containing the results.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="warning" open>
+  <summary>Warning</summary>
+  <p>This function requires the <code>pandas</code> module to be installed.</p>
+</details>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.results.ResultField" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.results.ResultField</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+
+        <p>Base class for fields within <code>Results</code> objects.</p>
+<p>The <code>ResultField</code> class serves as a foundation for defining the various data
+fields that can be stored within <a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="#ropt.results.Results"><code>Results</code></a> objects.
+These fields typically hold multi-dimensional numerical data, such as
+objective values, constraint values, or gradients.</p>
+<p>This class provides a standardized way to:</p>
+<ul>
+<li>Store metadata about the axes of multi-dimensional arrays.</li>
+<li>Retrieve the axes associated with a specific field.</li>
+</ul>
+<p>Derived classes, such as
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionEvaluations
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionEvaluations"><code>FunctionEvaluations</code></a> or
+<a class="autorefs autorefs-internal" title="            ropt.results.Gradients
+
+
+  
+      dataclass
+  " href="#ropt.results.Gradients"><code>Gradients</code></a>, extend this base class to define
+specific data structures for different types of optimization results.</p>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.results.ResultField.get_axes" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_axes</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_axes</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ResultAxis</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Retrieve the axes associated with a specific field.</p>
+<p>Fields within a <code>ResultField</code> object that store multi-dimensional
+<code>numpy</code> arrays, contain metadata that describes the meaning of each
+dimension in the array. This method retrieves the axes of a field within
+a ResultField object from that meta-data, returning a tuple of
+<code>ResultAxis</code>][ropt.enums.ResultAxis] enums.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>name</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the field (sub-field) within the
+  <code>ResultField</code> instance or class.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the provided field name is not recognized.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ResultAxis (ropt.enums.ResultAxis)" href="../enums/#ropt.enums.ResultAxis">ResultAxis</a>, ...]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A tuple of <a class="autorefs autorefs-internal" title="            ResultAxis" href="../enums/#ropt.enums.ResultAxis"><code>ResultAxis</code></a> enums, representing the axes of the field.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.results.FunctionResults" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.results.FunctionResults</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+   (ropt.results._results.Results)" href="#ropt.results.Results">Results</a></code></p>
+
+
+        <p>Stores results related to function evaluations.</p>
+<p>The <code>FunctionResults</code> class extends the base
+<a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="#ropt.results.Results"><code>Results</code></a> class to store data specific to function
+evaluations. This includes:</p>
+<ul>
+<li><strong>Evaluations:</strong> The results of the function evaluations, including the
+  variable values, objective values, and constraint values for each
+  realization. See
+  <a class="autorefs autorefs-internal" title="            ropt.results.FunctionEvaluations
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionEvaluations"><code>FunctionEvaluations</code></a>.</li>
+<li><strong>Realizations:</strong> Information about the realizations, such as weights for
+  objectives and constraints, and whether each realization was successful.
+  See <a class="autorefs autorefs-internal" title="            ropt.results.Realizations
+
+
+  
+      dataclass
+  " href="#ropt.results.Realizations"><code>Realizations</code></a>.</li>
+<li><strong>Functions:</strong> The calculated objective and constraint function values,
+  typically aggregated across realizations. See
+  <a class="autorefs autorefs-internal" title="            ropt.results.Functions
+
+
+  
+      dataclass
+  " href="#ropt.results.Functions"><code>Functions</code></a>.</li>
+<li><strong>Constraint Info:</strong> Details about constraint differences and violations.
+  See <a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
+
+
+  
+      dataclass
+  " href="#ropt.results.ConstraintInfo"><code>ConstraintInfo</code></a>.</li>
+</ul>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.FunctionResults.evaluations">evaluations</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.FunctionEvaluations
+
+
+  
+      dataclass
+   (ropt.results._function_evaluations.FunctionEvaluations)" href="#ropt.results.FunctionEvaluations">FunctionEvaluations</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Results of the function evaluations.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.FunctionResults.realizations">realizations</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.Realizations
+
+
+  
+      dataclass
+   (ropt.results._realizations.Realizations)" href="#ropt.results.Realizations">Realizations</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The calculated parameters of the realizations.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.FunctionResults.functions">functions</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.Functions
+
+
+  
+      dataclass
+   (ropt.results._functions.Functions)" href="#ropt.results.Functions">Functions</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The calculated functions.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.FunctionResults.constraint_info">constraint_info</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
+
+
+  
+      dataclass
+   (ropt.results._constraint_info.ConstraintInfo)" href="#ropt.results.ConstraintInfo">ConstraintInfo</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Information on constraint differences and violations.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.results.GradientResults" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.results.GradientResults</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+   (ropt.results._results.Results)" href="#ropt.results.Results">Results</a></code></p>
+
+
+        <p>Stores results related to gradient evaluations.</p>
+<p>The <code>GradientResults</code> class extends the base
+<a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="#ropt.results.Results"><code>Results</code></a> class to store data specific to gradient
+evaluations. This includes:</p>
+<ul>
+<li><strong>Evaluations:</strong> The results of the function evaluations for perturbed
+  variables, including the perturbed variable values, objective values, and
+  constraint values for each realization and perturbation. See
+  <a class="autorefs autorefs-internal" title="            ropt.results.GradientEvaluations
+
+
+  
+      dataclass
+  " href="#ropt.results.GradientEvaluations"><code>GradientEvaluations</code></a>.</li>
+<li><strong>Realizations:</strong> Information about the realizations, such as weights for
+  objectives and constraints, and whether each realization was successful.
+  See <a class="autorefs autorefs-internal" title="            ropt.results.Realizations
+
+
+  
+      dataclass
+  " href="#ropt.results.Realizations"><code>Realizations</code></a>.</li>
+<li><strong>Gradients:</strong> The calculated gradients of the objectives and constraints.
+  See <a class="autorefs autorefs-internal" title="            ropt.results.Gradients
+
+
+  
+      dataclass
+  " href="#ropt.results.Gradients"><code>Gradients</code></a>.</li>
+</ul>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.GradientResults.evaluations">evaluations</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.GradientEvaluations
+
+
+  
+      dataclass
+   (ropt.results._gradient_evaluations.GradientEvaluations)" href="#ropt.results.GradientEvaluations">GradientEvaluations</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Results of the function evaluations for perturbed
+          variables.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.GradientResults.realizations">realizations</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.Realizations
+
+
+  
+      dataclass
+   (ropt.results._realizations.Realizations)" href="#ropt.results.Realizations">Realizations</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The calculated parameters of the realizations.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.GradientResults.gradients">gradients</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.results.Gradients
+
+
+  
+      dataclass
+   (ropt.results._gradients.Gradients)" href="#ropt.results.Gradients">Gradients</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The calculated gradients.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.results.Functions" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.results.Functions</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.results.ResultField
+
+
+  
+      dataclass
+   (ropt.results._result_field.ResultField)" href="#ropt.results.ResultField">ResultField</a></code></p>
+
+
+        <p>Stores the calculated objective and constraint function values.</p>
+<p>The <code>Functions</code> class stores the calculated values of the objective and
+constraint functions. These values are typically derived from the
+evaluations performed across all realizations, often through a process like
+averaging. The optimizer may handle multiple objectives and constraints.
+Multiple objectives are combined into a single weighted sum, which is stored
+in the <code>weighted_objective</code> field. Multiple constraints are handled
+individually by the optimizer.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.Functions.weighted_objective">weighted_objective</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The weighted sum of the objective values.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.Functions.objectives">objectives</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The value of each individual objective.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.Functions.constraints">constraints</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The value of each individual constraint.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.results.Gradients" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.results.Gradients</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.results.ResultField
+
+
+  
+      dataclass
+   (ropt.results._result_field.ResultField)" href="#ropt.results.ResultField">ResultField</a></code></p>
+
+
+        <p>Stores the calculated objective and constraint gradients.</p>
+<p>The <code>Gradients</code> class stores the calculated gradients of the objective and
+constraint functions. These gradients are typically derived from function
+evaluations across all realizations, often through a process like averaging.
+The optimizer may handle multiple objectives and constraints. Multiple
+objective gradients are combined into a single weighted sum, which is stored
+in the <code>weighted_objective</code> field. Multiple constraint gradients are handled
+individually by the optimizer.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.Gradients.weighted_objective">weighted_objective</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The weighted sum of the objective gradients.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.Gradients.objectives">objectives</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The gradient of each individual objective.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.Gradients.constraints">constraints</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The gradient of each individual constraint.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.results.FunctionEvaluations" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.results.FunctionEvaluations</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.results.ResultField
+
+
+  
+      dataclass
+   (ropt.results._result_field.ResultField)" href="#ropt.results.ResultField">ResultField</a></code></p>
+
+
+        <p>Stores the results of function evaluations.</p>
+<p>The <code>FunctionEvaluations</code> class stores the results of evaluating the
+objective and constraint functions for a set of variables. It includes
+the following information:</p>
+<ul>
+<li><strong>Variables:</strong> The vector of variable values at which the functions were
+  evaluated.</li>
+<li><strong>Objectives:</strong> The calculated objective function values for each
+  realization. This is a two-dimensional array where each row corresponds to
+  a realization and each column corresponds to an objective.</li>
+<li><strong>Constraints:</strong> The calculated constraint function values for each
+  realization. This is a two-dimensional array where each row corresponds to
+  a realization and each column corresponds to a constraint.</li>
+<li><strong>Evaluation Info:</strong> Optional metadata associated with each realization,
+  potentially provided by the evaluator. If provided, each value in the info
+  dictionary must be a one-dimensional array with a length equal to the
+  number of realizations.</li>
+</ul>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.FunctionEvaluations.variables">variables</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The variable vector.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.FunctionEvaluations.objectives">objectives</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The objective function values for each realization.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.FunctionEvaluations.constraints">constraints</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The constraint function values for each realization.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.FunctionEvaluations.evaluation_info">evaluation_info</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <span title="numpy.typing.NDArray">NDArray</span>[<a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional metadata for each evaluated realization.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.results.GradientEvaluations" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.results.GradientEvaluations</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.results.ResultField
+
+
+  
+      dataclass
+   (ropt.results._result_field.ResultField)" href="#ropt.results.ResultField">ResultField</a></code></p>
+
+
+        <p>Stores the results of evaluations for gradient calculations.</p>
+<p>The <code>GradientEvaluations</code> class stores the results of evaluating the
+objective and constraint functions for perturbed variables, which is
+necessary for gradient calculations. It contains the following information:</p>
+<ul>
+<li><strong>Variables:</strong> The vector of unperturbed variable values.</li>
+<li><strong>Perturbed Variables:</strong> A three-dimensional array of perturbed variable
+  values. The axes represent (in order): realization, perturbation, and
+  variable.</li>
+<li><strong>Perturbed Objectives:</strong> The calculated objective function values for
+  each realization and perturbation. This is a three-dimensional array where
+  the axes represent (in order): realization, perturbation, and objective.</li>
+<li><strong>Perturbed Constraints:</strong> The calculated constraint function values for
+  each realization and perturbation. This is a three-dimensional array where
+  the axes represent (in order): realization, perturbation, and constraint.</li>
+<li><strong>Evaluation Info:</strong> Optional metadata associated with each realization
+  and perturbation, potentially provided by the evaluator. If provided, each
+  value in the <code>evaluation_info</code> dictionary must be a two-dimensional array
+  where the rows correspond to perturbations and the second columns
+  correspond to realizations.</li>
+</ul>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.GradientEvaluations.variables">variables</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The unperturbed variable vector.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.GradientEvaluations.perturbed_variables">perturbed_variables</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The perturbed variable values for each
+                   realization and perturbation.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.GradientEvaluations.perturbed_objectives">perturbed_objectives</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The objective function values for each
+                   realization and perturbation.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.GradientEvaluations.perturbed_constraints">perturbed_constraints</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The constraint function values for each
+                   realization and perturbation.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.GradientEvaluations.evaluation_info">evaluation_info</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <span title="numpy.typing.NDArray">NDArray</span>[<a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional metadata for each evaluated
+                   realization and perturbation.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.results.Realizations" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.results.Realizations</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.results.ResultField
+
+
+  
+      dataclass
+   (ropt.results._result_field.ResultField)" href="#ropt.results.ResultField">ResultField</a></code></p>
+
+
+        <p>Stores information about the realizations.</p>
+<p>The <code>Realizations</code> class stores data related to the individual realizations
+used in the optimization process. This includes:</p>
+<ul>
+<li><strong>Failed Realizations:</strong> A boolean array indicating whether each
+  realization's evaluation was successful. <code>True</code> indicates a failed
+  realization, while <code>False</code> indicates a successful one.</li>
+<li><strong>Objective Weights:</strong> A two-dimensional array of weights used for each
+  objective in each realization. The first axis corresponds to the
+  objectives, and the second axis corresponds to the realizations. These
+  weights may change during optimization, depending on the type of objective
+  calculation.</li>
+<li><strong>Constraint Weights:</strong> A two-dimensional array of weights used for each
+  constraint in each realization. The first axis corresponds to the
+  constraints, and the second axis corresponds to the realizations. These
+  weights may change during optimization, depending on the type of
+  constraint calculation.</li>
+</ul>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.Realizations.failed_realizations">failed_realizations</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Boolean array indicating failed realizations.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.Realizations.objective_weights">objective_weights</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Weights for each objective in each realization.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.Realizations.constraint_weights">constraint_weights</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Weights for each constraint in each realization.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.results.ConstraintInfo" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.results.ConstraintInfo</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.results.ResultField
+
+
+  
+      dataclass
+   (ropt.results._result_field.ResultField)" href="#ropt.results.ResultField">ResultField</a></code></p>
+
+
+        <p>Stores information about constraint differences and violations.</p>
+<p>The <code>ConstraintInfo</code> class stores the differences between variable or
+ constraint values and their respective bounds. It also calculates and
+ stores constraint violations. This information is useful for assessing
+ how well the optimization process is satisfying the imposed constraints.</p>
+<p>The class stores the following information:</p>
+<ul>
+<li>
+<p><strong>Bound Differences:</strong> The differences between the variable values and
+   their lower and upper bounds.</p>
+<ul>
+<li><code>bound_lower</code>: The difference between the variable values and their
+  lower bounds. A negative value indicates that the variable is below its
+  lower bound.</li>
+<li><code>bound_upper</code>: The difference between the variable values and their
+  upper bounds. A positive value indicates that the variable is above its
+  upper bound.</li>
+</ul>
+</li>
+<li>
+<p><strong>Linear Constraint Differences:</strong> The differences between the linear
+   constraint values and their lower and upper bounds.</p>
+<ul>
+<li><code>linear_lower</code>: The difference between the linear constraint values
+  and their lower bounds. A negative value indicates that the constraint
+  is below its lower bound.</li>
+<li><code>linear_upper</code>: The difference between the linear constraint values and
+  their upper bounds. A positive value indicates that the constraint is
+  above its upper bound.</li>
+</ul>
+</li>
+<li>
+<p><strong>Nonlinear Constraint Differences:</strong> The differences between the
+   nonlinear constraint values and their lower and upper bounds.</p>
+<ul>
+<li><code>nonlinear_lower</code>: The difference between the nonlinear constraint
+  values and their lower bounds. A negative value indicates that the
+  constraint is below its lower bound.</li>
+<li><code>nonlinear_upper</code>: The difference between the nonlinear constraint
+  values and their upper bounds. A positive value indicates that the
+  constraint is above its upper bound.</li>
+</ul>
+</li>
+<li>
+<p><strong>Constraint Violations:</strong> The magnitude of the constraint violations.</p>
+<ul>
+<li><code>bound_violation</code>: The magnitude of the violation of the variable
+  bounds.</li>
+<li><code>linear_violation</code>: The magnitude of the violation of the linear
+   constraints.</li>
+<li><code>nonlinear_violation</code>: The magnitude of the violation of the nonlinear
+  constraints.</li>
+</ul>
+</li>
+</ul>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.ConstraintInfo.bound_lower">bound_lower</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Difference between variables and their lower bounds.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.ConstraintInfo.bound_upper">bound_upper</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Difference between variables and their upper bounds.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.ConstraintInfo.linear_lower">linear_lower</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Difference between linear constraints and their lower
+                bounds.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.ConstraintInfo.linear_upper">linear_upper</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Difference between linear constraints and their upper
+                bounds.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.ConstraintInfo.nonlinear_lower">nonlinear_lower</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Difference between nonlinear constraints and their
+                lower bounds.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.ConstraintInfo.nonlinear_upper">nonlinear_upper</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Difference between nonlinear constraints and their
+                upper bounds.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.ConstraintInfo.bound_violation">bound_violation</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Magnitude of the violation of the variable bounds.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.ConstraintInfo.linear_violation">linear_violation</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Magnitude of the violation of the linear constraints.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.ConstraintInfo.nonlinear_violation">nonlinear_violation</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Magnitude of the violation of the nonlinear constraints.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="ropt.results.results_to_dataframe" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">ropt.results.results_to_dataframe</span>
+
+
+</h2>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">results_to_dataframe</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">results</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Results</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">fields</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">result_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;functions&quot;</span><span class="p">,</span> <span class="s2">&quot;gradients&quot;</span><span class="p">],</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">names</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Combine a sequence of results into a single pandas DataFrame.</p>
+<p>This function aggregates results from multiple
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> or
+<a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="#ropt.results.GradientResults"><code>GradientResults</code></a> objects into a single
+<code>pandas</code> DataFrame. It is designed to be used with observers that produce
+results during the optimization process.</p>
+<p>The <code>fields</code> argument determines which data fields to include in the
+DataFrame. These fields can be any of the attributes defined within
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionResults"><code>FunctionResults</code></a> or
+<a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="#ropt.results.GradientResults"><code>GradientResults</code></a>. Nested fields are
+specified using dot notation (e.g., <code>evaluations.variables</code> to include the
+<code>variables</code> field within the <code>evaluations</code> object).</p>
+<p>The <code>evaluation_info</code> sub-fields, found within the <code>evaluations</code> fields of
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionEvaluations
+
+
+  
+      dataclass
+  " href="#ropt.results.FunctionEvaluations"><code>functions</code></a> and
+<a class="autorefs autorefs-internal" title="            ropt.results.GradientEvaluations
+
+
+  
+      dataclass
+  " href="#ropt.results.GradientEvaluations"><code>gradient</code></a> results, respectively, are
+dictionaries. To include specific keys from these dictionaries, use the
+format <code>evaluations.evaluation_info.key</code>, where <code>key</code> is the name of the
+desired key.</p>
+<p>Many fields may result in multiple columns in the DataFrame. For example,
+<code>evaluations.variables</code> will generate a separate column for each variable.
+If available, variable names will be used as column labels.
+Multi-dimensional fields, such as those with named realizations and
+objectives, will have column names that are tuples of the corresponding
+names.</p>
+<p>The <code>result_type</code> argument specifies whether to include function evaluation
+results (<code>functions</code>) or gradient results (<code>gradients</code>).</p>
+<p>The <code>names</code> argument is an optional dictionary that maps axis types to
+names. These names are used to label the multi-index columns in the
+resulting DataFrame. If not provided, numerical indices are used.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>results</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Sequence" href="https://docs.python.org/3/library/typing.html#typing.Sequence">Sequence</a>[<a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="#ropt.results.Results">Results</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A sequence of <a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="#ropt.results.Results"><code>Results</code></a> objects
+         to combine.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fields</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The names of the fields to include in the DataFrame.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>result_type</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>[&#39;functions&#39;, &#39;gradients&#39;]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The type of results to include ("functions" or
+         "gradients").</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>names</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Sequence" href="https://docs.python.org/3/library/typing.html#typing.Sequence">Sequence</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>] | None] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary mapping axis types to names.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="pandas.DataFrame">DataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A <code>pandas</code> DataFrame containing the combined results.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.expand", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
