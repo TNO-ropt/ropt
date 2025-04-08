@@ -760,6 +760,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.config.options.gen_options_table" class="md-nav__link">
+    <span class="md-ellipsis">
+      gen_options_table
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1653,6 +1662,15 @@
   <a href="#ropt.config.options.MethodSchemaModel" class="md-nav__link">
     <span class="md-ellipsis">
       MethodSchemaModel
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.options.gen_options_table" class="md-nav__link">
+    <span class="md-ellipsis">
+      gen_options_table
     </span>
   </a>
   
@@ -3757,17 +3775,6 @@ describing a method supported by the plugin.</p>
               </div>
             </td>
           </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.options.OptionsSchemaModel.url">url</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>An optional URL for the plugin.</p>
-              </div>
-            </td>
-          </tr>
       </tbody>
     </table>
         <p><strong>Example</strong>:
@@ -3942,7 +3949,7 @@ this method.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.options.MethodSchemaModel.url">url</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
+                  <code><a class="autorefs autorefs-external" title="pydantic.HttpUrl" href="https://docs.pydantic.dev/latest/api/networks/#pydantic.networks.HttpUrl">HttpUrl</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3980,6 +3987,86 @@ this method.</p>
 
 </div>
 
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.config.options.gen_options_table" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">gen_options_table</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">gen_options_table</span><span class="p">(</span><span class="n">schema</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Generates a Markdown table documenting plugin options.</p>
+<p>This function takes a schema dictionary, validates it against the
+<a class="autorefs autorefs-internal" title="            OptionsSchemaModel" href="#ropt.config.options.OptionsSchemaModel"><code>OptionsSchemaModel</code></a>, and then
+generates a Markdown table that summarizes the available methods and their
+options. Each row in the table represents a method, and the columns list the
+method's name and its configurable options. If a URL is provided for a
+method, the method name will be hyperlinked to that URL in the table.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>schema</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary representing the schema of plugin options.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A string containing a Markdown table that documents the plugin options.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
 
 
 
