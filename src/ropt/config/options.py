@@ -12,9 +12,10 @@ Classes:
 
 from __future__ import annotations
 
+from textwrap import dedent
 from typing import Any, Callable, Generic, TypeVar, Union
 
-from pydantic import BaseModel, ConfigDict, create_model, model_validator
+from pydantic import BaseModel, ConfigDict, HttpUrl, create_model, model_validator
 
 T = TypeVar("T")
 
@@ -29,7 +30,7 @@ class OptionsSchemaModel(BaseModel):
 
     Attributes:
         methods: A list of method schemas.
-        url:     An optional URL for the plugin.
+
     **Example**:
     ```py
     from ropt.config.options import OptionsSchemaModel
@@ -53,7 +54,6 @@ class OptionsSchemaModel(BaseModel):
     """
 
     methods: dict[str, MethodSchemaModel[Any]]
-    url: str | None = None
 
     model_config = ConfigDict(extra="forbid")
 
@@ -116,6 +116,40 @@ class MethodSchemaModel(BaseModel, Generic[T]):
     """
 
     options: dict[str, T]
-    url: str | None = None
+    url: HttpUrl | None = None
 
     model_config = ConfigDict(extra="forbid")
+
+
+def gen_options_table(schema: dict[str, Any]) -> str:
+    """Generates a Markdown table documenting plugin options.
+
+    This function takes a schema dictionary, validates it against the
+    [`OptionsSchemaModel`][ropt.config.options.OptionsSchemaModel], and then
+    generates a Markdown table that summarizes the available methods and their
+    options. Each row in the table represents a method, and the columns list the
+    method's name and its configurable options. If a URL is provided for a
+    method, the method name will be hyperlinked to that URL in the table.
+
+    Args:
+        schema: A dictionary representing the schema of plugin options.
+
+    Returns:
+        A string containing a Markdown table that documents the plugin options.
+    """
+    OptionsSchemaModel.model_validate(schema)
+
+    docstring = dedent("""
+    | Method | Method Options |
+    |--------|----------------|
+    """)
+
+    for method, method_schema in schema["methods"].items():
+        url = MethodSchemaModel.model_validate(method_schema).url
+        options = ", ".join(key for key in method_schema["options"])
+        if url:
+            docstring += f"|[{method}]({url})|{options}|\n"
+        else:
+            docstring += f"|{method}:|{options}|\n"
+
+    return docstring

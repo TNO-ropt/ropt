@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 from functools import partial
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, ClassVar, Final, Literal
 
 import numpy as np
@@ -86,19 +87,9 @@ class SciPyOptimizer(Optimizer):
     """SciPy optimization backend for ropt.
 
     This class provides an interface to several optimization algorithms from
-    SciPy's `scipy.optimize` module, enabling their use within `ropt`. The
-    following optimizers are supported:
-
-    - Nelder-Mead
-    - Powell
-    - CG (Conjugate Gradient)
-    - BFGS (Broyden-Fletcher-Goldfarb-Shanno)
-    - Newton-CG (Newton Conjugate Gradient)
-    - L-BFGS-B (Limited-memory BFGS with bounds)
-    - TNC (Truncated Newton)
-    - COBYLA (Constrained Optimization BY Linear Approximations)
-    - SLSQP (Sequential Least Squares Programming)
-    - differential_evolution
+    SciPy's
+    [`scipy.optimize`](https://docs.scipy.org/doc/scipy/reference/optimize.html)
+    module, enabling their use within `ropt`.
 
     To select an optimizer, set the `method` field within the
     [`optimizer`][ropt.config.enopt.OptimizerConfig] section of the
@@ -106,19 +97,15 @@ class SciPyOptimizer(Optimizer):
     desired algorithm's name. Most methods support the general options defined
     in the [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object. For
     algorithm-specific options, use the `options` dictionary within the
-    configuration. Refer to the
-    [`scipy.optimize`](https://docs.scipy.org/doc/scipy/tutorial/optimize.html)
-    documentation for details on these options.
+    [`optimizer`][ropt.config.enopt.OptimizerConfig] section.
 
-    Constraint Support:
+    The table below lists the included methods together with the method-specific
+    options that are supported. Click on the method name to consult the
+    corresponding
+    [`scipy.optimize`](https://docs.scipy.org/doc/scipy/reference/optimize.html)
+    documentation:
 
-    Not all optimizers support all types of constraints. Here's a breakdown:
-
-    - **Bound Constraints:** Supported by Nelder-Mead, L-BFGS-B, SLSQP, TNC, and
-      differential_evolution.
-    - **Linear Constraints:** Supported by SLSQP and differential_evolution.
-    - **Nonlinear Constraints:** Supported by COBYLA (inequality constraints
-      only), SLSQP, and differential_evolution.
+    --8<-- "scipy.md"
     """
 
     _supported_constraints: ClassVar[dict[str, set[str]]] = {
@@ -544,7 +531,6 @@ class SciPyOptimizerPlugin(OptimizerPlugin):
 
 
 _OPTIONS_SCHEMA: dict[str, Any] = {
-    "url": "https://docs.scipy.org/doc/scipy/reference/optimize.html",
     "methods": {
         "Nelder-Mead": {
             "options": {
@@ -560,10 +546,10 @@ _OPTIONS_SCHEMA: dict[str, Any] = {
         "Powell": {
             "options": {
                 "disp": bool,
-                "xtol": float,
-                "ftol": float,
                 "maxiter": int,
                 "maxfev": int,
+                "xtol": float,
+                "ftol": float,
             },
             "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-powell.html",
         },
@@ -597,8 +583,8 @@ _OPTIONS_SCHEMA: dict[str, Any] = {
         "Newton-CG": {
             "options": {
                 "disp": bool,
-                "xtol": float,
                 "maxiter": int,
+                "xtol": float,
                 "eps": float,
                 "c1": float,
                 "c2": float,
@@ -608,24 +594,25 @@ _OPTIONS_SCHEMA: dict[str, Any] = {
         "L-BFGS-B": {
             "options": {
                 "disp": int,
+                "maxiter": int,
                 "maxcor": int,
                 "ftol": float,
                 "gtol": float,
                 "eps": float,
                 "maxfun": int,
-                "maxiter": int,
                 "iprint": int,
                 "maxls": int,
                 "finite_diff_rel_step": float,
             },
             "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-lbfgsb.html",
         },
-        "TNC:": {
+        "TNC": {
             "options": {
+                "disp": bool,
+                "maxfun": int,
                 "eps": float,
                 "scale": list[float],
                 "offset": float,
-                "disp": bool,
                 "maxCGit": int,
                 "eta": float,
                 "stepmx": float,
@@ -636,32 +623,33 @@ _OPTIONS_SCHEMA: dict[str, Any] = {
                 "gtol": float,
                 "rescale": float,
                 "finite_diff_rel_step": float,
-                "maxfun": int,
             },
             "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-tnc.html",
         },
         "COBYLA": {
             "options": {
-                "rhobeg": float,
-                "tol": float,
                 "disp": bool,
                 "maxiter": int,
+                "rhobeg": float,
+                "tol": float,
                 "catol": float,
             },
             "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-cobyla.html",
         },
         "SLSQP": {
             "options": {
-                "ftol": float,
-                "eps": float,
                 "disp": bool,
                 "maxiter": int,
+                "ftol": float,
+                "eps": float,
                 "finite_diff_rel_step": float,
             },
             "url": "https://docs.scipy.org/doc/scipy/reference/optimize.minimize-slsqp.html",
         },
         "differential_evolution": {
             "options": {
+                "disp": bool,
+                "maxiter": int,
                 "strategy": Literal[
                     "best1bin"
                     "best1exp"
@@ -676,13 +664,11 @@ _OPTIONS_SCHEMA: dict[str, Any] = {
                     "best2exp"
                     "best2bin"
                 ],
-                "maxiter": int,
                 "popsize": int,
                 "tol": float,
                 "mutation": float | tuple[float, float],
                 "recombination": float,
                 "seed": int,
-                "disp": bool,
                 "polish": bool,
                 "init": Literal["latinhypercube", "sobol", "haltonrandom"],
                 "atol": float,
@@ -692,3 +678,10 @@ _OPTIONS_SCHEMA: dict[str, Any] = {
         },
     },
 }
+
+
+if __name__ == "__main__":
+    from ropt.config.options import gen_options_table
+
+    with Path("scipy.md").open("w", encoding="utf-8") as fp:
+        fp.write(gen_options_table(_OPTIONS_SCHEMA))

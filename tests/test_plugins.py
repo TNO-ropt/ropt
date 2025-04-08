@@ -38,10 +38,9 @@ class MockedPluginWithValidation(MockedPlugin):
                             "a": float | str,
                             "b": Literal["foo", "bar"],
                         },
-                        "url": "https://example.com",
+                        "url": "https://example.org",
                     },
                 },
-                "url": "https://example.com",
             }
         ).get_options_model(method).model_validate(options)
 
