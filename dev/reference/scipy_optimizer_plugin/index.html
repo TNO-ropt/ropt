@@ -1278,42 +1278,17 @@
 <p>This class provides an interface to several optimization algorithms from
 SciPy's
 <a href="https://docs.scipy.org/doc/scipy/reference/optimize.html"><code>scipy.optimize</code></a>
-module, enabling their use within <code>ropt</code>. The following optimizers are
-supported:</p>
-<ul>
-<li>Nelder-Mead</li>
-<li>Powell</li>
-<li>CG (Conjugate Gradient)</li>
-<li>BFGS (Broyden-Fletcher-Goldfarb-Shanno)</li>
-<li>Newton-CG (Newton Conjugate Gradient)</li>
-<li>L-BFGS-B (Limited-memory BFGS with bounds)</li>
-<li>TNC (Truncated Newton)</li>
-<li>COBYLA (Constrained Optimization BY Linear Approximations)</li>
-<li>SLSQP (Sequential Least Squares Programming)</li>
-<li>differential_evolution</li>
-</ul>
+module, enabling their use within <code>ropt</code>.</p>
 <p>To select an optimizer, set the <code>method</code> field within the
 <a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../enopt_config/#ropt.config.enopt.OptimizerConfig"><code>optimizer</code></a> section of the
 <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> configuration object to the
 desired algorithm's name. Most methods support the general options defined
-in the <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
-
-
-<details class="note" open>
-  <summary>Constraint Support</summary>
-  <p>Not all optimizers support all types of constraints. Here's a breakdown:</p>
-<ul>
-<li><strong>Bound Constraints:</strong> Supported by Nelder-Mead, L-BFGS-B, SLSQP, TNC, and
-differential_evolution.</li>
-<li><strong>Linear Constraints:</strong> Supported by SLSQP and differential_evolution.</li>
-<li><strong>Nonlinear Constraints:</strong> Supported by COBYLA (inequality constraints
-only), SLSQP, and differential_evolution.</li>
-</ul>
-</details>        <p><strong>Algorithm-specific Options:</strong></p>
-<p>For algorithm-specific options, use the <code>options</code> dictionary within the
-<a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../enopt_config/#ropt.config.enopt.OptimizerConfig"><code>optimizer</code></a> section. The table below
-lists the supported options by method. Click on the method name to consult
-the corresponding
+in the <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. For
+algorithm-specific options, use the <code>options</code> dictionary within the
+<a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../enopt_config/#ropt.config.enopt.OptimizerConfig"><code>optimizer</code></a> section.</p>
+<p>The table below lists the included methods together with the method-specific
+options that are supported. Click on the method name to consult the
+corresponding
 <a href="https://docs.scipy.org/doc/scipy/reference/optimize.html"><code>scipy.optimize</code></a>
 documentation:</p>
 <table>
