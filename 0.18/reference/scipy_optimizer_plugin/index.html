@@ -1274,52 +1274,74 @@
               Bases: <code><a class="autorefs autorefs-internal" title="            Optimizer (ropt.plugins.optimizer.base.Optimizer)" href="../optimizer_plugins/#ropt.plugins.optimizer.base.Optimizer">Optimizer</a></code></p>
 
 
-        <p>Plugin class for optimization via SciPy.</p>
-<p>This class implements several optimizers provided by SciPy in the
-<a href="https://docs.scipy.org/doc/scipy/tutorial/optimize.html"><code>scipy.optimize</code></a>
-package:</p>
-<ul>
-<li>Nelder-Mead</li>
-<li>Powell</li>
-<li>CG</li>
-<li>BFGS</li>
-<li>Newton-CG</li>
-<li>L-BFGS-B</li>
-<li>TNC</li>
-<li>COBYLA</li>
-<li>SLSQP</li>
-<li>differential_evolution</li>
-</ul>
-<p>The optimizer to use is selected by setting the <code>method</code> field in the
-<a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../enopt_config/#ropt.config.enopt.OptimizerConfig"><code>optimizer</code></a> field of
-<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> to the name of the algorithm.
-Most of these methods support the general options set in the
-<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. However, specific
-options that are normally passed as arguments in the SciPy functions can be
-provided via the <code>options</code> dictionary in the configuration object. Consult
-the
-<a href="https://docs.scipy.org/doc/scipy/tutorial/optimize.html"><code>scipy.optimize</code></a>
-manual for details on these options.</p>
-<p>Not all constraints are supported by all optimizers:</p>
-<ul>
-<li>Bound constraints: Nelder-Mead, L-BFGS-B, SLSQP, TNC,
-  differential_evolution</li>
-<li>Linear constraints: SLSQP, differential_evolution</li>
-<li>Nonlinear constraints: COBYLA (only inequality), SLSQP,
-  differential_evolution</li>
-</ul>
+        <p>SciPy optimization backend for ropt.</p>
+<p>This class provides an interface to several optimization algorithms from
+SciPy's
+<a href="https://docs.scipy.org/doc/scipy/reference/optimize.html"><code>scipy.optimize</code></a>
+module, enabling their use within <code>ropt</code>.</p>
+<p>To select an optimizer, set the <code>method</code> field within the
+<a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../enopt_config/#ropt.config.enopt.OptimizerConfig"><code>optimizer</code></a> section of the
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> configuration object to the
+desired algorithm's name. Most methods support the general options defined
+in the <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object. For
+algorithm-specific options, use the <code>options</code> dictionary within the
+<a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../enopt_config/#ropt.config.enopt.OptimizerConfig"><code>optimizer</code></a> section.</p>
+<p>The table below lists the included methods together with the method-specific
+options that are supported. Click on the method name to consult the
+corresponding
+<a href="https://docs.scipy.org/doc/scipy/reference/optimize.html"><code>scipy.optimize</code></a>
+documentation:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Method Options</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-neldermead.html">Nelder-Mead</a></td>
+<td>disp, maxiter, maxfev, xatol, fatol, adaptive</td>
+</tr>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-powell.html">Powell</a></td>
+<td>disp, maxiter, maxfev, xtol, ftol</td>
+</tr>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-cg.html">CG</a></td>
+<td>disp, maxiter, gtol, norm, eps, finite_diff_rel_step, c1, c2</td>
+</tr>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-bfgs.html">BFGS</a></td>
+<td>disp, maxiter, gtol, norm, eps, finite_diff_rel_step, xrtol, c1, c2</td>
+</tr>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-newtoncg.html">Newton-CG</a></td>
+<td>disp, maxiter, xtol, eps, c1, c2</td>
+</tr>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-lbfgsb.html">L-BFGS-B</a></td>
+<td>disp, maxiter, maxcor, ftol, gtol, eps, maxfun, iprint, maxls, finite_diff_rel_step</td>
+</tr>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-tnc.html">TNC</a></td>
+<td>disp, maxfun, eps, scale, offset, maxCGit, eta, stepmx, accuracy, minfev, ftol, xtol, gtol, rescale, finite_diff_rel_step</td>
+</tr>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-cobyla.html">COBYLA</a></td>
+<td>disp, maxiter, rhobeg, tol, catol</td>
+</tr>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-slsqp.html">SLSQP</a></td>
+<td>disp, maxiter, ftol, eps, finite_diff_rel_step</td>
+</tr>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.differential_evolution.html">differential_evolution</a></td>
+<td>disp, maxiter, strategy, popsize, tol, mutation, recombination, seed, polish, init, atol, updating</td>
+</tr>
+</tbody>
+</table>
 
-
-<details class="info" open>
-  <summary>Info</summary>
-  <ul>
-<li>The Nelder-Mead algorithm only supports bound constraints if SciPy
-  version &gt;= 1.7.</li>
-<li>Some SciPy algorithms that require a Hessian or a Hessian-vector
-  product are not supported. These include dogleg, trust-ncg,
-  trust-exact, and trust-krylov.</li>
-</ul>
-</details>
 
 
 
