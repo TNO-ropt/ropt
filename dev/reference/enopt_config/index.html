@@ -2799,6 +2799,47 @@ optimizer:</p>
 </ul>
 
 
+<details class="note" open>
+  <summary>Differences between <code>max_iterations</code>, <code>max_functions</code>, and <code>max_batches</code></summary>
+  <p>These three parameters provide different ways to limit the duration or
+computational cost of the optimization process:</p>
+<ul>
+<li>
+<p><strong><code>max_iterations</code></strong>: This limit is passed directly to the backend
+  optimization algorithm. Many optimizers define an "iteration" as a
+  distinct step in their process, which might involve one or more
+  function or gradient evaluations. The interpretation of <code>max_iterations</code>
+  depends on the specific backend optimizer; it typically caps the number
+  of these internal iterations. Some backends might ignore this setting if
+  they don't have a clear concept of iterations.</p>
+</li>
+<li>
+<p><strong><code>max_batches</code></strong>: This limit restricts the total number of <em>calls</em> made
+  to the evaluation function provided to <code>ropt</code>. An optimizer might request
+  a batch containing multiple function and/or gradient evaluations within
+  a single call. <code>max_batches</code> limits how many such batch requests are
+  processed sequentially. This is particularly useful for managing resource
+  usage when batches are evaluated in parallel (e.g., on an HPC cluster),
+  as it controls the number of sequential submission steps. The number of
+  batches does not necessarily correspond directly to the number of
+  optimizer iterations, especially if function and gradient evaluations
+  occur in separate batches.</p>
+</li>
+<li>
+<p><strong><code>max_functions</code></strong>: This imposes a hard limit on the total <em>number</em> of
+  individual objective function evaluations performed across all batches.
+  Since a single batch evaluation (limited by <code>max_batches</code>) can involve
+  multiple function evaluations, setting <code>max_functions</code> provides more
+  granular control over the total computational effort spent on function
+  calls. It can serve as an alternative stopping criterion if the backend
+  optimizer doesn't support <code>max_iterations</code> or if you need to strictly
+  limit the function evaluation count. Note that exceeding this limit might
+  cause the optimization to terminate mid-batch, potentially earlier than
+  a corresponding <code>max_batches</code> limit would.</p>
+</li>
+</ul>
+</details>
+
 <p><span class="doc-section-title">Attributes:</span></p>
     <table>
       <thead>
