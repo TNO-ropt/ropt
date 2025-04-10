@@ -2772,9 +2772,9 @@ optimizer:</p>
 <li><strong><code>max_iterations</code></strong>: The maximum number of iterations allowed. The
   optimizer may choose to ignore this.</li>
 <li><strong><code>max_functions</code></strong>: The maximum number of function evaluations allowed.</li>
-<li><strong><code>max_evaluations</code></strong>: The maximum number of batch evaluations allowed. The
+<li><strong><code>max_batches</code></strong>: The maximum number of evaluations batches allowed. The
   optimizer callback may ask to evaluate a batch of multiple functions and
-  gradients at once. This setting will limit the number of those call.</li>
+  gradients at once. This setting will limit the number of those calls.</li>
 <li><strong><code>tolerance</code></strong>: The convergence tolerance used as a stopping criterion.
   The exact definition depends on the optimizer, and it may be ignored.</li>
 <li><strong><code>speculative</code></strong>: If <code>True</code>, forces early gradient evaluations, even if
@@ -2783,7 +2783,7 @@ optimizer:</p>
   <code>split_evaluations</code> is <code>True</code>.</li>
 <li><strong><code>split_evaluations</code></strong>: If <code>True</code>, forces separate function and gradient
   evaluations, even if the optimizer requests them together. This is useful
-  with realization filters that completerly disable some realizations, to
+  with realization filters that completely disable some realizations, to
   potentially reduce the number of evaluations for gradients (see
   <a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="#ropt.config.enopt.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>).</li>
 <li><strong><code>parallel</code></strong>: If <code>True</code>, allows the optimizer to use parallelized
@@ -2843,7 +2843,7 @@ optimizer:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.OptimizerConfig.max_evaluations">max_evaluations</span></code></td>
+            <td><code><span title="ropt.config.enopt.OptimizerConfig.max_batches">max_batches</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" title="pydantic.PositiveInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.PositiveInt">PositiveInt</a> | None</code>
             </td>
