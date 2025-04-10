@@ -137,6 +137,7 @@ class EnsembleOptimizer:
 
         # For implementing max_functions:
         self._completed_functions = 0
+        self._completed_batches = 0
 
         # Whether NaN values are allowed:
         self._allow_nan = False
@@ -250,6 +251,8 @@ class EnsembleOptimizer:
                 self._enopt_config.variables.mask,
             )
 
+        self._completed_batches += 1
+
         return functions, gradients
 
     def _get_completed_variables(
@@ -272,6 +275,9 @@ class EnsembleOptimizer:
         max_functions = self._enopt_config.optimizer.max_functions
         if max_functions is not None and self._completed_functions >= max_functions:
             raise OptimizationAborted(exit_code=OptimizerExitCode.MAX_FUNCTIONS_REACHED)
+        max_batches = self._enopt_config.optimizer.max_batches
+        if max_batches is not None and self._completed_batches >= max_batches:
+            raise OptimizationAborted(exit_code=OptimizerExitCode.MAX_BATCHES_REACHED)
 
     def _run_evaluations(
         self,

@@ -427,15 +427,27 @@ def test_evaluator_step_multi(enopt_config: dict[str, Any], evaluator: Any) -> N
     assert np.allclose(values, [1.66, 1.75])
 
 
-def test_exit_code(enopt_config: dict[str, Any], evaluator: Any) -> None:
+@pytest.mark.parametrize(
+    ("max_criterion", "max_enum"),
+    [
+        ("max_functions", OptimizerExitCode.MAX_FUNCTIONS_REACHED),
+        ("max_batches", OptimizerExitCode.MAX_BATCHES_REACHED),
+    ],
+)
+def test_exit_code(
+    enopt_config: dict[str, Any],
+    evaluator: Any,
+    max_criterion: str,
+    max_enum: OptimizerExitCode,
+) -> None:
     enopt_config["optimizer"]["speculative"] = True
-    enopt_config["optimizer"]["max_functions"] = 4
+    enopt_config["optimizer"][max_criterion] = 4
 
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(context)
     step = plan.add_step("optimizer")
     exit_code = plan.run_step(step, config=enopt_config)
-    assert exit_code == OptimizerExitCode.MAX_FUNCTIONS_REACHED
+    assert exit_code == max_enum
 
 
 def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:

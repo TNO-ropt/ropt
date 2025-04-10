@@ -54,6 +54,23 @@ def test_max_functions_exceeded(enopt_config: Any, evaluator: Any) -> None:
     assert optimizer.exit_code == OptimizerExitCode.MAX_FUNCTIONS_REACHED
 
 
+def test_max_batches_exceeded(enopt_config: Any, evaluator: Any) -> None:
+    last_evaluation = 0
+
+    def track_results(_: tuple[Results, ...]) -> None:
+        nonlocal last_evaluation
+        last_evaluation += 1
+
+    max_batches = 2
+    enopt_config["optimizer"]["max_batches"] = max_batches
+    optimizer = BasicOptimizer(enopt_config, evaluator()).set_results_callback(
+        track_results
+    )
+    optimizer.run()
+    assert last_evaluation == max_batches
+    assert optimizer.exit_code == OptimizerExitCode.MAX_BATCHES_REACHED
+
+
 def test_max_functions_not_exceeded(enopt_config: Any, evaluator: Any) -> None:
     last_evaluation = 0
 

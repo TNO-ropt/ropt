@@ -28,6 +28,9 @@ class OptimizerConfig(ImmutableBaseModel):
     - **`max_iterations`**: The maximum number of iterations allowed. The
       optimizer may choose to ignore this.
     - **`max_functions`**: The maximum number of function evaluations allowed.
+    - **`max_batches`**: The maximum number of evaluations batches allowed. The
+      optimizer callback may ask to evaluate a batch of multiple functions and
+      gradients at once. This setting will limit the number of those calls.
     - **`tolerance`**: The convergence tolerance used as a stopping criterion.
       The exact definition depends on the optimizer, and it may be ignored.
     - **`speculative`**: If `True`, forces early gradient evaluations, even if
@@ -36,7 +39,7 @@ class OptimizerConfig(ImmutableBaseModel):
       `split_evaluations` is `True`.
     - **`split_evaluations`**: If `True`, forces separate function and gradient
       evaluations, even if the optimizer requests them together. This is useful
-      with realization filters that completerly disable some realizations, to
+      with realization filters that completely disable some realizations, to
       potentially reduce the number of evaluations for gradients (see
       [`RealizationFilterConfig`][ropt.config.enopt.RealizationFilterConfig]).
     - **`parallel`**: If `True`, allows the optimizer to use parallelized
@@ -50,10 +53,45 @@ class OptimizerConfig(ImmutableBaseModel):
     - **`stdout`**: Redirect optimizer standard output to the given file.
     - **`stderr`**: Redirect optimizer standard error to the given file.
 
+    Note: Differences between `max_iterations`, `max_functions`, and `max_batches`
+      These three parameters provide different ways to limit the duration or
+      computational cost of the optimization process:
+
+      - **`max_iterations`**: This limit is passed directly to the backend
+        optimization algorithm. Many optimizers define an "iteration" as a
+        distinct step in their process, which might involve one or more
+        function or gradient evaluations. The interpretation of `max_iterations`
+        depends on the specific backend optimizer; it typically caps the number
+        of these internal iterations. Some backends might ignore this setting if
+        they don't have a clear concept of iterations.
+
+      - **`max_batches`**: This limit restricts the total number of *calls* made
+        to the evaluation function provided to `ropt`. An optimizer might request
+        a batch containing multiple function and/or gradient evaluations within
+        a single call. `max_batches` limits how many such batch requests are
+        processed sequentially. This is particularly useful for managing resource
+        usage when batches are evaluated in parallel (e.g., on an HPC cluster),
+        as it controls the number of sequential submission steps. The number of
+        batches does not necessarily correspond directly to the number of
+        optimizer iterations, especially if function and gradient evaluations
+        occur in separate batches.
+
+      - **`max_functions`**: This imposes a hard limit on the total *number* of
+        individual objective function evaluations performed across all batches.
+        Since a single batch evaluation (limited by `max_batches`) can involve
+        multiple function evaluations, setting `max_functions` provides more
+        granular control over the total computational effort spent on function
+        calls. It can serve as an alternative stopping criterion if the backend
+        optimizer doesn't support `max_iterations` or if you need to strictly
+        limit the function evaluation count. Note that exceeding this limit might
+        cause the optimization to terminate mid-batch, potentially earlier than
+        a corresponding `max_batches` limit would.
+
     Attributes:
         method:            Name of the optimization method.
         max_iterations:    Maximum number of iterations (optional).
         max_functions:     Maximum number of function evaluations (optional).
+        max_batches:       Maximum number of batch evaluations (optional).
         tolerance:         Convergence tolerance (optional).
         speculative:       Force early gradient evaluations (default: `False`).
         split_evaluations: Force separate function/gradient evaluations (default: `False`).
@@ -67,6 +105,7 @@ class OptimizerConfig(ImmutableBaseModel):
     method: str = "scipy/default"
     max_iterations: PositiveInt | None = None
     max_functions: PositiveInt | None = None
+    max_batches: PositiveInt | None = None
     tolerance: NonNegativeFloat | None = None
     speculative: bool = False
     split_evaluations: bool = False

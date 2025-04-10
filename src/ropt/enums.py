@@ -127,16 +127,19 @@ class OptimizerExitCode(IntEnum):
     MAX_FUNCTIONS_REACHED = 2
     """Returned when the maximum number of function evaluations is reached."""
 
-    NESTED_OPTIMIZER_FAILED = 3
+    MAX_BATCHES_REACHED = 3
+    """Returned when the maximum number of evaluation batches is reached."""
+
+    NESTED_OPTIMIZER_FAILED = 4
     """Returned when a nested optimization fails to find an optimal value."""
 
-    USER_ABORT = 4
+    USER_ABORT = 5
     """Returned when the optimization is aborted by the user."""
 
-    OPTIMIZER_STEP_FINISHED = 5
+    OPTIMIZER_STEP_FINISHED = 6
     """Returned when an optimization step terminates normally."""
 
-    EVALUATION_STEP_FINISHED = 6
+    EVALUATION_STEP_FINISHED = 7
     """Returned when an evaluation step terminates normally."""
 
 
