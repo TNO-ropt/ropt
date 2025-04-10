@@ -2772,6 +2772,9 @@ optimizer:</p>
 <li><strong><code>max_iterations</code></strong>: The maximum number of iterations allowed. The
   optimizer may choose to ignore this.</li>
 <li><strong><code>max_functions</code></strong>: The maximum number of function evaluations allowed.</li>
+<li><strong><code>max_batches</code></strong>: The maximum number of batch evaluations allowed. The
+  optimizer callback may ask to evaluate a batch of multiple functions and
+  gradients at once. This setting will limit the number of those call.</li>
 <li><strong><code>tolerance</code></strong>: The convergence tolerance used as a stopping criterion.
   The exact definition depends on the optimizer, and it may be ignored.</li>
 <li><strong><code>speculative</code></strong>: If <code>True</code>, forces early gradient evaluations, even if
@@ -2836,6 +2839,17 @@ optimizer:</p>
             <td>
               <div class="doc-md-description">
                 <p>Maximum number of function evaluations (optional).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.OptimizerConfig.max_batches">max_batches</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pydantic.PositiveInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.PositiveInt">PositiveInt</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum number of batch evaluations (optional).</p>
               </div>
             </td>
           </tr>
