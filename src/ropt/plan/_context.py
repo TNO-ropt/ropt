@@ -29,7 +29,7 @@ class OptimizerContext:
     - Managing a `PluginManager` to retrieve and utilize plugins, allowing for
       extensibility and customization of the optimization workflow. Plugins are
       modular pieces of code that extend the functionality of the optimization
-      framework, such as new `PlanStep` or `ResultHandler` implementations.
+      framework, such as new `PlanStep` or `PlanHandler` implementations.
     - Handling event callbacks that are triggered in response to specific events
       during the plan's execution. These callbacks are executed after the plan
       has processed the event, allowing for actions to be taken in response to

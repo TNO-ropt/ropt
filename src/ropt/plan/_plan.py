@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Callable
 
 from ropt.exceptions import PlanAborted
-from ropt.plugins.plan.base import PlanStep, ResultHandler
+from ropt.plugins.plan.base import PlanHandler, PlanStep
 
 if TYPE_CHECKING:
     import uuid
@@ -110,7 +110,7 @@ class Plan:
 
         self._aborted = False
         self._parent = parent
-        self._handlers: dict[uuid.UUID, ResultHandler] = {}
+        self._handlers: dict[uuid.UUID, PlanHandler] = {}
         self._steps: dict[uuid.UUID, PlanStep] = {}
         self._function: Callable[..., Any] | None = None
 
@@ -156,7 +156,7 @@ class Plan:
         handler = self._optimizer_context.plugin_manager.get_plugin(
             "plan_handler", method=name
         ).create(name, self, **kwargs)
-        assert isinstance(handler, ResultHandler)
+        assert isinstance(handler, PlanHandler)
         self._handlers[handler.id] = handler
         return handler.id
 

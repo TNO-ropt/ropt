@@ -5,7 +5,7 @@ managing steps and result handlers.
 
 A plan consists of [`PlanStep`][ropt.plugins.plan.base.PlanStep] objects, which
 define individual actions, and
-[`ResultHandler`][ropt.plugins.plan.base.ResultHandler] objects, which process
+[`PlanHandler`][ropt.plugins.plan.base.PlanHandler] objects, which process
 and store data generated during execution. Both steps and result handlers are
 implemented using a [plugin][ropt.plugins.plan] mechanism, making it easy to
 extend the range of supported actions and data processing. The `ropt` library

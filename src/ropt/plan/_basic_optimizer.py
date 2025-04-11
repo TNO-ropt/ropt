@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
     from ropt.evaluator import Evaluator
     from ropt.plan import Event
-    from ropt.plugins.plan.base import ResultHandler
+    from ropt.plugins.plan.base import PlanHandler
     from ropt.results import FunctionResults
     from ropt.transforms import OptModelTransforms
 
@@ -181,7 +181,7 @@ class BasicOptimizer:
 
         def _run_func(
             plan: Plan, transforms: OptModelTransforms | None
-        ) -> tuple[ResultHandler | None, OptimizerExitCode | None]:
+        ) -> tuple[PlanHandler | None, OptimizerExitCode | None]:
             exit_code = plan.run_step(
                 optimizer, config=self._config, transforms=transforms
             )

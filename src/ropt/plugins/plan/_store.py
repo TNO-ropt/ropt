@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ropt.enums import EventType
-from ropt.plugins.plan.base import ResultHandler
+from ropt.plugins.plan.base import PlanHandler
 
 if TYPE_CHECKING:
     import uuid
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from ropt.transforms import OptModelTransforms
 
 
-class DefaultStoreHandler(ResultHandler):
+class DefaultStoreHandler(PlanHandler):
     """The default store results handler object.
 
     This handler tracks the

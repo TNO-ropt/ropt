@@ -28,7 +28,7 @@ class PlanHandlerPlugin(Plugin):
     execution of an optimization plan, the required plugin is located through
     the [`PluginManager`][ropt.plugins.PluginManager], which then uses the
     plugin's `create_*` functions to instantiate  a
-    [`ResultHandler`][ropt.plugins.plan.base.ResultHandler].
+    [`PlanHandler`][ropt.plugins.plan.base.PlanHandler].
     """
 
     @classmethod
@@ -38,7 +38,7 @@ class PlanHandlerPlugin(Plugin):
         name: str,
         plan: Plan,
         **kwargs: Any,  # noqa: ANN401
-    ) -> ResultHandler:
+    ) -> PlanHandler:
         """Create a result handler.
 
         This factory function instantiates result handler
@@ -136,7 +136,7 @@ class PlanStep(ABC):
         """
 
 
-class ResultHandler(ABC):
+class PlanHandler(ABC):
     """Base class for result handler objects.
 
     Result handlers loaded and created by the plugin manager must inherit from

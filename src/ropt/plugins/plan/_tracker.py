@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Literal
 
 from ropt.enums import EventType
-from ropt.plugins.plan.base import ResultHandler
+from ropt.plugins.plan.base import PlanHandler
 
 from ._utils import _get_last_result, _update_optimal_result
 
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from ropt.transforms import OptModelTransforms
 
 
-class DefaultTrackerHandler(ResultHandler):
+class DefaultTrackerHandler(PlanHandler):
     """The default tracker results handler object.
 
     This handler tracks the

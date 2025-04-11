@@ -3,6 +3,6 @@
     options:
         members:
             - PlanStep
-            - ResultHandler
+            - PlanHandler
             - PlanHandlerPlugin
             - PlanStepPlugin
