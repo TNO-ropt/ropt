@@ -845,15 +845,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.PluginManager.plugins" class="md-nav__link">
-    <span class="md-ellipsis">
-      plugins
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1374,15 +1365,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.PluginManager.plugins" class="md-nav__link">
-    <span class="md-ellipsis">
-      plugins
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1468,83 +1450,91 @@
 
     <div class="doc doc-contents first">
 
-        <p>The <code>plugins</code> module facilitates the integration of <code>ropt</code> plugins.</p>
-<p>The core functionality of <code>ropt</code> can be extended through plugins, which can
-either be builtin, separately installed, or dynamically added at runtime.
-Currently, <code>ropt</code> supports the following plugin types to implement specific
-types of functionality:</p>
-<dl>
-<dt><a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer" href="../optimizer_plugins/#ropt.plugins.optimizer"><code>optimizer</code></a>:</dt>
-<dd>Plugins that implement specific optimization methods. The builtin
-  <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.scipy.SciPyOptimizer" href="../scipy_optimizer_plugin/#ropt.plugins.optimizer.scipy.SciPyOptimizer"><code>scipy</code></a> plugin utilizes the
-  <a href="https://docs.scipy.org/doc/scipy/reference/optimize.html"><code>scipy.optimize</code></a>
-module to implement various optimization algorithms.</dd>
-<dt><a class="autorefs autorefs-internal" title="            ropt.plugins.sampler" href="../sampler_plugins/#ropt.plugins.sampler"><code>sampler</code></a>:</dt>
-<dd>Plugins responsible for generating perturbations for estimating gradients.
-  The builtin <a class="autorefs autorefs-internal" title="            ropt.plugins.sampler.scipy.SciPySampler" href="../scipy_sampler_plugin/#ropt.plugins.sampler.scipy.SciPySampler"><code>scipy</code></a> plugin is based
-  on <a href="https://docs.scipy.org/doc/scipy/reference/stats.html"><code>scipy.stats</code></a>,
-  providing various sampling methods.</dd>
-<dt><a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter" href="../realization_filter_plugins/#ropt.plugins.realization_filter"><code>realization_filter</code></a>:</dt>
-<dd>These plugins implement filters for selecting a sub-set of realizations used
-  in calculating objective or constraint functions and their gradients. The
-  included
+        <p>Extending <code>ropt</code> with Plugins.</p>
+<p>The <code>ropt.plugins</code> module provides the framework for extending <code>ropt</code>'s
+capabilities through a plugin system. Plugins allow for the integration of
+custom or third-party components, installed as separate packages.</p>
+<p><code>ropt</code> supports several types of plugins, each addressing a specific aspect of
+the optimization workflow:</p>
+<ul>
+<li><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base" href="../plan_plugins/#ropt.plugins.plan.base"><code>plan</code></a>: Defines components for constructing and executing
+  optimization plans
+  (<a class="autorefs autorefs-internal" title="            PlanHandlerPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandlerPlugin"><code>PlanHandlerPlugin</code></a> and
+  <a class="autorefs autorefs-internal" title="            PlanStepPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a>).</li>
+<li><a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer" href="../optimizer_plugins/#ropt.plugins.optimizer"><code>optimizer</code></a>: Implements optimization algorithms.</li>
+<li><a class="autorefs autorefs-internal" title="            ropt.plugins.sampler" href="../sampler_plugins/#ropt.plugins.sampler"><code>sampler</code></a>: Generates parameter perturbations, which
+  are used for gradient estimation.</li>
+<li><a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter" href="../realization_filter_plugins/#ropt.plugins.realization_filter"><code>realization_filter</code></a>: Selects subsets of
+  ensemble realizations for calculating objectives or constraints.</li>
+<li><a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator" href="../function_estimator_plugins/#ropt.plugins.function_estimator"><code>function_estimator</code></a>: Computes final
+  objective function values and gradients from individual realization results.</li>
+</ul>
+<p><strong>Plugin Management and Discovery</strong></p>
+<p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="#ropt.plugins.PluginManager"><code>PluginManager</code></a> class is central to the plugin
+system. It discovers and manages available plugins. Plugins are typically
+discovered automatically using Python's standard entry points mechanism.</p>
+<p>Each plugin type has a corresponding abstract base class that custom plugins
+must inherit from:</p>
+<ul>
+<li><strong>Plan:</strong> <a class="autorefs autorefs-internal" title="            PlanHandlerPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandlerPlugin"><code>PlanHandlerPlugin</code></a> and
+  <a class="autorefs autorefs-internal" title="            PlanStepPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a></li>
+<li><strong>Optimizer:</strong>
+  <a class="autorefs autorefs-internal" title="            OptimizerPlugin" href="../optimizer_plugins/#ropt.plugins.optimizer.base.OptimizerPlugin"><code>OptimizerPlugin</code></a></li>
+<li><strong>Sampler:</strong> <a class="autorefs autorefs-internal" title="            SamplerPlugin" href="../sampler_plugins/#ropt.plugins.sampler.base.SamplerPlugin"><code>SamplerPlugin</code></a></li>
+<li><strong>Realization Filter:</strong>
+  <a class="autorefs autorefs-internal" title="            RealizationFilterPlugin" href="../realization_filter_plugins/#ropt.plugins.realization_filter.base.RealizationFilterPlugin"><code>RealizationFilterPlugin</code></a></li>
+<li><strong>Function Estimator:</strong>
+  <a class="autorefs autorefs-internal" title="            FunctionEstimatorPlugin" href="../function_estimator_plugins/#ropt.plugins.function_estimator.base.FunctionEstimatorPlugin"><code>FunctionEstimatorPlugin</code></a></li>
+</ul>
+<p><strong>Using Plugins</strong></p>
+<p>The <a class="autorefs autorefs-internal" title="            get_plugin" href="#ropt.plugins.PluginManager.get_plugin"><code>PluginManager.get_plugin</code></a> method
+is used internally by <code>ropt</code> to retrieve the appropriate plugin implementation
+based on a specified type and method name. The
+<a class="autorefs autorefs-internal" title="            is_supported" href="#ropt.plugins.PluginManager.is_supported"><code>PluginManager.is_supported</code></a> method
+can check if a specific method is available.</p>
+<p>Plugins can implement multiple named methods. To request a specific method
+(<code>method-name</code>) from a particular plugin (<code>plugin-name</code>), use the format
+<code>"plugin-name/method-name"</code>. If only a method name is provided, the plugin
+manager searches through all registered plugins (that allow discovery) for one
+that supports the method. Using <code>"plugin-name/default"</code> typically selects the
+primary or default method offered by that plugin, although specifying "default"
+without a plugin name is not permitted.</p>
+<p>Plugins retrieved by the <a class="autorefs autorefs-internal" title="            get_plugin" href="#ropt.plugins.PluginManager.get_plugin"><code>PluginManager.get_plugin</code></a>
+method generally implement a <code>create</code> factory method that will be used to instantiate the objects
+that implement the desired functionality. These objects must inherit from the base class for the
+corresponding plugin type:</p>
+<ul>
+<li><strong>Plan:</strong> <a class="autorefs autorefs-internal" title="            PlanHandler" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandler"><code>PlanHandler</code></a> and
+  <a class="autorefs autorefs-internal" title="            PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a></li>
+<li><strong>Optimizer:</strong>
+  <a class="autorefs autorefs-internal" title="            Optimizer" href="../optimizer_plugins/#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a></li>
+<li><strong>Sampler:</strong> <a class="autorefs autorefs-internal" title="            Sampler" href="../sampler_plugins/#ropt.plugins.sampler.base.Sampler"><code>Sampler</code></a></li>
+<li><strong>Realization Filter:</strong>
+  <a class="autorefs autorefs-internal" title="            RealizationFilter" href="../realization_filter_plugins/#ropt.plugins.realization_filter.base.RealizationFilter"><code>RealizationFilter</code></a></li>
+<li><strong>Function Estimator:</strong>
+  <a class="autorefs autorefs-internal" title="            FunctionEstimator" href="../function_estimator_plugins/#ropt.plugins.function_estimator.base.FunctionEstimator"><code>FunctionEstimator</code></a></li>
+</ul>
+<p><strong>Pre-installed Plugins Included with <code>ropt</code></strong></p>
+<p><code>ropt</code> comes bundled with a set of pre-installed plugins:</p>
+<ul>
+<li><strong>Plan:</strong> The built-in
+  <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.default.DefaultPlanHandlerPlugin" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanHandlerPlugin"><code>default</code></a> handler and
+  <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.default.DefaultPlanStepPlugin" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanStepPlugin"><code>default</code></a> step plugins,
+  providing components for executing complex optimization plans.</li>
+<li><strong>Optimizer:</strong> The <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.scipy.SciPyOptimizer" href="../scipy_optimizer_plugin/#ropt.plugins.optimizer.scipy.SciPyOptimizer"><code>scipy</code></a>
+  plugin, leveraging algorithms from <code>scipy.optimize</code>, and the
+  <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.external.ExternalOptimizer" href="../external_optimizer_plugin/#ropt.plugins.optimizer.external.ExternalOptimizer"><code>ExternalOptimizer</code></a>,
+  which is used to launch optimizers in separate processes.</li>
+<li><strong>Sampler:</strong> The <a class="autorefs autorefs-internal" title="            ropt.plugins.sampler.scipy.SciPySampler" href="../scipy_sampler_plugin/#ropt.plugins.sampler.scipy.SciPySampler"><code>scipy</code></a> plugin,
+  using distributions from <code>scipy.stats</code>.</li>
+<li><strong>Realization Filter:</strong> The
   <a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.default.DefaultRealizationFilter" href="../default_realization_filter_plugin/#ropt.plugins.realization_filter.default.DefaultRealizationFilter"><code>default</code></a>
-  plugin provides filters based on ranking and for CVaR optimization.</dd>
-<dt><a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator" href="../function_estimator_plugins/#ropt.plugins.function_estimator"><code>function_estimator</code></a>:</dt>
-<dd>These plugins calculate the final objective and gradient from sets of
-  objectives or constraints and their gradients for individual realizations. The
-  included
+  plugin, offering filters based on ranking and for CVaR optimization.</li>
+<li><strong>Function Estimator:</strong> The
   <a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.default.DefaultFunctionEstimator" href="../default_function_estimator_plugin/#ropt.plugins.function_estimator.default.DefaultFunctionEstimator"><code>default</code></a>
-  plugin supports objectives defined by the mean or standard deviation of these
-  values.</dd>
-<dt><a class="autorefs autorefs-internal" title="            ropt.plugins.plan" href="../plan_plugins/#ropt.plugins.plan"><code>plan</code></a>:</dt>
-<dd>Plan plugins implement the objects that execute an optimization plan.
-  The built-in <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.default.DefaultPlanHandlerPlugin" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanHandlerPlugin"><code>default</code></a>
-  handler and <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.default.DefaultPlanStepPlugin" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanStepPlugin"><code>default</code></a> step
-  plugins offer a full set of optimization plan objects for executing complex
-  optimization plans.</dd>
-</dl>
-<p>Plugins are managed by the <a class="autorefs autorefs-internal" title="            PluginManager" href="#ropt.plugins.PluginManager"><code>PluginManager</code></a> class.
-This class is used to retrieve plugin objects that derive from an abstract
-base class defining the required functionality for each plugin type:</p>
-<ol>
-<li><a class="autorefs autorefs-internal" title="            OptimizerPlugin" href="../optimizer_plugins/#ropt.plugins.optimizer.base.OptimizerPlugin"><code>OptimizerPlugin</code></a>:
-    Abstract base class for optimizer plugins.</li>
-<li><a class="autorefs autorefs-internal" title="            SamplerPlugin" href="../sampler_plugins/#ropt.plugins.sampler.base.SamplerPlugin"><code>SamplerPlugin</code></a>:
-    Abstract base class for sampler plugins.</li>
-<li><a class="autorefs autorefs-internal" title="            RealizationFilterPlugin" href="../realization_filter_plugins/#ropt.plugins.realization_filter.base.RealizationFilterPlugin"><code>RealizationFilterPlugin</code></a>:
-    Abstract base class for realization filter plugins.</li>
-<li><a class="autorefs autorefs-internal" title="            FunctionEstimatorPlugin" href="../function_estimator_plugins/#ropt.plugins.function_estimator.base.FunctionEstimatorPlugin"><code>FunctionEstimatorPlugin</code></a>:
-    Abstract base class for function estimator plugins.</li>
-<li><a class="autorefs autorefs-internal" title="            PlanHandlerPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandlerPlugin"><code>PlanHandlerPlugin</code></a>:
-    Abstract base class for optimization plan object plugins.</li>
-<li><a class="autorefs autorefs-internal" title="            PlanStepPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a>:
-    Abstract base class for optimization plan object plugins.</li>
-</ol>
-<p>Plugins are installed using the standard
-<a href="https://packaging.python.org/en/latest/guides/creating-and-discovering-plugins/#using-package-metadata">entry points</a>
-mechanism of python).</p>
-<p>The plugin manager object provides the
-<a class="autorefs autorefs-internal" title="            get_plugin" href="#ropt.plugins.PluginManager.get_plugin"><code>get_plugin</code></a> method, which <code>ropt</code> uses
-to retrieve the necessary plugin based on its type and name. Given the plugin's
-type and name, this method returns a callable (either a class or a factory
-function) that <code>ropt</code> uses to instantiate the plugin when needed.</p>
+  plugin, supporting objectives based on mean or standard deviation.</li>
+</ul>
 
-
-<details class="info" open>
-  <summary>Plugin and method names</summary>
-  <p>Plugins are registered by name by plugin manager objects. Plugins may
-implement multiple methods, each of which should also be identified by a name.
-<a class="autorefs autorefs-internal" title="            get_plugin" href="#ropt.plugins.PluginManager.get_plugin"><code>PluginManager.get_plugin</code></a> and
-<a class="autorefs autorefs-internal" title="            is_supported" href="#ropt.plugins.PluginManager.is_supported"><code>PluginManager.is_supported</code></a> accept
-method names and will search through the available plugins to find the correct
-plugin code. To refer to a method <em>method-name</em> of a given plugin
-<em>plugin-name</em>, a string in the form "<em>plugin-name/method-name</em>" can be used
-instead. In this case, the plugin manager will not search through all plugins
-for the requested method but will only inquire with the plugin <em>plugin-name</em>.
-By convention, using "default" for the method name in such a string will
-select the default method of the plugin.</p>
-</details>
 
 
 
@@ -1575,7 +1565,30 @@ select the default method of the plugin.</p>
     <div class="doc doc-contents ">
 
 
-        <p>The plugin manager.</p>
+        <p>Manages the discovery and retrieval of <code>ropt</code> plugins.</p>
+<p>The <code>PluginManager</code> is responsible for finding available plugins based on
+Python's entry points mechanism and providing access to them. It serves as
+a central registry for different types of plugins used within <code>ropt</code>, such
+as optimizers, samplers, and plan components.</p>
+<p>Upon initialization, the manager scans for entry points defined under the
+<code>ropt.plugins.*</code> groups (e.g., <code>ropt.plugins.optimizer</code>). Plugins found
+this way are loaded and stored internally, categorized by their type.</p>
+<p>The primary way to interact with the manager is through the
+<a class="autorefs autorefs-internal" title="            get_plugin" href="#ropt.plugins.PluginManager.get_plugin"><code>get_plugin</code></a> method, which retrieves
+a specific plugin class based on its type and a method name it supports.
+The <a class="autorefs autorefs-internal" title="            is_supported" href="#ropt.plugins.PluginManager.is_supported"><code>is_supported</code></a> method can be
+used to check for the availability of a plugin method without retrieving it.</p>
+<p><strong>Example: Registering a Custom Optimizer Plugin</strong></p>
+<p>To make a custom optimizer plugin available to <code>ropt</code>, you would typically
+define an entry point in your package's <code>pyproject.toml</code>:</p>
+<div class="language-toml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">[project.entry-points.</span><span class="s2">&quot;ropt.plugins.optimizer&quot;</span><span class="k">]</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">my_optimizer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my_package.my_module:MyOptimizer&quot;</span>
+</span></code></pre></div>
+<p>When <code>ropt</code> initializes the <code>PluginManager</code>, it will discover and load
+<code>MyOptimizer</code> from <code>my_package.my_module</code>, making it accessible via
+<code>plugin_manager.get_plugin("optimizer", "my_optimizer/some_method")</code> or
+potentially <code>plugin_manager.get_plugin("optimizer", "some_method")</code> if
+discovery is allowed and the method is unique.</p>
 
 
 
@@ -1608,19 +1621,6 @@ select the default method of the plugin.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize the plugin manager.</p>
-<p>The plugin manager object is initialized via the entry points mechanism
-(see
-<a href="https://docs.python.org/3/library/importlib.metadata.html"><code>importlib.metadata</code></a>).</p>
-<p>For instance, to install an additional optimizer plugin, implemented in
-an independent package, and assuming installation via a <code>pyproject.toml</code>
-file, add the following:</p>
-<p><div class="language-toml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">[project.entry-points.</span><span class="s2">&quot;ropt.plugins.optimizer&quot;</span><span class="k">]</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">my_optimizer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;my_optimizer_pkg.my_plugin:MyOptimizer&quot;</span>
-</span></code></pre></div>
-This will make the <code>MyOptimizer</code> class from the <code>my_optimizer_pkg</code>
-package available under the name <code>my_optimizer</code>. The <code>MyOptimizer</code> class
-will be used to create
-<a class="autorefs autorefs-internal" title="            OptimizerPlugin" href="../optimizer_plugins/#ropt.plugins.optimizer.base.OptimizerPlugin"><code>OptimizerPlugin</code></a> objects.</p>
 
 
     </div>
@@ -1645,14 +1645,25 @@ will be used to create
 
     <div class="doc doc-contents ">
 
-        <p>Retrieve a plugin by type and method name.</p>
-<p>If the method name is of the form "<em>plugin-name/method-name</em>", the method
-<em>method-name</em> will be retrieved from the given plugin <em>plugin-name</em>.</p>
-<p>If the given method name does not contain a slash (/), the plugin
-manager will search through all plugins and return the first plugin that
-supports the requested method. Searching occurs in the order that plugins
-were added to the manager, which normally will be one of the plugins loaded
-via entry points, but plugins added dynamically can be prioritized.</p>
+        <p>Retrieve a plugin class by its type and a supported method name.</p>
+<p>This method finds and returns the class of a plugin that matches the
+specified <code>plugin_type</code> and supports the given <code>method</code>.</p>
+<p>The <code>method</code> argument can be specified in two ways:</p>
+<ol>
+<li><strong>Explicit Plugin:</strong> Use the format <code>"plugin-name/method-name"</code>.
+    This directly requests the <code>method-name</code> from the plugin named
+    <code>plugin-name</code>.</li>
+<li><strong>Implicit Plugin:</strong> Provide only the <code>method-name</code>. The manager
+    will search through all registered plugins of the specified
+    <code>plugin_type</code> that allow discovery (see
+    <a class="autorefs autorefs-internal" title="            allows_discovery
+
+
+  
+      classmethod
+  " href="#ropt.plugins.Plugin.allows_discovery"><code>Plugin.allows_discovery</code></a>).
+    It returns the first plugin found that supports the <code>method-name</code>.</li>
+</ol>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1680,7 +1691,7 @@ via entry points, but plugins added dynamically can be prioritized.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The type of the plugin to retrieve.</p>
+                <p>The category of the plugin (e.g., "optimizer", "sampler").</p>
               </div>
             </td>
             <td>
@@ -1696,11 +1707,60 @@ via entry points, but plugins added dynamically can be prioritized.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The name of the method the plugin should provide.</p>
+                <p>The name of the method the plugin must support, potentially
+         prefixed with the plugin name and a slash (<code>/</code>).</p>
               </div>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The plugin class that matches the criteria.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ConfigError (ropt.exceptions.ConfigError)" href="../exceptions/#ropt.exceptions.ConfigError">ConfigError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If no matching plugin is found for the given type and
+         method, or if "default" is used as a method name without
+         specifying a plugin name.</p>
+              </div>
             </td>
           </tr>
       </tbody>
@@ -1729,12 +1789,17 @@ via entry points, but plugins added dynamically can be prioritized.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Check if a method is supported.</p>
-<p>If the given method name does not contain a slash (/), the plugin
-manager will search through all plugins and return <code>True</code> if a plugin is
-found that supports the requested method. If the method name is of the
-form "<em>plugin-name/method-name</em>", <code>True</code> will be returned if the method
-<em>method-name</em> is supported by the given plugin <em>plugin-name</em>.</p>
+        <p>Check if a specific plugin method is available.</p>
+<p>Verifies whether a plugin of the specified <code>plugin_type</code> supports the
+given <code>method</code>. This is useful for checking availability before attempting
+to retrieve a plugin with <a class="autorefs autorefs-internal" title="            get_plugin" href="#ropt.plugins.PluginManager.get_plugin"><code>get_plugin</code></a>.</p>
+<p>The <code>method</code> argument can be specified in two ways:</p>
+<ol>
+<li><strong>Explicit Plugin:</strong> <code>"plugin-name/method-name"</code> checks if the specific
+    plugin named <code>plugin-name</code> supports <code>method-name</code>.</li>
+<li><strong>Implicit Plugin:</strong> <code>"method-name"</code> searches through all discoverable
+    plugins of the given <code>plugin_type</code> to see if any support <code>method-name</code>.</li>
+</ol>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1762,7 +1827,7 @@ form "<em>plugin-name/method-name</em>", <code>True</code> will be returned if t
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The type of the plugin to retrieve.</p>
+                <p>The category of the plugin (e.g., "optimizer", "sampler").</p>
               </div>
             </td>
             <td>
@@ -1778,7 +1843,8 @@ form "<em>plugin-name/method-name</em>", <code>True</code> will be returned if t
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The name of the method the plugin should provide.</p>
+                <p>The name of the method to check, potentially prefixed
+         with the plugin name and a slash (<code>/</code>).</p>
               </div>
             </td>
             <td>
@@ -1789,70 +1855,7 @@ form "<em>plugin-name/method-name</em>", <code>True</code> will be returned if t
     </table>
 
 
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plugins.PluginManager.plugins" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">plugins</span>
-
-
-</h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">plugins</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">plugin_type</span><span class="p">:</span> <span class="n">PluginType</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">type</span><span class="p">[</span><span class="n">Plugin</span><span class="p">]],</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Generate a sequence of all plugins of a specified type.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>plugin_type</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            PluginType
-
-
-  
-      module-attribute
-   (ropt.plugins._manager.PluginType)" href="#ropt.plugins.PluginType">PluginType</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The type of plugins to return.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Yields:</span></p>
+    <p><span class="doc-section-title">Returns:</span></p>
     <table>
       <thead>
         <tr>
@@ -1863,11 +1866,11 @@ form "<em>plugin-name/method-name</em>", <code>True</code> will be returned if t
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#type">type</a>[<a class="autorefs autorefs-internal" title="            Plugin (ropt.plugins.base.Plugin)" href="#ropt.plugins.Plugin">Plugin</a>]]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A tuple of the plugin name and object.</p>
+                <p><code>True</code> if a matching plugin supports the specified method.</p>
               </div>
             </td>
           </tr>
@@ -1918,7 +1921,24 @@ form "<em>plugin-name/method-name</em>", <code>True</code> will be returned if t
 
     <div class="doc doc-contents ">
 
-        <p>Plugin Types Supported by <code>ropt</code></p>
+        <p>Represents the valid types of plugins supported by <code>ropt</code>.</p>
+<p>This type alias defines the string identifiers used to categorize different
+plugins within the <code>ropt</code> framework. Each identifier corresponds to a specific
+role in the optimization process:</p>
+<ul>
+<li><code>"optimizer"</code>: Plugins implementing optimization algorithms
+  (<a class="autorefs autorefs-internal" title="            OptimizerPlugin" href="../optimizer_plugins/#ropt.plugins.optimizer.base.OptimizerPlugin"><code>OptimizerPlugin</code></a>).</li>
+<li><code>"sampler"</code>: Plugins for generating parameter samples
+  (<a class="autorefs autorefs-internal" title="            SamplerPlugin" href="../sampler_plugins/#ropt.plugins.sampler.base.SamplerPlugin"><code>SamplerPlugin</code></a>).</li>
+<li><code>"realization_filter"</code>: Plugins for filtering ensemble realizations
+  (<a class="autorefs autorefs-internal" title="            RealizationFilterPlugin" href="../realization_filter_plugins/#ropt.plugins.realization_filter.base.RealizationFilterPlugin"><code>RealizationFilterPlugin</code></a>).</li>
+<li><code>"function_estimator"</code>: Plugins for estimating objective functions and gradients
+  (<a class="autorefs autorefs-internal" title="            FunctionEstimatorPlugin" href="../function_estimator_plugins/#ropt.plugins.function_estimator.base.FunctionEstimatorPlugin"><code>FunctionEstimatorPlugin</code></a>).</li>
+<li><code>"plan_handler"</code>: Plugins that create handlers for processing plan results
+  (<a class="autorefs autorefs-internal" title="            PlanHandlerPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandlerPlugin"><code>PlanHandlerPlugin</code></a>).</li>
+<li><code>"plan_step"</code>: Plugins that define executable steps within an optimization plan
+  (<a class="autorefs autorefs-internal" title="            PlanStepPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a>).</li>
+</ul>
 
     </div>
 
@@ -1945,9 +1965,19 @@ form "<em>plugin-name/method-name</em>", <code>True</code> will be returned if t
               Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
 
 
-        <p>Abstract base class for plugins.</p>
-<p><code>ropt</code>  plugins should derive from this base class, which specifies an
-<code>is_supported</code> method.</p>
+        <p>Abstract base class for all <code>ropt</code> plugins.</p>
+<p>This class serves as the fundamental building block for all plugins within
+the <code>ropt</code> framework. Any class intended to function as a plugin (e.g.,
+an optimizer, sampler, plan step, or plan handler) must inherit from this
+base class.</p>
+<p>It defines the core interface that all plugins must adhere to, ensuring
+consistency and enabling the <a class="autorefs autorefs-internal" title="            PluginManager" href="#ropt.plugins.PluginManager"><code>PluginManager</code></a>
+to discover and manage them effectively.</p>
+<p>Subclasses must implement the <code>is_supported</code> class method to indicate which
+named methods (functionalities) they provide. They can optionally override
+the <code>allows_discovery</code> class method if they should not be automatically
+selected by the plugin manager when a method name is provided without an
+explicit plugin name.</p>
 
 
 
@@ -1984,11 +2014,12 @@ form "<em>plugin-name/method-name</em>", <code>True</code> will be returned if t
 
     <div class="doc doc-contents ">
 
-        <p>Check whether a given method is supported.</p>
-<p>This method is called by the
-<a class="autorefs autorefs-internal" title="            is_supported" href="#ropt.plugins.PluginManager.is_supported"><code>is_supported</code></a> method of
-<a class="autorefs autorefs-internal" title="            PluginManager" href="#ropt.plugins.PluginManager"><code>PluginManager</code></a> objects to verify if a
-specific method is supported by this plugin.</p>
+        <p>Verify if this plugin supports a specific named method.</p>
+<p>This class method is used by the
+<a class="autorefs autorefs-internal" title="            PluginManager" href="#ropt.plugins.PluginManager"><code>PluginManager</code></a> (specifically its
+<a class="autorefs autorefs-internal" title="            is_supported" href="#ropt.plugins.PluginManager.is_supported"><code>is_supported</code></a> method) to
+determine if this plugin class provides the functionality associated
+with the given <code>method</code> name.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2011,7 +2042,7 @@ specific method is supported by this plugin.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The name of the method to check.</p>
+                <p>The string identifier of the method to check for support.</p>
               </div>
             </td>
             <td>
@@ -2037,7 +2068,7 @@ specific method is supported by this plugin.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>True if the method is supported; otherwise, False.</p>
+                <p><code>True</code> if the plugin supports the specified method, <code>False</code> otherwise.</p>
               </div>
             </td>
           </tr>
@@ -2071,17 +2102,41 @@ specific method is supported by this plugin.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Check if the plugin can be discovered automatically.</p>
-<p>Normally, plugins may be discovered automatically by the plugin manager
-by checking if they support a specific method. However, some plugins may
-not support this behavior and should be explicitly requested. These
-should override this property to return <code>False</code>.</p>
-<p>For example, the
-<a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.external.ExternalOptimizer" href="../external_optimizer_plugin/#ropt.plugins.optimizer.external.ExternalOptimizer"><code>external</code></a>
-optimizer plugin does not define its own methods but launches methods
-from other plugins as an external process. Therefore, the <code>external</code>
-optimizer plugin must always be specified explicitly, and this method
-is overloaded to return False.</p>
+        <p>Determine if the plugin allows implicit discovery by method name.</p>
+<p>By default (<code>True</code>), plugins can be found by the
+<a class="autorefs autorefs-internal" title="            PluginManager" href="#ropt.plugins.PluginManager"><code>PluginManager</code></a> when a user provides only
+a method name (without specifying the plugin, e.g., <code>"method-name"</code>).</p>
+<p>If a plugin should <em>only</em> be used when explicitly named (e.g.,
+<code>"plugin-name/method-name"</code>), it must override this class method to
+return <code>False</code>.</p>
+<p>For instance, the
+<a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.external.ExternalOptimizer" href="../external_optimizer_plugin/#ropt.plugins.optimizer.external.ExternalOptimizer"><code>external</code></a> optimizer
+plugin acts as a wrapper for other optimizers run in separate processes.
+It doesn't provide methods directly and must always be explicitly
+requested, so it overrides this method to return <code>False</code>.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the plugin can be discovered implicitly by method name.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     </div>
