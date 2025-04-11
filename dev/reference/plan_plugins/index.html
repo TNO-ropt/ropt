@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.plugins.plan.base" class="md-skip">
+        <a href="#ropt.plugins.plan" class="md-skip">
           Skip to content
         </a>
       
@@ -822,16 +822,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base" class="md-nav__link">
+  <a href="#ropt.plugins.plan" class="md-nav__link">
     <span class="md-ellipsis">
-      base
+      plan
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="base">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.plan.base.PlanStepPlugin" class="md-nav__link">
     <span class="md-ellipsis">
       PlanStepPlugin
@@ -854,8 +853,8 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.plan.base.PlanHandlerPlugin" class="md-nav__link">
     <span class="md-ellipsis">
       PlanHandlerPlugin
@@ -878,8 +877,8 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.plan.base.PlanStep" class="md-nav__link">
     <span class="md-ellipsis">
       PlanStep
@@ -929,8 +928,8 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.plan.base.PlanHandler" class="md-nav__link">
     <span class="md-ellipsis">
       PlanHandler
@@ -991,11 +990,6 @@
       __setitem__
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1403,16 +1397,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base" class="md-nav__link">
+  <a href="#ropt.plugins.plan" class="md-nav__link">
     <span class="md-ellipsis">
-      base
+      plan
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="base">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.plan.base.PlanStepPlugin" class="md-nav__link">
     <span class="md-ellipsis">
       PlanStepPlugin
@@ -1435,8 +1428,8 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.plan.base.PlanHandlerPlugin" class="md-nav__link">
     <span class="md-ellipsis">
       PlanHandlerPlugin
@@ -1459,8 +1452,8 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.plan.base.PlanStep" class="md-nav__link">
     <span class="md-ellipsis">
       PlanStep
@@ -1510,8 +1503,8 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.plan.base.PlanHandler" class="md-nav__link">
     <span class="md-ellipsis">
       PlanHandler
@@ -1579,11 +1572,6 @@
     </nav>
   
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
       
     </ul>
   
@@ -1610,27 +1598,38 @@
 
 
 
-<h2 id="ropt.plugins.plan.base" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.plugins.plan.base</span>
+<h2 id="ropt.plugins.plan" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.plugins.plan</span>
 
 
 </h2>
 
     <div class="doc doc-contents first">
 
-        <p>Defines Base Classes for Optimization Plan Components and Plugins.</p>
-<p>This module provides the fundamental abstract base classes required for creating
-and extending optimization plans within <code>ropt</code>. It defines two main categories
-of base classes:</p>
+        <p>Framework and Implementations for Optimization Plan Plugins.</p>
+<p>This module provides the core components and default implementations for
+extending <code>ropt</code>'s optimization plan capabilities (<a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a>)
+through plugins. It allows users to define custom sequences of operations
+(steps) and ways to process the results and events generated during plan
+execution (handlers).</p>
+<p><strong>Core Concepts:</strong></p>
+<ul>
+<li><strong>Plan Steps:</strong> Represent individual actions within an optimization plan,
+    such as running an optimizer or performing evaluations.</li>
+<li><strong>Plan Handlers:</strong> Process events emitted by the plan or its steps, enabling
+    tasks like result tracking, data storage, or logging.</li>
+</ul>
+<p>The implementation of these core concepts relies on classes derived from the
+following abstract base classes:</p>
 <ol>
 <li>
 <p><strong>Plugin Base Classes:</strong></p>
 <ul>
-<li><a class="autorefs autorefs-internal" title="            PlanStepPlugin" href="#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a>: The base for
+<li><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStepPlugin" href="#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a>: The base for
   plugins that <em>create</em> plan steps. These plugins are discovered by the
   <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> and used to instantiate
   actual <code>PlanStep</code> objects.</li>
-<li><a class="autorefs autorefs-internal" title="            PlanHandlerPlugin" href="#ropt.plugins.plan.base.PlanHandlerPlugin"><code>PlanHandlerPlugin</code></a>: The base
+<li><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanHandlerPlugin" href="#ropt.plugins.plan.base.PlanHandlerPlugin"><code>PlanHandlerPlugin</code></a>: The base
   for plugins that <em>create</em> plan result handlers. Similar to step plugins,
   these are used by the <code>PluginManager</code> to instantiate <code>PlanHandler</code>
   objects.</li>
@@ -1639,7 +1638,7 @@ of base classes:</p>
 <li>
 <p><strong>Component Base Classes:</strong></p>
 <ul>
-<li><a class="autorefs autorefs-internal" title="            PlanStep" href="#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a>: The abstract base class
+<li><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a>: The abstract base class
   that all concrete plan step implementations must inherit from. It defines
   the <a class="autorefs autorefs-internal" title="            run
 
@@ -1648,7 +1647,7 @@ of base classes:</p>
       abstractmethod
   " href="#ropt.plugins.plan.base.PlanStep.run"><code>run</code></a> method where the step's
   logic resides.</li>
-<li><a class="autorefs autorefs-internal" title="            PlanHandler" href="#ropt.plugins.plan.base.PlanHandler"><code>PlanHandler</code></a>: The abstract base
+<li><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanHandler" href="#ropt.plugins.plan.base.PlanHandler"><code>PlanHandler</code></a>: The abstract base
   class for all result handlers. It defines the
   <a class="autorefs autorefs-internal" title="            handle_event
 
@@ -1664,6 +1663,31 @@ of base classes:</p>
 <p>By inheriting from these classes, developers can create custom steps and
 handlers that integrate seamlessly into the <code>ropt</code> optimization plan execution
 framework (<a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a>).</p>
+<p><strong>Built-in Plan Plugins:</strong></p>
+<p><code>ropt</code> includes default plugins providing common plan components:</p>
+<ul>
+<li><strong>Steps</strong> (via
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.default.DefaultPlanStepPlugin" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanStepPlugin"><code>DefaultPlanStepPlugin</code></a>):<ul>
+<li><code>evaluator</code>: Performs ensemble evaluations
+    (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.evaluator.DefaultEvaluatorStep" href="../default_plan_plugin/#ropt.plugins.plan.evaluator.DefaultEvaluatorStep"><code>DefaultEvaluatorStep</code></a>).</li>
+<li><code>optimizer</code>: Runs an optimization algorithm using a configured optimizer
+    plugin
+    (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.optimizer.DefaultOptimizerStep" href="../default_plan_plugin/#ropt.plugins.plan.optimizer.DefaultOptimizerStep"><code>DefaultOptimizerStep</code></a>).</li>
+</ul>
+</li>
+<li><strong>Handlers</strong> (via
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.default.DefaultPlanHandlerPlugin" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanHandlerPlugin"><code>DefaultPlanHandlerPlugin</code></a>):<ul>
+<li><code>tracker</code>: Tracks the 'best' or 'last' valid result based on objective
+    value and constraints
+    (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan._tracker.DefaultTrackerHandler" href="../default_plan_plugin/#ropt.plugins.plan._tracker.DefaultTrackerHandler"><code>DefaultTrackerHandler</code></a>).</li>
+<li><code>store</code>: Accumulates all results from specified sources
+    (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan._store.DefaultStoreHandler" href="../default_plan_plugin/#ropt.plugins.plan._store.DefaultStoreHandler"><code>DefaultStoreHandler</code></a>).</li>
+</ul>
+</li>
+</ul>
+<p>These built-in components allow for the construction of standard optimization
+workflows out-of-the-box, while the plugin architecture enables customization
+and extension.</p>
 
 
 
@@ -1682,25 +1706,34 @@ framework (<a class="autorefs autorefs-internal" title="            ropt.plan.Pl
 
 
 
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
 <div class="doc doc-object doc-class">
 
 
 
-<h3 id="ropt.plugins.plan.base.PlanStepPlugin" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">PlanStepPlugin</span>
+<h2 id="ropt.plugins.plan.base.PlanStepPlugin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan.base.PlanStepPlugin</span>
 
 
-</h3>
+</h2>
 
 
-    <div class="doc doc-contents ">
+    <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
               Bases: <code><a class="autorefs autorefs-internal" title="            Plugin (ropt.plugins.base.Plugin)" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
 
 
         <p>Abstract base class for plugins that create PlanStep instances.</p>
 <p>This class defines the interface for plugins that act as factories for
-<a class="autorefs autorefs-internal" title="            PlanStep" href="#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a> objects.</p>
+<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a> objects.</p>
 <p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> uses the <code>create</code> class
 method of these plugins to instantiate <code>PlanStep</code> objects when they are
 added to an optimization <a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> via
@@ -1728,7 +1761,7 @@ added to an optimization <a class="autorefs autorefs-internal" title="          
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.plan.base.PlanStepPlugin.create" class="doc doc-heading">
+<h3 id="ropt.plugins.plan.base.PlanStepPlugin.create" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">create</span>
 
 
@@ -1737,7 +1770,7 @@ added to an optimization <a class="autorefs autorefs-internal" title="          
       <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlanStep</span>
 </span></code></pre></div>
 
@@ -1745,7 +1778,7 @@ added to an optimization <a class="autorefs autorefs-internal" title="          
 
         <p>Create a PlanStep instance.</p>
 <p>This abstract class method serves as a factory for creating concrete
-<a class="autorefs autorefs-internal" title="            PlanStep" href="#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a> objects. Plugin
+<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a> objects. Plugin
 implementations must override this method to return an instance of
 their specific <code>PlanStep</code> subclass.</p>
 <p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> calls this method
@@ -1834,7 +1867,7 @@ allowing for custom configuration of the step instance.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            PlanStep (ropt.plugins.plan.base.PlanStep)" href="#ropt.plugins.plan.base.PlanStep">PlanStep</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="#ropt.plugins.plan.base.PlanStep">PlanStep</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1862,21 +1895,21 @@ allowing for custom configuration of the step instance.</p>
 
 
 
-<h3 id="ropt.plugins.plan.base.PlanHandlerPlugin" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">PlanHandlerPlugin</span>
+<h2 id="ropt.plugins.plan.base.PlanHandlerPlugin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan.base.PlanHandlerPlugin</span>
 
 
-</h3>
+</h2>
 
 
-    <div class="doc doc-contents ">
+    <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
               Bases: <code><a class="autorefs autorefs-internal" title="            Plugin (ropt.plugins.base.Plugin)" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
 
 
         <p>Abstract Base Class for Plan Handler Plugins.</p>
 <p>This class defines the interface for plugins responsible for creating
-<a class="autorefs autorefs-internal" title="            PlanHandler" href="#ropt.plugins.plan.base.PlanHandler"><code>PlanHandler</code></a> instances within an
+<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanHandler" href="#ropt.plugins.plan.base.PlanHandler"><code>PlanHandler</code></a> instances within an
 optimization plan (<a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a>).</p>
 <p>During plan setup, the <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>
 identifies the appropriate handler plugin based on a requested name and
@@ -1905,7 +1938,7 @@ object that will process events during plan execution.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.plan.base.PlanHandlerPlugin.create" class="doc doc-heading">
+<h3 id="ropt.plugins.plan.base.PlanHandlerPlugin.create" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">create</span>
 
 
@@ -1914,7 +1947,7 @@ object that will process events during plan execution.</p>
       <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlanHandler</span>
 </span></code></pre></div>
 
@@ -1922,7 +1955,7 @@ object that will process events during plan execution.</p>
 
         <p>Create a PlanHandler instance.</p>
 <p>This abstract class method serves as a factory for creating concrete
-<a class="autorefs autorefs-internal" title="            PlanHandler" href="#ropt.plugins.plan.base.PlanHandler"><code>PlanHandler</code></a> objects. Plugin
+<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanHandler" href="#ropt.plugins.plan.base.PlanHandler"><code>PlanHandler</code></a> objects. Plugin
 implementations must override this method to return an instance of
 their specific <code>PlanHandler</code> subclass.</p>
 <p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> calls this method
@@ -2011,7 +2044,7 @@ allowing for custom configuration of the handler instance.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            PlanHandler (ropt.plugins.plan.base.PlanHandler)" href="#ropt.plugins.plan.base.PlanHandler">PlanHandler</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanHandler" href="#ropt.plugins.plan.base.PlanHandler">PlanHandler</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2039,14 +2072,14 @@ allowing for custom configuration of the handler instance.</p>
 
 
 
-<h3 id="ropt.plugins.plan.base.PlanStep" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">PlanStep</span>
+<h2 id="ropt.plugins.plan.base.PlanStep" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan.base.PlanStep</span>
 
 
-</h3>
+</h2>
 
 
-    <div class="doc doc-contents ">
+    <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
               Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
 
@@ -2057,7 +2090,7 @@ an optimization <a class="autorefs autorefs-internal" title="            ropt.pl
 which perform specific actions like running an optimizer or evaluating
 functions, must inherit from this base class.</p>
 <p><code>PlanStep</code> objects are typically created by corresponding
-<a class="autorefs autorefs-internal" title="            PlanStepPlugin" href="#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a> factories, which
+<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStepPlugin" href="#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a> factories, which
 are managed by the <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>. Once
 instantiated and added to a <code>Plan</code>, their
 <a class="autorefs autorefs-internal" title="            run
@@ -2110,7 +2143,7 @@ specific behavior.</p>
 
 
 
-<h4 id="ropt.plugins.plan.base.PlanStep.id" class="doc doc-heading">
+<h3 id="ropt.plugins.plan.base.PlanStep.id" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">id</span>
 
 
@@ -2118,7 +2151,7 @@ specific behavior.</p>
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">id</span><span class="p">:</span> <span class="n">UUID</span>
 </span></code></pre></div>
 
@@ -2157,7 +2190,7 @@ specific behavior.</p>
 
 
 
-<h4 id="ropt.plugins.plan.base.PlanStep.plan" class="doc doc-heading">
+<h3 id="ropt.plugins.plan.base.PlanStep.plan" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">plan</span>
 
 
@@ -2165,7 +2198,7 @@ specific behavior.</p>
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span>
 </span></code></pre></div>
 
@@ -2205,11 +2238,11 @@ specific behavior.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.plan.base.PlanStep.__init__" class="doc doc-heading">
+<h3 id="ropt.plugins.plan.base.PlanStep.__init__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span><span class="nf">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
@@ -2258,7 +2291,7 @@ a unique ID. The parent plan is accessible via the <code>plan</code> property.</
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.plan.base.PlanStep.run" class="doc doc-heading">
+<h3 id="ropt.plugins.plan.base.PlanStep.run" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
 
 
@@ -2266,7 +2299,7 @@ a unique ID. The parent plan is accessible via the <code>plan</code> property.</
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
 </span></code></pre></div>
 
@@ -2368,14 +2401,14 @@ can vary depending on the specific step implementation.</p>
 
 
 
-<h3 id="ropt.plugins.plan.base.PlanHandler" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">PlanHandler</span>
+<h2 id="ropt.plugins.plan.base.PlanHandler" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan.base.PlanHandler</span>
 
 
-</h3>
+</h2>
 
 
-    <div class="doc doc-contents ">
+    <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
               Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
 
@@ -2386,7 +2419,7 @@ an optimization <a class="autorefs autorefs-internal" title="            ropt.pl
 which process events emitted during plan execution (e.g., tracking results,
 storing data, logging), must inherit from this base class.</p>
 <p><code>PlanHandler</code> objects are typically created by corresponding
-<a class="autorefs autorefs-internal" title="            PlanHandlerPlugin" href="#ropt.plugins.plan.base.PlanHandlerPlugin"><code>PlanHandlerPlugin</code></a> factories,
+<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanHandlerPlugin" href="#ropt.plugins.plan.base.PlanHandlerPlugin"><code>PlanHandlerPlugin</code></a> factories,
 managed by the <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>. Once
 instantiated and added to a <code>Plan</code>, their
 <a class="autorefs autorefs-internal" title="            handle_event
@@ -2447,7 +2480,7 @@ define their specific event processing logic.</p>
 
 
 
-<h4 id="ropt.plugins.plan.base.PlanHandler.id" class="doc doc-heading">
+<h3 id="ropt.plugins.plan.base.PlanHandler.id" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">id</span>
 
 
@@ -2455,7 +2488,7 @@ define their specific event processing logic.</p>
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">id</span><span class="p">:</span> <span class="n">UUID</span>
 </span></code></pre></div>
 
@@ -2494,7 +2527,7 @@ define their specific event processing logic.</p>
 
 
 
-<h4 id="ropt.plugins.plan.base.PlanHandler.plan" class="doc doc-heading">
+<h3 id="ropt.plugins.plan.base.PlanHandler.plan" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">plan</span>
 
 
@@ -2502,7 +2535,7 @@ define their specific event processing logic.</p>
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span>
 </span></code></pre></div>
 
@@ -2542,11 +2575,11 @@ define their specific event processing logic.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.plan.base.PlanHandler.__init__" class="doc doc-heading">
+<h3 id="ropt.plugins.plan.base.PlanHandler.__init__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span><span class="nf">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
@@ -2596,7 +2629,7 @@ The parent plan is accessible via the <code>plan</code> property.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.plan.base.PlanHandler.handle_event" class="doc doc-heading">
+<h3 id="ropt.plugins.plan.base.PlanHandler.handle_event" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">handle_event</span>
 
 
@@ -2604,7 +2637,7 @@ The parent plan is accessible via the <code>plan</code> property.</p>
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
@@ -2674,11 +2707,11 @@ logging information, or updating internal state.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.plan.base.PlanHandler.__getitem__" class="doc doc-heading">
+<h3 id="ropt.plugins.plan.base.PlanHandler.__getitem__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__getitem__</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__getitem__</span><span class="p">(</span><span class="nf">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
 </span></code></pre></div>
 
@@ -2776,11 +2809,11 @@ execution.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.plan.base.PlanHandler.__setitem__" class="doc doc-heading">
+<h3 id="ropt.plugins.plan.base.PlanHandler.__setitem__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__setitem__</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__setitem__</span><span class="p">(</span><span class="nf">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
@@ -2867,15 +2900,6 @@ other components of the plan.</p>
     </div>
 
 </div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
 
 
 

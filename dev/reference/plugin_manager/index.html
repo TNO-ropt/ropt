@@ -1457,10 +1457,10 @@ custom or third-party components, installed as separate packages.</p>
 <p><code>ropt</code> supports several types of plugins, each addressing a specific aspect of
 the optimization workflow:</p>
 <ul>
-<li><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base" href="../plan_plugins/#ropt.plugins.plan.base"><code>plan</code></a>: Defines components for constructing and executing
+<li><a class="autorefs autorefs-internal" title="            ropt.plugins.plan" href="../plan_plugins/#ropt.plugins.plan"><code>plan</code></a>: Defines components for constructing and executing
   optimization plans
-  (<a class="autorefs autorefs-internal" title="            PlanHandlerPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandlerPlugin"><code>PlanHandlerPlugin</code></a> and
-  <a class="autorefs autorefs-internal" title="            PlanStepPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a>).</li>
+  (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanHandlerPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandlerPlugin"><code>PlanHandlerPlugin</code></a> and
+  <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStepPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a>).</li>
 <li><a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer" href="../optimizer_plugins/#ropt.plugins.optimizer"><code>optimizer</code></a>: Implements optimization algorithms.</li>
 <li><a class="autorefs autorefs-internal" title="            ropt.plugins.sampler" href="../sampler_plugins/#ropt.plugins.sampler"><code>sampler</code></a>: Generates parameter perturbations, which
   are used for gradient estimation.</li>
@@ -1476,10 +1476,10 @@ discovered automatically using Python's standard entry points mechanism.</p>
 <p>Each plugin type has a corresponding abstract base class that custom plugins
 must inherit from:</p>
 <ul>
-<li><strong>Plan:</strong> <a class="autorefs autorefs-internal" title="            PlanHandlerPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandlerPlugin"><code>PlanHandlerPlugin</code></a> and
-  <a class="autorefs autorefs-internal" title="            PlanStepPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a></li>
+<li><strong>Plan:</strong> <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanHandlerPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandlerPlugin"><code>PlanHandlerPlugin</code></a> and
+  <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStepPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a></li>
 <li><strong>Optimizer:</strong>
-  <a class="autorefs autorefs-internal" title="            OptimizerPlugin" href="../optimizer_plugins/#ropt.plugins.optimizer.base.OptimizerPlugin"><code>OptimizerPlugin</code></a></li>
+  <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.OptimizerPlugin" href="../optimizer_plugins/#ropt.plugins.optimizer.base.OptimizerPlugin"><code>OptimizerPlugin</code></a></li>
 <li><strong>Sampler:</strong> <a class="autorefs autorefs-internal" title="            SamplerPlugin" href="../sampler_plugins/#ropt.plugins.sampler.base.SamplerPlugin"><code>SamplerPlugin</code></a></li>
 <li><strong>Realization Filter:</strong>
   <a class="autorefs autorefs-internal" title="            RealizationFilterPlugin" href="../realization_filter_plugins/#ropt.plugins.realization_filter.base.RealizationFilterPlugin"><code>RealizationFilterPlugin</code></a></li>
@@ -1504,10 +1504,10 @@ method generally implement a <code>create</code> factory method that will be use
 that implement the desired functionality. These objects must inherit from the base class for the
 corresponding plugin type:</p>
 <ul>
-<li><strong>Plan:</strong> <a class="autorefs autorefs-internal" title="            PlanHandler" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandler"><code>PlanHandler</code></a> and
-  <a class="autorefs autorefs-internal" title="            PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a></li>
+<li><strong>Plan:</strong> <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanHandler" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandler"><code>PlanHandler</code></a> and
+  <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a></li>
 <li><strong>Optimizer:</strong>
-  <a class="autorefs autorefs-internal" title="            Optimizer" href="../optimizer_plugins/#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a></li>
+  <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.Optimizer" href="../optimizer_plugins/#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a></li>
 <li><strong>Sampler:</strong> <a class="autorefs autorefs-internal" title="            Sampler" href="../sampler_plugins/#ropt.plugins.sampler.base.Sampler"><code>Sampler</code></a></li>
 <li><strong>Realization Filter:</strong>
   <a class="autorefs autorefs-internal" title="            RealizationFilter" href="../realization_filter_plugins/#ropt.plugins.realization_filter.base.RealizationFilter"><code>RealizationFilter</code></a></li>
@@ -1927,7 +1927,7 @@ plugins within the <code>ropt</code> framework. Each identifier corresponds to a
 role in the optimization process:</p>
 <ul>
 <li><code>"optimizer"</code>: Plugins implementing optimization algorithms
-  (<a class="autorefs autorefs-internal" title="            OptimizerPlugin" href="../optimizer_plugins/#ropt.plugins.optimizer.base.OptimizerPlugin"><code>OptimizerPlugin</code></a>).</li>
+  (<a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.OptimizerPlugin" href="../optimizer_plugins/#ropt.plugins.optimizer.base.OptimizerPlugin"><code>OptimizerPlugin</code></a>).</li>
 <li><code>"sampler"</code>: Plugins for generating parameter samples
   (<a class="autorefs autorefs-internal" title="            SamplerPlugin" href="../sampler_plugins/#ropt.plugins.sampler.base.SamplerPlugin"><code>SamplerPlugin</code></a>).</li>
 <li><code>"realization_filter"</code>: Plugins for filtering ensemble realizations
@@ -1935,9 +1935,9 @@ role in the optimization process:</p>
 <li><code>"function_estimator"</code>: Plugins for estimating objective functions and gradients
   (<a class="autorefs autorefs-internal" title="            FunctionEstimatorPlugin" href="../function_estimator_plugins/#ropt.plugins.function_estimator.base.FunctionEstimatorPlugin"><code>FunctionEstimatorPlugin</code></a>).</li>
 <li><code>"plan_handler"</code>: Plugins that create handlers for processing plan results
-  (<a class="autorefs autorefs-internal" title="            PlanHandlerPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandlerPlugin"><code>PlanHandlerPlugin</code></a>).</li>
+  (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanHandlerPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandlerPlugin"><code>PlanHandlerPlugin</code></a>).</li>
 <li><code>"plan_step"</code>: Plugins that define executable steps within an optimization plan
-  (<a class="autorefs autorefs-internal" title="            PlanStepPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a>).</li>
+  (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStepPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a>).</li>
 </ul>
 
     </div>
