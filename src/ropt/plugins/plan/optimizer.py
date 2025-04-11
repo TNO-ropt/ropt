@@ -68,7 +68,7 @@ class DefaultOptimizerStep(PlanStep):
         """
         super().__init__(plan)
 
-    def run(  # type: ignore[override]
+    def run(
         self,
         config: dict[str, Any] | EnOptConfig,
         transforms: OptModelTransforms | None = None,

@@ -1,8 +1,7 @@
 ::: ropt.plugins.plan
-::: ropt.plugins.plan.base
     options:
-        members:
-            - PlanStep
-            - PlanHandler
-            - PlanHandlerPlugin
-            - PlanStepPlugin
+        members: False
+::: ropt.plugins.plan.base.PlanStepPlugin
+::: ropt.plugins.plan.base.PlanHandlerPlugin
+::: ropt.plugins.plan.base.PlanStep
+::: ropt.plugins.plan.base.PlanHandler

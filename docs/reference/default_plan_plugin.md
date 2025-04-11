@@ -7,3 +7,4 @@
 ::: ropt.plugins.plan.evaluator.DefaultEvaluatorStep
 ::: ropt.plugins.plan.optimizer.DefaultOptimizerStep
 ::: ropt.plugins.plan._tracker.DefaultTrackerHandler
+::: ropt.plugins.plan._store.DefaultStoreHandler
