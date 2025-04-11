@@ -23,19 +23,25 @@ if TYPE_CHECKING:
 
 
 class DefaultEvaluatorStep(PlanStep):
-    """The default evaluator step.
+    """The default evaluator step for optimization plans.
 
-    This step performs a single ensemble evaluation, yielding one or more
-    [`FunctionResults`][ropt.results.FunctionResults] objects. The evaluation
-    can process multiple variable vectors, each of which is evaluated
-    separately, producing an individual results object for each vector.
+    This step performs one or more ensemble evaluations based on the provided
+    `variables`. It yields a tuple of
+    [`FunctionResults`][ropt.results.FunctionResults] objects, one for each
+    input variable vector evaluated.
 
-    Before executing the evaluator step, a
-    [`START_EVALUATOR_STEP`][ropt.enums.EventType.START_EVALUATOR_STEP] event is
-    emitted. After the evaluator step finishes, an
-    [`FINISHED_EVALUATOR_STEP`][ropt.enums.EventType.FINISHED_EVALUATOR_STEP]
-    event is emitted. Result handlers should respond to the latter event to
-    process the generated results.
+    The step emits the following events:
+
+    - [`START_EVALUATOR_STEP`][ropt.enums.EventType.START_EVALUATOR_STEP]:
+      Emitted before the evaluation process begins.
+    - [`START_EVALUATION`][ropt.enums.EventType.START_EVALUATION]: Emitted
+      just before the underlying ensemble evaluation is called.
+    - [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION]: Emitted
+      after the evaluation completes, carrying the generated `FunctionResults`
+      in its `data` dictionary under the key `"results"`. Plan handlers typically
+      listen for this event.
+    - [`FINISHED_EVALUATOR_STEP`][ropt.enums.EventType.FINISHED_EVALUATOR_STEP]:
+      Emitted after the entire step, including result emission, is finished.
     """
 
     def __init__(
@@ -49,31 +55,41 @@ class DefaultEvaluatorStep(PlanStep):
         """
         super().__init__(plan)
 
-    def run(  # type: ignore[override]
+    def run(
         self,
         config: dict[str, Any] | EnOptConfig,
         transforms: OptModelTransforms | None = None,
         variables: ArrayLike | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> OptimizerExitCode:
-        """Run the evaluator step.
+        """Run the evaluator step to perform ensemble evaluations.
 
-        The
-        [`DefaultEvaluatorStep`][ropt.plugins.plan.evaluator.DefaultEvaluatorStep]
-        requires an optimizer configuration; the `variables` parameter is
-        optional. The configuration  object must be an
-        [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object, or a dictionary
-        that can be parsed into such an object. If no `variables` are provided,
-        the initial values specified by the optimizer configuration are used. If
-        `values` is given, it may be a single vector or a two-dimensional array.
-        In the latter case, each row of the matrix is treated as a separate set
-        of values to be evaluated.
+        This method executes the core logic of the evaluator step. It requires
+        an optimizer configuration
+        ([`EnOptConfig`][ropt.config.enopt.EnOptConfig] or a compatible
+        dictionary) and optionally accepts specific variable vectors to
+        evaluate.
+
+        If `variables` are not provided, the initial values specified in the
+        `config` are used. If `variables` are provided as a 2D array, each row
+        is treated as a separate vector for evaluation.
+
+        If a `transforms` object is given, it is passed to the ensemble
+        evaluator to transform variables and results between user and optimizer
+        domains (see [`ropt.transforms`][ropt.transforms]).
+
+        If `metadata` is provided, it is attached to the
+        [`Results`][ropt.results.Results] objects emitted via the
+        `FINISHED_EVALUATION` event.
 
         Args:
-            config:     The optimizer configuration.
-            transforms: Optional transforms object.
-            variables: Variables to evaluate.
-            metadata:   Optional metadata to add to events.
+            config:     Optimizer configuration.
+            transforms: Optional transforms object for variable/result conversion.
+            variables:  Optional variable vector(s) to evaluate.
+            metadata:   Optional dictionary to attach to emitted `FunctionResults`.
+
+        Returns:
+            An [`OptimizerExitCode`][ropt.enums.OptimizerExitCode] indicating the outcome.
         """
         config = EnOptConfig.model_validate(config, context=transforms)
 

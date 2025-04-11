@@ -1,25 +1,28 @@
-"""Annotated types for use with Pydantic models.
+"""Annotated types for Pydantic models providing input conversion and validation.
 
-These types can be used to convert input values to a desired type and guarantee
-certain properties. They include types that convert inputs to immutable NumPy
-arrays of specified dimension and type:
+These types leverage Pydantic's `BeforeValidator` to automatically convert
+input values (like lists or scalars) into standardized, immutable NumPy arrays
+or Python collections (sets, tuples) during model initialization.
 
-- [`Array1D`][ropt.config.validated_types.Array1D]: For converting sequences to
-  immutable one-dimensional floating-point arrays.
-- [`Array2D`][ropt.config.validated_types.Array2D]: For converting sequences to
-  immutable two-dimensional floating-point arrays.
-- [`ArrayEnum`][ropt.config.validated_types.ArrayEnum]: For converting
-  sequences to values of numerical enumerations of any dimension.
-- [`Array1DInt`][ropt.config.validated_types.Array1DInt]: For converting
-  sequences to immutable one-dimensional integer arrays.
-- [`Array1DBool`][ropt.config.validated_types.Array1DBool]: For converting
-  sequences to immutable one-dimensional boolean arrays.
+**NumPy Array Types:**
 
-Additionally, the following convenience types create sets or tuples, ensuring
-that single values are embedded in a set or tuple, respectively:
+- [`Array1D`][ropt.config.validated_types.Array1D]: Converts input to an
+  immutable 1D `np.float64` array.
+- [`Array2D`][ropt.config.validated_types.Array2D]: Converts input to an
+  immutable 2D `np.float64` array.
+- [`ArrayEnum`][ropt.config.validated_types.ArrayEnum]: Converts input to an
+  immutable 1D `np.ubyte` array (suitable for integer enum values).
+- [`Array1DInt`][ropt.config.validated_types.Array1DInt]: Converts input to an
+  immutable 1D `np.intc` array.
+- [`Array1DBool`][ropt.config.validated_types.Array1DBool]: Converts input to an
+  immutable 1D `np.bool_` array.
 
-- [`ItemOrSet[T]`][ropt.config.validated_types.ItemOrSet]: Create a set of type `T`.
-- [`ItemOrTuple[T]`][ropt.config.validated_types.ItemOrTuple]: Create a tuple of type `T`.
+**Collection Types:**
+
+- [`ItemOrSet[T]`][ropt.config.validated_types.ItemOrSet]: Ensures the value is a
+  `set[T]`, converting single items or sequences.
+- [`ItemOrTuple[T]`][ropt.config.validated_types.ItemOrTuple]: Ensures the value is a
+  `tuple[T, ...]`, converting single items or sequences.
 """
 
 from typing import Annotated, TypeVar

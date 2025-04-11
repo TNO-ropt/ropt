@@ -15,20 +15,30 @@ _MIN_STDDEV_REALIZATIONS: Final = 2
 
 
 class DefaultFunctionEstimator(FunctionEstimator):
-    """The default function estimator plugin.
+    """The default implementation for function estimation strategies.
 
-    This plugin currently implements two methods:
+    This class provides methods for combining objective function values and
+    gradients from an ensemble of realizations into a single representative
+    value or gradient. The specific method is configured via the
+    [`FunctionEstimatorConfig`][ropt.config.enopt.FunctionEstimatorConfig]
+    in the main [`EnOptConfig`][ropt.config.enopt.EnOptConfig].
 
-    `mean`:
-    :  Calculate the combined functions as a weighted mean of the function
-       values of each realization. Gradients are accordingly calculated as
-       a weighted sum.
+    **Supported Methods:**
 
-    `stddev`:
-    :  Calculate the combined functions as the standard deviation of function
-       values of each realization. Gradients are calculated accordingly using
-       the chain rule. The sign of the result is adjusted such that the standard
-       deviation is always minimized.
+    - `mean` (or `default`):
+        Calculates the combined function value as the weighted mean of the
+        individual realization function values. The combined gradient is
+        calculated as the weighted mean of the individual realization gradients
+        (unless `merge_realizations` is true, in which case the pre-merged
+        gradient is used directly).
+
+    - `stddev`:
+        Calculates the combined function value as the weighted standard
+        deviation of the individual realization function values. The combined
+        gradient is calculated using the chain rule based on the standard
+        deviation formula. This method requires at least two realizations with
+        non-zero weights and is incompatible with `merge_realizations=True`
+        for gradient calculation.
     """
 
     def __init__(self, enopt_config: EnOptConfig, estimator_index: int) -> None:

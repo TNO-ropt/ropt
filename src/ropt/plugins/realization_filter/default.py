@@ -24,18 +24,29 @@ class _ConfigBaseModel(BaseModel):
 
 
 class SortObjectiveOptions(_ConfigBaseModel):
-    """Configuration settings for the `sort-objective` method.
+    """Configuration settings for the `sort-objective` realization filter.
 
-    The `sort-objective` method sorts realizations according to the value of one
-    or multiple objectives, and retains a number of realizations within a given
-    index range in the sorted list. If more than one objective index is given, a
-    weighted sum of these objectives is used, using the weights given in the
-    configuration of the optimizer.
+    This method sorts realizations based on a weighted sum of objective function
+    values and assigns weights only to those within a specified rank range.
+
+    How it works:
+
+    1. A weighted sum is calculated for each realization using the objective
+       values specified by the `sort` indices and the corresponding weights
+       from the main [`EnOptConfig`][ropt.config.enopt.EnOptConfig]. If only
+       one objective index is provided in `sort`, no weighting is applied.
+    2. Realizations are sorted based on this calculated value (ascending).
+    3. Realizations whose rank falls within the range [`first`, `last`]
+       (inclusive) are selected.
+    4. The original weights (from `EnOptConfig.realizations.weights`) of the
+       selected realizations are retained; all other realizations receive a
+       weight of zero. Failed realizations (NaN objective values) are effectively
+       given the lowest rank and are excluded before selection.
 
     Attributes:
-        sort:  The indices of the objectives to sort.
-        first: Index or name of the first realization to use.
-        last:  Index of name of the last realization to use.
+        sort:  List of objective function indices to use for sorting.
+        first: The starting rank (0-based index) of realizations to select after sorting.
+        last:  The ending rank (0-based index) of realizations to select after sorting.
     """
 
     sort: list[NonNegativeInt]
@@ -44,16 +55,27 @@ class SortObjectiveOptions(_ConfigBaseModel):
 
 
 class SortConstraintOptions(_ConfigBaseModel):
-    """Configuration settings for the `sort-constraint` method.
+    """Configuration settings for the `sort-constraint` realization filter.
 
-    The `sort-constraint` method sorts realizations according to the value of a
-    constraint, and retains a number of realizations within a given index range
-    in the sorted list.
+    This method sorts realizations based on the value of a single constraint
+    function and assigns weights only to those within a specified rank range.
+
+    How it works:
+
+    1. The values of the constraint function specified by the `sort` index are
+       retrieved for each realization.
+    2. Realizations are sorted based on these constraint values (ascending).
+    3. Realizations whose rank falls within the range [`first`, `last`]
+       (inclusive) are selected.
+    4. The original weights (from `EnOptConfig.realizations.weights`) of the
+       selected realizations are retained; all other realizations receive a
+       weight of zero. Failed realizations (NaN constraint values) are effectively
+       given the lowest rank and are excluded before selection.
 
     Attributes:
-        sort:  The index of the constraint to sort.
-        first: Index or name of the first realization to use.
-        last:  Index or name of the last realization to use.
+        sort:  The index of the constraint function to use for sorting.
+        first: The starting rank (0-based index) of realizations to select after sorting.
+        last:  The ending rank (0-based index) of realizations to select after sorting.
     """
 
     sort: NonNegativeInt
@@ -62,22 +84,34 @@ class SortConstraintOptions(_ConfigBaseModel):
 
 
 class CVaRObjectiveOptions(_ConfigBaseModel):
-    """Configuration settings for the `cvar-objective` method.
+    """Configuration settings for the `cvar-objective` realization filter.
 
-    The `cvar-objective` method finds realizations weights by applying the CVaR
-    method to the objective values. If more than one objective index is given, a
-    weighted sum of these objectives is used, using the weights given in the
-    configuration of the optimizer.
+    This method calculates realization weights using the Conditional Value-at-Risk
+    (CVaR) approach applied to a weighted sum of objective function values. It
+    focuses on the "tail" of the distribution representing the worst-performing
+    realizations.
 
-    The percentile argument defines the contribution of the "worst" performing
-    realizations in the distribution that is used to calculate the ensemble
-    value. "Worst" is defined as those realizations having the highest values in
-    case of a minimization and those having the lowest values in case of
-    maximizing.
+    How it works:
+
+    1. A weighted sum is calculated for each realization using the objective
+       values specified by the `sort` indices and the corresponding weights
+       from the main [`EnOptConfig`][ropt.config.enopt.EnOptConfig]. If only
+       one objective index is provided in `sort`, no weighting is applied.
+    2. Realizations are conceptually sorted based on this calculated value
+       (ascending, assuming minimization).
+    3. The method identifies the subset of realizations corresponding to the
+       `percentile` worst outcomes (i.e., the highest weighted objective values).
+    4. Weights are assigned to these worst-performing realizations based on the
+       CVaR calculation. If the `percentile` boundary falls between two
+       realizations, interpolation is used to assign partial weights. All other
+       realizations receive a weight of zero.
+    5. Failed realizations (NaN objective values) are effectively excluded from
+       the CVaR calculation.
 
     Attributes:
-        sort:       The indices of the objectives to sort.
-        percentile: The CVaR percentile.
+        sort:       List of objective function indices to use for the weighted sum.
+        percentile: The CVaR percentile (0.0 to 1.0) defining the portion of
+                    worst realizations to consider. Defaults to 0.5.
     """
 
     sort: list[NonNegativeInt]
@@ -85,23 +119,40 @@ class CVaRObjectiveOptions(_ConfigBaseModel):
 
 
 class CVaRConstraintOptions(_ConfigBaseModel):
-    """Configuration settings for the `cvar-constraint` method.
+    """Configuration settings for the `cvar-constraint` realization filter.
 
-    The `cvar-constraint` method finds realizations weights by applying the CVaR
-    method to the objective values.
+    This method calculates realization weights using the Conditional Value-at-Risk
+    (CVaR) approach applied to the values of a single constraint function. It
+    focuses on the "tail" of the distribution representing the realizations that
+    most severely violate or are furthest from satisfying the constraint.
 
-    The percentile argument defines the contribution of the "worst" performing
-    realizations in the distribution that is used to calculate the ensemble
-    value. The definition of worst depends on the type of the constraints. After
-    subtracting the right-hand-side value the following applies:
+    How it works:
 
-    - For LE constraints, realizations with the largest values are the worst
-    - For GE constraints, realizations with the smallest values are the worst
-    - For EQ constraints, realizations with the largest absolute values are the worst
+    1. The values of the constraint function specified by the `sort` index are
+       retrieved for each realization. These values typically represent the
+       constraint function evaluated minus its right-hand-side value (e.g.,
+       `g(x) - rhs`).
+    2. Realizations are conceptually sorted based on how "badly" they perform
+       with respect to the constraint type:
+        - **LE (`<=`) constraints:** Realizations with the *largest* positive
+          values (most violated) are considered the worst.
+        - **GE (`>=`) constraints:** Realizations with the *smallest* negative
+          values (most violated) are considered the worst.
+        - **EQ (`==`) constraints:** Realizations with the *largest absolute*
+          values (furthest from zero) are considered the worst.
+    3. The method identifies the subset of realizations corresponding to the
+       `percentile` worst outcomes based on the sorting defined above.
+    4. Weights are assigned to these worst-performing realizations based on the
+       CVaR calculation. If the `percentile` boundary falls between two
+       realizations, interpolation is used to assign partial weights. All other
+       realizations receive a weight of zero.
+    5. Failed realizations (NaN constraint values) are effectively excluded from
+       the CVaR calculation.
 
     Attributes:
-        sort:       The index of the constraint to sort.
-        percentile: The CVaR percentile.
+        sort:       The index of the constraint function to use.
+        percentile: The CVaR percentile (0.0 to 1.0) defining the portion of
+                    worst realizations to consider. Defaults to 0.5.
     """
 
     sort: NonNegativeInt
@@ -109,47 +160,48 @@ class CVaRConstraintOptions(_ConfigBaseModel):
 
 
 class DefaultRealizationFilter(RealizationFilter):
-    """The default realization filter plugin class.
+    """The default implementation for realization filtering strategies.
 
-    This plugin currently implements four methods:
+    This class provides several methods for calculating realization weights based
+    on objective or constraint values. The specific method and its parameters
+    are configured via the
+    [`RealizationFilterConfig`][ropt.config.enopt.RealizationFilterConfig]
+    in the main [`EnOptConfig`][ropt.config.enopt.EnOptConfig].
 
-    `sort-objective`:
-    :  Filter realizations by selecting a range of objective values. This filter
-       requires additional configuration using an options dict that can be
-       parsed into a
-       [`SortObjectiveOptions`][ropt.plugins.realization_filter.default.SortObjectiveOptions]
-       class. This method sorts realizations according to the weighted sum of
-       the values of objective functions specified in the options. It then
-       selects the set of realizations from a given index range.
+    **Supported Methods:**
 
-    `sort-constraint`:
-    :  Filter realizations by selecting a range of constraint values. This
-       filter requires additional configuration using an options dict that can
-       be parsed into a
-       [`SortConstraintOptions`][ropt.plugins.realization_filter.default.SortConstraintOptions]
-       class. This method sorts realizations according to the values of
-       constraint functions specified in the options. It then selects the set of
-       realizations from a given index range.
+    - `sort-objective`:
+        Sorts realizations based on a weighted sum of specified objective
+        function values. It then assigns zero weights to realizations outside of
+        a defined index range (`first` to `last`) in the sorted list. Requires
+        options defined by
+        [`SortObjectiveOptions`][ropt.plugins.realization_filter.default.SortObjectiveOptions].
 
-    `cvar-objective`:
-    :  Filter realizations by selecting a range of objective values. This filter
-       requires additional configuration using an options dict that can be
-       parsed into a
-       [`CVaRObjectiveOptions`][ropt.plugins.realization_filter.default.CVaRObjectiveOptions]
-       class. This method sorts realizations according to the weighted sum of
-       the values of objective functions specified in the options. It then
-       selects a percentile of the realizations, applying interpolation whenever
-       the number of selected realizations is not an integer number.
+    - `sort-constraint`:
+        Sorts realizations based on the value of a single specified constraint
+        function. It assigns zero weights to realizations outside of a defined
+        index range (`first` to `last`) in the sorted list. Requires options
+        defined by
+        [`SortConstraintOptions`][ropt.plugins.realization_filter.default.SortConstraintOptions].
 
-    `cvar-constraint`:
-    :  Filter realizations by selecting a range of constraint values. This
-       filter requires additional configuration using an options dict that can
-       be parsed into a
-       [`CVaRConstraintOptions`][ropt.plugins.realization_filter.default.CVaRConstraintOptions]
-       class. This method sorts realizations according to the values of
-       constraint functions specified in the options. It then selects a
-       percentile of the realizations, applying interpolation whenever the
-       number of selected realizations is not an integer number.
+    - `cvar-objective`:
+        Calculates realization weights using the Conditional Value-at-Risk (CVaR)
+        method applied to a weighted sum of specified objective function values.
+        Weights are assigned based on a specified `percentile` of the worst-performing
+        realizations (highest objective values for minimization). Interpolation is
+        used if the percentile boundary falls between realizations.
+        Requires options defined by
+        [`CVaRObjectiveOptions`][ropt.plugins.realization_filter.default.CVaRObjectiveOptions].
+
+    - `cvar-constraint`:
+        Calculates realization weights using the CVaR method applied to the
+        value of a single specified constraint function. Weights are assigned
+        based on a specified `percentile` of the worst-performing realizations
+        (definition of "worst" depends on the constraint type: LE, GE, or EQ).
+        Interpolation is used if the percentile boundary falls between
+        realizations.
+        Requires options defined by
+        [`CVaRConstraintOptions`][ropt.plugins.realization_filter.default.CVaRConstraintOptions].
     """
 
     def __init__(self, enopt_config: EnOptConfig, filter_index: int) -> None:  # D107

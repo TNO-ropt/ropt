@@ -56,14 +56,38 @@ class RealizationFilter(ABC):
 
 
 class RealizationFilterPlugin(Plugin):
-    """Abstract base class for realizationFilter plugins."""
+    """Abstract Base Class for Realization Filter Plugins (Factories).
+
+    This class defines the interface for plugins responsible for creating
+    [`RealizationFilter`][ropt.plugins.realization_filter.base.RealizationFilter]
+    instances. These plugins act as factories for specific realization filtering
+    strategies.
+
+    During plan execution, the [`PluginManager`][ropt.plugins.PluginManager]
+    identifies the appropriate realization filter plugin based on the
+    configuration and uses its `create` class method to instantiate the actual
+    `RealizationFilter` object that will calculate the realization weights.
+    """
 
     @classmethod
     @abstractmethod
     def create(cls, enopt_config: EnOptConfig, filter_index: int) -> RealizationFilter:
-        """Initialize the realization filter plugin.
+        """Factory method to create a concrete RealizationFilter instance.
+
+        This abstract class method serves as a factory for creating concrete
+        [`RealizationFilter`][ropt.plugins.realization_filter.base.RealizationFilter]
+        objects. Plugin implementations must override this method to return an
+        instance of their specific `RealizationFilter` subclass.
+
+        The [`PluginManager`][ropt.plugins.PluginManager] calls this method when
+        an optimization step requires realization weights calculated by this
+        plugin.
 
         Args:
-            enopt_config: The configuration of the optimizer.
-            filter_index: The index of the filter to use.
+            enopt_config: The main EnOpt configuration object.
+            filter_index: Index into `enopt_config.realization_filters` for
+                          this filter.
+
+        Returns:
+            An initialized RealizationFilter object ready for use.
         """

@@ -16,13 +16,30 @@ if TYPE_CHECKING:
 
 
 class Sampler(ABC):
-    """Abstract base class for sampler classes.
+    """Abstract Base Class for Sampler Implementations.
 
-    `ropt` employs plugins to implement samplers that are called during an
-    optimization plan to generate perturbed variable vectors. Samplers should
-    derive from the `Sampler` base class, which specifies the requirements for
-    the class constructor (`__init__`) and also includes a `generate_samples`
-    method used to generate samples used to create perturbed values.
+    This class defines the fundamental interface for all concrete sampler
+    implementations within the `ropt` framework. Sampler plugins provide
+    classes derived from `Sampler` that encapsulate the logic of specific
+    sampling algorithms or strategies used to generate perturbed variable vectors
+    for the optimization process.
+
+    Instances of `Sampler` subclasses are created by their corresponding
+    [`SamplerPlugin`][ropt.plugins.sampler.base.SamplerPlugin] factories.
+    They are initialized with an
+    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object detailing the
+    optimization setup, the `sampler_index` identifying the specific sampler
+    configuration to use from the config, an optional variable `mask` indicating
+    which variables this sampler instance handles, and a NumPy random number
+    generator (`rng`) for stochastic methods.
+
+    The core functionality, generating samples, is performed by the
+    `generate_samples` method, which must be implemented by subclasses.
+
+    Subclasses must implement:
+
+    - `__init__`: To accept the configuration, index, mask, and RNG.
+    - `generate_samples`: To contain the sample generation logic.
     """
 
     def __init__(  # noqa: B027
@@ -34,58 +51,75 @@ class Sampler(ABC):
     ) -> None:
         """Initialize the sampler object.
 
-        The `samplers` field in the
-        [`enopt_config`][ropt.config.enopt.EnOptConfig] configuration used by
-        the optimization is a tuple of sampler configurations (see
-        [`SamplerConfig`][ropt.config.enopt.SamplerConfig]). The `sampler_index`
-        field is used to identify the configuration to use to initialize this
-        sampler.
+        The `samplers` field in the `enopt_config` is a tuple of sampler
+        configurations ([`SamplerConfig`][ropt.config.enopt.SamplerConfig]).
+        The `sampler_index` identifies which configuration from this tuple
+        should be used to initialize this specific sampler instance.
 
-        The sampler may be used for a subset of the variables. The boolean
-        `mask` array indicates the variables that are handled by this sampler.
+        If a boolean `mask` array is provided, it indicates that this sampler
+        instance is responsible for generating samples only for the subset of
+        variables where the mask is `True`.
 
         Args:
             enopt_config:  The configuration of the optimizer.
-            sampler_index: The index of the sampler to use.
-            mask:          The mask of the variables to sample.
-            rng:           A random generator object for use by stochastic samplers.
+            sampler_index: The index of the sampler configuration to use.
+            mask:          Optional mask indicating variables handled by this sampler.
+            rng:           A random generator object for stochastic methods.
         """
 
     @abstractmethod
     def generate_samples(self) -> NDArray[np.float64]:
-        """Return an array containing sampled values.
+        """Generate and return an array of sampled perturbation values.
 
-        The result should be a three-dimensional array of perturbation values.
-        The variable values are stored along the last axis, for each realization
-        and perturbation. The first axis indexes the realization, and the second
-        axis indexes the perturbation.
+        This method must return a three-dimensional NumPy array containing the
+        generated perturbation samples. The shape of the array should be
+        `(n_realizations, n_perturbations, n_variables)`, where:
 
-        If the `shared` flag is set in the
-        [`SamplerConfig`][ropt.config.enopt.SamplerConfig] configuration, the
-        first dimension should have a length equal to one, since all
-        realizations will use the same set of perturbations.
+        - `n_realizations` is the number of realizations in the ensemble.
+        - `n_perturbations` is the number of perturbations requested.
+        - `n_variables` is the total number of optimization variables.
 
-        The sampler may handle only a subset of the variables, as specified by
-        the `variable_indices` argument of the constructor. In this case, only
-        the corresponding values along the variables axis (the last axis) should
-        be set, while other values should be zero.
+        If the `shared` flag is `True` in the associated
+        [`SamplerConfig`][ropt.config.enopt.SamplerConfig], the first dimension
+        (realizations) should have a size of 1. The framework will broadcast
+        these shared samples across all realizations.
 
-        Note: Sample scaling
-            Samples will be multiplied by the values given by the
-            `perturbation_magnitudes` field in the
-            [`gradients`][ropt.config.enopt.GradientConfig] section of the
-            optimizer configuration. It makes therefore sense to generate
-            samples that have an order of magnitude around one. For instance, by
-            generating them on a `[-1, 1]` range, or with a unit standard
-            deviation.
+        If a boolean `mask` was provided during initialization, this sampler
+        instance is responsible only for a subset of variables (where the mask
+        is `True`). The returned array must still have the full `n_variables`
+        size along the last axis. However, values corresponding to variables
+        *not* handled by this sampler (where the mask is `False`) must be zero.
+
+        Note: Sample Scaling and Perturbation Magnitudes
+            The generated samples represent *unscaled* perturbations. During the
+            gradient estimation process, these samples will be multiplied element-wise
+            by the `perturbation_magnitudes` defined in the
+            [`GradientConfig`][ropt.config.enopt.GradientConfig].
+
+            Therefore, it is generally recommended that sampler implementations
+            produce samples with a characteristic scale of approximately one
+            (e.g., drawn from a distribution with a standard deviation of 1, or
+            uniformly distributed within `[-1, 1]`). This allows the
+            `perturbation_magnitudes` to directly control the effective size of
+            the perturbations applied to the variables.
 
         Returns:
-            The sampled values.
+            A 3D NumPy array of sampled perturbation values.
         """
 
 
 class SamplerPlugin(Plugin):
-    """Abtract base class for sampler plugins."""
+    """Abstract Base Class for Sampler Plugins (Factories).
+
+    This class defines the interface for plugins responsible for creating
+    [`Sampler`][ropt.plugins.sampler.base.Sampler] instances. These plugins
+    act as factories for specific sampling algorithms or strategies.
+
+    During plan execution, the [`PluginManager`][ropt.plugins.PluginManager]
+    identifies the appropriate sampler plugin based on the configuration and
+    uses its `create` class method to instantiate the actual `Sampler` object
+    that will generate the perturbation samples.
+    """
 
     @classmethod
     @abstractmethod
@@ -96,11 +130,22 @@ class SamplerPlugin(Plugin):
         mask: NDArray[np.bool_] | None,
         rng: Generator,
     ) -> Sampler:
-        """Create a sampler.
+        """Factory method to create a concrete Sampler instance.
+
+        This abstract class method serves as a factory for creating concrete
+        [`Sampler`][ropt.plugins.sampler.base.Sampler] objects. Plugin
+        implementations must override this method to return an instance of their
+        specific `Sampler` subclass.
+
+        The [`PluginManager`][ropt.plugins.PluginManager] calls this method when
+        an optimization step requires samples generated by this plugin.
 
         Args:
-            enopt_config:  The configuration of the optimizer.
-            sampler_index: The index of the sampler to use.
-            mask:          The indices of the variables to sample.
-            rng:           A random generator object for use by stochastic samplers.
+            enopt_config:  The main EnOpt configuration object.
+            sampler_index: Index into `enopt_config.samplers` for this sampler.
+            mask:          Optional boolean mask for variable subset sampling.
+            rng:           NumPy random number generator instance.
+
+        Returns:
+            An initialized Sampler object ready for use.
         """

@@ -32,41 +32,41 @@ _SUPPORTED_METHODS: Final[set[str]] = set(_STATS_SAMPLERS.keys()) | set(
 
 
 class SciPySampler(Sampler):
-    """Plugin class for producing sampling values via SciPy.
+    """A sampler implementation utilizing SciPy's statistical functions.
 
-    This plugin implements the following sampling methods using the
-    corresponding methods from the SciPy stats module:
+    This sampler leverages functions from the `scipy.stats` and
+    `scipy.stats.qmc` modules to generate perturbation samples for optimization.
 
-    - Sampling from [probability
-      distributions](https://docs.scipy.org/doc/scipy/reference/stats.html):
+    **Supported Sampling Methods:**
 
-        `uniform`
-        : Uniform distribution with a default range of [-1, 1].
+    - **From Probability Distributions
+      ([`scipy.stats`](https://docs.scipy.org/doc/scipy/reference/stats.html)):**
+        - `norm`: Samples from a standard normal distribution (mean 0,
+          standard deviation 1). This is the **default** method if none is
+          specified or if "default" is requested.
+        - `truncnorm`: Samples from a truncated normal distribution (mean 0,
+          std dev 1), truncated to the range `[-1, 1]` by default.
+        - `uniform`: Samples from a uniform distribution. Defaults to the
+          range `[-1, 1]`.
 
-        `norm`
-        : Normal distribution with mean zero and standard deviation 1.
+    - **From Quasi-Monte Carlo Sequences
+      ([`scipy.stats.qmc`](https://docs.scipy.org/doc/scipy/reference/stats.qmc.html)):**
+        - `sobol`: Uses Sobol' sequences.
+        - `halton`: Uses Halton sequences.
+        - `lhs`: Uses Latin Hypercube Sampling.
+        *(Note: QMC samples are generated in the unit hypercube `[0, 1]^d` and
+        then scaled to the hypercube `[-1, 1]^d`)*
 
-        `truncnorm`
-        : Truncated normal distribution with mean zero and standard
-          deviation 1 truncated a the range [-1, 1].
+    **Configuration:**
 
-    - Sampling using methods from the [Quasi-Monte Carlo
-      submodule](https://docs.scipy.org/doc/scipy/reference/stats.qmc.html):
-
-        `sobol`
-        : Using Sobol sequences, scaled to -1 and 1.
-
-        `halton`
-        : Using Halton sequences, scaled to -1 and 1.
-
-        `lhs`
-        : Using Latin Hypercube sampling, scaled to -1 and 1.
-
-    Specific options that are normally passed as arguments in the SciPy
-    functions can be provided via the options dictionary in the configuration
-    object. Consult the
-    [`scipy.stats`](https://docs.scipy.org/doc/scipy/reference/stats.html)
-    manual for details on these options.
+    The specific sampling method is chosen via the `method` field in the
+    [`SamplerConfig`][ropt.config.enopt.SamplerConfig]. Additional
+    method-specific parameters (e.g., distribution parameters like `loc`,
+    `scale`, `a`, `b` for `stats` methods, or engine parameters for `qmc`
+    methods) can be passed through the `options` dictionary within the
+    `SamplerConfig`. Refer to the
+    [`scipy.stats`](https://docs.scipy.org/doc/scipy/reference/stats.html) and
+    documentation for available options.
     """
 
     def __init__(

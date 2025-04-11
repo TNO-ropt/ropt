@@ -27,34 +27,39 @@ MetaDataType = dict[str, int | float | bool | str]
 
 
 class DefaultOptimizerStep(PlanStep):
-    """The default optimizer step.
+    """The default optimizer step for optimization plans.
 
-    The optimizer step performs an optimization, yielding a sequence of
+    This step executes an optimization algorithm based on a provided
+    configuration ([`EnOptConfig`][ropt.config.enopt.EnOptConfig] or a
+    compatible dictionary). It iteratively performs function and potentially
+    gradient evaluations, yielding a sequence of
     [`FunctionResults`][ropt.results.FunctionResults] and
-    [`GradientResults`][ropt.results.GradientResults] objects. The optimizer is
-    configured using an [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object or
-    a dictionary that can be parsed into such an object. While the initial values
-    for optimization are typically specified in the configuration, they can be
-    overridden by providing them directly.
+    [`GradientResults`][ropt.results.GradientResults] objects.
 
-    The optimizer step emits several signals:
+    While initial variable values are typically specified in the configuration,
+    they can be overridden by passing them directly to the `run` method.
+
+    The step emits the following events during its execution:
 
     - [`START_OPTIMIZER_STEP`][ropt.enums.EventType.START_OPTIMIZER_STEP]:
-      Emitted before the optimization starts.
-    - [`FINISHED_OPTIMIZER_STEP`][ropt.enums.EventType.FINISHED_OPTIMIZER_STEP]:
-      Emitted after the optimization finishes.
+      Emitted just before the optimization process begins.
     - [`START_EVALUATION`][ropt.enums.EventType.START_EVALUATION]: Emitted
-      before a function or gradient evaluation.
+      immediately before an ensemble evaluation (for functions or gradients)
+      is requested from the underlying optimizer.
     - [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION]: Emitted
-      after a function or gradient evaluation.
+      after an evaluation completes. This event carries the generated
+      [`Results`][ropt.results.Results] object(s) in its `data` dictionary
+      under the key `"results"`. Plan handlers typically listen for this event
+      to process or track optimization progress.
+    - [`FINISHED_OPTIMIZER_STEP`][ropt.enums.EventType.FINISHED_OPTIMIZER_STEP]:
+      Emitted after the entire optimization process concludes (successfully,
+      or due to termination conditions or errors).
 
-      The `FINISHED_EVALUATION` signal is particularly important as it passes
-      the generated [`Results`][ropt.results.Results] objects. Result handlers
-      specified in the plan will respond to this signal to process those results.
-
-    The optimizer step supports nested optimizations, where each function
-    evaluation in the optimization calls a function that should run the nested
-    optimization and produce the result for the function evaluation.
+    This step also supports **nested optimization**. If a `nested_optimization`
+    plan is provided to the `run` method, the optimizer will execute this nested
+    plan for each function evaluation instead of calling the standard ensemble
+    evaluator. The nested plan is expected to return a single
+    [`FunctionResults`][ropt.results.FunctionResults] object.
     """
 
     def __init__(
@@ -68,7 +73,7 @@ class DefaultOptimizerStep(PlanStep):
         """
         super().__init__(plan)
 
-    def run(  # type: ignore[override]
+    def run(
         self,
         config: dict[str, Any] | EnOptConfig,
         transforms: OptModelTransforms | None = None,
@@ -76,14 +81,38 @@ class DefaultOptimizerStep(PlanStep):
         nested_optimization: Plan | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> OptimizerExitCode:
-        """Run the optimizer step.
+        """Run the optimizer step to perform an optimization.
+
+        This method executes the core logic of the optimizer step. It requires
+        an optimizer configuration
+        ([`EnOptConfig`][ropt.config.enopt.EnOptConfig] or a compatible
+        dictionary) and optionally accepts specific initial variable vectors,
+        transforms, a nested optimization plan, and metadata.
+
+        If `variables` are not provided, the initial values specified in the
+        `config` are used. If `variables` are provided, they override the
+        config's initial values.
+
+        If a `transforms` object is given, it is passed to the optimizer to
+        transform variables and results between user and optimizer domains (see
+        [`ropt.transforms`][ropt.transforms]).
+
+        If `metadata` is provided, it is attached to the
+        [`Results`][ropt.results.Results] objects emitted via the
+        `FINISHED_EVALUATION` event.
+
+        If a `nested_optimization` plan is provided, it will be executed for
+        each function evaluation instead of the standard ensemble evaluator.
 
         Args:
-            config:              The optimizer configuration.
+            config:              Optimizer configuration.
             transforms:          Optional transforms object.
-            variables: Variables to evaluate.
+            variables:           Optional initial variable vector(s) to start optimization from.
             nested_optimization: Optional nested plan.
-            metadata:            Optional metadata to add to events.
+            metadata:            Optional dictionary to attach to emitted `Results`.
+
+        Returns:
+            An [`OptimizerExitCode`][ropt.enums.OptimizerExitCode] indicating the outcome of the optimization.
         """
         self._config = EnOptConfig.model_validate(config, context=transforms)
         self._transforms = transforms

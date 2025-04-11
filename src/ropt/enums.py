@@ -4,12 +4,10 @@ from enum import IntEnum, StrEnum
 
 
 class VariableType(IntEnum):
-    """Enumerates the variable types.
+    """Enumerates the types of optimization variables.
 
-    The variable types are configured in the
-    [`variables`][ropt.config.enopt.VariablesConfig] section of the optimizer
-    configuration. The optimization backends may make us of this information to
-    modify their behavior accordingly.
+    Specified in [`VariablesConfig`][ropt.config.enopt.VariablesConfig], this
+    information allows optimization backends to adapt their behavior.
     """
 
     REAL = 1
@@ -20,10 +18,13 @@ class VariableType(IntEnum):
 
 
 class BoundaryType(IntEnum):
-    """Enumerates the ways boundaries should be treated.
+    """Enumerates strategies for handling variable boundary violations.
 
-    When variables are perturbed their values may violate boundary constraints.
-    This enumeration lists the ways these values can be modified to fix this.
+    When variables are perturbed during optimization, their values might fall
+    outside the defined lower and upper bounds. This enumeration defines
+    different methods to adjust these perturbed values back within the valid
+    range. The chosen strategy is configured in the
+    [`GradientConfig`][ropt.config.enopt.GradientConfig].
     """
 
     NONE = 1
@@ -55,12 +56,12 @@ class BoundaryType(IntEnum):
 
 
 class PerturbationType(IntEnum):
-    """Enumerates the types of perturbations that can be applied.
+    """Enumerates methods for scaling perturbation samples.
 
-    When applying a perturbation to a variable, generally, some value is
-    generated, which is then applied to the unperturbed values (usually by
-    addition). This enumeration lists the ways how this perturbation value can
-    be modified before being added to the unperturbed variable.
+    Before a generated perturbation sample is added to a variable's current
+    value (during gradient estimation, for example), it can be scaled. This
+    enumeration defines the available scaling methods, configured in the
+    [`GradientConfig`][ropt.config.enopt.GradientConfig].
     """
 
     ABSOLUTE = 1
@@ -75,44 +76,42 @@ class PerturbationType(IntEnum):
 
 
 class EventType(IntEnum):
-    """Enumerates the events handled by the event broker.
+    """Enumerates the types of events emitted during optimization plan execution.
 
-    During the execution of the optimization plan, events may be emitted and
-    callbacks can be connected to these events . When triggered by an event, the
-    callbacks receive an [`Event`][ropt.plan.Event] object. This object
-    contains at least the type of the event (a value of this enumeration) and
-    the current configuration of the step that is executing. If the step has a
-    name it is also added to the event. Additionally, depending on the event
-    type, a tuple of result objects, an exit code  may be present. Refer to the
-    documentation of the individual event types for details.
+    Events signal significant occurrences within the optimization process, such
+    as the start or end of a plan step or an evaluation. Callbacks can be
+    registered to listen for specific event types.
+
+    When an event occurs, registered callbacks receive an
+    [`Event`][ropt.plan.Event] object containing:
+
+    - `event_type`: The type of the event (a value from this enumeration).
+    - `config`: The configuration object associated with the source.
+    - `source`: The unique ID (UUID) of the plan component that emitted the event.
+    - `data`: A dictionary containing event-specific data, such as
+      [`Results`][ropt.results.Results] objects.
+
+    Refer to the documentation of individual event types and plan components for
+    details on the specific data they provide.
     """
 
     START_EVALUATION = 1
     """Emitted before evaluating new functions."""
 
     FINISHED_EVALUATION = 2
-    """Emitted after finishing the evaluation.
-
-    Results may be passed to callback reacting to this event.
-    """
+    """Emitted after finishing the evaluation."""
 
     START_OPTIMIZER_STEP = 3
     """Emitted just before starting an optimizer step."""
 
     FINISHED_OPTIMIZER_STEP = 4
-    """Emitted immediately after an optimizer step finishes.
-
-    Results and an exit code may be passed via the event object.
-    """
+    """Emitted immediately after an optimizer step finishes."""
 
     START_EVALUATOR_STEP = 5
     """Emitted just before starting an evaluation step."""
 
     FINISHED_EVALUATOR_STEP = 6
-    """Emitted immediately after an evaluation step finishes.
-
-    Results and an exit code may be passed via the event object.
-    """
+    """Emitted immediately after an evaluation step finishes."""
 
 
 class OptimizerExitCode(IntEnum):
@@ -144,17 +143,21 @@ class OptimizerExitCode(IntEnum):
 
 
 class ResultAxis(StrEnum):
-    """Enumerates the possible axes in a Results data object.
+    """Enumerates the semantic meaning of axes in `Results` data arrays.
 
-    Result objects (see [`Results`][ropt.results.Results]) contain
-    multidimensional arrays where the axes represent particular quantities, for
-    instance variables, function objects, or realization numbers. The result
-    objects contain metadata that identify the axes by values of this
-    enumeration. These can be retrieved by the
-    [`get_axes`][ropt.results.ResultField.get_axes] method of the
-    attributes of a results object. They are used internally when exporting data
-    to determine the type of the array axes, for instance to retrieve the names
-    of the variables from the configuration.
+    [`Results`][ropt.results.Results] objects store optimization data (like
+    variable values, objective function values, constraint values, etc.) in
+    multidimensional NumPy arrays. This enumeration provides standardized labels
+    to identify what each dimension (axis) of these arrays represents.
+
+    For example, an array might have dimensions corresponding to different
+    realizations, different objective functions, or different variables.
+
+    This information is stored as metadata within the `Results` object and can
+    be accessed using methods like
+    [`get_axes`][ropt.results.ResultField.get_axes] on result fields. It is
+    used internally, for instance, during data export to correctly label axes
+    or retrieve associated names (like variable names) from the configuration.
     """
 
     VARIABLE = "variable"

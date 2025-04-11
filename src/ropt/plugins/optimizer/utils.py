@@ -26,14 +26,18 @@ def validate_supported_constraints(
     supported_constraints: dict[str, set[str]],
     required_constraints: dict[str, set[str]],
 ) -> None:
-    """Check if the requested optimization features are supported or required.
+    """Validate if the configured constraints are supported by the chosen method.
 
-    The keys of the supported_constraints and required_constraints dicts specify
-    the type of the constraint as shown in the example below. The values are
-    sets of method names that support or require the type of constraint
-    specified by the key.
+    This function checks if the constraints defined in the `config` object
+    (bounds, linear, non-linear) are compatible with the specified optimization
+    `method`. It uses dictionaries mapping constraint types to sets of methods
+    that support or require them.
 
-    For example:
+    Constraint types are identified by keys like `"bounds"`, `"linear:eq"`,
+    `"linear:ineq"`, `"nonlinear:eq"`, and `"nonlinear:ineq"`.
+
+    Example `supported_constraints` dictionary:
+    ```python
     {
         "bounds": {"L-BFGS-B", "TNC", "SLSQP"},
         "linear:eq": {"SLSQP"},
@@ -41,12 +45,20 @@ def validate_supported_constraints(
         "nonlinear:eq": {"SLSQP"},
         "nonlinear:ineq": {"SLSQP"},
     }
+    ```
+    A similar structure is used for `required_constraints`.
 
     Args:
-        config:                The ensemble optimizer configuration object.
-        method:                The method to check.
-        supported_constraints: Specify the supported constraints.
-        required_constraints:  Specify the required constraints.
+        config:                The optimization configuration object.
+        method:                The name of the optimization method being used.
+        supported_constraints: Dict mapping constraint types to sets of methods
+                               that support them.
+        required_constraints:  Dict mapping constraint types to sets of methods
+                               that require them.
+
+    Raises:
+        NotImplementedError: If a configured constraint is not supported by the
+                             method, or if a required constraint is missing.
     """
     _validate_bounds(config, method, supported_constraints, required_constraints)
     _validate_linear_constraints(
@@ -185,18 +197,20 @@ def create_output_path(
     name: str | None = None,
     suffix: str | None = None,
 ) -> Path:
-    """Create an output path name.
+    """Construct a unique output path, appending an index if necessary.
 
-    If the path already exists, an index is appended to it.
+    This function generates a file or directory path based on the provided
+    components. If the resulting path already exists, it automatically appends
+    or increments a numerical suffix (e.g., "-001", "-002") to ensure uniqueness.
 
     Args:
-        base_name: Base name of the path.
-        base_dir:  Optional directory to base the path in.
-        name:      Optional optimization step name to include in the name.
-        suffix:    Optional suffix for the resulting path.
+        base_name: The core name for the path.
+        base_dir:  Optional parent directory for the path.
+        name:      Optional identifier (e.g., step name) to include in the path.
+        suffix:    Optional file extension or suffix for the path.
 
     Returns:
-        The constructed path
+        A unique `pathlib.Path` object.
     """
     if base_dir is not None:
         base_dir.mkdir(parents=True, exist_ok=True)
@@ -236,26 +250,27 @@ class NormalizedConstraints:
     two-sided constraint into two normalized constraints.
 
     By default this normalizes inequality constraints to the form C(x) < 0, by
-    setting `flip` flag, this can be changed to C(x) > 0.
+    setting `flip` flag, this can be changed to C(x) < 0.
 
-    Usage:
-        1. Initialize with the lower and upper bounds.
-        2. Before each new function/gradient evaluation with a new variable
-           vector, reset the normalized constraints by calling the `reset`
-           method.
-        3. The constraint values are given by the `constraints` property. Before
-           accessing it, call the `set_constraints` with the raw constraints. If
-           necessary, this will calculate and cache the normalized values. Since
-           values are cached, calling this method and accessing `constraints`
-           multiple times is cheap.
-        4. Use the same procedure for gradients, using the `gradients` property
-           and `set_gradients`. Raw gradients must be provided as a matrix,
-           where the rows are the gradients of each constraint.
-        5. Use the `is_eq` property to retrieve a vector of boolean flags to
-           check which constraints are equality constraints.
+    **Usage:**
 
-        See the `scipy` optimization backend in the `ropt` source code for an
-        example of usage.
+    1. Initialize with the lower and upper bounds.
+    2. Before each new function/gradient evaluation with a new variable
+        vector, reset the normalized constraints by calling the `reset`
+        method.
+    3. The constraint values are given by the `constraints` property. Before
+        accessing it, call the `set_constraints` with the raw constraints. If
+        necessary, this will calculate and cache the normalized values. Since
+        values are cached, calling this method and accessing `constraints`
+        multiple times is cheap.
+    4. Use the same procedure for gradients, using the `gradients` property
+        and `set_gradients`. Raw gradients must be provided as a matrix,
+        where the rows are the gradients of each constraint.
+    5. Use the `is_eq` property to retrieve a vector of boolean flags to
+        check which constraints are equality constraints.
+
+    See the `scipy` optimization backend in the `ropt` source code for an
+    example of usage.
 
     Note: Parallel evaluation.
         The raw constraints may be a vector of constraints, or may be a matrix
@@ -279,7 +294,7 @@ class NormalizedConstraints:
         Args:
             lower_bounds: The lower bounds on the right hand sides.
             upper_bounds: The upper bounds on the right hand sides.
-            flip: Whether to flip the sign of the constraints.
+            flip:         Whether to flip the sign of the constraints.
         """
         self._apply_flip = flip
         self._is_eq: list[bool] = []
@@ -312,37 +327,74 @@ class NormalizedConstraints:
 
     @property
     def is_eq(self) -> list[bool]:
-        """Return the flags that indicate equality transforms."""
+        """Return flags indicating which constraints are equality constraints.
+
+        Returns:
+            A list of booleans, `True` for constraints that are equality constraints.
+        """
         return self._is_eq
 
     def reset(self) -> None:
-        """Reset the constraints and its gradients."""
+        """Reset cached normalized constraints and gradients.
+
+        This should be called before evaluating with a new variable vector to
+        ensure fresh values are calculated upon the next access.
+        """
         self._constraints = None
         self._gradients = None
 
     @property
     def constraints(self) -> NDArray[np.float64] | None:
-        """Return the normalized constraints.
+        """Return the cached normalized constraint values.
+
+        These are the constraint values after applying the normalization logic
+        (subtracting RHS, potential sign flipping) based on the bounds provided
+        during initialization.
+
+        This property should be accessed after calling
+        [`set_constraints`][ropt.plugins.optimizer.utils.NormalizedConstraints.set_constraints]
+        with the raw constraint values for the current variable vector. Returns
+        `None` if `set_constraints` has not been called since the last `reset`.
 
         Returns:
-            The normalized constraints.
+            A NumPy array containing the normalized constraint values.
         """
         return self._constraints
 
     @property
     def gradients(self) -> NDArray[np.float64] | None:
-        """Return the normalized constraint gradients.
+        """Return the cached normalized constraint gradients.
+
+        These are the gradients of the constraints after applying the
+        normalization logic (potential sign flipping) based on the bounds
+        provided during initialization.
+
+        This property should be accessed after calling
+        [`set_gradients`][ropt.plugins.optimizer.utils.NormalizedConstraints.set_gradients]
+        with the raw constraint gradients for the current variable vector.
+        Returns `None` if `set_gradients` has not been called since the last
+        `reset`.
 
         Returns:
-            The normalized constraint gradients.
+            A 2D NumPy array containing the normalized constraint gradients.
         """
         return self._gradients
 
     def set_constraints(self, values: NDArray[np.float64]) -> None:
-        """Set the constraints property.
+        """Calculate and cache normalized constraint values.
+
+        This method takes the raw constraint values (evaluated at the current
+        variable vector) and applies the normalization logic defined during
+        initialization (subtracting RHS, potential sign flipping). The results
+        are stored internally and made available via the `constraints` property.
+
+        This supports parallel evaluation: if `values` is a 2D array, each row
+        is treated as the constraint values for a separate variable vector
+        evaluation.
 
         Args:
-            values: The raw constraint values.
+            values: A 1D or 2D NumPy array of raw constraint values. If 2D,
+                    rows represent different evaluations.
         """
         if values.ndim == 1:
             values = np.expand_dims(values, axis=1)
@@ -357,10 +409,20 @@ class NormalizedConstraints:
                 self._constraints[idx, :] = -self._constraints[idx, :]
 
     def set_gradients(self, values: NDArray[np.float64]) -> None:
-        """Set the normalized and gradients.
+        """Calculate and cache normalized constraint gradients.
+
+        This method takes the raw constraint gradients (evaluated at the current
+        variable vector) and applies the normalization logic defined during
+        initialization (potential sign flipping). The results are stored
+        internally and made available via the `gradients` property.
+
+        Note:
+            Unlike `set_constraints`, this method does *not* support parallel
+            evaluation; it expects gradients corresponding to a single variable vector.
 
         Args:
-            values: The raw gradient values.
+            values: A 2D NumPy array of raw constraint gradients (rows are
+                    gradients of original constraints, columns are variables).
         """
         self._gradients = np.empty(
             (len(self._indices), values.shape[1]), dtype=np.float64
@@ -376,18 +438,30 @@ class NormalizedConstraints:
 def get_masked_linear_constraints(
     config: EnOptConfig,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
-    """Get masked coefficients and bounds for linear constraints.
+    """Adjust linear constraints based on a variable mask.
 
-    If a mask is defined on the variables that defines a sub-set of variables to
-    optimize, any linear constraints must be adapted accordingly. This function
-    does this by removing masked variables from the coefficients, and absorbing
-    the fixed variables in the lower and upper bounds.
+    When an optimization problem uses a variable mask (`config.variables.mask`)
+    to optimize only a subset of variables, the linear constraints need to be
+    adapted. This function performs that adaptation.
+
+    It removes columns from the constraint coefficient matrix
+    (`config.linear_constraints.coefficients`) that correspond to the masked
+    (fixed) variables. The contribution of these fixed variables (using their
+    `initial_values`) is then calculated and subtracted from the original lower
+    and upper bounds (`config.linear_constraints.lower_bounds`,
+    `config.linear_constraints.upper_bounds`) to produce adjusted bounds for the
+    optimization involving only the active variables.
+
+    Additionally, any constraint rows that originally involved *only* masked
+    variables (i.e., all coefficients for active variables in that row are zero)
+    are removed entirely, as they become trivial constants.
 
     Args:
-        config: The optimization configuration.
+        config: The [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object
+                containing the variable mask and linear constraints.
 
     Returns:
-        The corrected linear constraints.
+        The adjusted coefficients and bounds.
     """
     assert config.linear_constraints is not None
     mask = config.variables.mask
