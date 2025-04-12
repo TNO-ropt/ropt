@@ -1402,9 +1402,36 @@
 
     <div class="doc doc-contents first">
 
-        <p>Plugin functionality for adding function estimators.</p>
-<p>This package contains the abstract base classes for function estimator plugins,
-and the default function estimators that are part of <code>ropt</code>.</p>
+        <p>Provides plugin functionality for adding function estimators.</p>
+<p>Function estimators are used by the optimization process to combine the results
+(objective function values and gradients) from a set of realizations into a
+single representative value. This module allows for the extension of <code>ropt</code> with
+custom strategies for aggregating ensemble results.</p>
+<p><strong>Core Concepts:</strong></p>
+<ul>
+<li><strong>Plugin Interface:</strong> Function estimator plugins must inherit from the
+  <a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.base.FunctionEstimatorPlugin" href="#ropt.plugins.function_estimator.base.FunctionEstimatorPlugin"><code>FunctionEstimatorPlugin</code></a>
+  base class. This class acts as a factory, defining a <code>create</code> method to
+  instantiate estimator objects.</li>
+<li><strong>Estimator Implementation:</strong> The actual aggregation logic resides in classes
+  that inherit from the
+  <a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.base.FunctionEstimator" href="#ropt.plugins.function_estimator.base.FunctionEstimator"><code>FunctionEstimator</code></a>
+  abstract base class. These classes are initialized with the optimization
+  configuration (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>) and the index
+  of the specific estimator configuration to use (<code>estimator_index</code>). The core
+  functionality is provided by the <code>calculate_function</code> and
+  <code>calculate_gradient</code> methods, which combine the function values and gradients
+  from multiple realizations, respectively, using realization weights.</li>
+<li><strong>Discovery:</strong> The <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> discovers
+  available <code>FunctionEstimatorPlugin</code> implementations (typically via entry
+  points) and uses them to create <code>FunctionEstimator</code> instances as needed
+  during plan execution.</li>
+</ul>
+<p><strong>Built-in Function Estimator Plugins:</strong></p>
+<p>The default
+<a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.default.DefaultFunctionEstimator" href="../default_function_estimator_plugin/#ropt.plugins.function_estimator.default.DefaultFunctionEstimator"><code>DefaultFunctionEstimator</code></a>
+class provides methods for calculating the weighted mean (<code>mean</code>) and standard
+deviation (<code>stddev</code>) of the realization results.</p>
 
 
 
@@ -1448,7 +1475,16 @@ and the default function estimators that are part of <code>ropt</code>.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="            Plugin (ropt.plugins.base.Plugin)" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
 
 
-        <p>The function estimator plugin base class.</p>
+        <p>Abstract Base Class for Function Estimator Plugins (Factories).</p>
+<p>This class defines the interface for plugins responsible for creating
+<a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.base.FunctionEstimator" href="#ropt.plugins.function_estimator.base.FunctionEstimator"><code>FunctionEstimator</code></a>
+instances. These plugins act as factories for specific function estimation
+strategies.</p>
+<p>During plan execution, the <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>
+identifies the appropriate function estimator plugin based on the
+configuration and uses its <code>create</code> class method to instantiate the actual
+<code>FunctionEstimator</code> object that will perform the aggregation of ensemble
+results (function values and gradients).</p>
 
 
 
@@ -1489,7 +1525,14 @@ and the default function estimators that are part of <code>ropt</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the function estimator object.</p>
+        <p>Factory method to create a concrete FunctionEstimator instance.</p>
+<p>This abstract class method serves as a factory for creating concrete
+<a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.base.FunctionEstimator" href="#ropt.plugins.function_estimator.base.FunctionEstimator"><code>FunctionEstimator</code></a>
+objects. Plugin implementations must override this method to return an
+instance of their specific <code>FunctionEstimator</code> subclass.</p>
+<p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> calls this method when
+an optimization step requires a function estimator provided by this
+plugin.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1512,7 +1555,7 @@ and the default function estimators that are part of <code>ropt</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The configuration of the optimizer.</p>
+                <p>The main EnOpt configuration object.</p>
               </div>
             </td>
             <td>
@@ -1528,11 +1571,35 @@ and the default function estimators that are part of <code>ropt</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The index of the estimator to use.</p>
+                <p>Index into <code>enopt_config.function_estimators</code> for
+             this estimator.</p>
               </div>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.base.FunctionEstimator" href="#ropt.plugins.function_estimator.base.FunctionEstimator">FunctionEstimator</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An initialized FunctionEstimator object ready for use.</p>
+              </div>
             </td>
           </tr>
       </tbody>
@@ -1567,7 +1634,29 @@ and the default function estimators that are part of <code>ropt</code>.</p>
               Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
 
 
-        <p>Abstract base class for function estimators.</p>
+        <p>Abstract Base Class for Function Estimator Implementations.</p>
+<p>This class defines the fundamental interface for all concrete function
+estimator implementations within the <code>ropt</code> framework. Function estimator
+plugins provide classes derived from <code>FunctionEstimator</code> that encapsulate
+the logic for combining the objective function values and gradients from an
+ensemble of realizations into a single representative value. This aggregated
+value is then used by the core optimization algorithm.</p>
+<p>Instances of <code>FunctionEstimator</code> subclasses are created by their
+corresponding
+<a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.base.FunctionEstimatorPlugin" href="#ropt.plugins.function_estimator.base.FunctionEstimatorPlugin"><code>FunctionEstimatorPlugin</code></a>
+factories. They are initialized with an
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object detailing the
+optimization setup and the <code>estimator_index</code> identifying the specific
+estimator configuration to use from the config.</p>
+<p>The core functionality involves combining results using realization weights,
+performed by the <code>calculate_function</code> and <code>calculate_gradient</code> methods,
+which must be implemented by subclasses.</p>
+<p>Subclasses must implement:</p>
+<ul>
+<li><code>__init__</code>: To accept the configuration and index.</li>
+<li><code>calculate_function</code>: To combine function values from realizations.</li>
+<li><code>calculate_gradient</code>: To combine gradient values from realizations.</li>
+</ul>
 
 
 
@@ -1604,6 +1693,11 @@ and the default function estimators that are part of <code>ropt</code>.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize the function estimator object.</p>
+<p>The <code>function_estimators</code> field in the <code>enopt_config</code> is a tuple of
+estimator configurations
+(<a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="../enopt_config/#ropt.config.enopt.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a>).
+The <code>estimator_index</code> identifies which configuration from this tuple
+should be used to initialize this specific estimator instance.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1642,7 +1736,7 @@ and the default function estimators that are part of <code>ropt</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The index of the estimator to use.</p>
+                <p>The index of the estimator configuration to use.</p>
               </div>
             </td>
             <td>
@@ -1676,22 +1770,12 @@ and the default function estimators that are part of <code>ropt</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Combine functions from realizations into an expected function.</p>
+        <p>Combine function values from realizations into an expected value.</p>
+<p>This method takes the function (objective or constraint) values evaluated
+for each realization in the ensemble and combines them into a single
+representative value or vector of values, using the provided realization
+weights.</p>
 
-
-<details class="tip" open>
-  <summary>Calculation from merged realizations</summary>
-  <p>Normally the gradient is calculated for each realization separately
-and then combined into an overall gradient with <code>calculate_gradient</code>
-method. The <code>merge_realizations</code> flag in the ensemble optimizer
-configuration directs the optimizer to calculate the overall gradient
-from all realizations directly. This yields a reasonable estimation
-if the function estimator is an averaging operation, but may not be
-appropriate in other cases.</p>
-<p>At initialization, the <code>merge_realizations</code> flag should be checked,
-and if necessary a <code>ConfigError</code> with an appropriate message should
-be raised.</p>
-</details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>
@@ -1713,7 +1797,7 @@ be raised.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The functions for each realization.</p>
+                <p>The function values for each realization.</p>
               </div>
             </td>
             <td>
@@ -1729,7 +1813,7 @@ be raised.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The weight of each realization.</p>
+                <p>The weight for each realization.</p>
               </div>
             </td>
             <td>
@@ -1755,7 +1839,7 @@ be raised.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The expected function values.</p>
+                <p>A scalar or 1D array representing the combined function value(s).</p>
               </div>
             </td>
           </tr>
@@ -1789,7 +1873,37 @@ be raised.</p>
     <div class="doc doc-contents ">
 
         <p>Combine gradients from realizations into an expected gradient.</p>
+<p>This method takes the gradients evaluated for each realization and
+combines them into a single representative gradient vector or matrix,
+using the provided realization weights and potentially the function
+values themselves (e.g., for estimators like standard deviation where
+the chain rule applies).</p>
 
+
+<details class="note" open>
+  <summary>Interaction with <code>merge_realizations</code></summary>
+  <p>The <code>merge_realizations</code> flag in the
+<a class="autorefs autorefs-internal" title="            GradientConfig" href="../enopt_config/#ropt.config.enopt.GradientConfig"><code>GradientConfig</code></a> determines how
+the initial gradient estimate(s) are computed by <code>ropt</code> <em>before</em>
+being passed to this <code>calculate_gradient</code> method.</p>
+<ul>
+<li>If <code>False</code> (default): <code>ropt</code> estimates a separate gradient for each
+  realization that has a non-zero weight. The implementation
+  must then combine these gradients using the provided <code>weights</code>.</li>
+<li>If <code>True</code>: <code>ropt</code> computes a single, merged gradient estimate by
+  treating all perturbations across all realizations collectively.
+  The implementation must handle this input appropriately. For simple
+  averaging estimators, this might involve returning the input gradient
+  unchanged.</li>
+</ul>
+<p>The <code>merge_realizations=True</code> option allows gradient estimation even
+with a low number of perturbations (potentially just one) but is
+generally only suitable for estimators performing averaging-like
+operations. Estimator implementations should check this flag during
+initialization (<code>__init__</code>) and raise a
+<a class="autorefs autorefs-internal" title="            ConfigError" href="../exceptions/#ropt.exceptions.ConfigError"><code>ConfigError</code></a> if <code>merge_realizations=True</code>
+is incompatible with the estimator's logic (e.g., standard deviation).</p>
+</details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>

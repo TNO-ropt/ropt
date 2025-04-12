@@ -1458,7 +1458,15 @@ weighting.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="            Plugin (ropt.plugins.base.Plugin)" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
 
 
-        <p>Abstract base class for realizationFilter plugins.</p>
+        <p>Abstract Base Class for Realization Filter Plugins (Factories).</p>
+<p>This class defines the interface for plugins responsible for creating
+<a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.base.RealizationFilter" href="#ropt.plugins.realization_filter.base.RealizationFilter"><code>RealizationFilter</code></a>
+instances. These plugins act as factories for specific realization filtering
+strategies.</p>
+<p>During plan execution, the <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>
+identifies the appropriate realization filter plugin based on the
+configuration and uses its <code>create</code> class method to instantiate the actual
+<code>RealizationFilter</code> object that will calculate the realization weights.</p>
 
 
 
@@ -1499,7 +1507,14 @@ weighting.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the realization filter plugin.</p>
+        <p>Factory method to create a concrete RealizationFilter instance.</p>
+<p>This abstract class method serves as a factory for creating concrete
+<a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.base.RealizationFilter" href="#ropt.plugins.realization_filter.base.RealizationFilter"><code>RealizationFilter</code></a>
+objects. Plugin implementations must override this method to return an
+instance of their specific <code>RealizationFilter</code> subclass.</p>
+<p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> calls this method when
+an optimization step requires realization weights calculated by this
+plugin.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1522,7 +1537,7 @@ weighting.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The configuration of the optimizer.</p>
+                <p>The main EnOpt configuration object.</p>
               </div>
             </td>
             <td>
@@ -1538,11 +1553,35 @@ weighting.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The index of the filter to use.</p>
+                <p>Index into <code>enopt_config.realization_filters</code> for
+          this filter.</p>
               </div>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.base.RealizationFilter" href="#ropt.plugins.realization_filter.base.RealizationFilter">RealizationFilter</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An initialized RealizationFilter object ready for use.</p>
+              </div>
             </td>
           </tr>
       </tbody>
