@@ -900,16 +900,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.base" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.base.RealizationFilterPlugin" class="md-nav__link">
     <span class="md-ellipsis">
-      base
+      RealizationFilterPlugin
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="base">
+    <nav class="md-nav" aria-label="RealizationFilterPlugin">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.base.RealizationFilterPlugin.create" class="md-nav__link">
+    <span class="md-ellipsis">
+      create
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.realization_filter.base.RealizationFilter" class="md-nav__link">
     <span class="md-ellipsis">
       RealizationFilter
@@ -939,44 +953,6 @@
         
       </ul>
     </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.base.RealizationFilterPlugin" class="md-nav__link">
-    <span class="md-ellipsis">
-      RealizationFilterPlugin
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RealizationFilterPlugin">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.base.RealizationFilterPlugin.create" class="md-nav__link">
-    <span class="md-ellipsis">
-      create
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.default" class="md-nav__link">
-    <span class="md-ellipsis">
-      default
-    </span>
-  </a>
   
 </li>
       
@@ -1319,16 +1295,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.base" class="md-nav__link">
+  <a href="#ropt.plugins.realization_filter.base.RealizationFilterPlugin" class="md-nav__link">
     <span class="md-ellipsis">
-      base
+      RealizationFilterPlugin
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="base">
+    <nav class="md-nav" aria-label="RealizationFilterPlugin">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.plugins.realization_filter.base.RealizationFilterPlugin.create" class="md-nav__link">
+    <span class="md-ellipsis">
+      create
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.realization_filter.base.RealizationFilter" class="md-nav__link">
     <span class="md-ellipsis">
       RealizationFilter
@@ -1358,44 +1348,6 @@
         
       </ul>
     </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.base.RealizationFilterPlugin" class="md-nav__link">
-    <span class="md-ellipsis">
-      RealizationFilterPlugin
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="RealizationFilterPlugin">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.base.RealizationFilterPlugin.create" class="md-nav__link">
-    <span class="md-ellipsis">
-      create
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.realization_filter.default" class="md-nav__link">
-    <span class="md-ellipsis">
-      default
-    </span>
-  </a>
   
 </li>
       
@@ -1432,14 +1384,37 @@
 
     <div class="doc doc-contents first">
 
-        <p>Plugin functionality for adding realization filters.</p>
-<p>This package contains the abstract base class for realization filter plugins,
-and the default realization filters that are part of <code>ropt</code>.</p>
-<p>Realization filters are used by the optimizer to determine how a set of
-realizations should be used to calculate objective and constraint function
-values. They do this by calculating the weights that should be used for each
-realization when calculating the values of a given set of objectives and
-constraints.</p>
+        <p>Provides plugin functionality for adding realization filters.</p>
+<p>Realization filters are used by the optimization process to determine how the
+results from a set of realizations should be weighted when evaluating the
+overall objective and constraint functions. This module allows for the extension
+of <code>ropt</code> with custom realization filtering strategies.</p>
+<p><strong>Core Concepts:</strong></p>
+<ul>
+<li><strong>Plugin Interface:</strong> Realization filter plugins must inherit from the
+  <a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.base.RealizationFilterPlugin" href="#ropt.plugins.realization_filter.base.RealizationFilterPlugin"><code>RealizationFilterPlugin</code></a>
+  base class. This class acts as a factory, defining a <code>create</code> method to
+  instantiate filter objects.</li>
+<li><strong>Filter Implementation:</strong> The actual filtering logic resides in classes that
+  inherit from the
+  <a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.base.RealizationFilter" href="#ropt.plugins.realization_filter.base.RealizationFilter"><code>RealizationFilter</code></a>
+  abstract base class. These classes are initialized with the optimization
+  configuration (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>) and the index
+  of the specific filter configuration to use (<code>filter_index</code>). The core
+  functionality is provided by the <code>get_realization_weights</code> method, which
+  calculates and returns weights for each realization based on their objective
+  and constraint values.</li>
+<li><strong>Discovery:</strong> The <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> discovers
+  available <code>RealizationFilterPlugin</code> implementations (typically via entry
+  points) and uses them to create <code>RealizationFilter</code> instances as needed during
+  plan execution.</li>
+</ul>
+<p><strong>Built-in Realization Filter Plugins:</strong></p>
+<p>The default
+<a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.default.DefaultRealizationFilter" href="../default_realization_filter_plugin/#ropt.plugins.realization_filter.default.DefaultRealizationFilter"><code>DefaultRealizationFilter</code></a>
+class provides several filtering methods, including sorting by
+objective/constraint values and Conditional Value-at-Risk (CVaR) based
+weighting.</p>
 
 
 
@@ -1467,19 +1442,24 @@ constraints.</p>
 
 </div>
 
-<div class="doc doc-object doc-module">
+<div class="doc doc-object doc-class">
 
 
 
-<h2 id="ropt.plugins.realization_filter.base" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.plugins.realization_filter.base</span>
+<h2 id="ropt.plugins.realization_filter.base.RealizationFilterPlugin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.realization_filter.base.RealizationFilterPlugin</span>
 
 
 </h2>
 
-    <div class="doc doc-contents first">
 
-        <p>This module defines the abstract base class for realization filters.</p>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            Plugin (ropt.plugins.base.Plugin)" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
+
+
+        <p>Abstract base class for realizationFilter plugins.</p>
+
 
 
 
@@ -1498,18 +1478,101 @@ constraints.</p>
 
 
 
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.realization_filter.base.RealizationFilterPlugin.create" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">create</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">enopt_config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span> <span class="n">filter_index</span><span class="p">:</span> <span class="nb">int</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RealizationFilter</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize the realization filter plugin.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>enopt_config</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration of the optimizer.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>filter_index</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The index of the filter to use.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
 <div class="doc doc-object doc-class">
 
 
 
-<h3 id="ropt.plugins.realization_filter.base.RealizationFilter" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">RealizationFilter</span>
+<h2 id="ropt.plugins.realization_filter.base.RealizationFilter" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.realization_filter.base.RealizationFilter</span>
 
 
-</h3>
+</h2>
 
 
-    <div class="doc doc-contents ">
+    <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
               Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
 
@@ -1538,11 +1601,11 @@ constraints.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.realization_filter.base.RealizationFilter.__init__" class="doc doc-heading">
+<h3 id="ropt.plugins.realization_filter.base.RealizationFilter.__init__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">enopt_config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span> <span class="n">filter_index</span><span class="p">:</span> <span class="nb">int</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
@@ -1607,7 +1670,7 @@ constraints.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.realization_filter.base.RealizationFilter.get_realization_weights" class="doc doc-heading">
+<h3 id="ropt.plugins.realization_filter.base.RealizationFilter.get_realization_weights" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_realization_weights</span>
 
 
@@ -1615,7 +1678,7 @@ constraints.</p>
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_realization_weights</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">objectives</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">constraints</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -1713,174 +1776,6 @@ before use, hence any non-negative weight value is permissable.</p>
     </div>
 
 </div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.plugins.realization_filter.base.RealizationFilterPlugin" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">RealizationFilterPlugin</span>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            Plugin (ropt.plugins.base.Plugin)" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
-
-
-        <p>Abstract base class for realizationFilter plugins.</p>
-
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plugins.realization_filter.base.RealizationFilterPlugin.create" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">create</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
-  </span>
-
-</h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">enopt_config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span> <span class="n">filter_index</span><span class="p">:</span> <span class="nb">int</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RealizationFilter</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Initialize the realization filter plugin.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>enopt_config</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The configuration of the optimizer.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>filter_index</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The index of the filter to use.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-module">
-
-
-
-<h2 id="ropt.plugins.realization_filter.default" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.plugins.realization_filter.default</span>
-
-
-</h2>
-
-    <div class="doc doc-contents first">
-
-        <p>This plugin contains realization filters that are installed by default.</p>
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
 
 
 
