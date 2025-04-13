@@ -1,5 +1,7 @@
 # `ropt`: A Python module for robust optimization
 
+## Overview
+
 `ropt` is a module designed for implementing and executing robust optimization
 workflows. In classical optimization problems, a deterministic function is
 optimized. However, in robust optimization, the function is expected to exhibit
@@ -49,3 +51,23 @@ optimization problems:
   optimization process.
 - Optional support for exporting results as
   [`pandas`](https://pandas.pydata.org/) data frames.
+
+
+## Related packages
+
+### Plugins
+Additional backend optimizers can be installed separately and used via the plugin system:
+
+- The [`ropt-dakota`](https://tno-ropt.github.io/ropt-dakota/) plugin provides
+  access to algorithms from the [Dakota](https://dakota.sandia.gov/) package.
+- The [`ropt-nomad`](https://tno-ropt.github.io/ropt-nomad/) plugin implements
+  the MADS algorithm based on the
+  [NOMAD](https://www.gerad.ca/en/software/nomad/) package.
+- The [`ropt-pymoo`](https://tno-ropt.github.io/ropt-pymoo/) makes the
+  algorithms from the [`pymoo`](https://pymoo.org/) package available to `ropt`.
+
+
+### Applications
+The `ropt` package is used  by the
+[Everest](https://everest.readthedocs.io/en/latest/) decision-making tool as its
+core optimization engine.
