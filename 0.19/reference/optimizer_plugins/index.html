@@ -854,16 +854,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.optimizer.base" class="md-nav__link">
-    <span class="md-ellipsis">
-      base
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="base">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#ropt.plugins.optimizer.base.OptimizerPlugin" class="md-nav__link">
     <span class="md-ellipsis">
       OptimizerPlugin
@@ -895,8 +885,8 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.optimizer.base.Optimizer" class="md-nav__link">
     <span class="md-ellipsis">
       Optimizer
@@ -946,8 +936,8 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.optimizer.base.OptimizerCallback" class="md-nav__link">
     <span class="md-ellipsis">
       OptimizerCallback
@@ -963,11 +953,6 @@
       __call__
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1237,7 +1222,7 @@
   
   
   <span class="md-ellipsis">
-    Default Plan Plugin
+    Default Plan Plugins
     
   </span>
   
@@ -1481,16 +1466,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.optimizer.base" class="md-nav__link">
-    <span class="md-ellipsis">
-      base
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="base">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#ropt.plugins.optimizer.base.OptimizerPlugin" class="md-nav__link">
     <span class="md-ellipsis">
       OptimizerPlugin
@@ -1522,8 +1497,8 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.optimizer.base.Optimizer" class="md-nav__link">
     <span class="md-ellipsis">
       Optimizer
@@ -1573,8 +1548,8 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.optimizer.base.OptimizerCallback" class="md-nav__link">
     <span class="md-ellipsis">
       OptimizerCallback
@@ -1590,11 +1565,6 @@
       __call__
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1756,22 +1726,42 @@
 
     <div class="doc doc-contents first">
 
-        <p>Plugin functionality for adding optimization plugins.</p>
-<p>Optimization plugins are managed by a
-<a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> object, which returns classes or
-factory functions to create objects that implement one or more optimization
-methods. These objects must adhere to the
-<a class="autorefs autorefs-internal" title="            Optimizer" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> abstract base class.
-This abstract base class allows <code>ropt</code> to provide the optimizer with the
-callback used for evaluating functions and gradients and allows it to be started
-from an optimizer step in the optimization plan.</p>
-<p>To support the implementation of the optimizer classes, the
-<a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.utils" href="#ropt.plugins.optimizer.utils"><code>ropt.plugins.optimizer.utils</code></a> module provides
-some utilities.</p>
-<p>By default the <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.scipy.SciPyOptimizer" href="../scipy_optimizer_plugin/#ropt.plugins.optimizer.scipy.SciPyOptimizer"><code>SciPyOptimizer</code></a>
-plugin is installed which provides a number of methods from the
-<a href="https://docs.scipy.org/doc/scipy/tutorial/optimize.html"><code>scipy.optimize</code></a>
-package.</p>
+        <p>Framework and Implementations for Optimizer Plugins.</p>
+<p>This module provides the necessary components for integrating optimization
+algorithms into <code>ropt</code> via its plugin system. Optimizer plugins allow <code>ropt</code> to
+utilize various optimization techniques, either built-in or provided by
+third-party packages.</p>
+<p><strong>Core Concepts:</strong></p>
+<ul>
+<li><strong>Plugin Interface:</strong> Optimizer plugins must inherit from the
+  <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.OptimizerPlugin" href="#ropt.plugins.optimizer.base.OptimizerPlugin"><code>OptimizerPlugin</code></a> base class.
+  This class acts as a factory, defining a <code>create</code> method to instantiate
+  optimizer objects.</li>
+<li><strong>Optimizer Implementation:</strong> The actual optimization logic resides in classes
+  that inherit from the <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.Optimizer" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a>
+  abstract base class. These classes are initialized with the optimization
+  configuration (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>) and an
+  <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.OptimizerCallback" href="#ropt.plugins.optimizer.base.OptimizerCallback"><code>OptimizerCallback</code></a>. The
+  callback is used by the optimizer to request function and gradient evaluations
+  from <code>ropt</code>. The optimization process is initiated by calling the optimizer's
+  <code>start</code> method.</li>
+<li><strong>Discovery:</strong> The <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> discovers
+  available <code>OptimizerPlugin</code> implementations (typically via entry points) and
+  uses them to create <code>Optimizer</code> instances as needed during plan execution.</li>
+</ul>
+<p><strong>Utilities:</strong></p>
+<p>The <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.utils" href="#ropt.plugins.optimizer.utils"><code>ropt.plugins.optimizer.utils</code></a> module offers
+helper functions for common tasks within optimizer plugins, such as validating
+constraint support and handling normalized constraints.</p>
+<p><strong>Built-in Optimizers:</strong></p>
+<p><code>ropt</code> includes the following optimizers by default:</p>
+<ul>
+<li><a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.scipy.SciPyOptimizer" href="../scipy_optimizer_plugin/#ropt.plugins.optimizer.scipy.SciPyOptimizer"><code>SciPyOptimizer</code></a>: Provides
+  access to various algorithms from the <code>scipy.optimize</code> library.</li>
+<li><a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.external.ExternalOptimizer" href="../external_optimizer_plugin/#ropt.plugins.optimizer.external.ExternalOptimizer"><code>ExternalOptimizer</code></a>:
+  Enables running other optimizer plugins in a separate external process, useful
+  for isolation or specific execution environments.</li>
+</ul>
 
 
 
@@ -1799,61 +1789,30 @@ package.</p>
 
 </div>
 
-<div class="doc doc-object doc-module">
-
-
-
-<h2 id="ropt.plugins.optimizer.base" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.plugins.optimizer.base</span>
-
-
-</h2>
-
-    <div class="doc doc-contents first">
-
-        <p>This module defines base classes and protocols for optimization plugins.</p>
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
 <div class="doc doc-object doc-class">
 
 
 
-<h3 id="ropt.plugins.optimizer.base.OptimizerPlugin" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">OptimizerPlugin</span>
+<h2 id="ropt.plugins.optimizer.base.OptimizerPlugin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.optimizer.base.OptimizerPlugin</span>
 
 
-</h3>
+</h2>
 
 
-    <div class="doc doc-contents ">
+    <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
               Bases: <code><a class="autorefs autorefs-internal" title="            Plugin (ropt.plugins.base.Plugin)" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
 
 
-        <p>Abstract base class for optimizer plugins.</p>
-<p>Optimizers are implemented through optimizer plugins that must derive from
-this base class. Plugins can be built-in, installed via a plugin mechanism,
-or loaded dynamically. During execution of an optimization plan, the
-required optimizer plugin will be located via the
-<a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> and used to create
-<a class="autorefs autorefs-internal" title="            Optimizer" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> objects via its
-<code>create</code> function.</p>
+        <p>Abstract Base Class for Optimizer Plugins (Factories).</p>
+<p>This class defines the interface for plugins responsible for creating
+<a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.Optimizer" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> instances. These plugins
+act as factories for specific optimization algorithms or backends.</p>
+<p>During plan execution, the <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>
+identifies the appropriate optimizer plugin based on the configuration and
+uses its <code>create</code> class method to instantiate the actual <code>Optimizer</code> object
+that will perform the optimization.</p>
 
 
 
@@ -1877,7 +1836,7 @@ required optimizer plugin will be located via the
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.optimizer.base.OptimizerPlugin.create" class="doc doc-heading">
+<h3 id="ropt.plugins.optimizer.base.OptimizerPlugin.create" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">create</span>
 
 
@@ -1886,7 +1845,7 @@ required optimizer plugin will be located via the
       <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">optimizer_callback</span><span class="p">:</span> <span class="n">OptimizerCallback</span><span class="p">,</span>
@@ -1895,9 +1854,13 @@ required optimizer plugin will be located via the
 
     <div class="doc doc-contents ">
 
-        <p>Create an optimizer.</p>
-<p>This is a factory function for instantiating optimizer objects
-implemented in the plugin.</p>
+        <p>Create an Optimizer instance.</p>
+<p>This abstract class method serves as a factory for creating concrete
+<a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.Optimizer" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> objects. Plugin
+implementations must override this method to return an instance of their
+specific <code>Optimizer</code> subclass.</p>
+<p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> calls this method when
+an optimization step requires an optimizer provided by this plugin.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1920,7 +1883,8 @@ implemented in the plugin.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The optimizer configuration to used.</p>
+                <p>The  configuration object containing the
+                optimization settings.</p>
               </div>
             </td>
             <td>
@@ -1932,15 +1896,39 @@ implemented in the plugin.</p>
                 <code>optimizer_callback</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            OptimizerCallback (ropt.plugins.optimizer.base.OptimizerCallback)" href="#ropt.plugins.optimizer.base.OptimizerCallback">OptimizerCallback</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.OptimizerCallback" href="#ropt.plugins.optimizer.base.OptimizerCallback">OptimizerCallback</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The optimizer callback.</p>
+                <p>The callback function used by the optimizer to
+                request evaluations.</p>
               </div>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.Optimizer" href="#ropt.plugins.optimizer.base.Optimizer">Optimizer</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An initialized instance of an <code>Optimizer</code> subclass.</p>
+              </div>
             </td>
           </tr>
       </tbody>
@@ -1954,7 +1942,7 @@ implemented in the plugin.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.optimizer.base.OptimizerPlugin.validate_options" class="doc doc-heading">
+<h3 id="ropt.plugins.optimizer.base.OptimizerPlugin.validate_options" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">validate_options</span>
 
 
@@ -1962,7 +1950,7 @@ implemented in the plugin.</p>
       <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">validate_options</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
@@ -1970,10 +1958,16 @@ implemented in the plugin.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Validate the optimizer options.</p>
-<p>This method validates generic, backend-specific options. This is a
-default implementation that performs no validation . Subclasses can
-override this method to provide custom validation logic.</p>
+        <p>Validate the optimizer-specific options for a given method.</p>
+<p>This class method is intended to check if the <code>options</code> dictionary,
+typically provided in the
+<a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../enopt_config/#ropt.config.enopt.OptimizerConfig"><code>OptimizerConfig</code></a>, contains valid
+keys and values for the specified optimization <code>method</code> supported by
+this plugin.</p>
+<p>This default implementation performs no validation. Subclasses should
+override this method to implement validation logic specific to the
+methods they support, potentially using schema validation tools like
+Pydantic.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1996,7 +1990,8 @@ override this method to provide custom validation logic.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The optimization method.</p>
+                <p>The specific optimization method name (e.g., "slsqp",
+     "my_optimizer/variant1").</p>
               </div>
             </td>
             <td>
@@ -2012,7 +2007,7 @@ override this method to provide custom validation logic.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The optimizer options.</p>
+                <p>The dictionary or a list of strings of options.</p>
               </div>
             </td>
             <td>
@@ -2038,7 +2033,8 @@ override this method to provide custom validation logic.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An exception detailing the errors.</p>
+                <p>If the provided options are invalid for the specified
+       method.</p>
               </div>
             </td>
           </tr>
@@ -2062,23 +2058,39 @@ override this method to provide custom validation logic.</p>
 
 
 
-<h3 id="ropt.plugins.optimizer.base.Optimizer" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">Optimizer</span>
+<h2 id="ropt.plugins.optimizer.base.Optimizer" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.optimizer.base.Optimizer</span>
 
 
-</h3>
+</h2>
 
 
-    <div class="doc doc-contents ">
+    <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
               Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
 
 
-        <p>Abstract base for optimizer classes.</p>
-<p>Optimizers provided by optimizer plugins should derive from the <code>Optimizer</code>
-abstract base class, which specifies the requirements for the class
-constructor (<code>__init__</code>) and also includes a <code>start</code> method used to initiate
-the optimization process.</p>
+        <p>Abstract Base Class for Optimizer Implementations.</p>
+<p>This class defines the fundamental interface for all concrete optimizer
+implementations within the <code>ropt</code> framework. Optimizer plugins provide
+classes derived from <code>Optimizer</code> that encapsulate the logic of specific
+optimization algorithms.</p>
+<p>Instances of <code>Optimizer</code> subclasses are created by their corresponding
+<a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.OptimizerPlugin" href="#ropt.plugins.optimizer.base.OptimizerPlugin"><code>OptimizerPlugin</code></a> factories.
+They are initialized with an
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object detailing the
+optimization setup and an
+<a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.OptimizerCallback" href="#ropt.plugins.optimizer.base.OptimizerCallback"><code>OptimizerCallback</code></a> function.
+The callback is crucial as it allows the optimizer to request function and
+gradient evaluations from the <code>ropt</code> core during its execution.</p>
+<p>The optimization process itself is initiated by calling the <code>start</code> method,
+which must be implemented by subclasses.</p>
+<p>Subclasses must implement:
+- <code>__init__</code>: To accept the configuration and callback.
+- <code>start</code>: To contain the main optimization loop.</p>
+<p>Subclasses can optionally override:
+- <code>allow_nan</code>:   To indicate if the algorithm can handle NaN function values.
+- <code>is_parallel</code>: To indicate if the algorithm may perform parallel evaluations.</p>
 
 
 
@@ -2101,7 +2113,7 @@ the optimization process.</p>
 
 
 
-<h4 id="ropt.plugins.optimizer.base.Optimizer.allow_nan" class="doc doc-heading">
+<h3 id="ropt.plugins.optimizer.base.Optimizer.allow_nan" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">allow_nan</span>
 
 
@@ -2109,19 +2121,21 @@ the optimization process.</p>
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">allow_nan</span><span class="p">:</span> <span class="nb">bool</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Return <code>True</code> if a <code>NaN</code> is a valid function value.</p>
-<p>If the optimizer can handle <code>NaN</code> function values, it may implement this
-method to return <code>True</code>. This enables handling cases where all function
-evaluations in an ensemble fail. By setting the
-<a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../enopt_config/#ropt.config.enopt.RealizationsConfig"><code>realization_min_success</code></a>
-configuration parameter to zero, the ensemble optimization plan can then
-be allowed to return a <code>NaN</code> value instead of raising an error.</p>
+        <p>Indicate whether the optimizer can handle NaN function values.</p>
+<p>If an optimizer algorithm can gracefully handle <code>NaN</code> (Not a Number)
+objective function values, its implementation should override this
+property to return <code>True</code>.</p>
+<p>This is particularly relevant in ensemble-based optimization where
+evaluations might fail for all realizations. When <code>allow_nan</code> is <code>True</code>,
+setting <a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../enopt_config/#ropt.config.enopt.RealizationsConfig"><code>realization_min_success</code></a>
+to zero allows the evaluation process to return <code>NaN</code> instead of raising
+an error, enabling the optimizer to potentially continue.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2139,7 +2153,7 @@ be allowed to return a <code>NaN</code> value instead of raising an error.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>True</code> if <code>NaN</code> is allowed.</p>
+                <p><code>True</code> if the optimizer supports NaN function values.</p>
               </div>
             </td>
           </tr>
@@ -2154,7 +2168,7 @@ be allowed to return a <code>NaN</code> value instead of raising an error.</p>
 
 
 
-<h4 id="ropt.plugins.optimizer.base.Optimizer.is_parallel" class="doc doc-heading">
+<h3 id="ropt.plugins.optimizer.base.Optimizer.is_parallel" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">is_parallel</span>
 
 
@@ -2162,13 +2176,18 @@ be allowed to return a <code>NaN</code> value instead of raising an error.</p>
       <small class="doc doc-label doc-label-property"><code>property</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">is_parallel</span><span class="p">:</span> <span class="nb">bool</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Whether the current method uses parallel evaluations.</p>
+        <p>Indicate whether the optimizer alows parallel evaluations.</p>
+<p>If an optimizer algorithm is designed to evaluate multiple variable
+vectors concurrently, its implementation should override this property
+to return <code>True</code>.</p>
+<p>This information can be used by <code>ropt</code> or other components to manage
+resources or handle parallel execution appropriately.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2186,7 +2205,7 @@ be allowed to return a <code>NaN</code> value instead of raising an error.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>True</code> if optimization is parallelized.</p>
+                <p><code>True</code> if the optimizer allows parallel evaluations.</p>
               </div>
             </td>
           </tr>
@@ -2202,11 +2221,11 @@ be allowed to return a <code>NaN</code> value instead of raising an error.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.optimizer.base.Optimizer.__init__" class="doc doc-heading">
+<h3 id="ropt.plugins.optimizer.base.Optimizer.__init__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">optimizer_callback</span><span class="p">:</span> <span class="n">OptimizerCallback</span><span class="p">,</span>
@@ -2258,7 +2277,7 @@ forwarded to the optimizer.</p>
                 <code>optimizer_callback</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            OptimizerCallback (ropt.plugins.optimizer.base.OptimizerCallback)" href="#ropt.plugins.optimizer.base.OptimizerCallback">OptimizerCallback</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.OptimizerCallback" href="#ropt.plugins.optimizer.base.OptimizerCallback">OptimizerCallback</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2280,7 +2299,7 @@ forwarded to the optimizer.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.optimizer.base.Optimizer.start" class="doc doc-heading">
+<h3 id="ropt.plugins.optimizer.base.Optimizer.start" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">start</span>
 
 
@@ -2288,17 +2307,20 @@ forwarded to the optimizer.</p>
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">start</span><span class="p">(</span><span class="n">initial_values</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Start the optimization.</p>
-<p>This method must be implemented to run the optimization using the
-provided initial values, collecting function and gradient evaluations as
-needed by calling the callback passed via the <code>optimizer_callback</code>
-argument during initialization.</p>
+        <p>Initiate the optimization process.</p>
+<p>This abstract method must be implemented by concrete <code>Optimizer</code>
+subclasses to start the optimization process. It takes the initial set
+of variable values as input.</p>
+<p>During execution, the implementation should use the
+<a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.OptimizerCallback" href="#ropt.plugins.optimizer.base.OptimizerCallback"><code>OptimizerCallback</code></a>
+(provided during initialization) to request necessary function and
+gradient evaluations from the <code>ropt</code> core.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2321,7 +2343,8 @@ argument during initialization.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Vector of variables to start the optimization with.</p>
+                <p>A 1D NumPy array representing the starting variable
+            values for the optimization.</p>
               </div>
             </td>
             <td>
@@ -2348,24 +2371,23 @@ argument during initialization.</p>
 
 
 
-<h3 id="ropt.plugins.optimizer.base.OptimizerCallback" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">OptimizerCallback</span>
+<h2 id="ropt.plugins.optimizer.base.OptimizerCallback" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.optimizer.base.OptimizerCallback</span>
 
 
-</h3>
+</h2>
 
 
-    <div class="doc doc-contents ">
+    <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
               Bases: <code><a class="autorefs autorefs-external" title="typing.Protocol" href="https://docs.python.org/3/library/typing.html#typing.Protocol">Protocol</a></code></p>
 
 
-        <p>Protocol for the optimizer callback.</p>
-<p>Optimization plugins implement optimizer classes derived from the
-<a class="autorefs autorefs-internal" title="            Optimizer" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> abstract base class.
-Objects of these classes are initialized with a callback function that
-follows the call signature defined here. This callback should be used to
-request the function and gradient evaluations that the optimizer needs.</p>
+        <p>Defines the call signature for the optimizer evaluation callback.</p>
+<p><a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.Optimizer" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> instances, implemented
+by optimization plugins, are initialized with a callback function conforming
+to this protocol. The optimizer uses this callback to request function and
+gradient evaluations from the <code>ropt</code> core during the optimization process.</p>
 
 
 
@@ -2389,11 +2411,11 @@ request the function and gradient evaluations that the optimizer needs.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.optimizer.base.OptimizerCallback.__call__" class="doc doc-heading">
+<h3 id="ropt.plugins.optimizer.base.OptimizerCallback.__call__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__call__</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">/</span><span class="p">,</span>
@@ -2405,26 +2427,50 @@ request the function and gradient evaluations that the optimizer needs.</p>
 
     <div class="doc doc-contents ">
 
-        <p>The signature of the optimizer callback.</p>
-<p>The optimizer callback expects a vector or matrix with variables to
-evaluate. Discrete optimizers may request function evaluations for
-multiple variable vectors, passed as the rows of a matrix.
-Gradient-based methods may currently only pass a single variable vector
-at a time.</p>
-<p>The <code>return_functions</code> and <code>return_gradients</code> flags determine whether
-functions and/or gradients are to be evaluated. The results are returned
-as a tuple of arrays, one for functions and constraints, the other for
-gradients. If one of <code>return_functions</code> or <code>return_gradients</code> is
-<code>False</code>, the corresponding result is an empty array.</p>
-<p>Multiple function evaluations are returned as a matrix where the rows
-are the result vectors for each evaluation. The first element of a
-result vector is the value of the objective value, and the remaining
-elements are the values of the non-linear constraints.</p>
-<p>The gradients of the objective function and the non-linear constraints
-are returned as a matrix. The first row contains the gradient of the
-objective function, while the remaining rows contain the gradients of
-the non-linear constraints. Gradient-based methods currently support
-only a single evaluation, hence there is also only a single result.</p>
+        <p>Request function and/or gradient evaluations from the <code>ropt</code> core.</p>
+<p>This method is called by the optimizer implementation to obtain
+objective function values, constraint values, and their gradients for
+one or more sets of variable values.</p>
+<p>The <code>variables</code> argument can be a 1D array (single vector) or a 2D array
+(matrix where each row is a variable vector). Parallel or batch-based
+optimizers might provide a matrix, while others typically provide a
+single vector.</p>
+<p>The <code>return_functions</code> and <code>return_gradients</code> flags control what is
+computed and returned. The results are always a tuple <code>(functions,
+gradients)</code>.</p>
+<ul>
+<li>
+<p><strong>Functions Array:</strong> If <code>return_functions</code> is <code>True</code>, this array contains
+  the objective and non-linear constraint values.
+    If <code>variables</code> was a vector, it's a 1D array:</p>
+<div class="language-text highlight"><pre><span></span><code>[objective, constraint1, constraint2, ...]
+</code></pre></div>
+<p>If <code>variables</code> was a matrix, it's a 2D array where each row corresponds
+to a row in the input <code>variables</code>, with the same structure:</p>
+<div class="language-text highlight"><pre><span></span><code>[
+  [obj_row1, con1_row1, ...],
+  [obj_row2, con2_row2, ...],
+ ...
+]
+</code></pre></div>
+</li>
+<li>
+<p><strong>Gradients Array:</strong> If <code>return_gradients</code> is <code>True</code>, this array contains
+  the gradients of the objective and non-linear constraints. It's always
+  a 2D array where rows correspond to the objective/constraints and columns
+  correspond to the variables:</p>
+<div class="language-text highlight"><pre><span></span><code>[
+  [grad_obj_var1,  grad_obj_var2,  ...],
+  [grad_con1_var1, grad_con1_var2, ...],
+  ...
+]
+</code></pre></div>
+</li>
+</ul>
+<p>Currently, gradient evaluation is only requested for a single variable
+  vector at a time.</p>
+<p>If <code>return_functions</code> and/or <code>return_gradients</code> are <code>False</code>, the
+corresponding results are empty arrays.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2447,7 +2493,7 @@ only a single evaluation, hence there is also only a single result.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The variable vector or matrix to evaluate.</p>
+                <p>A 1D or 2D array of variable values to evaluate.</p>
               </div>
             </td>
             <td>
@@ -2463,7 +2509,7 @@ only a single evaluation, hence there is also only a single result.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>True</code>, evaluate and return functions.</p>
+                <p>If <code>True</code>, compute and return function/constraint values.</p>
               </div>
             </td>
             <td>
@@ -2479,7 +2525,7 @@ only a single evaluation, hence there is also only a single result.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>True</code>, evaluate and return gradients.</p>
+                <p>If <code>True</code>, compute and return gradient values.</p>
               </div>
             </td>
             <td>
@@ -2505,7 +2551,7 @@ only a single evaluation, hence there is also only a single result.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A tuple with function and gradient values.</p>
+                <p>A tuple containing two NumPy arrays: (functions_array, gradients_array).</p>
               </div>
             </td>
           </tr>
@@ -2516,15 +2562,6 @@ only a single evaluation, hence there is also only a single result.</p>
     </div>
 
 </div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
 
 
 
@@ -2595,30 +2632,27 @@ upper bound is finite, the same is done, but the constraint is multiplied by
 -1. If both are finite, both constraints are added, effectively splitting a
 two-sided constraint into two normalized constraints.</p>
 <p>By default this normalizes inequality constraints to the form C(x) &lt; 0, by
-setting <code>flip</code> flag, this can be changed to C(x) &gt; 0.</p>
-
-
-<details class="usage" open>
-  <summary>Usage</summary>
-  <ol>
+setting <code>flip</code> flag, this can be changed to C(x) &lt; 0.</p>
+<p><strong>Usage:</strong></p>
+<ol>
 <li>Initialize with the lower and upper bounds.</li>
 <li>Before each new function/gradient evaluation with a new variable
-   vector, reset the normalized constraints by calling the <code>reset</code>
-   method.</li>
+    vector, reset the normalized constraints by calling the <code>reset</code>
+    method.</li>
 <li>The constraint values are given by the <code>constraints</code> property. Before
-   accessing it, call the <code>set_constraints</code> with the raw constraints. If
-   necessary, this will calculate and cache the normalized values. Since
-   values are cached, calling this method and accessing <code>constraints</code>
-   multiple times is cheap.</li>
+    accessing it, call the <code>set_constraints</code> with the raw constraints. If
+    necessary, this will calculate and cache the normalized values. Since
+    values are cached, calling this method and accessing <code>constraints</code>
+    multiple times is cheap.</li>
 <li>Use the same procedure for gradients, using the <code>gradients</code> property
-   and <code>set_gradients</code>. Raw gradients must be provided as a matrix,
-   where the rows are the gradients of each constraint.</li>
+    and <code>set_gradients</code>. Raw gradients must be provided as a matrix,
+    where the rows are the gradients of each constraint.</li>
 <li>Use the <code>is_eq</code> property to retrieve a vector of boolean flags to
-   check which constraints are equality constraints.</li>
+    check which constraints are equality constraints.</li>
 </ol>
 <p>See the <code>scipy</code> optimization backend in the <code>ropt</code> source code for an
 example of usage.</p>
-</details>
+
 
 <details class="note" open>
   <summary>Parallel evaluation.</summary>
@@ -2665,7 +2699,30 @@ multiple gradients is not supported.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the flags that indicate equality transforms.</p>
+        <p>Return flags indicating which constraints are equality constraints.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A list of booleans, <code>True</code> for constraints that are equality constraints.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
     </div>
 
@@ -2689,7 +2746,14 @@ multiple gradients is not supported.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the normalized constraints.</p>
+        <p>Return the cached normalized constraint values.</p>
+<p>These are the constraint values after applying the normalization logic
+(subtracting RHS, potential sign flipping) based on the bounds provided
+during initialization.</p>
+<p>This property should be accessed after calling
+<a class="autorefs autorefs-internal" title="            set_constraints" href="#ropt.plugins.optimizer.utils.NormalizedConstraints.set_constraints"><code>set_constraints</code></a>
+with the raw constraint values for the current variable vector. Returns
+<code>None</code> if <code>set_constraints</code> has not been called since the last <code>reset</code>.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2707,7 +2771,7 @@ multiple gradients is not supported.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The normalized constraints.</p>
+                <p>A NumPy array containing the normalized constraint values.</p>
               </div>
             </td>
           </tr>
@@ -2736,7 +2800,15 @@ multiple gradients is not supported.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Return the normalized constraint gradients.</p>
+        <p>Return the cached normalized constraint gradients.</p>
+<p>These are the gradients of the constraints after applying the
+normalization logic (potential sign flipping) based on the bounds
+provided during initialization.</p>
+<p>This property should be accessed after calling
+<a class="autorefs autorefs-internal" title="            set_gradients" href="#ropt.plugins.optimizer.utils.NormalizedConstraints.set_gradients"><code>set_gradients</code></a>
+with the raw constraint gradients for the current variable vector.
+Returns <code>None</code> if <code>set_gradients</code> has not been called since the last
+<code>reset</code>.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2754,7 +2826,7 @@ multiple gradients is not supported.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The normalized constraint gradients.</p>
+                <p>A 2D NumPy array containing the normalized constraint gradients.</p>
               </div>
             </td>
           </tr>
@@ -2868,7 +2940,9 @@ multiple gradients is not supported.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Reset the constraints and its gradients.</p>
+        <p>Reset cached normalized constraints and gradients.</p>
+<p>This should be called before evaluating with a new variable vector to
+ensure fresh values are calculated upon the next access.</p>
 
 
     </div>
@@ -2888,7 +2962,14 @@ multiple gradients is not supported.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Set the constraints property.</p>
+        <p>Calculate and cache normalized constraint values.</p>
+<p>This method takes the raw constraint values (evaluated at the current
+variable vector) and applies the normalization logic defined during
+initialization (subtracting RHS, potential sign flipping). The results
+are stored internally and made available via the <code>constraints</code> property.</p>
+<p>This supports parallel evaluation: if <code>values</code> is a 2D array, each row
+is treated as the constraint values for a separate variable vector
+evaluation.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2911,7 +2992,8 @@ multiple gradients is not supported.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The raw constraint values.</p>
+                <p>A 1D or 2D NumPy array of raw constraint values. If 2D,
+    rows represent different evaluations.</p>
               </div>
             </td>
             <td>
@@ -2939,8 +3021,18 @@ multiple gradients is not supported.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Set the normalized and gradients.</p>
+        <p>Calculate and cache normalized constraint gradients.</p>
+<p>This method takes the raw constraint gradients (evaluated at the current
+variable vector) and applies the normalization logic defined during
+initialization (potential sign flipping). The results are stored
+internally and made available via the <code>gradients</code> property.</p>
 
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>Unlike <code>set_constraints</code>, this method does <em>not</em> support parallel
+evaluation; it expects gradients corresponding to a single variable vector.</p>
+</details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>
@@ -2962,7 +3054,8 @@ multiple gradients is not supported.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The raw gradient values.</p>
+                <p>A 2D NumPy array of raw constraint gradients (rows are
+    gradients of original constraints, columns are variables).</p>
               </div>
             </td>
             <td>
@@ -3004,19 +3097,23 @@ multiple gradients is not supported.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Check if the requested optimization features are supported or required.</p>
-<p>The keys of the supported_constraints and required_constraints dicts specify
-the type of the constraint as shown in the example below. The values are
-sets of method names that support or require the type of constraint
-specified by the key.</p>
-<p>For example:
-{
-    "bounds": {"L-BFGS-B", "TNC", "SLSQP"},
-    "linear:eq": {"SLSQP"},
-    "linear:ineq": {"SLSQP"},
-    "nonlinear:eq": {"SLSQP"},
-    "nonlinear:ineq": {"SLSQP"},
-}</p>
+        <p>Validate if the configured constraints are supported by the chosen method.</p>
+<p>This function checks if the constraints defined in the <code>config</code> object
+(bounds, linear, non-linear) are compatible with the specified optimization
+<code>method</code>. It uses dictionaries mapping constraint types to sets of methods
+that support or require them.</p>
+<p>Constraint types are identified by keys like <code>"bounds"</code>, <code>"linear:eq"</code>,
+<code>"linear:ineq"</code>, <code>"nonlinear:eq"</code>, and <code>"nonlinear:ineq"</code>.</p>
+<p>Example <code>supported_constraints</code> dictionary:
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">&quot;bounds&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;L-BFGS-B&quot;</span><span class="p">,</span> <span class="s2">&quot;TNC&quot;</span><span class="p">,</span> <span class="s2">&quot;SLSQP&quot;</span><span class="p">},</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">&quot;linear:eq&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;SLSQP&quot;</span><span class="p">},</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="s2">&quot;linear:ineq&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;SLSQP&quot;</span><span class="p">},</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="s2">&quot;nonlinear:eq&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;SLSQP&quot;</span><span class="p">},</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="s2">&quot;nonlinear:ineq&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;SLSQP&quot;</span><span class="p">},</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span>
+</span></code></pre></div>
+A similar structure is used for <code>required_constraints</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3039,7 +3136,7 @@ specified by the key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The ensemble optimizer configuration object.</p>
+                <p>The optimization configuration object.</p>
               </div>
             </td>
             <td>
@@ -3055,7 +3152,7 @@ specified by the key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The method to check.</p>
+                <p>The name of the optimization method being used.</p>
               </div>
             </td>
             <td>
@@ -3071,7 +3168,8 @@ specified by the key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Specify the supported constraints.</p>
+                <p>Dict mapping constraint types to sets of methods
+                   that support them.</p>
               </div>
             </td>
             <td>
@@ -3087,11 +3185,36 @@ specified by the key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Specify the required constraints.</p>
+                <p>Dict mapping constraint types to sets of methods
+                   that require them.</p>
               </div>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError">NotImplementedError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If a configured constraint is not supported by the
+                 method, or if a required constraint is missing.</p>
+              </div>
             </td>
           </tr>
       </tbody>
@@ -3120,8 +3243,10 @@ specified by the key.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Create an output path name.</p>
-<p>If the path already exists, an index is appended to it.</p>
+        <p>Construct a unique output path, appending an index if necessary.</p>
+<p>This function generates a file or directory path based on the provided
+components. If the resulting path already exists, it automatically appends
+or increments a numerical suffix (e.g., "-001", "-002") to ensure uniqueness.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3144,7 +3269,7 @@ specified by the key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Base name of the path.</p>
+                <p>The core name for the path.</p>
               </div>
             </td>
             <td>
@@ -3160,7 +3285,7 @@ specified by the key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional directory to base the path in.</p>
+                <p>Optional parent directory for the path.</p>
               </div>
             </td>
             <td>
@@ -3176,7 +3301,7 @@ specified by the key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional optimization step name to include in the name.</p>
+                <p>Optional identifier (e.g., step name) to include in the path.</p>
               </div>
             </td>
             <td>
@@ -3192,7 +3317,7 @@ specified by the key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional suffix for the resulting path.</p>
+                <p>Optional file extension or suffix for the path.</p>
               </div>
             </td>
             <td>
@@ -3218,7 +3343,7 @@ specified by the key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The constructed path</p>
+                <p>A unique <code>pathlib.Path</code> object.</p>
               </div>
             </td>
           </tr>
@@ -3249,11 +3374,20 @@ specified by the key.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Get masked coefficients and bounds for linear constraints.</p>
-<p>If a mask is defined on the variables that defines a sub-set of variables to
-optimize, any linear constraints must be adapted accordingly. This function
-does this by removing masked variables from the coefficients, and absorbing
-the fixed variables in the lower and upper bounds.</p>
+        <p>Adjust linear constraints based on a variable mask.</p>
+<p>When an optimization problem uses a variable mask (<code>config.variables.mask</code>)
+to optimize only a subset of variables, the linear constraints need to be
+adapted. This function performs that adaptation.</p>
+<p>It removes columns from the constraint coefficient matrix
+(<code>config.linear_constraints.coefficients</code>) that correspond to the masked
+(fixed) variables. The contribution of these fixed variables (using their
+<code>initial_values</code>) is then calculated and subtracted from the original lower
+and upper bounds (<code>config.linear_constraints.lower_bounds</code>,
+<code>config.linear_constraints.upper_bounds</code>) to produce adjusted bounds for the
+optimization involving only the active variables.</p>
+<p>Additionally, any constraint rows that originally involved <em>only</em> masked
+variables (i.e., all coefficients for active variables in that row are zero)
+are removed entirely, as they become trivial constants.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3276,7 +3410,8 @@ the fixed variables in the lower and upper bounds.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The optimization configuration.</p>
+                <p>The <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object
+    containing the variable mask and linear constraints.</p>
               </div>
             </td>
             <td>
@@ -3302,7 +3437,7 @@ the fixed variables in the lower and upper bounds.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The corrected linear constraints.</p>
+                <p>The adjusted coefficients and bounds.</p>
               </div>
             </td>
           </tr>

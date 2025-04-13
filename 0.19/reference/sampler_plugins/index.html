@@ -877,16 +877,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.base" class="md-nav__link">
+  <a href="#ropt.plugins.sampler.base.SamplerPlugin" class="md-nav__link">
     <span class="md-ellipsis">
-      base
+      SamplerPlugin
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="base">
+    <nav class="md-nav" aria-label="SamplerPlugin">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.plugins.sampler.base.SamplerPlugin.create" class="md-nav__link">
+    <span class="md-ellipsis">
+      create
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.sampler.base.Sampler" class="md-nav__link">
     <span class="md-ellipsis">
       Sampler
@@ -911,35 +925,6 @@
       generate_samples
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.base.SamplerPlugin" class="md-nav__link">
-    <span class="md-ellipsis">
-      SamplerPlugin
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="SamplerPlugin">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.base.SamplerPlugin.create" class="md-nav__link">
-    <span class="md-ellipsis">
-      create
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1066,7 +1051,7 @@
   
   
   <span class="md-ellipsis">
-    Default Plan Plugin
+    Default Plan Plugins
     
   </span>
   
@@ -1310,16 +1295,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.base" class="md-nav__link">
+  <a href="#ropt.plugins.sampler.base.SamplerPlugin" class="md-nav__link">
     <span class="md-ellipsis">
-      base
+      SamplerPlugin
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="base">
+    <nav class="md-nav" aria-label="SamplerPlugin">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#ropt.plugins.sampler.base.SamplerPlugin.create" class="md-nav__link">
+    <span class="md-ellipsis">
+      create
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.sampler.base.Sampler" class="md-nav__link">
     <span class="md-ellipsis">
       Sampler
@@ -1344,35 +1343,6 @@
       generate_samples
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.base.SamplerPlugin" class="md-nav__link">
-    <span class="md-ellipsis">
-      SamplerPlugin
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="SamplerPlugin">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.sampler.base.SamplerPlugin.create" class="md-nav__link">
-    <span class="md-ellipsis">
-      create
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1414,16 +1384,30 @@
 
     <div class="doc doc-contents first">
 
-        <p>Plugin functionality for adding sampler plugins.</p>
-<p>Sampler plugins are managed by a <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>
-object, which returns classes or factory functions to create objects that
-implement one or more sampling methods to produce perturbations. These objects
-must adhere to the <a class="autorefs autorefs-internal" title="            Sampler" href="#ropt.plugins.sampler.base.Sampler"><code>Sampler</code></a> abstract base
-class.</p>
-<p>Samplers can be added via the plugin manager, by default the
-<a class="autorefs autorefs-internal" title="            ropt.plugins.sampler.scipy.SciPySampler" href="../scipy_sampler_plugin/#ropt.plugins.sampler.scipy.SciPySampler"><code>SciPySampler</code></a> plugin is installed
-which provides a number of methods from the
-<a href="https://docs.scipy.org/doc/scipy/reference/stats.html"><code>scipy.stats</code></a> package.</p>
+        <p>Provides plugin functionality for adding sampler plugins.</p>
+<p>Samplers are used by the optimization process to generate perturbed variable
+vectors. This module allows for the extension of <code>ropt</code> with custom samplers.</p>
+<p><strong>Core Concepts:</strong></p>
+<ul>
+<li><strong>Plugin Interface:</strong> Sampler plugins must inherit from the
+  <a class="autorefs autorefs-internal" title="            ropt.plugins.sampler.base.SamplerPlugin" href="#ropt.plugins.sampler.base.SamplerPlugin"><code>SamplerPlugin</code></a> base class.
+  This class acts as a factory, defining a <code>create</code> method to instantiate
+  sampler objects.</li>
+<li><strong>Sampler Implementation:</strong> The actual sampling logic resides in classes
+  that inherit from the <a class="autorefs autorefs-internal" title="            ropt.plugins.sampler.base.Sampler" href="#ropt.plugins.sampler.base.Sampler"><code>Sampler</code></a>
+  abstract base class. These classes are initialized with the optimization
+  configuration (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>), the index
+  of the specific sampler configuration to use (<code>sampler_index</code>), an optional
+  variable mask (<code>mask</code>), and a random number generator (<code>rng</code>). Samples are
+  generated by calling the sampler's <code>generate_samples</code> method.</li>
+<li><strong>Discovery:</strong> The <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> discovers
+  available <code>SamplerPlugin</code> implementations (typically via entry points) and
+  uses them to create <code>Sampler</code> instances as needed during plan execution.</li>
+</ul>
+<p><strong>Built-in Sampler Plugins:</strong></p>
+<p>By default, the <a class="autorefs autorefs-internal" title="            ropt.plugins.sampler.scipy.SciPySampler" href="../scipy_sampler_plugin/#ropt.plugins.sampler.scipy.SciPySampler"><code>SciPySampler</code></a> sampler
+is installed, which provides several sampling methods based on the <code>scipy.stats</code>
+and <code>scipy.stats.qmc</code> packages.</p>
 
 
 
@@ -1451,59 +1435,30 @@ which provides a number of methods from the
 
 </div>
 
-<div class="doc doc-object doc-module">
-
-
-
-<h2 id="ropt.plugins.sampler.base" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.plugins.sampler.base</span>
-
-
-</h2>
-
-    <div class="doc doc-contents first">
-
-        <p>This module defines the abstract base class for samplers.</p>
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
 <div class="doc doc-object doc-class">
 
 
 
-<h3 id="ropt.plugins.sampler.base.Sampler" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">Sampler</span>
+<h2 id="ropt.plugins.sampler.base.SamplerPlugin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.sampler.base.SamplerPlugin</span>
 
 
-</h3>
+</h2>
 
 
-    <div class="doc doc-contents ">
+    <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            Plugin (ropt.plugins.base.Plugin)" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
 
 
-        <p>Abstract base class for sampler classes.</p>
-<p><code>ropt</code> employs plugins to implement samplers that are called during an
-optimization plan to generate perturbed variable vectors. Samplers should
-derive from the <code>Sampler</code> base class, which specifies the requirements for
-the class constructor (<code>__init__</code>) and also includes a <code>generate_samples</code>
-method used to generate samples used to create perturbed values.</p>
+        <p>Abstract Base Class for Sampler Plugins (Factories).</p>
+<p>This class defines the interface for plugins responsible for creating
+<a class="autorefs autorefs-internal" title="            ropt.plugins.sampler.base.Sampler" href="#ropt.plugins.sampler.base.Sampler"><code>Sampler</code></a> instances. These plugins
+act as factories for specific sampling algorithms or strategies.</p>
+<p>During plan execution, the <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>
+identifies the appropriate sampler plugin based on the configuration and
+uses its <code>create</code> class method to instantiate the actual <code>Sampler</code> object
+that will generate the perturbation samples.</p>
 
 
 
@@ -1527,11 +1482,214 @@ method used to generate samples used to create perturbed values.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.sampler.base.Sampler.__init__" class="doc doc-heading">
+<h3 id="ropt.plugins.sampler.base.SamplerPlugin.create" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">create</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">enopt_config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">sampler_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">mask</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">bool_</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">rng</span><span class="p">:</span> <span class="n">Generator</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sampler</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Factory method to create a concrete Sampler instance.</p>
+<p>This abstract class method serves as a factory for creating concrete
+<a class="autorefs autorefs-internal" title="            ropt.plugins.sampler.base.Sampler" href="#ropt.plugins.sampler.base.Sampler"><code>Sampler</code></a> objects. Plugin
+implementations must override this method to return an instance of their
+specific <code>Sampler</code> subclass.</p>
+<p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> calls this method when
+an optimization step requires samples generated by this plugin.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>enopt_config</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The main EnOpt configuration object.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sampler_index</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Index into <code>enopt_config.samplers</code> for this sampler.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>mask</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional boolean mask for variable subset sampling.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>rng</code>
+            </td>
+            <td>
+                  <code><span title="numpy.random.Generator">Generator</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>NumPy random number generator instance.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.sampler.base.Sampler" href="#ropt.plugins.sampler.base.Sampler">Sampler</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An initialized Sampler object ready for use.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.sampler.base.Sampler" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.sampler.base.Sampler</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
+
+
+        <p>Abstract Base Class for Sampler Implementations.</p>
+<p>This class defines the fundamental interface for all concrete sampler
+implementations within the <code>ropt</code> framework. Sampler plugins provide
+classes derived from <code>Sampler</code> that encapsulate the logic of specific
+sampling algorithms or strategies used to generate perturbed variable vectors
+for the optimization process.</p>
+<p>Instances of <code>Sampler</code> subclasses are created by their corresponding
+<a class="autorefs autorefs-internal" title="            ropt.plugins.sampler.base.SamplerPlugin" href="#ropt.plugins.sampler.base.SamplerPlugin"><code>SamplerPlugin</code></a> factories.
+They are initialized with an
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object detailing the
+optimization setup, the <code>sampler_index</code> identifying the specific sampler
+configuration to use from the config, an optional variable <code>mask</code> indicating
+which variables this sampler instance handles, and a NumPy random number
+generator (<code>rng</code>) for stochastic methods.</p>
+<p>The core functionality, generating samples, is performed by the
+<code>generate_samples</code> method, which must be implemented by subclasses.</p>
+<p>Subclasses must implement:</p>
+<ul>
+<li><code>__init__</code>: To accept the configuration, index, mask, and RNG.</li>
+<li><code>generate_samples</code>: To contain the sample generation logic.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.sampler.base.Sampler.__init__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">enopt_config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">sampler_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
@@ -1543,14 +1701,13 @@ method used to generate samples used to create perturbed values.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize the sampler object.</p>
-<p>The <code>samplers</code> field in the
-<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>enopt_config</code></a> configuration used by
-the optimization is a tuple of sampler configurations (see
-<a class="autorefs autorefs-internal" title="            SamplerConfig" href="../enopt_config/#ropt.config.enopt.SamplerConfig"><code>SamplerConfig</code></a>). The <code>sampler_index</code>
-field is used to identify the configuration to use to initialize this
-sampler.</p>
-<p>The sampler may be used for a subset of the variables. The boolean
-<code>mask</code> array indicates the variables that are handled by this sampler.</p>
+<p>The <code>samplers</code> field in the <code>enopt_config</code> is a tuple of sampler
+configurations (<a class="autorefs autorefs-internal" title="            SamplerConfig" href="../enopt_config/#ropt.config.enopt.SamplerConfig"><code>SamplerConfig</code></a>).
+The <code>sampler_index</code> identifies which configuration from this tuple
+should be used to initialize this specific sampler instance.</p>
+<p>If a boolean <code>mask</code> array is provided, it indicates that this sampler
+instance is responsible for generating samples only for the subset of
+variables where the mask is <code>True</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1589,7 +1746,7 @@ sampler.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The index of the sampler to use.</p>
+                <p>The index of the sampler configuration to use.</p>
               </div>
             </td>
             <td>
@@ -1605,7 +1762,7 @@ sampler.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The mask of the variables to sample.</p>
+                <p>Optional mask indicating variables handled by this sampler.</p>
               </div>
             </td>
             <td>
@@ -1621,7 +1778,7 @@ sampler.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A random generator object for use by stochastic samplers.</p>
+                <p>A random generator object for stochastic methods.</p>
               </div>
             </td>
             <td>
@@ -1639,7 +1796,7 @@ sampler.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.sampler.base.Sampler.generate_samples" class="doc doc-heading">
+<h3 id="ropt.plugins.sampler.base.Sampler.generate_samples" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">generate_samples</span>
 
 
@@ -1647,36 +1804,44 @@ sampler.</p>
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
 
-</h4>
+</h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">generate_samples</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Return an array containing sampled values.</p>
-<p>The result should be a three-dimensional array of perturbation values.
-The variable values are stored along the last axis, for each realization
-and perturbation. The first axis indexes the realization, and the second
-axis indexes the perturbation.</p>
-<p>If the <code>shared</code> flag is set in the
-<a class="autorefs autorefs-internal" title="            SamplerConfig" href="../enopt_config/#ropt.config.enopt.SamplerConfig"><code>SamplerConfig</code></a> configuration, the
-first dimension should have a length equal to one, since all
-realizations will use the same set of perturbations.</p>
-<p>The sampler may handle only a subset of the variables, as specified by
-the <code>variable_indices</code> argument of the constructor. In this case, only
-the corresponding values along the variables axis (the last axis) should
-be set, while other values should be zero.</p>
+        <p>Generate and return an array of sampled perturbation values.</p>
+<p>This method must return a three-dimensional NumPy array containing the
+generated perturbation samples. The shape of the array should be
+<code>(n_realizations, n_perturbations, n_variables)</code>, where:</p>
+<ul>
+<li><code>n_realizations</code> is the number of realizations in the ensemble.</li>
+<li><code>n_perturbations</code> is the number of perturbations requested.</li>
+<li><code>n_variables</code> is the total number of optimization variables.</li>
+</ul>
+<p>If the <code>shared</code> flag is <code>True</code> in the associated
+<a class="autorefs autorefs-internal" title="            SamplerConfig" href="../enopt_config/#ropt.config.enopt.SamplerConfig"><code>SamplerConfig</code></a>, the first dimension
+(realizations) should have a size of 1. The framework will broadcast
+these shared samples across all realizations.</p>
+<p>If a boolean <code>mask</code> was provided during initialization, this sampler
+instance is responsible only for a subset of variables (where the mask
+is <code>True</code>). The returned array must still have the full <code>n_variables</code>
+size along the last axis. However, values corresponding to variables
+<em>not</em> handled by this sampler (where the mask is <code>False</code>) must be zero.</p>
 
 
 <details class="note" open>
-  <summary>Sample scaling</summary>
-  <p>Samples will be multiplied by the values given by the
-<code>perturbation_magnitudes</code> field in the
-<a class="autorefs autorefs-internal" title="            GradientConfig" href="../enopt_config/#ropt.config.enopt.GradientConfig"><code>gradients</code></a> section of the
-optimizer configuration. It makes therefore sense to generate
-samples that have an order of magnitude around one. For instance, by
-generating them on a <code>[-1, 1]</code> range, or with a unit standard
-deviation.</p>
+  <summary>Sample Scaling and Perturbation Magnitudes</summary>
+  <p>The generated samples represent <em>unscaled</em> perturbations. During the
+gradient estimation process, these samples will be multiplied element-wise
+by the <code>perturbation_magnitudes</code> defined in the
+<a class="autorefs autorefs-internal" title="            GradientConfig" href="../enopt_config/#ropt.config.enopt.GradientConfig"><code>GradientConfig</code></a>.</p>
+<p>Therefore, it is generally recommended that sampler implementations
+produce samples with a characteristic scale of approximately one
+(e.g., drawn from a distribution with a standard deviation of 1, or
+uniformly distributed within <code>[-1, 1]</code>). This allows the
+<code>perturbation_magnitudes</code> to directly control the effective size of
+the perturbations applied to the variables.</p>
 </details>
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -1694,7 +1859,7 @@ deviation.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The sampled values.</p>
+                <p>A 3D NumPy array of sampled perturbation values.</p>
               </div>
             </td>
           </tr>
@@ -1705,169 +1870,6 @@ deviation.</p>
     </div>
 
 </div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="ropt.plugins.sampler.base.SamplerPlugin" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">SamplerPlugin</span>
-
-
-</h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            Plugin (ropt.plugins.base.Plugin)" href="../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
-
-
-        <p>Abtract base class for sampler plugins.</p>
-
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plugins.sampler.base.SamplerPlugin.create" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">create</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
-  </span>
-
-</h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">enopt_config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">sampler_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">mask</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">bool_</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">rng</span><span class="p">:</span> <span class="n">Generator</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sampler</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Create a sampler.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>enopt_config</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The configuration of the optimizer.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>sampler_index</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The index of the sampler to use.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>mask</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The indices of the variables to sample.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>rng</code>
-            </td>
-            <td>
-                  <code><span title="numpy.random.Generator">Generator</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A random generator object for use by stochastic samplers.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
 
 
 

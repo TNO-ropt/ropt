@@ -947,7 +947,7 @@
   
   
   <span class="md-ellipsis">
-    Default Plan Plugin
+    Default Plan Plugins
     
   </span>
   
@@ -1271,44 +1271,48 @@
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            Sampler (ropt.plugins.sampler.base.Sampler)" href="../sampler_plugins/#ropt.plugins.sampler.base.Sampler">Sampler</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.sampler.base.Sampler" href="../sampler_plugins/#ropt.plugins.sampler.base.Sampler">Sampler</a></code></p>
 
 
-        <p>Plugin class for producing sampling values via SciPy.</p>
-<p>This plugin implements the following sampling methods using the
-corresponding methods from the SciPy stats module:</p>
+        <p>A sampler implementation utilizing SciPy's statistical functions.</p>
+<p>This sampler leverages functions from the <code>scipy.stats</code> and
+<code>scipy.stats.qmc</code> modules to generate perturbation samples for optimization.</p>
+<p><strong>Supported Sampling Methods:</strong></p>
 <ul>
 <li>
-<p>Sampling from <a href="https://docs.scipy.org/doc/scipy/reference/stats.html">probability
-  distributions</a>:</p>
-<dl>
-<dt><code>uniform</code></dt>
-<dd>Uniform distribution with a default range of [-1, 1].</dd>
-<dt><code>norm</code></dt>
-<dd>Normal distribution with mean zero and standard deviation 1.</dd>
-<dt><code>truncnorm</code></dt>
-<dd>Truncated normal distribution with mean zero and standard
-  deviation 1 truncated a the range [-1, 1].</dd>
-</dl>
+<p><strong>From Probability Distributions
+  (<a href="https://docs.scipy.org/doc/scipy/reference/stats.html"><code>scipy.stats</code></a>):</strong></p>
+<ul>
+<li><code>norm</code>: Samples from a standard normal distribution (mean 0,
+  standard deviation 1). This is the <strong>default</strong> method if none is
+  specified or if "default" is requested.</li>
+<li><code>truncnorm</code>: Samples from a truncated normal distribution (mean 0,
+  std dev 1), truncated to the range <code>[-1, 1]</code> by default.</li>
+<li><code>uniform</code>: Samples from a uniform distribution. Defaults to the
+  range <code>[-1, 1]</code>.</li>
+</ul>
 </li>
 <li>
-<p>Sampling using methods from the <a href="https://docs.scipy.org/doc/scipy/reference/stats.qmc.html">Quasi-Monte Carlo
-  submodule</a>:</p>
-<dl>
-<dt><code>sobol</code></dt>
-<dd>Using Sobol sequences, scaled to -1 and 1.</dd>
-<dt><code>halton</code></dt>
-<dd>Using Halton sequences, scaled to -1 and 1.</dd>
-<dt><code>lhs</code></dt>
-<dd>Using Latin Hypercube sampling, scaled to -1 and 1.</dd>
-</dl>
+<p><strong>From Quasi-Monte Carlo Sequences
+  (<a href="https://docs.scipy.org/doc/scipy/reference/stats.qmc.html"><code>scipy.stats.qmc</code></a>):</strong></p>
+<ul>
+<li><code>sobol</code>: Uses Sobol' sequences.</li>
+<li><code>halton</code>: Uses Halton sequences.</li>
+<li><code>lhs</code>: Uses Latin Hypercube Sampling.
+<em>(Note: QMC samples are generated in the unit hypercube <code>[0, 1]^d</code> and
+then scaled to the hypercube <code>[-1, 1]^d</code>)</em></li>
+</ul>
 </li>
 </ul>
-<p>Specific options that are normally passed as arguments in the SciPy
-functions can be provided via the options dictionary in the configuration
-object. Consult the
-<a href="https://docs.scipy.org/doc/scipy/reference/stats.html"><code>scipy.stats</code></a>
-manual for details on these options.</p>
+<p><strong>Configuration:</strong></p>
+<p>The specific sampling method is chosen via the <code>method</code> field in the
+<a class="autorefs autorefs-internal" title="            SamplerConfig" href="../enopt_config/#ropt.config.enopt.SamplerConfig"><code>SamplerConfig</code></a>. Additional
+method-specific parameters (e.g., distribution parameters like <code>loc</code>,
+<code>scale</code>, <code>a</code>, <code>b</code> for <code>stats</code> methods, or engine parameters for <code>qmc</code>
+methods) can be passed through the <code>options</code> dictionary within the
+<code>SamplerConfig</code>. Refer to the
+<a href="https://docs.scipy.org/doc/scipy/reference/stats.html"><code>scipy.stats</code></a> and
+documentation for available options.</p>
 
 
 

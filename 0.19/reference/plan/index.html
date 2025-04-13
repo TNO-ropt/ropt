@@ -1204,7 +1204,7 @@
   
   
   <span class="md-ellipsis">
-    Default Plan Plugin
+    Default Plan Plugins
     
   </span>
   
@@ -1693,9 +1693,9 @@
         <p>Code for executing optimization plans.</p>
 <p>The <a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="#ropt.plan.Plan"><code>Plan</code></a> class orchestrates optimization workflows by
 managing steps and result handlers.</p>
-<p>A plan consists of <a class="autorefs autorefs-internal" title="            PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a> objects, which
+<p>A plan consists of <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a> objects, which
 define individual actions, and
-<a class="autorefs autorefs-internal" title="            ResultHandler" href="../plan_plugins/#ropt.plugins.plan.base.ResultHandler"><code>ResultHandler</code></a> objects, which process
+<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanHandler" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandler"><code>PlanHandler</code></a> objects, which process
 and store data generated during execution. Both steps and result handlers are
 implemented using a <a class="autorefs autorefs-internal" title="            ropt.plugins.plan" href="../plan_plugins/#ropt.plugins.plan">plugin</a> mechanism, making it easy to
 extend the range of supported actions and data processing. The <code>ropt</code> library
@@ -3111,7 +3111,7 @@ information and tools.</p>
 <li>Managing a <code>PluginManager</code> to retrieve and utilize plugins, allowing for
   extensibility and customization of the optimization workflow. Plugins are
   modular pieces of code that extend the functionality of the optimization
-  framework, such as new <code>PlanStep</code> or <code>ResultHandler</code> implementations.</li>
+  framework, such as new <code>PlanStep</code> or <code>PlanHandler</code> implementations.</li>
 <li>Handling event callbacks that are triggered in response to specific events
   during the plan's execution. These callbacks are executed after the plan
   has processed the event, allowing for actions to be taken in response to

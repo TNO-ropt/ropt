@@ -947,7 +947,7 @@
   
   
   <span class="md-ellipsis">
-    Default Plan Plugin
+    Default Plan Plugins
     
   </span>
   
@@ -1430,10 +1430,13 @@
               Bases: <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#Exception">Exception</a></code></p>
 
 
-        <p>Raised when an optimization is aborted.</p>
-<p>When constructing the exception object an exit code must be passed that
-indicates the reason for aborting (see
-<a class="autorefs autorefs-internal" title="            OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode"><code>OptimizerExitCode</code></a>).</p>
+        <p>Raised when an optimization process within a step is aborted prematurely.</p>
+<p>This exception signals that an optimizer or evaluator step could not
+complete its intended task due to a specific condition (e.g., insufficient
+valid realizations, user request).</p>
+<p>It must be initialized with an
+<a class="autorefs autorefs-internal" title="            OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode"><code>OptimizerExitCode</code></a> indicating the reason
+for the abortion.</p>
 
 
 
@@ -1467,7 +1470,9 @@ indicates the reason for aborting (see
 
     <div class="doc doc-contents ">
 
-        <p>Initialize an exception that aborts the optimization.</p>
+        <p>Initialize the OptimizationAborted exception.</p>
+<p>Stores the reason for the abortion, which can be accessed via the
+<code>exit_code</code> attribute.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1490,7 +1495,7 @@ indicates the reason for aborting (see
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The exit code indicating the reason for the abort.</p>
+                <p>The code indicating why the optimization step was aborted.</p>
               </div>
             </td>
             <td>
@@ -1529,9 +1534,14 @@ indicates the reason for aborting (see
               Bases: <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#Exception">Exception</a></code></p>
 
 
-        <p>Raised when an optimization plan is aborted.</p>
-<p>Steps within a plan may abort a plan by setting its <code>aborted</code> attribute. Any
-attemps to run steps after this, will raise this exception.</p>
+        <p>Raised when an optimization plan is aborted prematurely.</p>
+<p>This exception signals that the execution of a <a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a>
+was stopped before completion. This typically occurs when a step or handler
+within the plan explicitly sets the plan's <code>aborted</code> flag (e.g., due to a
+user request via a signal or an unrecoverable error condition detected by
+a handler).</p>
+<p>Any subsequent attempts to execute further steps in an already aborted plan
+will raise this exception.</p>
 
 
 
