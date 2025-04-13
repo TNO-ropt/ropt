@@ -1574,8 +1574,12 @@
 
     <div class="doc doc-contents first">
 
-        <p>Utilities for checking configuration values.</p>
-<p>These utilities are intended to be used in the model validation code of Pydantic models.</p>
+        <p>Utilities for checking and converting configuration values.</p>
+<p>This module provides helper functions primarily designed for use within Pydantic
+model validation logic. These functions facilitate the conversion of
+configuration inputs into standardized, immutable NumPy arrays and handle common
+validation tasks like checking enum values or broadcasting arrays to required
+dimensions.</p>
 
 
 
@@ -1610,10 +1614,18 @@
               Bases: <code><a class="autorefs autorefs-external" title="pydantic.BaseModel" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel">BaseModel</a></code></p>
 
 
-        <p>Base model for immutable classes.</p>
-<p>This model serves as an alternative to frozen Pydantic classes. It is
-particularly useful when post-initialization validators are required, as
-these validators may not function properly with frozen Pydantic classes.</p>
+        <p>Base model providing manual immutability control.</p>
+<p>This class offers an alternative to Pydantic's <code>frozen=True</code> configuration.
+It allows instances to be mutable during initialization (e.g., within
+<code>@model_validator(mode='after')</code>) and then explicitly made immutable
+afterwards by calling the <code>_immutable()</code> method.</p>
+<p>Immutability is enforced by overriding <code>__setattr__</code> to check an internal
+<code>_is_immutable</code> flag before allowing attribute modification. The
+<code>_mutable()</code> method can be used to temporarily disable immutability if
+needed, though this should be used with caution.</p>
+<p>This approach is particularly useful when complex validation or modification
+logic needs to run <em>after</em> the initial Pydantic model initialization, which
+can be problematic with standard frozen models.</p>
 
 
 
@@ -1647,8 +1659,11 @@ these validators may not function properly with frozen Pydantic classes.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Attribute setter method.</p>
-<p>This method sets an attribute if the object is not immutable.</p>
+        <p>Set an attribute's value, enforcing immutability.</p>
+<p>This method overrides the default attribute setting behavior. If the
+instance has been marked as immutable (via <code>_immutable()</code>), it prevents
+any further attribute modifications (except for the internal <code>_is_immutable</code>
+flag itself) and raises an <code>AttributeError</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1713,7 +1728,7 @@ these validators may not function properly with frozen Pydantic classes.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Raised if the object is immutable and cannot be modified.</p>
+                <p>If attempting to set an attribute on an immutable instance.</p>
               </div>
             </td>
           </tr>
@@ -1747,8 +1762,7 @@ these validators may not function properly with frozen Pydantic classes.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Normalize a vector.</p>
-<p>Normalize the sum of the values to one.</p>
+        <p>Normalize a NumPy array so its elements sum to one.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1771,7 +1785,7 @@ these validators may not function properly with frozen Pydantic classes.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The input array.</p>
+                <p>The input NumPy array (1D).</p>
               </div>
             </td>
             <td>
@@ -1786,18 +1800,52 @@ these validators may not function properly with frozen Pydantic classes.</p>
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
+          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>ValueError</code></td>            <td>
+            <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The normalized array</p>
+                <p>A new immutable NumPy array with the same shape as the input, where</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>the elements have been scaled to sum to 1.0.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the sum of the input array elements is not positive
+        (i.e., less than or equal to machine epsilon).</p>
               </div>
             </td>
           </tr>
@@ -1824,8 +1872,10 @@ these validators may not function properly with frozen Pydantic classes.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Make an immutable array.</p>
-<p>Converts the input to an array and makes it immutable.`</p>
+        <p>Convert input to an immutable NumPy array.</p>
+<p>This function takes various array-like inputs (e.g., lists, tuples, other
+NumPy arrays) and converts them into a NumPy array. It then sets the
+<code>writeable</code> flag of the resulting array to <code>False</code>, making it immutable.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1848,7 +1898,7 @@ these validators may not function properly with frozen Pydantic classes.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The input.</p>
+                <p>The input data to convert (e.g., list, tuple, NumPy array).</p>
               </div>
             </td>
             <td>
@@ -1860,11 +1910,11 @@ these validators may not function properly with frozen Pydantic classes.</p>
                 <code>kwargs</code>
             </td>
             <td>
-                  <code>   </code>
+                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Additional keyword arguments for array conversion.</p>
+                <p>Additional keyword arguments passed directly to <code>numpy.array</code>.</p>
               </div>
             </td>
             <td>
@@ -1890,7 +1940,7 @@ these validators may not function properly with frozen Pydantic classes.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The immutable array.</p>
+                <p>A new NumPy array, with its <code>writeable</code> flag set to <code>False</code>.</p>
               </div>
             </td>
           </tr>
@@ -1915,7 +1965,11 @@ these validators may not function properly with frozen Pydantic classes.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Broadcast a set of arrays to a common dimensionality and makes them immutable.</p>
+        <p>Broadcast arrays to a common shape and make them immutable.</p>
+<p>This function takes multiple NumPy arrays (or array-like objects) and uses
+<code>numpy.broadcast_arrays</code> to make them conform to a common shape according
+to NumPy's broadcasting rules. Each resulting array is then made immutable
+by setting its <code>writeable</code> flag to <code>False</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1938,7 +1992,7 @@ these validators may not function properly with frozen Pydantic classes.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The input arrays.</p>
+                <p>A variable number of NumPy arrays or array-like objects.</p>
               </div>
             </td>
             <td>
@@ -1964,7 +2018,7 @@ these validators may not function properly with frozen Pydantic classes.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The broadcasted immutable arrays.</p>
+                <p>A tuple containing the broadcasted, immutable NumPy arrays.</p>
               </div>
             </td>
           </tr>
@@ -1991,7 +2045,14 @@ these validators may not function properly with frozen Pydantic classes.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Broadcast the input array to an 1D array of given size.</p>
+        <p>Broadcast an array to a 1D array of a specific size and make it immutable.</p>
+<p>This function takes an input array and attempts to broadcast it to a
+one-dimensional array of the specified <code>size</code> using NumPy's broadcasting
+rules. If successful, the resulting array is made immutable.</p>
+<p>This is useful for ensuring configuration parameters (like weights or
+magnitudes) have the correct dimension corresponding to the number of
+variables, objectives, etc., allowing users to provide a single scalar value
+that applies to all elements.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2014,7 +2075,7 @@ these validators may not function properly with frozen Pydantic classes.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The input array.</p>
+                <p>The input NumPy array or array-like object.</p>
               </div>
             </td>
             <td>
@@ -2030,7 +2091,7 @@ these validators may not function properly with frozen Pydantic classes.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The name of the array, used in an error message.</p>
+                <p>A descriptive name for the array (used in error messages).</p>
               </div>
             </td>
             <td>
@@ -2046,7 +2107,7 @@ these validators may not function properly with frozen Pydantic classes.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The size of the result.</p>
+                <p>The target size (number of elements) for the 1D array.</p>
               </div>
             </td>
             <td>
@@ -2072,7 +2133,30 @@ these validators may not function properly with frozen Pydantic classes.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An 1D array of the requested size.</p>
+                <p>A new, immutable 1D NumPy array of the specified <code>size</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the input <code>array</code> cannot be broadcast to the target <code>size</code>.</p>
               </div>
             </td>
           </tr>
@@ -2099,9 +2183,9 @@ these validators may not function properly with frozen Pydantic classes.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Check if an enum value is valid.</p>
-<p>Given an array of byte integers, check of the values are within the range of
-values of the given enum.</p>
+        <p>Check if enum values in a NumPy array are valid members of an IntEnum.</p>
+<p>This function verifies that all integer values within the input NumPy array
+correspond to valid members of the specified <code>IntEnum</code> type.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2124,7 +2208,8 @@ values of the given enum.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The enum values.</p>
+                <p>A NumPy array containing integer values (typically <code>np.ubyte</code>)
+       representing potential enum members.</p>
               </div>
             </td>
             <td>
@@ -2140,7 +2225,7 @@ values of the given enum.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The type to check.</p>
+                <p>The <code>IntEnum</code> class to validate against.</p>
               </div>
             </td>
             <td>
@@ -2166,7 +2251,8 @@ values of the given enum.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the array contains an invalid value.</p>
+                <p>If any value in the <code>value</code> array does not correspond to a
+        member of the <code>enum_type</code>.</p>
               </div>
             </td>
           </tr>
@@ -2198,62 +2284,64 @@ values of the given enum.</p>
 
     <div class="doc doc-contents first">
 
-        <p>Annotated types for use with Pydantic models.</p>
-<p>These types can be used to convert input values to a desired type and guarantee
-certain properties. They include types that convert inputs to immutable NumPy
-arrays of specified dimension and type:</p>
+        <p>Annotated types for Pydantic models providing input conversion and validation.</p>
+<p>These types leverage Pydantic's <code>BeforeValidator</code> to automatically convert
+input values (like lists or scalars) into standardized, immutable NumPy arrays
+or Python collections (sets, tuples) during model initialization.</p>
+<p><strong>NumPy Array Types:</strong></p>
 <ul>
 <li><a class="autorefs autorefs-internal" title="            Array1D
 
 
   
       module-attribute
-  " href="#ropt.config.validated_types.Array1D"><code>Array1D</code></a>: For converting sequences to
-  immutable one-dimensional floating-point arrays.</li>
+  " href="#ropt.config.validated_types.Array1D"><code>Array1D</code></a>: Converts input to an
+  immutable 1D <code>np.float64</code> array.</li>
 <li><a class="autorefs autorefs-internal" title="            Array2D
 
 
   
       module-attribute
-  " href="#ropt.config.validated_types.Array2D"><code>Array2D</code></a>: For converting sequences to
-  immutable two-dimensional floating-point arrays.</li>
+  " href="#ropt.config.validated_types.Array2D"><code>Array2D</code></a>: Converts input to an
+  immutable 2D <code>np.float64</code> array.</li>
 <li><a class="autorefs autorefs-internal" title="            ArrayEnum
 
 
   
       module-attribute
-  " href="#ropt.config.validated_types.ArrayEnum"><code>ArrayEnum</code></a>: For converting
-  sequences to values of numerical enumerations of any dimension.</li>
+  " href="#ropt.config.validated_types.ArrayEnum"><code>ArrayEnum</code></a>: Converts input to an
+  immutable 1D <code>np.ubyte</code> array (suitable for integer enum values).</li>
 <li><a class="autorefs autorefs-internal" title="            Array1DInt
 
 
   
       module-attribute
-  " href="#ropt.config.validated_types.Array1DInt"><code>Array1DInt</code></a>: For converting
-  sequences to immutable one-dimensional integer arrays.</li>
+  " href="#ropt.config.validated_types.Array1DInt"><code>Array1DInt</code></a>: Converts input to an
+  immutable 1D <code>np.intc</code> array.</li>
 <li><a class="autorefs autorefs-internal" title="            Array1DBool
 
 
   
       module-attribute
-  " href="#ropt.config.validated_types.Array1DBool"><code>Array1DBool</code></a>: For converting
-  sequences to immutable one-dimensional boolean arrays.</li>
+  " href="#ropt.config.validated_types.Array1DBool"><code>Array1DBool</code></a>: Converts input to an
+  immutable 1D <code>np.bool_</code> array.</li>
 </ul>
-<p>Additionally, the following convenience types create sets or tuples, ensuring
-that single values are embedded in a set or tuple, respectively:</p>
+<p><strong>Collection Types:</strong></p>
 <ul>
 <li><a class="autorefs autorefs-internal" title="            ItemOrSet
 
 
   
       module-attribute
-  " href="#ropt.config.validated_types.ItemOrSet"><code>ItemOrSet[T]</code></a>: Create a set of type <code>T</code>.</li>
+  " href="#ropt.config.validated_types.ItemOrSet"><code>ItemOrSet[T]</code></a>: Ensures the value is a
+  <code>set[T]</code>, converting single items or sequences.</li>
 <li><a class="autorefs autorefs-internal" title="            ItemOrTuple
 
 
   
       module-attribute
-  " href="#ropt.config.validated_types.ItemOrTuple"><code>ItemOrTuple[T]</code></a>: Create a tuple of type <code>T</code>.</li>
+  " href="#ropt.config.validated_types.ItemOrTuple"><code>ItemOrTuple[T]</code></a>: Ensures the value is a
+  <code>tuple[T, ...]</code>, converting single items or sequences.</li>
 </ul>
 
 
