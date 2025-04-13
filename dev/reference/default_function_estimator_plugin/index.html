@@ -947,7 +947,7 @@
   
   
   <span class="md-ellipsis">
-    Default Plan Plugin
+    Default Plan Plugins
     
   </span>
   
@@ -1274,19 +1274,32 @@
               Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.base.FunctionEstimator" href="../function_estimator_plugins/#ropt.plugins.function_estimator.base.FunctionEstimator">FunctionEstimator</a></code></p>
 
 
-        <p>The default function estimator plugin.</p>
-<p>This plugin currently implements two methods:</p>
-<dl>
-<dt><code>mean</code>:</dt>
-<dd>Calculate the combined functions as a weighted mean of the function
-   values of each realization. Gradients are accordingly calculated as
-   a weighted sum.</dd>
-<dt><code>stddev</code>:</dt>
-<dd>Calculate the combined functions as the standard deviation of function
-   values of each realization. Gradients are calculated accordingly using
-   the chain rule. The sign of the result is adjusted such that the standard
-   deviation is always minimized.</dd>
-</dl>
+        <p>The default implementation for function estimation strategies.</p>
+<p>This class provides methods for combining objective function values and
+gradients from an ensemble of realizations into a single representative
+value or gradient. The specific method is configured via the
+<a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="../enopt_config/#ropt.config.enopt.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a>
+in the main <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>.</p>
+<p><strong>Supported Methods:</strong></p>
+<ul>
+<li>
+<p><code>mean</code> (or <code>default</code>):
+    Calculates the combined function value as the weighted mean of the
+    individual realization function values. The combined gradient is
+    calculated as the weighted mean of the individual realization gradients
+    (unless <code>merge_realizations</code> is true, in which case the pre-merged
+    gradient is used directly).</p>
+</li>
+<li>
+<p><code>stddev</code>:
+    Calculates the combined function value as the weighted standard
+    deviation of the individual realization function values. The combined
+    gradient is calculated using the chain rule based on the standard
+    deviation formula. This method requires at least two realizations with
+    non-zero weights and is incompatible with <code>merge_realizations=True</code>
+    for gradient calculation.</p>
+</li>
+</ul>
 
 
 

@@ -20,7 +20,7 @@
     
     
       
-        <title>Default Plan Plugin - ropt Documentation</title>
+        <title>Default Plan Plugins - ropt Documentation</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.plugins.plan.default.DefaultPlanStepPlugin" class="md-skip">
+        <a href="#ropt.plugins.plan.default" class="md-skip">
           Skip to content
         </a>
       
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Default Plan Plugin
+              Default Plan Plugins
             
           </span>
         </div>
@@ -954,7 +954,7 @@
   
   
   <span class="md-ellipsis">
-    Default Plan Plugin
+    Default Plan Plugins
     
   </span>
   
@@ -967,7 +967,7 @@
   
   
   <span class="md-ellipsis">
-    Default Plan Plugin
+    Default Plan Plugins
     
   </span>
   
@@ -986,6 +986,15 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default" class="md-nav__link">
+    <span class="md-ellipsis">
+      default
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#ropt.plugins.plan.default.DefaultPlanStepPlugin" class="md-nav__link">
@@ -1033,15 +1042,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep.emit_event" class="md-nav__link">
-    <span class="md-ellipsis">
-      emit_event
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1070,15 +1070,6 @@
   <a href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep.run" class="md-nav__link">
     <span class="md-ellipsis">
       run
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep.emit_event" class="md-nav__link">
-    <span class="md-ellipsis">
-      emit_event
     </span>
   </a>
   
@@ -1388,6 +1379,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default" class="md-nav__link">
+    <span class="md-ellipsis">
+      default
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.plan.default.DefaultPlanStepPlugin" class="md-nav__link">
     <span class="md-ellipsis">
       DefaultPlanStepPlugin
@@ -1433,15 +1433,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep.emit_event" class="md-nav__link">
-    <span class="md-ellipsis">
-      emit_event
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1470,15 +1461,6 @@
   <a href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep.run" class="md-nav__link">
     <span class="md-ellipsis">
       run
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep.emit_event" class="md-nav__link">
-    <span class="md-ellipsis">
-      emit_event
     </span>
   </a>
   
@@ -1574,7 +1556,69 @@
   
 
 
-  <h1>Default Plan Plugin</h1>
+  <h1>Default Plan Plugins</h1>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="ropt.plugins.plan.default" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.plugins.plan.default</span>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>This module provides the default plugin implementations for plan steps and handlers.</p>
+<p>It defines <code>DefaultPlanStepPlugin</code> and <code>DefaultPlanHandlerPlugin</code>, which serve
+as factories for the built-in plan components, enabling the creation of
+standard optimization plans out-of-the-box.</p>
+<p><strong>Supported Components:</strong></p>
+<ul>
+<li><strong>Steps:</strong><ul>
+<li><code>evaluator</code>: Performs ensemble evaluations
+    (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.evaluator.DefaultEvaluatorStep" href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep"><code>DefaultEvaluatorStep</code></a>).</li>
+<li><code>optimizer</code>: Runs an optimization algorithm using a configured optimizer
+    plugin
+    (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.optimizer.DefaultOptimizerStep" href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep"><code>DefaultOptimizerStep</code></a>).</li>
+</ul>
+</li>
+<li><strong>Handlers:</strong><ul>
+<li><code>tracker</code>: Tracks the 'best' or 'last' valid result based on objective
+    value and constraints
+    (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan._tracker.DefaultTrackerHandler" href="#ropt.plugins.plan._tracker.DefaultTrackerHandler"><code>DefaultTrackerHandler</code></a>).</li>
+<li><code>store</code>: Accumulates all results from specified sources
+    (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan._store.DefaultStoreHandler" href="#ropt.plugins.plan._store.DefaultStoreHandler"><code>DefaultStoreHandler</code></a>).</li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-class">
 
@@ -1592,23 +1636,21 @@
               Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStepPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanStepPlugin">PlanStepPlugin</a></code></p>
 
 
-        <p>The default plan plugin class.</p>
-<p>This class provides a number of steps:</p>
-<dl>
-<dt><code>Steps</code>:</dt>
-<dd>
+        <p>The default plugin for creating built-in plan steps.</p>
+<p>This plugin acts as a factory for the standard <code>PlanStep</code> implementations
+provided by <code>ropt</code>. It allows the
+<a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> to instantiate these steps
+when requested by a <a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a>.</p>
+<p><strong>Supported Steps:</strong></p>
 <ul>
-<li>A step that performs a single ensemble evaluation
-(<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.evaluator.DefaultEvaluatorStep" href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep"><code>evaluator</code></a>).</li>
+<li><code>evaluator</code>: Creates a
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.evaluator.DefaultEvaluatorStep" href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep"><code>DefaultEvaluatorStep</code></a>
+    instance, which performs ensemble evaluations.</li>
+<li><code>optimizer</code>: Creates a
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.optimizer.DefaultOptimizerStep" href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep"><code>DefaultOptimizerStep</code></a>
+    instance, which runs an optimization algorithm using a configured
+    optimizer plugin.</li>
 </ul>
-</dd>
-<dd>
-<ul>
-<li>A step that runs an optimization
-(<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.optimizer.DefaultOptimizerStep" href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep"><code>optimizer</code></a>).</li>
-</ul>
-</dd>
-</dl>
 
 
 
@@ -1653,17 +1695,21 @@
               Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanHandlerPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandlerPlugin">PlanHandlerPlugin</a></code></p>
 
 
-        <p>The default plan plugin class.</p>
-<p>This class provides a number of result handlers:</p>
-<dl>
-<dt><code>Result Handlers</code>:</dt>
-<dd>
+        <p>The default plugin for creating built-in plan handlers.</p>
+<p>This plugin acts as a factory for the standard <code>PlanHandler</code> implementations
+provided by <code>ropt</code>. It allows the
+<a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> to instantiate these handlers
+when requested by a <a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a>.</p>
+<p><strong>Supported Handlers:</strong></p>
 <ul>
-<li>A handler that tracks optimal results
-(<a class="autorefs autorefs-internal" title="            ropt.plugins.plan._tracker.DefaultTrackerHandler" href="#ropt.plugins.plan._tracker.DefaultTrackerHandler"><code>tracker</code></a>).</li>
+<li><code>tracker</code>: Creates a
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.plan._tracker.DefaultTrackerHandler" href="#ropt.plugins.plan._tracker.DefaultTrackerHandler"><code>DefaultTrackerHandler</code></a>
+    instance, which tracks either the 'best' or 'last' valid result based on
+    objective value and constraints.</li>
+<li><code>store</code>: Creates a
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.plan._store.DefaultStoreHandler" href="#ropt.plugins.plan._store.DefaultStoreHandler"><code>DefaultStoreHandler</code></a>
+    instance, which accumulates all results received from specified sources.</li>
 </ul>
-</dd>
-</dl>
 
 
 
@@ -1708,34 +1754,53 @@
               Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code></p>
 
 
-        <p>The default evaluator step.</p>
-<p>This step performs a single ensemble evaluation, yielding one or more
+        <p>The default evaluator step for optimization plans.</p>
+<p>This step performs one or more ensemble evaluations based on the provided
+<code>variables</code>. It yields a tuple of
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
       dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> objects. The evaluation
-can process multiple variable vectors, each of which is evaluated
-separately, producing an individual results object for each vector.</p>
-<p>Before executing the evaluator step, a
-<a class="autorefs autorefs-internal" title="            START_EVALUATOR_STEP
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> objects, one for each
+input variable vector evaluated.</p>
+<p>The step emits the following events:</p>
+<ul>
+<li><a class="autorefs autorefs-internal" title="            START_EVALUATOR_STEP
 
 
   
       class-attribute
       instance-attribute
-  " href="../enums/#ropt.enums.EventType.START_EVALUATOR_STEP"><code>START_EVALUATOR_STEP</code></a> event is
-emitted. After the evaluator step finishes, an
-<a class="autorefs autorefs-internal" title="            FINISHED_EVALUATOR_STEP
+  " href="../enums/#ropt.enums.EventType.START_EVALUATOR_STEP"><code>START_EVALUATOR_STEP</code></a>:
+  Emitted before the evaluation process begins.</li>
+<li><a class="autorefs autorefs-internal" title="            START_EVALUATION
 
 
   
       class-attribute
       instance-attribute
-  " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATOR_STEP"><code>FINISHED_EVALUATOR_STEP</code></a>
-event is emitted. Result handlers should respond to the latter event to
-process the generated results.</p>
+  " href="../enums/#ropt.enums.EventType.START_EVALUATION"><code>START_EVALUATION</code></a>: Emitted
+  just before the underlying ensemble evaluation is called.</li>
+<li><a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a>: Emitted
+  after the evaluation completes, carrying the generated <code>FunctionResults</code>
+  in its <code>data</code> dictionary under the key <code>"results"</code>. Plan handlers typically
+  listen for this event.</li>
+<li><a class="autorefs autorefs-internal" title="            FINISHED_EVALUATOR_STEP
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATOR_STEP"><code>FINISHED_EVALUATOR_STEP</code></a>:
+  Emitted after the entire step, including result emission, is finished.</li>
+</ul>
 
 
 
@@ -1825,17 +1890,26 @@ process the generated results.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Run the evaluator step.</p>
-<p>The
-<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.evaluator.DefaultEvaluatorStep" href="#ropt.plugins.plan.evaluator.DefaultEvaluatorStep"><code>DefaultEvaluatorStep</code></a>
-requires an optimizer configuration; the <code>variables</code> parameter is
-optional. The configuration  object must be an
-<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object, or a dictionary
-that can be parsed into such an object. If no <code>variables</code> are provided,
-the initial values specified by the optimizer configuration are used. If
-<code>values</code> is given, it may be a single vector or a two-dimensional array.
-In the latter case, each row of the matrix is treated as a separate set
-of values to be evaluated.</p>
+        <p>Run the evaluator step to perform ensemble evaluations.</p>
+<p>This method executes the core logic of the evaluator step. It requires
+an optimizer configuration
+(<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> or a compatible
+dictionary) and optionally accepts specific variable vectors to
+evaluate.</p>
+<p>If <code>variables</code> are not provided, the initial values specified in the
+<code>config</code> are used. If <code>variables</code> are provided as a 2D array, each row
+is treated as a separate vector for evaluation.</p>
+<p>If a <code>transforms</code> object is given, it is passed to the ensemble
+evaluator to transform variables and results between user and optimizer
+domains (see <a class="autorefs autorefs-internal" title="            ropt.transforms" href="../domain_transforms/#ropt.transforms"><code>ropt.transforms</code></a>).</p>
+<p>If <code>metadata</code> is provided, it is attached to the
+<a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.Results"><code>Results</code></a> objects emitted via the
+<code>FINISHED_EVALUATION</code> event.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1858,7 +1932,7 @@ of values to be evaluated.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The optimizer configuration.</p>
+                <p>Optimizer configuration.</p>
               </div>
             </td>
             <td>
@@ -1879,7 +1953,7 @@ of values to be evaluated.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional transforms object.</p>
+                <p>Optional transforms object for variable/result conversion.</p>
               </div>
             </td>
             <td>
@@ -1895,7 +1969,7 @@ of values to be evaluated.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Variables to evaluate.</p>
+                <p>Optional variable vector(s) to evaluate.</p>
               </div>
             </td>
             <td>
@@ -1911,7 +1985,7 @@ of values to be evaluated.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional metadata to add to events.</p>
+                <p>Optional dictionary to attach to emitted <code>FunctionResults</code>.</p>
               </div>
             </td>
             <td>
@@ -1922,56 +1996,23 @@ of values to be evaluated.</p>
     </table>
 
 
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plugins.plan.evaluator.DefaultEvaluatorStep.emit_event" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">emit_event</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">emit_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Emit an event.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
+    <p><span class="doc-section-title">Returns:</span></p>
     <table>
       <thead>
         <tr>
-          <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>event</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.plan.Event
-
-
-  
-      dataclass
-  " href="../plan/#ropt.plan.Event">Event</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            OptimizerExitCode (ropt.enums.OptimizerExitCode)" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The event to emit.</p>
+                <p>An <a class="autorefs autorefs-internal" title="            OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode"><code>OptimizerExitCode</code></a> indicating the outcome.</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
       </tbody>
@@ -2006,8 +2047,11 @@ of values to be evaluated.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code></p>
 
 
-        <p>The default optimizer step.</p>
-<p>The optimizer step performs an optimization, yielding a sequence of
+        <p>The default optimizer step for optimization plans.</p>
+<p>This step executes an optimization algorithm based on a provided
+configuration (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> or a
+compatible dictionary). It iteratively performs function and potentially
+gradient evaluations, yielding a sequence of
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
@@ -2019,12 +2063,10 @@ of values to be evaluated.</p>
 
   
       dataclass
-  " href="../results/#ropt.results.GradientResults"><code>GradientResults</code></a> objects. The optimizer is
-configured using an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object or
-a dictionary that can be parsed into such an object. While the initial values
-for optimization are typically specified in the configuration, they can be
-overridden by providing them directly.</p>
-<p>The optimizer step emits several signals:</p>
+  " href="../results/#ropt.results.GradientResults"><code>GradientResults</code></a> objects.</p>
+<p>While initial variable values are typically specified in the configuration,
+they can be overridden by passing them directly to the <code>run</code> method.</p>
+<p>The step emits the following events during its execution:</p>
 <ul>
 <li><a class="autorefs autorefs-internal" title="            START_OPTIMIZER_STEP
 
@@ -2033,15 +2075,7 @@ overridden by providing them directly.</p>
       class-attribute
       instance-attribute
   " href="../enums/#ropt.enums.EventType.START_OPTIMIZER_STEP"><code>START_OPTIMIZER_STEP</code></a>:
-  Emitted before the optimization starts.</li>
-<li><a class="autorefs autorefs-internal" title="            FINISHED_OPTIMIZER_STEP
-
-
-  
-      class-attribute
-      instance-attribute
-  " href="../enums/#ropt.enums.EventType.FINISHED_OPTIMIZER_STEP"><code>FINISHED_OPTIMIZER_STEP</code></a>:
-  Emitted after the optimization finishes.</li>
+  Emitted just before the optimization process begins.</li>
 <li><a class="autorefs autorefs-internal" title="            START_EVALUATION
 
 
@@ -2049,7 +2083,8 @@ overridden by providing them directly.</p>
       class-attribute
       instance-attribute
   " href="../enums/#ropt.enums.EventType.START_EVALUATION"><code>START_EVALUATION</code></a>: Emitted
-  before a function or gradient evaluation.</li>
+  immediately before an ensemble evaluation (for functions or gradients)
+  is requested from the underlying optimizer.</li>
 <li><a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
 
 
@@ -2057,19 +2092,35 @@ overridden by providing them directly.</p>
       class-attribute
       instance-attribute
   " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a>: Emitted
-  after a function or gradient evaluation.</li>
-</ul>
-<p>The <code>FINISHED_EVALUATION</code> signal is particularly important as it passes
-  the generated <a class="autorefs autorefs-internal" title="            ropt.results.Results
+  after an evaluation completes. This event carries the generated
+  <a class="autorefs autorefs-internal" title="            ropt.results.Results
 
 
   
       dataclass
-  " href="../results/#ropt.results.Results"><code>Results</code></a> objects. Result handlers
-  specified in the plan will respond to this signal to process those results.</p>
-<p>The optimizer step supports nested optimizations, where each function
-evaluation in the optimization calls a function that should run the nested
-optimization and produce the result for the function evaluation.</p>
+  " href="../results/#ropt.results.Results"><code>Results</code></a> object(s) in its <code>data</code> dictionary
+  under the key <code>"results"</code>. Plan handlers typically listen for this event
+  to process or track optimization progress.</li>
+<li><a class="autorefs autorefs-internal" title="            FINISHED_OPTIMIZER_STEP
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.FINISHED_OPTIMIZER_STEP"><code>FINISHED_OPTIMIZER_STEP</code></a>:
+  Emitted after the entire optimization process concludes (successfully,
+  or due to termination conditions or errors).</li>
+</ul>
+<p>This step also supports <strong>nested optimization</strong>. If a <code>nested_optimization</code>
+plan is provided to the <code>run</code> method, the optimizer will execute this nested
+plan for each function evaluation instead of calling the standard ensemble
+evaluator. The nested plan is expected to return a single
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object.</p>
 
 
 
@@ -2160,7 +2211,28 @@ optimization and produce the result for the function evaluation.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Run the optimizer step.</p>
+        <p>Run the optimizer step to perform an optimization.</p>
+<p>This method executes the core logic of the optimizer step. It requires
+an optimizer configuration
+(<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> or a compatible
+dictionary) and optionally accepts specific initial variable vectors,
+transforms, a nested optimization plan, and metadata.</p>
+<p>If <code>variables</code> are not provided, the initial values specified in the
+<code>config</code> are used. If <code>variables</code> are provided, they override the
+config's initial values.</p>
+<p>If a <code>transforms</code> object is given, it is passed to the optimizer to
+transform variables and results between user and optimizer domains (see
+<a class="autorefs autorefs-internal" title="            ropt.transforms" href="../domain_transforms/#ropt.transforms"><code>ropt.transforms</code></a>).</p>
+<p>If <code>metadata</code> is provided, it is attached to the
+<a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.Results"><code>Results</code></a> objects emitted via the
+<code>FINISHED_EVALUATION</code> event.</p>
+<p>If a <code>nested_optimization</code> plan is provided, it will be executed for
+each function evaluation instead of the standard ensemble evaluator.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2183,7 +2255,7 @@ optimization and produce the result for the function evaluation.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The optimizer configuration.</p>
+                <p>Optimizer configuration.</p>
               </div>
             </td>
             <td>
@@ -2220,7 +2292,7 @@ optimization and produce the result for the function evaluation.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Variables to evaluate.</p>
+                <p>Optional initial variable vector(s) to start optimization from.</p>
               </div>
             </td>
             <td>
@@ -2252,7 +2324,7 @@ optimization and produce the result for the function evaluation.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional metadata to add to events.</p>
+                <p>Optional dictionary to attach to emitted <code>Results</code>.</p>
               </div>
             </td>
             <td>
@@ -2263,56 +2335,23 @@ optimization and produce the result for the function evaluation.</p>
     </table>
 
 
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plugins.plan.optimizer.DefaultOptimizerStep.emit_event" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">emit_event</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">emit_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Emit an event.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
+    <p><span class="doc-section-title">Returns:</span></p>
     <table>
       <thead>
         <tr>
-          <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>event</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.plan.Event
-
-
-  
-      dataclass
-  " href="../plan/#ropt.plan.Event">Event</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            OptimizerExitCode (ropt.enums.OptimizerExitCode)" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The event to emit.</p>
+                <p>An <a class="autorefs autorefs-internal" title="            OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode"><code>OptimizerExitCode</code></a> indicating the outcome of the optimization.</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
       </tbody>
@@ -2347,19 +2386,42 @@ optimization and produce the result for the function evaluation.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanHandler" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandler">PlanHandler</a></code></p>
 
 
-        <p>The default tracker results handler object.</p>
-<p>This handler tracks the
+        <p>The default handler for tracking optimization results.</p>
+<p>This handler listens for
+<a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events
+emitted by specified <code>sources</code> (plan steps). It processes the
 <a class="autorefs autorefs-internal" title="            ropt.results.Results
 
 
   
       dataclass
-  " href="../results/#ropt.results.Results"><code>Results</code></a> objects that it receives and selects one
-to retain in a variable. Currently it tracks either the last result it
-receives, or the best result. The best result is defined as the result that
-has the lowest weighted objective value. Optionally, results may be filtered
-by checking for violations of constraints, by comparing constraint values to
-a threshold.</p>
+  " href="../results/#ropt.results.Results"><code>Results</code></a> objects contained within these events and
+selects a single <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object to
+retain based on defined criteria.</p>
+<p>The criteria for selection are:</p>
+<ul>
+<li><strong><code>what='best'</code> (default):</strong> Tracks the result with the lowest weighted
+  objective value encountered so far.</li>
+<li><strong><code>what='last'</code>:</strong> Tracks the most recently received valid result.</li>
+</ul>
+<p>Optionally, results can be filtered based on constraint violations using the
+<code>constraint_tolerance</code> parameter. If provided, any result violating
+constraints beyond this tolerance is ignored.</p>
+<p>The selected result (in the optimizer domain) is stored internally. The
+result accessible via dictionary access (<code>handler["results"]</code>) is the
+selected result, potentially transformed to the user domain if <code>transforms</code>
+were provided during initialization.</p>
 
 
 
@@ -2401,22 +2463,44 @@ a threshold.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize a default tracker results handler.</p>
-<p>This handler monitors <code>Results</code> objects from specified sources and
-selects a single result to retain based on the specified criteria. It
-can track either the best result encountered so far or the most recent
-result. The "best" result is determined by the lowest weighted
-objective value.</p>
-<p>Results can optionally be filtered based on constraint violations. If a
-<code>constraint_tolerance</code> is provided, results that violate constraints
-beyond this tolerance will be discarded and not tracked.</p>
-<p>The <code>sources</code> parameter allows you to specify which steps' results
-should be tracked. Only results from steps whose IDs are included in
-this set will be considered.</p>
-<p>Tracking of results is based on the results in the optimizer domain, and
-the tracked results are accessible via the <code>"results"</code> key. If the
-<code>transforms</code> argument is not <code>None</code>, tracking still occurs in the
-optimizer domain, but the results accessible via the <code>"results"</code> key are
-transformed to the user domain.</p>
+<p>This handler monitors <a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.Results"><code>Results</code></a> objects from
+specified <code>sources</code> (plan steps) and selects a single
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object to retain based
+on the <code>what</code> criterion ('best' or 'last').</p>
+<p>The 'best' result is the one with the lowest weighted objective value
+encountered so far. The 'last' result is the most recently received
+valid result. Results can optionally be filtered by
+<code>constraint_tolerance</code> to ignore those violating constraints beyond the
+specified threshold.</p>
+<p>The <code>sources</code> parameter acts as a filter, determining which plan steps
+this handler should listen to. It should be a set containing the unique
+IDs (UUIDs) of the <code>PlanStep</code> instances whose results you want to track.
+When a <a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a>
+event occurs, this handler checks if the ID of the step that emitted the
+event (<code>event.source</code>) is present in the <code>sources</code> set. If it is, the
+handler processes the results; otherwise, it ignores the event. If
+<code>sources</code> is <code>None</code> (the default), the handler will not track results
+from any source.</p>
+<p>Tracking logic (comparing 'best' or selecting 'last') operates on the
+results in the optimizer's domain. However, the final selected result
+that is made accessible via dictionary access (<code>handler["results"]</code>) is
+transformed to the user's domain if a <code>transforms</code> object is provided.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2439,7 +2523,7 @@ transformed to the user domain.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The plan this handler is part of.</p>
+                <p>The parent plan instance.</p>
               </div>
             </td>
             <td>
@@ -2455,7 +2539,7 @@ transformed to the user domain.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Specifies whether to track the "best" or "last" result.</p>
+                <p>Criterion for selecting results ('best' or 'last').</p>
               </div>
             </td>
             <td>
@@ -2471,7 +2555,7 @@ transformed to the user domain.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Constraint tolerance for filtering results.</p>
+                <p>Optional threshold for filtering constraint violations.</p>
               </div>
             </td>
             <td>
@@ -2487,7 +2571,7 @@ transformed to the user domain.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A set of UUIDs of steps whose results to track.</p>
+                <p>Optional set of step UUIDs whose results should be tracked.</p>
               </div>
             </td>
             <td>
@@ -2508,7 +2592,7 @@ transformed to the user domain.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional transforms to apply to the final results.</p>
+                <p>Optional transforms object for user-domain results.</p>
               </div>
             </td>
             <td>
@@ -2536,7 +2620,21 @@ transformed to the user domain.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Handle an event.</p>
+        <p>Handle incoming events from the plan.</p>
+<p>This method processes events emitted by the parent plan. It specifically
+listens for
+<a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events
+originating from steps whose IDs are included in the <code>sources</code> set
+configured during initialization.</p>
+<p>If a relevant event containing results is received, this method updates
+the tracked result (<code>self["results"]</code>) based on the <code>what</code> criterion
+('best' or 'last') and the optional <code>constraint_tolerance</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2564,7 +2662,7 @@ transformed to the user domain.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The event to handle.</p>
+                <p>The event object emitted by the plan.</p>
               </div>
             </td>
             <td>
@@ -2603,15 +2701,30 @@ transformed to the user domain.</p>
               Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanHandler" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandler">PlanHandler</a></code></p>
 
 
-        <p>The default store results handler object.</p>
-<p>This handler tracks the
+        <p>The default handler for storing optimization results.</p>
+<p>This handler listens for
+<a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events
+emitted by specified <code>sources</code> (plan steps). It collects all
 <a class="autorefs autorefs-internal" title="            ropt.results.Results
 
 
   
       dataclass
-  " href="../results/#ropt.results.Results"><code>Results</code></a> objects that it receives and stores them
-in memory.</p>
+  " href="../results/#ropt.results.Results"><code>Results</code></a> objects contained within these events and
+stores them sequentially in memory.</p>
+<p>The <code>sources</code> parameter filters which steps' results are collected. If a
+<code>transforms</code> object is provided, the results are converted from the
+optimizer domain to the user domain before being stored.</p>
+<p>The accumulated results are stored as a tuple and can be accessed via
+dictionary access using the key <code>"results"</code> (e.g., <code>handler["results"]</code>).
+Each time new results are received from a valid source, they are appended to
+this tuple.</p>
 
 
 
@@ -2650,15 +2763,42 @@ in memory.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize a default store results handler object.</p>
-<p>This handler stores a collection of <code>Results</code> objects from specified
-sources. It accumulates results from <code>FINISHED_EVALUATION</code> events
-emitted by the designated sources.</p>
-<p>The <code>sources</code> parameter determines which steps' results are tracked.</p>
-<p>The stored results can be accessed via the <code>"results"</code> key. The
-results are stored as a tuple of <code>Results</code> objects.</p>
-<p>If the <code>transforms</code> argument is not None, these are applied to transform
-the results from the optimizer domain to the user domain.</p>
+        <p>Initialize a default store results handler.</p>
+<p>This handler collects and stores all <a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.Results"><code>Results</code></a>
+objects received from specified <code>sources</code> (plan steps). It listens for
+<a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events
+and appends the results contained within them to an internal tuple.</p>
+<p>The <code>sources</code> parameter acts as a filter, determining which plan steps
+this handler should listen to. It should be a set containing the unique
+IDs (UUIDs) of the <code>PlanStep</code> instances whose results you want to store.
+When a <a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a>
+event occurs, this handler checks if the ID of the step that emitted the
+event (<code>event.source</code>) is present in the <code>sources</code> set. If it is, the
+handler stores the results; otherwise, it ignores the event. If
+<code>sources</code> is <code>None</code> (the default), the handler will not store results
+from any source.</p>
+<p>If a <code>transforms</code> object is provided, the results are converted from the
+optimizer domain to the user domain <em>before</em> being stored.</p>
+<p>The accumulated results are stored as a tuple and can be accessed via
+dictionary access using the key <code>"results"</code> (e.g., <code>handler["results"]</code>).
+Initially, <code>handler["results"]</code> is <code>None</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2681,7 +2821,7 @@ the results from the optimizer domain to the user domain.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The plan that this handler is part of.</p>
+                <p>The parent plan instance.</p>
               </div>
             </td>
             <td>
@@ -2697,7 +2837,7 @@ the results from the optimizer domain to the user domain.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The IDs of the steps whose results should be tracked.</p>
+                <p>Optional set of step UUIDs whose results should be stored.</p>
               </div>
             </td>
             <td>
@@ -2718,7 +2858,7 @@ the results from the optimizer domain to the user domain.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional transforms to apply to the results.</p>
+                <p>Optional transforms object to apply before storing results.</p>
               </div>
             </td>
             <td>
@@ -2746,7 +2886,22 @@ the results from the optimizer domain to the user domain.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Handle an event.</p>
+        <p>Handle incoming events from the plan.</p>
+<p>This method processes events emitted by the parent plan. It specifically
+listens for
+<a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events
+originating from steps whose IDs are included in the <code>sources</code> set
+configured during initialization.</p>
+<p>If a relevant event containing results is received, this method retrieves
+the results, optionally transforms them to the user domain if
+<code>transforms</code> were provided, and appends them to the tuple stored in
+<code>self["results"]</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2774,7 +2929,7 @@ the results from the optimizer domain to the user domain.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The event to handle.</p>
+                <p>The event object emitted by the plan.</p>
               </div>
             </td>
             <td>

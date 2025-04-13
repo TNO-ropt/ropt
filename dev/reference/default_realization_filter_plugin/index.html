@@ -947,7 +947,7 @@
   
   
   <span class="md-ellipsis">
-    Default Plan Plugin
+    Default Plan Plugins
     
   </span>
   
@@ -1346,44 +1346,52 @@
               Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.base.RealizationFilter" href="../realization_filter_plugins/#ropt.plugins.realization_filter.base.RealizationFilter">RealizationFilter</a></code></p>
 
 
-        <p>The default realization filter plugin class.</p>
-<p>This plugin currently implements four methods:</p>
-<dl>
-<dt><code>sort-objective</code>:</dt>
-<dd>Filter realizations by selecting a range of objective values. This filter
-   requires additional configuration using an options dict that can be
-   parsed into a
-   <a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.default.SortObjectiveOptions" href="#ropt.plugins.realization_filter.default.SortObjectiveOptions"><code>SortObjectiveOptions</code></a>
-   class. This method sorts realizations according to the weighted sum of
-   the values of objective functions specified in the options. It then
-   selects the set of realizations from a given index range.</dd>
-<dt><code>sort-constraint</code>:</dt>
-<dd>Filter realizations by selecting a range of constraint values. This
-   filter requires additional configuration using an options dict that can
-   be parsed into a
-   <a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.default.SortConstraintOptions" href="#ropt.plugins.realization_filter.default.SortConstraintOptions"><code>SortConstraintOptions</code></a>
-   class. This method sorts realizations according to the values of
-   constraint functions specified in the options. It then selects the set of
-   realizations from a given index range.</dd>
-<dt><code>cvar-objective</code>:</dt>
-<dd>Filter realizations by selecting a range of objective values. This filter
-   requires additional configuration using an options dict that can be
-   parsed into a
-   <a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.default.CVaRObjectiveOptions" href="#ropt.plugins.realization_filter.default.CVaRObjectiveOptions"><code>CVaRObjectiveOptions</code></a>
-   class. This method sorts realizations according to the weighted sum of
-   the values of objective functions specified in the options. It then
-   selects a percentile of the realizations, applying interpolation whenever
-   the number of selected realizations is not an integer number.</dd>
-<dt><code>cvar-constraint</code>:</dt>
-<dd>Filter realizations by selecting a range of constraint values. This
-   filter requires additional configuration using an options dict that can
-   be parsed into a
-   <a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.default.CVaRConstraintOptions" href="#ropt.plugins.realization_filter.default.CVaRConstraintOptions"><code>CVaRConstraintOptions</code></a>
-   class. This method sorts realizations according to the values of
-   constraint functions specified in the options. It then selects a
-   percentile of the realizations, applying interpolation whenever the
-   number of selected realizations is not an integer number.</dd>
-</dl>
+        <p>The default implementation for realization filtering strategies.</p>
+<p>This class provides several methods for calculating realization weights based
+on objective or constraint values. The specific method and its parameters
+are configured via the
+<a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="../enopt_config/#ropt.config.enopt.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>
+in the main <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>.</p>
+<p><strong>Supported Methods:</strong></p>
+<ul>
+<li>
+<p><code>sort-objective</code>:
+    Sorts realizations based on a weighted sum of specified objective
+    function values. It then assigns zero weights to realizations outside of
+    a defined index range (<code>first</code> to <code>last</code>) in the sorted list. Requires
+    options defined by
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.default.SortObjectiveOptions" href="#ropt.plugins.realization_filter.default.SortObjectiveOptions"><code>SortObjectiveOptions</code></a>.</p>
+</li>
+<li>
+<p><code>sort-constraint</code>:
+    Sorts realizations based on the value of a single specified constraint
+    function. It assigns zero weights to realizations outside of a defined
+    index range (<code>first</code> to <code>last</code>) in the sorted list. Requires options
+    defined by
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.default.SortConstraintOptions" href="#ropt.plugins.realization_filter.default.SortConstraintOptions"><code>SortConstraintOptions</code></a>.</p>
+</li>
+<li>
+<p><code>cvar-objective</code>:
+    Calculates realization weights using the Conditional Value-at-Risk (CVaR)
+    method applied to a weighted sum of specified objective function values.
+    Weights are assigned based on a specified <code>percentile</code> of the worst-performing
+    realizations (highest objective values for minimization). Interpolation is
+    used if the percentile boundary falls between realizations.
+    Requires options defined by
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.default.CVaRObjectiveOptions" href="#ropt.plugins.realization_filter.default.CVaRObjectiveOptions"><code>CVaRObjectiveOptions</code></a>.</p>
+</li>
+<li>
+<p><code>cvar-constraint</code>:
+    Calculates realization weights using the CVaR method applied to the
+    value of a single specified constraint function. Weights are assigned
+    based on a specified <code>percentile</code> of the worst-performing realizations
+    (definition of "worst" depends on the constraint type: LE, GE, or EQ).
+    Interpolation is used if the percentile boundary falls between
+    realizations.
+    Requires options defined by
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.default.CVaRConstraintOptions" href="#ropt.plugins.realization_filter.default.CVaRConstraintOptions"><code>CVaRConstraintOptions</code></a>.</p>
+</li>
+</ul>
 
 
 
@@ -1428,12 +1436,23 @@
               Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
 
 
-        <p>Configuration settings for the <code>sort-objective</code> method.</p>
-<p>The <code>sort-objective</code> method sorts realizations according to the value of one
-or multiple objectives, and retains a number of realizations within a given
-index range in the sorted list. If more than one objective index is given, a
-weighted sum of these objectives is used, using the weights given in the
-configuration of the optimizer.</p>
+        <p>Configuration settings for the <code>sort-objective</code> realization filter.</p>
+<p>This method sorts realizations based on a weighted sum of objective function
+values and assigns weights only to those within a specified rank range.</p>
+<p>How it works:</p>
+<ol>
+<li>A weighted sum is calculated for each realization using the objective
+   values specified by the <code>sort</code> indices and the corresponding weights
+   from the main <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>. If only
+   one objective index is provided in <code>sort</code>, no weighting is applied.</li>
+<li>Realizations are sorted based on this calculated value (ascending).</li>
+<li>Realizations whose rank falls within the range [<code>first</code>, <code>last</code>]
+   (inclusive) are selected.</li>
+<li>The original weights (from <code>EnOptConfig.realizations.weights</code>) of the
+   selected realizations are retained; all other realizations receive a
+   weight of zero. Failed realizations (NaN objective values) are effectively
+   given the lowest rank and are excluded before selection.</li>
+</ol>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -1453,7 +1472,7 @@ configuration of the optimizer.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The indices of the objectives to sort.</p>
+                <p>List of objective function indices to use for sorting.</p>
               </div>
             </td>
           </tr>
@@ -1464,7 +1483,7 @@ configuration of the optimizer.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Index or name of the first realization to use.</p>
+                <p>The starting rank (0-based index) of realizations to select after sorting.</p>
               </div>
             </td>
           </tr>
@@ -1475,7 +1494,7 @@ configuration of the optimizer.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Index of name of the last realization to use.</p>
+                <p>The ending rank (0-based index) of realizations to select after sorting.</p>
               </div>
             </td>
           </tr>
@@ -1525,10 +1544,21 @@ configuration of the optimizer.</p>
               Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
 
 
-        <p>Configuration settings for the <code>sort-constraint</code> method.</p>
-<p>The <code>sort-constraint</code> method sorts realizations according to the value of a
-constraint, and retains a number of realizations within a given index range
-in the sorted list.</p>
+        <p>Configuration settings for the <code>sort-constraint</code> realization filter.</p>
+<p>This method sorts realizations based on the value of a single constraint
+function and assigns weights only to those within a specified rank range.</p>
+<p>How it works:</p>
+<ol>
+<li>The values of the constraint function specified by the <code>sort</code> index are
+   retrieved for each realization.</li>
+<li>Realizations are sorted based on these constraint values (ascending).</li>
+<li>Realizations whose rank falls within the range [<code>first</code>, <code>last</code>]
+   (inclusive) are selected.</li>
+<li>The original weights (from <code>EnOptConfig.realizations.weights</code>) of the
+   selected realizations are retained; all other realizations receive a
+   weight of zero. Failed realizations (NaN constraint values) are effectively
+   given the lowest rank and are excluded before selection.</li>
+</ol>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -1548,7 +1578,7 @@ in the sorted list.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The index of the constraint to sort.</p>
+                <p>The index of the constraint function to use for sorting.</p>
               </div>
             </td>
           </tr>
@@ -1559,7 +1589,7 @@ in the sorted list.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Index or name of the first realization to use.</p>
+                <p>The starting rank (0-based index) of realizations to select after sorting.</p>
               </div>
             </td>
           </tr>
@@ -1570,7 +1600,7 @@ in the sorted list.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Index or name of the last realization to use.</p>
+                <p>The ending rank (0-based index) of realizations to select after sorting.</p>
               </div>
             </td>
           </tr>
@@ -1620,16 +1650,28 @@ in the sorted list.</p>
               Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
 
 
-        <p>Configuration settings for the <code>cvar-objective</code> method.</p>
-<p>The <code>cvar-objective</code> method finds realizations weights by applying the CVaR
-method to the objective values. If more than one objective index is given, a
-weighted sum of these objectives is used, using the weights given in the
-configuration of the optimizer.</p>
-<p>The percentile argument defines the contribution of the "worst" performing
-realizations in the distribution that is used to calculate the ensemble
-value. "Worst" is defined as those realizations having the highest values in
-case of a minimization and those having the lowest values in case of
-maximizing.</p>
+        <p>Configuration settings for the <code>cvar-objective</code> realization filter.</p>
+<p>This method calculates realization weights using the Conditional Value-at-Risk
+(CVaR) approach applied to a weighted sum of objective function values. It
+focuses on the "tail" of the distribution representing the worst-performing
+realizations.</p>
+<p>How it works:</p>
+<ol>
+<li>A weighted sum is calculated for each realization using the objective
+   values specified by the <code>sort</code> indices and the corresponding weights
+   from the main <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>. If only
+   one objective index is provided in <code>sort</code>, no weighting is applied.</li>
+<li>Realizations are conceptually sorted based on this calculated value
+   (ascending, assuming minimization).</li>
+<li>The method identifies the subset of realizations corresponding to the
+   <code>percentile</code> worst outcomes (i.e., the highest weighted objective values).</li>
+<li>Weights are assigned to these worst-performing realizations based on the
+   CVaR calculation. If the <code>percentile</code> boundary falls between two
+   realizations, interpolation is used to assign partial weights. All other
+   realizations receive a weight of zero.</li>
+<li>Failed realizations (NaN objective values) are effectively excluded from
+   the CVaR calculation.</li>
+</ol>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -1649,7 +1691,7 @@ maximizing.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The indices of the objectives to sort.</p>
+                <p>List of objective function indices to use for the weighted sum.</p>
               </div>
             </td>
           </tr>
@@ -1660,7 +1702,8 @@ maximizing.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The CVaR percentile.</p>
+                <p>The CVaR percentile (0.0 to 1.0) defining the portion of
+        worst realizations to consider. Defaults to 0.5.</p>
               </div>
             </td>
           </tr>
@@ -1710,18 +1753,36 @@ maximizing.</p>
               Bases: <code><span title="ropt.plugins.realization_filter.default._ConfigBaseModel">_ConfigBaseModel</span></code></p>
 
 
-        <p>Configuration settings for the <code>cvar-constraint</code> method.</p>
-<p>The <code>cvar-constraint</code> method finds realizations weights by applying the CVaR
-method to the objective values.</p>
-<p>The percentile argument defines the contribution of the "worst" performing
-realizations in the distribution that is used to calculate the ensemble
-value. The definition of worst depends on the type of the constraints. After
-subtracting the right-hand-side value the following applies:</p>
-<ul>
-<li>For LE constraints, realizations with the largest values are the worst</li>
-<li>For GE constraints, realizations with the smallest values are the worst</li>
-<li>For EQ constraints, realizations with the largest absolute values are the worst</li>
+        <p>Configuration settings for the <code>cvar-constraint</code> realization filter.</p>
+<p>This method calculates realization weights using the Conditional Value-at-Risk
+(CVaR) approach applied to the values of a single constraint function. It
+focuses on the "tail" of the distribution representing the realizations that
+most severely violate or are furthest from satisfying the constraint.</p>
+<p>How it works:</p>
+<ol>
+<li>The values of the constraint function specified by the <code>sort</code> index are
+   retrieved for each realization. These values typically represent the
+   constraint function evaluated minus its right-hand-side value (e.g.,
+   <code>g(x) - rhs</code>).</li>
+<li>Realizations are conceptually sorted based on how "badly" they perform
+   with respect to the constraint type:<ul>
+<li><strong>LE (<code>&lt;=</code>) constraints:</strong> Realizations with the <em>largest</em> positive
+  values (most violated) are considered the worst.</li>
+<li><strong>GE (<code>&gt;=</code>) constraints:</strong> Realizations with the <em>smallest</em> negative
+  values (most violated) are considered the worst.</li>
+<li><strong>EQ (<code>==</code>) constraints:</strong> Realizations with the <em>largest absolute</em>
+  values (furthest from zero) are considered the worst.</li>
 </ul>
+</li>
+<li>The method identifies the subset of realizations corresponding to the
+   <code>percentile</code> worst outcomes based on the sorting defined above.</li>
+<li>Weights are assigned to these worst-performing realizations based on the
+   CVaR calculation. If the <code>percentile</code> boundary falls between two
+   realizations, interpolation is used to assign partial weights. All other
+   realizations receive a weight of zero.</li>
+<li>Failed realizations (NaN constraint values) are effectively excluded from
+   the CVaR calculation.</li>
+</ol>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -1741,7 +1802,7 @@ subtracting the right-hand-side value the following applies:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The index of the constraint to sort.</p>
+                <p>The index of the constraint function to use.</p>
               </div>
             </td>
           </tr>
@@ -1752,7 +1813,8 @@ subtracting the right-hand-side value the following applies:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The CVaR percentile.</p>
+                <p>The CVaR percentile (0.0 to 1.0) defining the portion of
+        worst realizations to consider. Defaults to 0.5.</p>
               </div>
             </td>
           </tr>
