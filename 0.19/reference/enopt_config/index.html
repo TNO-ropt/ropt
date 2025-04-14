@@ -2777,15 +2777,6 @@ optimizer:</p>
   gradients at once. This setting will limit the number of those calls.</li>
 <li><strong><code>tolerance</code></strong>: The convergence tolerance used as a stopping criterion.
   The exact definition depends on the optimizer, and it may be ignored.</li>
-<li><strong><code>speculative</code></strong>: If <code>True</code>, forces early gradient evaluations, even if
-  not strictly required. This can improve load balancing on HPC clusters but
-  is only effective if the optimizer supports it. This is disabled if
-  <code>split_evaluations</code> is <code>True</code>.</li>
-<li><strong><code>split_evaluations</code></strong>: If <code>True</code>, forces separate function and gradient
-  evaluations, even if the optimizer requests them together. This is useful
-  with realization filters that completely disable some realizations, to
-  potentially reduce the number of evaluations for gradients (see
-  <a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="#ropt.config.enopt.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>).</li>
 <li><strong><code>parallel</code></strong>: If <code>True</code>, allows the optimizer to use parallelized
   function evaluations. This typically applies to gradient-free methods and
   may be ignored.</li>
@@ -2902,28 +2893,6 @@ computational cost of the optimization process:</p>
             <td>
               <div class="doc-md-description">
                 <p>Convergence tolerance (optional).</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.OptimizerConfig.speculative">speculative</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Force early gradient evaluations (default: <code>False</code>).</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.enopt.OptimizerConfig.split_evaluations">split_evaluations</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Force separate function/gradient evaluations (default: <code>False</code>).</p>
               </div>
             </td>
           </tr>
@@ -3057,6 +3026,25 @@ into a total gradient. If <code>number_of_perturbations</code> is low, or even j
 one, individual gradient calculations may be unreliable. In this case,
 setting <code>merge_realizations</code> to <code>True</code> directs the optimizer to combine the
 results of all realizations directly into a single gradient estimate.</p>
+<p>The <code>evaluation_policy</code> option controls how and when objective functions and
+gradients are calculated. It accepts one of three string values:</p>
+<ul>
+<li><code>"speculative"</code>: Evaluate the gradient whenever the objective function
+    is requested, even if the optimizer hasn't explicitly asked for the
+    gradient at that point. This approach can potentially improve load
+    balancing on HPC clusters by initiating gradient work earlier, though
+    its effectiveness depends on whether the optimizer can utilize these
+    speculatively computed gradients.</li>
+<li><code>"separate"</code>: Always launch function and gradient evaluations as
+    distinct operations, even if the optimizer requests both simultaneously.
+    This is particularly useful when employing realization filters (see
+    <a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="#ropt.config.enopt.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>)
+    that might disable certain realizations, as it can potentially reduce
+    the number of gradient evaluations needed.</li>
+<li><code>"auto"</code>: Evaluate functions and/or gradients strictly according to the
+    optimizer's requests. Calculations are performed only when the
+    optimization algorithm explicitly requires them.</li>
+</ul>
 
 
 <details class="note" open>
@@ -3217,6 +3205,17 @@ conditions (see <a class="autorefs autorefs-internal" title="            Boundar
               <div class="doc-md-description">
                 <p>Merge all realizations for the final gradient
 calculation (default: <code>False</code>).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.enopt.GradientConfig.evaluation_policy">evaluation_policy</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>[&#39;speculative&#39;, &#39;separate&#39;, &#39;auto&#39;]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>How to evaluate functions and gradients.</p>
               </div>
             </td>
           </tr>

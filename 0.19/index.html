@@ -341,6 +341,19 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    About
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="." class="md-nav__link md-nav__link--active">
         
   
@@ -352,6 +365,67 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-packages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Related packages
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Related packages">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      Plugins
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#applications" class="md-nav__link">
+    <span class="md-ellipsis">
+      Applications
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -1182,6 +1256,56 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-packages" class="md-nav__link">
+    <span class="md-ellipsis">
+      Related packages
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Related packages">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      Plugins
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#applications" class="md-nav__link">
+    <span class="md-ellipsis">
+      Applications
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -1200,6 +1324,7 @@
 
 
 <h1 id="ropt-a-python-module-for-robust-optimization"><code>ropt</code>: A Python module for robust optimization</h1>
+<h2 id="overview">Overview</h2>
 <p><code>ropt</code> is a module designed for implementing and executing robust optimization
 workflows. In classical optimization problems, a deterministic function is
 optimized. However, in robust optimization, the function is expected to exhibit
@@ -1248,6 +1373,22 @@ optimization problems:</p>
 <li>Optional support for exporting results as
   <a href="https://pandas.pydata.org/"><code>pandas</code></a> data frames.</li>
 </ul>
+<h2 id="related-packages">Related packages</h2>
+<h3 id="plugins">Plugins</h3>
+<p>Additional backend optimizers can be installed separately and used via the plugin system:</p>
+<ul>
+<li>The <a href="https://tno-ropt.github.io/ropt-dakota/"><code>ropt-dakota</code></a> plugin provides
+  access to algorithms from the <a href="https://dakota.sandia.gov/">Dakota</a> package.</li>
+<li>The <a href="https://tno-ropt.github.io/ropt-nomad/"><code>ropt-nomad</code></a> plugin implements
+  the MADS algorithm based on the
+  <a href="https://www.gerad.ca/en/software/nomad/">NOMAD</a> package.</li>
+<li>The <a href="https://tno-ropt.github.io/ropt-pymoo/"><code>ropt-pymoo</code></a> makes the
+  algorithms from the <a href="https://pymoo.org/"><code>pymoo</code></a> package available to <code>ropt</code>.</li>
+</ul>
+<h3 id="applications">Applications</h3>
+<p>The <code>ropt</code> package is used  by the
+<a href="https://everest.readthedocs.io/en/latest/">Everest</a> decision-making tool as its
+core optimization engine.</p>
 
 
 
