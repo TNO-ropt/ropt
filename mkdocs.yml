@@ -7,6 +7,8 @@ theme:
     - navigation.tabs.sticky
     - navigation.top
     - navigation.expand
+    - navigation.footer
+    - navigation.sections
     - content.code.copy
     - content.code.annotate
   palette:
@@ -63,6 +65,9 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.snippets:
       base_path: ["docs/snippets"]
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji 
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 extra_css:
   - stylesheets/extra.css
@@ -74,17 +79,23 @@ extra_javascript:
 extra:
   version:
     provider: mike
-  generator: false
 
 watch:
   - src
 
 repo_url: https://github.com/TNO-ropt/ropt
+repo_name: TNO-ropt/ropt
+
 nav:
   - "About": index.md
-  - Usage:
+  - "Usage":
       - "Introduction": usage/robust_optimization.md
-      - "Running Optimizations": usage/running.md
+      - "Optimization":
+          - "BasicOptimizer": usage/basic_optimizer.md
+          - "Function Evaluation": usage/evaluation.md
+          - "Configuration": usage/configuration.md
+          - "Domain Transforms": usage/domain_transforms.md
+          - "Results": usage/results.md
   - Reference:
       - "Configuration": reference/enopt_config.md
       - "Domain transforms": reference/domain_transforms.md

@@ -31,10 +31,20 @@ class NonlinearConstraintsConfig(ImmutableBaseModel):
     respectively. Equality constraints are specified by setting the lower bounds
     equal to the upper bounds.
 
-    Non-linear constraints can be processed by realization filters and function
-    estimators. The `realization_filters` and `function_estimators` fields contain
-    indices that refer to the corresponding objects configured in the parent
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
+    Non-linear constraints can optionally be processed using realization filters
+    and function estimators defined in the main
+    [`EnOptConfig`][ropt.config.enopt.EnOptConfig]. The `realization_filters`
+    and `function_estimators` attributes, if provided, must be arrays of integer
+    indices. Each index in the `realization_filters` array corresponds to a
+    constraint function (by position) and specifies which filter from the parent
+    [`EnOptConfig.realization_filters`][ropt.config.enopt.EnOptConfig] tuple
+    should be applied to it. The same logic applies to the `function_estimators`
+    array and the parent
+    [`EnOptConfig.function_estimators`][ropt.config.enopt.EnOptConfig] tuple. If
+    an index is invalid (e.g., out of bounds for the corresponding parent
+    tuple), no filter or estimator is applied to that specific constraint
+    function. If these attributes are not provided (`None`), no filters or
+    estimators are applied at all.
 
     Attributes:
         lower_bounds:        Lower bounds for the right-hand-side values.
