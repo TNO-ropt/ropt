@@ -33,15 +33,6 @@ class OptimizerConfig(ImmutableBaseModel):
       gradients at once. This setting will limit the number of those calls.
     - **`tolerance`**: The convergence tolerance used as a stopping criterion.
       The exact definition depends on the optimizer, and it may be ignored.
-    - **`speculative`**: If `True`, forces early gradient evaluations, even if
-      not strictly required. This can improve load balancing on HPC clusters but
-      is only effective if the optimizer supports it. This is disabled if
-      `split_evaluations` is `True`.
-    - **`split_evaluations`**: If `True`, forces separate function and gradient
-      evaluations, even if the optimizer requests them together. This is useful
-      with realization filters that completely disable some realizations, to
-      potentially reduce the number of evaluations for gradients (see
-      [`RealizationFilterConfig`][ropt.config.enopt.RealizationFilterConfig]).
     - **`parallel`**: If `True`, allows the optimizer to use parallelized
       function evaluations. This typically applies to gradient-free methods and
       may be ignored.
@@ -93,8 +84,6 @@ class OptimizerConfig(ImmutableBaseModel):
         max_functions:     Maximum number of function evaluations (optional).
         max_batches:       Maximum number of batch evaluations (optional).
         tolerance:         Convergence tolerance (optional).
-        speculative:       Force early gradient evaluations (default: `False`).
-        split_evaluations: Force separate function/gradient evaluations (default: `False`).
         parallel:          Allow parallelized function evaluations (default: `False`).
         output_dir:        Output directory for the optimizer (optional).
         options:           Generic options for the optimizer (optional).
@@ -107,8 +96,6 @@ class OptimizerConfig(ImmutableBaseModel):
     max_functions: PositiveInt | None = None
     max_batches: PositiveInt | None = None
     tolerance: NonNegativeFloat | None = None
-    speculative: bool = False
-    split_evaluations: bool = False
     parallel: bool = False
     output_dir: Path | None = None
     options: dict[str, Any] | list[str] | None = None

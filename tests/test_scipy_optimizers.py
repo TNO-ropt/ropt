@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Literal
 
 import numpy as np
 import pytest
@@ -416,21 +416,11 @@ def test_scipy_options(enopt_config: Any, evaluator: Any) -> None:
 
 
 @pytest.mark.parametrize("method", sorted(_SUPPORTED - _REQUIRES_BOUNDS))
-def test_scipy_split_evaluations(
+def test_scipy_evaluation_policy_separate(
     enopt_config: Any, method: str, evaluator: Any
 ) -> None:
     enopt_config["optimizer"]["method"] = method
-    enopt_config["optimizer"]["split_evaluations"] = True
-
-    variables = BasicOptimizer(enopt_config, evaluator()).run().variables
-    assert variables is not None
-    # Some methods are supported, but not reliable in this test.
-    if method != "newton-cg":
-        assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
-
-    enopt_config["optimizer"]["method"] = method
-    enopt_config["optimizer"]["speculative"] = True
-    enopt_config["optimizer"]["split_evaluations"] = True
+    enopt_config["gradient"]["evaluation_policy"] = "separate"
 
     variables = BasicOptimizer(enopt_config, evaluator()).run().variables
     assert variables is not None
@@ -439,15 +429,17 @@ def test_scipy_split_evaluations(
         assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
-@pytest.mark.parametrize("speculative", [True, False])
+@pytest.mark.parametrize("evaluation_policy", ["speculative", "auto"])
 def test_scipy_speculative(
-    enopt_config: Any, evaluator: Any, speculative: bool
+    enopt_config: Any,
+    evaluator: Any,
+    evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     enopt_config["optimizer"]["method"] = "slsqp"
-    enopt_config["optimizer"]["speculative"] = speculative
+    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
 
     def _observer(results: tuple[Results, ...]) -> None:
-        assert len(results) == 2 if speculative else 1
+        assert len(results) == 2 if evaluation_policy == "speculative" else 1
 
     variables = (
         BasicOptimizer(enopt_config, evaluator())

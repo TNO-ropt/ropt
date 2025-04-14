@@ -130,22 +130,15 @@ def test_two_optimizers_alternating(
                 completed_functions += 1
 
     enopt_config["variables"]["initial_values"] = [0.0, 0.2, 0.1]
-
-    opt_config1 = {
-        "speculative": True,
-        "max_functions": 4,
-    }
-    opt_config2 = {
-        "speculative": True,
-        "max_functions": 3,
-    }
+    enopt_config["gradient"]["evaluation_policy"] = "speculative"
+    del enopt_config["optimizer"]["tolerance"]
 
     enopt_config1 = deepcopy(enopt_config)
     enopt_config1["variables"]["mask"] = [True, False, True]
-    enopt_config1["optimizer"] = opt_config1
+    enopt_config1["optimizer"]["max_functions"] = 4
     enopt_config2 = deepcopy(enopt_config)
     enopt_config2["variables"]["mask"] = [False, True, False]
-    enopt_config2["optimizer"] = opt_config2
+    enopt_config2["optimizer"]["max_functions"] = 3
 
     context = OptimizerContext(evaluator=evaluator()).add_observer(
         EventType.FINISHED_EVALUATION, _track_evaluations
@@ -190,7 +183,7 @@ def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -
             item for item in event.data["results"] if isinstance(item, FunctionResults)
         ]
 
-    enopt_config["optimizer"]["speculative"] = True
+    enopt_config["gradient"]["evaluation_policy"] = "speculative"
     enopt_config["optimizer"]["max_functions"] = 2
 
     enopt_config2 = deepcopy(enopt_config)
@@ -229,7 +222,7 @@ def test_restart_initial(enopt_config: dict[str, Any], evaluator: Any) -> None:
             item for item in event.data["results"] if isinstance(item, FunctionResults)
         ]
 
-    enopt_config["optimizer"]["speculative"] = True
+    enopt_config["gradient"]["evaluation_policy"] = "speculative"
     enopt_config["optimizer"]["max_functions"] = 3
 
     context = OptimizerContext(evaluator=evaluator()).add_observer(
@@ -256,7 +249,7 @@ def test_restart_last(enopt_config: dict[str, Any], evaluator: Any) -> None:
             item for item in event.data["results"] if isinstance(item, FunctionResults)
         ]
 
-    enopt_config["optimizer"]["speculative"] = True
+    enopt_config["gradient"]["evaluation_policy"] = "speculative"
     enopt_config["optimizer"]["max_functions"] = 3
 
     context = OptimizerContext(evaluator=evaluator()).add_observer(
@@ -288,7 +281,7 @@ def test_restart_optimum(enopt_config: dict[str, Any], evaluator: Any) -> None:
             item for item in event.data["results"] if isinstance(item, FunctionResults)
         ]
 
-    enopt_config["optimizer"]["speculative"] = True
+    enopt_config["gradient"]["evaluation_policy"] = "speculative"
     enopt_config["optimizer"]["max_functions"] = 4
 
     context = OptimizerContext(evaluator=evaluator()).add_observer(
@@ -339,7 +332,7 @@ def test_restart_optimum_with_reset(
         ),
     )
 
-    enopt_config["optimizer"]["speculative"] = True
+    enopt_config["gradient"]["evaluation_policy"] = "speculative"
     enopt_config["optimizer"]["max_functions"] = max_functions
 
     context = OptimizerContext(evaluator=evaluator(new_functions)).add_observer(
@@ -412,7 +405,7 @@ def test_evaluator_step(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
 
 def test_evaluator_step_multi(enopt_config: dict[str, Any], evaluator: Any) -> None:
-    enopt_config["optimizer"]["speculative"] = True
+    enopt_config["gradient"]["evaluation_policy"] = "speculative"
     enopt_config["optimizer"]["max_functions"] = 4
 
     context = OptimizerContext(evaluator=evaluator())
@@ -440,7 +433,7 @@ def test_exit_code(
     max_criterion: str,
     max_enum: OptimizerExitCode,
 ) -> None:
-    enopt_config["optimizer"]["speculative"] = True
+    enopt_config["gradient"]["evaluation_policy"] = "speculative"
     enopt_config["optimizer"][max_criterion] = 4
 
     context = OptimizerContext(evaluator=evaluator())
@@ -463,7 +456,7 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
                 completed_functions += 1
 
     enopt_config["optimizer"]["tolerance"] = 1e-10
-    enopt_config["optimizer"]["speculative"] = True
+    enopt_config["gradient"]["evaluation_policy"] = "speculative"
     enopt_config["optimizer"]["max_functions"] = 4
     enopt_config["variables"]["mask"] = [True, False, True]
     nested_config = deepcopy(enopt_config)
@@ -513,7 +506,7 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
                     assert item.metadata.get("inner") == "inner_meta_data"
 
     enopt_config["optimizer"]["tolerance"] = 1e-10
-    enopt_config["optimizer"]["speculative"] = True
+    enopt_config["gradient"]["evaluation_policy"] = "speculative"
     enopt_config["optimizer"]["max_functions"] = 4
     enopt_config["variables"]["mask"] = [True, False, True]
     nested_config = deepcopy(enopt_config)

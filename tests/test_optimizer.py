@@ -80,7 +80,7 @@ def test_max_functions_not_exceeded(enopt_config: Any, evaluator: Any) -> None:
 
     max_functions = 100
     enopt_config["optimizer"]["max_functions"] = max_functions
-    enopt_config["optimizer"]["split_evaluations"] = True
+    enopt_config["gradient"]["evaluation_policy"] = "separate"
     optimizer = BasicOptimizer(enopt_config, evaluator()).set_results_callback(
         track_results
     )

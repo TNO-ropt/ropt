@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Any
+from typing import Any, Literal
 
 import numpy as np
 import pytest
@@ -84,18 +84,18 @@ def _compute_distance_squared_stddev(
     return result
 
 
-@pytest.mark.parametrize("split_evaluations", [True, False])
+@pytest.mark.parametrize("evaluation_policy", ["separate", "auto"])
 def test_stddev_function_estimator(
     enopt_config: Any,
     evaluator: Any,
-    split_evaluations: bool,
+    evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     functions = [
         partial(_compute_distance_squared_stddev, target=np.array([0.5, 0.5, 0.5])),
         partial(_compute_distance_squared_stddev, target=np.array([-1.5, -1.5, 0.5])),
     ]
 
-    enopt_config["optimizer"]["split_evaluations"] = split_evaluations
+    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
     enopt_config["function_estimators"] = [{"method": "stddev"}]
     variables = BasicOptimizer(enopt_config, evaluator(functions)).run().variables
     assert variables is not None

@@ -4,6 +4,7 @@ from typing import Any
 import numpy as np
 import pytest
 from numpy.typing import NDArray
+from typing_extensions import Literal
 
 from ropt.plan import BasicOptimizer
 from ropt.plugins.realization_filter.default import (
@@ -17,7 +18,6 @@ from ropt.results import FunctionResults, GradientResults, Results
 def enopt_config_fixture() -> dict[str, Any]:
     return {
         "optimizer": {
-            "speculative": True,
             "max_functions": 10,
         },
         "objectives": {
@@ -26,6 +26,7 @@ def enopt_config_fixture() -> dict[str, Any]:
         "gradient": {
             "number_of_perturbations": 5,
             "perturbation_magnitudes": 0.01,
+            "evaluation_policy": "speculative",
         },
         "realizations": {
             "weights": 5 * [1.0],
@@ -108,18 +109,18 @@ def _track_results(results: tuple[Results, ...], result_list: list[Results]) -> 
     result_list.extend(results)
 
 
-@pytest.mark.parametrize("split_evaluations", [True, False])
+@pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_sort_filter_on_objectives(
     enopt_config: Any,
     evaluator: Any,
-    split_evaluations: bool,
+    evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     functions = [
         partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
         partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
     ]
 
-    enopt_config["optimizer"]["split_evaluations"] = split_evaluations
+    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
 
     variables = BasicOptimizer(enopt_config, evaluator(functions)).run().variables
     assert variables is not None
@@ -156,7 +157,7 @@ def test_sort_filter_on_objectives(
             assert result.realizations.objective_weights is not None
             filtered = result.realizations.objective_weights[0, :] == 0.0
         if isinstance(result, GradientResults):
-            if split_evaluations:
+            if evaluation_policy == "separate":
                 assert np.all(
                     result.evaluations.perturbed_objectives[filtered, ...] == 0.0
                 )
@@ -166,11 +167,11 @@ def test_sort_filter_on_objectives(
                 )
 
 
-@pytest.mark.parametrize("split_evaluations", [True, False])
+@pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_sort_filter_on_objectives_with_constraints(
     enopt_config: Any,
     evaluator: Any,
-    split_evaluations: bool,
+    evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     functions = [
         partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
@@ -178,7 +179,7 @@ def test_sort_filter_on_objectives_with_constraints(
         partial(_constraint_function),
     ]
 
-    enopt_config["optimizer"]["split_evaluations"] = split_evaluations
+    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
 
     enopt_config["nonlinear_constraints"] = {
         "lower_bounds": -np.inf,
@@ -216,7 +217,7 @@ def test_sort_filter_on_objectives_with_constraints(
             filtered = result.realizations.objective_weights[0, :] == 0.0
         if isinstance(result, GradientResults):
             assert result.evaluations.perturbed_constraints is not None
-            if split_evaluations:
+            if evaluation_policy == "separate":
                 assert np.all(
                     result.evaluations.perturbed_objectives[filtered, ...] == 0.0
                 )
@@ -232,11 +233,11 @@ def test_sort_filter_on_objectives_with_constraints(
                 )
 
 
-@pytest.mark.parametrize("split_evaluations", [True, False])
+@pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_sort_filter_on_constraints(
     enopt_config: Any,
     evaluator: Any,
-    split_evaluations: bool,
+    evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     functions = [
         partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
@@ -244,7 +245,7 @@ def test_sort_filter_on_constraints(
         partial(_constraint_function),
     ]
 
-    enopt_config["optimizer"]["split_evaluations"] = split_evaluations
+    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
     enopt_config["nonlinear_constraints"] = {
         "lower_bounds": -np.inf,
         "upper_bounds": 0.4,
@@ -283,7 +284,7 @@ def test_sort_filter_on_constraints(
             filtered = result.realizations.objective_weights[0, :] == 0.0
         if isinstance(result, GradientResults):
             assert result.evaluations.perturbed_constraints is not None
-            if split_evaluations:
+            if evaluation_policy == "separate":
                 assert np.all(
                     result.evaluations.perturbed_objectives[filtered, ...] == 0.0
                 )
@@ -299,11 +300,11 @@ def test_sort_filter_on_constraints(
                 )
 
 
-@pytest.mark.parametrize("split_evaluations", [True, False])
+@pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_sort_filter_mixed(  # noqa: C901
     enopt_config: Any,
     evaluator: Any,
-    split_evaluations: bool,
+    evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     functions = [
         partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
@@ -313,7 +314,7 @@ def test_sort_filter_mixed(  # noqa: C901
     ]
 
     enopt_config["objectives"]["weights"] = [0.75, 0.25, 0.75, 0.25]
-    enopt_config["optimizer"]["split_evaluations"] = split_evaluations
+    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
 
     objective_values: list[NDArray[np.float64]] = []
 
@@ -354,7 +355,7 @@ def test_sort_filter_mixed(  # noqa: C901
             assert result.realizations.objective_weights is not None
             filtered = result.realizations.objective_weights[0, :] == 0.0
         if isinstance(result, GradientResults):
-            if split_evaluations:
+            if evaluation_policy == "separate":
                 assert np.all(
                     result.evaluations.perturbed_objectives[filtered, ...] == 0.0
                 )
@@ -392,7 +393,7 @@ def test_sort_filter_mixed(  # noqa: C901
             assert result.realizations.objective_weights is not None
             filtered = result.realizations.objective_weights[0, :] == 0.0
         if isinstance(result, GradientResults):
-            if split_evaluations:
+            if evaluation_policy == "separate":
                 assert np.all(
                     result.evaluations.perturbed_objectives[filtered, :, :2] == 0.0
                 )
@@ -408,18 +409,18 @@ def test_sort_filter_mixed(  # noqa: C901
     assert objective_values[0] != objective_values[1]
 
 
-@pytest.mark.parametrize("split_evaluations", [True, False])
+@pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_cvar_filter_on_objectives(
     enopt_config: Any,
     evaluator: Any,
-    split_evaluations: bool,
+    evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     functions = [
         partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
         partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
     ]
 
-    enopt_config["optimizer"]["split_evaluations"] = split_evaluations
+    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
 
     variables = BasicOptimizer(enopt_config, evaluator(functions)).run().variables
     assert variables is not None
@@ -456,7 +457,7 @@ def test_cvar_filter_on_objectives(
             assert result.realizations.objective_weights is not None
             filtered = result.realizations.objective_weights[0, :] == 0.0
         if isinstance(result, GradientResults):
-            if split_evaluations:
+            if evaluation_policy == "separate":
                 assert np.all(
                     result.evaluations.perturbed_objectives[filtered, ...] == 0.0
                 )
@@ -466,11 +467,11 @@ def test_cvar_filter_on_objectives(
                 )
 
 
-@pytest.mark.parametrize("split_evaluations", [True, False])
+@pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_cvar_filter_on_objectives_with_constraints(
     enopt_config: Any,
     evaluator: Any,
-    split_evaluations: bool,
+    evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     functions = [
         partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
@@ -478,7 +479,7 @@ def test_cvar_filter_on_objectives_with_constraints(
         partial(_constraint_function),
     ]
 
-    enopt_config["optimizer"]["split_evaluations"] = split_evaluations
+    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
 
     enopt_config["nonlinear_constraints"] = {
         "lower_bounds": -np.inf,
@@ -517,7 +518,7 @@ def test_cvar_filter_on_objectives_with_constraints(
             filtered = result.realizations.objective_weights[0, :] == 0.0
         if isinstance(result, GradientResults):
             assert result.evaluations.perturbed_constraints is not None
-            if split_evaluations:
+            if evaluation_policy == "separate":
                 assert np.all(
                     result.evaluations.perturbed_objectives[filtered, ...] == 0.0
                 )
@@ -533,11 +534,11 @@ def test_cvar_filter_on_objectives_with_constraints(
                 )
 
 
-@pytest.mark.parametrize("split_evaluations", [True, False])
+@pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_cvar_filter_on_constraints(
     enopt_config: Any,
     evaluator: Any,
-    split_evaluations: bool,
+    evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     functions = [
         partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
@@ -545,7 +546,7 @@ def test_cvar_filter_on_constraints(
         partial(_constraint_function),
     ]
 
-    enopt_config["optimizer"]["split_evaluations"] = split_evaluations
+    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
 
     enopt_config["nonlinear_constraints"] = {
         "lower_bounds": -np.inf,
@@ -584,7 +585,7 @@ def test_cvar_filter_on_constraints(
             filtered = result.realizations.objective_weights[0, :] == 0.0
         if isinstance(result, GradientResults):
             assert result.evaluations.perturbed_constraints is not None
-            if split_evaluations:
+            if evaluation_policy == "separate":
                 assert np.all(
                     result.evaluations.perturbed_objectives[filtered, ...] == 0.0
                 )
@@ -600,11 +601,11 @@ def test_cvar_filter_on_constraints(
                 )
 
 
-@pytest.mark.parametrize("split_evaluations", [True, False])
+@pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_cvar_filter_mixed(  # noqa: C901
     enopt_config: Any,
     evaluator: Any,
-    split_evaluations: bool,
+    evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     functions = [
         partial(_objective_function, target=np.array([0.5, 0.5, 0.5])),
@@ -613,7 +614,7 @@ def test_cvar_filter_mixed(  # noqa: C901
         partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
     ]
 
-    enopt_config["optimizer"]["split_evaluations"] = split_evaluations
+    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
     enopt_config["objectives"]["weights"] = [0.75, 0.25, 0.75, 0.25]
 
     objective_values: list[NDArray[np.float64]] = []
@@ -653,7 +654,7 @@ def test_cvar_filter_mixed(  # noqa: C901
             assert result.realizations.objective_weights is not None
             filtered = result.realizations.objective_weights[0, :] == 0.0
         if isinstance(result, GradientResults):
-            if split_evaluations:
+            if evaluation_policy == "separate":
                 assert np.all(
                     result.evaluations.perturbed_objectives[filtered, ...] == 0.0
                 )
@@ -690,7 +691,7 @@ def test_cvar_filter_mixed(  # noqa: C901
             assert result.realizations.objective_weights is not None
             filtered = result.realizations.objective_weights[0, :] == 0.0
         if isinstance(result, GradientResults):
-            if split_evaluations:
+            if evaluation_policy == "separate":
                 assert np.all(
                     result.evaluations.perturbed_objectives[filtered, :, :2] == 0.0
                 )

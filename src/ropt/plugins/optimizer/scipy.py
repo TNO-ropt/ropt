@@ -406,8 +406,9 @@ class SciPyOptimizer(Optimizer):
 
         if compute_functions or compute_gradients:
             self._cached_variables = variables.copy()
-            compute_functions = compute_functions or self._config.optimizer.speculative
-            compute_gradients = compute_gradients or self._config.optimizer.speculative
+            speculative = self._config.gradient.evaluation_policy == "speculative"
+            compute_functions = compute_functions or speculative
+            compute_gradients = compute_gradients or speculative
             new_function, new_gradient = self._compute_functions_and_gradients(
                 variables,
                 compute_functions=compute_functions,
@@ -438,7 +439,7 @@ class SciPyOptimizer(Optimizer):
         if (
             compute_functions
             and compute_gradients
-            and self._config.optimizer.split_evaluations
+            and self._config.gradient.evaluation_policy == "separate"
         ):
             new_function, _ = self._optimizer_callback(
                 variables,

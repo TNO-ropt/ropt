@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Literal, Self
 
 import numpy as np
 from pydantic import ConfigDict, PositiveInt, model_validator
@@ -71,6 +71,25 @@ class GradientConfig(ImmutableBaseModel):
     setting `merge_realizations` to `True` directs the optimizer to combine the
     results of all realizations directly into a single gradient estimate.
 
+    The `evaluation_policy` option controls how and when objective functions and
+    gradients are calculated. It accepts one of three string values:
+
+    - `"speculative"`: Evaluate the gradient whenever the objective function
+        is requested, even if the optimizer hasn't explicitly asked for the
+        gradient at that point. This approach can potentially improve load
+        balancing on HPC clusters by initiating gradient work earlier, though
+        its effectiveness depends on whether the optimizer can utilize these
+        speculatively computed gradients.
+    - `"separate"`: Always launch function and gradient evaluations as
+        distinct operations, even if the optimizer requests both simultaneously.
+        This is particularly useful when employing realization filters (see
+        [`RealizationFilterConfig`][ropt.config.enopt.RealizationFilterConfig])
+        that might disable certain realizations, as it can potentially reduce
+        the number of gradient evaluations needed.
+    - `"auto"`: Evaluate functions and/or gradients strictly according to the
+        optimizer's requests. Calculations are performed only when the
+        optimization algorithm explicitly requires them.
+
     Note: Seed for Samplers
         The `seed` value ensures consistent results across repeated runs with
         the same configuration. To obtain unique results for each optimization
@@ -96,6 +115,7 @@ class GradientConfig(ImmutableBaseModel):
         seed:                     Seed for the random number generator used by the samplers.
         merge_realizations:       Merge all realizations for the final gradient
             calculation (default: `False`).
+        evaluation_policy:        How to evaluate functions and gradients.
     """
 
     number_of_perturbations: PositiveInt = DEFAULT_NUMBER_OF_PERTURBATIONS
@@ -106,6 +126,7 @@ class GradientConfig(ImmutableBaseModel):
     samplers: Array1DInt | None = None
     seed: ItemOrTuple[int] = (DEFAULT_SEED,)
     merge_realizations: bool = False
+    evaluation_policy: Literal["speculative", "separate", "auto"] = "auto"
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,

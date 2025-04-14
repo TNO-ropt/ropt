@@ -19,7 +19,6 @@ def enopt_config_fixture() -> dict[str, Any]:
     return {
         "optimizer": {
             "tolerance": 1e-5,
-            "speculative": True,
             "max_functions": 3,
         },
         "variables": {
@@ -32,6 +31,7 @@ def enopt_config_fixture() -> dict[str, Any]:
         },
         "gradient": {
             "perturbation_magnitudes": 0.01,
+            "evaluation_policy": "speculative",
         },
     }
 
