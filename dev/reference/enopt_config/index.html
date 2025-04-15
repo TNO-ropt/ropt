@@ -2441,10 +2441,20 @@ field, a <code>numpy</code> array, determines the weight of each objective funct
 The length of this array defines the number of objective functions. The
 weights are automatically normalized to sum to 1 (e.g., <code>[1, 1]</code> becomes
 <code>[0.5, 0.5]</code>).</p>
-<p>Objective functions can be processed by realization filters and function
-estimators. The <code>realization_filters</code> and <code>function_estimators</code> fields
-contain indices that refer to the corresponding configuration objects in the
-parent <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+<p>Objective functions can optionally be processed using realization filters
+and function estimators defined in the main
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>. The <code>realization_filters</code>
+and <code>function_estimators</code> attributes, if provided, must be arrays of integer
+indices. Each index in the <code>realization_filters</code> array corresponds to an
+objective function (by position) and specifies which filter from the parent
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig.realization_filters</code></a> tuple
+should be applied to it. The same logic applies to the <code>function_estimators</code>
+array and the parent
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig.function_estimators</code></a> tuple. If
+an index is invalid (e.g., out of bounds for the corresponding parent
+tuple), no filter or estimator is applied to that specific objective
+function. If these attributes are not provided (<code>None</code>), no filters or
+estimators are applied at all.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2695,10 +2705,20 @@ the number of constraint functions.</p>
 setting the lower bounds to <span class="arithmatex">\(-\infty\)</span>, or the upper bounds to <span class="arithmatex">\(+\infty\)</span>,
 respectively. Equality constraints are specified by setting the lower bounds
 equal to the upper bounds.</p>
-<p>Non-linear constraints can be processed by realization filters and function
-estimators. The <code>realization_filters</code> and <code>function_estimators</code> fields contain
-indices that refer to the corresponding objects configured in the parent
-<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+<p>Non-linear constraints can optionally be processed using realization filters
+and function estimators defined in the main
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>. The <code>realization_filters</code>
+and <code>function_estimators</code> attributes, if provided, must be arrays of integer
+indices. Each index in the <code>realization_filters</code> array corresponds to a
+constraint function (by position) and specifies which filter from the parent
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig.realization_filters</code></a> tuple
+should be applied to it. The same logic applies to the <code>function_estimators</code>
+array and the parent
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.enopt.EnOptConfig"><code>EnOptConfig.function_estimators</code></a> tuple. If
+an index is invalid (e.g., out of bounds for the corresponding parent
+tuple), no filter or estimator is applied to that specific constraint
+function. If these attributes are not provided (<code>None</code>), no filters or
+estimators are applied at all.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
