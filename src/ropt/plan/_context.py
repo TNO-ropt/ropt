@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable, Self
+from typing import TYPE_CHECKING, Self
 
 from ropt.enums import EventType
 from ropt.plugins import PluginManager
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from ropt.evaluator import Evaluator
     from ropt.plan import Event
 

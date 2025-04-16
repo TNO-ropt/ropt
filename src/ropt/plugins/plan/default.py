@@ -22,7 +22,7 @@ standard optimization plans out-of-the-box.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Final, Type
+from typing import TYPE_CHECKING, Any, Final
 
 from ._store import DefaultStoreHandler
 from ._tracker import DefaultTrackerHandler
@@ -34,12 +34,12 @@ if TYPE_CHECKING:
     from ropt.plan import Plan
     from ropt.plugins.plan.base import PlanHandler, PlanStep
 
-_STEP_OBJECTS: Final[dict[str, Type[PlanStep]]] = {
+_STEP_OBJECTS: Final[dict[str, type[PlanStep]]] = {
     "evaluator": DefaultEvaluatorStep,
     "optimizer": DefaultOptimizerStep,
 }
 
-_RESULT_HANDLER_OBJECTS: Final[dict[str, Type[PlanHandler]]] = {
+_RESULT_HANDLER_OBJECTS: Final[dict[str, type[PlanHandler]]] = {
     "tracker": DefaultTrackerHandler,
     "store": DefaultStoreHandler,
 }

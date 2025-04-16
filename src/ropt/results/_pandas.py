@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Iterable, Sequence, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import pandas as pd
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
+
     from ropt.enums import ResultAxis
 
     from ._result_field import ResultField

@@ -3,9 +3,11 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from importlib.util import find_spec
-from typing import TYPE_CHECKING, Any, Final, Iterable, Sequence, TypeVar
+from typing import TYPE_CHECKING, Any, Final, TypeVar
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
+
     from ropt.enums import ResultAxis
     from ropt.transforms._transforms import OptModelTransforms
 

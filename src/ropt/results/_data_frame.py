@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from functools import partial
 from importlib.util import find_spec
-from typing import TYPE_CHECKING, Any, Final, Literal, Sequence
+from typing import TYPE_CHECKING, Any, Final, Literal
 
 from ropt.enums import ResultAxis
 
@@ -12,6 +12,8 @@ from ._function_results import FunctionResults
 from ._gradient_results import GradientResults
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from ropt.results import Results
 
 _HAVE_PANDAS: Final = find_spec("pandas") is not None

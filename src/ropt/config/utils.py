@@ -7,10 +7,11 @@ validation tasks like checking enum values or broadcasting arrays to required
 dimensions.
 """
 
+from collections.abc import Sequence
 from collections.abc import Sequence as AbstractSequence
 from collections.abc import Set as AbstractSet
 from enum import IntEnum
-from typing import Any, Sequence, Type, TypeVar, cast
+from typing import Any, TypeVar, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -109,7 +110,7 @@ def broadcast_1d_array(array: NDArray[Any], name: str, size: int) -> NDArray[Any
         raise ValueError(msg) from err
 
 
-def check_enum_values(value: NDArray[np.ubyte], enum_type: Type[IntEnum]) -> None:
+def check_enum_values(value: NDArray[np.ubyte], enum_type: type[IntEnum]) -> None:
     """Check if enum values in a NumPy array are valid members of an IntEnum.
 
     This function verifies that all integer values within the input NumPy array

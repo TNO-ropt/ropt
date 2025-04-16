@@ -1,6 +1,7 @@
+from collections.abc import Generator
 from dataclasses import InitVar, dataclass
 from itertools import zip_longest
-from typing import Any, Generator
+from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray

@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
 
 from ropt.exceptions import PlanAborted
 from ropt.plugins.plan.base import PlanHandler, PlanStep
 
 if TYPE_CHECKING:
     import uuid
+    from collections.abc import Callable
 
     from ropt.plan import Event
 

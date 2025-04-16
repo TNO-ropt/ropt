@@ -1,10 +1,9 @@
 from functools import partial
-from typing import Any
+from typing import Any, Literal
 
 import numpy as np
 import pytest
 from numpy.typing import NDArray
-from typing_extensions import Literal
 
 from ropt.plan import BasicOptimizer
 from ropt.plugins.realization_filter.default import (

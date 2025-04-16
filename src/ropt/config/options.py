@@ -13,9 +13,12 @@ Classes:
 from __future__ import annotations
 
 from textwrap import dedent
-from typing import Any, Callable, Generic, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Generic, TypeVar, Union
 
 from pydantic import BaseModel, ConfigDict, HttpUrl, create_model, model_validator
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 T = TypeVar("T")
 

@@ -1,5 +1,6 @@
+from collections.abc import Sequence
 from functools import partial
-from typing import Any, Literal, Sequence
+from typing import Any, Literal
 
 import pytest
 

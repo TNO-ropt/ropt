@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Callable, Self
+from typing import TYPE_CHECKING, Any, Self
 
 from ropt.config.enopt import EnOptConfig
 from ropt.enums import EventType, OptimizerExitCode
@@ -13,6 +13,8 @@ from ._context import OptimizerContext
 from ._plan import Plan
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     import numpy as np
     from numpy.typing import NDArray
 

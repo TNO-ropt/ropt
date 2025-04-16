@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 import sys
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Generator, Protocol
+from typing import TYPE_CHECKING, Protocol
 
 import numpy as np
 
@@ -14,6 +14,8 @@ from ropt.exceptions import OptimizationAborted
 from ropt.results import FunctionResults, GradientResults
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from numpy.typing import NDArray
 
     from ropt.config.enopt import EnOptConfig
@@ -388,7 +390,7 @@ class _Redirector:
             self._redirect = False
 
     @contextmanager
-    def start(self) -> Generator[None, None, None]:
+    def start(self) -> Generator[None]:
         if self._redirect:
             try:
                 sys.stdout.flush()
@@ -405,7 +407,7 @@ class _Redirector:
             yield
 
     @contextmanager
-    def suspend(self) -> Generator[None, None, None]:
+    def suspend(self) -> Generator[None]:
         if self._redirect:
             try:
                 os.fsync(self._new_stdout)
