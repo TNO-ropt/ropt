@@ -20,24 +20,63 @@ class FunctionEvaluations(ResultField):
     """Stores the results of function evaluations.
 
     The `FunctionEvaluations` class stores the results of evaluating the
-    objective and constraint functions for a set of variables. It includes
-    the following information:
+    objective and constraint functions for a set of variables.
 
-    * **Variables:** The vector of variable values at which the functions were
-      evaluated.
-    * **Objectives:** The calculated objective function values for each
-      realization. This is a two-dimensional array where each row corresponds to
-      a realization and each column corresponds to an objective.
-    * **Constraints:** The calculated constraint function values for each
-      realization. This is a two-dimensional array where each row corresponds to
-      a realization and each column corresponds to a constraint.
-    * **Evaluation Info:** Optional metadata associated with each realization,
-      potentially provided by the evaluator. If provided, each value in the info
-      dictionary must be a one-dimensional array with a length equal to the
-      number of realizations.
+    !!! info "Fields"
+
+        === "Variables"
+
+            `variables`: The vector of variable values at which the functions
+            were evaluated:
+
+            - Shape: $(n_v,)$, where:
+                - $n_v$ is the number of variables.
+            - Axis type:
+                - [`ResultAxis.VARIABLE`][ropt.enums.ResultAxis.VARIABLE]
+
+        === "Objectives"
+
+            `objectives`: The calculated objective function values for each
+            realization. This is a two-dimensional array of floating point
+            values where each row corresponds to a realization and each column
+            corresponds to an objective:
+
+            - Shape $(n_r, n_o)$, where:
+                - $n_r$ is the number of realizations.
+                - $n_o$ is the number of objectives.
+            - Axis types:
+                - [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]
+                - [`ResultAxis.OBJECTIVE`][ropt.enums.ResultAxis.OBJECTIVE]
+
+        === "Constraints"
+
+            `constraints`: The calculated constraint function values for each
+            realization. Only provided if non-linear constraints are defined.
+            This is a two-dimensional array of floating point values where each
+            row corresponds to a realization and each column corresponds to a
+            constraint:
+
+            - Shape $(n_r, n_c)$, where:
+                - $n_r$ is the number of realizations.
+                - $n_c$ is the number of constraints.
+            - Axis types:
+                - [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]
+                - [`ResultAxis.NONLINEAR_CONSTRAINT`][ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT]
+
+        === "Evaluation Info"
+
+            `evaluation_info`: Optional metadata associated with each
+            realization, potentially provided by the evaluator. If provided,
+            each value in the info dictionary must be a one-dimensional array of
+            arbitrary type supported by `numpy` (including objects):
+
+            - Shape: $(n_r,)$, where:
+                - $n_r$ is the number of realizations.
+            - Axis type:
+                - [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]
 
     Attributes:
-        variables:       The variable vector.
+        variables:       The variable vector:
         objectives:      The objective function values for each realization.
         constraints:     The constraint function values for each realization.
         evaluation_info: Optional metadata for each evaluated realization.

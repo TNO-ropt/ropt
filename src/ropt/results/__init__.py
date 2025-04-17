@@ -35,6 +35,39 @@ corresponding realization and objective, as specified in the optimizer
 configuration. The pandas exporting code, for example, utilizes this information
 to construct a multi-index for the output DataFrame and to transform the
 multi-dimensional data into multiple columns.
+
+The [`ResultAxis`][ropt.enums.ResultAxis] enumeration currently defines the
+following axes:
+
+- [`ResultAxis.OBJECTIVE`][ropt.enums.ResultAxis.OBJECTIVE] The index along this
+  axis refers to the objective number as specified in the
+  [`EnOptConfig`][ropt.config.enopt.EnOptConfig] configuration.
+- [`ResultAxis.NONLINEAR_CONSTRAINT`][ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT]
+  The index along this axis corresponds to the non-linear constraint index
+  defined in the [`EnOptConfig`][ropt.config.enopt.EnOptConfig] configuration.
+- [`ResultAxis.LINEAR_CONSTRAINT`][ropt.enums.ResultAxis.LINEAR_CONSTRAINT] The
+  index along this axis corresponds to the linear constraint index defined in
+  the [`EnOptConfig`][ropt.config.enopt.EnOptConfig] configuration.
+- [`ResultAxis.VARIABLE`][ropt.enums.ResultAxis.VARIABLE] The index along this
+  axis refers to the variable number as specified by the
+  [`EnOptConfig`][ropt.config.enopt.EnOptConfig] configuration.
+- [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]: When results
+  involve an ensemble, this axis represents the different realizations, where
+  the index corresponds to the realization number.
+- [`ResultAxis.PERTURBATION`][ropt.enums.ResultAxis.PERTURBATION] For gradient
+  calculations, multiple variable perturbations are used. The objectives and
+  constraints calculated for each perturbation are reported along this axis,
+  which represents the perturbation index.
+
+Refer to the documentation of the individual result classes for the exact
+dimensions of each result field. The dimensionality of the data and the order of
+the axes are fixed and listed sequentially for every field.
+
+Note:
+    The dimensionality associated with a result axis is fixed. For instance,
+    even with only a single objective, results containing objective values will
+    still include a [`ResultAxis.OBJECTIVE`][ropt.enums.ResultAxis.OBJECTIVE]
+    axis of length one.
 """
 
 from ._constraint_info import ConstraintInfo

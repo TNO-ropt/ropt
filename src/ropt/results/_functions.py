@@ -27,6 +27,38 @@ class Functions(ResultField):
     in the `weighted_objective` field. Multiple constraints are handled
     individually by the optimizer.
 
+
+    !!! info "Fields"
+
+        === "Weighted Objective"
+
+            `weighted_objective`: The overall objective calculated as a weighted
+            sum over the objectives. This is a single floating point values. It
+            is defined as a `numpy` array of dimensions 0, hence it has no axes:
+
+            - Shape: $()$
+            - Axis type: `None`
+
+        === "Objectives"
+
+            `objectives`: The calculated objective function values. This is a
+            one-dimensional array of floating point values:
+
+            - Shape $(n_o,)$, where:
+                - $n_o$ is the number of objectives.
+            - Axis type:
+                - [`ResultAxis.OBJECTIVE`][ropt.enums.ResultAxis.OBJECTIVE]
+
+        === "Constraints"
+
+            `constraints`: The calculated constraint function values. This is a
+            one-dimensional array of floating point values:
+
+            - Shape $(n_c,)$, where:
+                - $n_c$ is the number of constraints.
+            - Axis type:
+                - [`ResultAxis.NONLINEAR_CONSTRAINT`][ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT]
+
     Attributes:
         weighted_objective: The weighted sum of the objective values.
         objectives:         The value of each individual objective.

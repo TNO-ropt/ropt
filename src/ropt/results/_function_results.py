@@ -25,18 +25,21 @@ class FunctionResults(Results):
     [`Results`][ropt.results.Results] class to store data specific to function
     evaluations. This includes:
 
-    * **Evaluations:** The results of the function evaluations, including the
-      variable values, objective values, and constraint values for each
-      realization. See
-      [`FunctionEvaluations`][ropt.results.FunctionEvaluations].
-    * **Realizations:** Information about the realizations, such as weights for
-      objectives and constraints, and whether each realization was successful.
-      See [`Realizations`][ropt.results.Realizations].
-    * **Functions:** The calculated objective and constraint function values,
-      typically aggregated across realizations. See
-      [`Functions`][ropt.results.Functions].
-    * **Constraint Info:** Details about constraint differences and violations.
-      See [`ConstraintInfo`][ropt.results.ConstraintInfo].
+    1. **Evaluations:** The results of the function evaluations, including the
+       variable values, objective values, and constraint values for each
+       realization. See
+       [`FunctionEvaluations`][ropt.results.FunctionEvaluations].
+
+    2. **Realizations:** Information about the realizations, such as weights for
+       objectives and constraints, and whether each realization was successful.
+       See [`Realizations`][ropt.results.Realizations].
+
+    3. **Functions:** The calculated objective and constraint function values,
+       typically aggregated across realizations. See
+       [`Functions`][ropt.results.Functions].
+
+    4. **Constraint Info:** Details about constraint differences and violations.
+       See [`ConstraintInfo`][ropt.results.ConstraintInfo].
 
     Attributes:
         evaluations:     Results of the function evaluations.

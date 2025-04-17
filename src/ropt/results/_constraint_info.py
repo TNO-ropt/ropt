@@ -21,47 +21,65 @@ if TYPE_CHECKING:
 class ConstraintInfo(ResultField):
     """Stores information about constraint differences and violations.
 
-     The `ConstraintInfo` class stores the differences between variable or
-     constraint values and their respective bounds. It also calculates and
-     stores constraint violations. This information is useful for assessing
-     how well the optimization process is satisfying the imposed constraints.
+    The `ConstraintInfo` class stores the differences between variable or
+    constraint values and their respective bounds. It also calculates and stores
+    constraint violations. This information is useful for assessing how well the
+    optimization process is satisfying the imposed constraints.
 
-     The class stores the following information:
 
-     * **Bound Differences:** The differences between the variable values and
-       their lower and upper bounds.
-        - `bound_lower`: The difference between the variable values and their
-          lower bounds. A negative value indicates that the variable is below its
-          lower bound.
-        - `bound_upper`: The difference between the variable values and their
-          upper bounds. A positive value indicates that the variable is above its
-          upper bound.
+    **Constraint differences**
 
-    * **Linear Constraint Differences:** The differences between the linear
-       constraint values and their lower and upper bounds.
-        - `linear_lower`: The difference between the linear constraint values
-          and their lower bounds. A negative value indicates that the constraint
-          is below its lower bound.
-        - `linear_upper`: The difference between the linear constraint values and
-          their upper bounds. A positive value indicates that the constraint is
-          above its upper bound.
+    These represent the difference between a variable or constraint value and
+    its corresponding bound. Whether this difference signifies a violation
+    depends on the bound type:
 
-     * **Nonlinear Constraint Differences:** The differences between the
-       nonlinear constraint values and their lower and upper bounds.
-        - `nonlinear_lower`: The difference between the nonlinear constraint
-          values and their lower bounds. A negative value indicates that the
-          constraint is below its lower bound.
-        - `nonlinear_upper`: The difference between the nonlinear constraint
-          values and their upper bounds. A positive value indicates that the
-          constraint is above its upper bound.
+    - _Lower Bounds:_ A negative difference means the value is below the lower
+      bound, thus violating the constraint.
+    - _Upper Bounds:_ A positive difference means the value is above the upper
+      bound, thus violating the constraint.
 
-     * **Constraint Violations:** The magnitude of the constraint violations.
-        - `bound_violation`: The magnitude of the violation of the variable
-          bounds.
-        - `linear_violation`: The magnitude of the violation of the linear
-           constraints.
-        - `nonlinear_violation`: The magnitude of the violation of the nonlinear
-          constraints.
+    The class stores the following information on the differences:
+
+
+    **Constraint Violations**
+
+    Constraint violations are calculated based on the constraint differences. If
+    a bound is violated, the violation value is the absolute value of the
+    difference. If the bound is not violated, the violation value is zero.
+
+
+    !!! info "Fields"
+
+        The class stores the following information for bound, linear constraint,
+        and non-linear constraint differences and violations as one-dimensional
+        vectors:
+
+        === "Bound Constraints"
+
+            - Differences: `bound_lower` and `bound_upper`
+            - Violations: `bound_violation`
+            - Shape: $(n_v,)$, where:
+                - $n_v$ is the number of variables.
+            - Axis type:
+                - [`ResultAxis.VARIABLE`][ropt.enums.ResultAxis.VARIABLE]
+
+        === "Linear Constraints"
+
+            - Differences: `linear_lower` and `linear_upper`
+            - Violations: `linear_violation`
+            - Shape: $(n_l,)$, where:
+                - $n_l$ is the number of linear constraints.
+            - Axis type:
+                - [`ResultAxis.LINEAR_CONSTRAINT`][ropt.enums.ResultAxis.LINEAR_CONSTRAINT]
+
+        === "Nonlinear Constraints"
+
+            - Differences: `nonlinear_lower` and `nonlinear_upper`
+            - Violations: `nonlinear_violation`
+            - Shape: $(n_c,)$, where:
+                - $n_c$ is the number of non-linear constraints.
+            - Axis type:
+                - [`ResultAxis.NONLINEAR_CONSTRAINT`][ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT]
 
     Attributes:
          bound_lower:         Difference between variables and their lower bounds.

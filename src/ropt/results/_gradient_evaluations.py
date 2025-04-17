@@ -21,23 +21,76 @@ class GradientEvaluations(ResultField):
 
     The `GradientEvaluations` class stores the results of evaluating the
     objective and constraint functions for perturbed variables, which is
-    necessary for gradient calculations. It contains the following information:
+    necessary for gradient calculations.
 
-    * **Variables:** The vector of unperturbed variable values.
-    * **Perturbed Variables:** A three-dimensional array of perturbed variable
-      values. The axes represent (in order): realization, perturbation, and
-      variable.
-    * **Perturbed Objectives:** The calculated objective function values for
-      each realization and perturbation. This is a three-dimensional array where
-      the axes represent (in order): realization, perturbation, and objective.
-    * **Perturbed Constraints:** The calculated constraint function values for
-      each realization and perturbation. This is a three-dimensional array where
-      the axes represent (in order): realization, perturbation, and constraint.
-    * **Evaluation Info:** Optional metadata associated with each realization
-      and perturbation, potentially provided by the evaluator. If provided, each
-      value in the `evaluation_info` dictionary must be a two-dimensional array
-      where the rows correspond to perturbations and the second columns
-      correspond to realizations.
+    !!! info "Fields"
+
+        === "Variables"
+
+            `variables`: The vector of unperturbed variable values:
+
+            - Shape: $(n_v,)$, where:
+                - $n_v$ is the number of variables.
+            - Axis type:
+                - [`ResultAxis.VARIABLE`][ropt.enums.ResultAxis.VARIABLE]
+
+        === "Perturbed Variables"
+
+            `perturbed_variables`: A three-dimensional array of perturbed
+            variable values for each realization and perturbation:
+
+            - Shape: $(n_r, n_p, n_v)$, where:
+                - $n_r$ is the number of realizations.
+                - $n_p$ is the number of perturbations.
+                - $n_v$ is the number of variables.
+            - Axis type:
+                - [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]
+                - [`ResultAxis.PERTURBATION`][ropt.enums.ResultAxis.PERTURBATION]
+                - [`ResultAxis.VARIABLE`][ropt.enums.ResultAxis.VARIABLE]
+
+        === "Perturbed Objectives"
+
+            `perturbed_objectives`: A three-dimensional array of perturbed
+            calculated objective function values for each realization and
+            perturbation:
+
+            - Shape $(n_r, n_p, n_o)$, where:
+                - $n_r$ is the number of realizations.
+                - $n_p$ is the number of perturbations.
+                - $n_o$ is the number of objectives.
+            - Axis types:
+                - [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]
+                - [`ResultAxis.PERTURBATION`][ropt.enums.ResultAxis.PERTURBATION]
+                - [`ResultAxis.OBJECTIVE`][ropt.enums.ResultAxis.OBJECTIVE]
+
+        === "Perturbed Constraints"
+
+            `perturbed_constraints`: A three-dimensional array of perturbed
+            calculated non-linear constraint values for each realization and
+            perturbation:
+
+            - Shape $(n_r, n_p, n_c)$, where:
+                - $n_r$ is the number of realizations.
+                - $n_p$ is the number of perturbations.
+                - $n_c$ is the number of constraints.
+            - Axis types:
+                - [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]
+                - [`ResultAxis.PERTURBATION`][ropt.enums.ResultAxis.PERTURBATION]
+                - [`ResultAxis.NONLINEAR_CONSTRAINT`][ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT]
+
+        === "Evaluation Info"
+
+            `evaluation_info`: Optional metadata associated with each
+            realization, potentially provided by the evaluator. If provided,
+            each value in the info dictionary must be a two-dimensional array of
+            arbitrary type supported by `numpy` (including objects):
+
+            - Shape: $(n_r, n_p)$, where:
+                - $n_r$ is the number of realizations.
+                - $n_p$ is the number of perturbations.
+            - Axis types:
+                - [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]
+                - [`ResultAxis.PERTURBATION`][ropt.enums.ResultAxis.PERTURBATION]
 
 
     Attributes:

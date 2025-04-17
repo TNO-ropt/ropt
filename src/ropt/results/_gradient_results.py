@@ -23,15 +23,17 @@ class GradientResults(Results):
     [`Results`][ropt.results.Results] class to store data specific to gradient
     evaluations. This includes:
 
-    * **Evaluations:** The results of the function evaluations for perturbed
-      variables, including the perturbed variable values, objective values, and
-      constraint values for each realization and perturbation. See
-      [`GradientEvaluations`][ropt.results.GradientEvaluations].
-    * **Realizations:** Information about the realizations, such as weights for
-      objectives and constraints, and whether each realization was successful.
-      See [`Realizations`][ropt.results.Realizations].
-    * **Gradients:** The calculated gradients of the objectives and constraints.
-      See [`Gradients`][ropt.results.Gradients].
+    1. **Evaluations:** The results of the function evaluations for perturbed
+       variables, including the perturbed variable values, objective values, and
+       constraint values for each realization and perturbation. See
+       [`GradientEvaluations`][ropt.results.GradientEvaluations].
+
+    2. **Realizations:** Information about the realizations, such as weights for
+       objectives and constraints, and whether each realization was successful.
+       See [`Realizations`][ropt.results.Realizations].
+
+    3. **Gradients:** The calculated gradients of the objectives and constraints.
+       See [`Gradients`][ropt.results.Gradients].
 
     Attributes:
         evaluations:  Results of the function evaluations for perturbed

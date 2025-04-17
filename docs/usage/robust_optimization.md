@@ -4,10 +4,10 @@ $f(\mathbf{x})$ with respect to a vector of variables $\mathbf{x}$ in the
 presence of one or more inequality constraints $g_j(\mathbf{x})$ and/or equality
 constraints $h_k(\mathbf{x})$.
 
-$$ \begin{align} \textrm{minimize} \quad & f(\mathbf{x}) \\
-\textrm{subject to} \quad & g_j(\mathbf{x}) \le 0, \quad j=1, \ldots, J \\ &
-h_k(\mathbf{x}) = 0, \quad k=1, \ldots, K \\
-& \mathbf{x}^L \le \mathbf{x} \le \mathbf{x}^U \end{align} $$
+$$ \begin{align*} \textrm{minimize} \quad & f(\mathbf{x}) \\
+\textrm{subject to} \quad & g_j(\mathbf{x}) \le 0, \quad \quad j=1, \ldots, J \\ &
+h_k(\mathbf{x}) = 0, \quad \quad k=1, \ldots, K \\
+& \mathbf{x}^L \le \mathbf{x} \le \mathbf{x}^U \end{align*} $$
 
 In this context, the function $f(\mathbf{x})$ is assumed to have a deterministic
 nature, meaning it is well-defined for given parameters. However, in realistic

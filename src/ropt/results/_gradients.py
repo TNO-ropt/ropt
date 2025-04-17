@@ -28,6 +28,44 @@ class Gradients(ResultField):
     in the `weighted_objective` field. Multiple constraint gradients are handled
     individually by the optimizer.
 
+    !!! info "Fields"
+
+        === "Weighted Objective Gradient"
+
+            `weighted_objective`: The gradient of the weighted objective with
+            respect to each variable:
+
+            - Shape: $(n_v,)$, where:
+                - $n_v$ is the number of variables.
+            - Axis type:
+                - [`ResultAxis.VARIABLE`][ropt.enums.ResultAxis.VARIABLE]
+
+        === "Objective  Gradients"
+
+            `objectives`: The calculated gradients of each objective with
+            respect to each variable. This is a two-dimensional array of
+            floating point values:
+
+            - Shape $(n_o, n_v)$, where:
+                - $n_o$ is the number of objectives.
+                - $n_v$ is the number of variables.
+            - Axis types:
+                - [`ResultAxis.OBJECTIVE`][ropt.enums.ResultAxis.OBJECTIVE]
+                - [`ResultAxis.VARIABLE`][ropt.enums.ResultAxis.VARIABLE]
+
+        === "Constraint Gradients"
+
+            `constraints`: The calculated gradients of each nonlinear constraint
+            with respect to each variable. This is a two-dimensional array of
+            floating point values:
+
+            - Shape $(n_c, n_v)$, where:
+                - $n_c$ is the number of constraints.
+                - $n_v$ is the number of variables.
+            - Axis types:
+                - [`ResultAxis.NONLINEAR_CONSTRAINT`][ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT]
+                - [`ResultAxis.VARIABLE`][ropt.enums.ResultAxis.VARIABLE]
+
     Attributes:
         weighted_objective: The weighted sum of the objective gradients.
         objectives:         The gradient of each individual objective.

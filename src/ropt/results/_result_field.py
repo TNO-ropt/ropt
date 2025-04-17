@@ -20,8 +20,8 @@ class ResultField:
 
     This class provides a standardized way to:
 
-    * Store metadata about the axes of multi-dimensional arrays.
-    * Retrieve the axes associated with a specific field.
+    - Store metadata about the axes of multi-dimensional arrays.
+    - Retrieve the axes associated with a specific field.
 
     Derived classes, such as
     [`FunctionEvaluations`][ropt.results.FunctionEvaluations] or
