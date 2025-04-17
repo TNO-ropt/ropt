@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.11">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.12">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.4af4bdda.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.2afb09e1.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -1777,7 +1777,83 @@ corresponding realization and objective, as specified in the optimizer
 configuration. The pandas exporting code, for example, utilizes this information
 to construct a multi-index for the output DataFrame and to transform the
 multi-dimensional data into multiple columns.</p>
+<p>The <a class="autorefs autorefs-internal" title="            ResultAxis" href="../enums/#ropt.enums.ResultAxis"><code>ResultAxis</code></a> enumeration currently defines the
+following axes:</p>
+<ul>
+<li><a class="autorefs autorefs-internal" title="            OBJECTIVE
 
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.OBJECTIVE"><code>ResultAxis.OBJECTIVE</code></a> The index along this
+  axis refers to the objective number as specified in the
+  <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> configuration.</li>
+<li><a class="autorefs autorefs-internal" title="            NONLINEAR_CONSTRAINT
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT"><code>ResultAxis.NONLINEAR_CONSTRAINT</code></a>
+  The index along this axis corresponds to the non-linear constraint index
+  defined in the <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> configuration.</li>
+<li><a class="autorefs autorefs-internal" title="            LINEAR_CONSTRAINT
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.LINEAR_CONSTRAINT"><code>ResultAxis.LINEAR_CONSTRAINT</code></a> The
+  index along this axis corresponds to the linear constraint index defined in
+  the <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> configuration.</li>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.VARIABLE"><code>ResultAxis.VARIABLE</code></a> The index along this
+  axis refers to the variable number as specified by the
+  <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> configuration.</li>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.REALIZATION"><code>ResultAxis.REALIZATION</code></a>: When results
+  involve an ensemble, this axis represents the different realizations, where
+  the index corresponds to the realization number.</li>
+<li><a class="autorefs autorefs-internal" title="            PERTURBATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.PERTURBATION"><code>ResultAxis.PERTURBATION</code></a> For gradient
+  calculations, multiple variable perturbations are used. The objectives and
+  constraints calculated for each perturbation are reported along this axis,
+  which represents the perturbation index.</li>
+</ul>
+<p>Refer to the documentation of the individual result classes for the exact
+dimensions of each result field. The dimensionality of the data and the order of
+the axes are fixed and listed sequentially for every field.</p>
+
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>The dimensionality associated with a result axis is fixed. For instance,
+even with only a single objective, results containing objective values will
+still include a <a class="autorefs autorefs-internal" title="            OBJECTIVE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.OBJECTIVE"><code>ResultAxis.OBJECTIVE</code></a>
+axis of length one.</p>
+</details>
 
 
 
@@ -2470,40 +2546,48 @@ a ResultField object from that meta-data, returning a tuple of
       dataclass
   " href="#ropt.results.Results"><code>Results</code></a> class to store data specific to function
 evaluations. This includes:</p>
-<ul>
-<li><strong>Evaluations:</strong> The results of the function evaluations, including the
-  variable values, objective values, and constraint values for each
-  realization. See
-  <a class="autorefs autorefs-internal" title="            ropt.results.FunctionEvaluations
+<ol>
+<li>
+<p><strong>Evaluations:</strong> The results of the function evaluations, including the
+   variable values, objective values, and constraint values for each
+   realization. See
+   <a class="autorefs autorefs-internal" title="            ropt.results.FunctionEvaluations
 
 
   
       dataclass
-  " href="#ropt.results.FunctionEvaluations"><code>FunctionEvaluations</code></a>.</li>
-<li><strong>Realizations:</strong> Information about the realizations, such as weights for
-  objectives and constraints, and whether each realization was successful.
-  See <a class="autorefs autorefs-internal" title="            ropt.results.Realizations
+  " href="#ropt.results.FunctionEvaluations"><code>FunctionEvaluations</code></a>.</p>
+</li>
+<li>
+<p><strong>Realizations:</strong> Information about the realizations, such as weights for
+   objectives and constraints, and whether each realization was successful.
+   See <a class="autorefs autorefs-internal" title="            ropt.results.Realizations
 
 
   
       dataclass
-  " href="#ropt.results.Realizations"><code>Realizations</code></a>.</li>
-<li><strong>Functions:</strong> The calculated objective and constraint function values,
-  typically aggregated across realizations. See
-  <a class="autorefs autorefs-internal" title="            ropt.results.Functions
+  " href="#ropt.results.Realizations"><code>Realizations</code></a>.</p>
+</li>
+<li>
+<p><strong>Functions:</strong> The calculated objective and constraint function values,
+   typically aggregated across realizations. See
+   <a class="autorefs autorefs-internal" title="            ropt.results.Functions
 
 
   
       dataclass
-  " href="#ropt.results.Functions"><code>Functions</code></a>.</li>
-<li><strong>Constraint Info:</strong> Details about constraint differences and violations.
-  See <a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
+  " href="#ropt.results.Functions"><code>Functions</code></a>.</p>
+</li>
+<li>
+<p><strong>Constraint Info:</strong> Details about constraint differences and violations.
+   See <a class="autorefs autorefs-internal" title="            ropt.results.ConstraintInfo
 
 
   
       dataclass
-  " href="#ropt.results.ConstraintInfo"><code>ConstraintInfo</code></a>.</li>
-</ul>
+  " href="#ropt.results.ConstraintInfo"><code>ConstraintInfo</code></a>.</p>
+</li>
+</ol>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2644,32 +2728,38 @@ evaluations. This includes:</p>
       dataclass
   " href="#ropt.results.Results"><code>Results</code></a> class to store data specific to gradient
 evaluations. This includes:</p>
-<ul>
-<li><strong>Evaluations:</strong> The results of the function evaluations for perturbed
-  variables, including the perturbed variable values, objective values, and
-  constraint values for each realization and perturbation. See
-  <a class="autorefs autorefs-internal" title="            ropt.results.GradientEvaluations
+<ol>
+<li>
+<p><strong>Evaluations:</strong> The results of the function evaluations for perturbed
+   variables, including the perturbed variable values, objective values, and
+   constraint values for each realization and perturbation. See
+   <a class="autorefs autorefs-internal" title="            ropt.results.GradientEvaluations
 
 
   
       dataclass
-  " href="#ropt.results.GradientEvaluations"><code>GradientEvaluations</code></a>.</li>
-<li><strong>Realizations:</strong> Information about the realizations, such as weights for
-  objectives and constraints, and whether each realization was successful.
-  See <a class="autorefs autorefs-internal" title="            ropt.results.Realizations
+  " href="#ropt.results.GradientEvaluations"><code>GradientEvaluations</code></a>.</p>
+</li>
+<li>
+<p><strong>Realizations:</strong> Information about the realizations, such as weights for
+   objectives and constraints, and whether each realization was successful.
+   See <a class="autorefs autorefs-internal" title="            ropt.results.Realizations
 
 
   
       dataclass
-  " href="#ropt.results.Realizations"><code>Realizations</code></a>.</li>
-<li><strong>Gradients:</strong> The calculated gradients of the objectives and constraints.
-  See <a class="autorefs autorefs-internal" title="            ropt.results.Gradients
+  " href="#ropt.results.Realizations"><code>Realizations</code></a>.</p>
+</li>
+<li>
+<p><strong>Gradients:</strong> The calculated gradients of the objectives and constraints.
+   See <a class="autorefs autorefs-internal" title="            ropt.results.Gradients
 
 
   
       dataclass
-  " href="#ropt.results.Gradients"><code>Gradients</code></a>.</li>
-</ul>
+  " href="#ropt.results.Gradients"><code>Gradients</code></a>.</p>
+</li>
+</ol>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2794,6 +2884,60 @@ averaging. The optimizer may handle multiple objectives and constraints.
 Multiple objectives are combined into a single weighted sum, which is stored
 in the <code>weighted_objective</code> field. Multiple constraints are handled
 individually by the optimizer.</p>
+<p>The following fields are defined:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.Functions--__tabbed_1_1" name="ropt.results.Functions--__tabbed_1" type="radio" /><input id="ropt.results.Functions--__tabbed_1_2" name="ropt.results.Functions--__tabbed_1" type="radio" /><input id="ropt.results.Functions--__tabbed_1_3" name="ropt.results.Functions--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Functions--__tabbed_1_1">Weighted Objective</label><label for="ropt.results.Functions--__tabbed_1_2">Objectives</label><label for="ropt.results.Functions--__tabbed_1_3">Constraints</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>The overall objective calculated as a weighted sum over the objectives.
+This is a single floating point values. It is defined as a <code>numpy</code> array
+of dimensions 0, hence it has no axes:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\(()\)</span></li>
+<li>Axis type: <code>None</code></li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>The calculated objective function values. This is a one-dimensional
+array of floating point values:</p>
+<ul>
+<li>Shape <span class="arithmatex">\((n_o,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_o\)</span> is the number of objectives.</li>
+</ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            OBJECTIVE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.OBJECTIVE"><code>ResultAxis.OBJECTIVE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>The calculated constraint function values. This is a one-dimensional
+array of floating point values:</p>
+<ul>
+<li>Shape <span class="arithmatex">\((n_c,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_c\)</span> is the number of constraints.</li>
+</ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            NONLINEAR_CONSTRAINT
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT"><code>ResultAxis.NONLINEAR_CONSTRAINT</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2902,6 +3046,86 @@ The optimizer may handle multiple objectives and constraints. Multiple
 objective gradients are combined into a single weighted sum, which is stored
 in the <code>weighted_objective</code> field. Multiple constraint gradients are handled
 individually by the optimizer.</p>
+<p>The following fields are defined:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.Gradients--__tabbed_1_1" name="ropt.results.Gradients--__tabbed_1" type="radio" /><input id="ropt.results.Gradients--__tabbed_1_2" name="ropt.results.Gradients--__tabbed_1" type="radio" /><input id="ropt.results.Gradients--__tabbed_1_3" name="ropt.results.Gradients--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Gradients--__tabbed_1_1">Weighted Objective Gradient</label><label for="ropt.results.Gradients--__tabbed_1_2">Objective  Gradients</label><label for="ropt.results.Gradients--__tabbed_1_3">Constraint Gradients</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>The gradient of the weighted objective with respect to each variable:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_v,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
+</ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.VARIABLE"><code>ResultAxis.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>The calculated gradients of each objective with respect to each
+variable. This is a two-dimensional array of floating point values:</p>
+<ul>
+<li>Shape <span class="arithmatex">\((n_o, n_v)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_o\)</span> is the number of objectives.</li>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
+</ul>
+</li>
+<li>Axis types:<ul>
+<li><a class="autorefs autorefs-internal" title="            OBJECTIVE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.OBJECTIVE"><code>ResultAxis.OBJECTIVE</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.VARIABLE"><code>ResultAxis.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>The calculated gradients of each nonlinear constraint with respect to
+each variable. This is a two-dimensional array of floating point values:</p>
+<ul>
+<li>Shape <span class="arithmatex">\((n_c, n_v)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_c\)</span> is the number of constraints.</li>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
+</ul>
+</li>
+<li>Axis types:<ul>
+<li><a class="autorefs autorefs-internal" title="            NONLINEAR_CONSTRAINT
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT"><code>ResultAxis.NONLINEAR_CONSTRAINT</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.VARIABLE"><code>ResultAxis.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3006,20 +3230,112 @@ individually by the optimizer.</p>
 <p>The <code>FunctionEvaluations</code> class stores the results of evaluating the
 objective and constraint functions for a set of variables. It includes
 the following information:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="ropt.results.FunctionEvaluations--__tabbed_1_1" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_2" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_3" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_4" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.FunctionEvaluations--__tabbed_1_1">Variables</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_2">Objectives</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_3">Constraints</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_4">Evaluation Info</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>The vector of variable values at which the functions were evaluated:</p>
 <ul>
-<li><strong>Variables:</strong> The vector of variable values at which the functions were
-  evaluated.</li>
-<li><strong>Objectives:</strong> The calculated objective function values for each
-  realization. This is a two-dimensional array where each row corresponds to
-  a realization and each column corresponds to an objective.</li>
-<li><strong>Constraints:</strong> The calculated constraint function values for each
-  realization. This is a two-dimensional array where each row corresponds to
-  a realization and each column corresponds to a constraint.</li>
-<li><strong>Evaluation Info:</strong> Optional metadata associated with each realization,
-  potentially provided by the evaluator. If provided, each value in the info
-  dictionary must be a one-dimensional array with a length equal to the
-  number of realizations.</li>
+<li>Shape: <span class="arithmatex">\((n_v,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
 </ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.VARIABLE"><code>ResultAxis.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>The calculated objective function values for each realization. This is a
+two-dimensional array of floating point values where each row
+corresponds to a realization and each column corresponds to an
+objective:</p>
+<ul>
+<li>Shape <span class="arithmatex">\((n_r, n_o)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+<li><span class="arithmatex">\(n_o\)</span> is the number of objectives.</li>
+</ul>
+</li>
+<li>Axis types:<ul>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.REALIZATION"><code>ResultAxis.REALIZATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            OBJECTIVE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.OBJECTIVE"><code>ResultAxis.OBJECTIVE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>The calculated constraint function values for each realization. Only
+provided if non-linear constraints are defined. This is a
+two-dimensional array of floating point values where each row
+corresponds to a realization and each column corresponds to a
+constraint:</p>
+<ul>
+<li>Shape <span class="arithmatex">\((n_r, n_c)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+<li><span class="arithmatex">\(n_c\)</span> is the number of constraints.</li>
+</ul>
+</li>
+<li>Axis types:<ul>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.REALIZATION"><code>ResultAxis.REALIZATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            NONLINEAR_CONSTRAINT
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT"><code>ResultAxis.NONLINEAR_CONSTRAINT</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>Optional metadata associated with each realization, potentially provided
+by the evaluator. If provided, each value in the info dictionary must be
+a one-dimensional array of arbitrary type supported by <code>numpy</code>
+(including objects):</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_r,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+</ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.REALIZATION"><code>ResultAxis.REALIZATION</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3039,7 +3355,7 @@ the following information:</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The variable vector.</p>
+                <p>The variable vector:</p>
               </div>
             </td>
           </tr>
@@ -3135,23 +3451,167 @@ the following information:</p>
 <p>The <code>GradientEvaluations</code> class stores the results of evaluating the
 objective and constraint functions for perturbed variables, which is
 necessary for gradient calculations. It contains the following information:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:5"><input checked="checked" id="ropt.results.GradientEvaluations--__tabbed_1_1" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_2" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_3" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_4" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_5" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.GradientEvaluations--__tabbed_1_1">Variables</label><label for="ropt.results.GradientEvaluations--__tabbed_1_2">Perturbed Variables</label><label for="ropt.results.GradientEvaluations--__tabbed_1_3">Perturbed Objectives</label><label for="ropt.results.GradientEvaluations--__tabbed_1_4">Perturbed Constraints</label><label for="ropt.results.GradientEvaluations--__tabbed_1_5">Evaluation Info</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>The vector of unperturbed variable values:</p>
 <ul>
-<li><strong>Variables:</strong> The vector of unperturbed variable values.</li>
-<li><strong>Perturbed Variables:</strong> A three-dimensional array of perturbed variable
-  values. The axes represent (in order): realization, perturbation, and
-  variable.</li>
-<li><strong>Perturbed Objectives:</strong> The calculated objective function values for
-  each realization and perturbation. This is a three-dimensional array where
-  the axes represent (in order): realization, perturbation, and objective.</li>
-<li><strong>Perturbed Constraints:</strong> The calculated constraint function values for
-  each realization and perturbation. This is a three-dimensional array where
-  the axes represent (in order): realization, perturbation, and constraint.</li>
-<li><strong>Evaluation Info:</strong> Optional metadata associated with each realization
-  and perturbation, potentially provided by the evaluator. If provided, each
-  value in the <code>evaluation_info</code> dictionary must be a two-dimensional array
-  where the rows correspond to perturbations and the second columns
-  correspond to realizations.</li>
+<li>Shape: <span class="arithmatex">\((n_v,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
 </ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.VARIABLE"><code>ResultAxis.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>A three-dimensional array of perturbed variable values for each
+realization and perturbation:</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_r, n_p, n_v)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+<li><span class="arithmatex">\(n_p\)</span> is the number of perturbations.</li>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
+</ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.REALIZATION"><code>ResultAxis.REALIZATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            PERTURBATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.PERTURBATION"><code>ResultAxis.PERTURBATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.VARIABLE"><code>ResultAxis.VARIABLE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>A three-dimensional array of perturbed calculated objective function
+values for each realization and perturbation:</p>
+<ul>
+<li>Shape <span class="arithmatex">\((n_r, n_p, n_o)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+<li><span class="arithmatex">\(n_p\)</span> is the number of perturbations.</li>
+<li><span class="arithmatex">\(n_o\)</span> is the number of objectives.</li>
+</ul>
+</li>
+<li>Axis types:<ul>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.REALIZATION"><code>ResultAxis.REALIZATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            PERTURBATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.PERTURBATION"><code>ResultAxis.PERTURBATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            OBJECTIVE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.OBJECTIVE"><code>ResultAxis.OBJECTIVE</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>A three-dimensional array of perturbed calculated non-linear constraint
+values for each realization and perturbation:</p>
+<ul>
+<li>Shape <span class="arithmatex">\((n_r, n_p, n_c)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+<li><span class="arithmatex">\(n_p\)</span> is the number of perturbations.</li>
+<li><span class="arithmatex">\(n_c\)</span> is the number of constraints.</li>
+</ul>
+</li>
+<li>Axis types:<ul>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.REALIZATION"><code>ResultAxis.REALIZATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            PERTURBATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.PERTURBATION"><code>ResultAxis.PERTURBATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            NONLINEAR_CONSTRAINT
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT"><code>ResultAxis.NONLINEAR_CONSTRAINT</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>Optional metadata associated with each realization, potentially provided
+by the evaluator. If provided, each value in the info dictionary must be
+a two-dimensional array of arbitrary type supported by <code>numpy</code> (including
+objects):</p>
+<ul>
+<li>Shape: <span class="arithmatex">\((n_r, n_p)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+<li><span class="arithmatex">\(n_p\)</span> is the number of perturbations.</li>
+</ul>
+</li>
+<li>Axis types:<ul>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.REALIZATION"><code>ResultAxis.REALIZATION</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            PERTURBATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.PERTURBATION"><code>ResultAxis.PERTURBATION</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3281,21 +3741,91 @@ necessary for gradient calculations. It contains the following information:</p>
         <p>Stores information about the realizations.</p>
 <p>The <code>Realizations</code> class stores data related to the individual realizations
 used in the optimization process. This includes:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.Realizations--__tabbed_1_1" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_2" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_3" name="ropt.results.Realizations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Realizations--__tabbed_1_1">Failed Realizations</label><label for="ropt.results.Realizations--__tabbed_1_2">Objective Weights</label><label for="ropt.results.Realizations--__tabbed_1_3">Constraint Weights</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>A boolean array indicating whether each realization's evaluation was
+successful. <code>True</code> indicates a failed realization, while <code>False</code>
+indicates a successful one:</p>
 <ul>
-<li><strong>Failed Realizations:</strong> A boolean array indicating whether each
-  realization's evaluation was successful. <code>True</code> indicates a failed
-  realization, while <code>False</code> indicates a successful one.</li>
-<li><strong>Objective Weights:</strong> A two-dimensional array of weights used for each
-  objective in each realization. The first axis corresponds to the
-  objectives, and the second axis corresponds to the realizations. These
-  weights may change during optimization, depending on the type of objective
-  calculation.</li>
-<li><strong>Constraint Weights:</strong> A two-dimensional array of weights used for each
-  constraint in each realization. The first axis corresponds to the
-  constraints, and the second axis corresponds to the realizations. These
-  weights may change during optimization, depending on the type of
-  constraint calculation.</li>
+<li>Shape <span class="arithmatex">\((n_r,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
 </ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.REALIZATION"><code>ResultAxis.REALIZATION</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>A two-dimensional array of weights used for each objective in each
+realization:</p>
+<ul>
+<li>Shape <span class="arithmatex">\((n_o, n_r)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_o\)</span> is the number of objectives.</li>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+</ul>
+</li>
+<li>Axis types:<ul>
+<li><a class="autorefs autorefs-internal" title="            OBJECTIVE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.OBJECTIVE"><code>ResultAxis.OBJECTIVE</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.REALIZATION"><code>ResultAxis.REALIZATION</code></a></li>
+</ul>
+</li>
+</ul>
+<p>These weights may change during optimization, depending on the type of
+objective calculation</p>
+</div>
+<div class="tabbed-block">
+<p>A two-dimensional array of weights used for each constraint in each
+realization:</p>
+<ul>
+<li>Shape <span class="arithmatex">\((n_c, n_r)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_c\)</span> is the number of constraints.</li>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+</ul>
+</li>
+<li>Axis types:<ul>
+<li><a class="autorefs autorefs-internal" title="            NONLINEAR_CONSTRAINT
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT"><code>ResultAxis.NONLINEAR_CONSTRAINT</code></a></li>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.REALIZATION"><code>ResultAxis.REALIZATION</code></a></li>
+</ul>
+</li>
+</ul>
+<p>These weights may change during optimization, depending on the type of
+constraint calculation</p>
+</div>
+</div>
+</div>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -3398,59 +3928,91 @@ used in the optimization process. This includes:</p>
 
         <p>Stores information about constraint differences and violations.</p>
 <p>The <code>ConstraintInfo</code> class stores the differences between variable or
- constraint values and their respective bounds. It also calculates and
- stores constraint violations. This information is useful for assessing
- how well the optimization process is satisfying the imposed constraints.</p>
-<p>The class stores the following information:</p>
+constraint values and their respective bounds. It also calculates and stores
+constraint violations. This information is useful for assessing how well the
+optimization process is satisfying the imposed constraints.</p>
+<p><strong>Constraint differences</strong></p>
+<p>These represent the difference between a variable or constraint value and
+its corresponding bound. Whether this difference signifies a violation
+depends on the bound type:</p>
 <ul>
-<li>
-<p><strong>Bound Differences:</strong> The differences between the variable values and
-   their lower and upper bounds.</p>
+<li><em>Lower Bounds:</em> A negative difference means the value is below the lower
+  bound, thus violating the constraint.</li>
+<li><em>Upper Bounds:</em> A positive difference means the value is above the upper
+  bound, thus violating the constraint.</li>
+</ul>
+<p>The class stores the following information on the differences:</p>
+<p><strong>Constraint Violations</strong></p>
+<p>Constraint violations are calculated based on the constraint differences. If
+a bound is violated, the violation value is the absolute value of the
+difference. If the bound is not violated, the violation value is zero.</p>
+<p><strong>Fields</strong></p>
+<p>The class stores the following information for bound, linear constraint, and non-linear
+constraint differences and violations as one-dimensional vectors:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.ConstraintInfo--__tabbed_1_1" name="ropt.results.ConstraintInfo--__tabbed_1" type="radio" /><input id="ropt.results.ConstraintInfo--__tabbed_1_2" name="ropt.results.ConstraintInfo--__tabbed_1" type="radio" /><input id="ropt.results.ConstraintInfo--__tabbed_1_3" name="ropt.results.ConstraintInfo--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.ConstraintInfo--__tabbed_1_1">Bound Constraints</label><label for="ropt.results.ConstraintInfo--__tabbed_1_2">Linear Constraints</label><label for="ropt.results.ConstraintInfo--__tabbed_1_3">Nonlinear Constraints</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
 <ul>
-<li><code>bound_lower</code>: The difference between the variable values and their
-  lower bounds. A negative value indicates that the variable is below its
-  lower bound.</li>
-<li><code>bound_upper</code>: The difference between the variable values and their
-  upper bounds. A positive value indicates that the variable is above its
-  upper bound.</li>
+<li>Differences: <code>bound_lower</code> and <code>bound_upper</code></li>
+<li>Violations: <code>bound_violation</code></li>
+<li>Shape: <span class="arithmatex">\((n_v,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_v\)</span> is the number of variables.</li>
 </ul>
 </li>
-<li>
-<p><strong>Linear Constraint Differences:</strong> The differences between the linear
-   constraint values and their lower and upper bounds.</p>
-<ul>
-<li><code>linear_lower</code>: The difference between the linear constraint values
-  and their lower bounds. A negative value indicates that the constraint
-  is below its lower bound.</li>
-<li><code>linear_upper</code>: The difference between the linear constraint values and
-  their upper bounds. A positive value indicates that the constraint is
-  above its upper bound.</li>
-</ul>
-</li>
-<li>
-<p><strong>Nonlinear Constraint Differences:</strong> The differences between the
-   nonlinear constraint values and their lower and upper bounds.</p>
-<ul>
-<li><code>nonlinear_lower</code>: The difference between the nonlinear constraint
-  values and their lower bounds. A negative value indicates that the
-  constraint is below its lower bound.</li>
-<li><code>nonlinear_upper</code>: The difference between the nonlinear constraint
-  values and their upper bounds. A positive value indicates that the
-  constraint is above its upper bound.</li>
-</ul>
-</li>
-<li>
-<p><strong>Constraint Violations:</strong> The magnitude of the constraint violations.</p>
-<ul>
-<li><code>bound_violation</code>: The magnitude of the violation of the variable
-  bounds.</li>
-<li><code>linear_violation</code>: The magnitude of the violation of the linear
-   constraints.</li>
-<li><code>nonlinear_violation</code>: The magnitude of the violation of the nonlinear
-  constraints.</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            VARIABLE
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.VARIABLE"><code>ResultAxis.VARIABLE</code></a></li>
 </ul>
 </li>
 </ul>
+</div>
+<div class="tabbed-block">
+<ul>
+<li>Differences: <code>linear_lower</code> and <code>linear_upper</code></li>
+<li>Violations: <code>linear_violation</code></li>
+<li>Shape: <span class="arithmatex">\((n_l,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_l\)</span> is the number of linear constraints.</li>
+</ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            LINEAR_CONSTRAINT
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.LINEAR_CONSTRAINT"><code>ResultAxis.LINEAR_CONSTRAINT</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<ul>
+<li>Differences: <code>nonlinear_lower</code> and <code>nonlinear_upper</code></li>
+<li>Violations: <code>nonlinear_violation</code></li>
+<li>Shape: <span class="arithmatex">\((n_c,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_c\)</span> is the number of non-linear constraints.</li>
+</ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            NONLINEAR_CONSTRAINT
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT"><code>ResultAxis.NONLINEAR_CONSTRAINT</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
