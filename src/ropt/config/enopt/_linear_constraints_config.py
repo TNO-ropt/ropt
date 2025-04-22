@@ -5,13 +5,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Self
 
 import numpy as np
-from pydantic import ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, model_validator
 
-from ropt.config.utils import (
-    ImmutableBaseModel,
-    broadcast_1d_array,
-    immutable_array,
-)
+from ropt.config.utils import broadcast_1d_array, immutable_array
 from ropt.config.validated_types import Array1D, Array2D  # noqa: TC001
 
 if TYPE_CHECKING:
@@ -19,7 +15,7 @@ if TYPE_CHECKING:
     from ropt.transforms import OptModelTransforms
 
 
-class LinearConstraintsConfig(ImmutableBaseModel):
+class LinearConstraintsConfig(BaseModel):
     r"""Configuration class for linear constraints.
 
     This class, `LinearConstraintsConfig`, defines linear constraints used in an
@@ -84,10 +80,8 @@ class LinearConstraintsConfig(ImmutableBaseModel):
             msg = "The lower bounds are larger than the upper bounds."
             raise ValueError(msg)
 
-        self._mutable()
         self.lower_bounds = immutable_array(lower_bounds)
         self.upper_bounds = immutable_array(upper_bounds)
-        self._immutable()
         return self
 
     def apply_transformation(

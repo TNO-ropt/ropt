@@ -15,7 +15,6 @@ from typing import Any, TypeVar, cast
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
-from pydantic import BaseModel
 
 
 def normalize(array: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -177,50 +176,3 @@ def _convert_tuple(value: T | Sequence[T]) -> tuple[T, ...]:
     if isinstance(value, str):
         return (cast("T", value),)
     return tuple(value) if isinstance(value, AbstractSequence) else (value,)
-
-
-class ImmutableBaseModel(BaseModel):
-    """Base model providing manual immutability control.
-
-    This class offers an alternative to Pydantic's `frozen=True` configuration.
-    It allows instances to be mutable during initialization (e.g., within
-    `@model_validator(mode='after')`) and then explicitly made immutable
-    afterwards by calling the `_immutable()` method.
-
-    Immutability is enforced by overriding `__setattr__` to check an internal
-    `_is_immutable` flag before allowing attribute modification. The
-    `_mutable()` method can be used to temporarily disable immutability if
-    needed, though this should be used with caution.
-
-    This approach is particularly useful when complex validation or modification
-    logic needs to run *after* the initial Pydantic model initialization, which
-    can be problematic with standard frozen models.
-    """
-
-    _is_immutable: bool
-
-    def _immutable(self) -> None:
-        self._is_immutable = True
-
-    def _mutable(self) -> None:
-        self._is_immutable = False
-
-    def __setattr__(self, name: str, value: Any) -> None:  # noqa: ANN401
-        """Set an attribute's value, enforcing immutability.
-
-        This method overrides the default attribute setting behavior. If the
-        instance has been marked as immutable (via `_immutable()`), it prevents
-        any further attribute modifications (except for the internal `_is_immutable`
-        flag itself) and raises an `AttributeError`.
-
-        Args:
-            name:  The name of the attribute to set.
-            value: The value to assign to the attribute.
-
-        Raises:
-            AttributeError: If attempting to set an attribute on an immutable instance.
-        """
-        if name != "_is_immutable" and self._is_immutable:
-            msg = f"{self.__class__.__name__} is immutable"
-            raise AttributeError(msg)
-        super().__setattr__(name, value)

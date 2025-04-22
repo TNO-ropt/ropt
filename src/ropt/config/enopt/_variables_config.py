@@ -5,14 +5,9 @@ from __future__ import annotations
 from typing import Self
 
 import numpy as np
-from pydantic import ConfigDict, ValidationInfo, model_validator
+from pydantic import BaseModel, ConfigDict, ValidationInfo, model_validator
 
-from ropt.config.utils import (
-    ImmutableBaseModel,
-    broadcast_1d_array,
-    check_enum_values,
-    immutable_array,
-)
+from ropt.config.utils import broadcast_1d_array, check_enum_values, immutable_array
 from ropt.config.validated_types import (  # noqa: TC001
     Array1D,
     Array1DBool,
@@ -21,7 +16,7 @@ from ropt.config.validated_types import (  # noqa: TC001
 from ropt.enums import VariableType
 
 
-class VariablesConfig(ImmutableBaseModel):
+class VariablesConfig(BaseModel):
     r"""Configuration class for optimization variables.
 
     This class, `VariablesConfig`, defines the configuration for the
@@ -72,8 +67,6 @@ class VariablesConfig(ImmutableBaseModel):
 
     @model_validator(mode="after")
     def _broadcast_and_transform(self, info: ValidationInfo) -> Self:
-        self._mutable()
-
         lower_bounds = broadcast_1d_array(
             self.lower_bounds, "lower_bounds", self.initial_values.size
         )
@@ -102,7 +95,5 @@ class VariablesConfig(ImmutableBaseModel):
             )
         if self.mask is not None:
             self.mask = broadcast_1d_array(self.mask, "mask", self.initial_values.size)
-
-        self._immutable()
 
         return self

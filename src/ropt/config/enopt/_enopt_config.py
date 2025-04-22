@@ -4,9 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Self
 
-from pydantic import ConfigDict, ValidationInfo, model_validator
-
-from ropt.config.utils import ImmutableBaseModel
+from pydantic import BaseModel, ConfigDict, ValidationInfo, model_validator
 
 from ._function_estimator_config import FunctionEstimatorConfig
 from ._gradient_config import GradientConfig
@@ -20,7 +18,7 @@ from ._sampler_config import SamplerConfig
 from ._variables_config import VariablesConfig  # noqa: TC001
 
 
-class EnOptConfig(ImmutableBaseModel):
+class EnOptConfig(BaseModel):
     """The primary configuration class for an optimization step.
 
     `EnOptConfig` orchestrates the configuration of an entire optimization
@@ -78,18 +76,14 @@ class EnOptConfig(ImmutableBaseModel):
     @model_validator(mode="after")
     def _linear_constraints(self, info: ValidationInfo) -> Self:
         if self.linear_constraints is not None:
-            self._mutable()
             self.linear_constraints = self.linear_constraints.apply_transformation(
                 self.variables, info.context
             )
-            self._immutable()
         return self
 
     @model_validator(mode="after")
     def _gradient(self, info: ValidationInfo) -> Self:
-        self._mutable()
         self.gradient = self.gradient.fix_perturbations(self.variables, info.context)
-        self._immutable()
         return self
 
     @model_validator(mode="wrap")  # type: ignore[arg-type]

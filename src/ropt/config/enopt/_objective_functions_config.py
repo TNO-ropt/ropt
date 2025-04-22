@@ -5,16 +5,16 @@ from __future__ import annotations
 from typing import Self
 
 import numpy as np
-from pydantic import ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, model_validator
 
-from ropt.config.utils import ImmutableBaseModel, normalize
+from ropt.config.utils import normalize
 from ropt.config.validated_types import (  # noqa: TC001
     Array1D,
     Array1DInt,
 )
 
 
-class ObjectiveFunctionsConfig(ImmutableBaseModel):
+class ObjectiveFunctionsConfig(BaseModel):
     """Configuration class for objective functions.
 
     This class, `ObjectiveFunctionsConfig`, defines the configuration for
@@ -61,7 +61,5 @@ class ObjectiveFunctionsConfig(ImmutableBaseModel):
 
     @model_validator(mode="after")
     def _broadcast_and_normalize(self) -> Self:
-        self._mutable()
         self.weights = normalize(self.weights)
-        self._immutable()
         return self

@@ -6,16 +6,15 @@ from pathlib import Path  # noqa: TC003
 from typing import Any, Self
 
 from pydantic import (
+    BaseModel,
     ConfigDict,
     NonNegativeFloat,
     PositiveInt,
     model_validator,
 )
 
-from ropt.config.utils import ImmutableBaseModel
 
-
-class OptimizerConfig(ImmutableBaseModel):
+class OptimizerConfig(BaseModel):
     """Configuration class for the optimization algorithm.
 
     This class, `OptimizerConfig`, defines the configuration for the optimization
@@ -79,16 +78,16 @@ class OptimizerConfig(ImmutableBaseModel):
         a corresponding `max_batches` limit would.
 
     Attributes:
-        method:            Name of the optimization method.
-        max_iterations:    Maximum number of iterations (optional).
-        max_functions:     Maximum number of function evaluations (optional).
-        max_batches:       Maximum number of batch evaluations (optional).
-        tolerance:         Convergence tolerance (optional).
-        parallel:          Allow parallelized function evaluations (default: `False`).
-        output_dir:        Output directory for the optimizer (optional).
-        options:           Generic options for the optimizer (optional).
-        stdout:            File to redirect optimizer standard output (optional).
-        stderr:            File to redirect optimizer standard error (optional).
+        method:         Name of the optimization method.
+        max_iterations: Maximum number of iterations (optional).
+        max_functions:  Maximum number of function evaluations (optional).
+        max_batches:    Maximum number of batch evaluations (optional).
+        tolerance:      Convergence tolerance (optional).
+        parallel:       Allow parallelized function evaluations (default: `False`).
+        output_dir:     Output directory for the optimizer (optional).
+        options:        Generic options for the optimizer (optional).
+        stdout:         File to redirect optimizer standard output (optional).
+        stderr:         File to redirect optimizer standard error (optional).
     """
 
     method: str = "scipy/default"
@@ -111,10 +110,8 @@ class OptimizerConfig(ImmutableBaseModel):
 
     @model_validator(mode="after")
     def _method(self) -> Self:
-        self._mutable()
         plugin, sep, method = self.method.rpartition("/")
         if (sep == "/") and (plugin == "" or method) == "":
             msg = f"malformed method specification: `{self.method}`"
             raise ValueError(msg)
-        self._mutable()
         return self

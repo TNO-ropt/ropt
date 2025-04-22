@@ -16,7 +16,6 @@ from .base import RealizationFilter, RealizationFilterPlugin
 class _ConfigBaseModel(BaseModel):
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
-        frozen=True,
         extra="forbid",
         str_min_length=1,
         str_strip_whitespace=True,

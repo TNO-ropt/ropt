@@ -5,13 +5,13 @@ from __future__ import annotations
 from typing import Self
 
 import numpy as np
-from pydantic import ConfigDict, NonNegativeInt, model_validator
+from pydantic import BaseModel, ConfigDict, NonNegativeInt, model_validator
 
-from ropt.config.utils import ImmutableBaseModel, normalize
+from ropt.config.utils import normalize
 from ropt.config.validated_types import Array1D  # noqa: TC001
 
 
-class RealizationsConfig(ImmutableBaseModel):
+class RealizationsConfig(BaseModel):
     """Configuration class for realizations.
 
     This class, `RealizationsConfig`, defines the configuration for realizations
@@ -57,12 +57,10 @@ class RealizationsConfig(ImmutableBaseModel):
 
     @model_validator(mode="after")
     def _broadcast_normalize_and_check(self) -> Self:
-        self._mutable()
         self.weights = normalize(self.weights)
         if (
             self.realization_min_success is None
             or self.realization_min_success > self.weights.size
         ):
             self.realization_min_success = self.weights.size
-        self._immutable()
         return self

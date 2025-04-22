@@ -5,16 +5,16 @@ from __future__ import annotations
 from typing import Self
 
 import numpy as np
-from pydantic import ConfigDict, ValidationInfo, model_validator
+from pydantic import BaseModel, ConfigDict, ValidationInfo, model_validator
 
-from ropt.config.utils import ImmutableBaseModel, broadcast_arrays, immutable_array
+from ropt.config.utils import broadcast_arrays, immutable_array
 from ropt.config.validated_types import (  # noqa: TC001
     Array1D,
     Array1DInt,
 )
 
 
-class NonlinearConstraintsConfig(ImmutableBaseModel):
+class NonlinearConstraintsConfig(BaseModel):
     r"""Configuration class for non-linear constraints.
 
     This class, `NonlinearConstraintsConfig`, defines non-linear constraints used
@@ -81,9 +81,7 @@ class NonlinearConstraintsConfig(ImmutableBaseModel):
             msg = "The non-linear constraint lower bounds are larger than the upper bounds."
             raise ValueError(msg)
 
-        self._mutable()
         self.lower_bounds = immutable_array(lower_bounds)
         self.upper_bounds = immutable_array(upper_bounds)
-        self._immutable()
 
         return self
