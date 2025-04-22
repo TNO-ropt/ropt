@@ -5,7 +5,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Literal, Self
 
 import numpy as np
-from pydantic import BaseModel, ConfigDict, PositiveInt, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    PositiveInt,
+    field_validator,
+    model_validator,
+)
 
 from ropt.config.utils import check_enum_values, immutable_array
 from ropt.config.validated_types import (  # noqa: TC001
@@ -143,59 +149,32 @@ class GradientConfig(BaseModel):
             self.perturbation_min_success = self.number_of_perturbations
         return self
 
-    @model_validator(mode="after")
-    def _check(self) -> Self:
-        check_enum_values(self.perturbation_types, PerturbationType)
-        check_enum_values(self.boundary_types, BoundaryType)
-        return self
+    @field_validator("perturbation_types", mode="after")
+    @classmethod
+    def _check_perturbation_types(cls, value: ArrayEnum) -> ArrayEnum:
+        check_enum_values(value, PerturbationType)
+        return value
+
+    @field_validator("boundary_types", mode="after")
+    @classmethod
+    def _check_boundary_types(cls, value: ArrayEnum) -> ArrayEnum:
+        check_enum_values(value, BoundaryType)
+        return value
 
     def fix_perturbations(
         self, variables: VariablesConfig, transforms: OptModelTransforms | None
     ) -> GradientConfig:
-        variable_count = variables.initial_values.size
-        magnitudes = self.perturbation_magnitudes
-        boundary_types = self.boundary_types
-        types = self.perturbation_types
+        variable_shape = (variables.initial_values.size,)
+        magnitudes = np.broadcast_to(self.perturbation_magnitudes, variable_shape)
+        boundary_types = np.broadcast_to(
+            immutable_array(self.boundary_types), variable_shape
+        )
+        types = np.broadcast_to(
+            immutable_array(self.perturbation_types), variable_shape
+        )
 
-        try:
-            magnitudes = np.broadcast_to(magnitudes, (variable_count,))
-        except ValueError as err:
-            msg = (
-                "the perturbation magnitudes cannot be broadcasted "
-                f"to a length of {variable_count}"
-            )
-            raise ValueError(msg) from err
-
-        if boundary_types.size == 1:
-            boundary_types = np.broadcast_to(
-                immutable_array(boundary_types),
-                (variable_count,),
-            )
-        elif boundary_types.size == variable_count:
-            boundary_types = immutable_array(boundary_types)
-        else:
-            msg = f"perturbation boundary_types must have {variable_count} items"
-            raise ValueError(msg)
-
-        if types.size == 1:
-            types = np.broadcast_to(immutable_array(types), (variable_count,))
-        elif types.size == variable_count:
-            types = immutable_array(types)
-        else:
-            msg = f"perturbation types must have {variable_count} items"
-            raise ValueError(msg)
-
-        relative = types == PerturbationType.RELATIVE
-        if not np.all(
-            np.logical_and(
-                np.isfinite(variables.lower_bounds[relative]),
-                np.isfinite(variables.upper_bounds[relative]),
-            ),
-        ):
-            msg = "The variable bounds must be finite to use relative perturbations"
-            raise ValueError(msg)
         magnitudes = np.where(
-            relative,
+            types == PerturbationType.RELATIVE,
             (variables.upper_bounds - variables.lower_bounds) * magnitudes,
             magnitudes,
         )

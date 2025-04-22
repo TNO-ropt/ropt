@@ -11,7 +11,6 @@ from ropt.config.utils import broadcast_1d_array, immutable_array
 from ropt.config.validated_types import Array1D, Array2D  # noqa: TC001
 
 if TYPE_CHECKING:
-    from ropt.config.enopt import VariablesConfig
     from ropt.transforms import OptModelTransforms
 
 
@@ -85,16 +84,8 @@ class LinearConstraintsConfig(BaseModel):
         return self
 
     def apply_transformation(
-        self, variables: VariablesConfig, transforms: OptModelTransforms | None
+        self, transforms: OptModelTransforms | None
     ) -> LinearConstraintsConfig:
-        variable_count = variables.initial_values.size
-        if (
-            self.coefficients.shape[0] > 0
-            and self.coefficients.shape[1] != variable_count
-        ):
-            msg = f"the coefficients matrix should have {variable_count} columns"
-            raise ValueError(msg)
-
         if transforms is not None and transforms.variables is not None:
             coefficients, lower_bounds, upper_bounds = (
                 transforms.variables.linear_constraints_to_optimizer(
@@ -108,5 +99,4 @@ class LinearConstraintsConfig(BaseModel):
                 upper_bounds=upper_bounds,
             )
             return LinearConstraintsConfig.model_construct(**values)
-
         return self
