@@ -1177,6 +1177,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.set_bounds" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_bounds
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.reset" class="md-nav__link">
     <span class="md-ellipsis">
       reset
@@ -1788,6 +1797,15 @@
   <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.utils.NormalizedConstraints.set_bounds" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_bounds
     </span>
   </a>
   
@@ -2787,7 +2805,7 @@ linear constraints, and to retrieve the list of supported optimizers.</p>
 C(x) = 0, C(x) &lt;= 0, or C(x) &gt;= 0. By default this is done by subtracting
 the right-hand side value, and multiplying with -1, if necessary.</p>
 <p>The right hand sides are provided by the <code>lower_bounds</code> and <code>upper_bound</code>
-values. If corresponding entries in these arrays are equeal (within a 1e-15
+values. If corresponding entries in these arrays are equal (within a 1e-15
 tolerance), the corresponding constraint is assumed to be a equality
 constraint. If they are not, they are considered inequality constraints, if
 one or both values are finite. If the lower bounds are finite, the
@@ -2795,8 +2813,8 @@ constraint is added as is, after subtracting of the lower bound. If the
 upper bound is finite, the same is done, but the constraint is multiplied by
 -1. If both are finite, both constraints are added, effectively splitting a
 two-sided constraint into two normalized constraints.</p>
-<p>By default this normalizes inequality constraints to the form C(x) &lt; 0, by
-setting <code>flip</code> flag, this can be changed to C(x) &lt; 0.</p>
+<p>By default this normalizes inequality constraints to the form C(x) &gt; 0, by
+setting the <code>flip</code> flag, this can be changed to C(x) &lt; 0.</p>
 <p><strong>Usage:</strong></p>
 <ol>
 <li>Initialize with the lower and upper bounds.</li>
@@ -3094,6 +3112,76 @@ Returns <code>None</code> if <code>set_gradients</code> has not been called sinc
 <div class="doc doc-object doc-function">
 
 
+<h4 id="ropt.plugins.optimizer.utils.NormalizedConstraints.set_bounds" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">set_bounds</span>
+
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_bounds</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">lower_bounds</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">upper_bounds</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Set the bounds of the normalization class.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>lower_bounds</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The lower bounds on the right hand sides.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>upper_bounds</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The upper bounds on the right hand sides.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h4 id="ropt.plugins.optimizer.utils.NormalizedConstraints.reset" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">reset</span>
 
@@ -3105,8 +3193,13 @@ Returns <code>None</code> if <code>set_gradients</code> has not been called sinc
     <div class="doc doc-contents ">
 
         <p>Reset cached normalized constraints and gradients.</p>
-<p>This should be called before evaluating with a new variable vector to
-ensure fresh values are calculated upon the next access.</p>
+<p>This must be called when the stored constraints and their gradients are
+no longer valid. This is typically done after a new function/gradient
+evaluation. The <code>set_constraints</code> and <code>set_gradients</code> methods can then
+be called to set the new values.</p>
+<p>After calling this method, the <code>constraints</code> and <code>gradients</code> properties
+will return <code>None</code> until new values are set. This can be utilized to check
+if new values need to be calculated.</p>
 
 
     </div>
@@ -3134,6 +3227,8 @@ are stored internally and made available via the <code>constraints</code> proper
 <p>This supports parallel evaluation: if <code>values</code> is a 2D array, each row
 is treated as the constraint values for a separate variable vector
 evaluation.</p>
+<p>If there are already cached values, this method will not overwrite them,
+the <code>reset</code> method must be called first.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3190,6 +3285,8 @@ evaluation.</p>
 variable vector) and applies the normalization logic defined during
 initialization (potential sign flipping). The results are stored
 internally and made available via the <code>gradients</code> property.</p>
+<p>If there are already cached values, this method will not overwrite them,
+the <code>reset</code> method must be called first.</p>
 
 
 <details class="note" open>
