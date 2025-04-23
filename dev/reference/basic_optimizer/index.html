@@ -1806,10 +1806,9 @@ error.</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">enopt_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">EnOptConfig</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">evaluator</span><span class="p">:</span> <span class="n">Evaluator</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">transforms</span><span class="p">:</span> <span class="n">OptModelTransforms</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">constraint_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">constraint_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1818,9 +1817,7 @@ error.</p>
 <p>This constructor sets up the necessary components for a single
 optimization run. It requires an optimization configuration and an
 evaluator, which together define the optimization problem and how to
-evaluate potential solutions. The <code>transforms</code> object can be used to
-apply transformations to the optimization model, such as scaling or
-shifting variables. If a constraint value is within the
+evaluate potential solutions. If a constraint value is within the
 <code>constraint_tolerance</code> of zero, it is considered satisfied. The <code>kwargs</code>
 may be used to define custom steps, and handlers to modify the behavior
 of the optimization process.</p>
@@ -1835,8 +1832,7 @@ as follows:</p>
 <li><strong>Custom Step Execution:</strong> If a single keyword argument is
     provided, the <code>BasicOptimizer</code> checks if a step with the same
     name exists. If so, that step is executed immediately, receiving
-    the key-value pair as a keyword input, together with the
-    transforms passed via a <code>transforms</code> keyword. Only one custom
+    the key-value pair as a keyword input. Only one custom
     step can be executed this way, if other keyword arguments are
     present an error is raised. The custom step receives the <code>Plan</code>
     object and may install a custom run function to be executed
@@ -1891,27 +1887,6 @@ as follows:</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>transforms</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.transforms.OptModelTransforms
-
-
-  
-      dataclass
-  " href="../domain_transforms/#ropt.transforms.OptModelTransforms">OptModelTransforms</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional transforms.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">

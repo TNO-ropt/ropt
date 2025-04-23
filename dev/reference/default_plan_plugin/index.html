@@ -2045,11 +2045,10 @@ input variable vector evaluated.</p>
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">EnOptConfig</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">transforms</span><span class="p">:</span> <span class="n">OptModelTransforms</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizerExitCode</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizerExitCode</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2057,15 +2056,11 @@ input variable vector evaluated.</p>
         <p>Run the evaluator step to perform ensemble evaluations.</p>
 <p>This method executes the core logic of the evaluator step. It requires
 an optimizer configuration
-(<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> or a compatible
-dictionary) and optionally accepts specific variable vectors to
-evaluate.</p>
+(<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>) and optionally accepts
+specific variable vectors to evaluate.</p>
 <p>If <code>variables</code> are not provided, the initial values specified in the
 <code>config</code> are used. If <code>variables</code> are provided as a 2D array, each row
 is treated as a separate vector for evaluation.</p>
-<p>If a <code>transforms</code> object is given, it is passed to the ensemble
-evaluator to transform variables and results between user and optimizer
-domains (see <a class="autorefs autorefs-internal" title="            ropt.transforms" href="../domain_transforms/#ropt.transforms"><code>ropt.transforms</code></a>).</p>
 <p>If <code>metadata</code> is provided, it is attached to the
 <a class="autorefs autorefs-internal" title="            ropt.results.Results
 
@@ -2092,7 +2087,7 @@ domains (see <a class="autorefs autorefs-internal" title="            ropt.trans
                 <code>config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>] | <a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2101,27 +2096,6 @@ domains (see <a class="autorefs autorefs-internal" title="            ropt.trans
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>transforms</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.transforms.OptModelTransforms
-
-
-  
-      dataclass
-  " href="../domain_transforms/#ropt.transforms.OptModelTransforms">OptModelTransforms</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional transforms object for variable/result conversion.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -2365,12 +2339,11 @@ evaluator. The nested plan is expected to return a single
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">EnOptConfig</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">transforms</span><span class="p">:</span> <span class="n">OptModelTransforms</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">nested_optimization</span><span class="p">:</span> <span class="n">Plan</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizerExitCode</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">nested_optimization</span><span class="p">:</span> <span class="n">Plan</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizerExitCode</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2378,15 +2351,12 @@ evaluator. The nested plan is expected to return a single
         <p>Run the optimizer step to perform an optimization.</p>
 <p>This method executes the core logic of the optimizer step. It requires
 an optimizer configuration
-(<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> or a compatible
-dictionary) and optionally accepts specific initial variable vectors,
-transforms, a nested optimization plan, and metadata.</p>
+(<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>) and optionally accepts
+specific initial variable vectors, and/or a nested optimization plan,
+and metadata.</p>
 <p>If <code>variables</code> are not provided, the initial values specified in the
 <code>config</code> are used. If <code>variables</code> are provided, they override the
 config's initial values.</p>
-<p>If a <code>transforms</code> object is given, it is passed to the optimizer to
-transform variables and results between user and optimizer domains (see
-<a class="autorefs autorefs-internal" title="            ropt.transforms" href="../domain_transforms/#ropt.transforms"><code>ropt.transforms</code></a>).</p>
 <p>If <code>metadata</code> is provided, it is attached to the
 <a class="autorefs autorefs-internal" title="            ropt.results.Results
 
@@ -2415,7 +2385,7 @@ each function evaluation instead of the standard ensemble evaluator.</p>
                 <code>config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>] | <a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2424,27 +2394,6 @@ each function evaluation instead of the standard ensemble evaluator.</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>transforms</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.transforms.OptModelTransforms
-
-
-  
-      dataclass
-  " href="../domain_transforms/#ropt.transforms.OptModelTransforms">OptModelTransforms</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional transforms object.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -2584,8 +2533,7 @@ retain based on defined criteria.</p>
 constraints beyond this tolerance is ignored.</p>
 <p>The selected result (in the optimizer domain) is stored internally. The
 result accessible via dictionary access (<code>handler["results"]</code>) is the
-selected result, potentially transformed to the user domain if <code>transforms</code>
-were provided during initialization.</p>
+selected result, potentially transformed to the user domain.</p>
 
 
 
@@ -2620,8 +2568,7 @@ were provided during initialization.</p>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">what</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;best&quot;</span><span class="p">,</span> <span class="s2">&quot;last&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;best&quot;</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">constraint_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">sources</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">UUID</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">transforms</span><span class="p">:</span> <span class="n">OptModelTransforms</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2664,7 +2611,7 @@ from any source.</p>
 <p>Tracking logic (comparing 'best' or selecting 'last') operates on the
 results in the optimizer's domain. However, the final selected result
 that is made accessible via dictionary access (<code>handler["results"]</code>) is
-transformed to the user's domain if a <code>transforms</code> object is provided.</p>
+transformed to the user's domain.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2736,27 +2683,6 @@ transformed to the user's domain if a <code>transforms</code> object is provided
             <td>
               <div class="doc-md-description">
                 <p>Optional set of step UUIDs whose results should be tracked.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>transforms</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.transforms.OptModelTransforms
-
-
-  
-      dataclass
-  " href="../domain_transforms/#ropt.transforms.OptModelTransforms">OptModelTransforms</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional transforms object for user-domain results.</p>
               </div>
             </td>
             <td>
@@ -2882,13 +2808,10 @@ emitted by specified <code>sources</code> (plan steps). It collects all
       dataclass
   " href="../results/#ropt.results.Results"><code>Results</code></a> objects contained within these events and
 stores them sequentially in memory.</p>
-<p>The <code>sources</code> parameter filters which steps' results are collected. If a
-<code>transforms</code> object is provided, the results are converted from the
-optimizer domain to the user domain before being stored.</p>
-<p>The accumulated results are stored as a tuple and can be accessed via
-dictionary access using the key <code>"results"</code> (e.g., <code>handler["results"]</code>).
-Each time new results are received from a valid source, they are appended to
-this tuple.</p>
+<p>The <code>sources</code> parameter filters which steps' results are collected. The
+accumulated results are stored as a tuple and can be accessed via dictionary
+access using the key <code>"results"</code> (e.g., <code>handler["results"]</code>). Each time new
+results are received from a valid source, they are appended to this tuple.</p>
 
 
 
@@ -2918,11 +2841,8 @@ this tuple.</p>
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">sources</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">UUID</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">transforms</span><span class="p">:</span> <span class="n">OptModelTransforms</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sources</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">UUID</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2958,11 +2878,10 @@ event (<code>event.source</code>) is present in the <code>sources</code> set. If
 handler stores the results; otherwise, it ignores the event. If
 <code>sources</code> is <code>None</code> (the default), the handler will not store results
 from any source.</p>
-<p>If a <code>transforms</code> object is provided, the results are converted from the
-optimizer domain to the user domain <em>before</em> being stored.</p>
-<p>The accumulated results are stored as a tuple and can be accessed via
-dictionary access using the key <code>"results"</code> (e.g., <code>handler["results"]</code>).
-Initially, <code>handler["results"]</code> is <code>None</code>.</p>
+<p>The results are converted from the optimizer domain to the user domain
+<em>before</em> being stored. The accumulated results are stored as a tuple and
+can be accessed via dictionary access using the key <code>"results"</code> (e.g.,
+<code>handler["results"]</code>). Initially, <code>handler["results"]</code> is <code>None</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3008,27 +2927,6 @@ Initially, <code>handler["results"]</code> is <code>None</code>.</p>
                   <code>None</code>
             </td>
           </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>transforms</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.transforms.OptModelTransforms
-
-
-  
-      dataclass
-  " href="../domain_transforms/#ropt.transforms.OptModelTransforms">OptModelTransforms</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional transforms object to apply before storing results.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
       </tbody>
     </table>
 
@@ -3062,10 +2960,9 @@ listens for
   " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events
 originating from steps whose IDs are included in the <code>sources</code> set
 configured during initialization.</p>
-<p>If a relevant event containing results is received, this method retrieves
-the results, optionally transforms them to the user domain if
-<code>transforms</code> were provided, and appends them to the tuple stored in
-<code>self["results"]</code>.</p>
+<p>If a relevant event containing results is received, this method
+retrieves the results, optionally transforms them to the user domain and
+appends them to the tuple stored in <code>self["results"]</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
