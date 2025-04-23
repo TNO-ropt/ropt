@@ -240,7 +240,7 @@ class NormalizedConstraints:
     the right-hand side value, and multiplying with -1, if necessary.
 
     The right hand sides are provided by the `lower_bounds` and `upper_bound`
-    values. If corresponding entries in these arrays are equeal (within a 1e-15
+    values. If corresponding entries in these arrays are equal (within a 1e-15
     tolerance), the corresponding constraint is assumed to be a equality
     constraint. If they are not, they are considered inequality constraints, if
     one or both values are finite. If the lower bounds are finite, the
@@ -249,8 +249,8 @@ class NormalizedConstraints:
     -1. If both are finite, both constraints are added, effectively splitting a
     two-sided constraint into two normalized constraints.
 
-    By default this normalizes inequality constraints to the form C(x) < 0, by
-    setting `flip` flag, this can be changed to C(x) < 0.
+    By default this normalizes inequality constraints to the form C(x) > 0, by
+    setting the `flip` flag, this can be changed to C(x) < 0.
 
     **Usage:**
 
@@ -297,33 +297,43 @@ class NormalizedConstraints:
             flip:         Whether to flip the sign of the constraints.
         """
         self._apply_flip = flip
-        self._is_eq: list[bool] = []
-        self._indices: list[int] = []
-        self._rhs: list[float] = []
-        self._flip: list[bool] = []
-
         self._constraints: NDArray[np.float64] | None = None
         self._gradients: NDArray[np.float64] | None = None
+        self.set_bounds(lower_bounds, upper_bounds)
+
+    def set_bounds(
+        self,
+        lower_bounds: NDArray[np.float64],
+        upper_bounds: NDArray[np.float64],
+    ) -> None:
+        """Set the bounds of the normalization class.
+
+        Args:
+            lower_bounds: The lower bounds on the right hand sides.
+            upper_bounds: The upper bounds on the right hand sides.
+        """
+        self._lower_bounds = lower_bounds.copy()
+        self._upper_bounds = upper_bounds.copy()
+        self._is_eq: list[bool] = []
+        self._indices: list[int] = []
+        self._is_lower: list[bool] = []
 
         for idx, (lower_bound, upper_bound) in enumerate(
-            zip(lower_bounds, upper_bounds, strict=True), start=len(self._is_eq)
+            zip(lower_bounds, upper_bounds, strict=True)
         ):
             if abs(upper_bound - lower_bound) < 1e-15:  # noqa: PLR2004
                 self._is_eq.append(True)
                 self._indices.append(idx)
-                self._rhs.append(lower_bound)
-                self._flip.append(self._apply_flip)
+                self._is_lower.append(True)
             else:
                 if np.isfinite(lower_bound):
                     self._is_eq.append(False)
                     self._indices.append(idx)
-                    self._rhs.append(lower_bound)
-                    self._flip.append(self._apply_flip)
+                    self._is_lower.append(True)
                 if np.isfinite(upper_bound):
                     self._is_eq.append(False)
                     self._indices.append(idx)
-                    self._rhs.append(upper_bound)
-                    self._flip.append(not self._apply_flip)
+                    self._is_lower.append(False)
 
     @property
     def is_eq(self) -> list[bool]:
@@ -337,8 +347,14 @@ class NormalizedConstraints:
     def reset(self) -> None:
         """Reset cached normalized constraints and gradients.
 
-        This should be called before evaluating with a new variable vector to
-        ensure fresh values are calculated upon the next access.
+        This must be called when the stored constraints and their gradients are
+        no longer valid. This is typically done after a new function/gradient
+        evaluation. The `set_constraints` and `set_gradients` methods can then
+        be called to set the new values.
+
+        After calling this method, the `constraints` and `gradients` properties
+        will return `None` until new values are set. This can be utilized to check
+        if new values need to be calculated.
         """
         self._constraints = None
         self._gradients = None
@@ -392,19 +408,28 @@ class NormalizedConstraints:
         is treated as the constraint values for a separate variable vector
         evaluation.
 
+        If there are already cached values, this method will not overwrite them,
+        the `reset` method must be called first.
+
         Args:
             values: A 1D or 2D NumPy array of raw constraint values. If 2D,
                     rows represent different evaluations.
         """
+        if self._constraints is not None:
+            return
         if values.ndim == 1:
             values = np.expand_dims(values, axis=1)
         self._constraints = np.empty(
             (len(self._indices), values.shape[1]), dtype=np.float64
         )
-        for idx, (constraint_idx, rhs_value, flip) in enumerate(
-            zip(self._indices, self._rhs, self._flip, strict=True)
-        ):
+        for idx, constraint_idx in enumerate(self._indices):
+            rhs_value = (
+                self._lower_bounds[constraint_idx]
+                if self._is_lower[idx]
+                else self._upper_bounds[constraint_idx]
+            )
             self._constraints[idx, :] = values[constraint_idx, :] - rhs_value
+            flip = self._apply_flip if self._is_lower[idx] else not self._apply_flip
             if flip:
                 self._constraints[idx, :] = -self._constraints[idx, :]
 
@@ -416,6 +441,9 @@ class NormalizedConstraints:
         initialization (potential sign flipping). The results are stored
         internally and made available via the `gradients` property.
 
+        If there are already cached values, this method will not overwrite them,
+        the `reset` method must be called first.
+
         Note:
             Unlike `set_constraints`, this method does *not* support parallel
             evaluation; it expects gradients corresponding to a single variable vector.
@@ -424,12 +452,13 @@ class NormalizedConstraints:
             values: A 2D NumPy array of raw constraint gradients (rows are
                     gradients of original constraints, columns are variables).
         """
+        if self._gradients is not None:
+            return
         self._gradients = np.empty(
             (len(self._indices), values.shape[1]), dtype=np.float64
         )
-        for idx, (constraint_idx, flip) in enumerate(
-            zip(self._indices, self._flip, strict=True)
-        ):
+        for idx, constraint_idx in enumerate(self._indices):
+            flip = self._apply_flip if self._is_lower[idx] else not self._apply_flip
             self._gradients[idx, :] = values[constraint_idx, :]
             if flip:
                 self._gradients[idx, :] = -self._gradients[idx, :]

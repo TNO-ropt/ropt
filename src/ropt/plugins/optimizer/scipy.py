@@ -236,6 +236,11 @@ class SciPyOptimizer(Optimizer):
             lin_coef, lin_lower, lin_upper = get_masked_linear_constraints(self._config)
 
         if self._method == "differential_evolution":
+            if self._config.nonlinear_constraints is not None:
+                self._normalized_constraints = NormalizedConstraints(
+                    self._config.nonlinear_constraints.lower_bounds,
+                    self._config.nonlinear_constraints.upper_bounds,
+                )
             return self._initialize_constraints_object(lin_coef, lin_lower, lin_upper)
 
         lower_bounds = []
@@ -254,17 +259,18 @@ class SciPyOptimizer(Optimizer):
 
         return []
 
-    def _fun(
+    def _fun_dict(
         self,
         variables: NDArray[np.float64],
-        index: int,
+        index: int | None,
         lin_coef: NDArray[np.float64] | None,
     ) -> NDArray[np.float64]:
         assert self._normalized_constraints is not None
+        functions = self._constraint_functions(variables).transpose()
         if self._normalized_constraints.constraints is None:
             constraints = []
             if self._config.nonlinear_constraints is not None:
-                constraints.append(self._constraint_functions(variables).transpose())
+                constraints.append(functions)
             if lin_coef is not None:
                 constraints.append(np.matmul(lin_coef, variables))
             self._normalized_constraints.set_constraints(
@@ -273,21 +279,22 @@ class SciPyOptimizer(Optimizer):
         assert self._normalized_constraints.constraints is not None
         return self._normalized_constraints.constraints[index, :]
 
-    def _jac(
+    def _jac_dict(
         self,
         variables: NDArray[np.float64],
-        index: int,
+        index: int | None,
         lin_coef: NDArray[np.float64] | None,
     ) -> NDArray[np.float64]:
         assert self._normalized_constraints is not None
+        gradients = self._constraint_gradients(variables)
         if self._normalized_constraints.gradients is None:
-            gradients = []
+            constraints = []
             if self._config.nonlinear_constraints is not None:
-                gradients.append(self._constraint_gradients(variables))
+                constraints.append(gradients)
             if lin_coef is not None:
-                gradients.append(lin_coef)
+                constraints.append(lin_coef)
             self._normalized_constraints.set_gradients(
-                np.concatenate(gradients, axis=0)
+                np.concatenate(constraints, axis=0)
             )
         assert self._normalized_constraints.gradients is not None
         return self._normalized_constraints.gradients[index, :]
@@ -300,16 +307,35 @@ class SciPyOptimizer(Optimizer):
             return []
 
         def _constraint_entry(type_: str, index: int) -> dict[str, _ConstraintType]:
-            fun = partial(self._fun, index=index, lin_coef=lin_coef)
+            fun = partial(self._fun_dict, index=index, lin_coef=lin_coef)
             if self._method == "cobyla":
                 return {"type": type_, "fun": fun}
-            jac = partial(self._jac, index=index, lin_coef=lin_coef)
+            jac = partial(self._jac_dict, index=index, lin_coef=lin_coef)
             return {"type": type_, "fun": fun, "jac": jac}
 
         return [
             _constraint_entry("eq" if is_eq else "ineq", inx)
             for inx, is_eq in enumerate(self._normalized_constraints.is_eq)
         ]
+
+    def _fun_object(self, variables: NDArray[np.float64]) -> NDArray[np.float64]:
+        assert self._normalized_constraints is not None
+        self._normalized_constraints.set_constraints(
+            self._constraint_functions(variables).transpose()
+        )
+        assert self._normalized_constraints.constraints is not None
+        return self._normalized_constraints.constraints
+
+    def _jac_object(
+        self,
+        variables: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
+        assert self._normalized_constraints is not None
+        self._normalized_constraints.set_gradients(
+            self._constraint_gradients(variables)
+        )
+        assert self._normalized_constraints.gradients is not None
+        return self._normalized_constraints.gradients
 
     def _initialize_constraints_object(
         self,
@@ -320,21 +346,13 @@ class SciPyOptimizer(Optimizer):
         constraints = []
         if self._config.linear_constraints is not None:
             constraints.append(LinearConstraint(lin_coef, lin_lower, lin_upper))
-
-        if self._config.nonlinear_constraints is not None:
-            lower_bounds = self._config.nonlinear_constraints.lower_bounds
-            upper_bounds = self._config.nonlinear_constraints.upper_bounds
-
-            def _fun(variables: NDArray[np.float64]) -> NDArray[np.float64]:
-                functions = self._constraint_functions(variables)
-                return functions.transpose()
-
-            def _jac(variables: NDArray[np.float64]) -> NDArray[np.float64]:
-                return self._constraint_gradients(variables)
-
+        if self._normalized_constraints is not None:
+            ub = [
+                0.0 if is_eq else np.inf for is_eq in self._normalized_constraints.is_eq
+            ]
             constraints.append(
                 NonlinearConstraint(
-                    fun=_fun, jac=_jac, lb=lower_bounds, ub=upper_bounds
+                    fun=self._fun_object, jac=self._jac_object, lb=0.0, ub=ub
                 ),
             )
         return constraints
