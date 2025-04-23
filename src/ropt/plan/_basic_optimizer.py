@@ -22,7 +22,6 @@ if TYPE_CHECKING:
     from ropt.plan import Event
     from ropt.plugins.plan.base import PlanHandler
     from ropt.results import FunctionResults
-    from ropt.transforms import OptModelTransforms
 
 
 @dataclass(slots=True)
@@ -72,7 +71,6 @@ class BasicOptimizer:
         enopt_config: dict[str, Any] | EnOptConfig,
         evaluator: Evaluator,
         *,
-        transforms: OptModelTransforms | None = None,
         constraint_tolerance: float = 1e-10,
         **kwargs: Any,  # noqa: ANN401
     ) -> None:
@@ -81,9 +79,7 @@ class BasicOptimizer:
         This constructor sets up the necessary components for a single
         optimization run. It requires an optimization configuration and an
         evaluator, which together define the optimization problem and how to
-        evaluate potential solutions. The `transforms` object can be used to
-        apply transformations to the optimization model, such as scaling or
-        shifting variables. If a constraint value is within the
+        evaluate potential solutions. If a constraint value is within the
         `constraint_tolerance` of zero, it is considered satisfied. The `kwargs`
         may be used to define custom steps, and handlers to modify the behavior
         of the optimization process.
@@ -96,8 +92,7 @@ class BasicOptimizer:
             1.  **Custom Step Execution:** If a single keyword argument is
                 provided, the `BasicOptimizer` checks if a step with the same
                 name exists. If so, that step is executed immediately, receiving
-                the key-value pair as a keyword input, together with the
-                transforms passed via a `transforms` keyword. Only one custom
+                the key-value pair as a keyword input. Only one custom
                 step can be executed this way, if other keyword arguments are
                 present an error is raised. The custom step receives the `Plan`
                 object and may install a custom run function to be executed
@@ -112,12 +107,10 @@ class BasicOptimizer:
         Args:
             enopt_config:         The configuration for the optimization.
             evaluator:            The evaluator object.
-            transforms:           Optional transforms.
             constraint_tolerance: The constraint violation tolerance.
             kwargs:               Optional keyword arguments.
         """
         self._config = EnOptConfig.model_validate(enopt_config)
-        self._transforms = transforms
         self._constraint_tolerance = constraint_tolerance
         self._optimizer_context = OptimizerContext(evaluator=evaluator)
         self._observers: list[tuple[EventType, Callable[[Event], None]]] = []
@@ -182,11 +175,9 @@ class BasicOptimizer:
         """
 
         def _run_func(
-            plan: Plan, transforms: OptModelTransforms | None
+            plan: Plan,
         ) -> tuple[PlanHandler | None, OptimizerExitCode | None]:
-            exit_code = plan.run_step(
-                optimizer, config=self._config, transforms=transforms
-            )
+            exit_code = plan.run_step(optimizer, config=self._config)
             return plan.get(tracker, "results"), exit_code
 
         plan = Plan(self._optimizer_context)
@@ -197,9 +188,7 @@ class BasicOptimizer:
             if len(self._kwargs) > 1:
                 msg = "Only one custom step is allowed."
                 raise TypeError(msg)
-            plan.run_step(
-                plan.add_step(key), transforms=self._transforms, **{key: value}
-            )
+            plan.run_step(plan.add_step(key), **{key: value})
 
         # If no custom function was installed, install the default function:
         if not plan.has_function():
@@ -208,14 +197,13 @@ class BasicOptimizer:
                 "tracker",
                 constraint_tolerance=self._constraint_tolerance,
                 sources={optimizer},
-                transforms=self._transforms,
             )
             plan.add_function(_run_func)
 
         for event_type, function in self._observers:
             self._optimizer_context.add_observer(event_type, function)
 
-        results, exit_code = plan.run_function(self._transforms)
+        results, exit_code = plan.run_function()
         variables = None if results is None else results.evaluations.variables
         self._results = _Results(
             results=results,
@@ -275,9 +263,10 @@ class BasicOptimizer:
 
         def _results_callback(event: Event) -> None:
             results = event.data.get("results", ())
-            if self._transforms is not None:
+            if event.config.transforms is not None:
                 results = tuple(
-                    item.transform_from_optimizer(self._transforms) for item in results
+                    item.transform_from_optimizer(event.config.transforms)
+                    for item in results
                 )
             callback(results)
 

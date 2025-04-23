@@ -14,7 +14,6 @@ if TYPE_CHECKING:
 
     from ropt.plan import Event, Plan
     from ropt.results import FunctionResults
-    from ropt.transforms import OptModelTransforms
 
 
 class DefaultTrackerHandler(PlanHandler):
@@ -39,8 +38,7 @@ class DefaultTrackerHandler(PlanHandler):
 
     The selected result (in the optimizer domain) is stored internally. The
     result accessible via dictionary access (`handler["results"]`) is the
-    selected result, potentially transformed to the user domain if `transforms`
-    were provided during initialization.
+    selected result, potentially transformed to the user domain.
     """
 
     def __init__(
@@ -50,7 +48,6 @@ class DefaultTrackerHandler(PlanHandler):
         what: Literal["best", "last"] = "best",
         constraint_tolerance: float | None = None,
         sources: set[uuid.UUID] | None = None,
-        transforms: OptModelTransforms | None = None,
     ) -> None:
         """Initialize a default tracker results handler.
 
@@ -78,20 +75,18 @@ class DefaultTrackerHandler(PlanHandler):
         Tracking logic (comparing 'best' or selecting 'last') operates on the
         results in the optimizer's domain. However, the final selected result
         that is made accessible via dictionary access (`handler["results"]`) is
-        transformed to the user's domain if a `transforms` object is provided.
+        transformed to the user's domain.
 
         Args:
             plan:                 The parent plan instance.
             what:                 Criterion for selecting results ('best' or 'last').
             constraint_tolerance: Optional threshold for filtering constraint violations.
             sources:              Optional set of step UUIDs whose results should be tracked.
-            transforms:           Optional transforms object for user-domain results.
         """
         super().__init__(plan)
         self._what = what
         self._constraint_tolerance = constraint_tolerance
         self._sources = set() if sources is None else sources
-        self._transforms = transforms
         self._tracked_results: FunctionResults | None = None
         self["results"] = None
 
@@ -134,8 +129,8 @@ class DefaultTrackerHandler(PlanHandler):
                     )
             if filtered_results is not None:
                 self._tracked_results = filtered_results
-                if self._transforms is not None:
+                if event.config.transforms is not None:
                     filtered_results = filtered_results.transform_from_optimizer(
-                        self._transforms
+                        event.config.transforms
                     )
                 self["results"] = filtered_results

@@ -11,7 +11,6 @@ if TYPE_CHECKING:
     import uuid
 
     from ropt.plan import Event, Plan
-    from ropt.transforms import OptModelTransforms
 
 
 class DefaultStoreHandler(PlanHandler):
@@ -23,14 +22,10 @@ class DefaultStoreHandler(PlanHandler):
     [`Results`][ropt.results.Results] objects contained within these events and
     stores them sequentially in memory.
 
-    The `sources` parameter filters which steps' results are collected. If a
-    `transforms` object is provided, the results are converted from the
-    optimizer domain to the user domain before being stored.
-
-    The accumulated results are stored as a tuple and can be accessed via
-    dictionary access using the key `"results"` (e.g., `handler["results"]`).
-    Each time new results are received from a valid source, they are appended to
-    this tuple.
+    The `sources` parameter filters which steps' results are collected. The
+    accumulated results are stored as a tuple and can be accessed via dictionary
+    access using the key `"results"` (e.g., `handler["results"]`). Each time new
+    results are received from a valid source, they are appended to this tuple.
     """
 
     def __init__(
@@ -38,7 +33,6 @@ class DefaultStoreHandler(PlanHandler):
         plan: Plan,
         *,
         sources: set[uuid.UUID] | None = None,
-        transforms: OptModelTransforms | None = None,
     ) -> None:
         """Initialize a default store results handler.
 
@@ -57,21 +51,17 @@ class DefaultStoreHandler(PlanHandler):
         `sources` is `None` (the default), the handler will not store results
         from any source.
 
-        If a `transforms` object is provided, the results are converted from the
-        optimizer domain to the user domain *before* being stored.
-
-        The accumulated results are stored as a tuple and can be accessed via
-        dictionary access using the key `"results"` (e.g., `handler["results"]`).
-        Initially, `handler["results"]` is `None`.
+        The results are converted from the optimizer domain to the user domain
+        *before* being stored. The accumulated results are stored as a tuple and
+        can be accessed via dictionary access using the key `"results"` (e.g.,
+        `handler["results"]`). Initially, `handler["results"]` is `None`.
 
         Args:
             plan:       The parent plan instance.
             sources:    Optional set of step UUIDs whose results should be stored.
-            transforms: Optional transforms object to apply before storing results.
         """
         super().__init__(plan)
         self._sources = set() if sources is None else sources
-        self._transforms = transforms
         self["results"] = None
 
     def handle_event(self, event: Event) -> None:
@@ -83,10 +73,9 @@ class DefaultStoreHandler(PlanHandler):
         originating from steps whose IDs are included in the `sources` set
         configured during initialization.
 
-        If a relevant event containing results is received, this method retrieves
-        the results, optionally transforms them to the user domain if
-        `transforms` were provided, and appends them to the tuple stored in
-        `self["results"]`.
+        If a relevant event containing results is received, this method
+        retrieves the results, optionally transforms them to the user domain and
+        appends them to the tuple stored in `self["results"]`.
 
         Args:
             event: The event object emitted by the plan.
@@ -97,9 +86,10 @@ class DefaultStoreHandler(PlanHandler):
         ):
             if (results := event.data.get("results", None)) is None:
                 return
-            if self._transforms is not None:
+            if event.config.transforms is not None:
                 results = (
-                    item.transform_from_optimizer(self._transforms) for item in results
+                    item.transform_from_optimizer(event.config.transforms)
+                    for item in results
                 )
             self["results"] = (
                 results if self["results"] is None else (*self["results"], *results)

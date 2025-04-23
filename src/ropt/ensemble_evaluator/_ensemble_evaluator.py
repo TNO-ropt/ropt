@@ -42,7 +42,6 @@ if TYPE_CHECKING:
     from ropt.plugins.function_estimator.base import FunctionEstimator
     from ropt.plugins.realization_filter.base import RealizationFilter
     from ropt.plugins.sampler.base import Sampler
-    from ropt.transforms import OptModelTransforms
 
 
 class EnsembleEvaluator:
@@ -63,7 +62,6 @@ class EnsembleEvaluator:
     def __init__(
         self,
         config: EnOptConfig,
-        transforms: OptModelTransforms | None,
         evaluator: Evaluator,
         plugin_manager: PluginManager,
     ) -> None:
@@ -74,21 +72,17 @@ class EnsembleEvaluator:
 
         The `config` object contains all the settings required for the ensemble
         evaluation, such as the number of realizations, the function estimators,
-        and the gradient settings. The `transforms` object can be used to
-        transform the variables, objectives, and constraints before or after the
-        evaluation. The `evaluator` callable should conform to the
-        [`Evaluator`][ropt.evaluator.Evaluator] protocol. The `plugin_manager`
-        is used to load the realization filters, function estimators, and
-        samplers.
+        and the gradient settings. The `evaluator` callable should conform to
+        the [`Evaluator`][ropt.evaluator.Evaluator] protocol. The
+        `plugin_manager` is used to load the realization filters, function
+        estimators, and samplers.
 
         Args:
             config:         The configuration object.
-            transforms:     Optional transforms object.
             evaluator:      The callable for evaluating individual functions.
             plugin_manager: A plugin manager to load required plugins.
         """
         self._config = config
-        self._transforms = transforms
         self._evaluator = evaluator
         self._realization_filters = self._init_realization_filters(plugin_manager)
         self._function_estimators = self._init_function_estimators(plugin_manager)
@@ -160,7 +154,6 @@ class EnsembleEvaluator:
             self._calculate_one_set_of_functions(f_eval_results, variables[idx, :])
             for idx, f_eval_results in _get_function_results(
                 self._config,
-                self._transforms,
                 self._evaluator,
                 variables,
                 active_objectives,
@@ -255,7 +248,6 @@ class EnsembleEvaluator:
         )
         g_eval_results = _get_gradient_results(
             self._config,
-            self._transforms,
             self._evaluator,
             perturbed_variables,
             active_objectives,
@@ -320,7 +312,6 @@ class EnsembleEvaluator:
         active_objectives, active_constraints = _get_active_realizations(self._config)
         f_eval_results, g_eval_results = _get_function_and_gradient_results(
             self._config,
-            self._transforms,
             self._evaluator,
             variables,
             perturbed_variables,

@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
+from ropt.config.enopt import EnOptConfig
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted, PlanAborted
 from ropt.plan import (
@@ -46,7 +47,7 @@ def test_run_basic(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plan = Plan(context)
     step = plan.add_step("optimizer")
     tracker = plan.add_handler("tracker", sources={step})
-    plan.run_step(step, config=enopt_config)
+    plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
     assert plan.get(tracker, "results") is not None
     assert np.allclose(
         plan.get(tracker, "results").evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
@@ -67,15 +68,15 @@ def test_plan_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step = plan.add_step("optimizer")
     tracker = plan.add_handler("tracker", sources={step})
 
-    plan.run_step(step, config=enopt_config)
+    plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
     assert plan.get(tracker, "results") is not None
     variables1 = plan.get(tracker, "results").evaluations.variables
     plan.set(tracker, "results", None)
-    plan.run_step(step, config=enopt_config)
+    plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
     assert plan.get(tracker, "results") is not None
     variables2 = plan.get(tracker, "results").evaluations.variables
     plan.set(tracker, "results", None)
-    plan.run_step(step, config=config2)
+    plan.run_step(step, config=EnOptConfig.model_validate(config2))
     assert plan.get(tracker, "results") is not None
     variables3 = plan.get(tracker, "results").evaluations.variables
 
@@ -88,11 +89,13 @@ def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> Non
     plan = Plan(context)
     step = plan.add_step("optimizer")
     tracker = plan.add_handler("tracker", sources={step})
-    plan.run_step(step, config=enopt_config)
+    plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
     assert plan.get(tracker, "results") is not None
     variables1 = plan.get(tracker, "results").evaluations.variables
     plan.set(tracker, "variables", None)
-    plan.run_step(step, config=enopt_config, variables=[0, 0, 0])
+    plan.run_step(
+        step, config=EnOptConfig.model_validate(enopt_config), variables=[0, 0, 0]
+    )
     assert plan.get(tracker, "results") is not None
     variables2 = plan.get(tracker, "results").evaluations.variables
 
@@ -110,7 +113,7 @@ def test_reset_results(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plan = Plan(context)
     step = plan.add_step("optimizer")
     tracker = plan.add_handler("tracker", sources={step})
-    plan.run_step(step, config=enopt_config)
+    plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
     saved_results = deepcopy(plan.get(tracker, "results"))
     plan.set(tracker, "results", None)
     assert saved_results is not None
@@ -147,23 +150,23 @@ def test_two_optimizers_alternating(
     step = plan.add_step("optimizer")
     tracker1 = plan.add_handler("tracker", sources={step})
     tracker2 = plan.add_handler("tracker", sources={step}, what="last")
-    plan.run_step(step, config=enopt_config1)
+    plan.run_step(step, config=EnOptConfig.model_validate(enopt_config1))
     assert plan.get(tracker2, "results") is not None
     plan.run_step(
         step,
-        config=enopt_config2,
+        config=EnOptConfig.model_validate(enopt_config2),
         variables=plan.get(tracker2, "results").evaluations.variables,
     )
     assert plan.get(tracker2, "results") is not None
     plan.run_step(
         step,
-        config=enopt_config1,
+        config=EnOptConfig.model_validate(enopt_config1),
         variables=plan.get(tracker2, "results").evaluations.variables,
     )
     assert plan.get(tracker2, "results") is not None
     plan.run_step(
         step,
-        config=enopt_config2,
+        config=EnOptConfig.model_validate(enopt_config2),
         variables=plan.get(tracker2, "results").evaluations.variables,
     )
     assert completed_functions == 14
@@ -195,11 +198,11 @@ def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -
     plan = Plan(context)
     step = plan.add_step("optimizer")
     tracker = plan.add_handler("tracker", sources={step}, what="last")
-    plan.run_step(step, config=enopt_config)
+    plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
     assert plan.get(tracker, "results") is not None
     plan.run_step(
         step,
-        config=enopt_config2,
+        config=EnOptConfig.model_validate(enopt_config2),
         variables=plan.get(tracker, "results").evaluations.variables,
     )
 
@@ -231,7 +234,7 @@ def test_restart_initial(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plan = Plan(context)
     step = plan.add_step("optimizer")
     for _ in range(2):
-        plan.run_step(step, config=enopt_config)
+        plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
 
     assert len(completed) == 6
     initial = np.array([enopt_config["variables"]["initial_values"]])
@@ -264,7 +267,9 @@ def test_restart_last(enopt_config: dict[str, Any], evaluator: Any) -> None:
             if plan.get(tracker, "results") is None
             else plan.get(tracker, "results").evaluations.variables
         )
-        plan.run_step(step, config=enopt_config, variables=variables)
+        plan.run_step(
+            step, config=EnOptConfig.model_validate(enopt_config), variables=variables
+        )
 
     assert np.all(
         completed[3].evaluations.variables == completed[2].evaluations.variables
@@ -296,7 +301,9 @@ def test_restart_optimum(enopt_config: dict[str, Any], evaluator: Any) -> None:
             if plan.get(tracker, "results") is None
             else plan.get(tracker, "results").evaluations.variables
         )
-        plan.run_step(step, config=enopt_config, variables=variables)
+        plan.run_step(
+            step, config=EnOptConfig.model_validate(enopt_config), variables=variables
+        )
 
     assert np.all(
         completed[2].evaluations.variables == completed[4].evaluations.variables
@@ -348,7 +355,9 @@ def test_restart_optimum_with_reset(
             else plan.get(tracker, "results").evaluations.variables
         )
         plan.set(tracker, "results", None)
-        plan.run_step(step, config=enopt_config, variables=variables)
+        plan.run_step(
+            step, config=EnOptConfig.model_validate(enopt_config), variables=variables
+        )
 
     # The third evaluation is the optimum, and used to restart the second run:
     assert np.all(
@@ -385,7 +394,9 @@ def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step = plan.add_step("optimizer")
     for idx in range(2):
         metadata["restart"] = idx
-        plan.run_step(step, config=enopt_config, metadata=metadata)
+        plan.run_step(
+            step, config=EnOptConfig.model_validate(enopt_config), metadata=metadata
+        )
     assert restarts == [0, 1]
 
 
@@ -394,12 +405,14 @@ def test_evaluator_step(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plan = Plan(context)
     step = plan.add_step("evaluator")
     tracker = plan.add_handler("tracker", sources={step})
-    plan.run_step(step, config=enopt_config)
+    plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
     assert plan.get(tracker, "results").functions is not None
     assert np.allclose(plan.get(tracker, "results").functions.weighted_objective, 1.66)
 
     plan.set(tracker, "results", None)
-    plan.run_step(step, config=enopt_config, variables=[0, 0, 0])
+    plan.run_step(
+        step, config=EnOptConfig.model_validate(enopt_config), variables=[0, 0, 0]
+    )
     assert plan.get(tracker, "results").functions is not None
     assert np.allclose(plan.get(tracker, "results").functions.weighted_objective, 1.75)
 
@@ -412,7 +425,11 @@ def test_evaluator_step_multi(enopt_config: dict[str, Any], evaluator: Any) -> N
     plan = Plan(context)
     step = plan.add_step("evaluator")
     store = plan.add_handler("store", sources={step})
-    plan.run_step(step, config=enopt_config, variables=[[0, 0, 0.1], [0, 0, 0]])
+    plan.run_step(
+        step,
+        config=EnOptConfig.model_validate(enopt_config),
+        variables=[[0, 0, 0.1], [0, 0, 0]],
+    )
     values = [
         results.functions.weighted_objective.item()
         for results in plan.get(store, "results")
@@ -439,7 +456,7 @@ def test_exit_code(
     context = OptimizerContext(evaluator=evaluator())
     plan = Plan(context)
     step = plan.add_step("optimizer")
-    exit_code = plan.run_step(step, config=enopt_config)
+    exit_code = plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
     assert exit_code == max_enum
 
 
@@ -474,7 +491,11 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
     def _inner_optimization(
         plan: Plan, variables: NDArray[np.float64]
     ) -> FunctionResults | None:
-        plan.run_step(inner_step, config=nested_config, variables=variables)
+        plan.run_step(
+            inner_step,
+            config=EnOptConfig.model_validate(nested_config),
+            variables=variables,
+        )
         results = inner_plan.get(inner_tracker, "results")
         assert isinstance(results, FunctionResults | None)
         return results
@@ -484,7 +505,11 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
     outer_plan = Plan(context)
     outer_step = outer_plan.add_step("optimizer")
     outer_tracker = outer_plan.add_handler("tracker", sources={outer_step})
-    outer_plan.run_step(outer_step, config=enopt_config, nested_optimization=inner_plan)
+    outer_plan.run_step(
+        outer_step,
+        config=EnOptConfig.model_validate(enopt_config),
+        nested_optimization=inner_plan,
+    )
     assert outer_plan.get(outer_tracker, "results") is not None
     assert np.allclose(
         outer_plan.get(outer_tracker, "results").evaluations.variables,
@@ -526,7 +551,7 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
     ) -> FunctionResults | None:
         plan.run_step(
             inner_step,
-            config=nested_config,
+            config=EnOptConfig.model_validate(nested_config),
             metadata={"inner": "inner_meta_data"},
             variables=variables,
         )
@@ -541,7 +566,7 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
     outer_tracker = outer_plan.add_handler("tracker", sources={outer_step})
     outer_plan.run_step(
         outer_step,
-        config=enopt_config,
+        config=EnOptConfig.model_validate(enopt_config),
         nested_optimization=inner_plan,
         metadata={"outer": 1},
     )
@@ -574,11 +599,11 @@ def test_plan_abort(enopt_config: Any, evaluator: Any) -> None:
     plan = Plan(context)
     step = plan.add_step("optimizer")
     tracker = plan.add_handler("tracker", sources={step})
-    plan.run_step(step, config=enopt_config)
+    plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
     assert plan.get(tracker, "results") is not None
     assert last_evaluation == 1
     assert plan.aborted
 
     step = plan.add_step("optimizer")
     with pytest.raises(PlanAborted, match="Plan was aborted by the previous step."):
-        plan.run_step(step, config=enopt_config)
+        plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))

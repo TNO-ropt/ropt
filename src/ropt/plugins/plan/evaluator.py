@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt.config.enopt import EnOptConfig
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
@@ -18,8 +17,8 @@ from ropt.results import FunctionResults
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
+    from ropt.config.enopt import EnOptConfig
     from ropt.plan import Plan
-    from ropt.transforms import OptModelTransforms
 
 
 class DefaultEvaluatorStep(PlanStep):
@@ -57,8 +56,7 @@ class DefaultEvaluatorStep(PlanStep):
 
     def run(
         self,
-        config: dict[str, Any] | EnOptConfig,
-        transforms: OptModelTransforms | None = None,
+        config: EnOptConfig,
         variables: ArrayLike | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> OptimizerExitCode:
@@ -66,17 +64,12 @@ class DefaultEvaluatorStep(PlanStep):
 
         This method executes the core logic of the evaluator step. It requires
         an optimizer configuration
-        ([`EnOptConfig`][ropt.config.enopt.EnOptConfig] or a compatible
-        dictionary) and optionally accepts specific variable vectors to
-        evaluate.
+        ([`EnOptConfig`][ropt.config.enopt.EnOptConfig]) and optionally accepts
+        specific variable vectors to evaluate.
 
         If `variables` are not provided, the initial values specified in the
         `config` are used. If `variables` are provided as a 2D array, each row
         is treated as a separate vector for evaluation.
-
-        If a `transforms` object is given, it is passed to the ensemble
-        evaluator to transform variables and results between user and optimizer
-        domains (see [`ropt.transforms`][ropt.transforms]).
 
         If `metadata` is provided, it is attached to the
         [`Results`][ropt.results.Results] objects emitted via the
@@ -84,15 +77,12 @@ class DefaultEvaluatorStep(PlanStep):
 
         Args:
             config:     Optimizer configuration.
-            transforms: Optional transforms object for variable/result conversion.
             variables:  Optional variable vector(s) to evaluate.
             metadata:   Optional dictionary to attach to emitted `FunctionResults`.
 
         Returns:
             An [`OptimizerExitCode`][ropt.enums.OptimizerExitCode] indicating the outcome.
         """
-        config = EnOptConfig.model_validate(config, context=transforms)
-
         self.emit_event(
             Event(
                 event_type=EventType.START_EVALUATOR_STEP,
@@ -105,12 +95,14 @@ class DefaultEvaluatorStep(PlanStep):
             variables = config.variables.initial_values
         else:
             variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
-            if transforms is not None and transforms.variables is not None:
-                variables = transforms.variables.to_optimizer(variables)
+            if (
+                config.transforms is not None
+                and config.transforms.variables is not None
+            ):
+                variables = config.transforms.variables.to_optimizer(variables)
 
         ensemble_evaluator = EnsembleEvaluator(
             config,
-            transforms,
             self.plan.optimizer_context.evaluator,
             self.plan.optimizer_context.plugin_manager,
         )
