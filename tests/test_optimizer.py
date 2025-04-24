@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from functools import partial
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -8,14 +7,16 @@ import pytest
 
 from ropt.config.enopt import EnOptConfig
 from ropt.config.enopt.constants import DEFAULT_SEED
-from ropt.enums import OptimizerExitCode
+from ropt.enums import EventType, OptimizerExitCode
 from ropt.plan import BasicOptimizer
 from ropt.results import FunctionResults, GradientResults, Results
 from ropt.transforms import OptModelTransforms, VariableScaler
 from ropt.transforms.base import NonLinearConstraintTransform, ObjectiveTransform
 
 if TYPE_CHECKING:
-    from numpy.typing import NDArray
+    from numpy.typing import ArrayLike, NDArray
+
+    from ropt.plan import Event
 
 
 @pytest.fixture(name="enopt_config")
@@ -146,8 +147,14 @@ def test_single_perturbation(enopt_config: Any, evaluator: Any) -> None:
 
 
 class ObjectiveScaler(ObjectiveTransform):
-    def __init__(self, scales: NDArray[np.float64]) -> None:
-        self._scales = scales
+    def __init__(self, scales: ArrayLike) -> None:
+        self._scales = np.asarray(scales, dtype=np.float64)
+        self._set = True
+
+    def set_scales(self, scales: ArrayLike) -> None:
+        if self._set:
+            self._scales = np.asarray(scales, dtype=np.float64)
+            self._set = False
 
     def to_optimizer(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
         return objectives / self._scales
@@ -159,19 +166,7 @@ class ObjectiveScaler(ObjectiveTransform):
 def test_objective_with_scaler(
     enopt_config: Any, evaluator: Any, test_functions: Any
 ) -> None:
-    checked = False
-
-    def check_value(results: tuple[Results, ...], value: float) -> None:
-        nonlocal checked
-        for item in results:
-            if isinstance(item, FunctionResults) and not checked:
-                checked = True
-                assert item.functions is not None
-                assert item.functions.objectives is not None
-                assert np.allclose(item.functions.objectives[-1], value)
-
     config = EnOptConfig.model_validate(enopt_config)
-
     results1 = BasicOptimizer(enopt_config, evaluator()).run().results
     assert results1 is not None
     assert results1.functions is not None
@@ -180,15 +175,98 @@ def test_objective_with_scaler(
     assert np.allclose(variables1, [0.0, 0.0, 0.5], atol=0.02)
     assert np.allclose(objectives1, [0.5, 4.5], atol=0.02)
 
+    def function1(variables: NDArray[np.float64], _: Any) -> float:
+        return float(test_functions[0](variables, None))
+
+    def function2(variables: NDArray[np.float64], _: Any) -> float:
+        return float(test_functions[1](variables, None))
+
     init1 = test_functions[1](config.variables.initial_values, None)
     transforms = OptModelTransforms(
         objectives=ObjectiveScaler(np.array([init1, init1]))
     )
+    config = EnOptConfig.model_validate(enopt_config, context=transforms)
+
+    checked = False
+
+    def check_value(event: Event) -> None:
+        nonlocal checked
+        results = event.data.get("results", ())
+        for item in results:
+            if isinstance(item, FunctionResults) and not checked:
+                checked = True
+                assert item.functions is not None
+                assert item.functions.objectives is not None
+                assert np.allclose(item.functions.objectives[-1], 1.0)
+                assert config.transforms is not None
+                transformed = item.transform_from_optimizer(config.transforms)
+                assert transformed.functions is not None
+                assert transformed.functions.objectives is not None
+                assert np.allclose(transformed.functions.objectives[-1], init1)
 
     optimizer = BasicOptimizer(
         EnOptConfig.model_validate(enopt_config, context=transforms),
-        evaluator(),
-    ).set_results_callback(partial(check_value, value=init1))
+        evaluator([function1, function2]),
+    )
+    optimizer._observers.append(  # noqa: SLF001
+        (EventType.FINISHED_EVALUATION, check_value)
+    )
+    results2 = optimizer.run().results
+    assert results2 is not None
+    assert np.allclose(results2.evaluations.variables, variables1, atol=0.02)
+    assert results2.functions is not None
+    assert np.allclose(objectives1, results2.functions.objectives, atol=0.025)
+
+
+def test_objective_with_lazy_scaler(
+    enopt_config: Any, evaluator: Any, test_functions: Any
+) -> None:
+    config = EnOptConfig.model_validate(enopt_config)
+    results1 = BasicOptimizer(enopt_config, evaluator()).run().results
+    assert results1 is not None
+    assert results1.functions is not None
+    variables1 = results1.evaluations.variables
+    objectives1 = results1.functions.objectives
+    assert np.allclose(variables1, [0.0, 0.0, 0.5], atol=0.02)
+    assert np.allclose(objectives1, [0.5, 4.5], atol=0.02)
+
+    objective_transform = ObjectiveScaler(np.array([1.0, 1.0]))
+    transforms = OptModelTransforms(objectives=objective_transform)
+    config = EnOptConfig.model_validate(enopt_config, context=transforms)
+
+    init1 = test_functions[1](config.variables.initial_values, None)
+
+    def function1(variables: NDArray[np.float64], _: Any) -> float:
+        objective_transform.set_scales([init1, init1])
+        return float(test_functions[0](variables, None))
+
+    def function2(variables: NDArray[np.float64], _: Any) -> float:
+        return float(test_functions[1](variables, None))
+
+    checked = False
+
+    def check_value(event: Event) -> None:
+        nonlocal checked
+        results = event.data.get("results", ())
+        for item in results:
+            if isinstance(item, FunctionResults) and not checked:
+                checked = True
+                assert item.functions is not None
+                assert item.functions.objectives is not None
+                assert np.allclose(item.functions.objectives[-1], 1.0)
+                assert config.transforms is not None
+                transformed = item.transform_from_optimizer(config.transforms)
+                assert transformed.functions is not None
+                assert transformed.functions.objectives is not None
+                assert np.allclose(transformed.functions.objectives[-1], init1)
+
+    optimizer = BasicOptimizer(
+        EnOptConfig.model_validate(enopt_config, context=transforms),
+        evaluator([function1, function2]),
+    )
+    optimizer._observers.append(  # noqa: SLF001
+        (EventType.FINISHED_EVALUATION, check_value)
+    )
     results2 = optimizer.run().results
     assert results2 is not None
     assert np.allclose(results2.evaluations.variables, variables1, atol=0.02)
@@ -197,8 +275,14 @@ def test_objective_with_scaler(
 
 
 class ConstraintScaler(NonLinearConstraintTransform):
-    def __init__(self, scales: NDArray[np.float64]) -> None:
-        self._scales = scales
+    def __init__(self, scales: ArrayLike) -> None:
+        self._scales = np.asarray(scales, dtype=np.float64)
+        self._set = True
+
+    def set_scales(self, scales: ArrayLike) -> None:
+        if self._set:
+            self._scales = np.asarray(scales, dtype=np.float64)
+            self._set = False
 
     def bounds_to_optimizer(
         self, lower_bounds: NDArray[np.float64], upper_bounds: NDArray[np.float64]
@@ -217,43 +301,139 @@ class ConstraintScaler(NonLinearConstraintTransform):
         return lower_diffs * self._scales, upper_diffs * self._scales
 
 
-def test_constraint_with_scaler(
+def test_nonlinear_constraint_with_scaler(
     enopt_config: Any, evaluator: Any, test_functions: Any
 ) -> None:
     enopt_config["nonlinear_constraints"] = {
-        "lower_bounds": 0.4,
-        "upper_bounds": np.inf,
+        "lower_bounds": 0.0,
+        "upper_bounds": 0.4,
     }
 
-    test_functions = (
+    functions = (
         *test_functions,
         lambda variables, _: variables[0] + variables[2],
     )
 
+    config = EnOptConfig.model_validate(enopt_config)
+    results1 = BasicOptimizer(config, evaluator(functions)).run().results
+    assert results1 is not None
+    assert results1.evaluations.variables[[0, 2]].sum() > 0.0 - 1e-5
+    assert results1.evaluations.variables[[0, 2]].sum() < 0.4 + 1e-5
+
     scales = np.array(
-        test_functions[-1](enopt_config["variables"]["initial_values"], None), ndmin=1
+        functions[-1](enopt_config["variables"]["initial_values"], None), ndmin=1
     )
     transforms = OptModelTransforms(nonlinear_constraints=ConstraintScaler(scales))
     config = EnOptConfig.model_validate(enopt_config, context=transforms)
     assert config.nonlinear_constraints is not None
-    assert config.nonlinear_constraints.lower_bounds == 0.4 / scales
+    assert config.nonlinear_constraints.upper_bounds == 0.4
+    bounds = config.nonlinear_constraints.get_bounds()
+    assert bounds is not None
+    assert bounds[1] == 0.4 / scales
 
     check = True
 
-    def check_constraints(
-        results: tuple[Results, ...], values: NDArray[np.float64]
-    ) -> None:
+    def check_constraints(event: Event) -> None:
         nonlocal check
+        results = event.data.get("results", ())
         for item in results:
             if isinstance(item, FunctionResults) and check:
                 check = False
                 assert item.functions is not None
                 assert item.functions.constraints is not None
-                assert np.allclose(item.functions.constraints, values)
+                assert np.allclose(item.functions.constraints, 1.0)
+                transformed = item.transform_from_optimizer(transforms)
+                assert transformed.functions is not None
+                assert transformed.functions.constraints is not None
+                assert np.allclose(transformed.functions.constraints, scales)
 
-    BasicOptimizer(config, evaluator(test_functions)).set_results_callback(
-        partial(check_constraints, values=scales)
-    ).run()
+    optimizer = BasicOptimizer(config, evaluator(functions))
+    optimizer._observers.append(  # noqa: SLF001
+        (EventType.FINISHED_EVALUATION, check_constraints)
+    )
+    results2 = optimizer.run().results
+    assert results2 is not None
+    assert np.allclose(
+        results2.evaluations.variables, results1.evaluations.variables, atol=0.02
+    )
+    assert results1.functions is not None
+    assert results2.functions is not None
+    assert np.allclose(
+        results1.functions.objectives, results2.functions.objectives, atol=0.025
+    )
+
+
+def test_nonlinear_constraint_with_lazy_scaler(
+    enopt_config: Any, evaluator: Any, test_functions: Any
+) -> None:
+    enopt_config["nonlinear_constraints"] = {
+        "lower_bounds": 0.0,
+        "upper_bounds": 0.4,
+    }
+
+    functions = (
+        *test_functions,
+        lambda variables, _: variables[0] + variables[2],
+    )
+
+    config = EnOptConfig.model_validate(enopt_config)
+    results1 = BasicOptimizer(config, evaluator(functions)).run().results
+    assert results1 is not None
+    assert results1.evaluations.variables[[0, 2]].sum() > 0.0 - 1e-5
+    assert results1.evaluations.variables[[0, 2]].sum() < 0.4 + 1e-5
+
+    scales = np.array(
+        functions[-1](enopt_config["variables"]["initial_values"], None), ndmin=1
+    )
+    scaler = ConstraintScaler([1.0])
+    transforms = OptModelTransforms(nonlinear_constraints=scaler)
+
+    config = EnOptConfig.model_validate(enopt_config, context=transforms)
+    assert config.nonlinear_constraints is not None
+    assert config.nonlinear_constraints.upper_bounds == 0.4
+    bounds = config.nonlinear_constraints.get_bounds()
+    assert bounds is not None
+    assert bounds[1] == 0.4
+
+    def constraint_function(variables: NDArray[np.float64], _: Any) -> float:
+        scaler.set_scales(scales)
+        return float(variables[0] + variables[2])
+
+    functions = (*test_functions, constraint_function)
+
+    check = True
+
+    def check_constraints(event: Event) -> None:
+        nonlocal check
+        results = event.data.get("results", ())
+        for item in results:
+            if isinstance(item, FunctionResults) and check:
+                check = False
+                assert config.nonlinear_constraints is not None
+                _, upper_bounds = config.nonlinear_constraints.get_bounds()
+                assert np.allclose(upper_bounds, 0.4 / scales)
+                assert item.functions is not None
+                assert item.functions.constraints is not None
+                assert np.allclose(item.functions.constraints, 1.0)
+                transformed = item.transform_from_optimizer(transforms)
+                assert transformed.functions is not None
+                assert transformed.functions.constraints is not None
+                assert np.allclose(transformed.functions.constraints, scales)
+
+    optimizer = BasicOptimizer(config, evaluator(functions))
+    optimizer._observers.append(  # noqa: SLF001
+        (EventType.FINISHED_EVALUATION, check_constraints)
+    )
+    results2 = optimizer.run().results
+    assert results2 is not None
+    assert np.allclose(
+        results2.evaluations.variables, results1.evaluations.variables, atol=0.02
+    )
+    assert results1.functions is not None
+    assert results2.functions is not None
+    assert np.allclose(
+        results1.functions.objectives, results2.functions.objectives, atol=0.025
+    )
 
 
 @pytest.mark.parametrize("offsets", [None, np.array([1.0, 1.1, 1.2])])

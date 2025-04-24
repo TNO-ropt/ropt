@@ -284,22 +284,22 @@ class NormalizedConstraints:
 
     def __init__(
         self,
-        lower_bounds: NDArray[np.float64],
-        upper_bounds: NDArray[np.float64],
         *,
         flip: bool = False,
     ) -> None:
         """Initialize the normalization class.
 
         Args:
-            lower_bounds: The lower bounds on the right hand sides.
-            upper_bounds: The upper bounds on the right hand sides.
             flip:         Whether to flip the sign of the constraints.
         """
         self._apply_flip = flip
         self._constraints: NDArray[np.float64] | None = None
         self._gradients: NDArray[np.float64] | None = None
-        self.set_bounds(lower_bounds, upper_bounds)
+        self._lower_bounds: NDArray[np.float64] | None = None
+        self._upper_bounds: NDArray[np.float64] | None = None
+        self._is_eq: list[bool] = []
+        self._indices: list[int] = []
+        self._is_lower: list[bool] = []
 
     def set_bounds(
         self,
@@ -312,28 +312,40 @@ class NormalizedConstraints:
             lower_bounds: The lower bounds on the right hand sides.
             upper_bounds: The upper bounds on the right hand sides.
         """
-        self._lower_bounds = lower_bounds.copy()
-        self._upper_bounds = upper_bounds.copy()
-        self._is_eq: list[bool] = []
-        self._indices: list[int] = []
-        self._is_lower: list[bool] = []
-
-        for idx, (lower_bound, upper_bound) in enumerate(
-            zip(lower_bounds, upper_bounds, strict=True)
+        if (
+            self._lower_bounds is None
+            or self._upper_bounds is None
+            or not np.array_equal(self._lower_bounds, lower_bounds)
+            or not np.array_equal(self._upper_bounds, upper_bounds)
         ):
-            if abs(upper_bound - lower_bound) < 1e-15:  # noqa: PLR2004
-                self._is_eq.append(True)
-                self._indices.append(idx)
-                self._is_lower.append(True)
-            else:
-                if np.isfinite(lower_bound):
-                    self._is_eq.append(False)
+            is_eq = self._is_eq
+
+            self._lower_bounds = lower_bounds.copy()
+            self._upper_bounds = upper_bounds.copy()
+            self._is_eq = []
+            self._indices = []
+            self._is_lower = []
+
+            for idx, (lower_bound, upper_bound) in enumerate(
+                zip(lower_bounds, upper_bounds, strict=True)
+            ):
+                if abs(upper_bound - lower_bound) < 1e-15:  # noqa: PLR2004
+                    self._is_eq.append(True)
                     self._indices.append(idx)
                     self._is_lower.append(True)
-                if np.isfinite(upper_bound):
-                    self._is_eq.append(False)
-                    self._indices.append(idx)
-                    self._is_lower.append(False)
+                else:
+                    if np.isfinite(lower_bound):
+                        self._is_eq.append(False)
+                        self._indices.append(idx)
+                        self._is_lower.append(True)
+                    if np.isfinite(upper_bound):
+                        self._is_eq.append(False)
+                        self._indices.append(idx)
+                        self._is_lower.append(False)
+
+            if is_eq and is_eq != self._is_eq:
+                msg = "Some constraints have changed type (equality/inequality)."
+                raise ValueError(msg)
 
     @property
     def is_eq(self) -> list[bool]:
@@ -422,6 +434,8 @@ class NormalizedConstraints:
         self._constraints = np.empty(
             (len(self._indices), values.shape[1]), dtype=np.float64
         )
+        assert self._lower_bounds is not None
+        assert self._upper_bounds is not None
         for idx, constraint_idx in enumerate(self._indices):
             rhs_value = (
                 self._lower_bounds[constraint_idx]

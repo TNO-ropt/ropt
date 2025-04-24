@@ -197,12 +197,9 @@ class ConstraintInfo(ResultField):
 
         if constraints is not None:
             assert config.nonlinear_constraints is not None
-            diffs["nonlinear_lower"] = (
-                constraints - config.nonlinear_constraints.lower_bounds
-            )
-            diffs["nonlinear_upper"] = (
-                constraints - config.nonlinear_constraints.upper_bounds
-            )
+            lower_bounds, upper_bounds = config.nonlinear_constraints.get_bounds()
+            diffs["nonlinear_lower"] = constraints - lower_bounds
+            diffs["nonlinear_upper"] = constraints - upper_bounds
 
         if diffs:
             return ConstraintInfo(**diffs)

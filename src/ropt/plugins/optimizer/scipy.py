@@ -226,38 +226,44 @@ class SciPyOptimizer(Optimizer):
             return Bounds(lower_bounds, upper_bounds)
         return None
 
+    def _get_constraint_bounds(
+        self,
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]] | None:
+        bounds = []
+        if self._config.nonlinear_constraints is not None:
+            bounds.append(self._config.nonlinear_constraints.get_bounds())
+        if (
+            self._method != "differential_evolution"
+            and self._linear_constraint_bounds is not None
+        ):
+            bounds.append(self._linear_constraint_bounds)
+
+        if bounds:
+            lower_bounds, upper_bounds = zip(*bounds, strict=True)
+            return np.concatenate(lower_bounds), np.concatenate(upper_bounds)
+        return None
+
     def _initialize_constraints(
         self,
     ) -> list[dict[str, _ConstraintType] | NonlinearConstraint | LinearConstraint]:
         self._normalized_constraints = None
 
         lin_coef, lin_lower, lin_upper = None, None, None
+        self._linear_constraint_bounds: (
+            tuple[NDArray[np.float64], NDArray[np.float64]] | None
+        ) = None
         if self._config.linear_constraints is not None:
             lin_coef, lin_lower, lin_upper = get_masked_linear_constraints(self._config)
+            self._linear_constraint_bounds = (lin_lower, lin_upper)
+
+        if (bounds := self._get_constraint_bounds()) is not None:
+            self._normalized_constraints = NormalizedConstraints()
+            self._normalized_constraints.set_bounds(*bounds)
 
         if self._method == "differential_evolution":
-            if self._config.nonlinear_constraints is not None:
-                self._normalized_constraints = NormalizedConstraints(
-                    self._config.nonlinear_constraints.lower_bounds,
-                    self._config.nonlinear_constraints.upper_bounds,
-                )
             return self._initialize_constraints_object(lin_coef, lin_lower, lin_upper)
 
-        lower_bounds = []
-        upper_bounds = []
-        if self._config.nonlinear_constraints is not None:
-            lower_bounds.append(self._config.nonlinear_constraints.lower_bounds)
-            upper_bounds.append(self._config.nonlinear_constraints.upper_bounds)
-        if lin_lower is not None and lin_upper is not None:
-            lower_bounds.append(lin_lower)
-            upper_bounds.append(lin_upper)
-        if lower_bounds:
-            self._normalized_constraints = NormalizedConstraints(
-                np.concatenate(lower_bounds), np.concatenate(upper_bounds)
-            )
-            return self._initialize_constraints_dict(lin_coef)
-
-        return []
+        return self._initialize_constraints_dict(lin_coef)
 
     def _fun_dict(
         self,
@@ -476,6 +482,13 @@ class SciPyOptimizer(Optimizer):
                 return_functions=compute_functions,
                 return_gradients=compute_gradients,
             )
+
+        # The optimizer callback may change non-linear constraint bounds:
+        if self._normalized_constraints is not None:
+            bounds = self._get_constraint_bounds()
+            assert bounds is not None
+            self._normalized_constraints.set_bounds(*bounds)
+
         if self.allow_nan:
             new_function = np.where(np.isnan(new_function), np.inf, new_function)
         return new_function, new_gradient
