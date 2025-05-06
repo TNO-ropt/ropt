@@ -53,7 +53,7 @@ def _function_runner(
         else None
     )
     for sim, realization in enumerate(evaluator_context.realizations):
-        context = FunctionContext(realization=realization, index=sim)
+        context = FunctionContext(realization=int(realization), index=sim)
         for idx in range(objective_count):
             if (
                 evaluator_context.active_objectives is None

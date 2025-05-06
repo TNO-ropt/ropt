@@ -187,7 +187,9 @@ def _get_gradient_results(
         active_objectives=active_objectives,
         active_constraints=active_constraints,
     )
-    variables = perturbed_variables.reshape(-1, perturbed_variables.shape[-1])
+    variables: NDArray[np.float64] = perturbed_variables.reshape(
+        -1, perturbed_variables.shape[-1]
+    )
     if config.transforms is not None and config.transforms.variables:
         variables = config.transforms.variables.from_optimizer(variables)
     evaluator_result = evaluator(variables, context)

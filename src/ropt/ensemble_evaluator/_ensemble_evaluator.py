@@ -24,12 +24,8 @@ from ._evaluator_results import (
     _get_function_results,
     _get_gradient_results,
 )
-from ._function import _calculate_estimated_constraints, _calculate_estimated_objectives
-from ._gradient import (
-    _calculate_estimated_constraint_gradients,
-    _calculate_estimated_objective_gradients,
-    _perturb_variables,
-)
+from ._function import _calculate_estimated_functions
+from ._gradient import _calculate_estimated_gradients, _perturb_variables
 from ._utils import _get_failed_realizations
 
 if TYPE_CHECKING:
@@ -171,10 +167,9 @@ class EnsembleEvaluator:
     def _calculate_one_set_of_functions(
         self, f_eval_results: _FunctionEvaluatorResults, variables: NDArray[np.float64]
     ) -> FunctionResults:
-        (
-            objective_weights,
-            constraint_weights,
-        ) = self._calculate_filtered_realization_weights(f_eval_results)
+        objective_weights, constraint_weights = (
+            self._calculate_filtered_realization_weights(f_eval_results)
+        )
 
         assert self._config.gradient.perturbation_min_success is not None
         failed_realizations = _get_failed_realizations(
@@ -326,11 +321,8 @@ class EnsembleEvaluator:
             evaluation_info=f_eval_results.evaluation_info,
         )
 
-        (
-            objective_weights,
-            constraint_weights,
-        ) = self._calculate_filtered_realization_weights(
-            f_eval_results,
+        objective_weights, constraint_weights = (
+            self._calculate_filtered_realization_weights(f_eval_results)
         )
 
         assert self._config.gradient.perturbation_min_success is not None
@@ -441,20 +433,30 @@ class EnsembleEvaluator:
                 constraints.fill(np.nan)
             weighted_objective = np.array(np.nan)
         else:
-            objectives = _calculate_estimated_objectives(
-                self._config,
+            objectives = _calculate_estimated_functions(
                 self._function_estimators,
+                self._config.objectives.function_estimators,
                 objectives,
-                objective_weights,
+                (
+                    self._config.realizations.weights
+                    if objective_weights is None
+                    else objective_weights
+                ),
                 failed_realizations,
             )
-            constraints = _calculate_estimated_constraints(
-                self._config,
-                self._function_estimators,
-                constraints,
-                constraint_weights,
-                failed_realizations,
-            )
+            if constraints is not None:
+                assert self._config.nonlinear_constraints is not None
+                constraints = _calculate_estimated_functions(
+                    self._function_estimators,
+                    self._config.nonlinear_constraints.function_estimators,
+                    constraints,
+                    (
+                        self._config.realizations.weights
+                        if constraint_weights is None
+                        else constraint_weights
+                    ),
+                    failed_realizations,
+                )
 
             weighted_objective = np.array(
                 (self._config.objectives.weights * objectives).sum()
@@ -489,26 +491,41 @@ class EnsembleEvaluator:
             perturbed_variables = perturbed_variables[..., mask]
 
         assert perturbed_objectives is not None
-        objective_gradients = _calculate_estimated_objective_gradients(
-            self._config,
+        objective_gradients = _calculate_estimated_gradients(
             self._function_estimators,
+            self._config.objectives.function_estimators,
             variables,
             objectives,
             perturbed_variables,
             perturbed_objectives,
-            objective_weights,
+            (
+                self._config.realizations.weights
+                if objective_weights is None
+                else objective_weights
+            ),
             failed_realizations,
+            merge_realizations=self._config.gradient.merge_realizations,
         )
-        constraint_gradients = _calculate_estimated_constraint_gradients(
-            self._config,
-            self._function_estimators,
-            variables,
-            constraints,
-            perturbed_variables,
-            perturbed_constraints,
-            constraint_weights,
-            failed_realizations,
-        )
+        if constraints is not None:
+            assert self._config.nonlinear_constraints is not None
+            assert perturbed_constraints is not None
+            constraint_gradients = _calculate_estimated_gradients(
+                self._function_estimators,
+                self._config.nonlinear_constraints.function_estimators,
+                variables,
+                constraints,
+                perturbed_variables,
+                perturbed_constraints,
+                (
+                    self._config.realizations.weights
+                    if constraint_weights is None
+                    else constraint_weights
+                ),
+                failed_realizations,
+                merge_realizations=self._config.gradient.merge_realizations,
+            )
+        else:
+            constraint_gradients = None
 
         weighted_objective_gradient = np.array(
             (self._config.objectives.weights[:, np.newaxis] * objective_gradients).sum(

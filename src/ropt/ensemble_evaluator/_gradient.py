@@ -149,15 +149,16 @@ def _calculate_gradient(  # noqa: PLR0913
 
 
 def _calculate_estimated_gradients(  # noqa: PLR0913
-    config: EnOptConfig,
     function_estimators: list[FunctionEstimator],
     estimator_indices: NDArray[np.intc] | None,
     variables: NDArray[np.float64],
     functions: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
     perturbed_functions: NDArray[np.float64],
-    realization_weights: NDArray[np.float64] | None,
+    realization_weights: NDArray[np.float64],
     failed_realizations: NDArray[np.bool_],
+    *,
+    merge_realizations: bool,
 ) -> NDArray[np.float64]:
     gradients = np.zeros((functions.shape[-1], variables.shape[-1]), dtype=np.float64)
     delta_variables = perturbed_variables - np.expand_dims(variables, axis=1)
@@ -165,6 +166,10 @@ def _calculate_estimated_gradients(  # noqa: PLR0913
 
     if estimator_indices is None:
         estimator_indices = np.zeros(functions.shape[1], dtype=np.intc)
+
+    realization_weights = np.broadcast_to(
+        realization_weights, (functions.shape[1], realization_weights.shape[-1])
+    )
 
     for estimator_idx, estimator in enumerate(function_estimators):
         mask = estimator_indices == estimator_idx
@@ -174,63 +179,9 @@ def _calculate_estimated_gradients(  # noqa: PLR0913
                 delta_variables,
                 delta_functions[..., idx],
                 failed_realizations,
-                (
-                    config.realizations.weights
-                    if realization_weights is None
-                    else realization_weights[idx, ...]
-                ),
+                realization_weights[idx, ...],
                 estimator,
-                merge_realizations=config.gradient.merge_realizations,
+                merge_realizations=merge_realizations,
             )
 
     return gradients
-
-
-def _calculate_estimated_objective_gradients(  # noqa: PLR0913
-    config: EnOptConfig,
-    function_estimators: list[FunctionEstimator],
-    variables: NDArray[np.float64],
-    functions: NDArray[np.float64],
-    perturbed_variables: NDArray[np.float64],
-    perturbed_functions: NDArray[np.float64],
-    realization_weights: NDArray[np.float64] | None,
-    failed_realizations: NDArray[np.bool_],
-) -> NDArray[np.float64]:
-    return _calculate_estimated_gradients(
-        config,
-        function_estimators,
-        config.objectives.function_estimators,
-        variables,
-        functions,
-        perturbed_variables,
-        perturbed_functions,
-        realization_weights,
-        failed_realizations,
-    )
-
-
-def _calculate_estimated_constraint_gradients(  # noqa: PLR0913
-    config: EnOptConfig,
-    function_estimators: list[FunctionEstimator],
-    variables: NDArray[np.float64],
-    constraints: NDArray[np.float64] | None,
-    perturbed_variables: NDArray[np.float64],
-    perturbed_constaints: NDArray[np.float64] | None,
-    realization_weights: NDArray[np.float64] | None,
-    failed_realizations: NDArray[np.bool_],
-) -> NDArray[np.float64] | None:
-    if constraints is None:
-        return None
-    assert perturbed_constaints is not None
-    assert config.nonlinear_constraints is not None
-    return _calculate_estimated_gradients(
-        config,
-        function_estimators,
-        config.nonlinear_constraints.function_estimators,
-        variables,
-        constraints,
-        perturbed_variables,
-        perturbed_constaints,
-        realization_weights,
-        failed_realizations,
-    )
