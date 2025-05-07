@@ -20,7 +20,9 @@ class EvaluatorContext:
     Specifically, it provides:
 
     - The configuration object for the current optimization step.
-    - The realization index for each variable vector.
+    - The realization index for each variable vector. This can be used to
+      determine the correct function from an ensemble to use with each variable
+      vector.
     - The perturbation index for each variable vector (if applicable). A value
       less than 0 indicates that the vector is not a perturbation.
     - Boolean matrices (`active_objectives` and `active_constraints`) indicating
@@ -31,8 +33,15 @@ class EvaluatorContext:
 
     The `active_objectives` and `active_constraints` matrices are structured
     such that each column corresponds to a realization, and each row corresponds
-    to a function or constraint. A `True` value signifies that the corresponding
-    evaluation is essential for the optimizer.
+    to a objective or constraint. A `True` value signifies that the
+    corresponding objective or constraint is essential for the optimizer and
+    must be calculated for that realization. Checking if an objective or constraint
+    must be calculated for a given control vector involves the following:
+
+    1. Find the realization corresponding to the control in the `realizations`
+       property.
+    2. Given that realization index, check in `active_objects` and
+       `active_constraints` if the objective or constraint should be calculated.
 
     Note: The `active` property
         In many cases, evaluators may only be able to compute all objectives and
@@ -40,18 +49,21 @@ class EvaluatorContext:
         the `active` property provides a simplified view, indicating only the
         realizations that need to be evaluated. `active` cannot be set when creating
         the evaluator context, it is calculated from `active_objectives` and
-        `active_constraints`.
+        `active_constraints`. It returns a vector where each entry indicates if
+        a given realization is active or not.
 
-    Args:
+    Attributes:
         config:             Configuration of the optimizer.
         realizations:       Realization numbers for each requested evaluation.
         perturbations:      Perturbation numbers for each requested evaluation.
                             A value less than 0 indicates that the vector is
                             not a perturbation.
-        active_objectives:  Indicates which function/realization evaluations are
+        active_objectives:  Indicates which objective/realization evaluations are
                             essential for the optimizer.
         active_constraints: Indicates which constraint/realization evaluations
                             are essential for the optimizer.
+        active:             Indicates which realizations require evaluation (computed
+                            from `active_objectives` and `active_constraints`).
     """
 
     config: EnOptConfig
