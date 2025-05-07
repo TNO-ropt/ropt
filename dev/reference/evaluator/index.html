@@ -919,6 +919,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="EvaluatorContext">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.evaluator.EvaluatorContext.filter_inactive_realizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      filter_inactive_realizations
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.evaluator.EvaluatorContext.expand_inactive_realizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      expand_inactive_realizations
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1521,6 +1545,30 @@
       EvaluatorContext
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="EvaluatorContext">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.evaluator.EvaluatorContext.filter_inactive_realizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      filter_inactive_realizations
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.evaluator.EvaluatorContext.expand_inactive_realizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      expand_inactive_realizations
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2171,6 +2219,212 @@ a given realization is active or not.</p>
 
 
 
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.evaluator.EvaluatorContext.filter_inactive_realizations" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">filter_inactive_realizations</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">filter_inactive_realizations</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">intc</span><span class="p">],</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">intc</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Filter input variables and context properties based on active realizations.</p>
+<p>This is a utility method, which can be used if only the active property
+is used to exclude realizations that are fully inactive, i.e. where none
+of the objects or constraints are needed.</p>
+<p>This method processes a matrix of input <code>variables</code> (where each row is a
+variable vector). It filters these vectors, retaining only those that
+correspond to active realizations. The activity of realizations is
+determined by the <code>self.active</code> boolean array (where <code>True</code> indicates an
+active realization). The <code>self.realizations</code> array maps each input
+variable vector to its specific model realization index.</p>
+<p>Alongside the filtered <code>variables</code>, the method also returns the
+correspondingly filtered realization and perturbation indices. These
+filtered indices are derived from <code>self.realizations</code> and
+<code>self.perturbations</code> respectively.</p>
+<p>If <code>self.active</code> is <code>None</code> (indicating that all model realizations are
+to be considered active or that activity filtering is not applicable at
+this stage), no filtering is applied to the input <code>variables</code>. In this
+scenario, the original input <code>variables</code> array is returned, along with
+the original <code>self.realizations</code> and <code>self.perturbations</code> arrays.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>variables</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The matrix of variable vectors to filter.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>] | None]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A tuple containing the filtered results.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.evaluator.EvaluatorContext.expand_inactive_realizations" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">expand_inactive_realizations</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">expand_inactive_realizations</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">array</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">fill_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">T</span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Expand an array by inserting fill values for inactive realizations.</p>
+<p>This is a utility method, which can be used if only the active property
+is used to exclude realizations that are fully inactive, i.e. where none
+of the objects or constraints are needed.</p>
+<p>This method takes an array that typically has been processed for active
+realizations (e.g., after being filtered by
+<code>filter_inactive_realizations</code>) and expands it to its original
+dimensions by inserting a specified <code>fill_value</code> at positions
+corresponding to inactive realizations.</p>
+<p>The activity of realizations is determined by <code>self.active</code> (a boolean
+array indicating active model realizations) and <code>self.realizations</code> (an
+array mapping control vectors to model realization indices). The mask
+<code>self.active[self.realizations]</code> identifies which of the original
+control vectors were active.</p>
+<p>If <code>self.active</code> is <code>None</code> (implying all realizations were considered
+active or no filtering was applied), the input <code>array</code> is returned
+unchanged.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>array</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="ropt.evaluator._evaluator.T">T</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The array to expand.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fill_value</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The value to insert for inactive entries.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.0</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="ropt.evaluator._evaluator.T">T</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An expanded array matching the original number of variables.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
 
 
 
