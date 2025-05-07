@@ -1,10 +1,12 @@
 from dataclasses import dataclass, field
-from typing import Any, Protocol
+from typing import Any, Protocol, TypeVar
 
 import numpy as np
 from numpy.typing import NDArray
 
 from ropt.config.enopt import EnOptConfig
+
+T = TypeVar("T", bound=np.generic)
 
 
 @dataclass(slots=True)
@@ -90,6 +92,78 @@ class EvaluatorContext:
             self.active = active_constraints
         else:
             self.active = np.logical_or(active_objectives, active_constraints)
+
+    def filter_inactive_realizations(self, array: NDArray[T]) -> NDArray[T]:
+        """Filter an array based on active realizations.
+
+        This is a utility method, which can be used if only the active property
+        is used to exclude realizations that are fully inactive, i.e. where none
+        of the objects or constraints are needed.
+
+        This method filters a one- or two-dimensional array by retaining only
+        those entries or rows that correspond to active realizations. The
+        activity of realizations is determined by the `self.active` boolean
+        array (where `True` indicates an active realization). The
+        `self.realizations` array maps each input entry to its specific model
+        realization index.
+
+        If `self.active` is `None` (indicating that all model realizations are
+        to be considered active), no filtering is applied, and the original
+        input is returned
+
+        Args:
+            array: The array to filter.
+
+        Returns:
+            The filtered results.
+        """
+        if self.active is not None:
+            return array[self.active[self.realizations], ...]
+        return array
+
+    def insert_inactive_realizations(
+        self, array: NDArray[T], *, fill_value: float = 0.0
+    ) -> NDArray[T]:
+        """Expand an array by inserting fill values for inactive realizations.
+
+        This is a utility method, which can be used if only the active property
+        is used to exclude realizations that are fully inactive, i.e. where none
+        of the objects or constraints are needed.
+
+        This method takes an array that typically has been processed for active
+        realizations (e.g., after being filtered by
+        `filter_inactive_realizations`) and expands it to its original
+        dimensions by inserting a specified `fill_value` at positions
+        corresponding to inactive realizations. If the array is one-dimensional,
+        zero entries are inserted, if it is two-dimensional rows of zero values
+        are inserted.
+
+        The activity of realizations is determined by `self.active` (a boolean
+        array indicating active model realizations) and `self.realizations` (an
+        array mapping control vectors to model realization indices). The mask
+        `self.active[self.realizations]` identifies which of the original
+        control vectors were active.
+
+        If `self.active` is `None` (implying all realizations were considered
+        active or no filtering was applied), the input `array` is returned
+        unchanged.
+
+        Args:
+            array:      The array to expand.
+            fill_value: The value to insert for inactive entries.
+
+        Returns:
+            An expanded array matching the original number of variables.
+        """
+        if self.active is not None:
+            expanded_array = np.full(
+                (self.realizations.shape[0], *array.shape[1:]),
+                fill_value=fill_value,
+                dtype=array.dtype,
+            )
+            expanded_array[self.active[self.realizations], ...] = array
+            return expanded_array
+        return array
 
 
 @dataclass
