@@ -806,18 +806,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.aborted" class="md-nav__link">
+  <a href="#ropt.plan.Plan.evaluator" class="md-nav__link">
     <span class="md-ellipsis">
-      aborted
+      evaluator
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.evaluator" class="md-nav__link">
+  <a href="#ropt.plan.Plan.aborted" class="md-nav__link">
     <span class="md-ellipsis">
-      evaluator
+      aborted
     </span>
   </a>
   
@@ -1589,18 +1589,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.aborted" class="md-nav__link">
+  <a href="#ropt.plan.Plan.evaluator" class="md-nav__link">
     <span class="md-ellipsis">
-      aborted
+      evaluator
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.evaluator" class="md-nav__link">
+  <a href="#ropt.plan.Plan.aborted" class="md-nav__link">
     <span class="md-ellipsis">
-      evaluator
+      aborted
     </span>
   </a>
   
@@ -1877,7 +1877,7 @@ method can be used to check if a function has been added to the plan.</p>
 <p><strong>Evaluator:</strong></p>
 <p>The plan stores an <a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="../evaluator/#ropt.evaluator.Evaluator"><code>Evaluator</code></a> object that is
 used to perform function evaluations that are needed by optimization and
-evaluation steps.</p>
+evaluation steps. It can be retrieved and set via the <code>evaluator</code> attribute.</p>
 <p><strong>PluginManager:</strong></p>
 <p>A <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> object can be provided that
 is used by the plan object to find step and handler objects, and that can be
@@ -1932,6 +1932,32 @@ methods.</p>
 
 
 
+<h3 id="ropt.plan.Plan.evaluator" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">evaluator</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">evaluator</span><span class="p">:</span> <span class="n">Evaluator</span> <span class="o">=</span> <span class="n">evaluator</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The evaluator used by the plan.</p>
+<p>The evaluator is set upon plan creation, and can be retrieved and set via
+the <code>evaluator</code> attribute.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
 <h3 id="ropt.plan.Plan.aborted" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">aborted</span>
 
@@ -1966,55 +1992,6 @@ methods.</p>
             <td>
               <div class="doc-md-description">
                 <p><code>True</code> if the plan was aborted; otherwise, <code>False</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.plan.Plan.evaluator" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">evaluator</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">evaluator</span><span class="p">:</span> <span class="n">Evaluator</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Return the evaluator.</p>
-<p>Retrieves the <a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="../evaluator/#ropt.evaluator.Evaluator"><code>Evaluator</code></a> object associated
-with this plan.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="../evaluator/#ropt.evaluator.Evaluator">Evaluator</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The evaluator stored by the plan.</p>
               </div>
             </td>
           </tr>
