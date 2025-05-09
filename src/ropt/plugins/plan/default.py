@@ -18,12 +18,16 @@ standard optimization plans out-of-the-box.
         ([`DefaultTrackerHandler`][ropt.plugins.plan._tracker.DefaultTrackerHandler]).
     - `store`: Accumulates all results from specified sources
         ([`DefaultStoreHandler`][ropt.plugins.plan._store.DefaultStoreHandler]).
+    - `observer`: Listens for events from specified sources, and calls a
+      callback for each event
+        ([`DefaultObserverHandler`][ropt.plugins.plan._observer.DefaultObserverHandler]).
 """
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Final
 
+from ._observer import DefaultObserverHandler
 from ._store import DefaultStoreHandler
 from ._tracker import DefaultTrackerHandler
 from .base import PlanHandlerPlugin, PlanStepPlugin
@@ -40,6 +44,7 @@ _STEP_OBJECTS: Final[dict[str, type[PlanStep]]] = {
 }
 
 _RESULT_HANDLER_OBJECTS: Final[dict[str, type[PlanHandler]]] = {
+    "observer": DefaultObserverHandler,
     "tracker": DefaultTrackerHandler,
     "store": DefaultStoreHandler,
 }
@@ -62,6 +67,10 @@ class DefaultPlanHandlerPlugin(PlanHandlerPlugin):
     - `store`: Creates a
         [`DefaultStoreHandler`][ropt.plugins.plan._store.DefaultStoreHandler]
         instance, which accumulates all results received from specified sources.
+    - `observer`: Creates a
+        [`DefaultObserverHandler`][ropt.plugins.plan._observer.DefaultObserverHandler]
+        instance, which calls a callback for each event received from specified
+        sources.
     """
 
     @classmethod

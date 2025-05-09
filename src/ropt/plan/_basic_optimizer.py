@@ -201,7 +201,7 @@ class BasicOptimizer:
             plan.add_function(_run_func)
 
         for event_type, function in self._observers:
-            self._optimizer_context.add_observer(event_type, function)
+            plan.add_handler("observer", event_types={event_type}, callback=function)
 
         results, exit_code = plan.run_function()
         variables = None if results is None else results.evaluations.variables

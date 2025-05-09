@@ -331,9 +331,7 @@ class Plan:
         """
         for handler in self._handlers.values():
             handler.handle_event(event)
-        if self._parent is None:
-            self._optimizer_context.call_observers(event)
-        else:
+        if self._parent is not None:
             self._parent.emit_event(event)
 
     def get(self, id_: uuid.UUID, /, key: str) -> Any:  # noqa: ANN401

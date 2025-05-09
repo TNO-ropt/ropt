@@ -32,7 +32,7 @@ class DefaultStoreHandler(PlanHandler):
         self,
         plan: Plan,
         *,
-        sources: set[uuid.UUID],
+        sources: set[uuid.UUID] | None = None,
     ) -> None:
         """Initialize a default store results handler.
 
@@ -47,7 +47,8 @@ class DefaultStoreHandler(PlanHandler):
         When a [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION]
         event occurs, this handler checks if the ID of the step that emitted the
         event (`event.source`) is present in the `sources` set. If it is, the
-        handler stores the results; otherwise, it ignores the event.
+        handler stores the results; otherwise, it ignores the event. If `sources`
+        is `None`, events from all sources will be processed.
 
         The results are converted from the optimizer domain to the user domain
         *before* being stored. The accumulated results are stored as a tuple and
@@ -78,9 +79,8 @@ class DefaultStoreHandler(PlanHandler):
         Args:
             event: The event object emitted by the plan.
         """
-        if (
-            event.event_type == EventType.FINISHED_EVALUATION
-            and event.source in self._sources
+        if event.event_type == EventType.FINISHED_EVALUATION and (
+            self._sources is None or event.source in self._sources
         ):
             if (results := event.data.get("results", None)) is None:
                 return
