@@ -1310,6 +1310,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan._observer.DefaultObserverHandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultObserverHandler
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DefaultObserverHandler">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan._observer.DefaultObserverHandler.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan._observer.DefaultObserverHandler.handle_event" class="md-nav__link">
+    <span class="md-ellipsis">
+      handle_event
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1701,6 +1734,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan._observer.DefaultObserverHandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultObserverHandler
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DefaultObserverHandler">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan._observer.DefaultObserverHandler.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan._observer.DefaultObserverHandler.handle_event" class="md-nav__link">
+    <span class="md-ellipsis">
+      handle_event
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1754,6 +1820,9 @@ standard optimization plans out-of-the-box.</p>
     (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan._tracker.DefaultTrackerHandler" href="#ropt.plugins.plan._tracker.DefaultTrackerHandler"><code>DefaultTrackerHandler</code></a>).</li>
 <li><code>store</code>: Accumulates all results from specified sources
     (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan._store.DefaultStoreHandler" href="#ropt.plugins.plan._store.DefaultStoreHandler"><code>DefaultStoreHandler</code></a>).</li>
+<li><code>observer</code>: Listens for events from specified sources, and calls a
+  callback for each event
+    (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan._observer.DefaultObserverHandler" href="#ropt.plugins.plan._observer.DefaultObserverHandler"><code>DefaultObserverHandler</code></a>).</li>
 </ul>
 </li>
 </ul>
@@ -1873,6 +1942,10 @@ when requested by a <a class="autorefs autorefs-internal" title="            rop
 <li><code>store</code>: Creates a
     <a class="autorefs autorefs-internal" title="            ropt.plugins.plan._store.DefaultStoreHandler" href="#ropt.plugins.plan._store.DefaultStoreHandler"><code>DefaultStoreHandler</code></a>
     instance, which accumulates all results received from specified sources.</li>
+<li><code>observer</code>: Creates a
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.plan._observer.DefaultObserverHandler" href="#ropt.plugins.plan._observer.DefaultObserverHandler"><code>DefaultObserverHandler</code></a>
+    instance, which calls a callback for each event received from specified
+    sources.</li>
 </ul>
 
 
@@ -2565,7 +2638,7 @@ selected result, potentially transformed to the user domain.</p>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">sources</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">UUID</span><span class="p">],</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">sources</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">UUID</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">what</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;best&quot;</span><span class="p">,</span> <span class="s2">&quot;last&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;best&quot;</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">constraint_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
@@ -2605,7 +2678,8 @@ When a <a class="autorefs autorefs-internal" title="            FINISHED_EVALUAT
   " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a>
 event occurs, this handler checks if the ID of the step that emitted the
 event (<code>event.source</code>) is present in the <code>sources</code> set. If it is, the
-handler processes the results; otherwise, it ignores the event.</p>
+handler processes the results; otherwise, it ignores the event. If <code>sources</code>
+is <code>None</code>, events from all sources will be processed.</p>
 <p>Tracking logic (comparing 'best' or selecting 'last') operates on the
 results in the optimizer's domain. However, the final selected result
 that is made accessible via dictionary access (<code>handler["results"]</code>) is
@@ -2676,7 +2750,7 @@ transformed to the user's domain.</p>
                 <code>sources</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a>]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2684,7 +2758,7 @@ transformed to the user's domain.</p>
               </div>
             </td>
             <td>
-                <em>required</em>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -2838,7 +2912,9 @@ results are received from a valid source, they are appended to this tuple.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span><span class="nf">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sources</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">UUID</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">sources</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">UUID</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2871,7 +2947,8 @@ When a <a class="autorefs autorefs-internal" title="            FINISHED_EVALUAT
   " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a>
 event occurs, this handler checks if the ID of the step that emitted the
 event (<code>event.source</code>) is present in the <code>sources</code> set. If it is, the
-handler stores the results; otherwise, it ignores the event.</p>
+handler stores the results; otherwise, it ignores the event. If <code>sources</code>
+is <code>None</code>, events from all sources will be processed.</p>
 <p>The results are converted from the optimizer domain to the user domain
 <em>before</em> being stored. The accumulated results are stored as a tuple and
 can be accessed via dictionary access using the key <code>"results"</code> (e.g.,
@@ -2910,7 +2987,7 @@ can be accessed via dictionary access using the key <code>"results"</code> (e.g.
                 <code>sources</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a>]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2918,7 +2995,7 @@ can be accessed via dictionary access using the key <code>"results"</code> (e.g.
               </div>
             </td>
             <td>
-                <em>required</em>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -2957,6 +3034,236 @@ configured during initialization.</p>
 <p>If a relevant event containing results is received, this method
 retrieves the results, optionally transforms them to the user domain and
 appends them to the tuple stored in <code>self["results"]</code>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>event</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plan.Event
+
+
+  
+      dataclass
+  " href="../plan/#ropt.plan.Event">Event</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The event object emitted by the plan.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.plan._observer.DefaultObserverHandler" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan._observer.DefaultObserverHandler</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanHandler" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandler">PlanHandler</a></code></p>
+
+
+        <p>The default handler for observing events.</p>
+<p>This handler listens for events emitted by specified <code>sources</code> (plan steps)
+and forwards them to one or more callback functions.</p>
+<p>The <code>sources</code> parameter filters which events are observed.</p>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.plan._observer.DefaultObserverHandler.__init__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">event_types</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">EventType</span><span class="p">],</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Event</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">sources</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">UUID</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize a default ob results handler.</p>
+<p>This handler responds to events received from specified <code>sources</code> (plan
+steps) and calls <code>callback</code> if the event type matches <code>event_types</code>.</p>
+<p>The <code>sources</code> parameter acts as a filter, determining which plan steps
+this handler should listen to. It should be a set containing the unique
+IDs (UUIDs) of the <code>PlanStep</code> instances whose event you want to receive.
+When an event is received, this handler checks if the ID of the step
+that emitted the event (<code>event.source</code>) is present in the <code>sources</code> set.
+If it is, and the event type (event.event_type) is present in the
+<code>event_types</code> set, the handler will call <code>callback</code>; otherwise, it
+ignores the event. If <code>sources</code> is <code>None</code>, events from all sources will
+be processed.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>plan</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan">Plan</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The parent plan instance.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sources</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional set of step UUIDs whose results should be stored.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>event_types</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            EventType (ropt.enums.EventType)" href="../enums/#ropt.enums.EventType">EventType</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The set of event types  to respond to.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>callback</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Callable" href="https://docs.python.org/3/library/typing.html#typing.Callable">Callable</a>[[<a class="autorefs autorefs-internal" title="            ropt.plan.Event
+
+
+  
+      dataclass
+  " href="../plan/#ropt.plan.Event">Event</a>], None]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The callable to call.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.plan._observer.DefaultObserverHandler.handle_event" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">handle_event</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Handle incoming events from the plan.</p>
+<p>This method processes events emitted by the parent plan. It specifically
+listens for events originating from steps whose IDs are included in the
+<code>sources</code> set configured during initialization.</p>
+<p>If a event containing results is received, and its type equals the
+stored event type, the stored callback is called.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

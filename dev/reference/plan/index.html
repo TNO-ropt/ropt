@@ -815,9 +815,18 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.optimizer_context" class="md-nav__link">
+  <a href="#ropt.plan.Plan.evaluator" class="md-nav__link">
     <span class="md-ellipsis">
-      optimizer_context
+      evaluator
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.plugin_manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      plugin_manager
     </span>
   </a>
   
@@ -944,48 +953,6 @@
   <a href="#ropt.plan.Plan.set" class="md-nav__link">
     <span class="md-ellipsis">
       set
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.plan.OptimizerContext" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptimizerContext
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptimizerContext">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.OptimizerContext.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.OptimizerContext.add_observer" class="md-nav__link">
-    <span class="md-ellipsis">
-      add_observer
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.OptimizerContext.call_observers" class="md-nav__link">
-    <span class="md-ellipsis">
-      call_observers
     </span>
   </a>
   
@@ -1631,9 +1598,18 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.optimizer_context" class="md-nav__link">
+  <a href="#ropt.plan.Plan.evaluator" class="md-nav__link">
     <span class="md-ellipsis">
-      optimizer_context
+      evaluator
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.plugin_manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      plugin_manager
     </span>
   </a>
   
@@ -1771,48 +1747,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plan.OptimizerContext" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptimizerContext
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptimizerContext">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.OptimizerContext.__init__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __init__
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.OptimizerContext.add_observer" class="md-nav__link">
-    <span class="md-ellipsis">
-      add_observer
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.OptimizerContext.call_observers" class="md-nav__link">
-    <span class="md-ellipsis">
-      call_observers
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#ropt.plan.Event" class="md-nav__link">
     <span class="md-ellipsis">
       Event
@@ -1868,17 +1802,6 @@ handler</a> and <a class="autorefs autorefs-internal" title="            ropt.pl
 step</a> plugins. These provide
 basic steps and result handlers to support a wide range of optimization
 workflows.</p>
-<p>Most optimization plans require shared state across all steps, such as the
-plugin manager and an evaluator callable for function evaluations. This shared
-state is managed by the <a class="autorefs autorefs-internal" title="            ropt.plan.OptimizerContext" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a> object,
-which is provided when creating a plan. The <code>OptimizerContext</code> also handles
-<a class="autorefs autorefs-internal" title="            ropt.plan.Event
-
-
-  
-      dataclass
-  " href="#ropt.plan.Event">events</a> produced by plan steps by calling registered callbacks
-and forwarding them to result handlers.</p>
 <p>Setting up and executing a <code>Plan</code> object for simple optimization cases can be
 complex. The <a class="autorefs autorefs-internal" title="            ropt.plan.BasicOptimizer" href="../basic_optimizer/#ropt.plan.BasicOptimizer"><code>BasicOptimizer</code></a> class simplifies this
 process by providing a convenient way to build and execute straightforward plans
@@ -1951,17 +1874,15 @@ defined by this function can then be executed with a single call to
 <a class="autorefs autorefs-internal" title="            run_function" href="#ropt.plan.Plan.run_function"><code>run_function</code></a>, with optional arguments to
 customize its behavior. The <a class="autorefs autorefs-internal" title="            has_function" href="#ropt.plan.Plan.has_function"><code>has_function</code></a>
 method can be used to check if a function has been added to the plan.</p>
-<p><strong>Shared State and Events:</strong></p>
-<p>The plan maintains shared state in an
-<a class="autorefs autorefs-internal" title="            ropt.plan.OptimizerContext" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a>, which is provided during
-initialization and can be shared among multiple plans. The
-<a class="autorefs autorefs-internal" title="            optimizer_context
-
-
-  
-      property
-  " href="#ropt.plan.Plan.optimizer_context"><code>optimizer_context</code></a> property provides
-access to this context.</p>
+<p><strong>Evaluator:</strong></p>
+<p>The plan stores an <a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="../evaluator/#ropt.evaluator.Evaluator"><code>Evaluator</code></a> object that is
+used to perform function evaluations that are needed by optimization and
+evaluation steps.</p>
+<p><strong>PluginManager:</strong></p>
+<p>A <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> object can be provided that
+is used by the plan object to find step and handler objects, and that can be
+used by optimizers and evaluators to implement functionality.</p>
+<p><strong>Events:</strong></p>
 <p>Steps can communicate events using the
 <a class="autorefs autorefs-internal" title="            emit_event" href="#ropt.plan.Plan.emit_event"><code>emit_event</code></a> method. Result handlers can
 respond to these events, enabling actions such as processing optimization
@@ -2059,8 +1980,8 @@ methods.</p>
 
 
 
-<h3 id="ropt.plan.Plan.optimizer_context" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">optimizer_context</span>
+<h3 id="ropt.plan.Plan.evaluator" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">evaluator</span>
 
 
   <span class="doc doc-labels">
@@ -2068,33 +1989,81 @@ methods.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">optimizer_context</span><span class="p">:</span> <span class="n">OptimizerContext</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">evaluator</span><span class="p">:</span> <span class="n">Evaluator</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Return the optimizer context.</p>
-<p>Retrieves the <a class="autorefs autorefs-internal" title="            ropt.plan.OptimizerContext" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a> object
-associated with this plan. The optimizer context provides shared state
-and functionality for executing the optimization plan.</p>
+        <p>Return the evaluator.</p>
+<p>Retrieves the <a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="../evaluator/#ropt.evaluator.Evaluator"><code>Evaluator</code></a> object associated
+with this plan.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
+          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>OptimizerContext</code></td>            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.plan.OptimizerContext (ropt.plan._context.OptimizerContext)" href="#ropt.plan.OptimizerContext">OptimizerContext</a></code>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="../evaluator/#ropt.evaluator.Evaluator">Evaluator</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The optimizer context object used by the plan.</p>
+                <p>The evaluator stored by the plan.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.plan.Plan.plugin_manager" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">plugin_manager</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">plugin_manager</span><span class="p">:</span> <span class="n">PluginManager</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the plugin manager.</p>
+<p>Retrieves the <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> object
+associated with this plan.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            PluginManager (ropt.plugins.PluginManager)" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The plugin manager stored by the plan.</p>
               </div>
             </td>
           </tr>
@@ -2116,20 +2085,21 @@ and functionality for executing the optimization plan.</p>
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">optimizer_context</span><span class="p">:</span> <span class="n">OptimizerContext</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">parent</span><span class="p">:</span> <span class="n">Plan</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">evaluator</span><span class="p">:</span> <span class="n">Evaluator</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">plugin_manager</span><span class="p">:</span> <span class="n">PluginManager</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">parent</span><span class="p">:</span> <span class="n">Plan</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Initialize a plan object.</p>
-<p>Constructs a new plan, associating it with an
-<a class="autorefs autorefs-internal" title="            ropt.plan.OptimizerContext" href="#ropt.plan.OptimizerContext"><code>OptimizerContext</code></a> and an optional parent
-plan.</p>
-<p>The plan will operate within the provided <code>optimizer_context</code>. If a
-<code>parent</code> plan is specified, this plan becomes a child, enabling event
-propagation up the plan hierarchy.</p>
+<p>Constructs a new plan, associating it with an evaluator, and optionally
+with a plugin manager and/or a parent plan.</p>
+<p>The <code>plugin_manager</code> is used by the plan, and possibly by steps and
+handlers to add plugin functionality.</p>
+<p>If a <code>parent</code> plan is specified, this plan becomes a child, enabling
+event propagation up the plan hierarchy.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2145,18 +2115,34 @@ propagation up the plan hierarchy.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>optimizer_context</code>
+                <code>evaluator</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.plan.OptimizerContext (ropt.plan._context.OptimizerContext)" href="#ropt.plan.OptimizerContext">OptimizerContext</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="../evaluator/#ropt.evaluator.Evaluator">Evaluator</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The execution context for the plan.</p>
+                <p>The evaluator used by the plan.</p>
               </div>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>plugin_manager</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            PluginManager (ropt.plugins.PluginManager)" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An optional plugin manager.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -3229,353 +3215,6 @@ key.</p>
               <div class="doc-md-description">
                 <p>If the provided <code>id_</code> is not a valid handler ID.</p>
               </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ropt.plan.OptimizerContext" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plan.OptimizerContext</span>
-
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-
-
-        <p>Manages shared state and resources for an optimization plan.</p>
-<p>The OptimizerContext acts as a central hub for managing shared resources and
-state across all steps within an optimization plan. This ensures that
-different parts of the plan can access and interact with the same
-information and tools.</p>
-<p>This context object is responsible for:</p>
-<ul>
-<li>Providing a callable <code>Evaluator</code> for evaluating functions, which is
-  essential for optimization algorithms to assess the quality of solutions.
-  The evaluator is used to calculate the objective function's value and
-  potentially constraint values for given variables.</li>
-<li>Managing a <code>PluginManager</code> to retrieve and utilize plugins, allowing for
-  extensibility and customization of the optimization workflow. Plugins are
-  modular pieces of code that extend the functionality of the optimization
-  framework, such as new <code>PlanStep</code> or <code>PlanHandler</code> implementations.</li>
-<li>Handling event callbacks that are triggered in response to specific events
-  during the plan's execution. These callbacks are executed after the plan
-  has processed the event, allowing for actions to be taken in response to
-  changes or milestones. This allows you to monitor the optimization, react
-  to changes, or perform custom actions at specific points in the plan's
-  execution.</li>
-</ul>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>evaluator</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="../evaluator/#ropt.evaluator.Evaluator">Evaluator</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A callable for evaluating functions in the plan.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>plugin_manager</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            PluginManager (ropt.plugins.PluginManager)" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A plugin manager; a default is created if not provided.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plan.OptimizerContext.__init__" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">evaluator</span><span class="p">:</span> <span class="n">Evaluator</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">plugin_manager</span><span class="p">:</span> <span class="n">PluginManager</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Initializes the optimization context.</p>
-<p>Sets up the shared state and resources required for an optimization
-plan. This includes a function evaluator and a plugin manager.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>evaluator</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="../evaluator/#ropt.evaluator.Evaluator">Evaluator</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A callable for evaluating functions in the plan.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>plugin_manager</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            PluginManager (ropt.plugins.PluginManager)" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A plugin manager; a default is created if not provided.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plan.OptimizerContext.add_observer" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">add_observer</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_observer</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">event</span><span class="p">:</span> <span class="n">EventType</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Event</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Adds an observer function for a specific event type.</p>
-<p>Observer functions are called when an event of the specified type
-occurs during optimization. The provided callback function will receive
-an <a class="autorefs autorefs-internal" title="            ropt.plan.Event
-
-
-  
-      dataclass
-  " href="#ropt.plan.Event"><code>Event</code></a> object containing information about the
-event.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>event</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            EventType (ropt.enums.EventType)" href="../enums/#ropt.enums.EventType">EventType</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The type of event to observe.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>callback</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-internal" title="            ropt.plan.Event
-
-
-  
-      dataclass
-  " href="#ropt.plan.Event">Event</a>], None]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The function to call when the event occurs.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Self" href="https://docs.python.org/3/library/typing.html#typing.Self">Self</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The OptimizerContext instance, allowing for method chaining.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plan.OptimizerContext.call_observers" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">call_observers</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">call_observers</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Calls all observers for a specific event.</p>
-<p>This method triggers all observer functions registered for the given
-event type.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>event</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.plan.Event
-
-
-  
-      dataclass
-  " href="#ropt.plan.Event">Event</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The event to emit to the observers.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
       </tbody>
