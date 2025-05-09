@@ -45,9 +45,9 @@ class DefaultTrackerHandler(PlanHandler):
         self,
         plan: Plan,
         *,
+        sources: set[uuid.UUID],
         what: Literal["best", "last"] = "best",
         constraint_tolerance: float | None = None,
-        sources: set[uuid.UUID] | None = None,
     ) -> None:
         """Initialize a default tracker results handler.
 
@@ -68,9 +68,7 @@ class DefaultTrackerHandler(PlanHandler):
         When a [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION]
         event occurs, this handler checks if the ID of the step that emitted the
         event (`event.source`) is present in the `sources` set. If it is, the
-        handler processes the results; otherwise, it ignores the event. If
-        `sources` is `None` (the default), the handler will not track results
-        from any source.
+        handler processes the results; otherwise, it ignores the event.
 
         Tracking logic (comparing 'best' or selecting 'last') operates on the
         results in the optimizer's domain. However, the final selected result
@@ -86,7 +84,7 @@ class DefaultTrackerHandler(PlanHandler):
         super().__init__(plan)
         self._what = what
         self._constraint_tolerance = constraint_tolerance
-        self._sources = set() if sources is None else sources
+        self._sources = sources
         self._tracked_results: FunctionResults | None = None
         self["results"] = None
 
