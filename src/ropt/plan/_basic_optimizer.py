@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING, Any, Self
 from ropt.config.enopt import EnOptConfig
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
+from ropt.plugins import PluginManager
 
-from ._context import OptimizerContext
 from ._plan import Plan
 
 if TYPE_CHECKING:
@@ -112,7 +112,8 @@ class BasicOptimizer:
         """
         self._config = EnOptConfig.model_validate(enopt_config)
         self._constraint_tolerance = constraint_tolerance
-        self._optimizer_context = OptimizerContext(evaluator=evaluator)
+        self._evaluator = evaluator
+        self._plugin_manager = PluginManager()
         self._observers: list[tuple[EventType, Callable[[Event], None]]] = []
         self._results: _Results
         self._kwargs: dict[str, Any] = kwargs
@@ -180,7 +181,7 @@ class BasicOptimizer:
             exit_code = plan.run_step(optimizer, config=self._config)
             return plan.get(tracker, "results"), exit_code
 
-        plan = Plan(self._optimizer_context)
+        plan = Plan(self._evaluator)
 
         # Optionally run a custom step defined in the keyword arguments:
         key, value = next(iter(self._kwargs.items()), (None, None))

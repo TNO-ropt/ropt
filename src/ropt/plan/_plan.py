@@ -5,15 +5,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from ropt.exceptions import PlanAborted
+from ropt.plugins import PluginManager
 from ropt.plugins.plan.base import PlanHandler, PlanStep
 
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Callable
 
+    from ropt.evaluator import Evaluator
     from ropt.plan import Event
-
-    from ._context import OptimizerContext
 
 
 class Plan:
@@ -50,13 +50,19 @@ class Plan:
     customize its behavior. The [`has_function`][ropt.plan.Plan.has_function]
     method can be used to check if a function has been added to the plan.
 
-    **Shared State and Events:**
+    **Evaluator:**
 
-    The plan maintains shared state in an
-    [`OptimizerContext`][ropt.plan.OptimizerContext], which is provided during
-    initialization and can be shared among multiple plans. The
-    [`optimizer_context`][ropt.plan.Plan.optimizer_context] property provides
-    access to this context.
+    The plan stores an [`Evaluator`][ropt.evaluator.Evaluator] object that is
+    used to perform function evaluations that are needed by optimization and
+    evaluation steps. It can be retrieved and set via the `evaluator` attribute.
+
+    **PluginManager:**
+
+    A [`PluginManager`][ropt.plugins.PluginManager] object can be provided that
+    is used by the plan object to find step and handler objects, and that can be
+    used by optimizers and evaluators to implement functionality.
+
+    **Events:**
 
     Steps can communicate events using the
     [`emit_event`][ropt.plan.Plan.emit_event] method. Result handlers can
@@ -90,25 +96,38 @@ class Plan:
 
     def __init__(
         self,
-        optimizer_context: OptimizerContext,
+        evaluator: Evaluator,
+        plugin_manager: PluginManager | None = None,
         parent: Plan | None = None,
     ) -> None:
         """Initialize a plan object.
 
-        Constructs a new plan, associating it with an
-        [`OptimizerContext`][ropt.plan.OptimizerContext] and an optional parent
-        plan.
+        Constructs a new plan, associating it with an evaluator, and optionally
+        with a plugin manager and/or a parent plan.
 
-        The plan will operate within the provided `optimizer_context`. If a
-        `parent` plan is specified, this plan becomes a child, enabling event
-        propagation up the plan hierarchy.
+        The `plugin_manager` is used by the plan, and possibly by steps and
+        handlers to add plugin functionality.
+
+        If a `parent` plan is specified, this plan becomes a child, enabling
+        event propagation up the plan hierarchy.
 
         Args:
-            optimizer_context: The execution context for the plan.
-            parent: An optional parent plan.
+            evaluator:      The evaluator used by the plan.
+            plugin_manager: An optional plugin manager.
+            parent:         An optional parent plan.
         """
-        self._optimizer_context = optimizer_context
+        self.evaluator: Evaluator
+        """The evaluator used by the plan.
 
+        The evaluator is set upon plan creation, and can be retrieved and set via
+        the `evaluator` attribute.
+        """
+
+        self._plugin_manager = (
+            PluginManager() if plugin_manager is None else plugin_manager
+        )
+
+        self.evaluator = evaluator
         self._aborted = False
         self._parent = parent
         self._handlers: dict[uuid.UUID, PlanHandler] = {}
@@ -127,17 +146,16 @@ class Plan:
         return self._aborted
 
     @property
-    def optimizer_context(self) -> OptimizerContext:
-        """Return the optimizer context.
+    def plugin_manager(self) -> PluginManager:
+        """Return the plugin manager.
 
-        Retrieves the [`OptimizerContext`][ropt.plan.OptimizerContext] object
-        associated with this plan. The optimizer context provides shared state
-        and functionality for executing the optimization plan.
+        Retrieves the [`PluginManager`][ropt.plugins.PluginManager] object
+        associated with this plan.
 
         Returns:
-            OptimizerContext: The optimizer context object used by the plan.
+            The plugin manager stored by the plan.
         """
-        return self._optimizer_context
+        return self._plugin_manager
 
     def add_handler(self, name: str, **kwargs: Any) -> uuid.UUID:  # noqa: ANN401
         """Add a handler to the plan.
@@ -154,9 +172,9 @@ class Plan:
         Returns:
             The unique ID of the newly added handler.
         """
-        handler = self._optimizer_context.plugin_manager.get_plugin(
-            "plan_handler", method=name
-        ).create(name, self, **kwargs)
+        handler = self._plugin_manager.get_plugin("plan_handler", method=name).create(
+            name, self, **kwargs
+        )
         assert isinstance(handler, PlanHandler)
         self._handlers[handler.id] = handler
         return handler.id
@@ -176,9 +194,9 @@ class Plan:
         Returns:
             uuid.UUID: The unique ID of the newly added step.
         """
-        step = self._optimizer_context.plugin_manager.get_plugin(
-            "plan_step", method=name
-        ).create(name, self, **kwargs)
+        step = self._plugin_manager.get_plugin("plan_step", method=name).create(
+            name, self, **kwargs
+        )
         assert isinstance(step, PlanStep)
         self._steps[step.id] = step
         return step.id
@@ -195,9 +213,7 @@ class Plan:
         Returns:
             bool: `True` if the handler exists; otherwise, `False`.
         """
-        return self._optimizer_context.plugin_manager.is_supported(
-            "plan_handler", method=name
-        )
+        return self._plugin_manager.is_supported("plan_handler", method=name)
 
     def step_exists(self, name: str) -> bool:
         """Check if a step exists.
@@ -211,9 +227,7 @@ class Plan:
         Returns:
             bool: `True` if the step exists; otherwise, `False`.
         """
-        return self._optimizer_context.plugin_manager.is_supported(
-            "plan_step", method=name
-        )
+        return self._plugin_manager.is_supported("plan_step", method=name)
 
     def run_step(self, step: uuid.UUID, **kwargs: Any) -> Any:  # noqa: ANN401
         """Run a step in the plan.

@@ -130,15 +130,13 @@ class DefaultOptimizerStep(PlanStep):
                 variables = self._config.transforms.variables.to_optimizer(variables)
 
         ensemble_evaluator = EnsembleEvaluator(
-            self._config,
-            self.plan.optimizer_context.evaluator,
-            self.plan.optimizer_context.plugin_manager,
+            self._config, self.plan.evaluator, self.plan.plugin_manager
         )
 
         ensemble_optimizer = EnsembleOptimizer(
             enopt_config=self._config,
             ensemble_evaluator=ensemble_evaluator,
-            plugin_manager=self.plan.optimizer_context.plugin_manager,
+            plugin_manager=self.plan.plugin_manager,
             nested_optimizer=(
                 self._run_nested_plan if self._nested_optimization is not None else None
             ),

@@ -9,12 +9,7 @@ import pytest
 from ropt.config.enopt import EnOptConfig
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted, PlanAborted
-from ropt.plan import (
-    BasicOptimizer,
-    Event,
-    OptimizerContext,
-    Plan,
-)
+from ropt.plan import BasicOptimizer, Event, Plan
 from ropt.results import FunctionResults
 
 if TYPE_CHECKING:
@@ -43,8 +38,7 @@ def enopt_config_fixture() -> dict[str, Any]:
 
 
 def test_run_basic(enopt_config: dict[str, Any], evaluator: Any) -> None:
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(context)
+    plan = Plan(evaluator())
     step = plan.add_step("optimizer")
     tracker = plan.add_handler("tracker", sources={step})
     plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
@@ -63,8 +57,7 @@ def test_plan_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:
     config2 = deepcopy(enopt_config)
     config2["gradient"]["seed"] = 2
 
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(context)
+    plan = Plan(evaluator())
     step = plan.add_step("optimizer")
     tracker = plan.add_handler("tracker", sources={step})
 
@@ -85,8 +78,7 @@ def test_plan_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
 
 def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> None:
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(context)
+    plan = Plan(evaluator())
     step = plan.add_step("optimizer")
     tracker = plan.add_handler("tracker", sources={step})
     plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
@@ -109,8 +101,7 @@ def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> Non
 
 
 def test_reset_results(enopt_config: dict[str, Any], evaluator: Any) -> None:
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(context)
+    plan = Plan(evaluator())
     step = plan.add_step("optimizer")
     tracker = plan.add_handler("tracker", sources={step})
     plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
@@ -143,8 +134,7 @@ def test_two_optimizers_alternating(
     enopt_config2["variables"]["mask"] = [False, True, False]
     enopt_config2["optimizer"]["max_functions"] = 3
 
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(context)
+    plan = Plan(evaluator())
     step = plan.add_step("optimizer")
     tracker1 = plan.add_handler("tracker", sources={step})
     tracker2 = plan.add_handler("tracker", sources={step}, what="last")
@@ -195,8 +185,7 @@ def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -
     enopt_config2 = deepcopy(enopt_config)
     enopt_config2["optimizer"]["max_functions"] = 3
 
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(context)
+    plan = Plan(evaluator())
     step = plan.add_step("optimizer")
     tracker = plan.add_handler("tracker", sources={step}, what="last")
     plan.add_handler(
@@ -234,8 +223,7 @@ def test_restart_initial(enopt_config: dict[str, Any], evaluator: Any) -> None:
     enopt_config["gradient"]["evaluation_policy"] = "speculative"
     enopt_config["optimizer"]["max_functions"] = 3
 
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(context)
+    plan = Plan(evaluator())
     step = plan.add_step("optimizer")
     plan.add_handler(
         "observer",
@@ -264,8 +252,7 @@ def test_restart_last(enopt_config: dict[str, Any], evaluator: Any) -> None:
     enopt_config["gradient"]["evaluation_policy"] = "speculative"
     enopt_config["optimizer"]["max_functions"] = 3
 
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(context)
+    plan = Plan(evaluator())
     step = plan.add_step("optimizer")
     plan.add_handler(
         "observer",
@@ -301,8 +288,7 @@ def test_restart_optimum(enopt_config: dict[str, Any], evaluator: Any) -> None:
     enopt_config["gradient"]["evaluation_policy"] = "speculative"
     enopt_config["optimizer"]["max_functions"] = 4
 
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(context)
+    plan = Plan(evaluator())
     step = plan.add_step("optimizer")
     plan.add_handler(
         "observer",
@@ -357,8 +343,7 @@ def test_restart_optimum_with_reset(
     enopt_config["gradient"]["evaluation_policy"] = "speculative"
     enopt_config["optimizer"]["max_functions"] = max_functions
 
-    context = OptimizerContext(evaluator=evaluator(new_functions))
-    plan = Plan(context)
+    plan = Plan(evaluator(new_functions))
     step = plan.add_step("optimizer")
     plan.add_handler(
         "observer",
@@ -405,8 +390,7 @@ def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
         "bar": "string",
     }
 
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(context)
+    plan = Plan(evaluator())
     step = plan.add_step("optimizer")
     plan.add_handler(
         "observer",
@@ -422,8 +406,7 @@ def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
 
 def test_evaluator_step(enopt_config: dict[str, Any], evaluator: Any) -> None:
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(context)
+    plan = Plan(evaluator())
     step = plan.add_step("evaluator")
     tracker = plan.add_handler("tracker", sources={step})
     plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
@@ -442,8 +425,7 @@ def test_evaluator_step_multi(enopt_config: dict[str, Any], evaluator: Any) -> N
     enopt_config["gradient"]["evaluation_policy"] = "speculative"
     enopt_config["optimizer"]["max_functions"] = 4
 
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(context)
+    plan = Plan(evaluator())
     step = plan.add_step("evaluator")
     store = plan.add_handler("store", sources={step})
     plan.run_step(
@@ -474,8 +456,7 @@ def test_exit_code(
     enopt_config["gradient"]["evaluation_policy"] = "speculative"
     enopt_config["optimizer"][max_criterion] = 4
 
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(context)
+    plan = Plan(evaluator())
     step = plan.add_step("optimizer")
     exit_code = plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
     assert exit_code == max_enum
@@ -501,9 +482,7 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
     nested_config["variables"]["mask"] = [False, True, False]
     enopt_config["optimizer"]["max_functions"] = 5
 
-    context = OptimizerContext(evaluator=evaluator())
-
-    inner_plan = Plan(context)
+    inner_plan = Plan(evaluator())
     inner_step = inner_plan.add_step("optimizer")
     inner_tracker = inner_plan.add_handler("tracker", sources={inner_step})
 
@@ -521,7 +500,7 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
     inner_plan.add_function(_inner_optimization)
 
-    outer_plan = Plan(context)
+    outer_plan = Plan(evaluator())
     outer_step = outer_plan.add_step("optimizer")
     outer_tracker = outer_plan.add_handler("tracker", sources={outer_step})
     outer_plan.add_handler(
@@ -562,9 +541,7 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
     nested_config["variables"]["mask"] = [False, True, False]
     enopt_config["optimizer"]["max_functions"] = 5
 
-    context = OptimizerContext(evaluator=evaluator())
-
-    inner_plan = Plan(context)
+    inner_plan = Plan(evaluator())
     inner_step = inner_plan.add_step("optimizer")
     inner_tracker = inner_plan.add_handler("tracker", sources={inner_step})
 
@@ -583,7 +560,7 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
 
     inner_plan.add_function(_inner_optimization)
 
-    outer_plan = Plan(context)
+    outer_plan = Plan(evaluator())
     outer_step = outer_plan.add_step("optimizer")
     outer_tracker = outer_plan.add_handler("tracker", sources={outer_step})
     outer_plan.add_handler(
@@ -620,8 +597,7 @@ def test_plan_abort(enopt_config: Any, evaluator: Any) -> None:
         if last_evaluation == 1:
             raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
 
-    context = OptimizerContext(evaluator=evaluator())
-    plan = Plan(context)
+    plan = Plan(evaluator())
     step = plan.add_step("optimizer")
     tracker = plan.add_handler("tracker", sources={step})
     plan.add_handler(

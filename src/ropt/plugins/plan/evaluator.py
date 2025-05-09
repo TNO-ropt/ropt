@@ -102,9 +102,7 @@ class DefaultEvaluatorStep(PlanStep):
                 variables = config.transforms.variables.to_optimizer(variables)
 
         ensemble_evaluator = EnsembleEvaluator(
-            config,
-            self.plan.optimizer_context.evaluator,
-            self.plan.optimizer_context.plugin_manager,
+            config, self.plan.evaluator, self.plan.plugin_manager
         )
 
         exit_code = OptimizerExitCode.EVALUATION_STEP_FINISHED

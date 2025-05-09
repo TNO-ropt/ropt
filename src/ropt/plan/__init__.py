@@ -15,13 +15,6 @@ step][ropt.plugins.plan.default.DefaultPlanStepPlugin] plugins. These provide
 basic steps and result handlers to support a wide range of optimization
 workflows.
 
-Most optimization plans require shared state across all steps, such as the
-plugin manager and an evaluator callable for function evaluations. This shared
-state is managed by the [`OptimizerContext`][ropt.plan.OptimizerContext] object,
-which is provided when creating a plan. The `OptimizerContext` also handles
-[events][ropt.plan.Event] produced by plan steps by calling registered callbacks
-and forwarding them to result handlers.
-
 Setting up and executing a `Plan` object for simple optimization cases can be
 complex. The [`BasicOptimizer`][ropt.plan.BasicOptimizer] class simplifies this
 process by providing a convenient way to build and execute straightforward plans
@@ -29,13 +22,11 @@ involving a single optimization.
 """
 
 from ._basic_optimizer import BasicOptimizer
-from ._context import OptimizerContext
 from ._events import Event
 from ._plan import Plan
 
 __all__ = [
     "BasicOptimizer",
     "Event",
-    "OptimizerContext",
     "Plan",
 ]
