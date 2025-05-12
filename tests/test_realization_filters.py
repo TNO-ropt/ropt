@@ -81,25 +81,25 @@ def test__get_cvar_weights_from_percentile(
 
 def _objective_function(
     variables: NDArray[np.float64],
-    context: Any,
+    realization: int,
     target: NDArray[np.float64],
 ) -> float:
     diff: NDArray[np.float64] = variables - target
     # Make sure that some realizations yield a different result:
-    if context.realization % 2 == 0:
+    if realization % 2 == 0:
         diff += 1.0
     result = np.sum(diff**2)
     # Make sure the other realizations have a worse result:
-    if context.realization % 2 == 1:
+    if realization % 2 == 1:
         result += 10.0
     return float(result)
 
 
-def _constraint_function(variables: NDArray[np.float64], context: Any) -> float:
+def _constraint_function(variables: NDArray[np.float64], realization: int) -> float:
     # Track how often this function is called.
     result = variables[0] + variables[2]
     # Break some realizations, same as in the distance function:
-    if context.realization % 2 == 0:
+    if realization % 2 == 0:
         result = variables[0] + variables[2] - 10.0
     return float(result)
 

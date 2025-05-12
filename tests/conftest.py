@@ -1,5 +1,4 @@
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass
 from functools import partial
 from typing import Any
 
@@ -9,7 +8,7 @@ from numpy.typing import NDArray
 
 from ropt.evaluator import Evaluator, EvaluatorContext, EvaluatorResult
 
-_Function = Callable[[NDArray[np.float64], Any], float]
+_Function = Callable[[NDArray[np.float64], int], float]
 
 
 def pytest_addoption(parser: Any) -> Any:
@@ -24,12 +23,6 @@ def pytest_collection_modifyitems(config: Any, items: Sequence[Any]) -> None:
         for item in items:
             if "slow" in item.keywords:
                 item.add_marker(skip_slow)
-
-
-@dataclass(slots=True)
-class FunctionContext:
-    realization: int
-    index: int
 
 
 def _function_runner(
@@ -53,22 +46,25 @@ def _function_runner(
         else None
     )
     for sim, realization in enumerate(evaluator_context.realizations):
-        context = FunctionContext(realization=int(realization), index=sim)
         for idx in range(objective_count):
             if (
                 evaluator_context.active_objectives is None
                 or evaluator_context.active_objectives[idx, realization]
             ):
                 function = functions[idx]
-                objective_results[sim, idx] = function(variables[sim, :], context)
+                objective_results[sim, idx] = function(
+                    variables[sim, :], int(realization)
+                )
         for idx in range(constraint_count):
             if (
                 evaluator_context.active_constraints is None
-                or evaluator_context.active_constraints[idx, realization]
+                or evaluator_context.active_constraints[idx, int(realization)]
             ):
                 function = functions[idx + objective_count]
                 assert constraint_results is not None
-                constraint_results[sim, idx] = function(variables[sim, :], context)
+                constraint_results[sim, idx] = function(
+                    variables[sim, :], int(realization)
+                )
 
     return EvaluatorResult(
         objectives=objective_results,
@@ -77,9 +73,7 @@ def _function_runner(
 
 
 def _compute_distance_squared(
-    variables: NDArray[np.float64],
-    context: Any,  # noqa: ARG001
-    target: NDArray[np.float64],
+    variables: NDArray[np.float64], _: int, target: NDArray[np.float64]
 ) -> float:
     return float(((variables - target) ** 2).sum())
 
