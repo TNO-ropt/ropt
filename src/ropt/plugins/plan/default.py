@@ -1,6 +1,6 @@
-"""This module provides the default plugin implementations for plan steps and handlers.
+"""This module provides the default plugin implementations for steps and event handlers.
 
-It defines `DefaultPlanStepPlugin` and `DefaultPlanHandlerPlugin`, which serve
+It defines `DefaultPlanStepPlugin` and `DefaultEventHandlerPlugin`, which serve
 as factories for the built-in plan components, enabling the creation of
 standard optimization plans out-of-the-box.
 
@@ -30,33 +30,33 @@ from typing import TYPE_CHECKING, Any, Final
 from ._observer import DefaultObserverHandler
 from ._store import DefaultStoreHandler
 from ._tracker import DefaultTrackerHandler
-from .base import PlanHandlerPlugin, PlanStepPlugin
+from .base import EventHandlerPlugin, PlanStepPlugin
 from .evaluator import DefaultEvaluatorStep
 from .optimizer import DefaultOptimizerStep
 
 if TYPE_CHECKING:
     from ropt.plan import Plan
-    from ropt.plugins.plan.base import PlanHandler, PlanStep
+    from ropt.plugins.plan.base import EventHandler, PlanStep
 
 _STEP_OBJECTS: Final[dict[str, type[PlanStep]]] = {
     "evaluator": DefaultEvaluatorStep,
     "optimizer": DefaultOptimizerStep,
 }
 
-_RESULT_HANDLER_OBJECTS: Final[dict[str, type[PlanHandler]]] = {
+_EVENT_HANDLER_OBJECTS: Final[dict[str, type[EventHandler]]] = {
     "observer": DefaultObserverHandler,
     "tracker": DefaultTrackerHandler,
     "store": DefaultStoreHandler,
 }
 
 
-class DefaultPlanHandlerPlugin(PlanHandlerPlugin):
-    """The default plugin for creating built-in plan handlers.
+class DefaultEventHandlerPlugin(EventHandlerPlugin):
+    """The default plugin for creating built-in event handlers.
 
-    This plugin acts as a factory for the standard `PlanHandler` implementations
-    provided by `ropt`. It allows the
-    [`PluginManager`][ropt.plugins.PluginManager] to instantiate these handlers
-    when requested by a [`Plan`][ropt.plan.Plan].
+    This plugin acts as a factory for the standard `EventHandler`
+    implementations provided by `ropt`. It allows the
+    [`PluginManager`][ropt.plugins.PluginManager] to instantiate these event
+    handlers when requested by a [`Plan`][ropt.plan.Plan].
 
     **Supported Handlers:**
 
@@ -74,19 +74,19 @@ class DefaultPlanHandlerPlugin(PlanHandlerPlugin):
     """
 
     @classmethod
-    def create(cls, name: str, plan: Plan, **kwargs: dict[str, Any]) -> PlanHandler:
-        """Create a result  handler.
+    def create(cls, name: str, plan: Plan, **kwargs: dict[str, Any]) -> EventHandler:
+        """Create an event handler.
 
         See the [ropt.plugins.plan.base.PlanPlugin][] abstract base class.
 
         # noqa
         """
         _, _, name = name.lower().rpartition("/")
-        obj = _RESULT_HANDLER_OBJECTS.get(name)
+        obj = _EVENT_HANDLER_OBJECTS.get(name)
         if obj is not None:
             return obj(plan, **kwargs)
 
-        msg = f"Unknown results handler object type: {name}"
+        msg = f"Unknown event handler object type: {name}"
         raise TypeError(msg)
 
     @classmethod
@@ -97,7 +97,7 @@ class DefaultPlanHandlerPlugin(PlanHandlerPlugin):
 
         # noqa
         """
-        return method.lower() in _RESULT_HANDLER_OBJECTS
+        return method.lower() in _EVENT_HANDLER_OBJECTS
 
 
 class DefaultPlanStepPlugin(PlanStepPlugin):

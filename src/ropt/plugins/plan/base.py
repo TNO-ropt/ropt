@@ -12,16 +12,16 @@ if TYPE_CHECKING:
     from ropt.plan import Event, Plan
 
 
-class PlanHandlerPlugin(Plugin):
+class EventHandlerPlugin(Plugin):
     """Abstract Base Class for Plan Handler Plugins.
 
     This class defines the interface for plugins responsible for creating
-    [`PlanHandler`][ropt.plugins.plan.base.PlanHandler] instances within an
+    [`EventHandler`][ropt.plugins.plan.base.EventHandler] instances within an
     optimization plan ([`Plan`][ropt.plan.Plan]).
 
     During plan setup, the [`PluginManager`][ropt.plugins.PluginManager]
-    identifies the appropriate handler plugin based on a requested name and
-    uses its `create` class method to instantiate the actual `PlanHandler`
+    identifies the appropriate event handler plugin based on a requested name
+    and uses its `create` class method to instantiate the actual `EventHandler`
     object that will process events during plan execution.
     """
 
@@ -32,34 +32,35 @@ class PlanHandlerPlugin(Plugin):
         name: str,
         plan: Plan,
         **kwargs: Any,  # noqa: ANN401
-    ) -> PlanHandler:
-        """Create a PlanHandler instance.
+    ) -> EventHandler:
+        """Create a EventHandler instance.
 
         This abstract class method serves as a factory for creating concrete
-        [`PlanHandler`][ropt.plugins.plan.base.PlanHandler] objects. Plugin
-        implementations must override this method to return an instance of
-        their specific `PlanHandler` subclass.
+        [`EventHandler`][ropt.plugins.plan.base.EventHandler] objects. Plugin
+        implementations must override this method to return an instance of their
+        specific `EventHandler` subclass.
 
-        The [`PluginManager`][ropt.plugins.PluginManager] calls this method
-        when a plan requests a handler provided by this plugin via
-        [`Plan.add_handler`][ropt.plan.Plan.add_handler].
+        The [`PluginManager`][ropt.plugins.PluginManager] calls this method when
+        a plan requests an event handler provided by this plugin via
+        [`Plan.add_event_handler`][ropt.plan.Plan.add_event_handler].
 
-        The `name` argument specifies the requested handler, potentially in the
-        format `"plugin-name/method-name"` or just `"method-name"`.
-        Implementations can use this `name` to vary the created handler if the
-        plugin supports multiple handler types.
+        The `name` argument specifies the requested event handler, potentially
+        in the format `"plugin-name/method-name"` or just `"method-name"`.
+        Implementations can use this `name` to vary the created event handler if
+        the plugin supports multiple event handler types.
 
         Any additional keyword arguments (`kwargs`) passed during the
-        [`Plan.add_handler`][ropt.plan.Plan.add_handler] call are forwarded here,
-        allowing for custom configuration of the handler instance.
+        [`Plan.add_event_handler`][ropt.plan.Plan.add_event_handler] call are
+        forwarded here, allowing for custom configuration of the event handler
+        instance.
 
         Args:
-            name:   The requested handler name (potentially plugin-specific).
+            name:   The requested event handler name (potentially plugin-specific).
             plan:   The parent [`Plan`][ropt.plan.Plan] instance.
             kwargs: Additional arguments for custom configuration.
 
         Returns:
-            An initialized instance of a `PlanHandler` subclass.
+            An initialized instance of a `EventHandler` subclass.
         """
 
 
@@ -151,10 +152,10 @@ class PlanStep(ABC):
 
     @property
     def id(self) -> uuid.UUID:
-        """Return the unique identifier of the handler.
+        """Return the unique identifier of the event handler.
 
         Returns:
-            A UUID object representing the unique identifier of the handler.
+            A UUID object representing the unique identifier of the event handler.
         """
         return self.__id
 
@@ -189,43 +190,43 @@ class PlanStep(ABC):
         """
 
 
-class PlanHandler(ABC):
+class EventHandler(ABC):
     """Abstract Base Class for Optimization Plan Result Handlers.
 
-    This class defines the fundamental interface for all result handlers within
+    This class defines the fundamental interface for all event handlers within
     an optimization [`Plan`][ropt.plan.Plan]. Concrete handler implementations,
     which process events emitted during plan execution (e.g., tracking results,
     storing data, logging), must inherit from this base class.
 
-    `PlanHandler` objects are typically created by corresponding
-    [`PlanHandlerPlugin`][ropt.plugins.plan.base.PlanHandlerPlugin] factories,
+    `EventHandler` objects are typically created by corresponding
+    [`EventHandlerPlugin`][ropt.plugins.plan.base.EventHandlerPlugin] factories,
     managed by the [`PluginManager`][ropt.plugins.PluginManager]. Once
     instantiated and added to a `Plan`, their
-    [`handle_event`][ropt.plugins.plan.base.PlanHandler.handle_event] method is
+    [`handle_event`][ropt.plugins.plan.base.EventHandler.handle_event] method is
     called by the plan whenever an [`Event`][ropt.plan.Event] is emitted.
 
     Handlers can also store state using dictionary-like access (`[]`), allowing
     them to accumulate information or make data available to subsequent steps
-    or handlers within the plan.
+    or event handlers within the plan.
 
-    Each `PlanHandler` instance has a unique
-    [`id`][ropt.plugins.plan.base.PlanHandler.id] and maintains a reference to
-    its parent [`plan`][ropt.plugins.plan.base.PlanHandler.plan].
+    Each `EventHandler` instance has a unique
+    [`id`][ropt.plugins.plan.base.EventHandler.id] and maintains a reference to
+    its parent [`plan`][ropt.plugins.plan.base.EventHandler.plan].
 
     Subclasses must implement the abstract
-    [`handle_event`][ropt.plugins.plan.base.PlanHandler.handle_event] method to
+    [`handle_event`][ropt.plugins.plan.base.EventHandler.handle_event] method to
     define their specific event processing logic.
     """
 
     def __init__(self, plan: Plan) -> None:
-        """Initialize the PlanHandler.
+        """Initialize the EventHandler.
 
-        Associates the handler with its parent [`Plan`][ropt.plan.Plan], assigns
-        a unique ID, and initializes an internal dictionary for storing state.
-        The parent plan is accessible via the `plan` property.
+        Associates the event handler with its parent [`Plan`][ropt.plan.Plan],
+        assigns a unique ID, and initializes an internal dictionary for storing
+        state. The parent plan is accessible via the `plan` property.
 
         Args:
-            plan: The [`Plan`][ropt.plan.Plan] instance that owns this handler.
+            plan: The [`Plan`][ropt.plan.Plan] instance that owns this event handler.
         """
         self.__stored_plan = plan
         self.__stored_values: dict[str, Any] = {}
@@ -233,19 +234,19 @@ class PlanHandler(ABC):
 
     @property
     def id(self) -> uuid.UUID:
-        """Return the unique identifier (UUID) of this handler instance.
+        """Return the unique identifier (UUID) of this event handler instance.
 
         Returns:
-            The unique UUID object for this handler.
+            The unique UUID object for this event handler.
         """
         return self.__id
 
     @property
     def plan(self) -> Plan:
-        """Return the parent plan associated with this handler.
+        """Return the parent plan associated with this event handler.
 
         Returns:
-            The [`Plan`][ropt.plan.Plan] object that owns this handler.
+            The [`Plan`][ropt.plan.Plan] object that owns this event handler.
         """
         return self.__stored_plan
 
@@ -253,8 +254,8 @@ class PlanHandler(ABC):
     def handle_event(self, event: Event) -> None:
         """Process an event emitted by the optimization plan.
 
-        This abstract method must be implemented by concrete `PlanHandler`
-        subclasses. It defines the handler's core logic for reacting to
+        This abstract method must be implemented by concrete `EventHandler`
+        subclasses. It defines the event handler's core logic for reacting to
         [`Event`][ropt.plan.Event] objects emitted during the execution of the
         parent [`Plan`][ropt.plan.Plan].
 
@@ -268,10 +269,10 @@ class PlanHandler(ABC):
         """
 
     def __getitem__(self, key: str) -> Any:  # noqa: ANN401
-        """Retrieve a value from the handler's internal state.
+        """Retrieve a value from the event handler's internal state.
 
         This method enables dictionary-like access (`handler[key]`) to the
-        values stored within the handler's internal state dictionary. This
+        values stored within the event handler's internal state dictionary. This
         allows handlers to store and retrieve data accumulated during plan
         execution.
 
@@ -283,7 +284,7 @@ class PlanHandler(ABC):
 
         Raises:
             AttributeError: If the provided `key` does not exist in the
-                            handler's stored values.
+                            event handler's stored values.
         """
         if key in self.__stored_values:
             return self.__stored_values[key]
@@ -291,12 +292,12 @@ class PlanHandler(ABC):
         raise AttributeError(msg)
 
     def __setitem__(self, key: str, value: Any) -> None:  # noqa: ANN401
-        """Store or update a value in the handler's internal state.
+        """Store or update a value in the event handler's internal state.
 
         This method enables dictionary-like assignment (`handler[key] = value`)
-        to store arbitrary data within the handler's internal state dictionary.
-        This allows handlers to accumulate information or make data available to
-        other components of the plan.
+        to store arbitrary data within the event handler's internal state
+        dictionary. This allows event handlers to accumulate information or make
+        data available to other components of plan.
 
         The key must be a valid Python identifier.
 

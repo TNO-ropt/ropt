@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
     from ropt.evaluator import Evaluator
     from ropt.plan import Event
-    from ropt.plugins.plan.base import PlanHandler
+    from ropt.plugins.plan.base import EventHandler
     from ropt.results import FunctionResults
 
 
@@ -56,9 +56,9 @@ class BasicOptimizer:
       results, corresponding variables, and the optimization's exit code are
       readily accessible.
     - **Customizable Steps and Handlers:** While designed for single runs, it
-      allows for the addition of custom steps and handlers to the underlying
-      `Plan` for more complex scenarios. It is possible to pass keyword
-      arguments to the custom steps and handlers.
+      allows for the addition of custom plan steps and event handlers to the
+      underlying `Plan` for more complex scenarios. It is possible to pass
+      keyword arguments to the custom steps and handlers.
 
     By encapsulating the core elements of an optimization run, the
     `BasicOptimizer` reduces the boilerplate code required for simple
@@ -81,8 +81,8 @@ class BasicOptimizer:
         evaluator, which together define the optimization problem and how to
         evaluate potential solutions. If a constraint value is within the
         `constraint_tolerance` of zero, it is considered satisfied. The `kwargs`
-        may be used to define custom steps, and handlers to modify the behavior
-        of the optimization process.
+        may be used to define custom steps and event handlers to modify the
+        behavior of the optimization process.
 
         Note: Custom  steps
             The optional keyword arguments (`kwargs`) provide a mechanism to
@@ -96,7 +96,7 @@ class BasicOptimizer:
                 step can be executed this way, if other keyword arguments are
                 present an error is raised. The custom step receives the `Plan`
                 object and may install a custom run function to be executed
-                later, or install custom result handlers.
+                later, or install custom event handlers.
             2.  **Default Optimization:** If no custom step is run, or if the
                 custom step does not install a custom run function, the default
                 optimization process is used.
@@ -177,7 +177,7 @@ class BasicOptimizer:
 
         def _run_func(
             plan: Plan,
-        ) -> tuple[PlanHandler | None, OptimizerExitCode | None]:
+        ) -> tuple[EventHandler | None, OptimizerExitCode | None]:
             exit_code = plan.run_step(optimizer, config=self._config)
             return plan.get(tracker, "results"), exit_code
 
@@ -194,7 +194,7 @@ class BasicOptimizer:
         # If no custom function was installed, install the default function:
         if not plan.has_function():
             optimizer = plan.add_step("optimizer")
-            tracker = plan.add_handler(
+            tracker = plan.add_event_handler(
                 "tracker",
                 constraint_tolerance=self._constraint_tolerance,
                 sources={optimizer},
@@ -202,7 +202,9 @@ class BasicOptimizer:
             plan.add_function(_run_func)
 
         for event_type, function in self._observers:
-            plan.add_handler("observer", event_types={event_type}, callback=function)
+            plan.add_event_handler(
+                "observer", event_types={event_type}, callback=function
+            )
 
         results, exit_code = plan.run_function()
         variables = None if results is None else results.evaluations.variables

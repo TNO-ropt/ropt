@@ -40,7 +40,7 @@ def enopt_config_fixture() -> dict[str, Any]:
 def test_run_basic(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plan = Plan(evaluator())
     step = plan.add_step("optimizer")
-    tracker = plan.add_handler("tracker", sources={step})
+    tracker = plan.add_event_handler("tracker", sources={step})
     plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
     assert plan.get(tracker, "results") is not None
     assert np.allclose(
@@ -59,7 +59,7 @@ def test_plan_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
     plan = Plan(evaluator())
     step = plan.add_step("optimizer")
-    tracker = plan.add_handler("tracker", sources={step})
+    tracker = plan.add_event_handler("tracker", sources={step})
 
     plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
     assert plan.get(tracker, "results") is not None
@@ -80,7 +80,7 @@ def test_plan_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:
 def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plan = Plan(evaluator())
     step = plan.add_step("optimizer")
-    tracker = plan.add_handler("tracker", sources={step})
+    tracker = plan.add_event_handler("tracker", sources={step})
     plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
     assert plan.get(tracker, "results") is not None
     variables1 = plan.get(tracker, "results").evaluations.variables
@@ -103,7 +103,7 @@ def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> Non
 def test_reset_results(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plan = Plan(evaluator())
     step = plan.add_step("optimizer")
-    tracker = plan.add_handler("tracker", sources={step})
+    tracker = plan.add_event_handler("tracker", sources={step})
     plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
     saved_results = deepcopy(plan.get(tracker, "results"))
     plan.set(tracker, "results", None)
@@ -136,9 +136,9 @@ def test_two_optimizers_alternating(
 
     plan = Plan(evaluator())
     step = plan.add_step("optimizer")
-    tracker1 = plan.add_handler("tracker", sources={step})
-    tracker2 = plan.add_handler("tracker", sources={step}, what="last")
-    plan.add_handler(
+    tracker1 = plan.add_event_handler("tracker", sources={step})
+    tracker2 = plan.add_event_handler("tracker", sources={step}, what="last")
+    plan.add_event_handler(
         "observer",
         event_types={EventType.FINISHED_EVALUATION},
         callback=_track_evaluations,
@@ -187,8 +187,8 @@ def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -
 
     plan = Plan(evaluator())
     step = plan.add_step("optimizer")
-    tracker = plan.add_handler("tracker", sources={step}, what="last")
-    plan.add_handler(
+    tracker = plan.add_event_handler("tracker", sources={step}, what="last")
+    plan.add_event_handler(
         "observer",
         event_types={EventType.FINISHED_EVALUATION},
         callback=_track_evaluations,
@@ -225,7 +225,7 @@ def test_restart_initial(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
     plan = Plan(evaluator())
     step = plan.add_step("optimizer")
-    plan.add_handler(
+    plan.add_event_handler(
         "observer",
         event_types={EventType.FINISHED_EVALUATION},
         callback=_track_evaluations,
@@ -254,12 +254,12 @@ def test_restart_last(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
     plan = Plan(evaluator())
     step = plan.add_step("optimizer")
-    plan.add_handler(
+    plan.add_event_handler(
         "observer",
         event_types={EventType.FINISHED_EVALUATION},
         callback=_track_evaluations,
     )
-    tracker = plan.add_handler("tracker", sources={step}, what="last")
+    tracker = plan.add_event_handler("tracker", sources={step}, what="last")
     for _ in range(2):
         variables = (
             None
@@ -290,12 +290,12 @@ def test_restart_optimum(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
     plan = Plan(evaluator())
     step = plan.add_step("optimizer")
-    plan.add_handler(
+    plan.add_event_handler(
         "observer",
         event_types={EventType.FINISHED_EVALUATION},
         callback=_track_evaluations,
     )
-    tracker = plan.add_handler("tracker", sources={step})
+    tracker = plan.add_event_handler("tracker", sources={step})
     for _ in range(2):
         variables = (
             None
@@ -345,12 +345,12 @@ def test_restart_optimum_with_reset(
 
     plan = Plan(evaluator(new_functions))
     step = plan.add_step("optimizer")
-    plan.add_handler(
+    plan.add_event_handler(
         "observer",
         event_types={EventType.FINISHED_EVALUATION},
         callback=_track_evaluations,
     )
-    tracker = plan.add_handler("tracker", sources={step})
+    tracker = plan.add_event_handler("tracker", sources={step})
     for _ in range(3):
         variables = (
             None
@@ -392,7 +392,7 @@ def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
     plan = Plan(evaluator())
     step = plan.add_step("optimizer")
-    plan.add_handler(
+    plan.add_event_handler(
         "observer",
         event_types={EventType.FINISHED_EVALUATION},
         callback=_track_results,
@@ -408,7 +408,7 @@ def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
 def test_evaluator_step(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plan = Plan(evaluator())
     step = plan.add_step("evaluator")
-    tracker = plan.add_handler("tracker", sources={step})
+    tracker = plan.add_event_handler("tracker", sources={step})
     plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
     assert plan.get(tracker, "results").functions is not None
     assert np.allclose(plan.get(tracker, "results").functions.weighted_objective, 1.66)
@@ -427,7 +427,7 @@ def test_evaluator_step_multi(enopt_config: dict[str, Any], evaluator: Any) -> N
 
     plan = Plan(evaluator())
     step = plan.add_step("evaluator")
-    store = plan.add_handler("store", sources={step})
+    store = plan.add_event_handler("store", sources={step})
     plan.run_step(
         step,
         config=EnOptConfig.model_validate(enopt_config),
@@ -484,7 +484,7 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
     inner_plan = Plan(evaluator())
     inner_step = inner_plan.add_step("optimizer")
-    inner_tracker = inner_plan.add_handler("tracker", sources={inner_step})
+    inner_tracker = inner_plan.add_event_handler("tracker", sources={inner_step})
 
     def _inner_optimization(
         plan: Plan, variables: NDArray[np.float64]
@@ -502,8 +502,8 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
     outer_plan = Plan(evaluator())
     outer_step = outer_plan.add_step("optimizer")
-    outer_tracker = outer_plan.add_handler("tracker", sources={outer_step})
-    outer_plan.add_handler(
+    outer_tracker = outer_plan.add_event_handler("tracker", sources={outer_step})
+    outer_plan.add_event_handler(
         "observer",
         event_types={EventType.FINISHED_EVALUATION},
         callback=_track_evaluations,
@@ -543,7 +543,7 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
 
     inner_plan = Plan(evaluator())
     inner_step = inner_plan.add_step("optimizer")
-    inner_tracker = inner_plan.add_handler("tracker", sources={inner_step})
+    inner_tracker = inner_plan.add_event_handler("tracker", sources={inner_step})
 
     def _inner_optimization(
         plan: Plan, variables: NDArray[np.float64]
@@ -562,8 +562,8 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
 
     outer_plan = Plan(evaluator())
     outer_step = outer_plan.add_step("optimizer")
-    outer_tracker = outer_plan.add_handler("tracker", sources={outer_step})
-    outer_plan.add_handler(
+    outer_tracker = outer_plan.add_event_handler("tracker", sources={outer_step})
+    outer_plan.add_event_handler(
         "observer",
         event_types={EventType.FINISHED_EVALUATION},
         callback=_track_evaluations,
@@ -599,8 +599,8 @@ def test_plan_abort(enopt_config: Any, evaluator: Any) -> None:
 
     plan = Plan(evaluator())
     step = plan.add_step("optimizer")
-    tracker = plan.add_handler("tracker", sources={step})
-    plan.add_handler(
+    tracker = plan.add_event_handler("tracker", sources={step})
+    plan.add_event_handler(
         "observer",
         event_types={EventType.FINISHED_EVALUATION},
         callback=_observer,

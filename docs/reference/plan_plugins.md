@@ -2,6 +2,6 @@
     options:
         members: False
 ::: ropt.plugins.plan.base.PlanStepPlugin
-::: ropt.plugins.plan.base.PlanHandlerPlugin
+::: ropt.plugins.plan.base.EventHandlerPlugin
 ::: ropt.plugins.plan.base.PlanStep
-::: ropt.plugins.plan.base.PlanHandler
+::: ropt.plugins.plan.base.EventHandler

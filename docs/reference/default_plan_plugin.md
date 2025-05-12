@@ -4,7 +4,7 @@
 ::: ropt.plugins.plan.default.DefaultPlanStepPlugin
     options:
         members: False
-::: ropt.plugins.plan.default.DefaultPlanHandlerPlugin
+::: ropt.plugins.plan.default.DefaultEventHandlerPlugin
     options:
         members: False
 ::: ropt.plugins.plan.evaluator.DefaultEvaluatorStep

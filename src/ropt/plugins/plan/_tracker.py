@@ -1,11 +1,11 @@
-"""This module implements the default tracker handler."""
+"""This module implements the default tracker event handler."""
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal
 
 from ropt.enums import EventType
-from ropt.plugins.plan.base import PlanHandler
+from ropt.plugins.plan.base import EventHandler
 
 from ._utils import _get_last_result, _update_optimal_result
 
@@ -16,10 +16,10 @@ if TYPE_CHECKING:
     from ropt.results import FunctionResults
 
 
-class DefaultTrackerHandler(PlanHandler):
-    """The default handler for tracking optimization results.
+class DefaultTrackerHandler(EventHandler):
+    """The default event handler for tracking optimization results.
 
-    This handler listens for
+    This event handler listens for
     [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events
     emitted by specified `sources` (plan steps). It processes the
     [`Results`][ropt.results.Results] objects contained within these events and
@@ -49,10 +49,10 @@ class DefaultTrackerHandler(PlanHandler):
         what: Literal["best", "last"] = "best",
         constraint_tolerance: float | None = None,
     ) -> None:
-        """Initialize a default tracker results handler.
+        """Initialize a default tracker event handler.
 
-        This handler monitors [`Results`][ropt.results.Results] objects from
-        specified `sources` (plan steps) and selects a single
+        This event handler monitors [`Results`][ropt.results.Results] objects
+        from specified `sources` (plan steps) and selects a single
         [`FunctionResults`][ropt.results.FunctionResults] object to retain based
         on the `what` criterion ('best' or 'last').
 
@@ -63,13 +63,14 @@ class DefaultTrackerHandler(PlanHandler):
         specified threshold.
 
         The `sources` parameter acts as a filter, determining which plan steps
-        this handler should listen to. It should be a set containing the unique
-        IDs (UUIDs) of the `PlanStep` instances whose results you want to track.
-        When a [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION]
-        event occurs, this handler checks if the ID of the step that emitted the
+        this event handler should listen to. It should be a set containing the
+        unique IDs (UUIDs) of the `PlanStep` instances whose results you want to
+        track. When a
+        [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] event
+        occurs, this event handler checks if the ID of the step that emitted the
         event (`event.source`) is present in the `sources` set. If it is, the
-        handler processes the results; otherwise, it ignores the event. If `sources`
-        is `None`, events from all sources will be processed.
+        handler processes the results; otherwise, it ignores the event. If
+        `sources` is `None`, events from all sources will be processed.
 
         Tracking logic (comparing 'best' or selecting 'last') operates on the
         results in the optimizer's domain. However, the final selected result

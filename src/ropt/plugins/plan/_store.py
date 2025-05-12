@@ -1,11 +1,11 @@
-"""This module implements the default tracker handler."""
+"""This module implements the default store event handler."""
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
 from ropt.enums import EventType
-from ropt.plugins.plan.base import PlanHandler
+from ropt.plugins.plan.base import EventHandler
 
 if TYPE_CHECKING:
     import uuid
@@ -13,10 +13,10 @@ if TYPE_CHECKING:
     from ropt.plan import Event, Plan
 
 
-class DefaultStoreHandler(PlanHandler):
-    """The default handler for storing optimization results.
+class DefaultStoreHandler(EventHandler):
+    """The default event handler for storing optimization results.
 
-    This handler listens for
+    This event handler listens for
     [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events
     emitted by specified `sources` (plan steps). It collects all
     [`Results`][ropt.results.Results] objects contained within these events and
@@ -34,21 +34,23 @@ class DefaultStoreHandler(PlanHandler):
         *,
         sources: set[uuid.UUID] | None = None,
     ) -> None:
-        """Initialize a default store results handler.
+        """Initialize a default store event handler.
 
-        This handler collects and stores all [`Results`][ropt.results.Results]
-        objects received from specified `sources` (plan steps). It listens for
+        This event handler collects and stores all
+        [`Results`][ropt.results.Results] objects received from specified
+        `sources` (plan steps). It listens for
         [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events
         and appends the results contained within them to an internal tuple.
 
         The `sources` parameter acts as a filter, determining which plan steps
-        this handler should listen to. It should be a set containing the unique
-        IDs (UUIDs) of the `PlanStep` instances whose results you want to store.
-        When a [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION]
-        event occurs, this handler checks if the ID of the step that emitted the
+        this event handler should listen to. It should be a set containing the
+        unique IDs (UUIDs) of the `PlanStep` instances whose results you want to
+        store. When a
+        [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] event
+        occurs, this event handler checks if the ID of the step that emitted the
         event (`event.source`) is present in the `sources` set. If it is, the
-        handler stores the results; otherwise, it ignores the event. If `sources`
-        is `None`, events from all sources will be processed.
+        handler stores the results; otherwise, it ignores the event. If
+        `sources` is `None`, events from all sources will be processed.
 
         The results are converted from the optimizer domain to the user domain
         *before* being stored. The accumulated results are stored as a tuple and

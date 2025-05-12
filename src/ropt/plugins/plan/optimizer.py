@@ -48,7 +48,7 @@ class DefaultOptimizerStep(PlanStep):
     - [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION]: Emitted
       after an evaluation completes. This event carries the generated
       [`Results`][ropt.results.Results] object(s) in its `data` dictionary
-      under the key `"results"`. Plan handlers typically listen for this event
+      under the key `"results"`. Event handlers typically listen for this event
       to process or track optimization progress.
     - [`FINISHED_OPTIMIZER_STEP`][ropt.enums.EventType.FINISHED_OPTIMIZER_STEP]:
       Emitted after the entire optimization process concludes (successfully,

@@ -9,7 +9,7 @@ the optimization workflow:
 
 * [`plan`][ropt.plugins.plan]: Defines components for constructing and executing
   optimization plans
-  ([`PlanHandlerPlugin`][ropt.plugins.plan.base.PlanHandlerPlugin] and
+  ([`EventHandlerPlugin`][ropt.plugins.plan.base.EventHandlerPlugin] and
   [`PlanStepPlugin`][ropt.plugins.plan.base.PlanStepPlugin]).
 * [`optimizer`][ropt.plugins.optimizer]: Implements optimization algorithms.
 * [`sampler`][ropt.plugins.sampler]: Generates parameter perturbations, which
@@ -28,7 +28,7 @@ discovered automatically using Python's standard entry points mechanism.
 Each plugin type has a corresponding abstract base class that custom plugins
 must inherit from:
 
-* **Plan:** [`PlanHandlerPlugin`][ropt.plugins.plan.base.PlanHandlerPlugin] and
+* **Plan:** [`EventHandlerPlugin`][ropt.plugins.plan.base.EventHandlerPlugin] and
   [`PlanStepPlugin`][ropt.plugins.plan.base.PlanStepPlugin]
 * **Optimizer:**
   [`OptimizerPlugin`][ropt.plugins.optimizer.base.OptimizerPlugin]
@@ -59,7 +59,7 @@ method generally implement a `create` factory method that will be used to instan
 that implement the desired functionality. These objects must inherit from the base class for the
 corresponding plugin type:
 
-* **Plan:** [`PlanHandler`][ropt.plugins.plan.base.PlanHandler] and
+* **Plan:** [`EventHandler`][ropt.plugins.plan.base.EventHandler] and
   [`PlanStep`][ropt.plugins.plan.base.PlanStep]
 * **Optimizer:**
   [`Optimizer`][ropt.plugins.optimizer.base.Optimizer]
@@ -74,8 +74,8 @@ corresponding plugin type:
 `ropt` comes bundled with a set of pre-installed plugins:
 
 * **Plan:** The built-in
-  [`default`][ropt.plugins.plan.default.DefaultPlanHandlerPlugin] handler and
-  [`default`][ropt.plugins.plan.default.DefaultPlanStepPlugin] step plugins,
+  [`default`][ropt.plugins.plan.default.DefaultEventHandlerPlugin] event handler
+  and [`default`][ropt.plugins.plan.default.DefaultPlanStepPlugin] step plugins,
   providing components for executing complex optimization plans.
 * **Optimizer:** The [`scipy`][ropt.plugins.optimizer.scipy.SciPyOptimizer]
   plugin, leveraging algorithms from `scipy.optimize`, and the

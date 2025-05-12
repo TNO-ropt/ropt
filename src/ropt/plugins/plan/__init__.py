@@ -21,9 +21,9 @@ following abstract base classes:
       plugins that *create* plan steps. These plugins are discovered by the
       [`PluginManager`][ropt.plugins.PluginManager] and used to instantiate
       actual `PlanStep` objects.
-    * [`PlanHandlerPlugin`][ropt.plugins.plan.base.PlanHandlerPlugin]: The base
-      for plugins that *create* plan result handlers. Similar to step plugins,
-      these are used by the `PluginManager` to instantiate `PlanHandler`
+    * [`EventHandlerPlugin`][ropt.plugins.plan.base.EventHandlerPlugin]: The
+      base for plugins that *create* event handlers. Similar to step plugins,
+      these are used by the `PluginManager` to instantiate `EventHandler`
       objects.
 
 2.  **Component Base Classes:**
@@ -31,9 +31,9 @@ following abstract base classes:
       that all concrete plan step implementations must inherit from. It defines
       the [`run`][ropt.plugins.plan.base.PlanStep.run] method where the step's
       logic resides.
-    * [`PlanHandler`][ropt.plugins.plan.base.PlanHandler]: The abstract base
-      class for all result handlers. It defines the
-      [`handle_event`][ropt.plugins.plan.base.PlanHandler.handle_event] method
+    * [`EventHandler`][ropt.plugins.plan.base.EventHandler]: The abstract base
+      class for all event handlers. It defines the
+      [`handle_event`][ropt.plugins.plan.base.EventHandler.handle_event] method
       for processing events emitted during plan execution and allows storing
       state using dictionary-like access.
 
@@ -54,7 +54,7 @@ framework ([`Plan`][ropt.plan.Plan]).
         plugin
         ([`DefaultOptimizerStep`][ropt.plugins.plan.optimizer.DefaultOptimizerStep]).
 *   **Handlers** (via
-    [`DefaultPlanHandlerPlugin`][ropt.plugins.plan.default.DefaultPlanHandlerPlugin]):
+    [`DefaultEventHandlerPlugin`][ropt.plugins.plan.default.DefaultEventHandlerPlugin]):
     *   `tracker`: Tracks the 'best' or 'last' valid result based on objective
         value and constraints
         ([`DefaultTrackerHandler`][ropt.plugins.plan._tracker.DefaultTrackerHandler]).
@@ -66,11 +66,11 @@ workflows out-of-the-box, while the plugin architecture enables customization
 and extension.
 """
 
-from .base import PlanHandler, PlanHandlerPlugin, PlanStep, PlanStepPlugin
+from .base import EventHandler, EventHandlerPlugin, PlanStep, PlanStepPlugin
 
 __all__ = [
-    "PlanHandler",
-    "PlanHandlerPlugin",
+    "EventHandler",
+    "EventHandlerPlugin",
     "PlanStep",
     "PlanStepPlugin",
 ]

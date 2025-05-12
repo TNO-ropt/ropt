@@ -37,8 +37,8 @@ class DefaultEvaluatorStep(PlanStep):
       just before the underlying ensemble evaluation is called.
     - [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION]: Emitted
       after the evaluation completes, carrying the generated `FunctionResults`
-      in its `data` dictionary under the key `"results"`. Plan handlers typically
-      listen for this event.
+      in its `data` dictionary under the key `"results"`. Event handlers
+      typically listen for this event.
     - [`FINISHED_EVALUATOR_STEP`][ropt.enums.EventType.FINISHED_EVALUATOR_STEP]:
       Emitted after the entire step, including result emission, is finished.
     """

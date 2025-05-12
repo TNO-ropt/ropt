@@ -1,18 +1,18 @@
 r"""Code for executing optimization plans.
 
 The [`Plan`][ropt.plan.Plan] class orchestrates optimization workflows by
-managing steps and result handlers.
+managing steps and event handlers.
 
 A plan consists of [`PlanStep`][ropt.plugins.plan.base.PlanStep] objects, which
 define individual actions, and
-[`PlanHandler`][ropt.plugins.plan.base.PlanHandler] objects, which process
-and store data generated during execution. Both steps and result handlers are
+[`EventHandler`][ropt.plugins.plan.base.EventHandler] objects, which process and
+store data generated during execution. Both steps and event handlers are
 implemented using a [plugin][ropt.plugins.plan] mechanism, making it easy to
 extend the range of supported actions and data processing. The `ropt` library
 provides default implementations through the [default plan
-handler][ropt.plugins.plan.default.DefaultPlanHandlerPlugin] and [default plan
+handler][ropt.plugins.plan.default.DefaultEventHandlerPlugin] and [default plan
 step][ropt.plugins.plan.default.DefaultPlanStepPlugin] plugins. These provide
-basic steps and result handlers to support a wide range of optimization
+basic steps and event handlers to support a wide range of optimization
 workflows.
 
 Setting up and executing a `Plan` object for simple optimization cases can be

@@ -10,7 +10,7 @@ from ropt.exceptions import ConfigError
 
 from .function_estimator.base import FunctionEstimatorPlugin
 from .optimizer.base import OptimizerPlugin
-from .plan.base import PlanHandlerPlugin, PlanStepPlugin
+from .plan.base import EventHandlerPlugin, PlanStepPlugin
 from .realization_filter.base import RealizationFilterPlugin
 from .sampler.base import SamplerPlugin
 
@@ -23,7 +23,7 @@ _PLUGIN_TYPES: Final = {
     "optimizer": OptimizerPlugin,
     "sampler": SamplerPlugin,
     "realization_filter": RealizationFilterPlugin,
-    "plan_handler": PlanHandlerPlugin,
+    "event_handler": EventHandlerPlugin,
     "plan_step": PlanStepPlugin,
 }
 
@@ -32,7 +32,7 @@ PluginType = Literal[
     "sampler",
     "realization_filter",
     "function_estimator",
-    "plan_handler",
+    "event_handler",
     "plan_step",
 ]
 """Represents the valid types of plugins supported by `ropt`.
@@ -49,8 +49,8 @@ role in the optimization process:
   ([`RealizationFilterPlugin`][ropt.plugins.realization_filter.base.RealizationFilterPlugin]).
 * `"function_estimator"`: Plugins for estimating objective functions and gradients
   ([`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.base.FunctionEstimatorPlugin]).
-* `"plan_handler"`: Plugins that create handlers for processing plan results
-  ([`PlanHandlerPlugin`][ropt.plugins.plan.base.PlanHandlerPlugin]).
+* `"event_handler"`: Plugins that create event handlers for processing plan
+  results ([`EventHandlerPlugin`][ropt.plugins.plan.base.EventHandlerPlugin]).
 * `"plan_step"`: Plugins that define executable steps within an optimization plan
   ([`PlanStepPlugin`][ropt.plugins.plan.base.PlanStepPlugin]).
 """
@@ -99,7 +99,7 @@ class PluginManager:
             "sampler": {},
             "realization_filter": {},
             "function_estimator": {},
-            "plan_handler": {},
+            "event_handler": {},
             "plan_step": {},
         }
 

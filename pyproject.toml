@@ -46,8 +46,8 @@ default = "ropt.plugins.realization_filter.default:DefaultRealizationFilterPlugi
 [project.entry-points."ropt.plugins.function_estimator"]
 default = "ropt.plugins.function_estimator.default:DefaultFunctionEstimatorPlugin"
 
-[project.entry-points."ropt.plugins.plan_handler"]
-default = "ropt.plugins.plan.default:DefaultPlanHandlerPlugin"
+[project.entry-points."ropt.plugins.event_handler"]
+default = "ropt.plugins.plan.default:DefaultEventHandlerPlugin"
 
 [project.entry-points."ropt.plugins.plan_step"]
 default = "ropt.plugins.plan.default:DefaultPlanStepPlugin"

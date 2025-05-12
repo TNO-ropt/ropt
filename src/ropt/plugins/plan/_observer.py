@@ -1,10 +1,10 @@
-"""This module implements the default tracker handler."""
+"""This module implements the default tracker event handler."""
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Callable
 
-from ropt.plugins.plan.base import PlanHandler
+from ropt.plugins.plan.base import EventHandler
 
 if TYPE_CHECKING:
     import uuid
@@ -13,11 +13,11 @@ if TYPE_CHECKING:
     from ropt.plan import Event, Plan
 
 
-class DefaultObserverHandler(PlanHandler):
-    """The default handler for observing events.
+class DefaultObserverHandler(EventHandler):
+    """The default event handler for observing events.
 
-    This handler listens for events emitted by specified `sources` (plan steps)
-    and forwards them to one or more callback functions.
+    This event handler listens for events emitted by specified `sources` (plan
+    steps) and forwards them to one or more callback functions.
 
     The `sources` parameter filters which events are observed.
     """
@@ -30,20 +30,20 @@ class DefaultObserverHandler(PlanHandler):
         callback: Callable[[Event], None],
         sources: set[uuid.UUID] | None = None,
     ) -> None:
-        """Initialize a default ob results handler.
+        """Initialize a default event handler.
 
-        This handler responds to events received from specified `sources` (plan
+        This event handler responds to events received from specified `sources` (plan
         steps) and calls `callback` if the event type matches `event_types`.
 
         The `sources` parameter acts as a filter, determining which plan steps
-        this handler should listen to. It should be a set containing the unique
-        IDs (UUIDs) of the `PlanStep` instances whose event you want to receive.
-        When an event is received, this handler checks if the ID of the step
-        that emitted the event (`event.source`) is present in the `sources` set.
-        If it is, and the event type (event.event_type) is present in the
-        `event_types` set, the handler will call `callback`; otherwise, it
-        ignores the event. If `sources` is `None`, events from all sources will
-        be processed.
+        this event handler should listen to. It should be a set containing the
+        unique IDs (UUIDs) of the `PlanStep` instances whose event you want to
+        receive. When an event is received, this event handler checks if the ID
+        of the step that emitted the event (`event.source`) is present in the
+        `sources` set. If it is, and the event type (event.event_type) is
+        present in the `event_types` set, the handler will call `callback`;
+        otherwise, it ignores the event. If `sources` is `None`, events from all
+        sources will be processed.
 
         Args:
             plan:        The parent plan instance.
