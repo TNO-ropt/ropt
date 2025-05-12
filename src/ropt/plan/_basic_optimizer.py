@@ -94,11 +94,13 @@ class BasicOptimizer:
             1.  **Custom Step Execution:** If a single keyword argument is
                 provided, the `BasicOptimizer` checks if a step with the same
                 name exists. If so, that step is executed immediately, receiving
-                the key-value pair as a keyword input. Only one custom
-                step can be executed this way, if other keyword arguments are
-                present an error is raised. The custom step receives the `Plan`
-                object and may install a custom run function to be executed
-                later, or install custom event handlers.
+                the key-value pair as a keyword input, in addition to the
+                evaluator function (via the `evaluator` keyword). Only one
+                custom step can be executed this way, if other keyword arguments
+                are present an error is raised. The custom step receives the
+                `Plan` object and may install a custom run function to be
+                executed instead of the default one, or install custom event
+                handlers.
             2.  **Default Optimization:** If no custom step is run, or if the
                 custom step does not install a custom run function, the default
                 optimization process is used.
@@ -193,7 +195,7 @@ class BasicOptimizer:
             if len(self._kwargs) > 1:
                 msg = "Only one custom step is allowed."
                 raise TypeError(msg)
-            plan.run_step(plan.add_step(key), **{key: value})
+            plan.run_step(plan.add_step(key), evaluator=self._evaluator, **{key: value})
 
         # If no custom function was installed, install the default function:
         if not plan.has_function():
