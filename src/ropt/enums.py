@@ -107,10 +107,10 @@ class EventType(IntEnum):
     FINISHED_OPTIMIZER_STEP = 4
     """Emitted immediately after an optimizer step finishes."""
 
-    START_EVALUATOR_STEP = 5
+    START_ENSEMBLE_EVALUATOR_STEP = 5
     """Emitted just before starting an evaluation step."""
 
-    FINISHED_EVALUATOR_STEP = 6
+    FINISHED_ENSEMBLE_EVALUATOR_STEP = 6
     """Emitted immediately after an evaluation step finishes."""
 
 

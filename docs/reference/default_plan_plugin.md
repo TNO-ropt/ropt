@@ -7,7 +7,7 @@
 ::: ropt.plugins.plan.default.DefaultEventHandlerPlugin
     options:
         members: False
-::: ropt.plugins.plan.evaluator.DefaultEvaluatorStep
+::: ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep
     options:
         members: [__init__, run]
 ::: ropt.plugins.plan.optimizer.DefaultOptimizerStep

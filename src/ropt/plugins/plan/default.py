@@ -7,8 +7,8 @@ standard optimization plans out-of-the-box.
 **Supported Components:**
 
 - **Steps:**
-    - `evaluator`: Performs ensemble evaluations
-        ([`DefaultEvaluatorStep`][ropt.plugins.plan.evaluator.DefaultEvaluatorStep]).
+    - `ensemble_evaluator`: Performs ensemble evaluations
+        ([`DefaultEnsembleEvaluatorStep`][ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep]).
     - `optimizer`: Runs an optimization algorithm using a configured optimizer
         plugin
         ([`DefaultOptimizerStep`][ropt.plugins.plan.optimizer.DefaultOptimizerStep]).
@@ -31,7 +31,7 @@ from ._observer import DefaultObserverHandler
 from ._store import DefaultStoreHandler
 from ._tracker import DefaultTrackerHandler
 from .base import EventHandlerPlugin, PlanStepPlugin
-from .evaluator import DefaultEvaluatorStep
+from .ensemble_evaluator import DefaultEnsembleEvaluatorStep
 from .optimizer import DefaultOptimizerStep
 
 if TYPE_CHECKING:
@@ -39,7 +39,7 @@ if TYPE_CHECKING:
     from ropt.plugins.plan.base import EventHandler, PlanStep
 
 _STEP_OBJECTS: Final[dict[str, type[PlanStep]]] = {
-    "evaluator": DefaultEvaluatorStep,
+    "ensemble_evaluator": DefaultEnsembleEvaluatorStep,
     "optimizer": DefaultOptimizerStep,
 }
 
@@ -110,8 +110,8 @@ class DefaultPlanStepPlugin(PlanStepPlugin):
 
     **Supported Steps:**
 
-    - `evaluator`: Creates a
-        [`DefaultEvaluatorStep`][ropt.plugins.plan.evaluator.DefaultEvaluatorStep]
+    - `ensemble_evaluator`: Creates a
+        [`DefaultEnsembleEvaluatorStep`][ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep]
         instance, which performs ensemble evaluations.
     - `optimizer`: Creates a
         [`DefaultOptimizerStep`][ropt.plugins.plan.optimizer.DefaultOptimizerStep]

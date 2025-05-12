@@ -21,8 +21,8 @@ if TYPE_CHECKING:
     from ropt.plan import Plan
 
 
-class DefaultEvaluatorStep(PlanStep):
-    """The default evaluator step for optimization plans.
+class DefaultEnsembleEvaluatorStep(PlanStep):
+    """The default ensemble evaluator step for optimization plans.
 
     This step performs one or more ensemble evaluations based on the provided
     `variables`. It yields a tuple of
@@ -31,7 +31,7 @@ class DefaultEvaluatorStep(PlanStep):
 
     The step emits the following events:
 
-    - [`START_EVALUATOR_STEP`][ropt.enums.EventType.START_EVALUATOR_STEP]:
+    - [`START_ENSEMBLE_EVALUATOR_STEP`][ropt.enums.EventType.START_ENSEMBLE_EVALUATOR_STEP]:
       Emitted before the evaluation process begins.
     - [`START_EVALUATION`][ropt.enums.EventType.START_EVALUATION]: Emitted
       just before the underlying ensemble evaluation is called.
@@ -39,7 +39,7 @@ class DefaultEvaluatorStep(PlanStep):
       after the evaluation completes, carrying the generated `FunctionResults`
       in its `data` dictionary under the key `"results"`. Event handlers
       typically listen for this event.
-    - [`FINISHED_EVALUATOR_STEP`][ropt.enums.EventType.FINISHED_EVALUATOR_STEP]:
+    - [`FINISHED_ENSEMBLE_EVALUATOR_STEP`][ropt.enums.EventType.FINISHED_ENSEMBLE_EVALUATOR_STEP]:
       Emitted after the entire step, including result emission, is finished.
     """
 
@@ -85,7 +85,7 @@ class DefaultEvaluatorStep(PlanStep):
         """
         self.emit_event(
             Event(
-                event_type=EventType.START_EVALUATOR_STEP,
+                event_type=EventType.START_ENSEMBLE_EVALUATOR_STEP,
                 config=config,
                 source=self.id,
             )
@@ -146,7 +146,7 @@ class DefaultEvaluatorStep(PlanStep):
 
         self.emit_event(
             Event(
-                event_type=EventType.FINISHED_EVALUATOR_STEP,
+                event_type=EventType.FINISHED_ENSEMBLE_EVALUATOR_STEP,
                 config=config,
                 source=self.id,
             )

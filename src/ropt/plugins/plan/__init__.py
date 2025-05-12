@@ -49,7 +49,7 @@ framework ([`Plan`][ropt.plan.Plan]).
 *   **Steps** (via
     [`DefaultPlanStepPlugin`][ropt.plugins.plan.default.DefaultPlanStepPlugin]):
     *   `evaluator`: Performs ensemble evaluations
-        ([`DefaultEvaluatorStep`][ropt.plugins.plan.evaluator.DefaultEvaluatorStep]).
+        ([`DefaultEnsembleEvaluatorStep`][ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep]).
     *   `optimizer`: Runs an optimization algorithm using a configured optimizer
         plugin
         ([`DefaultOptimizerStep`][ropt.plugins.plan.optimizer.DefaultOptimizerStep]).

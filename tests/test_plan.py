@@ -407,7 +407,7 @@ def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
 def test_evaluator_step(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plan = Plan(evaluator())
-    step = plan.add_step("evaluator")
+    step = plan.add_step("ensemble_evaluator")
     tracker = plan.add_event_handler("tracker", sources={step})
     plan.run_step(step, config=EnOptConfig.model_validate(enopt_config))
     assert plan.get(tracker, "results").functions is not None
@@ -426,7 +426,7 @@ def test_evaluator_step_multi(enopt_config: dict[str, Any], evaluator: Any) -> N
     enopt_config["optimizer"]["max_functions"] = 4
 
     plan = Plan(evaluator())
-    step = plan.add_step("evaluator")
+    step = plan.add_step("ensemble_evaluator")
     store = plan.add_event_handler("store", sources={step})
     plan.run_step(
         step,
