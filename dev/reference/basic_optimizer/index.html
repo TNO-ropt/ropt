@@ -1835,11 +1835,13 @@ as follows:</p>
 <li><strong>Custom Step Execution:</strong> If a single keyword argument is
     provided, the <code>BasicOptimizer</code> checks if a step with the same
     name exists. If so, that step is executed immediately, receiving
-    the key-value pair as a keyword input. Only one custom
-    step can be executed this way, if other keyword arguments are
-    present an error is raised. The custom step receives the <code>Plan</code>
-    object and may install a custom run function to be executed
-    later, or install custom event handlers.</li>
+    the key-value pair as a keyword input, in addition to the
+    evaluator function (via the <code>evaluator</code> keyword). Only one
+    custom step can be executed this way, if other keyword arguments
+    are present an error is raised. The custom step receives the
+    <code>Plan</code> object and may install a custom run function to be
+    executed instead of the default one, or install custom event
+    handlers.</li>
 <li><strong>Default Optimization:</strong> If no custom step is run, or if the
     custom step does not install a custom run function, the default
     optimization process is used.</li>
