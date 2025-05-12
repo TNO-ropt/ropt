@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.12">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.13">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.2afb09e1.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -889,30 +889,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.evaluator.Evaluator" class="md-nav__link">
-    <span class="md-ellipsis">
-      Evaluator
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Evaluator">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.evaluator.Evaluator.__call__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __call__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#ropt.evaluator.EvaluatorContext" class="md-nav__link">
     <span class="md-ellipsis">
       EvaluatorContext
@@ -1516,30 +1492,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.evaluator.Evaluator" class="md-nav__link">
-    <span class="md-ellipsis">
-      Evaluator
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Evaluator">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.evaluator.Evaluator.__call__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __call__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#ropt.evaluator.EvaluatorContext" class="md-nav__link">
     <span class="md-ellipsis">
       EvaluatorContext
@@ -1621,11 +1573,11 @@
 gradients from an ensemble of functions. It leverages the settings defined
 in an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> configuration object to
 guide the calculations.</p>
-<p>The core functionality relies on an <a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a>
-callable, which is used to evaluate the individual functions within the
-ensemble. The evaluator provides the raw function values, which are then
-processed by the <code>EnsembleEvaluator</code> to produce the final function and
-gradient estimates.</p>
+<p>The core functionality relies on an evaluator callable, (usually provided by
+an <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator"><code>Evaluator</code></a> object), which is used to
+evaluate the individual functions within the ensemble. The evaluator
+provides the raw function values, which are then processed by the
+<code>EnsembleEvaluator</code> to produce the final function and gradient estimates.</p>
 
 
 
@@ -1656,9 +1608,12 @@ gradient estimates.</p>
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">evaluator</span><span class="p">:</span> <span class="n">Evaluator</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">plugin_manager</span><span class="p">:</span> <span class="n">PluginManager</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">evaluator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">EvaluatorContext</span><span class="p">],</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="n">EvaluatorResult</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="p">],</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">plugin_manager</span><span class="p">:</span> <span class="n">PluginManager</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1668,8 +1623,8 @@ gradient estimates.</p>
 configuration, evaluator, and plugins.</p>
 <p>The <code>config</code> object contains all the settings required for the ensemble
 evaluation, such as the number of realizations, the function estimators,
-and the gradient settings. The <code>evaluator</code> callable should conform to
-the <a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a> protocol. The
+and the gradient settings. The <code>evaluator</code> callable is usually provide
+by a <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator"><code>Evaluator</code></a> object. The
 <code>plugin_manager</code> is used to load the realization filters, function
 estimators, and samplers.</p>
 
@@ -1706,7 +1661,17 @@ estimators, and samplers.</p>
                 <code>evaluator</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="#ropt.evaluator.Evaluator">Evaluator</a></code>
+                  <code><a class="autorefs autorefs-external" title="typing.Callable" href="https://docs.python.org/3/library/typing.html#typing.Callable">Callable</a>[[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
+
+
+  
+      dataclass
+  " href="#ropt.evaluator.EvaluatorContext">EvaluatorContext</a>], <a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
+
+
+  
+      dataclass
+  " href="#ropt.evaluator.EvaluatorResult">EvaluatorResult</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1873,191 +1838,6 @@ row is a variable vector.</p>
 
 
 
-<h2 id="ropt.evaluator.Evaluator" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.evaluator.Evaluator</span>
-
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="typing.Protocol" href="https://docs.python.org/3/library/typing.html#typing.Protocol">Protocol</a></code></p>
-
-
-        <p>Protocol for evaluator objects or callables.</p>
-<p>The <a class="autorefs autorefs-internal" title="            ropt.ensemble_evaluator.EnsembleEvaluator" href="#ropt.ensemble_evaluator.EnsembleEvaluator"><code>EnsembleEvaluator</code></a> class
-requires a function evaluator callback that conforms to the
-<a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a> signature. This callback accepts
-one or more variable vectors to evaluate, along with an
-<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
-
-
-  
-      dataclass
-  " href="#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a> object that provides
-relevant information for the evaluation. It returns an
-<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
-
-
-  
-      dataclass
-  " href="#ropt.evaluator.EvaluatorResult"><code>EvaluatorResult</code></a> object containing the results.</p>
-
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.evaluator.Evaluator.__call__" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__call__</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">EvaluatorContext</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluatorResult</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Evaluate objective and constraint functions for given variables.</p>
-<p>This method defines the signature for the function evaluator callback.
-The evaluator calculates objective and constraint functions for a set of
-variable vectors, potentially for a subset of realizations and
-perturbations.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>variables</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The matrix of variables to evaluate. Each row represents
-       a variable vector.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>context</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
-
-
-  
-      dataclass
-   (ropt.evaluator._evaluator.EvaluatorContext)" href="#ropt.evaluator.EvaluatorContext">EvaluatorContext</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The evaluation context, providing additional information
-       about the evaluation.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
-
-
-  
-      dataclass
-   (ropt.evaluator._evaluator.EvaluatorResult)" href="#ropt.evaluator.EvaluatorResult">EvaluatorResult</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>An evaluation results object containing the calculated objective and
-constraint values, along with any additional metadata.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<details class="tip" open>
-  <summary>Reusing Objective</summary>
-  <p>When defining multiple objectives, there may be a need to reuse the
-same objective value multiple times. For instance, a total objective
-could consist of the mean of the objectives for each realization,
-plus the standard deviation of the same values. This can be
-implemented by defining two objectives: the first calculated as the
-mean of the realizations, and the second using a function estimator
-to compute the standard deviations. The optimizer is unaware that
-both objectives use the same set of realizations. To prevent
-redundant calculations, the evaluator should compute the results of
-the realizations once and return them for both objectives.</p>
-</details>
-
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
 <h2 id="ropt.evaluator.EvaluatorContext" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.evaluator.EvaluatorContext</span>
 
@@ -2073,7 +1853,7 @@ the realizations once and return them for both objectives.</p>
 
 
         <p>Capture additional details for the function evaluator.</p>
-<p>Function evaluator callbacks (see <a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="#ropt.evaluator.Evaluator"><code>Evaluator</code></a>)
+<p>Function evaluators (see <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator"><code>Evaluator</code></a>)
 primarily receive variable vectors to evaluate objective and constraint
 functions. However, they may also benefit from additional information to
 optimize their calculations. This <code>EvaluatorContext</code> object provides that
@@ -2661,10 +2441,10 @@ input vectors.</p>
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.expand", "navigation.footer", "navigation.sections", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.expand", "navigation.footer", "navigation.sections", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       

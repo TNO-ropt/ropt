@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.12">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.13">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.2afb09e1.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
       
         
         <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
@@ -806,15 +806,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.evaluator" class="md-nav__link">
-    <span class="md-ellipsis">
-      evaluator
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.aborted" class="md-nav__link">
     <span class="md-ellipsis">
       aborted
@@ -842,9 +833,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.add_handler" class="md-nav__link">
+  <a href="#ropt.plan.Plan.add_event_handler" class="md-nav__link">
     <span class="md-ellipsis">
-      add_handler
+      add_event_handler
     </span>
   </a>
   
@@ -860,9 +851,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.handler_exists" class="md-nav__link">
+  <a href="#ropt.plan.Plan.event_handler_exists" class="md-nav__link">
     <span class="md-ellipsis">
-      handler_exists
+      event_handler_exists
     </span>
   </a>
   
@@ -872,6 +863,15 @@
   <a href="#ropt.plan.Plan.step_exists" class="md-nav__link">
     <span class="md-ellipsis">
       step_exists
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.evaluator_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      evaluator_exists
     </span>
   </a>
   
@@ -1589,15 +1589,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.evaluator" class="md-nav__link">
-    <span class="md-ellipsis">
-      evaluator
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.aborted" class="md-nav__link">
     <span class="md-ellipsis">
       aborted
@@ -1625,9 +1616,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.add_handler" class="md-nav__link">
+  <a href="#ropt.plan.Plan.add_event_handler" class="md-nav__link">
     <span class="md-ellipsis">
-      add_handler
+      add_event_handler
     </span>
   </a>
   
@@ -1643,9 +1634,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.handler_exists" class="md-nav__link">
+  <a href="#ropt.plan.Plan.event_handler_exists" class="md-nav__link">
     <span class="md-ellipsis">
-      handler_exists
+      event_handler_exists
     </span>
   </a>
   
@@ -1655,6 +1646,15 @@
   <a href="#ropt.plan.Plan.step_exists" class="md-nav__link">
     <span class="md-ellipsis">
       step_exists
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.evaluator_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      evaluator_exists
     </span>
   </a>
   
@@ -1790,17 +1790,17 @@
 
         <p>Code for executing optimization plans.</p>
 <p>The <a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="#ropt.plan.Plan"><code>Plan</code></a> class orchestrates optimization workflows by
-managing steps and result handlers.</p>
+managing steps and event handlers.</p>
 <p>A plan consists of <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a> objects, which
 define individual actions, and
-<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanHandler" href="../plan_plugins/#ropt.plugins.plan.base.PlanHandler"><code>PlanHandler</code></a> objects, which process
-and store data generated during execution. Both steps and result handlers are
+<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.EventHandler" href="../plan_plugins/#ropt.plugins.plan.base.EventHandler"><code>EventHandler</code></a> objects, which process and
+store data generated during execution. Both steps and event handlers are
 implemented using a <a class="autorefs autorefs-internal" title="            ropt.plugins.plan" href="../plan_plugins/#ropt.plugins.plan">plugin</a> mechanism, making it easy to
 extend the range of supported actions and data processing. The <code>ropt</code> library
-provides default implementations through the <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.default.DefaultPlanHandlerPlugin" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanHandlerPlugin">default plan
+provides default implementations through the <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.default.DefaultEventHandlerPlugin" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultEventHandlerPlugin">default plan
 handler</a> and <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.default.DefaultPlanStepPlugin" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultPlanStepPlugin">default plan
 step</a> plugins. These provide
-basic steps and result handlers to support a wide range of optimization
+basic steps and event handlers to support a wide range of optimization
 workflows.</p>
 <p>Setting up and executing a <code>Plan</code> object for simple optimization cases can be
 complex. The <a class="autorefs autorefs-internal" title="            ropt.plan.BasicOptimizer" href="../basic_optimizer/#ropt.plan.BasicOptimizer"><code>BasicOptimizer</code></a> class simplifies this
@@ -1850,17 +1850,17 @@ involving a single optimization.</p>
         <p>Plan class for executing optimization workflows.</p>
 <p>The <code>Plan</code> object is the core component for executing optimization
 workflows. It orchestrates the execution of individual steps and the
-processing of results through handlers.</p>
+processing of results through event handlers.</p>
 <p><strong>Building a Plan:</strong></p>
 <p>To construct a plan, individual actions, known as steps, are added using the
 <a class="autorefs autorefs-internal" title="            add_step" href="#ropt.plan.Plan.add_step"><code>add_step</code></a> method. Data processing and storage
-are managed by handlers, which are added using the
-<a class="autorefs autorefs-internal" title="            add_handler" href="#ropt.plan.Plan.add_handler"><code>add_handler</code></a> method. The plan stores the step
-and handler objects internally. Their respective creation functions return
-unique IDs for identification. The
-<a class="autorefs autorefs-internal" title="            handler_exists" href="#ropt.plan.Plan.handler_exists"><code>handler_exists</code></a> and
+are managed by event handlers, which are added using the
+<a class="autorefs autorefs-internal" title="            add_event_handler" href="#ropt.plan.Plan.add_event_handler"><code>add_event_handler</code></a> method. The plan
+stores the step and event handler objects internally. Their respective
+creation functions return unique IDs for identification. The
+<a class="autorefs autorefs-internal" title="            event_handler_exists" href="#ropt.plan.Plan.event_handler_exists"><code>event_handler_exists</code></a> and
 <a class="autorefs autorefs-internal" title="            step_exists" href="#ropt.plan.Plan.step_exists"><code>step_exists</code></a> methods can be used to verify
-whether a handler or step with a given name is supported.</p>
+whether an event handler or step with a given name is supported.</p>
 <p><strong>Executing a Plan:</strong></p>
 <p>Once a plan is assembled, it can be executed in several ways. For
 fine-grained control, the <a class="autorefs autorefs-internal" title="            run_step" href="#ropt.plan.Plan.run_step"><code>run_step</code></a> method can
@@ -1874,17 +1874,13 @@ defined by this function can then be executed with a single call to
 <a class="autorefs autorefs-internal" title="            run_function" href="#ropt.plan.Plan.run_function"><code>run_function</code></a>, with optional arguments to
 customize its behavior. The <a class="autorefs autorefs-internal" title="            has_function" href="#ropt.plan.Plan.has_function"><code>has_function</code></a>
 method can be used to check if a function has been added to the plan.</p>
-<p><strong>Evaluator:</strong></p>
-<p>The plan stores an <a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="../evaluator/#ropt.evaluator.Evaluator"><code>Evaluator</code></a> object that is
-used to perform function evaluations that are needed by optimization and
-evaluation steps. It can be retrieved and set via the <code>evaluator</code> attribute.</p>
 <p><strong>PluginManager:</strong></p>
 <p>A <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> object can be provided that
-is used by the plan object to find step and handler objects, and that can be
-used by optimizers and evaluators to implement functionality.</p>
+is used by the plan object to find step and event handler objects, and that
+can be used by optimizers and evaluators to implement functionality.</p>
 <p><strong>Events:</strong></p>
 <p>Steps can communicate events using the
-<a class="autorefs autorefs-internal" title="            emit_event" href="#ropt.plan.Plan.emit_event"><code>emit_event</code></a> method. Result handlers can
+<a class="autorefs autorefs-internal" title="            emit_event" href="#ropt.plan.Plan.emit_event"><code>emit_event</code></a> method. Event handlers can
 respond to these events, enabling actions such as processing optimization
 results.</p>
 <p><strong>Nested Plans:</strong></p>
@@ -1895,7 +1891,7 @@ relationship, allowing events to propagate up the hierarchy to the parent
 plan.</p>
 <p><strong>Aborting a Plan:</strong></p>
 <p>A plan's execution can be terminated, either programmatically from within a
-step or handler, or externally by directly calling the
+step or event handler, or externally by directly calling the
 <a class="autorefs autorefs-internal" title="            abort" href="#ropt.plan.Plan.abort"><code>abort</code></a> method. The
 <a class="autorefs autorefs-internal" title="            aborted
 
@@ -1905,11 +1901,11 @@ step or handler, or externally by directly calling the
   " href="#ropt.plan.Plan.aborted"><code>aborted</code></a> property can be used to check if a plan
 has been aborted.</p>
 <p><strong>Handler Data:</strong></p>
-<p>Individual handlers may store values that they accumulate or calculate from
-the events that they handle. Code outside of the handlers, such as the
-optimization workflow code that runs the steps, can set and retrieve these
-values using the <a class="autorefs autorefs-internal" title="            get" href="#ropt.plan.Plan.get"><code>get</code></a> and <a class="autorefs autorefs-internal" title="            set" href="#ropt.plan.Plan.set"><code>set</code></a>
-methods.</p>
+<p>Individual event handlers may store values that they accumulate or calculate
+from the events that they handle. Code outside of the event handlers, such
+as the optimization workflow code that runs the steps, can set and retrieve
+these values using the <a class="autorefs autorefs-internal" title="            get" href="#ropt.plan.Plan.get"><code>get</code></a> and
+<a class="autorefs autorefs-internal" title="            set" href="#ropt.plan.Plan.set"><code>set</code></a> methods.</p>
 
 
 
@@ -1927,32 +1923,6 @@ methods.</p>
 
 
 
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.plan.Plan.evaluator" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">evaluator</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">evaluator</span><span class="p">:</span> <span class="n">Evaluator</span> <span class="o">=</span> <span class="n">evaluator</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>The evaluator used by the plan.</p>
-<p>The evaluator is set upon plan creation, and can be retrieved and set via
-the <code>evaluator</code> attribute.</p>
-
-    </div>
-
-</div>
 
 <div class="doc doc-object doc-attribute">
 
@@ -2062,10 +2032,9 @@ associated with this plan.</p>
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">evaluator</span><span class="p">:</span> <span class="n">Evaluator</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">plugin_manager</span><span class="p">:</span> <span class="n">PluginManager</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">parent</span><span class="p">:</span> <span class="n">Plan</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">plugin_manager</span><span class="p">:</span> <span class="n">PluginManager</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">parent</span><span class="p">:</span> <span class="n">Plan</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2074,7 +2043,7 @@ associated with this plan.</p>
 <p>Constructs a new plan, associating it with an evaluator, and optionally
 with a plugin manager and/or a parent plan.</p>
 <p>The <code>plugin_manager</code> is used by the plan, and possibly by steps and
-handlers to add plugin functionality.</p>
+event handlers to add plugin functionality.</p>
 <p>If a <code>parent</code> plan is specified, this plan becomes a child, enabling
 event propagation up the plan hierarchy.</p>
 
@@ -2092,34 +2061,18 @@ event propagation up the plan hierarchy.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>evaluator</code>
+                <code>plugin_manager</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.Evaluator" href="../evaluator/#ropt.evaluator.Evaluator">Evaluator</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            PluginManager (ropt.plugins.PluginManager)" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The evaluator used by the plan.</p>
+                <p>A plugin manager.</p>
               </div>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>plugin_manager</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            PluginManager (ropt.plugins.PluginManager)" href="../plugin_manager/#ropt.plugins.PluginManager">PluginManager</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>An optional plugin manager.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -2149,18 +2102,18 @@ event propagation up the plan hierarchy.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plan.Plan.add_handler" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">add_handler</span>
+<h3 id="ropt.plan.Plan.add_event_handler" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">add_event_handler</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_handler</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_event_handler</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Add a handler to the plan.</p>
-<p>Constructs and registers a result handler with the plan. The handler's
+        <p>Add an event handler to the plan.</p>
+<p>Constructs and registers an event handler with the plan. The handler's
 type is determined by the provided <code>name</code>, which the plugin system uses
 to locate the corresponding handler class. Any additional keyword
 arguments are passed to the handler's constructor.</p>
@@ -2186,7 +2139,7 @@ arguments are passed to the handler's constructor.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The name of the handler to add.</p>
+                <p>The name of the event handler to add.</p>
               </div>
             </td>
             <td>
@@ -2228,7 +2181,7 @@ arguments are passed to the handler's constructor.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The unique ID of the newly added handler.</p>
+                <p>The unique ID of the newly added event handler.</p>
               </div>
             </td>
           </tr>
@@ -2337,19 +2290,19 @@ the step's constructor.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plan.Plan.handler_exists" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">handler_exists</span>
+<h3 id="ropt.plan.Plan.event_handler_exists" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">event_handler_exists</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handler_exists</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">event_handler_exists</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Check if a handler exists.</p>
-<p>Determines whether a handler with the specified name is supported by the
-plugin system.</p>
+        <p>Check if an event handler exists.</p>
+<p>Determines whether an event handler with the specified name is supported
+by the plugin system.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2372,7 +2325,7 @@ plugin system.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The name of the handler to check.</p>
+                <p>The name of the event handler to check.</p>
               </div>
             </td>
             <td>
@@ -2475,6 +2428,82 @@ plugin system.</p>
             <td>
               <div class="doc-md-description">
                 <p><code>True</code> if the step exists; otherwise, <code>False</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plan.Plan.evaluator_exists" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">evaluator_exists</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">evaluator_exists</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Check if an evaluator exists.</p>
+<p>Determines whether an evaluator with the specified name is supported by the
+plugin system.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>name</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the evaluator to check.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>bool</code></td>            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the evaluator exists; otherwise, <code>False</code>.</p>
               </div>
             </td>
           </tr>
@@ -2927,7 +2956,7 @@ plan. This enables event propagation up the plan hierarchy.</p>
     <div class="doc doc-contents ">
 
         <p>Emit an event.</p>
-<p>Emits an event, triggering associated handlers and observers.</p>
+<p>Emits an event, triggering associated event handlers.</p>
 <p>When this method is called:</p>
 <ol>
 <li>All event handlers associated with the plan are invoked.</li>
@@ -2991,8 +3020,8 @@ plan. This enables event propagation up the plan hierarchy.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Retrieve a value stored in a handler.</p>
-<p>Retrieves a value stored within a specific result handler. This method
+        <p>Retrieve a value stored in an event handler.</p>
+<p>Retrieves a value stored within a specific event handler. This method
 uses the <code>[]</code> operator to access the value associated with the given
 key.</p>
 
@@ -3017,7 +3046,7 @@ key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The unique identifier of the handler.</p>
+                <p>The unique identifier of the event handler.</p>
               </div>
             </td>
             <td>
@@ -3082,7 +3111,7 @@ key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the provided <code>id_</code> is not a valid handler ID.</p>
+                <p>If the provided <code>id_</code> is not a valid event handler ID.</p>
               </div>
             </td>
           </tr>
@@ -3107,8 +3136,8 @@ key.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Set a value in a handler.</p>
-<p>Stores a value within a specific result handler. This method uses the
+        <p>Set a value in an event handler.</p>
+<p>Stores a value within a specific event handler. This method uses the
 <code>[]</code> operator to assign the value to the specified key.</p>
 
 
@@ -3132,7 +3161,7 @@ key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The unique identifier of the handler.</p>
+                <p>The unique identifier of the event handler.</p>
               </div>
             </td>
             <td>
@@ -3190,7 +3219,7 @@ key.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the provided <code>id_</code> is not a valid handler ID.</p>
+                <p>If the provided <code>id_</code> is not a valid event handler ID.</p>
               </div>
             </td>
           </tr>
@@ -3414,10 +3443,10 @@ details.</p>
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.expand", "navigation.footer", "navigation.sections", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.expand", "navigation.footer", "navigation.sections", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       
