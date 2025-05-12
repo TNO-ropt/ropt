@@ -21,22 +21,26 @@ standard optimization plans out-of-the-box.
     - `observer`: Listens for events from specified sources, and calls a
       callback for each event
         ([`DefaultObserverHandler`][ropt.plugins.plan._observer.DefaultObserverHandler]).
+- **Evaluators:**
+    - `forwarding_evaluator`: Evaluator that forwards calculations to a given evaluation function.
+      ([`DefaultForwardingEvaluator`][ropt.plugins.plan._evaluator.DefaultForwardingEvaluator])
 """
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Final
 
+from ._evaluator import DefaultForwardingEvaluator
 from ._observer import DefaultObserverHandler
 from ._store import DefaultStoreHandler
 from ._tracker import DefaultTrackerHandler
-from .base import EventHandlerPlugin, PlanStepPlugin
+from .base import EvaluatorPlugin, EventHandlerPlugin, PlanStepPlugin
 from .ensemble_evaluator import DefaultEnsembleEvaluatorStep
 from .optimizer import DefaultOptimizerStep
 
 if TYPE_CHECKING:
     from ropt.plan import Plan
-    from ropt.plugins.plan.base import EventHandler, PlanStep
+    from ropt.plugins.plan.base import Evaluator, EventHandler, PlanStep
 
 _STEP_OBJECTS: Final[dict[str, type[PlanStep]]] = {
     "ensemble_evaluator": DefaultEnsembleEvaluatorStep,
@@ -47,6 +51,10 @@ _EVENT_HANDLER_OBJECTS: Final[dict[str, type[EventHandler]]] = {
     "observer": DefaultObserverHandler,
     "tracker": DefaultTrackerHandler,
     "store": DefaultStoreHandler,
+}
+
+_EVALUATOR_OBJECTS: Final[dict[str, type[Evaluator]]] = {
+    "forwarding_evaluator": DefaultForwardingEvaluator,
 }
 
 
@@ -144,3 +152,46 @@ class DefaultPlanStepPlugin(PlanStepPlugin):
         # noqa
         """
         return method.lower() in _STEP_OBJECTS
+
+
+class DefaultEvaluatorPlugin(EvaluatorPlugin):
+    """The default plugin for creating evaluators.
+
+    This plugin acts as a factory for the standard evaluator implementations
+    provided by `ropt`. It allows the
+    [`PluginManager`][ropt.plugins.PluginManager] to instantiate these steps
+    when requested by a [`Plan`][ropt.plan.Plan].
+
+    **Supported Evaluators:**
+
+    - `function_evaluator`: Creates a
+        [`DefaultFunctionEvaluator`][ropt.plugins.plan.ensemble_evaluator.DefaultFunctionEvaluator]
+        instance, which uses function calls to calculated individual objectives
+        and constraints.
+    """
+
+    @classmethod
+    def create(cls, name: str, **kwargs: Any) -> Evaluator:  # noqa: ANN401
+        """Create a step.
+
+        See the [ropt.plugins.plan.base.PlanPlugin][] abstract base class.
+
+        # noqa
+        """
+        _, _, name = name.lower().rpartition("/")
+        evaluator_obj = _EVALUATOR_OBJECTS.get(name)
+        if evaluator_obj is not None:
+            return evaluator_obj(**kwargs)
+
+        msg = f"Unknown evaluator type: {name}"
+        raise TypeError(msg)
+
+    @classmethod
+    def is_supported(cls, method: str) -> bool:
+        """Check if a method is supported.
+
+        See the [ropt.plugins.base.Plugin][] abstract base class.
+
+        # noqa
+        """
+        return method.lower() in _EVALUATOR_OBJECTS

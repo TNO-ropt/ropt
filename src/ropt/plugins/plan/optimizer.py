@@ -12,7 +12,7 @@ from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.optimization import EnsembleOptimizer
 from ropt.plan import Event, Plan
-from ropt.plugins.plan.base import PlanStep
+from ropt.plugins.plan.base import Evaluator, PlanStep
 from ropt.results import FunctionResults
 
 if TYPE_CHECKING:
@@ -75,6 +75,7 @@ class DefaultOptimizerStep(PlanStep):
     def run(
         self,
         config: EnOptConfig,
+        evaluator: Evaluator,
         variables: ArrayLike | None = None,
         nested_optimization: Plan | None = None,
         metadata: dict[str, Any] | None = None,
@@ -100,6 +101,7 @@ class DefaultOptimizerStep(PlanStep):
 
         Args:
             config:              Optimizer configuration.
+            evaluator:           The evaluator to use for function evaluations.
             variables:           Optional initial variable vector(s) to start optimization from.
             nested_optimization: Optional nested plan.
             metadata:            Optional dictionary to attach to emitted `Results`.
@@ -108,6 +110,7 @@ class DefaultOptimizerStep(PlanStep):
             An [`OptimizerExitCode`][ropt.enums.OptimizerExitCode] indicating the outcome of the optimization.
         """
         self._config = config
+        self._evaluator = evaluator
         self._nested_optimization = nested_optimization
         self._metadata = metadata
 
@@ -130,7 +133,7 @@ class DefaultOptimizerStep(PlanStep):
                 variables = self._config.transforms.variables.to_optimizer(variables)
 
         ensemble_evaluator = EnsembleEvaluator(
-            self._config, self.plan.evaluator, self.plan.plugin_manager
+            self._config, self._evaluator.eval, self.plan.plugin_manager
         )
 
         ensemble_optimizer = EnsembleOptimizer(

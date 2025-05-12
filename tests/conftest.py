@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from ropt.evaluator import Evaluator, EvaluatorContext, EvaluatorResult
+from ropt.evaluator import EvaluatorContext, EvaluatorResult
 
 _Function = Callable[[NDArray[np.float64], int], float]
 
@@ -87,10 +87,8 @@ def fixture_test_functions() -> tuple[_Function, _Function]:
 
 
 @pytest.fixture(scope="session")
-def evaluator(test_functions: Any) -> Callable[[list[_Function]], Evaluator]:
-    def _evaluator(
-        test_functions: list[_Function] = test_functions,
-    ) -> Evaluator:
+def evaluator(test_functions: Any) -> Any:
+    def _evaluator(test_functions: list[_Function] = test_functions) -> Any:
         return partial(_function_runner, functions=test_functions)
 
     return _evaluator

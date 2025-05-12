@@ -1,9 +1,8 @@
 """Function evaluation protocols and classes."""
 
-from ._evaluator import Evaluator, EvaluatorContext, EvaluatorResult
+from ._evaluator import EvaluatorContext, EvaluatorResult
 
 __all__ = [
-    "Evaluator",
     "EvaluatorContext",
     "EvaluatorResult",
 ]

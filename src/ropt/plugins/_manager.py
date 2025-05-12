@@ -10,7 +10,7 @@ from ropt.exceptions import ConfigError
 
 from .function_estimator.base import FunctionEstimatorPlugin
 from .optimizer.base import OptimizerPlugin
-from .plan.base import EventHandlerPlugin, PlanStepPlugin
+from .plan.base import EvaluatorPlugin, EventHandlerPlugin, PlanStepPlugin
 from .realization_filter.base import RealizationFilterPlugin
 from .sampler.base import SamplerPlugin
 
@@ -25,6 +25,7 @@ _PLUGIN_TYPES: Final = {
     "realization_filter": RealizationFilterPlugin,
     "event_handler": EventHandlerPlugin,
     "plan_step": PlanStepPlugin,
+    "evaluator": EvaluatorPlugin,
 }
 
 PluginType = Literal[
@@ -34,6 +35,7 @@ PluginType = Literal[
     "function_estimator",
     "event_handler",
     "plan_step",
+    "evaluator",
 ]
 """Represents the valid types of plugins supported by `ropt`.
 
@@ -53,6 +55,8 @@ role in the optimization process:
   results ([`EventHandlerPlugin`][ropt.plugins.plan.base.EventHandlerPlugin]).
 * `"plan_step"`: Plugins that define executable steps within an optimization plan
   ([`PlanStepPlugin`][ropt.plugins.plan.base.PlanStepPlugin]).
+* `"evaluator"`: Plugins that define evaluators within an optimization plan
+  ([`EvaluatorPlugin`][ropt.plugins.plan.base.EvaluatorPlugin]).
 """
 
 
@@ -101,6 +105,7 @@ class PluginManager:
             "function_estimator": {},
             "event_handler": {},
             "plan_step": {},
+            "evaluator": {},
         }
 
         for plugin_type in self._plugins:

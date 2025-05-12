@@ -5,15 +5,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from ropt.exceptions import PlanAborted
-from ropt.plugins import PluginManager
 from ropt.plugins.plan.base import EventHandler, PlanStep
 
 if TYPE_CHECKING:
     import uuid
     from collections.abc import Callable
 
-    from ropt.evaluator import Evaluator
     from ropt.plan import Event
+    from ropt.plugins import PluginManager
 
 
 class Plan:
@@ -50,11 +49,6 @@ class Plan:
     customize its behavior. The [`has_function`][ropt.plan.Plan.has_function]
     method can be used to check if a function has been added to the plan.
 
-    **Evaluator:**
-
-    The plan stores an [`Evaluator`][ropt.evaluator.Evaluator] object that is
-    used to perform function evaluations that are needed by optimization and
-    evaluation steps. It can be retrieved and set via the `evaluator` attribute.
 
     **PluginManager:**
 
@@ -96,8 +90,7 @@ class Plan:
 
     def __init__(
         self,
-        evaluator: Evaluator,
-        plugin_manager: PluginManager | None = None,
+        plugin_manager: PluginManager,
         parent: Plan | None = None,
     ) -> None:
         """Initialize a plan object.
@@ -112,22 +105,10 @@ class Plan:
         event propagation up the plan hierarchy.
 
         Args:
-            evaluator:      The evaluator used by the plan.
-            plugin_manager: An optional plugin manager.
+            plugin_manager: A plugin manager.
             parent:         An optional parent plan.
         """
-        self.evaluator: Evaluator
-        """The evaluator used by the plan.
-
-        The evaluator is set upon plan creation, and can be retrieved and set via
-        the `evaluator` attribute.
-        """
-
-        self._plugin_manager = (
-            PluginManager() if plugin_manager is None else plugin_manager
-        )
-
-        self.evaluator = evaluator
+        self._plugin_manager = plugin_manager
         self._aborted = False
         self._parent = parent
         self._handlers: dict[uuid.UUID, EventHandler] = {}
@@ -226,6 +207,20 @@ class Plan:
 
         Returns:
             bool: `True` if the step exists; otherwise, `False`.
+        """
+        return self._plugin_manager.is_supported("plan_step", method=name)
+
+    def evaluator_exists(self, name: str) -> bool:
+        """Check if an evaluator exists.
+
+        Determines whether an evaluator with the specified name is supported by the
+        plugin system.
+
+        Args:
+            name: The name of the evaluator to check.
+
+        Returns:
+            bool: `True` if the evaluator exists; otherwise, `False`.
         """
         return self._plugin_manager.is_supported("plan_step", method=name)
 

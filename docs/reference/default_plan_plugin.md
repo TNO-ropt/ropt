@@ -16,3 +16,4 @@
 ::: ropt.plugins.plan._tracker.DefaultTrackerHandler
 ::: ropt.plugins.plan._store.DefaultStoreHandler
 ::: ropt.plugins.plan._observer.DefaultObserverHandler
+::: ropt.plugins.plan._evaluator.DefaultForwardingEvaluator

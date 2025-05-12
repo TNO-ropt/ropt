@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 
 import numpy as np
 from numpy.random import default_rng
@@ -33,7 +33,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config.enopt import EnOptConfig
-    from ropt.evaluator import Evaluator
+    from ropt.evaluator import EvaluatorContext, EvaluatorResult
     from ropt.plugins import PluginManager
     from ropt.plugins.function_estimator.base import FunctionEstimator
     from ropt.plugins.realization_filter.base import RealizationFilter
@@ -48,17 +48,17 @@ class EnsembleEvaluator:
     in an [`EnOptConfig`][ropt.config.enopt.EnOptConfig] configuration object to
     guide the calculations.
 
-    The core functionality relies on an [`Evaluator`][ropt.evaluator.Evaluator]
-    callable, which is used to evaluate the individual functions within the
-    ensemble. The evaluator provides the raw function values, which are then
-    processed by the `EnsembleEvaluator` to produce the final function and
-    gradient estimates.
+    The core functionality relies on an evaluator callable, (usually provided by
+    an [`Evaluator`][ropt.plugins.plan.base.Evaluator] object), which is used to
+    evaluate the individual functions within the ensemble. The evaluator
+    provides the raw function values, which are then processed by the
+    `EnsembleEvaluator` to produce the final function and gradient estimates.
     """
 
     def __init__(
         self,
         config: EnOptConfig,
-        evaluator: Evaluator,
+        evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult],
         plugin_manager: PluginManager,
     ) -> None:
         """Initialize the EnsembleEvaluator.
@@ -68,8 +68,8 @@ class EnsembleEvaluator:
 
         The `config` object contains all the settings required for the ensemble
         evaluation, such as the number of realizations, the function estimators,
-        and the gradient settings. The `evaluator` callable should conform to
-        the [`Evaluator`][ropt.evaluator.Evaluator] protocol. The
+        and the gradient settings. The `evaluator` callable is usually provide
+        by a [`Evaluator`][ropt.plugins.plan.base.Evaluator] object. The
         `plugin_manager` is used to load the realization filters, function
         estimators, and samplers.
 

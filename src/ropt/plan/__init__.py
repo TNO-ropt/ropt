@@ -22,11 +22,8 @@ involving a single optimization.
 """
 
 from ._basic_optimizer import BasicOptimizer
+from ._evaluator import create_evaluator
 from ._events import Event
 from ._plan import Plan
 
-__all__ = [
-    "BasicOptimizer",
-    "Event",
-    "Plan",
-]
+__all__ = ["BasicOptimizer", "Event", "Plan", "create_evaluator"]

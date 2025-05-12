@@ -9,7 +9,15 @@ serves as an excellent introduction to several fundamental concepts within
 
 - [**Function Evaluation**](evaluation.md): You, the user, must supply the
   objective function to be optimized. This is done by providing a Python
-  function that adheres to the [`Evaluator`][ropt.evaluator.Evaluator] protocol.
+  function that adheres to the following signature:
+  ```python
+  evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult]
+  ```
+  This function receives the variables to evaluate, together with a
+  [`EvaluatorContext`][ropt.evaluator.EvaluatorContext] object, that provides
+  some additional information, and returns a
+  [`EvaluatorResult`][ropt.evaluator.EvaluatorResult] object containing the
+  results.
 - [**Configuration**](configuration.md): The behavior of the optimization
   process is controlled through a configuration object, specifically an instance
   of [`EnOptConfig`][ropt.config.enopt.EnOptConfig].

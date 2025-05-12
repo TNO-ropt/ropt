@@ -52,6 +52,9 @@ default = "ropt.plugins.plan.default:DefaultEventHandlerPlugin"
 [project.entry-points."ropt.plugins.plan_step"]
 default = "ropt.plugins.plan.default:DefaultPlanStepPlugin"
 
+[project.entry-points."ropt.plugins.evaluator"]
+default = "ropt.plugins.plan.default:DefaultEvaluatorPlugin"
+
 [project.scripts]
 ropt_plugin_optimizer = "ropt.plugins.optimizer.external:ropt_plugin_optimizer"
 

@@ -138,7 +138,7 @@ class OptimizerExitCode(IntEnum):
     OPTIMIZER_STEP_FINISHED = 6
     """Returned when an optimization step terminates normally."""
 
-    EVALUATION_STEP_FINISHED = 7
+    EVALUATOR_STEP_FINISHED = 7
     """Returned when an evaluation step terminates normally."""
 
 

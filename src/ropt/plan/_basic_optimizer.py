@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import partial
 from typing import TYPE_CHECKING, Any, Self
 
 from ropt.config.enopt import EnOptConfig
@@ -10,6 +11,7 @@ from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
 from ropt.plugins import PluginManager
 
+from ._evaluator import create_evaluator
 from ._plan import Plan
 
 if TYPE_CHECKING:
@@ -18,9 +20,9 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
-    from ropt.evaluator import Evaluator
+    from ropt.evaluator import EvaluatorContext, EvaluatorResult
     from ropt.plan import Event
-    from ropt.plugins.plan.base import EventHandler
+    from ropt.plugins.plan.base import Evaluator, EventHandler
     from ropt.results import FunctionResults
 
 
@@ -69,7 +71,7 @@ class BasicOptimizer:
     def __init__(
         self,
         enopt_config: dict[str, Any] | EnOptConfig,
-        evaluator: Evaluator,
+        evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult],
         *,
         constraint_tolerance: float = 1e-10,
         **kwargs: Any,  # noqa: ANN401
@@ -176,12 +178,14 @@ class BasicOptimizer:
         """
 
         def _run_func(
-            plan: Plan,
+            plan: Plan, evaluator: Evaluator
         ) -> tuple[EventHandler | None, OptimizerExitCode | None]:
-            exit_code = plan.run_step(optimizer, config=self._config)
+            exit_code = plan.run_step(
+                optimizer, config=self._config, evaluator=evaluator
+            )
             return plan.get(tracker, "results"), exit_code
 
-        plan = Plan(self._evaluator)
+        plan = Plan(self._plugin_manager)
 
         # Optionally run a custom step defined in the keyword arguments:
         key, value = next(iter(self._kwargs.items()), (None, None))
@@ -193,13 +197,16 @@ class BasicOptimizer:
 
         # If no custom function was installed, install the default function:
         if not plan.has_function():
+            evaluator = create_evaluator(
+                "forwarding_evaluator", self._plugin_manager, evaluator=self._evaluator
+            )
             optimizer = plan.add_step("optimizer")
             tracker = plan.add_event_handler(
                 "tracker",
                 constraint_tolerance=self._constraint_tolerance,
                 sources={optimizer},
             )
-            plan.add_function(_run_func)
+            plan.add_function(partial(_run_func, evaluator=evaluator))
 
         for event_type, function in self._observers:
             plan.add_event_handler(

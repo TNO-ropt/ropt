@@ -9,8 +9,9 @@ the optimization workflow:
 
 * [`plan`][ropt.plugins.plan]: Defines components for constructing and executing
   optimization plans
-  ([`EventHandlerPlugin`][ropt.plugins.plan.base.EventHandlerPlugin] and
-  [`PlanStepPlugin`][ropt.plugins.plan.base.PlanStepPlugin]).
+  ([`EventHandlerPlugin`][ropt.plugins.plan.base.EventHandlerPlugin],
+  [`PlanStepPlugin`][ropt.plugins.plan.base.PlanStepPlugin] and
+  [`EvaluatorPlugin`][ropt.plugins.plan.base.EvaluatorPlugin]).
 * [`optimizer`][ropt.plugins.optimizer]: Implements optimization algorithms.
 * [`sampler`][ropt.plugins.sampler]: Generates parameter perturbations, which
   are used for gradient estimation.
@@ -28,8 +29,9 @@ discovered automatically using Python's standard entry points mechanism.
 Each plugin type has a corresponding abstract base class that custom plugins
 must inherit from:
 
-* **Plan:** [`EventHandlerPlugin`][ropt.plugins.plan.base.EventHandlerPlugin] and
-  [`PlanStepPlugin`][ropt.plugins.plan.base.PlanStepPlugin]
+* **Plan:** [`EventHandlerPlugin`][ropt.plugins.plan.base.EventHandlerPlugin],
+  [`PlanStepPlugin`][ropt.plugins.plan.base.PlanStepPlugin], and
+  [`EvaluatorPlugin`][ropt.plugins.plan.base.EvaluatorPlugin]
 * **Optimizer:**
   [`OptimizerPlugin`][ropt.plugins.optimizer.base.OptimizerPlugin]
 * **Sampler:** [`SamplerPlugin`][ropt.plugins.sampler.base.SamplerPlugin]

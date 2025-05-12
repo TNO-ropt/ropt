@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, Protocol, TypeVar
+from typing import Any, TypeVar
 
 import numpy as np
 from numpy.typing import NDArray
@@ -13,7 +13,7 @@ T = TypeVar("T", bound=np.generic)
 class EvaluatorContext:
     """Capture additional details for the function evaluator.
 
-    Function evaluator callbacks (see [`Evaluator`][ropt.evaluator.Evaluator])
+    Function evaluators (see [`Evaluator`][ropt.plugins.plan.base.Evaluator])
     primarily receive variable vectors to evaluate objective and constraint
     functions. However, they may also benefit from additional information to
     optimize their calculations. This `EvaluatorContext` object provides that
@@ -202,49 +202,3 @@ class EvaluatorResult:
     constraints: NDArray[np.float64] | None = None
     batch_id: int | None = None
     evaluation_info: dict[str, NDArray[Any]] = field(default_factory=dict)
-
-
-class Evaluator(Protocol):
-    """Protocol for evaluator objects or callables.
-
-    The [`EnsembleEvaluator`][ropt.ensemble_evaluator.EnsembleEvaluator] class
-    requires a function evaluator callback that conforms to the
-    [`Evaluator`][ropt.evaluator.Evaluator] signature. This callback accepts
-    one or more variable vectors to evaluate, along with an
-    [`EvaluatorContext`][ropt.evaluator.EvaluatorContext] object that provides
-    relevant information for the evaluation. It returns an
-    [`EvaluatorResult`][ropt.evaluator.EvaluatorResult] object containing the results.
-    """
-
-    def __call__(
-        self, variables: NDArray[np.float64], context: EvaluatorContext, /
-    ) -> EvaluatorResult:
-        r"""Evaluate objective and constraint functions for given variables.
-
-        This method defines the signature for the function evaluator callback.
-        The evaluator calculates objective and constraint functions for a set of
-        variable vectors, potentially for a subset of realizations and
-        perturbations.
-
-        Args:
-            variables: The matrix of variables to evaluate. Each row represents
-                       a variable vector.
-            context:   The evaluation context, providing additional information
-                       about the evaluation.
-
-        Returns:
-            An evaluation results object containing the calculated objective and
-                constraint values, along with any additional metadata.
-
-        Tip: Reusing Objective
-            When defining multiple objectives, there may be a need to reuse the
-            same objective value multiple times. For instance, a total objective
-            could consist of the mean of the objectives for each realization,
-            plus the standard deviation of the same values. This can be
-            implemented by defining two objectives: the first calculated as the
-            mean of the realizations, and the second using a function estimator
-            to compute the standard deviations. The optimizer is unaware that
-            both objectives use the same set of realizations. To prevent
-            redundant calculations, the evaluator should compute the results of
-            the realizations once and return them for both objectives.
-        """
