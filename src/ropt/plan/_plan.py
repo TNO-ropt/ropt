@@ -70,17 +70,20 @@ class Plan:
     Steps can communicate events using the
     [`emit_event`][ropt.plan.Plan.emit_event] method. Event handlers can respond
     to these events, enabling actions such as processing optimization results.
-    To connect the event handlers to steps, they generally accept a set of steps
-    via their `sources` argument. The steps must be part of the same plan, or a
-    child plan (if existant).
+    Event handlers are added to the plan using the
+    [`add_event_handler`][ropt.plan.Plan.add_event_handler] method. To connect
+    the event handlers to steps, they generally accept a set of steps via the
+    `sources` argument. The steps must be part of the same plan, or a child plan
+    (if existent).
 
     **Evaluators:**
 
     Evaluators ([`Evaluator`][ropt.plugins.plan.base.Evaluator]) are key
     components responsible for performing function evaluations, such as
     computing objective functions or constraint values. They are added to the
-    plan using the [`add_evaluator`][ropt.plan.Plan.add_evaluator] method and
-    passed to any steps that need them.
+    plan using the [`add_evaluator`][ropt.plan.Plan.add_evaluator] method. They
+    connect to the steps in the plan, or in child plans, via the `clients`
+    argument.
 
     **Nested Plans:**
 
@@ -120,7 +123,7 @@ class Plan:
         event handlers to add plugin functionality.
 
         If a `parent` plan is specified, this plan becomes a child, enabling
-        event propagation up the plan hierarchy.
+        communication up the plan hierarchy.
 
         Args:
             plugin_manager: A plugin manager.
@@ -157,7 +160,12 @@ class Plan:
         """
         return self._plugin_manager
 
-    def add_event_handler(self, name: str, **kwargs: Any) -> EventHandler:  # noqa: ANN401
+    def add_event_handler(
+        self,
+        name: str,
+        sources: set[PlanStep] | None = None,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> EventHandler:
         """Add an event handler to the plan.
 
         Constructs and registers an event handler with the plan. The handler's
@@ -165,15 +173,23 @@ class Plan:
         to locate the corresponding handler class. Any additional keyword
         arguments are passed to the handler's constructor.
 
+        The `sources` parameter acts as a filter, determining which plan steps
+        this event handler should listen to. It should be a set containing the
+        `PlanStep` instances whose event you want to receive. When an event is
+        received, this event handler checks if the step that emitted the event
+        (`event.source`) is present in the `sources` set. If `sources` is
+        `None`, events from all sources will be processed.
+
         Args:
-            name:   The name of the event handler to add.
-            kwargs: Additional arguments for the handler's constructor.
+            name:    The name of the event handler to add.
+            sources: The steps whose events should be processed.
+            kwargs:  Additional arguments for the handler's constructor.
 
         Returns:
             The newly added event handler.
         """
         handler = self._plugin_manager.get_plugin("event_handler", method=name).create(
-            name, self, **kwargs
+            name, self, sources, **kwargs
         )
         assert isinstance(handler, EventHandler)
         self._handlers[handler.id] = handler
@@ -201,22 +217,35 @@ class Plan:
         self._steps[step.id] = step
         return step
 
-    def add_evaluator(self, name: str, **kwargs: Any) -> Evaluator:  # noqa: ANN401
+    def add_evaluator(
+        self,
+        name: str,
+        clients: set[PlanStep] | None = None,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> Evaluator:
         """Add an evaluator object to the plan.
 
         Creates an evaluator of a type that is determined by the provided `name`,
         which the plugin system uses to locate the corresponding evaluator class.
         Any additional keyword arguments are passed to the evaluators's constructor.
 
+        The `clients` parameter acts as a filter, determining which plan steps
+        this evaluator should serve. It should be a set containing the
+        `PlanStep` instances that should be handled. When an evaluation is
+        requested, this evaluator checks if the step that emitted the event is
+        present in the `client` set. If `clients` is `None`, all clients will be
+        served.
+
         Args:
-            name:   The name of the evaluator to add.
-            kwargs: Additional arguments for the evaluators's constructor.
+            name:    The name of the evaluator to add.
+            clients: The clients that should be served by this evaluator.
+            kwargs:  Additional arguments for the evaluators's constructor.
 
         Returns:
             The new evaluator object.
         """
         evaluator = self._plugin_manager.get_plugin("evaluator", method=name).create(
-            name, self, **kwargs
+            name, self, clients, **kwargs
         )
         assert isinstance(evaluator, Evaluator)
         self._evaluators[evaluator.id] = evaluator
@@ -251,6 +280,50 @@ class Plan:
             msg = "Plan was aborted by the previous step."
             raise PlanAborted(msg)
         return step.run_step_from_plan(**kwargs)
+
+    def _get_evaluators(self, client: PlanStep) -> list[Evaluator]:
+        evaluators = [
+            evaluator
+            for evaluator in self._evaluators.values()
+            if evaluator.client_ids is None or client.id in evaluator.client_ids
+        ]
+        if not evaluators and self._parent is not None:
+            evaluators = self._parent._get_evaluators(client)  # noqa: SLF001
+        return evaluators
+
+    def get_evaluator(self, client: PlanStep) -> Evaluator:
+        """Retrieve the appropriate evaluator for a given client step.
+
+        This method searches for an [`Evaluator`][ropt.plugins.plan.base.Evaluator]
+        that is configured to serve the specified `client`
+        ([`PlanStep`][ropt.plugins.plan.base.PlanStep]). The search starts in the
+        current plan and, if no suitable evaluator is found and a parent plan
+        exists, continues recursively up the plan hierarchy.
+
+        An evaluator is considered suitable if its `client_ids` attribute is `None`
+        (indicating it serves all clients) or if the `id` of the `client` step
+        is present in the `client_ids` set of the evaluator.
+
+        The method expects to find exactly one suitable evaluator.
+
+        Args:
+            client: The step for which an evaluator is being requested.
+
+        Returns:
+            The single evaluator instance configured to serve the client.
+
+        Raises:
+            AttributeError: If no suitable evaluator is found, or if multiple
+                            suitable evaluators are found.
+        """
+        evaluators = self._get_evaluators(client)
+        if not evaluators:
+            msg = "No suitable evaluator found."
+            raise AttributeError(msg)
+        if len(evaluators) > 1:
+            msg = "Ambiguous request: multiple suitable evaluators found."
+            raise AttributeError(msg)
+        return evaluators[0]
 
     def set_run_function(self, func: Callable[..., Any]) -> None:
         """Add a function to the plan.

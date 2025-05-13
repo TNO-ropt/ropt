@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Callable
 
-from ropt.plugins.plan.base import Evaluator
+from ropt.plugins.plan.base import Evaluator, PlanStep
 
 if TYPE_CHECKING:
     import numpy as np
@@ -28,11 +28,15 @@ class DefaultForwardingEvaluator(Evaluator):
 
     This is useful for integrating existing evaluation logic that is not already
     structured as an `Evaluator` subclass into a `ropt` plan.
+
+    The `clients` parameter acts as a filter, determining which plan steps this
+    evaluator should serve.If `clients` is `None`, all clients will be served.
     """
 
     def __init__(
         self,
         plan: Plan,
+        clients: set[PlanStep] | None = None,
         *,
         evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult],
     ) -> None:
@@ -40,9 +44,10 @@ class DefaultForwardingEvaluator(Evaluator):
 
         Args:
             plan:      The parent plan instance.
+            clients:   The steps that are allowed to use this evaluator.
             evaluator: The callable that will perform the actual evaluation.
         """
-        super().__init__(plan)
+        super().__init__(plan, clients)
         self._evaluator = evaluator
 
     def eval(

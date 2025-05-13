@@ -82,7 +82,13 @@ class DefaultEventHandlerPlugin(EventHandlerPlugin):
     """
 
     @classmethod
-    def create(cls, name: str, plan: Plan, **kwargs: dict[str, Any]) -> EventHandler:
+    def create(
+        cls,
+        name: str,
+        plan: Plan,
+        sources: set[PlanStep] | None = None,
+        **kwargs: dict[str, Any],
+    ) -> EventHandler:
         """Create an event handler.
 
         See the [ropt.plugins.plan.base.PlanPlugin][] abstract base class.
@@ -92,8 +98,6 @@ class DefaultEventHandlerPlugin(EventHandlerPlugin):
         _, _, name = name.lower().rpartition("/")
         obj = _EVENT_HANDLER_OBJECTS.get(name)
         if obj is not None:
-            sources = kwargs.pop("sources", None)
-            assert isinstance(sources, set | None)
             return obj(plan, sources=sources, **kwargs)
 
         msg = f"Unknown event handler object type: {name}"
@@ -173,7 +177,13 @@ class DefaultEvaluatorPlugin(EvaluatorPlugin):
     """
 
     @classmethod
-    def create(cls, name: str, plan: Plan, **kwargs: Any) -> Evaluator:  # noqa: ANN401
+    def create(
+        cls,
+        name: str,
+        plan: Plan,
+        clients: set[PlanStep] | None = None,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> Evaluator:
         """Create a step.
 
         See the [ropt.plugins.plan.base.PlanPlugin][] abstract base class.
@@ -183,7 +193,7 @@ class DefaultEvaluatorPlugin(EvaluatorPlugin):
         _, _, name = name.lower().rpartition("/")
         evaluator_obj = _EVALUATOR_OBJECTS.get(name)
         if evaluator_obj is not None:
-            return evaluator_obj(plan, **kwargs)
+            return evaluator_obj(plan, clients=clients, **kwargs)
 
         msg = f"Unknown evaluator type: {name}"
         raise TypeError(msg)

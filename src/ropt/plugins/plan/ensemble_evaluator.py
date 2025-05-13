@@ -11,7 +11,7 @@ from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
 from ropt.plan import Event
-from ropt.plugins.plan.base import Evaluator, PlanStep
+from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
 
 if TYPE_CHECKING:
@@ -57,14 +57,13 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
     def run_step_from_plan(
         self,
         config: EnOptConfig,
-        evaluator: Evaluator,
         variables: ArrayLike | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> OptimizerExitCode:
-        """Run the evaluator step to perform ensemble evaluations.
+        """Run the ensemble evaluator step to perform ensemble evaluations.
 
-        This method executes the core logic of the evaluator step. It requires
-        an optimizer configuration
+        This method executes the core logic of the ensemble evaluator step. It
+        requires an optimizer configuration
         ([`EnOptConfig`][ropt.config.enopt.EnOptConfig]) and optionally accepts
         specific variable vectors to evaluate.
 
@@ -78,7 +77,6 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
 
         Args:
             config:    Optimizer configuration.
-            evaluator: The evaluator to use for function evaluations.
             variables: Optional variable vector(s) to evaluate.
             metadata:  Optional dictionary to attach to emitted `FunctionResults`.
 
@@ -103,6 +101,7 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
             ):
                 variables = config.transforms.variables.to_optimizer(variables)
 
+        evaluator = self.plan.get_evaluator(self)
         ensemble_evaluator = EnsembleEvaluator(
             config, evaluator.eval, self.plan.plugin_manager
         )

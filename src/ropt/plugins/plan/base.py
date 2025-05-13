@@ -35,6 +35,7 @@ class EventHandlerPlugin(Plugin):
         cls,
         name: str,
         plan: Plan,
+        sources: set[PlanStep] | None = None,
         **kwargs: Any,  # noqa: ANN401
     ) -> EventHandler:
         """Create a EventHandler instance.
@@ -53,6 +54,13 @@ class EventHandlerPlugin(Plugin):
         Implementations can use this `name` to vary the created event handler if
         the plugin supports multiple event handler types.
 
+        The `sources` parameter acts as a filter, determining which plan steps
+        this event handler should listen to. It should be a set containing the
+        `PlanStep` instances whose event you want to receive. When an event is
+        received, this event handler checks if the step that emitted the event
+        (`event.source`) is present in the `sources` set. If `sources` is
+        `None`, events from all sources will be processed.
+
         Any additional keyword arguments (`kwargs`) passed during the
         [`Plan.add_event_handler`][ropt.plan.Plan.add_event_handler] call are
         forwarded here, allowing for custom configuration of the event handler
@@ -61,6 +69,7 @@ class EventHandlerPlugin(Plugin):
         Args:
             name:   The requested event handler name (potentially plugin-specific).
             plan:   The parent [`Plan`][ropt.plan.Plan] instance.
+            sources: The steps whose events should be processed.
             kwargs: Additional arguments for custom configuration.
 
         Returns:
@@ -137,6 +146,7 @@ class EvaluatorPlugin(Plugin):
         cls,
         name: str,
         plan: Plan,
+        clients: set[PlanStep] | None = None,
         **kwargs: Any,  # noqa: ANN401
     ) -> Evaluator:
         """Create an Evaluator instance.
@@ -154,9 +164,17 @@ class EvaluatorPlugin(Plugin):
         Implementations can use this `name` to vary the created evaluator if
         the plugin supports multiple evaluator types.
 
+        The `clients` parameter acts as a filter, determining which plan steps
+        this evaluator should serve. It should be a set containing the
+        `PlanStep` instances that should be handled. When an evaluation is
+        requested, this evaluator checks if the step that emitted the event is
+        present in the `client` set. If `clients` is `None`, all clients will be
+        served.
+
         Args:
             name:   The requested evaluator name (potentially plugin-specific).
             plan:   The parent [`Plan`][ropt.plan.Plan] instance.
+            clients: The clients that should be served by this evaluator.
             kwargs: Additional arguments for custom configuration.
 
         Returns:
@@ -298,8 +316,8 @@ class EventHandler(ABC):
         `PlanStep` instances whose event you want to receive. When an event is
         received, this event handler checks if the step that emitted the event
         (`event.source`) is present in the `sources` set. If `sources` is
-        `None`, events from all sources will be processed. The source steps are
-        accessible via the `sources` property.
+        `None`, events from all sources will be processed. The IDs of the source
+        steps are accessible via the `source_ids` property.
 
         Args:
             plan:    The [`Plan`][ropt.plan.Plan] instance that owns this event handler.
@@ -337,7 +355,7 @@ class EventHandler(ABC):
         If it returns `None` any event will be responded to.
 
         Returns:
-            The source this event handler is interested in.
+            The source IDs this event handler is interested in.
         """
         return self._sources
 
@@ -355,8 +373,7 @@ class EventHandler(ABC):
         logging information, or updating internal state.
 
         Args:
-            event: The [`Event`][ropt.plan.Event] object containing details
-                   about what occurred in the plan.
+            event: The event object containing details about what occurred in the plan.
         """
 
     def __getitem__(self, key: str) -> Any:  # noqa: ANN401
@@ -415,17 +432,29 @@ class Evaluator(ABC):
     [`EvaluatorResult`][ropt.evaluator.EvaluatorResult].
     """
 
-    def __init__(self, plan: Plan) -> None:
+    def __init__(self, plan: Plan, clients: set[PlanStep] | None = None) -> None:
         """Initialize the Evaluator.
 
         Associates the evaluator with its parent [`Plan`][ropt.plan.Plan], and
         assigns a unique ID. The parent plan is accessible via the `plan`
         property.
 
+        The `clients` parameter acts as a filter, determining which plan steps
+        this evaluator should serve. It should be a set containing the
+        `PlanStep` instances that should be handled. When an evaluation is
+        requested, this evaluator checks if the step that emitted the event is
+        present in the `client` set. If `clients` is `None`, all clients will be
+        served. The IDs of the client steps are accessible via the `client_ids`
+        property.
+
         Args:
-            plan: The [`Plan`][ropt.plan.Plan] instance that owns this evaluator.
+            plan:    The [`Plan`][ropt.plan.Plan] instance that owns this evaluator.
+            clients: The steps that use this evaluator.
         """
         self.__stored_plan = plan
+        self.__clients = (
+            {client.id for client in clients} if clients is not None else None
+        )
         self.__id: uuid.UUID = uuid.uuid4()
 
     @abstractmethod
@@ -478,3 +507,14 @@ class Evaluator(ABC):
             The [`Plan`][ropt.plan.Plan] object that owns this event handler.
         """
         return self.__stored_plan
+
+    @property
+    def client_ids(self) -> set[uuid.UUID] | None:
+        """Return the client IDs that are served.
+
+        If it returns `None` any client will be served.
+
+        Returns:
+            The IDs of the clients this evaluator will handle.
+        """
+        return self.__clients

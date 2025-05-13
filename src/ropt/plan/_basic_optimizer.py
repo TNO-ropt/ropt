@@ -180,16 +180,14 @@ class BasicOptimizer:
         def _run_func(
             plan: Plan,
         ) -> tuple[EventHandler | None, OptimizerExitCode | None]:
-            evaluator = plan.add_evaluator(
-                "forwarding_evaluator", evaluator=self._evaluator
-            )
+            plan.add_evaluator("forwarding_evaluator", evaluator=self._evaluator)
             optimizer = plan.add_step("optimizer")
             tracker = plan.add_event_handler(
                 "tracker",
                 constraint_tolerance=self._constraint_tolerance,
                 sources={optimizer},
             )
-            exit_code = optimizer.run(config=self._config, evaluator=evaluator)
+            exit_code = optimizer.run(config=self._config)
             return tracker["results"], exit_code
 
         plan = Plan(self._plugin_manager)
