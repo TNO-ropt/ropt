@@ -1820,15 +1820,18 @@ implement further plugin-based functionality.</p>
 <p>Steps can communicate events using the
 <a class="autorefs autorefs-internal" title="            emit_event" href="#ropt.plan.Plan.emit_event"><code>emit_event</code></a> method. Event handlers can respond
 to these events, enabling actions such as processing optimization results.
-To connect the event handlers to steps, they generally accept a set of steps
-via their <code>sources</code> argument. The steps must be part of the same plan, or a
-child plan (if existant).</p>
+Event handlers are added to the plan using the
+<a class="autorefs autorefs-internal" title="            add_event_handler" href="#ropt.plan.Plan.add_event_handler"><code>add_event_handler</code></a> method. To connect
+the event handlers to steps, they generally accept a set of steps via the
+<code>sources</code> argument. The steps must be part of the same plan, or a child plan
+(if existent).</p>
 <p><strong>Evaluators:</strong></p>
 <p>Evaluators (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator"><code>Evaluator</code></a>) are key
 components responsible for performing function evaluations, such as
 computing objective functions or constraint values. They are added to the
-plan using the <a class="autorefs autorefs-internal" title="            add_evaluator" href="#ropt.plan.Plan.add_evaluator"><code>add_evaluator</code></a> method and
-passed to any steps that need them.</p>
+plan using the <a class="autorefs autorefs-internal" title="            add_evaluator" href="#ropt.plan.Plan.add_evaluator"><code>add_evaluator</code></a> method. They
+connect to the steps in the plan, or in child plans, via the <code>clients</code>
+argument.</p>
 <p><strong>Nested Plans:</strong></p>
 <p>Multiple plans can be defined. A step within one plan can trigger the
 execution of another plan, enabling nested workflows. In nested plans, the
@@ -1990,7 +1993,7 @@ with a plugin manager and/or a parent plan.</p>
 <p>The <code>plugin_manager</code> is used by the plan, and possibly by steps and
 event handlers to add plugin functionality.</p>
 <p>If a <code>parent</code> plan is specified, this plan becomes a child, enabling
-event propagation up the plan hierarchy.</p>
+communication up the plan hierarchy.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2052,7 +2055,11 @@ event propagation up the plan hierarchy.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_event_handler</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EventHandler</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_event_handler</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">sources</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">PlanStep</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EventHandler</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2062,6 +2069,12 @@ event propagation up the plan hierarchy.</p>
 type is determined by the provided <code>name</code>, which the plugin system uses
 to locate the corresponding handler class. Any additional keyword
 arguments are passed to the handler's constructor.</p>
+<p>The <code>sources</code> parameter acts as a filter, determining which plan steps
+this event handler should listen to. It should be a set containing the
+<code>PlanStep</code> instances whose event you want to receive. When an event is
+received, this event handler checks if the step that emitted the event
+(<code>event.source</code>) is present in the <code>sources</code> set. If <code>sources</code> is
+<code>None</code>, events from all sources will be processed.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2089,6 +2102,22 @@ arguments are passed to the handler's constructor.</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sources</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The steps whose events should be processed.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -2240,7 +2269,11 @@ the step's constructor.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_evaluator</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Evaluator</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_evaluator</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">clients</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">PlanStep</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Evaluator</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2249,6 +2282,12 @@ the step's constructor.</p>
 <p>Creates an evaluator of a type that is determined by the provided <code>name</code>,
 which the plugin system uses to locate the corresponding evaluator class.
 Any additional keyword arguments are passed to the evaluators's constructor.</p>
+<p>The <code>clients</code> parameter acts as a filter, determining which plan steps
+this evaluator should serve. It should be a set containing the
+<code>PlanStep</code> instances that should be handled. When an evaluation is
+requested, this evaluator checks if the step that emitted the event is
+present in the <code>client</code> set. If <code>clients</code> is <code>None</code>, all clients will be
+served.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2276,6 +2315,22 @@ Any additional keyword arguments are passed to the evaluators's constructor.</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>clients</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The clients that should be served by this evaluator.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">

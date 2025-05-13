@@ -2334,8 +2334,11 @@ object that will process events during plan execution.</p>
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EventHandler</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">sources</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">PlanStep</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EventHandler</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2352,6 +2355,12 @@ a plan requests an event handler provided by this plugin via
 in the format <code>"plugin-name/method-name"</code> or just <code>"method-name"</code>.
 Implementations can use this <code>name</code> to vary the created event handler if
 the plugin supports multiple event handler types.</p>
+<p>The <code>sources</code> parameter acts as a filter, determining which plan steps
+this event handler should listen to. It should be a set containing the
+<code>PlanStep</code> instances whose event you want to receive. When an event is
+received, this event handler checks if the step that emitted the event
+(<code>event.source</code>) is present in the <code>sources</code> set. If <code>sources</code> is
+<code>None</code>, events from all sources will be processed.</p>
 <p>Any additional keyword arguments (<code>kwargs</code>) passed during the
 <a class="autorefs autorefs-internal" title="            add_event_handler" href="../plan/#ropt.plan.Plan.add_event_handler"><code>Plan.add_event_handler</code></a> call are
 forwarded here, allowing for custom configuration of the event handler
@@ -2399,6 +2408,22 @@ instance.</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sources</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="#ropt.plugins.plan.base.PlanStep">PlanStep</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The steps whose events should be processed.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -2513,7 +2538,12 @@ that will perform evaluations during plan execution.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Evaluator</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">clients</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">PlanStep</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Evaluator</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2529,6 +2559,12 @@ an evaluator provided by this plugin is requested.</p>
 in the format <code>"plugin-name/method-name"</code> or just <code>"method-name"</code>.
 Implementations can use this <code>name</code> to vary the created evaluator if
 the plugin supports multiple evaluator types.</p>
+<p>The <code>clients</code> parameter acts as a filter, determining which plan steps
+this evaluator should serve. It should be a set containing the
+<code>PlanStep</code> instances that should be handled. When an evaluation is
+requested, this evaluator checks if the step that emitted the event is
+present in the <code>client</code> set. If <code>clients</code> is <code>None</code>, all clients will be
+served.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2572,6 +2608,22 @@ the plugin supports multiple evaluator types.</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>clients</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="#ropt.plugins.plan.base.PlanStep">PlanStep</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The clients that should be served by this evaluator.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
