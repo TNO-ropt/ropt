@@ -1932,6 +1932,8 @@ execution (handlers).</p>
     such as running an optimizer or performing evaluations.</li>
 <li><strong>Plan Handlers:</strong> Process events emitted by the plan or its steps, enabling
     tasks like result tracking, data storage, or logging.</li>
+<li><strong>Evaluators:</strong> Perform the actual function evaluations (e.g., objective
+    functions, constraints) required by the optimization process.</li>
 </ul>
 <p>The implementation of these core concepts relies on classes derived from the
 following abstract base classes:</p>
@@ -1947,6 +1949,10 @@ following abstract base classes:</p>
   base for plugins that <em>create</em> event handlers. Similar to step plugins,
   these are used by the <code>PluginManager</code> to instantiate <code>EventHandler</code>
   objects.</li>
+<li><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.EvaluatorPlugin" href="#ropt.plugins.plan.base.EvaluatorPlugin"><code>EvaluatorPlugin</code></a>: The base for
+  plugins that <em>create</em> evaluators. These are used by the
+  <code>PluginManager</code> to instantiate <code>Evaluator</code> objects, which are
+  responsible for function computations.</li>
 </ul>
 </li>
 <li>
@@ -1971,6 +1977,15 @@ following abstract base classes:</p>
   " href="#ropt.plugins.plan.base.EventHandler.handle_event"><code>handle_event</code></a> method
   for processing events emitted during plan execution and allows storing
   state using dictionary-like access.</li>
+<li><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="#ropt.plugins.plan.base.Evaluator"><code>Evaluator</code></a>: The abstract base class
+  for all evaluators. It defines the
+  <a class="autorefs autorefs-internal" title="            eval
+
+
+  
+      abstractmethod
+  " href="#ropt.plugins.plan.base.Evaluator.eval"><code>eval</code></a> method responsible for
+  performing function computations.</li>
 </ul>
 </li>
 </ol>
@@ -1996,6 +2011,13 @@ framework (<a class="autorefs autorefs-internal" title="            ropt.plan.Pl
     (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan._tracker.DefaultTrackerHandler" href="../default_plan_plugin/#ropt.plugins.plan._tracker.DefaultTrackerHandler"><code>DefaultTrackerHandler</code></a>).</li>
 <li><code>store</code>: Accumulates all results from specified sources
     (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan._store.DefaultStoreHandler" href="../default_plan_plugin/#ropt.plugins.plan._store.DefaultStoreHandler"><code>DefaultStoreHandler</code></a>).</li>
+</ul>
+</li>
+<li><strong>Evaluators</strong> (via
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.default.DefaultEvaluatorPlugin" href="../default_plan_plugin/#ropt.plugins.plan.default.DefaultEvaluatorPlugin"><code>DefaultEvaluatorPlugin</code></a>):<ul>
+<li><code>forwarding_evaluator</code>: Forwards calculations to a given evaluation
+    function
+    (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan._evaluator.DefaultForwardingEvaluator" href="../default_plan_plugin/#ropt.plugins.plan._evaluator.DefaultForwardingEvaluator"><code>DefaultForwardingEvaluator</code></a>).</li>
 </ul>
 </li>
 </ul>
@@ -3712,17 +3734,18 @@ potentially for a subset of realizations and perturbations.</p>
 
 
 <details class="tip" open>
-  <summary>Reusing Objective</summary>
+  <summary>Reusing Objectives and Constraints</summary>
   <p>When defining multiple objectives, there may be a need to reuse the
-same objective value multiple times. For instance, a total objective
-could consist of the mean of the objectives for each realization,
-plus the standard deviation of the same values. This can be
-implemented by defining two objectives: the first calculated as the
-mean of the realizations, and the second using a function estimator
-to compute the standard deviations. The optimizer is unaware that
-both objectives use the same set of realizations. To prevent
-redundant calculations, the evaluator should compute the results of
-the realizations once and return them for both objectives.</p>
+same objective or constraint value multiple times. For instance, a
+total objective could consist of the mean of the objectives for each
+realization, plus the standard deviation of the same values. This
+can be implemented by defining two objectives: the first calculated
+as the mean of the realizations, and the second using a function
+estimator to compute the standard deviations. The optimizer is
+unaware that both objectives use the same set of realizations. To
+prevent redundant calculations, the evaluator should compute the
+results of the realizations once and return them for both
+objectives.</p>
 </details>
 
     </div>
