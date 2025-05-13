@@ -41,9 +41,6 @@ class Plan:
         [`add_evaluator`][ropt.plan.Plan.add_evaluator] method and can be
         passed to steps that need them.
 
-    The plan stores these components internally, and the methods for adding them
-    return unique IDs (`uuid.UUID`) for identification and retrieval.
-
     **Executing a Plan:**
 
     Once a plan is assembled, it can be executed in several ways. For

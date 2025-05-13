@@ -61,14 +61,8 @@ class DefaultTrackerHandler(EventHandler):
         specified threshold.
 
         The `sources` parameter acts as a filter, determining which plan steps
-        this event handler should listen to. It should be a set containing the
-        unique IDs (UUIDs) of the `PlanStep` instances whose results you want to
-        track. When a
-        [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] event
-        occurs, this event handler checks if the ID of the step that emitted the
-        event (`event.source`) is present in the `sources` set. If it is, the
-        handler processes the results; otherwise, it ignores the event. If
-        `sources` is `None`, events from all sources will be processed.
+        this event handler should listen to. If `sources` is `None`, events from
+        all sources will be processed.
 
         Tracking logic (comparing 'best' or selecting 'last') operates on the
         results in the optimizer's domain. However, the final selected result
@@ -79,14 +73,11 @@ class DefaultTrackerHandler(EventHandler):
             plan:                 The parent plan instance.
             what:                 Criterion for selecting results ('best' or 'last').
             constraint_tolerance: Optional threshold for filtering constraint violations.
-            sources:              Optional set of step UUIDs whose results should be tracked.
+            sources:              Optional set of steps whose results should be tracked.
         """
-        super().__init__(plan)
+        super().__init__(plan, sources)
         self._what = what
         self._constraint_tolerance = constraint_tolerance
-        self._sources = (
-            {source.id for source in sources} if sources is not None else None
-        )
         self._tracked_results: FunctionResults | None = None
         self["results"] = None
 
@@ -96,8 +87,8 @@ class DefaultTrackerHandler(EventHandler):
         This method processes events emitted by the parent plan. It specifically
         listens for
         [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events
-        originating from steps whose IDs are included in the `sources` set
-        configured during initialization.
+        originating from steps that are included in the `sources` set configured
+        during initialization.
 
         If a relevant event containing results is received, this method updates
         the tracked result (`self["results"]`) based on the `what` criterion
@@ -109,7 +100,7 @@ class DefaultTrackerHandler(EventHandler):
         if (
             event.event_type == EventType.FINISHED_EVALUATION
             and "results" in event.data
-            and (self._sources is None or event.source in self._sources)
+            and (self.source_ids is None or event.source in self.source_ids)
         ):
             results = event.data["results"]
             if self["results"] is None:

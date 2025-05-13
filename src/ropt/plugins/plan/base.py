@@ -286,17 +286,29 @@ class EventHandler(ABC):
     define their specific event processing logic.
     """
 
-    def __init__(self, plan: Plan) -> None:
+    def __init__(self, plan: Plan, sources: set[PlanStep] | None = None) -> None:
         """Initialize the EventHandler.
 
         Associates the event handler with its parent [`Plan`][ropt.plan.Plan],
         assigns a unique ID, and initializes an internal dictionary for storing
         state. The parent plan is accessible via the `plan` property.
 
+        The `sources` parameter acts as a filter, determining which plan steps
+        this event handler should listen to. It should be a set containing the
+        `PlanStep` instances whose event you want to receive. When an event is
+        received, this event handler checks if the step that emitted the event
+        (`event.source`) is present in the `sources` set. If `sources` is
+        `None`, events from all sources will be processed. The source steps are
+        accessible via the `sources` property.
+
         Args:
-            plan: The [`Plan`][ropt.plan.Plan] instance that owns this event handler.
+            plan:    The [`Plan`][ropt.plan.Plan] instance that owns this event handler.
+            sources: Optional set of steps whose events should be processed.
         """
         self.__stored_plan = plan
+        self._sources = (
+            {source.id for source in sources} if sources is not None else None
+        )
         self.__stored_values: dict[str, Any] = {}
         self.__id: uuid.UUID = uuid.uuid4()
 
@@ -314,9 +326,20 @@ class EventHandler(ABC):
         """Return the parent plan associated with this event handler.
 
         Returns:
-            The [`Plan`][ropt.plan.Plan] object that owns this event handler.
+            The plan object that owns this event handler.
         """
         return self.__stored_plan
+
+    @property
+    def source_ids(self) -> set[uuid.UUID] | None:
+        """Return the source IDs that are listened to.
+
+        If it returns `None` any event will be responded to.
+
+        Returns:
+            The source this event handler is interested in.
+        """
+        return self._sources
 
     @abstractmethod
     def handle_event(self, event: Event) -> None:

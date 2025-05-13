@@ -41,14 +41,8 @@ class DefaultStoreHandler(EventHandler):
         and appends the results contained within them to an internal tuple.
 
         The `sources` parameter acts as a filter, determining which plan steps
-        this event handler should listen to. It should be a set containing the
-        unique IDs (UUIDs) of the `PlanStep` instances whose results you want to
-        store. When a
-        [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] event
-        occurs, this event handler checks if the ID of the step that emitted the
-        event (`event.source`) is present in the `sources` set. If it is, the
-        handler stores the results; otherwise, it ignores the event. If
-        `sources` is `None`, events from all sources will be processed.
+        this event handler should listen to. If `sources` is `None`, events from
+        all sources will be processed.
 
         The results are converted from the optimizer domain to the user domain
         *before* being stored. The accumulated results are stored as a tuple and
@@ -57,12 +51,9 @@ class DefaultStoreHandler(EventHandler):
 
         Args:
             plan:       The parent plan instance.
-            sources:    Optional set of step UUIDs whose results should be stored.
+            sources:    Optional set of steps whose results should be stored.
         """
-        super().__init__(plan)
-        self._sources = (
-            {source.id for source in sources} if sources is not None else None
-        )
+        super().__init__(plan, sources)
         self["results"] = None
 
     def handle_event(self, event: Event) -> None:
@@ -71,8 +62,8 @@ class DefaultStoreHandler(EventHandler):
         This method processes events emitted by the parent plan. It specifically
         listens for
         [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events
-        originating from steps whose IDs are included in the `sources` set
-        configured during initialization.
+        originating from steps that are included in the `sources` set configured
+        during initialization.
 
         If a relevant event containing results is received, this method
         retrieves the results, optionally transforms them to the user domain and
@@ -82,7 +73,7 @@ class DefaultStoreHandler(EventHandler):
             event: The event object emitted by the plan.
         """
         if event.event_type == EventType.FINISHED_EVALUATION and (
-            self._sources is None or event.source in self._sources
+            self.source_ids is None or event.source in self.source_ids
         ):
             if (results := event.data.get("results", None)) is None:
                 return

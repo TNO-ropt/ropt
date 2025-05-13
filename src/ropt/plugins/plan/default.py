@@ -92,7 +92,9 @@ class DefaultEventHandlerPlugin(EventHandlerPlugin):
         _, _, name = name.lower().rpartition("/")
         obj = _EVENT_HANDLER_OBJECTS.get(name)
         if obj is not None:
-            return obj(plan, **kwargs)
+            sources = kwargs.pop("sources", None)
+            assert isinstance(sources, set | None)
+            return obj(plan, sources=sources, **kwargs)
 
         msg = f"Unknown event handler object type: {name}"
         raise TypeError(msg)
