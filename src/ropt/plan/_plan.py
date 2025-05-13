@@ -29,10 +29,7 @@ class Plan:
     are managed by event handlers, which are added using the
     [`add_event_handler`][ropt.plan.Plan.add_event_handler] method. The plan
     stores the step and event handler objects internally. Their respective
-    creation functions return unique IDs for identification. The
-    [`event_handler_exists`][ropt.plan.Plan.event_handler_exists] and
-    [`step_exists`][ropt.plan.Plan.step_exists] methods can be used to verify
-    whether an event handler or step with a given name is supported.
+    creation functions return unique IDs for identification.
 
     **Executing a Plan:**
 
@@ -181,48 +178,6 @@ class Plan:
         assert isinstance(step, PlanStep)
         self._steps[step.id] = step
         return step.id
-
-    def event_handler_exists(self, name: str) -> bool:
-        """Check if an event handler exists.
-
-        Determines whether an event handler with the specified name is supported
-        by the plugin system.
-
-        Args:
-            name: The name of the event handler to check.
-
-        Returns:
-            bool: `True` if the handler exists; otherwise, `False`.
-        """
-        return self._plugin_manager.is_supported("event_handler", method=name)
-
-    def step_exists(self, name: str) -> bool:
-        """Check if a step exists.
-
-        Determines whether a step with the specified name is supported by the
-        plugin system.
-
-        Args:
-            name: The name of the step to check.
-
-        Returns:
-            bool: `True` if the step exists; otherwise, `False`.
-        """
-        return self._plugin_manager.is_supported("plan_step", method=name)
-
-    def evaluator_exists(self, name: str) -> bool:
-        """Check if an evaluator exists.
-
-        Determines whether an evaluator with the specified name is supported by the
-        plugin system.
-
-        Args:
-            name: The name of the evaluator to check.
-
-        Returns:
-            bool: `True` if the evaluator exists; otherwise, `False`.
-        """
-        return self._plugin_manager.is_supported("plan_step", method=name)
 
     def run_step(self, step: uuid.UUID, **kwargs: Any) -> Any:  # noqa: ANN401
         """Run a step in the plan.

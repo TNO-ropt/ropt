@@ -191,7 +191,9 @@ class BasicOptimizer:
 
         # Optionally run a custom step defined in the keyword arguments:
         key, value = next(iter(self._kwargs.items()), (None, None))
-        if key is not None and plan.step_exists(key):
+        if key is not None and self._plugin_manager.is_supported(
+            "plan_step", method=key
+        ):
             if len(self._kwargs) > 1:
                 msg = "Only one custom step is allowed."
                 raise TypeError(msg)
