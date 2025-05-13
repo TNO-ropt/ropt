@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.13">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
     
     
       
@@ -1198,9 +1198,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep.run" class="md-nav__link">
+  <a href="#ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep.run_step_from_plan" class="md-nav__link">
     <span class="md-ellipsis">
-      run
+      run_step_from_plan
     </span>
   </a>
   
@@ -1222,9 +1222,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep.run" class="md-nav__link">
+  <a href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep.run_step_from_plan" class="md-nav__link">
     <span class="md-ellipsis">
-      run
+      run_step_from_plan
     </span>
   </a>
   
@@ -1550,9 +1550,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep.run" class="md-nav__link">
+  <a href="#ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep.run_step_from_plan" class="md-nav__link">
     <span class="md-ellipsis">
-      run
+      run_step_from_plan
     </span>
   </a>
   
@@ -1574,9 +1574,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep.run" class="md-nav__link">
+  <a href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep.run_step_from_plan" class="md-nav__link">
     <span class="md-ellipsis">
-      run
+      run_step_from_plan
     </span>
   </a>
   
@@ -1978,24 +1978,23 @@ input variable vector evaluated.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep.run" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
+<h3 id="ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep.run_step_from_plan" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run_step_from_plan</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run_step_from_plan</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">evaluator</span><span class="p">:</span> <span class="n">UUID</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizerExitCode</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizerExitCode</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Run the evaluator step to perform ensemble evaluations.</p>
-<p>This method executes the core logic of the evaluator step. It requires
-an optimizer configuration
+        <p>Run the ensemble evaluator step to perform ensemble evaluations.</p>
+<p>This method executes the core logic of the ensemble evaluator step. It
+requires an optimizer configuration
 (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>) and optionally accepts
 specific variable vectors to evaluate.</p>
 <p>If <code>variables</code> are not provided, the initial values specified in the
@@ -2032,22 +2031,6 @@ is treated as a separate vector for evaluation.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optimizer configuration.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>evaluator</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The evaluator to use for function evaluations.</p>
               </div>
             </td>
             <td>
@@ -2206,10 +2189,11 @@ they can be overridden by passing them directly to the <code>run</code> method.<
   or due to termination conditions or errors).</li>
 </ul>
 <p>This step also supports <strong>nested optimization</strong>. If a <code>nested_optimization</code>
-plan is provided to the <code>run</code> method, the optimizer will execute this nested
-plan for each function evaluation instead of calling the standard ensemble
-evaluator. The nested plan is expected to return a single
-<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+plan is provided to the <code>run</code> method, the optimizer will execute the
+<a class="autorefs autorefs-internal" title="            run" href="../plan/#ropt.plan.Plan.run"><code>run</code></a> method of the nested plan for each function
+evaluation instead of calling the standard evaluator. The
+<a class="autorefs autorefs-internal" title="            run" href="../plan/#ropt.plan.Plan.run"><code>run</code></a> method of the nested plan is expected to return
+a single <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
@@ -2238,18 +2222,17 @@ evaluator. The nested plan is expected to return a single
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plugins.plan.optimizer.DefaultOptimizerStep.run" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
+<h3 id="ropt.plugins.plan.optimizer.DefaultOptimizerStep.run_step_from_plan" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run_step_from_plan</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run_step_from_plan</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">evaluator</span><span class="p">:</span> <span class="n">UUID</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">nested_optimization</span><span class="p">:</span> <span class="n">Plan</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizerExitCode</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">nested_optimization</span><span class="p">:</span> <span class="n">Plan</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizerExitCode</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2304,22 +2287,6 @@ each function evaluation instead of the standard ensemble evaluator.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>evaluator</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The evaluator to use for function evaluations.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
                 <code>variables</code>
             </td>
             <td>
@@ -2327,7 +2294,7 @@ each function evaluation instead of the standard ensemble evaluator.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional initial variable vector(s) to start optimization from.</p>
+                <p>Optional initial variable vector(s) to start from.</p>
               </div>
             </td>
             <td>
@@ -2385,7 +2352,7 @@ each function evaluation instead of the standard ensemble evaluator.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An <a class="autorefs autorefs-internal" title="            OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode"><code>OptimizerExitCode</code></a> indicating the outcome of the optimization.</p>
+                <p>An exit code indicating the outcome of the optimization.</p>
               </div>
             </td>
           </tr>
@@ -2623,6 +2590,8 @@ this class is invoked by the plan, it simply delegates the call, along with
 all arguments, to the wrapped <code>evaluator</code> function.</p>
 <p>This is useful for integrating existing evaluation logic that is not already
 structured as an <code>Evaluator</code> subclass into a <code>ropt</code> plan.</p>
+<p>The <code>clients</code> parameter acts as a filter, determining which plan steps this
+evaluator should serve.If <code>clients</code> is <code>None</code>, all clients will be served.</p>
 
 
 

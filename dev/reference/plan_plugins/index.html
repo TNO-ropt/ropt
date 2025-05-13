@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.13">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
     
     
       
@@ -1107,6 +1107,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.PlanStep.run_step_from_plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      run_step_from_plan
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1135,6 +1144,15 @@
   <a href="#ropt.plugins.plan.base.EventHandler.plan" class="md-nav__link">
     <span class="md-ellipsis">
       plan
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.EventHandler.source_ids" class="md-nav__link">
+    <span class="md-ellipsis">
+      source_ids
     </span>
   </a>
   
@@ -1204,6 +1222,15 @@
   <a href="#ropt.plugins.plan.base.Evaluator.plan" class="md-nav__link">
     <span class="md-ellipsis">
       plan
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.Evaluator.client_ids" class="md-nav__link">
+    <span class="md-ellipsis">
+      client_ids
     </span>
   </a>
   
@@ -1762,6 +1789,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.PlanStep.run_step_from_plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      run_step_from_plan
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1790,6 +1826,15 @@
   <a href="#ropt.plugins.plan.base.EventHandler.plan" class="md-nav__link">
     <span class="md-ellipsis">
       plan
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.EventHandler.source_ids" class="md-nav__link">
+    <span class="md-ellipsis">
+      source_ids
     </span>
   </a>
   
@@ -1859,6 +1904,15 @@
   <a href="#ropt.plugins.plan.base.Evaluator.plan" class="md-nav__link">
     <span class="md-ellipsis">
       plan
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.Evaluator.client_ids" class="md-nav__link">
+    <span class="md-ellipsis">
+      client_ids
     </span>
   </a>
   
@@ -1960,12 +2014,7 @@ following abstract base classes:</p>
 <ul>
 <li><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a>: The abstract base class
   that all concrete plan step implementations must inherit from. It defines
-  the <a class="autorefs autorefs-internal" title="            run
-
-
-  
-      abstractmethod
-  " href="#ropt.plugins.plan.base.PlanStep.run"><code>run</code></a> method where the step's
+  the <a class="autorefs autorefs-internal" title="            run" href="#ropt.plugins.plan.base.PlanStep.run"><code>run</code></a> method where the step's
   logic resides.</li>
 <li><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.EventHandler" href="#ropt.plugins.plan.base.EventHandler"><code>EventHandler</code></a>: The abstract base
   class for all event handlers. It defines the
@@ -2605,34 +2654,23 @@ functions, must inherit from this base class.</p>
 <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStepPlugin" href="#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a> factories, which
 are managed by the <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>. Once
 instantiated and added to a <code>Plan</code>, their
-<a class="autorefs autorefs-internal" title="            run
+<a class="autorefs autorefs-internal" title="            run_step_from_plan
 
 
   
       abstractmethod
-  " href="#ropt.plugins.plan.base.PlanStep.run"><code>run</code></a> method is called by the plan
-during execution.</p>
-<p>Each <code>PlanStep</code> instance has a unique <a class="autorefs autorefs-internal" title="            id
-
-
-  
-      property
-  " href="#ropt.plugins.plan.base.PlanStep.id"><code>id</code></a>
-and maintains a reference to its parent
-<a class="autorefs autorefs-internal" title="            plan
-
-
-  
-      property
-  " href="#ropt.plugins.plan.base.PlanStep.plan"><code>plan</code></a>.</p>
+  " href="#ropt.plugins.plan.base.PlanStep.run_step_from_plan"><code>run_step_from_plan</code></a>
+method is called by the plan during execution. This is generally done
+indirectly by calling the <a class="autorefs autorefs-internal" title="            run" href="#ropt.plugins.plan.base.PlanStep.run"><code>run</code></a>
+method on the step object.</p>
 <p>Subclasses must implement the abstract
-<a class="autorefs autorefs-internal" title="            run
+<a class="autorefs autorefs-internal" title="            run_step_from_plan
 
 
   
       abstractmethod
-  " href="#ropt.plugins.plan.base.PlanStep.run"><code>run</code></a> method to define the step's
-specific behavior.</p>
+  " href="#ropt.plugins.plan.base.PlanStep.run_step_from_plan"><code>run_step_from_plan</code></a>
+method to define the step's specific behavior.</p>
 
 
 
@@ -2807,12 +2845,117 @@ a unique ID. The parent plan is accessible via the <code>plan</code> property.</
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
 
 
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Execute this plan step.</p>
+<p>This method initiates the execution of the current plan step. It
+delegates the actual execution to the parent
+<a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> object's
+<a class="autorefs autorefs-internal" title="            run_step" href="../plan/#ropt.plan.Plan.run_step"><code>run_step</code></a> method, passing itself
+(the step instance) along with any provided arguments.</p>
+<p>The parent <code>Plan</code> then calls the concrete
+<a class="autorefs autorefs-internal" title="            run_step_from_plan
+
+
+  
+      abstractmethod
+  " href="#ropt.plugins.plan.base.PlanStep.run_step_from_plan"><code>run_step_from_plan</code></a>
+method implemented by the subclass of this <code>PlanStep</code>. This allows the
+plan to do some bookkeeping, for instance to check if the plan was
+aborted.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>*args</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Positional arguments to be passed to the step's specific <code>run_step</code> method.</p>
+              </div>
+            </td>
+            <td>
+                  <code>()</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>**kwargs</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Keyword arguments to be passed to the step's specific <code>run_step</code> method.</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The result returned by the step's specific <code>run_step_from_plan</code> method.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.plan.base.PlanStep.run_step_from_plan" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run_step_from_plan</span>
+
+
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run_step_from_plan</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2949,19 +3092,6 @@ called by the plan whenever an <a class="autorefs autorefs-internal" title="    
 <p>Handlers can also store state using dictionary-like access (<code>[]</code>), allowing
 them to accumulate information or make data available to subsequent steps
 or event handlers within the plan.</p>
-<p>Each <code>EventHandler</code> instance has a unique
-<a class="autorefs autorefs-internal" title="            id
-
-
-  
-      property
-  " href="#ropt.plugins.plan.base.EventHandler.id"><code>id</code></a> and maintains a reference to
-its parent <a class="autorefs autorefs-internal" title="            plan
-
-
-  
-      property
-  " href="#ropt.plugins.plan.base.EventHandler.plan"><code>plan</code></a>.</p>
 <p>Subclasses must implement the abstract
 <a class="autorefs autorefs-internal" title="            handle_event
 
@@ -3071,7 +3201,55 @@ define their specific event processing logic.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> object that owns this event handler.</p>
+                <p>The plan object that owns this event handler.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.plugins.plan.base.EventHandler.source_ids" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">source_ids</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">source_ids</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">UUID</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the source IDs that are listened to.</p>
+<p>If it returns <code>None</code> any event will be responded to.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The source IDs this event handler is interested in.</p>
               </div>
             </td>
           </tr>
@@ -3092,7 +3270,9 @@ define their specific event processing logic.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span><span class="nf">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span> <span class="n">sources</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">PlanStep</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3101,6 +3281,13 @@ define their specific event processing logic.</p>
 <p>Associates the event handler with its parent <a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a>,
 assigns a unique ID, and initializes an internal dictionary for storing
 state. The parent plan is accessible via the <code>plan</code> property.</p>
+<p>The <code>sources</code> parameter acts as a filter, determining which plan steps
+this event handler should listen to. It should be a set containing the
+<code>PlanStep</code> instances whose event you want to receive. When an event is
+received, this event handler checks if the step that emitted the event
+(<code>event.source</code>) is present in the <code>sources</code> set. If <code>sources</code> is
+<code>None</code>, events from all sources will be processed. The IDs of the source
+steps are accessible via the <code>source_ids</code> property.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3128,6 +3315,22 @@ state. The parent plan is accessible via the <code>plan</code> property.</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sources</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="#ropt.plugins.plan.base.PlanStep">PlanStep</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional set of steps whose events should be processed.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>
@@ -3195,13 +3398,7 @@ logging information, or updating internal state.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <a class="autorefs autorefs-internal" title="            ropt.plan.Event
-
-
-  
-      dataclass
-  " href="../plan/#ropt.plan.Event"><code>Event</code></a> object containing details
-   about what occurred in the plan.</p>
+                <p>The event object containing details about what occurred in the plan.</p>
               </div>
             </td>
             <td>
@@ -3570,6 +3767,54 @@ for performing the actual evaluation of variables using an
 
 </div>
 
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.plugins.plan.base.Evaluator.client_ids" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">client_ids</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">client_ids</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">UUID</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the client IDs that are served.</p>
+<p>If it returns <code>None</code> any client will be served.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The IDs of the clients this evaluator will handle.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
 
 
 <div class="doc doc-object doc-function">
@@ -3580,7 +3825,9 @@ for performing the actual evaluation of variables using an
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span><span class="nf">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__init__</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">plan</span><span class="p">:</span> <span class="n">Plan</span><span class="p">,</span> <span class="n">clients</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">PlanStep</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3588,6 +3835,13 @@ for performing the actual evaluation of variables using an
         <p>Initialize the Evaluator.</p>
 <p>Associates the evaluator with its parent <a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a>, and
 assigns a unique ID. The parent plan is accessible via the <code>plan</code>
+property.</p>
+<p>The <code>clients</code> parameter acts as a filter, determining which plan steps
+this evaluator should serve. It should be a set containing the
+<code>PlanStep</code> instances that should be handled. When an evaluation is
+requested, this evaluator checks if the step that emitted the event is
+present in the <code>client</code> set. If <code>clients</code> is <code>None</code>, all clients will be
+served. The IDs of the client steps are accessible via the <code>client_ids</code>
 property.</p>
 
 
@@ -3616,6 +3870,22 @@ property.</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>clients</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="#ropt.plugins.plan.base.PlanStep">PlanStep</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The steps that use this evaluator.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
             </td>
           </tr>
       </tbody>

@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.13">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
     
     
       
@@ -878,27 +878,18 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.add_function" class="md-nav__link">
+  <a href="#ropt.plan.Plan.set_run_function" class="md-nav__link">
     <span class="md-ellipsis">
-      add_function
+      set_run_function
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.has_function" class="md-nav__link">
+  <a href="#ropt.plan.Plan.run" class="md-nav__link">
     <span class="md-ellipsis">
-      has_function
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.run_function" class="md-nav__link">
-    <span class="md-ellipsis">
-      run_function
+      run
     </span>
   </a>
   
@@ -926,24 +917,6 @@
   <a href="#ropt.plan.Plan.emit_event" class="md-nav__link">
     <span class="md-ellipsis">
       emit_event
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.get" class="md-nav__link">
-    <span class="md-ellipsis">
-      get
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.set" class="md-nav__link">
-    <span class="md-ellipsis">
-      set
     </span>
   </a>
   
@@ -1652,27 +1625,18 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.add_function" class="md-nav__link">
+  <a href="#ropt.plan.Plan.set_run_function" class="md-nav__link">
     <span class="md-ellipsis">
-      add_function
+      set_run_function
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.has_function" class="md-nav__link">
+  <a href="#ropt.plan.Plan.run" class="md-nav__link">
     <span class="md-ellipsis">
-      has_function
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.run_function" class="md-nav__link">
-    <span class="md-ellipsis">
-      run_function
+      run
     </span>
   </a>
   
@@ -1700,24 +1664,6 @@
   <a href="#ropt.plan.Plan.emit_event" class="md-nav__link">
     <span class="md-ellipsis">
       emit_event
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.get" class="md-nav__link">
-    <span class="md-ellipsis">
-      get
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.set" class="md-nav__link">
-    <span class="md-ellipsis">
-      set
     </span>
   </a>
   
@@ -1848,26 +1794,23 @@ instantiated via the <a class="autorefs autorefs-internal" title="            Pl
     are responsible for performing function evaluations (e.g., objective
     functions, constraints). Evaluators are added using the
     <a class="autorefs autorefs-internal" title="            add_evaluator" href="#ropt.plan.Plan.add_evaluator"><code>add_evaluator</code></a> method and can be
-    retrieved by steps using
-    <a class="autorefs autorefs-internal" title="            get_evaluator" href="#ropt.plan.Plan.get_evaluator"><code>get_evaluator</code></a>.</li>
+    passed to steps that need them.</li>
 </ol>
-<p>The plan stores these components internally, and the methods for adding them
-return unique IDs (<code>uuid.UUID</code>) for identification and retrieval.</p>
 <p><strong>Executing a Plan:</strong></p>
 <p>Once a plan is assembled, it can be executed in several ways. For
-fine-grained control, the <a class="autorefs autorefs-internal" title="            run_step" href="#ropt.plan.Plan.run_step"><code>run_step</code></a> method can
-be invoked repeatedly, executing each step individually. Steps may require
-access to <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator"><code>Evaluator</code></a> instances, which
-they can retrieve using <a class="autorefs autorefs-internal" title="            get_evaluator" href="#ropt.plan.Plan.get_evaluator"><code>get_evaluator</code></a>.
-This approach allows for the integration of complex logic and custom
-functions, leveraging the full capabilities of Python. Alternatively, for
-more structured workflows, a Python function encapsulating a sequence of
-steps can be defined. This function is added to the plan using the
-<a class="autorefs autorefs-internal" title="            add_function" href="#ropt.plan.Plan.add_function"><code>add_function</code></a> method. The entire workflow
-defined by this function can then be executed with a single call to
-<a class="autorefs autorefs-internal" title="            run_function" href="#ropt.plan.Plan.run_function"><code>run_function</code></a>, with optional arguments to
-customize its behavior. The <a class="autorefs autorefs-internal" title="            has_function" href="#ropt.plan.Plan.has_function"><code>has_function</code></a>
-method can be used to check if a function has been added to the plan.</p>
+fine-grained control, the <a class="autorefs autorefs-internal" title="            run" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep.run"><code>run</code></a>
+method can be invoked for each step individually. Steps may require access
+to <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator"><code>Evaluator</code></a> instances, which need to
+be passed to them explicitly. This approach allows for the integration of
+complex logic and custom functions, leveraging the full capabilities of
+Python. Alternatively, for more structured workflows, a Python function
+encapsulating a sequence of steps can be defined. This function is added to
+the plan using the <a class="autorefs autorefs-internal" title="            set_run_function" href="#ropt.plan.Plan.set_run_function"><code>set_run_function</code></a>
+method. This function
+ accepts the plan object as its first argument with additional
+optional (keyword) arguments to customize its behavior. The entire workflow
+defined by this function can then be executed with a single call to the
+<a class="autorefs autorefs-internal" title="            run" href="#ropt.plan.Plan.run"><code>run</code></a> the method of the plan.</p>
 <p><strong>PluginManager:</strong></p>
 <p>A <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> object can be provided that
 is used by the plan object to find and instantiate step, event handler, and
@@ -1875,28 +1818,23 @@ evaluator objects. This manager can also be used by these components to
 implement further plugin-based functionality.</p>
 <p><strong>Events:</strong></p>
 <p>Steps can communicate events using the
-<a class="autorefs autorefs-internal" title="            emit_event" href="#ropt.plan.Plan.emit_event"><code>emit_event</code></a> method. Event handlers can
-respond to these events, enabling actions such as processing optimization
-results.</p>
+<a class="autorefs autorefs-internal" title="            emit_event" href="#ropt.plan.Plan.emit_event"><code>emit_event</code></a> method. Event handlers can respond
+to these events, enabling actions such as processing optimization results.
+To connect the event handlers to steps, they generally accept a set of steps
+via their <code>sources</code> argument. The steps must be part of the same plan, or a
+child plan (if existant).</p>
 <p><strong>Evaluators:</strong></p>
 <p>Evaluators (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator"><code>Evaluator</code></a>) are key
 components responsible for performing function evaluations, such as
 computing objective functions or constraint values. They are added to the
-plan using the <a class="autorefs autorefs-internal" title="            add_evaluator" href="#ropt.plan.Plan.add_evaluator"><code>add_evaluator</code></a> method,
-which returns a unique ID. Steps within the plan can then retrieve specific
-evaluators by their ID using the
-<a class="autorefs autorefs-internal" title="            get_evaluator" href="#ropt.plan.Plan.get_evaluator"><code>get_evaluator</code></a> method to perform
-necessary computations.</p>
+plan using the <a class="autorefs autorefs-internal" title="            add_evaluator" href="#ropt.plan.Plan.add_evaluator"><code>add_evaluator</code></a> method and
+passed to any steps that need them.</p>
 <p><strong>Nested Plans:</strong></p>
 <p>Multiple plans can be defined. A step within one plan can trigger the
 execution of another plan, enabling nested workflows. In nested plans, the
 <a class="autorefs autorefs-internal" title="            set_parent" href="#ropt.plan.Plan.set_parent"><code>set_parent</code></a> method establishes a parent-child
 relationship. This allows events to propagate up the hierarchy to the parent
-plan. This parent-child relationship also affects how
-<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator"><code>Evaluator</code></a> instances are accessed: the
-<a class="autorefs autorefs-internal" title="            get_evaluator" href="#ropt.plan.Plan.get_evaluator"><code>get_evaluator</code></a> method automatically
-searches up the parent chain if an evaluator is not found locally in the
-child plan, simplifying evaluator management in complex, nested workflows.</p>
+plan.</p>
 <p><strong>Aborting a Plan:</strong></p>
 <p>A plan's execution can be terminated, either programmatically from within a
 step or event handler, or externally by directly calling the
@@ -1912,8 +1850,7 @@ has been aborted.</p>
 <p>Individual event handlers may store values that they accumulate or calculate
 from the events that they handle. Code outside of the event handlers, such
 as the optimization workflow code that runs the steps, can set and retrieve
-these values using the <a class="autorefs autorefs-internal" title="            get" href="#ropt.plan.Plan.get"><code>get</code></a> and
-<a class="autorefs autorefs-internal" title="            set" href="#ropt.plan.Plan.set"><code>set</code></a> methods.</p>
+these values using the <code>[]</code> operator.</p>
 
 
 
@@ -2115,7 +2052,7 @@ event propagation up the plan hierarchy.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_event_handler</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_event_handler</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EventHandler</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2185,11 +2122,11 @@ arguments are passed to the handler's constructor.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.EventHandler" href="../plan_plugins/#ropt.plugins.plan.base.EventHandler">EventHandler</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The unique ID of the newly added event handler.</p>
+                <p>The newly added event handler.</p>
               </div>
             </td>
           </tr>
@@ -2209,7 +2146,7 @@ arguments are passed to the handler's constructor.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_step</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_step</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlanStep</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2279,11 +2216,11 @@ the step's constructor.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>uuid.UUID: The unique ID of the newly added step.</p>
+                <p>The newly added step.</p>
               </div>
             </td>
           </tr>
@@ -2303,7 +2240,7 @@ the step's constructor.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_evaluator</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_evaluator</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Evaluator</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2372,7 +2309,7 @@ Any additional keyword arguments are passed to the evaluators's constructor.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator">Evaluator</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2396,7 +2333,7 @@ Any additional keyword arguments are passed to the evaluators's constructor.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run_step</span><span class="p">(</span><span class="n">step</span><span class="p">:</span> <span class="n">UUID</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run_step</span><span class="p">(</span><span class="n">step</span><span class="p">:</span> <span class="n">PlanStep</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2426,11 +2363,11 @@ method is returned by this method.</p>
                 <code>step</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The unique ID of the step to run.</p>
+                <p>Tthe step to run.</p>
               </div>
             </td>
             <td>
@@ -2525,20 +2462,21 @@ method is returned by this method.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_evaluator</span><span class="p">(</span><span class="n">evaluator</span><span class="p">:</span> <span class="n">UUID</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_evaluator</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="n">PlanStep</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Evaluator</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Retrieve an evaluator object from the plan.</p>
-<p>Fetches the <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator"><code>Evaluator</code></a> instance
-associated with the given unique ID. This method is used to access
-evaluators that have been previously added to the plan via the
-<a class="autorefs autorefs-internal" title="            add_evaluator" href="#ropt.plan.Plan.add_evaluator"><code>add_evaluator</code></a> method.</p>
-<p>If the requested evaluator is not found, and the plan has a parent plan,
-the request is forwarded to the parent plan, by calling its
-<code>get_evaluator</code> method. This allows child plans to make direct use of
-evaluators that were created by a parent plan.</p>
+        <p>Retrieve the appropriate evaluator for a given client step.</p>
+<p>This method searches for an <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator"><code>Evaluator</code></a>
+that is configured to serve the specified <code>client</code>
+(<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a>). The search starts in the
+current plan and, if no suitable evaluator is found and a parent plan
+exists, continues recursively up the plan hierarchy.</p>
+<p>An evaluator is considered suitable if its <code>client_ids</code> attribute is <code>None</code>
+(indicating it serves all clients) or if the <code>id</code> of the <code>client</code> step
+is present in the <code>client_ids</code> set of the evaluator.</p>
+<p>The method expects to find exactly one suitable evaluator.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2554,14 +2492,14 @@ evaluators that were created by a parent plan.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>evaluator</code>
+                <code>client</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The unique ID of the evaluator to retrieve.</p>
+                <p>The step for which an evaluator is being requested.</p>
               </div>
             </td>
             <td>
@@ -2583,11 +2521,11 @@ evaluators that were created by a parent plan.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator">Evaluator</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The evaluator object corresponding to the provided ID.</p>
+                <p>The single evaluator instance configured to serve the client.</p>
               </div>
             </td>
           </tr>
@@ -2610,7 +2548,8 @@ evaluators that were created by a parent plan.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the provided <code>evaluator</code> ID is not valid.</p>
+                <p>If no suitable evaluator is found, or if multiple
+            suitable evaluators are found.</p>
               </div>
             </td>
           </tr>
@@ -2625,12 +2564,12 @@ evaluators that were created by a parent plan.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plan.Plan.add_function" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">add_function</span>
+<h3 id="ropt.plan.Plan.set_run_function" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">set_run_function</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_function</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_run_function</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2638,7 +2577,9 @@ evaluators that were created by a parent plan.</p>
         <p>Add a function to the plan.</p>
 <p>Registers a user-defined function with the plan. This function can
 encapsulate a sequence of steps or custom logic. It can be executed
-later using the <a class="autorefs autorefs-internal" title="            run_function" href="#ropt.plan.Plan.run_function"><code>run_function</code></a> method.</p>
+later using the <a class="autorefs autorefs-internal" title="            run" href="#ropt.plan.Plan.run"><code>run</code></a> method. The function should
+accept a plan as its first argument plus an arbitrary set of additional
+arguments.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2679,64 +2620,21 @@ later using the <a class="autorefs autorefs-internal" title="            run_fun
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plan.Plan.has_function" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">has_function</span>
+<h3 id="ropt.plan.Plan.run" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">has_function</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Check if a function has been added to the plan.</p>
-<p>Determines whether a user-defined function has been registered with the
-plan.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>bool</code></td>            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p><code>True</code> if a function has been added; otherwise, <code>False</code>.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plan.Plan.run_function" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run_function</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run_function</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Run a function in the plan.</p>
-<p>Executes the user-defined function that has been registered with the
-plan via the <a class="autorefs autorefs-internal" title="            add_function" href="#ropt.plan.Plan.add_function"><code>add_function</code></a> method.</p>
+        <p>Run the plan by executing the run-function.</p>
+<p>Executes the function that has been registered with the plan via the
+<a class="autorefs autorefs-internal" title="            set_run_function" href="#ropt.plan.Plan.set_run_function"><code>add_function</code></a> method. The plan
+object will passed as the first argument, and in addition the <code>args</code> and
+<code>kwargs</code> argument will be passed.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2975,230 +2873,6 @@ plan. This enables event propagation up the plan hierarchy.</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plan.Plan.get" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get</span><span class="p">(</span><span class="n">id_</span><span class="p">:</span> <span class="n">UUID</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Retrieve a value stored in an event handler.</p>
-<p>Retrieves a value stored within a specific event handler. This method
-uses the <code>[]</code> operator to access the value associated with the given
-key.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>id_</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The unique identifier of the event handler.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>key</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The key associated with the value to retrieve.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>Any</code></td>            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The value associated with the key in the specified handler.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#AttributeError">AttributeError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the provided <code>id_</code> is not a valid event handler ID.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plan.Plan.set" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">set</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">set</span><span class="p">(</span><span class="nf">id_</span><span class="p">:</span> <span class="n">UUID</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Set a value in an event handler.</p>
-<p>Stores a value within a specific event handler. This method uses the
-<code>[]</code> operator to assign the value to the specified key.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>id_</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The unique identifier of the event handler.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>key</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The key to associate with the value.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>value</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The value to store.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#AttributeError">AttributeError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the provided <code>id_</code> is not a valid event handler ID.</p>
-              </div>
             </td>
           </tr>
       </tbody>
