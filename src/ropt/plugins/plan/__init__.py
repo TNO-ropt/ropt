@@ -12,6 +12,8 @@ execution (handlers).
     such as running an optimizer or performing evaluations.
 *   **Plan Handlers:** Process events emitted by the plan or its steps, enabling
     tasks like result tracking, data storage, or logging.
+*   **Evaluators:** Perform the actual function evaluations (e.g., objective
+    functions, constraints) required by the optimization process.
 
 The implementation of these core concepts relies on classes derived from the
 following abstract base classes:
@@ -25,6 +27,10 @@ following abstract base classes:
       base for plugins that *create* event handlers. Similar to step plugins,
       these are used by the `PluginManager` to instantiate `EventHandler`
       objects.
+    * [`EvaluatorPlugin`][ropt.plugins.plan.base.EvaluatorPlugin]: The base for
+      plugins that *create* evaluators. These are used by the
+      `PluginManager` to instantiate `Evaluator` objects, which are
+      responsible for function computations.
 
 2.  **Component Base Classes:**
     * [`PlanStep`][ropt.plugins.plan.base.PlanStep]: The abstract base class
@@ -36,6 +42,10 @@ following abstract base classes:
       [`handle_event`][ropt.plugins.plan.base.EventHandler.handle_event] method
       for processing events emitted during plan execution and allows storing
       state using dictionary-like access.
+    * [`Evaluator`][ropt.plugins.plan.base.Evaluator]: The abstract base class
+      for all evaluators. It defines the
+      [`eval`][ropt.plugins.plan.base.Evaluator.eval] method responsible for
+      performing function computations.
 
 By inheriting from these classes, developers can create custom steps and
 handlers that integrate seamlessly into the `ropt` optimization plan execution
@@ -60,6 +70,11 @@ framework ([`Plan`][ropt.plan.Plan]).
         ([`DefaultTrackerHandler`][ropt.plugins.plan._tracker.DefaultTrackerHandler]).
     *   `store`: Accumulates all results from specified sources
         ([`DefaultStoreHandler`][ropt.plugins.plan._store.DefaultStoreHandler]).
+*   **Evaluators** (via
+    [`DefaultEvaluatorPlugin`][ropt.plugins.plan.default.DefaultEvaluatorPlugin]):
+    *   `forwarding_evaluator`: Forwards calculations to a given evaluation
+        function
+        ([`DefaultForwardingEvaluator`][ropt.plugins.plan._evaluator.DefaultForwardingEvaluator]).
 
 These built-in components allow for the construction of standard optimization
 workflows out-of-the-box, while the plugin architecture enables customization
