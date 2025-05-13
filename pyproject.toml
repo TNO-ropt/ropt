@@ -21,7 +21,7 @@ dynamic = ["version"]
 dependencies = [
     "numpy",
     "pydantic",
-    "scipy"
+    "scipy>=1.15"
 ]
 
 [project.urls]

@@ -10,4 +10,4 @@
 |[TNC](https://docs.scipy.org/doc/scipy/reference/optimize.minimize-tnc.html)|disp, maxfun, eps, scale, offset, maxCGit, eta, stepmx, accuracy, minfev, ftol, xtol, gtol, rescale, finite_diff_rel_step|
 |[COBYLA](https://docs.scipy.org/doc/scipy/reference/optimize.minimize-cobyla.html)|disp, maxiter, rhobeg, tol, catol|
 |[SLSQP](https://docs.scipy.org/doc/scipy/reference/optimize.minimize-slsqp.html)|disp, maxiter, ftol, eps, finite_diff_rel_step|
-|[differential_evolution](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.differential_evolution.html)|disp, maxiter, strategy, popsize, tol, mutation, recombination, seed, polish, init, atol, updating|
+|[differential_evolution](https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.differential_evolution.html)|disp, maxiter, strategy, popsize, tol, mutation, recombination, rng, polish, init, atol, updating|

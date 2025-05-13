@@ -36,7 +36,7 @@ def enopt_config_fixture() -> dict[str, Any]:
         },
         "optimizer": {
             "tolerance": 1e-4,
-            "max_iterations": 10,
+            "max_iterations": 25,
         },
         "objectives": {
             "weights": [0.75, 0.25],

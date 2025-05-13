@@ -494,9 +494,11 @@ class SciPyOptimizer(Optimizer):
         return new_function, new_gradient
 
     def _parse_options(self) -> dict[str, Any]:
-        if not isinstance(self._config.optimizer.options, dict):
-            return {}
-        options = copy.deepcopy(self._config.optimizer.options)
+        options = (
+            copy.deepcopy(self._config.optimizer.options)
+            if isinstance(self._config.optimizer.options, dict)
+            else {}
+        )
         # The maximum number of iterations is passed as an option to ropt.
         # Setting maxiter directly as an entry in the options dict will also
         # work, but iterations will override it.
@@ -701,7 +703,7 @@ _OPTIONS_SCHEMA: dict[str, Any] = {
                 "tol": float,
                 "mutation": float | tuple[float, float],
                 "recombination": float,
-                "seed": int,
+                "rng": int,
                 "polish": bool,
                 "init": Literal["latinhypercube", "sobol", "haltonrandom"],
                 "atol": float,

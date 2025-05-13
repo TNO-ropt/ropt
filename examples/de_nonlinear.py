@@ -23,9 +23,9 @@ CONFIG: dict[str, Any] = {
     },
     "optimizer": {
         "method": "differential_evolution",
-        "options": {"seed": 123},
-        "max_functions": 10,
-        "parallel": True,
+        "options": {"rng": 4},
+        "max_functions": 5,
+        "parallel": False,
     },
     "nonlinear_constraints": {"lower_bounds": [-np.inf], "upper_bounds": [10.0]},
 }
