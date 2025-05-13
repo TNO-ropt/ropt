@@ -12,12 +12,10 @@ from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.optimization import EnsembleOptimizer
 from ropt.plan import Event, Plan
-from ropt.plugins.plan.base import PlanStep
+from ropt.plugins.plan.base import Evaluator, PlanStep
 from ropt.results import FunctionResults
 
 if TYPE_CHECKING:
-    from uuid import UUID
-
     from numpy.typing import ArrayLike
 
     from ropt.config.enopt import EnOptConfig
@@ -57,10 +55,11 @@ class DefaultOptimizerStep(PlanStep):
       or due to termination conditions or errors).
 
     This step also supports **nested optimization**. If a `nested_optimization`
-    plan is provided to the `run` method, the optimizer will execute this nested
-    plan for each function evaluation instead of calling the standard ensemble
-    evaluator. The nested plan is expected to return a single
-    [`FunctionResults`][ropt.results.FunctionResults] object.
+    plan is provided to the `run` method, the optimizer will execute the
+    [`run`][ropt.plan.Plan.run] method of the nested plan for each function
+    evaluation instead of calling the standard ensemble evaluator. The
+    [`run`][ropt.plan.Plan.run] method of the nested plan is expected to return
+    a single [`FunctionResults`][ropt.results.FunctionResults] object.
     """
 
     def __init__(
@@ -74,10 +73,10 @@ class DefaultOptimizerStep(PlanStep):
         """
         super().__init__(plan)
 
-    def run(
+    def run_step_from_plan(
         self,
         config: EnOptConfig,
-        evaluator: UUID,
+        evaluator: Evaluator,
         variables: ArrayLike | None = None,
         nested_optimization: Plan | None = None,
         metadata: dict[str, Any] | None = None,
@@ -104,12 +103,12 @@ class DefaultOptimizerStep(PlanStep):
         Args:
             config:              Optimizer configuration.
             evaluator:           The evaluator to use for function evaluations.
-            variables:           Optional initial variable vector(s) to start optimization from.
+            variables:           Optional initial variable vector(s) to start from.
             nested_optimization: Optional nested plan.
             metadata:            Optional dictionary to attach to emitted `Results`.
 
         Returns:
-            An [`OptimizerExitCode`][ropt.enums.OptimizerExitCode] indicating the outcome of the optimization.
+            An exit code indicating the outcome of the optimization.
         """
         self._config = config
         self._evaluator = evaluator
@@ -135,9 +134,7 @@ class DefaultOptimizerStep(PlanStep):
                 variables = self._config.transforms.variables.to_optimizer(variables)
 
         ensemble_evaluator = EnsembleEvaluator(
-            self._config,
-            self.plan.get_evaluator(self._evaluator).eval,
-            self.plan.plugin_manager,
+            self._config, evaluator.eval, self.plan.plugin_manager
         )
 
         ensemble_optimizer = EnsembleOptimizer(
@@ -207,7 +204,7 @@ class DefaultOptimizerStep(PlanStep):
         if self._nested_optimization is None:
             return None, False
         self._nested_optimization.set_parent(self.plan)
-        results = self._nested_optimization.run_function(variables)
+        results = self._nested_optimization.run(variables)
         if self._nested_optimization.aborted:
             self.plan.abort()
         if not isinstance(results, FunctionResults):

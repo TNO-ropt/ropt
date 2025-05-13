@@ -4,11 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Callable
 
-from ropt.plugins.plan.base import EventHandler
+from ropt.plugins.plan.base import EventHandler, PlanStep
 
 if TYPE_CHECKING:
-    import uuid
-
     from ropt.enums import EventType
     from ropt.plan import Event, Plan
 
@@ -28,7 +26,7 @@ class DefaultObserverHandler(EventHandler):
         *,
         event_types: set[EventType],
         callback: Callable[[Event], None],
-        sources: set[uuid.UUID] | None = None,
+        sources: set[PlanStep] | None = None,
     ) -> None:
         """Initialize a default event handler.
 
@@ -52,7 +50,9 @@ class DefaultObserverHandler(EventHandler):
             callback:    The callable to call.
         """
         super().__init__(plan)
-        self._sources = sources
+        self._sources = (
+            {source.id for source in sources} if sources is not None else None
+        )
         self._event_types = event_types
         self._callback = callback
 

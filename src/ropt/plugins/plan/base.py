@@ -176,16 +176,14 @@ class PlanStep(ABC):
     [`PlanStepPlugin`][ropt.plugins.plan.base.PlanStepPlugin] factories, which
     are managed by the [`PluginManager`][ropt.plugins.PluginManager]. Once
     instantiated and added to a `Plan`, their
-    [`run`][ropt.plugins.plan.base.PlanStep.run] method is called by the plan
-    during execution.
-
-    Each `PlanStep` instance has a unique [`id`][ropt.plugins.plan.base.PlanStep.id]
-    and maintains a reference to its parent
-    [`plan`][ropt.plugins.plan.base.PlanStep.plan].
+    [`run_step_from_plan`][ropt.plugins.plan.base.PlanStep.run_step_from_plan]
+    method is called by the plan during execution. This is generally done
+    indirectly by calling the [`run`][ropt.plugins.plan.base.PlanStep.run]
+    method on the step object.
 
     Subclasses must implement the abstract
-    [`run`][ropt.plugins.plan.base.PlanStep.run] method to define the step's
-    specific behavior.
+    [`run_step_from_plan`][ropt.plugins.plan.base.PlanStep.run_step_from_plan]
+    method to define the step's specific behavior.
     """
 
     def __init__(self, plan: Plan) -> None:
@@ -218,8 +216,32 @@ class PlanStep(ABC):
         """
         return self.__stored_plan
 
-    @abstractmethod
     def run(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
+        """Execute this plan step.
+
+        This method initiates the execution of the current plan step. It
+        delegates the actual execution to the parent
+        [`Plan`][ropt.plan.Plan] object's
+        [`run_step`][ropt.plan.Plan.run_step] method, passing itself
+        (the step instance) along with any provided arguments.
+
+        The parent `Plan` then calls the concrete
+        [`run_step_from_plan`][ropt.plugins.plan.base.PlanStep.run_step_from_plan]
+        method implemented by the subclass of this `PlanStep`. This allows the
+        plan to do some bookkeeping, for instance to check if the plan was
+        aborted.
+
+        Args:
+            *args:    Positional arguments to be passed to the step's specific `run_step` method.
+            **kwargs: Keyword arguments to be passed to the step's specific `run_step` method.
+
+        Returns:
+            The result returned by the step's specific `run_step_from_plan` method.
+        """
+        return self.__stored_plan.run_step(self, *args, **kwargs)
+
+    @abstractmethod
+    def run_step_from_plan(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
         """Execute the logic defined by this plan step.
 
         This abstract method must be implemented by concrete `PlanStep`
@@ -258,10 +280,6 @@ class EventHandler(ABC):
     Handlers can also store state using dictionary-like access (`[]`), allowing
     them to accumulate information or make data available to subsequent steps
     or event handlers within the plan.
-
-    Each `EventHandler` instance has a unique
-    [`id`][ropt.plugins.plan.base.EventHandler.id] and maintains a reference to
-    its parent [`plan`][ropt.plugins.plan.base.EventHandler.plan].
 
     Subclasses must implement the abstract
     [`handle_event`][ropt.plugins.plan.base.EventHandler.handle_event] method to

@@ -11,12 +11,10 @@ from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
 from ropt.plan import Event
-from ropt.plugins.plan.base import PlanStep
+from ropt.plugins.plan.base import Evaluator, PlanStep
 from ropt.results import FunctionResults
 
 if TYPE_CHECKING:
-    from uuid import UUID
-
     from numpy.typing import ArrayLike
 
     from ropt.config.enopt import EnOptConfig
@@ -56,10 +54,10 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
         """
         super().__init__(plan)
 
-    def run(
+    def run_step_from_plan(
         self,
         config: EnOptConfig,
-        evaluator: UUID,
+        evaluator: Evaluator,
         variables: ArrayLike | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> OptimizerExitCode:
@@ -106,9 +104,7 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
                 variables = config.transforms.variables.to_optimizer(variables)
 
         ensemble_evaluator = EnsembleEvaluator(
-            config,
-            self.plan.get_evaluator(evaluator).eval,
-            self.plan.plugin_manager,
+            config, evaluator.eval, self.plan.plugin_manager
         )
 
         exit_code = OptimizerExitCode.EVALUATOR_STEP_FINISHED

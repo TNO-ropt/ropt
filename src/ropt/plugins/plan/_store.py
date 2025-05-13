@@ -5,11 +5,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ropt.enums import EventType
-from ropt.plugins.plan.base import EventHandler
+from ropt.plugins.plan.base import EventHandler, PlanStep
 
 if TYPE_CHECKING:
-    import uuid
-
     from ropt.plan import Event, Plan
 
 
@@ -32,7 +30,7 @@ class DefaultStoreHandler(EventHandler):
         self,
         plan: Plan,
         *,
-        sources: set[uuid.UUID] | None = None,
+        sources: set[PlanStep] | None = None,
     ) -> None:
         """Initialize a default store event handler.
 
@@ -62,7 +60,9 @@ class DefaultStoreHandler(EventHandler):
             sources:    Optional set of step UUIDs whose results should be stored.
         """
         super().__init__(plan)
-        self._sources = sources
+        self._sources = (
+            {source.id for source in sources} if sources is not None else None
+        )
         self["results"] = None
 
     def handle_event(self, event: Event) -> None:

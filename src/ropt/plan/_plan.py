@@ -39,8 +39,7 @@ class Plan:
         are responsible for performing function evaluations (e.g., objective
         functions, constraints). Evaluators are added using the
         [`add_evaluator`][ropt.plan.Plan.add_evaluator] method and can be
-        retrieved by steps using
-        [`get_evaluator`][ropt.plan.Plan.get_evaluator].
+        passed to steps that need them.
 
     The plan stores these components internally, and the methods for adding them
     return unique IDs (`uuid.UUID`) for identification and retrieval.
@@ -48,20 +47,19 @@ class Plan:
     **Executing a Plan:**
 
     Once a plan is assembled, it can be executed in several ways. For
-    fine-grained control, the [`run_step`][ropt.plan.Plan.run_step] method can
-    be invoked repeatedly, executing each step individually. Steps may require
-    access to [`Evaluator`][ropt.plugins.plan.base.Evaluator] instances, which
-    they can retrieve using [`get_evaluator`][ropt.plan.Plan.get_evaluator].
-    This approach allows for the integration of complex logic and custom
-    functions, leveraging the full capabilities of Python. Alternatively, for
-    more structured workflows, a Python function encapsulating a sequence of
-    steps can be defined. This function is added to the plan using the
-    [`add_function`][ropt.plan.Plan.add_function] method. The entire workflow
-    defined by this function can then be executed with a single call to
-    [`run_function`][ropt.plan.Plan.run_function], with optional arguments to
-    customize its behavior. The [`has_function`][ropt.plan.Plan.has_function]
-    method can be used to check if a function has been added to the plan.
-
+    fine-grained control, the [`run`][ropt.plugins.plan.base.PlanStep.run]
+    method can be invoked for each step individually. Steps may require access
+    to [`Evaluator`][ropt.plugins.plan.base.Evaluator] instances, which need to
+    be passed to them explicitly. This approach allows for the integration of
+    complex logic and custom functions, leveraging the full capabilities of
+    Python. Alternatively, for more structured workflows, a Python function
+    encapsulating a sequence of steps can be defined. This function is added to
+    the plan using the [`set_run_function`][ropt.plan.Plan.set_run_function]
+    method. This function
+     accepts the plan object as its first argument with additional
+    optional (keyword) arguments to customize its behavior. The entire workflow
+    defined by this function can then be executed with a single call to the
+    [`run`][ropt.plan.Plan.run] the method of the plan.
 
     **PluginManager:**
 
@@ -73,20 +71,19 @@ class Plan:
     **Events:**
 
     Steps can communicate events using the
-    [`emit_event`][ropt.plan.Plan.emit_event] method. Event handlers can
-    respond to these events, enabling actions such as processing optimization
-    results.
+    [`emit_event`][ropt.plan.Plan.emit_event] method. Event handlers can respond
+    to these events, enabling actions such as processing optimization results.
+    To connect the event handlers to steps, they generally accept a set of steps
+    via their `sources` argument. The steps must be part of the same plan, or a
+    child plan (if existant).
 
     **Evaluators:**
 
     Evaluators ([`Evaluator`][ropt.plugins.plan.base.Evaluator]) are key
     components responsible for performing function evaluations, such as
     computing objective functions or constraint values. They are added to the
-    plan using the [`add_evaluator`][ropt.plan.Plan.add_evaluator] method,
-    which returns a unique ID. Steps within the plan can then retrieve specific
-    evaluators by their ID using the
-    [`get_evaluator`][ropt.plan.Plan.get_evaluator] method to perform
-    necessary computations.
+    plan using the [`add_evaluator`][ropt.plan.Plan.add_evaluator] method and
+    passed to any steps that need them.
 
     **Nested Plans:**
 
@@ -94,11 +91,7 @@ class Plan:
     execution of another plan, enabling nested workflows. In nested plans, the
     [`set_parent`][ropt.plan.Plan.set_parent] method establishes a parent-child
     relationship. This allows events to propagate up the hierarchy to the parent
-    plan. This parent-child relationship also affects how
-    [`Evaluator`][ropt.plugins.plan.base.Evaluator] instances are accessed: the
-    [`get_evaluator`][ropt.plan.Plan.get_evaluator] method automatically
-    searches up the parent chain if an evaluator is not found locally in the
-    child plan, simplifying evaluator management in complex, nested workflows.
+    plan.
 
     **Aborting a Plan:**
 
@@ -113,8 +106,7 @@ class Plan:
     Individual event handlers may store values that they accumulate or calculate
     from the events that they handle. Code outside of the event handlers, such
     as the optimization workflow code that runs the steps, can set and retrieve
-    these values using the [`get`][ropt.plan.Plan.get] and
-    [`set`][ropt.plan.Plan.set] methods.
+    these values using the `[]` operator.
     """
 
     def __init__(
@@ -143,7 +135,7 @@ class Plan:
         self._handlers: dict[uuid.UUID, EventHandler] = {}
         self._steps: dict[uuid.UUID, PlanStep] = {}
         self._evaluators: dict[uuid.UUID, Evaluator] = {}
-        self._function: Callable[..., Any] | None = None
+        self._run_function: Callable[..., Any] | None = None
 
     @property
     def aborted(self) -> bool:
@@ -168,7 +160,7 @@ class Plan:
         """
         return self._plugin_manager
 
-    def add_event_handler(self, name: str, **kwargs: Any) -> uuid.UUID:  # noqa: ANN401
+    def add_event_handler(self, name: str, **kwargs: Any) -> EventHandler:  # noqa: ANN401
         """Add an event handler to the plan.
 
         Constructs and registers an event handler with the plan. The handler's
@@ -181,16 +173,16 @@ class Plan:
             kwargs: Additional arguments for the handler's constructor.
 
         Returns:
-            The unique ID of the newly added event handler.
+            The newly added event handler.
         """
         handler = self._plugin_manager.get_plugin("event_handler", method=name).create(
             name, self, **kwargs
         )
         assert isinstance(handler, EventHandler)
         self._handlers[handler.id] = handler
-        return handler.id
+        return handler
 
-    def add_step(self, name: str, **kwargs: Any) -> uuid.UUID:  # noqa: ANN401
+    def add_step(self, name: str, **kwargs: Any) -> PlanStep:  # noqa: ANN401
         """Add a step to the plan.
 
         Registers a step with the plan. The step's type is determined by the
@@ -203,16 +195,16 @@ class Plan:
             kwargs: Additional arguments for the step's constructor.
 
         Returns:
-            uuid.UUID: The unique ID of the newly added step.
+            The newly added step.
         """
         step = self._plugin_manager.get_plugin("plan_step", method=name).create(
             name, self, **kwargs
         )
         assert isinstance(step, PlanStep)
         self._steps[step.id] = step
-        return step.id
+        return step
 
-    def add_evaluator(self, name: str, **kwargs: Any) -> uuid.UUID:  # noqa: ANN401
+    def add_evaluator(self, name: str, **kwargs: Any) -> Evaluator:  # noqa: ANN401
         """Add an evaluator object to the plan.
 
         Creates an evaluator of a type that is determined by the provided `name`,
@@ -220,8 +212,8 @@ class Plan:
         Any additional keyword arguments are passed to the evaluators's constructor.
 
         Args:
-            name:           The name of the evaluator to add.
-            kwargs:         Additional arguments for the evaluators's constructor.
+            name:   The name of the evaluator to add.
+            kwargs: Additional arguments for the evaluators's constructor.
 
         Returns:
             The new evaluator object.
@@ -231,9 +223,9 @@ class Plan:
         )
         assert isinstance(evaluator, Evaluator)
         self._evaluators[evaluator.id] = evaluator
-        return evaluator.id
+        return evaluator
 
-    def run_step(self, step: uuid.UUID, **kwargs: Any) -> Any:  # noqa: ANN401
+    def run_step(self, step: PlanStep, **kwargs: Any) -> Any:  # noqa: ANN401
         """Run a step in the plan.
 
         Executes a specific step within the plan. The step's `run` method is
@@ -245,7 +237,7 @@ class Plan:
         method is returned by this method.
 
         Args:
-            step:   The unique ID of the step to run.
+            step:   Tthe step to run.
             kwargs: Additional arguments to pass to the step's `run` method.
 
         Returns:
@@ -255,71 +247,35 @@ class Plan:
             AttributeError: If the provided `step` ID is not valid.
             PlanAborted:    If the plan has been aborted.
         """
-        if step not in self._steps:
+        if step.id not in self._steps:
             msg = "not a valid step"
             raise AttributeError(msg)
         if self._aborted:
             msg = "Plan was aborted by the previous step."
             raise PlanAborted(msg)
-        return self._steps[step].run(**kwargs)
+        return step.run_step_from_plan(**kwargs)
 
-    def get_evaluator(self, evaluator: uuid.UUID) -> Any:  # noqa: ANN401
-        """Retrieve an evaluator object from the plan.
-
-        Fetches the [`Evaluator`][ropt.plugins.plan.base.Evaluator] instance
-        associated with the given unique ID. This method is used to access
-        evaluators that have been previously added to the plan via the
-        [`add_evaluator`][ropt.plan.Plan.add_evaluator] method.
-
-        If the requested evaluator is not found, and the plan has a parent plan,
-        the request is forwarded to the parent plan, by calling its
-        `get_evaluator` method. This allows child plans to make direct use of
-        evaluators that were created by a parent plan.
-
-        Args:
-            evaluator: The unique ID of the evaluator to retrieve.
-
-        Returns:
-            The evaluator object corresponding to the provided ID.
-
-        Raises:
-            AttributeError: If the provided `evaluator` ID is not valid.
-        """
-        if evaluator not in self._evaluators:
-            if self._parent is not None:
-                return self._parent.get_evaluator(evaluator)
-            msg = "not a valid evaluator"
-            raise AttributeError(msg)
-        return self._evaluators[evaluator]
-
-    def add_function(self, func: Callable[..., Any]) -> None:
+    def set_run_function(self, func: Callable[..., Any]) -> None:
         """Add a function to the plan.
 
         Registers a user-defined function with the plan. This function can
         encapsulate a sequence of steps or custom logic. It can be executed
-        later using the [`run_function`][ropt.plan.Plan.run_function] method.
+        later using the [`run`][ropt.plan.Plan.run] method. The function should
+        accept a plan as its first argument plus an arbitrary set of additional
+        arguments.
 
         Args:
             func: The function to register with the plan.
         """
-        self._function = func
+        self._run_function = func
 
-    def has_function(self) -> bool:
-        """Check if a function has been added to the plan.
+    def run(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
+        """Run the plan by executing the run-function.
 
-        Determines whether a user-defined function has been registered with the
-        plan.
-
-        Returns:
-            bool: `True` if a function has been added; otherwise, `False`.
-        """
-        return self._function is not None
-
-    def run_function(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
-        """Run a function in the plan.
-
-        Executes the user-defined function that has been registered with the
-        plan via the [`add_function`][ropt.plan.Plan.add_function] method.
+        Executes the function that has been registered with the plan via the
+        [`add_function`][ropt.plan.Plan.set_run_function] method. The plan
+        object will passed as the first argument, and in addition the `args` and
+        `kwargs` argument will be passed.
 
         Args:
             args:   Arbitrary positional arguments to pass to the function.
@@ -331,10 +287,10 @@ class Plan:
         Raises:
             AttributeError: If no function has been added to the plan.
         """
-        if self._function is None:
+        if self._run_function is None:
             msg = "No function has been added to the plan."
             raise AttributeError(msg)
-        return self._function(self, *args, **kwargs)
+        return self._run_function(self, *args, **kwargs)
 
     def abort(self) -> None:
         """Abort the plan.
@@ -380,44 +336,3 @@ class Plan:
             handler.handle_event(event)
         if self._parent is not None:
             self._parent.emit_event(event)
-
-    def get(self, id_: uuid.UUID, /, key: str) -> Any:  # noqa: ANN401
-        """Retrieve a value stored in an event handler.
-
-        Retrieves a value stored within a specific event handler. This method
-        uses the `[]` operator to access the value associated with the given
-        key.
-
-        Args:
-            id_: The unique identifier of the event handler.
-            key: The key associated with the value to retrieve.
-
-        Returns:
-            Any: The value associated with the key in the specified handler.
-
-        Raises:
-            AttributeError: If the provided `id_` is not a valid event handler ID.
-        """
-        if id_ not in self._handlers:
-            msg = "not a valid event handler"
-            raise AttributeError(msg)
-        return self._handlers[id_][key]
-
-    def set(self, id_: uuid.UUID, /, key: str, value: Any) -> None:  # noqa: ANN401
-        """Set a value in an event handler.
-
-        Stores a value within a specific event handler. This method uses the
-        `[]` operator to assign the value to the specified key.
-
-        Args:
-            id_:   The unique identifier of the event handler.
-            key:   The key to associate with the value.
-            value: The value to store.
-
-        Raises:
-            AttributeError: If the provided `id_` is not a valid event handler ID.
-        """
-        if id_ not in self._handlers:
-            msg = "not a valid event handler"
-            raise AttributeError(msg)
-        self._handlers[id_][key] = value

@@ -5,13 +5,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Literal
 
 from ropt.enums import EventType
-from ropt.plugins.plan.base import EventHandler
+from ropt.plugins.plan.base import EventHandler, PlanStep
 
 from ._utils import _get_last_result, _update_optimal_result
 
 if TYPE_CHECKING:
-    import uuid
-
     from ropt.plan import Event, Plan
     from ropt.results import FunctionResults
 
@@ -45,7 +43,7 @@ class DefaultTrackerHandler(EventHandler):
         self,
         plan: Plan,
         *,
-        sources: set[uuid.UUID] | None = None,
+        sources: set[PlanStep] | None = None,
         what: Literal["best", "last"] = "best",
         constraint_tolerance: float | None = None,
     ) -> None:
@@ -86,7 +84,9 @@ class DefaultTrackerHandler(EventHandler):
         super().__init__(plan)
         self._what = what
         self._constraint_tolerance = constraint_tolerance
-        self._sources = sources
+        self._sources = (
+            {source.id for source in sources} if sources is not None else None
+        )
         self._tracked_results: FunctionResults | None = None
         self["results"] = None
 
