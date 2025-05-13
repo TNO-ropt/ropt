@@ -11,18 +11,18 @@ from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
 from ropt.plugins import PluginManager
 
-from ._evaluator import create_evaluator
 from ._plan import Plan
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from uuid import UUID
 
     import numpy as np
     from numpy.typing import NDArray
 
     from ropt.evaluator import EvaluatorContext, EvaluatorResult
     from ropt.plan import Event
-    from ropt.plugins.plan.base import Evaluator, EventHandler
+    from ropt.plugins.plan.base import EventHandler
     from ropt.results import FunctionResults
 
 
@@ -180,7 +180,7 @@ class BasicOptimizer:
         """
 
         def _run_func(
-            plan: Plan, evaluator: Evaluator
+            plan: Plan, evaluator: UUID
         ) -> tuple[EventHandler | None, OptimizerExitCode | None]:
             exit_code = plan.run_step(
                 optimizer, config=self._config, evaluator=evaluator
@@ -201,8 +201,8 @@ class BasicOptimizer:
 
         # If no custom function was installed, install the default function:
         if not plan.has_function():
-            evaluator = create_evaluator(
-                "forwarding_evaluator", self._plugin_manager, evaluator=self._evaluator
+            evaluator = plan.add_evaluator(
+                "forwarding_evaluator", evaluator=self._evaluator
             )
             optimizer = plan.add_step("optimizer")
             tracker = plan.add_event_handler(

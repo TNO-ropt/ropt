@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.evaluator import EvaluatorContext, EvaluatorResult
+    from ropt.plan import Plan
 
 
 class DefaultForwardingEvaluator(Evaluator):
@@ -31,15 +32,17 @@ class DefaultForwardingEvaluator(Evaluator):
 
     def __init__(
         self,
+        plan: Plan,
         *,
         evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult],
     ) -> None:
         """Initialize the DefaultForwardingEvaluator.
 
         Args:
+            plan:      The parent plan instance.
             evaluator: The callable that will perform the actual evaluation.
         """
-        super().__init__()
+        super().__init__(plan)
         self._evaluator = evaluator
 
     def eval(

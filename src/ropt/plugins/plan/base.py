@@ -136,6 +136,7 @@ class EvaluatorPlugin(Plugin):
     def create(
         cls,
         name: str,
+        plan: Plan,
         **kwargs: Any,  # noqa: ANN401
     ) -> Evaluator:
         """Create an Evaluator instance.
@@ -155,6 +156,7 @@ class EvaluatorPlugin(Plugin):
 
         Args:
             name:   The requested evaluator name (potentially plugin-specific).
+            plan:   The parent [`Plan`][ropt.plan.Plan] instance.
             kwargs: Additional arguments for custom configuration.
 
         Returns:
@@ -372,6 +374,19 @@ class Evaluator(ABC):
     [`EvaluatorResult`][ropt.evaluator.EvaluatorResult].
     """
 
+    def __init__(self, plan: Plan) -> None:
+        """Initialize the Evaluator.
+
+        Associates the evaluator with its parent [`Plan`][ropt.plan.Plan], and
+        assigns a unique ID. The parent plan is accessible via the `plan`
+        property.
+
+        Args:
+            plan: The [`Plan`][ropt.plan.Plan] instance that owns this evaluator.
+        """
+        self.__stored_plan = plan
+        self.__id: uuid.UUID = uuid.uuid4()
+
     @abstractmethod
     def eval(
         self, variables: NDArray[np.float64], context: EvaluatorContext
@@ -403,3 +418,21 @@ class Evaluator(ABC):
             redundant calculations, the evaluator should compute the results of
             the realizations once and return them for both objectives.
         """
+
+    @property
+    def id(self) -> uuid.UUID:
+        """Return the unique identifier (UUID) of this evaluator instance.
+
+        Returns:
+            The unique UUID object for this evaluator.
+        """
+        return self.__id
+
+    @property
+    def plan(self) -> Plan:
+        """Return the parent plan associated with this event handler.
+
+        Returns:
+            The [`Plan`][ropt.plan.Plan] object that owns this event handler.
+        """
+        return self.__stored_plan

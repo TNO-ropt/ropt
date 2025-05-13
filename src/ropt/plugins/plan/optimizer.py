@@ -12,10 +12,12 @@ from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, OptimizerExitCode
 from ropt.optimization import EnsembleOptimizer
 from ropt.plan import Event, Plan
-from ropt.plugins.plan.base import Evaluator, PlanStep
+from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
 
 if TYPE_CHECKING:
+    from uuid import UUID
+
     from numpy.typing import ArrayLike
 
     from ropt.config.enopt import EnOptConfig
@@ -75,7 +77,7 @@ class DefaultOptimizerStep(PlanStep):
     def run(
         self,
         config: EnOptConfig,
-        evaluator: Evaluator,
+        evaluator: UUID,
         variables: ArrayLike | None = None,
         nested_optimization: Plan | None = None,
         metadata: dict[str, Any] | None = None,
@@ -133,7 +135,9 @@ class DefaultOptimizerStep(PlanStep):
                 variables = self._config.transforms.variables.to_optimizer(variables)
 
         ensemble_evaluator = EnsembleEvaluator(
-            self._config, self._evaluator.eval, self.plan.plugin_manager
+            self._config,
+            self.plan.get_evaluator(self._evaluator).eval,
+            self.plan.plugin_manager,
         )
 
         ensemble_optimizer = EnsembleOptimizer(

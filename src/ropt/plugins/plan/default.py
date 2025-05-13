@@ -164,14 +164,14 @@ class DefaultEvaluatorPlugin(EvaluatorPlugin):
 
     **Supported Evaluators:**
 
-    - `function_evaluator`: Creates a
-        [`DefaultFunctionEvaluator`][ropt.plugins.plan.ensemble_evaluator.DefaultFunctionEvaluator]
+    - `forwarding_evaluator`: Creates a
+        [`DefaultForwardingEvaluator`][ropt.plugins.plan._evaluator.DefaultForwardingEvaluator]
         instance, which uses function calls to calculated individual objectives
         and constraints.
     """
 
     @classmethod
-    def create(cls, name: str, **kwargs: Any) -> Evaluator:  # noqa: ANN401
+    def create(cls, name: str, plan: Plan, **kwargs: Any) -> Evaluator:  # noqa: ANN401
         """Create a step.
 
         See the [ropt.plugins.plan.base.PlanPlugin][] abstract base class.
@@ -181,7 +181,7 @@ class DefaultEvaluatorPlugin(EvaluatorPlugin):
         _, _, name = name.lower().rpartition("/")
         evaluator_obj = _EVALUATOR_OBJECTS.get(name)
         if evaluator_obj is not None:
-            return evaluator_obj(**kwargs)
+            return evaluator_obj(plan, **kwargs)
 
         msg = f"Unknown evaluator type: {name}"
         raise TypeError(msg)

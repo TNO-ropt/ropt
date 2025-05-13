@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from ropt.exceptions import PlanAborted
-from ropt.plugins.plan.base import EventHandler, PlanStep
+from ropt.plugins.plan.base import Evaluator, EventHandler, PlanStep
 
 if TYPE_CHECKING:
     import uuid
@@ -18,28 +18,44 @@ if TYPE_CHECKING:
 class Plan:
     """Plan class for executing optimization workflows.
 
-    The `Plan` object is the core component for executing optimization
-    workflows. It orchestrates the execution of individual steps and the
-    processing of results through event handlers.
+    The `Plan` object is the core component for executing optimization workflows.
+    It orchestrates the execution of individual steps, manages evaluators for
+    function computations, and processes data and results through event handlers.
+
 
     **Building a Plan:**
 
-    To construct a plan, individual actions, known as steps, are added using the
-    [`add_step`][ropt.plan.Plan.add_step] method. Data processing and storage
-    are managed by event handlers, which are added using the
-    [`add_event_handler`][ropt.plan.Plan.add_event_handler] method. The plan
-    stores the step and event handler objects internally. Their respective
-    creation functions return unique IDs for identification.
+    A `Plan` is constructed by adding three main types of components, typically
+    instantiated via the [`PluginManager`][ropt.plugins.PluginManager]:
+
+    1.  **Steps ([`PlanStep`][ropt.plugins.plan.base.PlanStep]):** These define
+        individual actions or operations within the optimization workflow. Steps
+        are added using the [`add_step`][ropt.plan.Plan.add_step] method.
+    2.  **Event Handlers ([`EventHandler`][ropt.plugins.plan.base.EventHandler]):**
+        These components process data, track results, or react to events
+        emitted during plan execution. Event handlers are added using the
+        [`add_event_handler`][ropt.plan.Plan.add_event_handler] method.
+    3.  **Evaluators ([`Evaluator`][ropt.plugins.plan.base.Evaluator]):** These
+        are responsible for performing function evaluations (e.g., objective
+        functions, constraints). Evaluators are added using the
+        [`add_evaluator`][ropt.plan.Plan.add_evaluator] method and can be
+        retrieved by steps using
+        [`get_evaluator`][ropt.plan.Plan.get_evaluator].
+
+    The plan stores these components internally, and the methods for adding them
+    return unique IDs (`uuid.UUID`) for identification and retrieval.
 
     **Executing a Plan:**
 
     Once a plan is assembled, it can be executed in several ways. For
     fine-grained control, the [`run_step`][ropt.plan.Plan.run_step] method can
-    be invoked repeatedly, executing each step individually. This approach
-    allows for the integration of complex logic and custom functions, leveraging
-    the full capabilities of Python. Alternatively, for more structured
-    workflows, a Python function encapsulating a sequence of steps can be
-    defined. This function is added to the plan using the
+    be invoked repeatedly, executing each step individually. Steps may require
+    access to [`Evaluator`][ropt.plugins.plan.base.Evaluator] instances, which
+    they can retrieve using [`get_evaluator`][ropt.plan.Plan.get_evaluator].
+    This approach allows for the integration of complex logic and custom
+    functions, leveraging the full capabilities of Python. Alternatively, for
+    more structured workflows, a Python function encapsulating a sequence of
+    steps can be defined. This function is added to the plan using the
     [`add_function`][ropt.plan.Plan.add_function] method. The entire workflow
     defined by this function can then be executed with a single call to
     [`run_function`][ropt.plan.Plan.run_function], with optional arguments to
@@ -50,8 +66,9 @@ class Plan:
     **PluginManager:**
 
     A [`PluginManager`][ropt.plugins.PluginManager] object can be provided that
-    is used by the plan object to find step and event handler objects, and that
-    can be used by optimizers and evaluators to implement functionality.
+    is used by the plan object to find and instantiate step, event handler, and
+    evaluator objects. This manager can also be used by these components to
+    implement further plugin-based functionality.
 
     **Events:**
 
@@ -60,13 +77,28 @@ class Plan:
     respond to these events, enabling actions such as processing optimization
     results.
 
+    **Evaluators:**
+
+    Evaluators ([`Evaluator`][ropt.plugins.plan.base.Evaluator]) are key
+    components responsible for performing function evaluations, such as
+    computing objective functions or constraint values. They are added to the
+    plan using the [`add_evaluator`][ropt.plan.Plan.add_evaluator] method,
+    which returns a unique ID. Steps within the plan can then retrieve specific
+    evaluators by their ID using the
+    [`get_evaluator`][ropt.plan.Plan.get_evaluator] method to perform
+    necessary computations.
+
     **Nested Plans:**
 
     Multiple plans can be defined. A step within one plan can trigger the
     execution of another plan, enabling nested workflows. In nested plans, the
     [`set_parent`][ropt.plan.Plan.set_parent] method establishes a parent-child
-    relationship, allowing events to propagate up the hierarchy to the parent
-    plan.
+    relationship. This allows events to propagate up the hierarchy to the parent
+    plan. This parent-child relationship also affects how
+    [`Evaluator`][ropt.plugins.plan.base.Evaluator] instances are accessed: the
+    [`get_evaluator`][ropt.plan.Plan.get_evaluator] method automatically
+    searches up the parent chain if an evaluator is not found locally in the
+    child plan, simplifying evaluator management in complex, nested workflows.
 
     **Aborting a Plan:**
 
@@ -110,6 +142,7 @@ class Plan:
         self._parent = parent
         self._handlers: dict[uuid.UUID, EventHandler] = {}
         self._steps: dict[uuid.UUID, PlanStep] = {}
+        self._evaluators: dict[uuid.UUID, Evaluator] = {}
         self._function: Callable[..., Any] | None = None
 
     @property
@@ -179,6 +212,27 @@ class Plan:
         self._steps[step.id] = step
         return step.id
 
+    def add_evaluator(self, name: str, **kwargs: Any) -> uuid.UUID:  # noqa: ANN401
+        """Add an evaluator object to the plan.
+
+        Creates an evaluator of a type that is determined by the provided `name`,
+        which the plugin system uses to locate the corresponding evaluator class.
+        Any additional keyword arguments are passed to the evaluators's constructor.
+
+        Args:
+            name:           The name of the evaluator to add.
+            kwargs:         Additional arguments for the evaluators's constructor.
+
+        Returns:
+            The new evaluator object.
+        """
+        evaluator = self._plugin_manager.get_plugin("evaluator", method=name).create(
+            name, self, **kwargs
+        )
+        assert isinstance(evaluator, Evaluator)
+        self._evaluators[evaluator.id] = evaluator
+        return evaluator.id
+
     def run_step(self, step: uuid.UUID, **kwargs: Any) -> Any:  # noqa: ANN401
         """Run a step in the plan.
 
@@ -208,6 +262,35 @@ class Plan:
             msg = "Plan was aborted by the previous step."
             raise PlanAborted(msg)
         return self._steps[step].run(**kwargs)
+
+    def get_evaluator(self, evaluator: uuid.UUID) -> Any:  # noqa: ANN401
+        """Retrieve an evaluator object from the plan.
+
+        Fetches the [`Evaluator`][ropt.plugins.plan.base.Evaluator] instance
+        associated with the given unique ID. This method is used to access
+        evaluators that have been previously added to the plan via the
+        [`add_evaluator`][ropt.plan.Plan.add_evaluator] method.
+
+        If the requested evaluator is not found, and the plan has a parent plan,
+        the request is forwarded to the parent plan, by calling its
+        `get_evaluator` method. This allows child plans to make direct use of
+        evaluators that were created by a parent plan.
+
+        Args:
+            evaluator: The unique ID of the evaluator to retrieve.
+
+        Returns:
+            The evaluator object corresponding to the provided ID.
+
+        Raises:
+            AttributeError: If the provided `evaluator` ID is not valid.
+        """
+        if evaluator not in self._evaluators:
+            if self._parent is not None:
+                return self._parent.get_evaluator(evaluator)
+            msg = "not a valid evaluator"
+            raise AttributeError(msg)
+        return self._evaluators[evaluator]
 
     def add_function(self, func: Callable[..., Any]) -> None:
         """Add a function to the plan.
