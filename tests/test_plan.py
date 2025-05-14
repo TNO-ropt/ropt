@@ -519,13 +519,11 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
         callback=_track_evaluations,
     )
 
-    inner_plan = Plan(PluginManager())
-    inner_step = inner_plan.add_step("optimizer")
-    inner_tracker = inner_plan.add_event_handler("tracker", sources={inner_step})
-
     def _inner_optimization(
-        _: Plan, variables: NDArray[np.float64]
+        inner_plan: Plan, variables: NDArray[np.float64]
     ) -> FunctionResults | None:
+        inner_step = inner_plan.add_step("optimizer")
+        inner_tracker = inner_plan.add_event_handler("tracker", sources={inner_step})
         inner_step.run(
             config=EnOptConfig.model_validate(nested_config), variables=variables
         )
@@ -533,10 +531,9 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
         assert isinstance(results, FunctionResults | None)
         return results
 
-    inner_plan.set_run_function(_inner_optimization)
-
     outer_step.run(
-        config=EnOptConfig.model_validate(enopt_config), nested_optimization=inner_plan
+        config=EnOptConfig.model_validate(enopt_config),
+        nested_optimization=_inner_optimization,
     )
     assert outer_tracker["results"] is not None
     assert np.allclose(
@@ -574,13 +571,11 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
         callback=_track_evaluations,
     )
 
-    inner_plan = Plan(PluginManager())
-    inner_step = inner_plan.add_step("optimizer")
-    inner_tracker = inner_plan.add_event_handler("tracker", sources={inner_step})
-
     def _inner_optimization(
-        _: Plan, variables: NDArray[np.float64]
+        inner_plan: Plan, variables: NDArray[np.float64]
     ) -> FunctionResults | None:
+        inner_step = inner_plan.add_step("optimizer")
+        inner_tracker = inner_plan.add_event_handler("tracker", sources={inner_step})
         inner_step.run(
             config=EnOptConfig.model_validate(nested_config),
             metadata={"inner": "inner_meta_data"},
@@ -588,22 +583,19 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
         )
         results = inner_tracker["results"]
         assert isinstance(results, FunctionResults)
+        assert results.metadata["inner"] == "inner_meta_data"
         return results
-
-    inner_plan.set_run_function(_inner_optimization)
 
     outer_step.run(
         config=EnOptConfig.model_validate(enopt_config),
-        nested_optimization=inner_plan,
+        nested_optimization=_inner_optimization,
         metadata={"outer": 1},
     )
 
-    assert inner_tracker["results"] is not None
     assert np.allclose(
         outer_tracker["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
     assert outer_tracker["results"].metadata["outer"] == 1
-    assert inner_tracker["results"].metadata["inner"] == "inner_meta_data"
 
 
 def test_plan_abort(enopt_config: Any, evaluator: Any) -> None:

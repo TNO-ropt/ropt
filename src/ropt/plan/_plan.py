@@ -9,7 +9,6 @@ from ropt.plugins.plan.base import Evaluator, EventHandler, PlanStep
 
 if TYPE_CHECKING:
     import uuid
-    from collections.abc import Callable
 
     from ropt.plan import Event
     from ropt.plugins import PluginManager
@@ -49,14 +48,7 @@ class Plan:
     to [`Evaluator`][ropt.plugins.plan.base.Evaluator] instances, which need to
     be passed to them explicitly. This approach allows for the integration of
     complex logic and custom functions, leveraging the full capabilities of
-    Python. Alternatively, for more structured workflows, a Python function
-    encapsulating a sequence of steps can be defined. This function is added to
-    the plan using the [`set_run_function`][ropt.plan.Plan.set_run_function]
-    method. This function
-     accepts the plan object as its first argument with additional
-    optional (keyword) arguments to customize its behavior. The entire workflow
-    defined by this function can then be executed with a single call to the
-    [`run`][ropt.plan.Plan.run] the method of the plan.
+    Python.
 
     **PluginManager:**
 
@@ -135,7 +127,6 @@ class Plan:
         self._handlers: dict[uuid.UUID, EventHandler] = {}
         self._steps: dict[uuid.UUID, PlanStep] = {}
         self._evaluators: dict[uuid.UUID, Evaluator] = {}
-        self._run_function: Callable[..., Any] | None = None
 
     @property
     def aborted(self) -> bool:
@@ -324,43 +315,6 @@ class Plan:
             msg = "Ambiguous request: multiple suitable evaluators found."
             raise AttributeError(msg)
         return evaluators[0]
-
-    def set_run_function(self, func: Callable[..., Any]) -> None:
-        """Add a function to the plan.
-
-        Registers a user-defined function with the plan. This function can
-        encapsulate a sequence of steps or custom logic. It can be executed
-        later using the [`run`][ropt.plan.Plan.run] method. The function should
-        accept a plan as its first argument plus an arbitrary set of additional
-        arguments.
-
-        Args:
-            func: The function to register with the plan.
-        """
-        self._run_function = func
-
-    def run(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
-        """Run the plan by executing the run-function.
-
-        Executes the function that has been registered with the plan via the
-        [`add_function`][ropt.plan.Plan.set_run_function] method. The plan
-        object will passed as the first argument, and in addition the `args` and
-        `kwargs` argument will be passed.
-
-        Args:
-            args:   Arbitrary positional arguments to pass to the function.
-            kwargs: Arbitrary keyword arguments to pass to the function.
-
-        Returns:
-            Any: The result returned by the function.
-
-        Raises:
-            AttributeError: If no function has been added to the plan.
-        """
-        if self._run_function is None:
-            msg = "No function has been added to the plan."
-            raise AttributeError(msg)
-        return self._run_function(self, *args, **kwargs)
 
     def abort(self) -> None:
         """Abort the plan.

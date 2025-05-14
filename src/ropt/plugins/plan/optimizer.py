@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Protocol
 
 import numpy as np
 from numpy.typing import NDArray  # noqa: TC002
@@ -23,6 +23,27 @@ if TYPE_CHECKING:
 
 
 MetaDataType = dict[str, int | float | bool | str]
+
+
+class NestedOptimizationCallable(Protocol):
+    """Protocol for nested optimizer function calls."""
+
+    def __call__(
+        self, plan: Plan, variables: NDArray[np.float64]
+    ) -> FunctionResults | None:
+        """Run a nested optimization using the given plan and variables.
+
+        This functions defines the signature of the callable that defines a
+        nested optimization in a
+        [`DefaultOptimizerStep`][ropt.plugins.plan.optimizer.DefaultOptimizerStep].
+
+        Args:
+            plan:      The plan that is used to run the nested optimization.
+            variables: The matrix of variables to start the nested optimization.
+
+        Returns:
+            A function results object, with the results of the nested optimization.
+        """
 
 
 class DefaultOptimizerStep(PlanStep):
@@ -77,7 +98,7 @@ class DefaultOptimizerStep(PlanStep):
         self,
         config: EnOptConfig,
         variables: ArrayLike | None = None,
-        nested_optimization: Plan | None = None,
+        nested_optimization: NestedOptimizationCallable | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> OptimizerExitCode:
         """Run the optimizer step to perform an optimization.
@@ -96,13 +117,16 @@ class DefaultOptimizerStep(PlanStep):
         [`Results`][ropt.results.Results] objects emitted via the
         `FINISHED_EVALUATION` event.
 
-        If a `nested_optimization` plan is provided, it will be executed for
-        each function evaluation instead of the standard ensemble evaluator.
+        If a `nested_optimization` callable is provided, a fresh plan will be
+        constructed, and the callable will be called passing that plan and the
+        initial variables to use. The callable should return a a single
+        [`FunctionResults`][ropt.results.FunctionResults] object that should
+        contain the results of the nested optimization.
 
         Args:
             config:              Optimizer configuration.
             variables:           Optional initial variable vector(s) to start from.
-            nested_optimization: Optional nested plan.
+            nested_optimization: Optional callable to run a nested plan.
             metadata:            Optional dictionary to attach to emitted `Results`.
 
         Returns:
@@ -201,11 +225,12 @@ class DefaultOptimizerStep(PlanStep):
     ) -> tuple[FunctionResults | None, bool]:
         if self._nested_optimization is None:
             return None, False
-        self._nested_optimization.set_parent(self.plan)
-        results = self._nested_optimization.run(variables)
-        if self._nested_optimization.aborted:
+        nested_plan = Plan(self.plan.plugin_manager)
+        nested_plan.set_parent(self.plan)
+        results = self._nested_optimization(nested_plan, variables)
+        if nested_plan.aborted:
             self.plan.abort()
         if not isinstance(results, FunctionResults):
             msg = "Nested optimization must return a FunctionResults object."
             raise TypeError(msg)
-        return results, self._nested_optimization.aborted
+        return results, nested_plan.aborted

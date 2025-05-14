@@ -20,7 +20,6 @@ if TYPE_CHECKING:
 
     from ropt.evaluator import EvaluatorContext, EvaluatorResult
     from ropt.plan import Event
-    from ropt.plugins.plan.base import EventHandler
     from ropt.results import FunctionResults
 
 
@@ -176,10 +175,26 @@ class BasicOptimizer:
         Returns:
             The `BasicOptimizer` instance, allowing for method chaining.
         """
+        plan = Plan(self._plugin_manager)
+        for event_type, function in self._observers:
+            plan.add_event_handler(
+                "observer", event_types={event_type}, callback=function
+            )
 
-        def _run_func(
-            plan: Plan,
-        ) -> tuple[EventHandler | None, OptimizerExitCode | None]:
+        # Optionally run a custom step defined in the keyword arguments:
+        custom_function: Callable[[Plan], OptimizerExitCode] | None = None
+        key, value = next(iter(self._kwargs.items()), (None, None))
+        if key is not None and self._plugin_manager.is_supported(
+            "plan_step", method=key
+        ):
+            if len(self._kwargs) > 1:
+                msg = "Only one custom step is allowed."
+                raise TypeError(msg)
+            custom_function = plan.add_step(key).run(
+                evaluator=self._evaluator, **{key: value}
+            )
+
+        if custom_function is None:
             plan.add_evaluator("forwarding_evaluator", evaluator=self._evaluator)
             optimizer = plan.add_step("optimizer")
             tracker = plan.add_event_handler(
@@ -188,33 +203,17 @@ class BasicOptimizer:
                 sources={optimizer},
             )
             exit_code = optimizer.run(config=self._config)
-            return tracker["results"], exit_code
+            results = tracker["results"]
+            variables = None if results is None else results.evaluations.variables
+        else:
+            exit_code = custom_function(plan)
+            results = None
+            variables = None
 
-        plan = Plan(self._plugin_manager)
-        plan.set_run_function(_run_func)
-
-        # Optionally run a custom step defined in the keyword arguments:
-        key, value = next(iter(self._kwargs.items()), (None, None))
-        if key is not None and self._plugin_manager.is_supported(
-            "plan_step", method=key
-        ):
-            if len(self._kwargs) > 1:
-                msg = "Only one custom step is allowed."
-                raise TypeError(msg)
-            plan.add_step(key).run(evaluator=self._evaluator, **{key: value})
-
-        for event_type, function in self._observers:
-            plan.add_event_handler(
-                "observer", event_types={event_type}, callback=function
-            )
-
-        results, exit_code = plan.run()
-        variables = None if results is None else results.evaluations.variables
         self._results = _Results(
-            results=results,
-            variables=variables,
-            exit_code=exit_code,
+            results=results, variables=variables, exit_code=exit_code
         )
+
         return self
 
     def set_abort_callback(self, callback: Callable[[], bool]) -> Self:
