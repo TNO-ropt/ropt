@@ -56,8 +56,7 @@ class BasicOptimizer:
       readily accessible.
     - **Customizable Steps and Handlers:** While designed for single runs, it
       allows for the addition of custom plan steps and event handlers to the
-      underlying `Plan` for more complex scenarios. It is possible to pass
-      keyword arguments to the custom steps and handlers.
+      underlying `Plan` for more complex scenarios.
 
     By encapsulating the core elements of an optimization run, the
     `BasicOptimizer` reduces the boilerplate code required for simple
@@ -95,11 +94,9 @@ class BasicOptimizer:
                 evaluator function (via the `evaluator` keyword). Only one
                 custom step can be executed this way, if other keyword arguments
                 are present an error is raised. The custom step receives the
-                `Plan` object and may install a custom run function to be
-                executed instead of the default one, or install custom event
-                handlers.
+                `Plan` object and may return a custom function to execute.
             2.  **Default Optimization:** If no custom step is run, or if the
-                custom step does not install a custom run function, the default
+                custom step does not return a custom run function, the default
                 optimization process is used.
             3.  **Callback Installation and Execution:** Finally, any callbacks
                 added via `set_abort_callback` or `set_results_callback` are

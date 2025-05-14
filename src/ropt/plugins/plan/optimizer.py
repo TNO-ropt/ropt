@@ -76,11 +76,12 @@ class DefaultOptimizerStep(PlanStep):
       or due to termination conditions or errors).
 
     This step also supports **nested optimization**. If a `nested_optimization`
-    plan is provided to the `run` method, the optimizer will execute the
-    [`run`][ropt.plan.Plan.run] method of the nested plan for each function
-    evaluation instead of calling the standard evaluator. The
-    [`run`][ropt.plan.Plan.run] method of the nested plan is expected to return
-    a single [`FunctionResults`][ropt.results.FunctionResults] object.
+    function is provided to the `run` method, the optimizer will execute a
+    nested optimization at as part of each function evaluation. Each nested
+    optimization run is done by creating a new plan. The provided function is
+    then executed, passing the new plan and the variables. The
+    `nested_optimization` function is expected to return a single
+    [`FunctionResults`][ropt.results.FunctionResults] object.
     """
 
     def __init__(

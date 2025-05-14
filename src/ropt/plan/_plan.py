@@ -21,7 +21,6 @@ class Plan:
     It orchestrates the execution of individual steps, manages evaluators for
     function computations, and processes data and results through event handlers.
 
-
     **Building a Plan:**
 
     A `Plan` is constructed by adding three main types of components, typically
@@ -42,13 +41,10 @@ class Plan:
 
     **Executing a Plan:**
 
-    Once a plan is assembled, it can be executed in several ways. For
-    fine-grained control, the [`run`][ropt.plugins.plan.base.PlanStep.run]
-    method can be invoked for each step individually. Steps may require access
-    to [`Evaluator`][ropt.plugins.plan.base.Evaluator] instances, which need to
-    be passed to them explicitly. This approach allows for the integration of
-    complex logic and custom functions, leveraging the full capabilities of
-    Python.
+    Once a plan is assembled, the [`run`][ropt.plugins.plan.base.PlanStep.run]
+    method can be invoked for each step individually. This approach allows for
+    the integration of complex logic and custom functions, leveraging the full
+    capabilities of Python.
 
     **PluginManager:**
 
@@ -333,7 +329,9 @@ class Plan:
         """Set the parent of the plan.
 
         Establishes a parent-child relationship between this plan and another
-        plan. This enables event propagation up the plan hierarchy.
+        plan. This enables event propagation up the plan hierarchy. It also
+        allows the `get_evaluation` method to inquire the parent for an
+        evaluator object, if necessary.
 
         Args:
             parent: The parent plan.
@@ -345,13 +343,10 @@ class Plan:
 
         Emits an event, triggering associated event handlers.
 
-        When this method is called:
-
-        1.  All event handlers associated with the plan are invoked.
-        2.  If the plan has no parent, all observer functions registered for the
-            specified event type are called.
-        3.  If the plan has a parent, the parent plan's `emit_event` method is
-            also called, propagating the event up the hierarchy.
+        When this method is called, all event handlers associated with the plan
+        are invoked. Then, if the plan has a parent, the parent plan's
+        `emit_event` method is also called, propagating the event up the
+        hierarchy.
 
         Args:
             event: The event object to emit.
