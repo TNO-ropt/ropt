@@ -922,6 +922,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#ropt.optimization.OptimizerCallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      OptimizerCallback
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OptimizerCallback">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.OptimizerCallback.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.optimization.OptimizerCallbackResult" class="md-nav__link">
+    <span class="md-ellipsis">
+      OptimizerCallbackResult
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1563,6 +1596,39 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#ropt.optimization.OptimizerCallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      OptimizerCallback
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OptimizerCallback">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.optimization.OptimizerCallback.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.optimization.OptimizerCallbackResult" class="md-nav__link">
+    <span class="md-ellipsis">
+      OptimizerCallbackResult
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1730,6 +1796,10 @@ functionality:</p>
     This callback is invoked at each function evaluation to run a nested
     optimization.</li>
 </ol>
+<p>The optimizer plugins are used by the ensemble optimizer to implement
+the actual optimization process. The <code>EnsembleOptimizer</code> class provides
+the callback function to these plugins needed (see
+<a class="autorefs autorefs-internal" title="            ropt.optimization.OptimizerCallback" href="#ropt.optimization.OptimizerCallback">OptimizerCallback</a>)</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2168,6 +2238,324 @@ no result is available.</p>
     </div>
 
 </div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.optimization.OptimizerCallback" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.optimization.OptimizerCallback</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" title="typing.Protocol" href="https://docs.python.org/3/library/typing.html#typing.Protocol">Protocol</a></code></p>
+
+
+        <p>Defines the call signature for the optimizer evaluation callback.</p>
+<p>Optimizers uses this callback to request function and gradient evaluations
+from the <code>ropt</code> core during the optimization process.</p>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.optimization.OptimizerCallback.__call__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__call__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">/</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">return_functions</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">return_gradients</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizerCallbackResult</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Request function and/or gradient evaluations from the <code>ropt</code> core.</p>
+<p>This method is called by the optimizer implementation to obtain
+objective function values, constraint values, and their gradients for
+one or more sets of variable values. In addition other update
+information, such as non-linear constraint bounds may be returned.</p>
+<p>The <code>variables</code> argument can be a 1D array (single vector) or a 2D array
+(matrix where each row is a variable vector). Parallel or batch-based
+optimizers might provide a matrix, while others typically provide a
+single vector.</p>
+<p>The <code>return_functions</code> and <code>return_gradients</code> flags control what is
+computed and returned in a
+<a class="autorefs autorefs-internal" title="            ropt.optimization.OptimizerCallbackResult
+
+
+  
+      dataclass
+  " href="#ropt.optimization.OptimizerCallbackResult"><code>OptimizerCallbackResult</code></a>
+structure.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>variables</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A 1D or 2D array of variable values to evaluate.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>return_functions</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>True</code>, compute and return function/constraint values.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>return_gradients</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>True</code>, compute and return gradient values.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.optimization.OptimizerCallbackResult
+
+
+  
+      dataclass
+   (ropt.optimization._callback.OptimizerCallbackResult)" href="#ropt.optimization.OptimizerCallbackResult">OptimizerCallbackResult</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A data structure with the results.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.optimization.OptimizerCallbackResult" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.optimization.OptimizerCallbackResult</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+
+        <p>Holds the results from an optimizer callback evaluation.</p>
+<p>This dataclass is used to structure the output of the
+<a class="autorefs autorefs-internal" title="            ropt.optimization.OptimizerCallback" href="#ropt.optimization.OptimizerCallback"><code>OptimizerCallback</code></a>.
+It bundles the objective function values, gradient values, and any
+updated non-linear constraint bounds that result from an evaluation
+request.</p>
+<p>The <code>functions</code> attribute will contain a NumPy array of the objective
+function value(s) if they were requested and successfully computed,
+otherwise it will be <code>None</code>. Similarly, the <code>gradients</code> attribute will
+hold a NumPy array of gradient values if requested and computed, and
+<code>None</code> otherwise.</p>
+<p>The <code>nonlinear_constraint_bounds</code> attribute is a tuple containing two
+NumPy arrays: the first for lower bounds and the second for upper bounds
+of any non-linear constraints. This will be <code>None</code> if there are no
+non-linear constraints or if their bounds were not updated during the
+callback.</p>
+<p>The <code>functions</code> and <code>gradients</code> fields must be structured as follows:</p>
+<ul>
+<li>
+<p><strong>Functions Array:</strong> This array contains the objective and non-linear
+    constraint values. If <code>variables</code> was a vector, it's a 1D array:</p>
+<div class="language-text highlight"><pre><span></span><code>[objective, constraint1, constraint2, ...]
+</code></pre></div>
+<p>If <code>variables</code> was a matrix, it's a 2D array where each row corresponds
+to a row in the input <code>variables</code>, with the same structure:</p>
+<div class="language-text highlight"><pre><span></span><code>[
+    [obj_row1, con1_row1, ...],
+    [obj_row2, con2_row2, ...],
+    ...
+]
+</code></pre></div>
+</li>
+<li>
+<p><strong>Gradients Array:</strong> This array contains the gradients of the objective
+    and non-linear constraints. It's always a 2D array where rows correspond
+    to the objective/constraints and columns correspond to the variables:</p>
+<div class="language-text highlight"><pre><span></span><code>[
+    [grad_obj_var1,  grad_obj_var2,  ...],
+    [grad_con1_var1, grad_con1_var2, ...],
+    ...
+]
+</code></pre></div>
+</li>
+</ul>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.optimization.OptimizerCallbackResult.functions">functions</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Objective function value(s).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.optimization.OptimizerCallbackResult.gradients">gradients</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Gradient values.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.optimization.OptimizerCallbackResult.nonlinear_constraint_bounds">nonlinear_constraint_bounds</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Updated non-linear constraint lower and upper bounds.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
 
 
 

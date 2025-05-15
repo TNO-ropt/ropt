@@ -1097,30 +1097,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.optimizer.base.OptimizerCallback" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptimizerCallback
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptimizerCallback">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.optimizer.base.OptimizerCallback.__call__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __call__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#ropt.plugins.optimizer.utils" class="md-nav__link">
     <span class="md-ellipsis">
       utils
@@ -1723,30 +1699,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.optimizer.base.OptimizerCallback" class="md-nav__link">
-    <span class="md-ellipsis">
-      OptimizerCallback
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptimizerCallback">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.optimizer.base.OptimizerCallback.__call__" class="md-nav__link">
-    <span class="md-ellipsis">
-      __call__
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#ropt.plugins.optimizer.utils" class="md-nav__link">
     <span class="md-ellipsis">
       utils
@@ -1923,9 +1875,9 @@ third-party packages.</p>
   that inherit from the <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.Optimizer" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a>
   abstract base class. These classes are initialized with the optimization
   configuration (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>) and an
-  <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.OptimizerCallback" href="#ropt.plugins.optimizer.base.OptimizerCallback"><code>OptimizerCallback</code></a>. The
-  callback is used by the optimizer to request function and gradient evaluations
-  from <code>ropt</code>. The optimization process is initiated by calling the optimizer's
+  <a class="autorefs autorefs-internal" title="            ropt.optimization.OptimizerCallback" href="../optimization/#ropt.optimization.OptimizerCallback"><code>OptimizerCallback</code></a>. The callback is
+  used by the optimizer to request function and gradient evaluations from
+  <code>ropt</code>. The optimization process is initiated by calling the optimizer's
   <code>start</code> method.</li>
 <li><strong>Discovery:</strong> The <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> discovers
   available <code>OptimizerPlugin</code> implementations (typically via entry points) and
@@ -2078,7 +2030,7 @@ an optimization step requires an optimizer provided by this plugin.</p>
                 <code>optimizer_callback</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.OptimizerCallback" href="#ropt.plugins.optimizer.base.OptimizerCallback">OptimizerCallback</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.optimization.OptimizerCallback" href="../optimization/#ropt.optimization.OptimizerCallback">OptimizerCallback</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2262,7 +2214,7 @@ optimization algorithms.</p>
 They are initialized with an
 <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object detailing the
 optimization setup and an
-<a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.OptimizerCallback" href="#ropt.plugins.optimizer.base.OptimizerCallback"><code>OptimizerCallback</code></a> function.
+<a class="autorefs autorefs-internal" title="            ropt.optimization.OptimizerCallback" href="../optimization/#ropt.optimization.OptimizerCallback"><code>OptimizerCallback</code></a> function.
 The callback is crucial as it allows the optimizer to request function and
 gradient evaluations from the <code>ropt</code> core during its execution.</p>
 <p>The optimization process itself is initiated by calling the <code>start</code> method,
@@ -2459,7 +2411,7 @@ forwarded to the optimizer.</p>
                 <code>optimizer_callback</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.OptimizerCallback" href="#ropt.plugins.optimizer.base.OptimizerCallback">OptimizerCallback</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.optimization.OptimizerCallback" href="../optimization/#ropt.optimization.OptimizerCallback">OptimizerCallback</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2500,7 +2452,7 @@ forwarded to the optimizer.</p>
 subclasses to start the optimization process. It takes the initial set
 of variable values as input.</p>
 <p>During execution, the implementation should use the
-<a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.OptimizerCallback" href="#ropt.plugins.optimizer.base.OptimizerCallback"><code>OptimizerCallback</code></a>
+<a class="autorefs autorefs-internal" title="            ropt.optimization.OptimizerCallback" href="../optimization/#ropt.optimization.OptimizerCallback"><code>OptimizerCallback</code></a>
 (provided during initialization) to request necessary function and
 gradient evaluations from the <code>ropt</code> core.</p>
 
@@ -2531,210 +2483,6 @@ gradient evaluations from the <code>ropt</code> core.</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ropt.plugins.optimizer.base.OptimizerCallback" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.optimizer.base.OptimizerCallback</span>
-
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="typing.Protocol" href="https://docs.python.org/3/library/typing.html#typing.Protocol">Protocol</a></code></p>
-
-
-        <p>Defines the call signature for the optimizer evaluation callback.</p>
-<p><a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.Optimizer" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> instances, implemented
-by optimization plugins, are initialized with a callback function conforming
-to this protocol. The optimizer uses this callback to request function and
-gradient evaluations from the <code>ropt</code> core during the optimization process.</p>
-
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plugins.optimizer.base.OptimizerCallback.__call__" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__call__</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="fm">__call__</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nf">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">/</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">return_functions</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">return_gradients</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Request function and/or gradient evaluations from the <code>ropt</code> core.</p>
-<p>This method is called by the optimizer implementation to obtain
-objective function values, constraint values, and their gradients for
-one or more sets of variable values.</p>
-<p>The <code>variables</code> argument can be a 1D array (single vector) or a 2D array
-(matrix where each row is a variable vector). Parallel or batch-based
-optimizers might provide a matrix, while others typically provide a
-single vector.</p>
-<p>The <code>return_functions</code> and <code>return_gradients</code> flags control what is
-computed and returned. The results are always a tuple <code>(functions,
-gradients)</code>.</p>
-<ul>
-<li>
-<p><strong>Functions Array:</strong> If <code>return_functions</code> is <code>True</code>, this array contains
-  the objective and non-linear constraint values.
-    If <code>variables</code> was a vector, it's a 1D array:</p>
-<div class="language-text highlight"><pre><span></span><code>[objective, constraint1, constraint2, ...]
-</code></pre></div>
-<p>If <code>variables</code> was a matrix, it's a 2D array where each row corresponds
-to a row in the input <code>variables</code>, with the same structure:</p>
-<div class="language-text highlight"><pre><span></span><code>[
-  [obj_row1, con1_row1, ...],
-  [obj_row2, con2_row2, ...],
- ...
-]
-</code></pre></div>
-</li>
-<li>
-<p><strong>Gradients Array:</strong> If <code>return_gradients</code> is <code>True</code>, this array contains
-  the gradients of the objective and non-linear constraints. It's always
-  a 2D array where rows correspond to the objective/constraints and columns
-  correspond to the variables:</p>
-<div class="language-text highlight"><pre><span></span><code>[
-  [grad_obj_var1,  grad_obj_var2,  ...],
-  [grad_con1_var1, grad_con1_var2, ...],
-  ...
-]
-</code></pre></div>
-</li>
-</ul>
-<p>Currently, gradient evaluation is only requested for a single variable
-  vector at a time.</p>
-<p>If <code>return_functions</code> and/or <code>return_gradients</code> are <code>False</code>, the
-corresponding results are empty arrays.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>variables</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A 1D or 2D array of variable values to evaluate.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>return_functions</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If <code>True</code>, compute and return function/constraint values.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>return_gradients</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If <code>True</code>, compute and return gradient values.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A tuple containing two NumPy arrays: (functions_array, gradients_array).</p>
-              </div>
             </td>
           </tr>
       </tbody>
