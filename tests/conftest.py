@@ -15,6 +15,12 @@ def pytest_addoption(parser: Any) -> Any:
     parser.addoption(
         "--run-slow", action="store_true", default=False, help="run slow tests"
     )
+    parser.addoption(
+        "--run-external",
+        action="store_true",
+        default=False,
+        help="run tests with external optimizers",
+    )
 
 
 def pytest_collection_modifyitems(config: Any, items: Sequence[Any]) -> None:
@@ -23,6 +29,12 @@ def pytest_collection_modifyitems(config: Any, items: Sequence[Any]) -> None:
         for item in items:
             if "slow" in item.keywords:
                 item.add_marker(skip_slow)
+
+    if not config.getoption("--run-external"):
+        skip_external = pytest.mark.skip(reason="need --run-external option to run")
+        for item in items:
+            if "external" in item.keywords:
+                item.add_marker(skip_external)
 
 
 def _function_runner(

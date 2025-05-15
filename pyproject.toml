@@ -71,7 +71,7 @@ version = { attr = "ropt.version.__version__" }
 write_to = "src/ropt/version.py"
 
 [tool.pytest.ini_options]
-markers = ["slow: slow test marker"]
+markers = ["slow: slow test marker", "external: external optimizer marker"]
 filterwarnings = [
     "error",
     'ignore:\nPyarrow will become a required dependency of pandas.*:DeprecationWarning',
