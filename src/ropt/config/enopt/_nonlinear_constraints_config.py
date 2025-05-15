@@ -2,19 +2,15 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import Self
 
-import numpy as np
-from pydantic import BaseModel, ConfigDict, ValidationInfo, model_validator
+from pydantic import BaseModel, ConfigDict, model_validator
 
 from ropt.config.utils import broadcast_arrays, immutable_array
 from ropt.config.validated_types import (  # noqa: TC001
     Array1D,
     Array1DInt,
 )
-
-if TYPE_CHECKING:
-    from ropt.transforms.base import NonLinearConstraintTransform
 
 
 class NonlinearConstraintsConfig(BaseModel):
@@ -60,20 +56,12 @@ class NonlinearConstraintsConfig(BaseModel):
     upper_bounds: Array1D
     realization_filters: Array1DInt | None = None
     function_estimators: Array1DInt | None = None
-    _transform: NonLinearConstraintTransform | None = None
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
         extra="forbid",
         validate_default=True,
     )
-
-    @model_validator(mode="after")
-    def _set_transform(self, info: ValidationInfo) -> Self:
-        self._transform = (
-            None if info.context is None else info.context.nonlinear_constraints
-        )
-        return self
 
     @model_validator(mode="after")
     def _broadcast_and_check(self) -> Self:
@@ -83,19 +71,3 @@ class NonlinearConstraintsConfig(BaseModel):
         self.lower_bounds = immutable_array(lower_bounds)
         self.upper_bounds = immutable_array(upper_bounds)
         return self
-
-    def get_bounds(self) -> tuple[Array1D, Array1D]:
-        """Get the bounds of the non-linear constraints.
-
-        Returns:
-            A tuple containing the lower and upper bounds.
-        """
-        lower_bounds, upper_bounds = self.lower_bounds, self.upper_bounds
-        if self._transform is not None:
-            lower_bounds, upper_bounds = self._transform.bounds_to_optimizer(
-                lower_bounds, upper_bounds
-            )
-            if np.any(lower_bounds > upper_bounds):
-                msg = "The non-linear constraint lower bounds are larger than the upper bounds."
-                raise ValueError(msg)
-        return lower_bounds, upper_bounds

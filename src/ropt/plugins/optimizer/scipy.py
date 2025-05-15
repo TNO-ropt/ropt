@@ -22,11 +22,12 @@ from ropt.config.options import OptionsSchemaModel
 from ropt.enums import VariableType
 from ropt.plugins.optimizer.utils import validate_supported_constraints
 
-from .base import Optimizer, OptimizerCallback, OptimizerPlugin
+from .base import Optimizer, OptimizerPlugin
 from .utils import NormalizedConstraints, get_masked_linear_constraints
 
 if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
+    from ropt.optimization import OptimizerCallback
 
 _SUPPORTED_METHODS: Final[set[str]] = {
     name.lower()
@@ -227,11 +228,11 @@ class SciPyOptimizer(Optimizer):
         return None
 
     def _get_constraint_bounds(
-        self,
+        self, nonlinear_bounds: tuple[NDArray[np.float64], NDArray[np.float64]] | None
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]] | None:
         bounds = []
-        if self._config.nonlinear_constraints is not None:
-            bounds.append(self._config.nonlinear_constraints.get_bounds())
+        if nonlinear_bounds is not None:
+            bounds.append(nonlinear_bounds)
         if (
             self._method != "differential_evolution"
             and self._linear_constraint_bounds is not None
@@ -255,11 +256,17 @@ class SciPyOptimizer(Optimizer):
         if self._config.linear_constraints is not None:
             lin_coef, lin_lower, lin_upper = get_masked_linear_constraints(self._config)
             self._linear_constraint_bounds = (lin_lower, lin_upper)
-
-        if (bounds := self._get_constraint_bounds()) is not None:
+        nonlinear_bounds = (
+            None
+            if self._config.nonlinear_constraints is None
+            else (
+                self._config.nonlinear_constraints.lower_bounds,
+                self._config.nonlinear_constraints.upper_bounds,
+            )
+        )
+        if (bounds := self._get_constraint_bounds(nonlinear_bounds)) is not None:
             self._normalized_constraints = NormalizedConstraints()
             self._normalized_constraints.set_bounds(*bounds)
-
         if self._method == "differential_evolution":
             return self._initialize_constraints_object(lin_coef, lin_lower, lin_upper)
 
@@ -466,30 +473,39 @@ class SciPyOptimizer(Optimizer):
             and compute_gradients
             and self._config.gradient.evaluation_policy == "separate"
         ):
-            new_function, _ = self._optimizer_callback(
+            callback_result = self._optimizer_callback(
                 variables,
                 return_functions=True,
                 return_gradients=False,
             )
-            _, new_gradient = self._optimizer_callback(
+            new_function = callback_result.functions
+            callback_result = self._optimizer_callback(
                 variables,
                 return_functions=False,
                 return_gradients=True,
             )
+            new_gradient = callback_result.gradients
         else:
-            new_function, new_gradient = self._optimizer_callback(
+            callback_result = self._optimizer_callback(
                 variables,
                 return_functions=compute_functions,
                 return_gradients=compute_gradients,
             )
+            new_function = callback_result.functions
+            new_gradient = callback_result.gradients
 
         # The optimizer callback may change non-linear constraint bounds:
-        if self._normalized_constraints is not None:
-            bounds = self._get_constraint_bounds()
+        if (
+            self._normalized_constraints is not None
+            and callback_result.nonlinear_constraint_bounds is not None
+        ):
+            bounds = self._get_constraint_bounds(
+                callback_result.nonlinear_constraint_bounds
+            )
             assert bounds is not None
             self._normalized_constraints.set_bounds(*bounds)
 
-        if self.allow_nan:
+        if self.allow_nan and new_function is not None:
             new_function = np.where(np.isnan(new_function), np.inf, new_function)
         return new_function, new_gradient
 

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Protocol
+from typing import TYPE_CHECKING, Any
 
 from ropt.plugins.base import Plugin
 
@@ -12,81 +12,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config.enopt import EnOptConfig
-
-
-class OptimizerCallback(Protocol):
-    """Defines the call signature for the optimizer evaluation callback.
-
-    [`Optimizer`][ropt.plugins.optimizer.base.Optimizer] instances, implemented
-    by optimization plugins, are initialized with a callback function conforming
-    to this protocol. The optimizer uses this callback to request function and
-    gradient evaluations from the `ropt` core during the optimization process.
-    """
-
-    def __call__(
-        self,
-        variables: NDArray[np.float64],
-        /,
-        *,
-        return_functions: bool,
-        return_gradients: bool,
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Request function and/or gradient evaluations from the `ropt` core.
-
-        This method is called by the optimizer implementation to obtain
-        objective function values, constraint values, and their gradients for
-        one or more sets of variable values.
-
-        The `variables` argument can be a 1D array (single vector) or a 2D array
-        (matrix where each row is a variable vector). Parallel or batch-based
-        optimizers might provide a matrix, while others typically provide a
-        single vector.
-
-        The `return_functions` and `return_gradients` flags control what is
-        computed and returned. The results are always a tuple `(functions,
-        gradients)`.
-
-        - **Functions Array:** If `return_functions` is `True`, this array contains
-          the objective and non-linear constraint values.
-            If `variables` was a vector, it's a 1D array:
-
-                [objective, constraint1, constraint2, ...]
-
-            If `variables` was a matrix, it's a 2D array where each row corresponds
-            to a row in the input `variables`, with the same structure:
-
-                [
-                  [obj_row1, con1_row1, ...],
-                  [obj_row2, con2_row2, ...],
-                 ...
-                ]
-
-        - **Gradients Array:** If `return_gradients` is `True`, this array contains
-          the gradients of the objective and non-linear constraints. It's always
-          a 2D array where rows correspond to the objective/constraints and columns
-          correspond to the variables:
-
-                [
-                  [grad_obj_var1,  grad_obj_var2,  ...],
-                  [grad_con1_var1, grad_con1_var2, ...],
-                  ...
-                ]
-
-          Currently, gradient evaluation is only requested for a single variable
-          vector at a time.
-
-        If `return_functions` and/or `return_gradients` are `False`, the
-        corresponding results are empty arrays.
-
-
-        Args:
-            variables:        A 1D or 2D array of variable values to evaluate.
-            return_functions: If `True`, compute and return function/constraint values.
-            return_gradients: If `True`, compute and return gradient values.
-
-        Returns:
-            A tuple containing two NumPy arrays: (functions_array, gradients_array).
-        """
+    from ropt.optimization import OptimizerCallback
 
 
 class Optimizer(ABC):
@@ -102,7 +28,7 @@ class Optimizer(ABC):
     They are initialized with an
     [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object detailing the
     optimization setup and an
-    [`OptimizerCallback`][ropt.plugins.optimizer.base.OptimizerCallback] function.
+    [`OptimizerCallback`][ropt.optimization.OptimizerCallback] function.
     The callback is crucial as it allows the optimizer to request function and
     gradient evaluations from the `ropt` core during its execution.
 

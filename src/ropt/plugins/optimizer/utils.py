@@ -319,7 +319,6 @@ class NormalizedConstraints:
             or not np.array_equal(self._upper_bounds, upper_bounds)
         ):
             is_eq = self._is_eq
-
             self._lower_bounds = lower_bounds.copy()
             self._upper_bounds = upper_bounds.copy()
             self._is_eq = []

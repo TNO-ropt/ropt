@@ -1,5 +1,6 @@
 """The main functionality for ensemble-based optimizations."""
 
+from ._callback import OptimizerCallback, OptimizerCallbackResult
 from ._optimizer import (
     EnsembleOptimizer,
     NestedOptimizerCallback,
@@ -9,5 +10,7 @@ from ._optimizer import (
 __all__ = [
     "EnsembleOptimizer",
     "NestedOptimizerCallback",
+    "OptimizerCallback",
+    "OptimizerCallbackResult",
     "SignalEvaluationCallback",
 ]

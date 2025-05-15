@@ -19,9 +19,10 @@ import numpy as np
 
 from ropt.config.enopt import EnOptConfig
 from ropt.exceptions import ConfigError, OptimizationAborted
+from ropt.optimization import OptimizerCallback, OptimizerCallbackResult
 from ropt.plugins import PluginManager
 
-from .base import Optimizer, OptimizerCallback, OptimizerPlugin
+from .base import Optimizer, OptimizerPlugin
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
@@ -160,14 +161,30 @@ class ExternalOptimizer(Optimizer):
 
         if isinstance(request, dict):
             if (evaluation := request.get("evaluation")) is not None:
-                functions, gradients = self._optimizer_callback(
+                callback_results = self._optimizer_callback(
                     np.array(evaluation["variables"], dtype=np.float64),
                     return_functions=evaluation["return_functions"],
                     return_gradients=evaluation["return_gradients"],
                 )
                 return {
-                    "functions": functions.tolist(),
-                    "gradients": gradients.tolist(),
+                    "functions": (
+                        None
+                        if callback_results.functions is None
+                        else callback_results.functions.tolist()
+                    ),
+                    "gradients": (
+                        None
+                        if callback_results.gradients is None
+                        else callback_results.gradients.tolist()
+                    ),
+                    "nonlinear_constraint_bounds": (
+                        None
+                        if callback_results.nonlinear_constraint_bounds is None
+                        else (
+                            callback_results.nonlinear_constraint_bounds[0].tolist(),
+                            callback_results.nonlinear_constraint_bounds[1].tolist(),
+                        )
+                    ),
                 }
             if (error := request.get("error")) is not None:
                 msg = f"External optimizer error: {error}"
@@ -260,7 +277,7 @@ class _PluginOptimizer:
         *,
         return_functions: bool,
         return_gradients: bool,
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    ) -> OptimizerCallbackResult:
         response = self._request(
             {
                 "evaluation": {
@@ -272,9 +289,26 @@ class _PluginOptimizer:
         )
         if response == "abort":
             raise OptimizationAborted(response)
-        return (
-            np.array(response["functions"], dtype=np.float64),
-            np.array(response["gradients"], dtype=np.float64),
+        functions = response["functions"]
+        gradients = response["gradients"]
+        nonlinear_constraint_bounds = response["nonlinear_constraint_bounds"]
+        return OptimizerCallbackResult(
+            functions=(
+                None if functions is None else np.array(functions, dtype=np.float64)
+            ),
+            gradients=(
+                None
+                if gradients is None
+                else np.array(response["gradients"], dtype=np.float64)
+            ),
+            nonlinear_constraint_bounds=(
+                None
+                if nonlinear_constraint_bounds is None
+                else (
+                    np.array(nonlinear_constraint_bounds[0], dtype=np.float64),
+                    np.array(nonlinear_constraint_bounds[1], dtype=np.float64),
+                )
+            ),
         )
 
     def run(self, fifo1: Path, fifo2: Path) -> int:

@@ -8,11 +8,12 @@ from pydantic import ValidationError
 
 from ropt.config.options import OptionsSchemaModel
 from ropt.plugins import PluginManager
-from ropt.plugins.optimizer.base import OptimizerCallback, OptimizerPlugin
+from ropt.plugins.optimizer.base import OptimizerPlugin
 from ropt.plugins.optimizer.scipy import SciPyOptimizerPlugin
 
 if TYPE_CHECKING:
     from ropt.config.enopt import EnOptConfig
+    from ropt.optimization import OptimizerCallback
 
 
 class MockedPlugin(OptimizerPlugin):

@@ -197,7 +197,9 @@ class ConstraintInfo(ResultField):
 
         if constraints is not None:
             assert config.nonlinear_constraints is not None
-            lower_bounds, upper_bounds = config.nonlinear_constraints.get_bounds()
+            lower_bounds, upper_bounds = _get_nonlinear_constraint_bounds(
+                config,
+            )
             diffs["nonlinear_lower"] = constraints - lower_bounds
             diffs["nonlinear_upper"] = constraints - upper_bounds
 
@@ -240,3 +242,21 @@ class ConstraintInfo(ResultField):
             )
 
         return ConstraintInfo(**diffs)
+
+
+def _get_nonlinear_constraint_bounds(
+    config: EnOptConfig,
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    assert config.nonlinear_constraints is not None
+    if (
+        config.transforms is not None
+        and config.transforms.nonlinear_constraints is not None
+    ):
+        return config.transforms.nonlinear_constraints.bounds_to_optimizer(
+            config.nonlinear_constraints.lower_bounds,
+            config.nonlinear_constraints.upper_bounds,
+        )
+    return (
+        config.nonlinear_constraints.lower_bounds,
+        config.nonlinear_constraints.upper_bounds,
+    )

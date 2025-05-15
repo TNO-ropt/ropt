@@ -11,6 +11,7 @@ import numpy as np
 
 from ropt.enums import OptimizerExitCode
 from ropt.exceptions import OptimizationAborted
+from ropt.optimization import OptimizerCallbackResult
 from ropt.results import FunctionResults, GradientResults
 
 if TYPE_CHECKING:
@@ -121,6 +122,11 @@ class EnsembleOptimizer:
             This callback is invoked at each function evaluation to run a nested
             optimization.
 
+        The optimizer plugins are used by the ensemble optimizer to implement
+        the actual optimization process. The `EnsembleOptimizer` class provides
+        the callback function to these plugins needed (see
+        [OptimizerCallback][ropt.optimization.OptimizerCallback])
+
         Args:
             enopt_config:       The ensemble optimization configuration.
             ensemble_evaluator: The evaluator for function evaluations.
@@ -195,7 +201,7 @@ class EnsembleOptimizer:
         *,
         return_functions: bool,
         return_gradients: bool,
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    ) -> OptimizerCallbackResult:
         assert return_functions or return_gradients
 
         self._check_stopping_criteria()
@@ -227,7 +233,7 @@ class EnsembleOptimizer:
             compute_gradients=return_gradients,
         )
 
-        functions = np.array([])
+        functions = None
         if return_functions:
             # Functions might be parallelized hence we need potentially to
             # process a list of function results:
@@ -241,7 +247,7 @@ class EnsembleOptimizer:
                 np.vstack(functions_list) if variables.ndim > 1 else functions_list[0]
             )
 
-        gradients = np.array([])
+        gradients = None
         if return_gradients:
             # Gradients cannot be parallelized, there is at most one gradient:
             gradients = self._gradients_from_results(
@@ -255,7 +261,13 @@ class EnsembleOptimizer:
 
         self._completed_batches += 1
 
-        return functions, gradients
+        return OptimizerCallbackResult(
+            functions=functions,
+            gradients=gradients,
+            nonlinear_constraint_bounds=_get_nonlinear_constraint_bounds(
+                self._enopt_config
+            ),
+        )
 
     def _get_completed_variables(
         self, variables: NDArray[np.float64]
@@ -422,3 +434,22 @@ class _Redirector:
                 os.dup2(self._new_stderr, 2)
         else:
             yield
+
+
+def _get_nonlinear_constraint_bounds(
+    config: EnOptConfig,
+) -> tuple[NDArray[np.float64], NDArray[np.float64]] | None:
+    if config.nonlinear_constraints is None:
+        return None
+    if (
+        config.transforms is not None
+        and config.transforms.nonlinear_constraints is not None
+    ):
+        return config.transforms.nonlinear_constraints.bounds_to_optimizer(
+            config.nonlinear_constraints.lower_bounds,
+            config.nonlinear_constraints.upper_bounds,
+        )
+    return (
+        config.nonlinear_constraints.lower_bounds,
+        config.nonlinear_constraints.upper_bounds,
+    )

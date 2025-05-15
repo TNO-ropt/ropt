@@ -327,8 +327,11 @@ def test_nonlinear_constraint_with_scaler(
     config = EnOptConfig.model_validate(enopt_config, context=transforms)
     assert config.nonlinear_constraints is not None
     assert config.nonlinear_constraints.upper_bounds == 0.4
-    bounds = config.nonlinear_constraints.get_bounds()
-    assert bounds is not None
+    assert transforms.nonlinear_constraints is not None
+    bounds = transforms.nonlinear_constraints.bounds_to_optimizer(
+        config.nonlinear_constraints.lower_bounds,
+        config.nonlinear_constraints.upper_bounds,
+    )
     assert bounds[1] == 0.4 / scales
 
     check = True
@@ -391,8 +394,11 @@ def test_nonlinear_constraint_with_lazy_scaler(
     config = EnOptConfig.model_validate(enopt_config, context=transforms)
     assert config.nonlinear_constraints is not None
     assert config.nonlinear_constraints.upper_bounds == 0.4
-    bounds = config.nonlinear_constraints.get_bounds()
-    assert bounds is not None
+    assert transforms.nonlinear_constraints is not None
+    bounds = transforms.nonlinear_constraints.bounds_to_optimizer(
+        config.nonlinear_constraints.lower_bounds,
+        config.nonlinear_constraints.upper_bounds,
+    )
     assert bounds[1] == 0.4
 
     def constraint_function(variables: NDArray[np.float64], _: Any) -> float:
@@ -410,7 +416,11 @@ def test_nonlinear_constraint_with_lazy_scaler(
             if isinstance(item, FunctionResults) and check:
                 check = False
                 assert config.nonlinear_constraints is not None
-                _, upper_bounds = config.nonlinear_constraints.get_bounds()
+                assert transforms.nonlinear_constraints is not None
+                _, upper_bounds = transforms.nonlinear_constraints.bounds_to_optimizer(
+                    config.nonlinear_constraints.lower_bounds,
+                    config.nonlinear_constraints.upper_bounds,
+                )
                 assert np.allclose(upper_bounds, 0.4 / scales)
                 assert item.functions is not None
                 assert item.functions.constraints is not None
