@@ -878,24 +878,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.set_run_function" class="md-nav__link">
-    <span class="md-ellipsis">
-      set_run_function
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.run" class="md-nav__link">
-    <span class="md-ellipsis">
-      run
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.abort" class="md-nav__link">
     <span class="md-ellipsis">
       abort
@@ -1625,24 +1607,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.set_run_function" class="md-nav__link">
-    <span class="md-ellipsis">
-      set_run_function
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.run" class="md-nav__link">
-    <span class="md-ellipsis">
-      run
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.abort" class="md-nav__link">
     <span class="md-ellipsis">
       abort
@@ -1797,20 +1761,10 @@ instantiated via the <a class="autorefs autorefs-internal" title="            Pl
     passed to steps that need them.</li>
 </ol>
 <p><strong>Executing a Plan:</strong></p>
-<p>Once a plan is assembled, it can be executed in several ways. For
-fine-grained control, the <a class="autorefs autorefs-internal" title="            run" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep.run"><code>run</code></a>
-method can be invoked for each step individually. Steps may require access
-to <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator"><code>Evaluator</code></a> instances, which need to
-be passed to them explicitly. This approach allows for the integration of
-complex logic and custom functions, leveraging the full capabilities of
-Python. Alternatively, for more structured workflows, a Python function
-encapsulating a sequence of steps can be defined. This function is added to
-the plan using the <a class="autorefs autorefs-internal" title="            set_run_function" href="#ropt.plan.Plan.set_run_function"><code>set_run_function</code></a>
-method. This function
- accepts the plan object as its first argument with additional
-optional (keyword) arguments to customize its behavior. The entire workflow
-defined by this function can then be executed with a single call to the
-<a class="autorefs autorefs-internal" title="            run" href="#ropt.plan.Plan.run"><code>run</code></a> the method of the plan.</p>
+<p>Once a plan is assembled, the <a class="autorefs autorefs-internal" title="            run" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep.run"><code>run</code></a>
+method can be invoked for each step individually. This approach allows for
+the integration of complex logic and custom functions, leveraging the full
+capabilities of Python.</p>
 <p><strong>PluginManager:</strong></p>
 <p>A <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> object can be provided that
 is used by the plan object to find and instantiate step, event handler, and
@@ -2619,179 +2573,6 @@ is present in the <code>client_ids</code> set of the evaluator.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plan.Plan.set_run_function" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">set_run_function</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_run_function</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Add a function to the plan.</p>
-<p>Registers a user-defined function with the plan. This function can
-encapsulate a sequence of steps or custom logic. It can be executed
-later using the <a class="autorefs autorefs-internal" title="            run" href="#ropt.plan.Plan.run"><code>run</code></a> method. The function should
-accept a plan as its first argument plus an arbitrary set of additional
-arguments.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>func</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[..., <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The function to register with the plan.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plan.Plan.run" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Run the plan by executing the run-function.</p>
-<p>Executes the function that has been registered with the plan via the
-<a class="autorefs autorefs-internal" title="            set_run_function" href="#ropt.plan.Plan.set_run_function"><code>add_function</code></a> method. The plan
-object will passed as the first argument, and in addition the <code>args</code> and
-<code>kwargs</code> argument will be passed.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>args</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Arbitrary positional arguments to pass to the function.</p>
-              </div>
-            </td>
-            <td>
-                  <code>()</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>kwargs</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Arbitrary keyword arguments to pass to the function.</p>
-              </div>
-            </td>
-            <td>
-                  <code>{}</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>Any</code></td>            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The result returned by the function.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#AttributeError">AttributeError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If no function has been added to the plan.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
 <h3 id="ropt.plan.Plan.abort" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">abort</span>
 
@@ -2835,7 +2616,9 @@ the plan has been aborted.</p>
 
         <p>Set the parent of the plan.</p>
 <p>Establishes a parent-child relationship between this plan and another
-plan. This enables event propagation up the plan hierarchy.</p>
+plan. This enables event propagation up the plan hierarchy. It also
+allows the <code>get_evaluation</code> method to inquire the parent for an
+evaluator object, if necessary.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2888,14 +2671,10 @@ plan. This enables event propagation up the plan hierarchy.</p>
 
         <p>Emit an event.</p>
 <p>Emits an event, triggering associated event handlers.</p>
-<p>When this method is called:</p>
-<ol>
-<li>All event handlers associated with the plan are invoked.</li>
-<li>If the plan has no parent, all observer functions registered for the
-    specified event type are called.</li>
-<li>If the plan has a parent, the parent plan's <code>emit_event</code> method is
-    also called, propagating the event up the hierarchy.</li>
-</ol>
+<p>When this method is called, all event handlers associated with the plan
+are invoked. Then, if the plan has a parent, the parent plan's
+<code>emit_event</code> method is also called, propagating the event up the
+hierarchy.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

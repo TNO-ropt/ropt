@@ -2189,11 +2189,12 @@ they can be overridden by passing them directly to the <code>run</code> method.<
   or due to termination conditions or errors).</li>
 </ul>
 <p>This step also supports <strong>nested optimization</strong>. If a <code>nested_optimization</code>
-plan is provided to the <code>run</code> method, the optimizer will execute the
-<a class="autorefs autorefs-internal" title="            run" href="../plan/#ropt.plan.Plan.run"><code>run</code></a> method of the nested plan for each function
-evaluation instead of calling the standard evaluator. The
-<a class="autorefs autorefs-internal" title="            run" href="../plan/#ropt.plan.Plan.run"><code>run</code></a> method of the nested plan is expected to return
-a single <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+function is provided to the <code>run</code> method, the optimizer will execute a
+nested optimization at as part of each function evaluation. Each nested
+optimization run is done by creating a new plan. The provided function is
+then executed, passing the new plan and the variables. The
+<code>nested_optimization</code> function is expected to return a single
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
@@ -2230,9 +2231,10 @@ a single <a class="autorefs autorefs-internal" title="            ropt.results.F
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run_step_from_plan</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">nested_optimization</span><span class="p">:</span> <span class="n">Plan</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizerExitCode</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">nested_optimization</span><span class="p">:</span> <span class="n">NestedOptimizationCallable</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizerExitCode</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2254,8 +2256,16 @@ config's initial values.</p>
       dataclass
   " href="../results/#ropt.results.Results"><code>Results</code></a> objects emitted via the
 <code>FINISHED_EVALUATION</code> event.</p>
-<p>If a <code>nested_optimization</code> plan is provided, it will be executed for
-each function evaluation instead of the standard ensemble evaluator.</p>
+<p>If a <code>nested_optimization</code> callable is provided, a fresh plan will be
+constructed, and the callable will be called passing that plan and the
+initial variables to use. The callable should return a a single
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object that should
+contain the results of the nested optimization.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2306,11 +2316,11 @@ each function evaluation instead of the standard ensemble evaluator.</p>
                 <code>nested_optimization</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan">Plan</a> | None</code>
+                  <code><span title="ropt.plugins.plan.optimizer.NestedOptimizationCallable">NestedOptimizationCallable</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional nested plan.</p>
+                <p>Optional callable to run a nested plan.</p>
               </div>
             </td>
             <td>
