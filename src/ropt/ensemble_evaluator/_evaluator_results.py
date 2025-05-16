@@ -86,40 +86,20 @@ def _get_active_realizations(
     *,
     objective_weights: NDArray[np.float64] | None = None,
     constraint_weights: NDArray[np.float64] | None = None,
-) -> tuple[NDArray[np.bool_] | None, NDArray[np.bool_] | None]:
+) -> NDArray[np.bool_]:
     if objective_weights is None:
-        active_realizations = np.abs(config.realizations.weights) > 0
-        if np.all(active_realizations):
-            return None, None
-        active_objectives = np.broadcast_to(
-            active_realizations,
-            (config.objectives.weights.size, active_realizations.size),
-        )
-        active_constraints = (
-            None
-            if config.nonlinear_constraints is None
-            else np.broadcast_to(
-                active_realizations,
-                (
-                    config.nonlinear_constraints.lower_bounds.size,
-                    active_realizations.size,
-                ),
-            )
-        )
-        return active_objectives, active_constraints
-    active_objectives = np.abs(objective_weights) > 0
-    active_constraints = (
-        None if constraint_weights is None else np.abs(constraint_weights) > 0
-    )
-    return active_objectives, active_constraints
+        return np.abs(config.realizations.weights) > 0
+    active: NDArray[np.bool_] = np.any(np.abs(objective_weights) > 0, axis=0)
+    if constraint_weights is None:
+        return active
+    return np.logical_or(active, np.any(np.abs(constraint_weights) > 0, axis=0))
 
 
 def _get_function_results(
     config: EnOptConfig,
     evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult],
     variables: NDArray[np.float64],
-    active_objectives: NDArray[np.bool_] | None,
-    active_constraints: NDArray[np.bool_] | None,
+    active_realizations: NDArray[np.bool_],
 ) -> Generator[tuple[int, _FunctionEvaluatorResults], None, None]:
     realization_num = config.realizations.weights.size
     context = EvaluatorContext(
@@ -127,8 +107,7 @@ def _get_function_results(
         realizations=np.tile(
             np.arange(realization_num, dtype=np.intc), variables.shape[0]
         ),
-        active_objectives=active_objectives,
-        active_constraints=active_constraints,
+        active=active_realizations,
     )
     if config.transforms is not None and config.transforms.variables:
         variables = config.transforms.variables.from_optimizer(variables)
@@ -175,8 +154,7 @@ def _get_gradient_results(
     config: EnOptConfig,
     evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult],
     perturbed_variables: NDArray[np.float64],
-    active_objectives: NDArray[np.bool_] | None,
-    active_constraints: NDArray[np.bool_] | None,
+    active_realizations: NDArray[np.bool_],
 ) -> _GradientEvaluatorResults:
     realization_num = config.realizations.weights.size
     perturbation_num = config.gradient.number_of_perturbations
@@ -184,8 +162,7 @@ def _get_gradient_results(
         config=config,
         realizations=np.repeat(np.arange(realization_num), perturbation_num),
         perturbations=np.tile(np.arange(perturbation_num), realization_num),
-        active_objectives=active_objectives,
-        active_constraints=active_constraints,
+        active=active_realizations,
     )
     variables: NDArray[np.float64] = perturbed_variables.reshape(
         -1, perturbed_variables.shape[-1]
@@ -217,13 +194,12 @@ def _get_gradient_results(
     )
 
 
-def _get_function_and_gradient_results(  # noqa: PLR0913
+def _get_function_and_gradient_results(
     config: EnOptConfig,
     evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult],
     variables: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
-    active_objectives: NDArray[np.bool_] | None,
-    active_constraints: NDArray[np.bool_] | None,
+    active_realizations: NDArray[np.bool_],
 ) -> tuple[_FunctionEvaluatorResults, _GradientEvaluatorResults]:
     realization_num = config.realizations.weights.size
     perturbation_num = config.gradient.number_of_perturbations
@@ -242,8 +218,7 @@ def _get_function_and_gradient_results(  # noqa: PLR0913
                 np.tile(np.arange(perturbation_num), realization_num),
             )
         ),
-        active_objectives=active_objectives,
-        active_constraints=active_constraints,
+        active=active_realizations,
     )
     all_variables = np.vstack(
         (

@@ -32,6 +32,7 @@ def function_result_fixture() -> FunctionResults:
     )
     realizations = Realizations(
         objective_weights=np.arange(6, dtype=np.float64).reshape((2, 3)),
+        active_realizations=np.ones(3, dtype=np.bool_),
         failed_realizations=np.zeros(3, dtype=np.bool_),
     )
     functions = Functions.create(

@@ -44,6 +44,7 @@ def function_result_fixture() -> FunctionResults:
     )
     realizations = Realizations(
         objective_weights=np.arange(6, dtype=np.float64).reshape((2, 3)),
+        active_realizations=np.ones(3, dtype=np.bool_),
         failed_realizations=np.zeros(3, dtype=np.bool_),
     )
     functions = Functions.create(
@@ -75,6 +76,7 @@ def gradient_result_fixture() -> GradientResults:
         metadata={},
         evaluations=evaluations,
         realizations=Realizations(
+            active_realizations=np.ones(36, dtype=np.bool_),
             failed_realizations=np.zeros(36, dtype=np.bool_),
         ),
         gradients=gradients,

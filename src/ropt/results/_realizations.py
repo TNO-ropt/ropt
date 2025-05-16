@@ -22,6 +22,17 @@ class Realizations(ResultField):
 
     !!! info "Fields"
 
+        === "Active Realizations"
+
+            `active_realizations`: A boolean array indicating whether each
+            realization's evaluation was evaluated. `True` indicates that a
+            realization was evaluated:
+
+            - Shape $(n_r,)$, where:
+                - $n_r$ is the number of realizations.
+            - Axis type:
+                - [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]
+
         === "Failed Realizations"
 
             `failed_realizations`: A boolean array indicating whether each
@@ -64,11 +75,17 @@ class Realizations(ResultField):
             constraint calculation
 
     Attributes:
+        active_realizations: Boolean array indicating active realizations.
         failed_realizations: Boolean array indicating failed realizations.
         objective_weights:   Weights for each objective in each realization.
         constraint_weights:  Weights for each constraint in each realization.
     """
 
+    active_realizations: NDArray[np.bool_] = field(
+        metadata={
+            "__axes__": (ResultAxis.REALIZATION,),
+        },
+    )
     failed_realizations: NDArray[np.bool_] = field(
         metadata={
             "__axes__": (ResultAxis.REALIZATION,),
@@ -98,6 +115,7 @@ class Realizations(ResultField):
 
         # noqa
         """
+        self.active_realizations = _immutable_copy(self.active_realizations)
         self.failed_realizations = _immutable_copy(self.failed_realizations)
         self.objective_weights = _immutable_copy(self.objective_weights)
         self.constraint_weights = _immutable_copy(self.constraint_weights)

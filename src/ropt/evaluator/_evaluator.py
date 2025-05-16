@@ -22,76 +22,27 @@ class EvaluatorContext:
     Specifically, it provides:
 
     - The configuration object for the current optimization step.
+    - A boolean vector (`active`) indicating which realizations require
+      evaluation.
     - The realization index for each variable vector. This can be used to
       determine the correct function from an ensemble to use with each variable
       vector.
     - The perturbation index for each variable vector (if applicable). A value
       less than 0 indicates that the vector is not a perturbation.
-    - Boolean matrices (`active_objectives` and `active_constraints`) indicating
-      which objective/realization and constraint/realization evaluations are
-      required by the optimizer.
-    - A boolean vector (`active`) indicating which realizations require
-      evaluation.
-
-    The `active_objectives` and `active_constraints` matrices are structured
-    such that each column corresponds to a realization, and each row corresponds
-    to a objective or constraint. A `True` value signifies that the
-    corresponding objective or constraint is essential for the optimizer and
-    must be calculated for that realization. Checking if an objective or constraint
-    must be calculated for a given control vector involves the following:
-
-    1. Find the realization corresponding to the control in the `realizations`
-       property.
-    2. Given that realization index, check in `active_objects` and
-       `active_constraints` if the objective or constraint should be calculated.
-
-    Note: The `active` property
-        In many cases, evaluators may only be able to compute all objectives and
-        constraints for a given realization or none at all. In these scenarios,
-        the `active` property provides a simplified view, indicating only the
-        realizations that need to be evaluated. `active` cannot be set when creating
-        the evaluator context, it is calculated from `active_objectives` and
-        `active_constraints`. It returns a vector where each entry indicates if
-        a given realization is active or not.
 
     Attributes:
         config:             Configuration of the optimizer.
+        active:             Indicates which realizations require evaluation.
         realizations:       Realization numbers for each requested evaluation.
         perturbations:      Perturbation numbers for each requested evaluation.
                             A value less than 0 indicates that the vector is
                             not a perturbation.
-        active_objectives:  Indicates which objective/realization evaluations are
-                            essential for the optimizer.
-        active_constraints: Indicates which constraint/realization evaluations
-                            are essential for the optimizer.
-        active:             Indicates which realizations require evaluation (computed
-                            from `active_objectives` and `active_constraints`).
     """
 
     config: EnOptConfig
+    active: NDArray[np.bool_]
     realizations: NDArray[np.intc]
     perturbations: NDArray[np.intc] | None = None
-    active_objectives: NDArray[np.bool_] | None = None
-    active_constraints: NDArray[np.bool_] | None = None
-    active: NDArray[np.bool_] | None = field(init=False)
-
-    def __post_init__(self) -> None:
-        active_objectives: NDArray[np.bool_] | None = (
-            None
-            if self.active_objectives is None
-            else np.logical_or.reduce(self.active_objectives, axis=0)
-        )
-        active_constraints: NDArray[np.bool_] | None = (
-            None
-            if self.active_constraints is None
-            else np.logical_or.reduce(self.active_constraints, axis=0)
-        )
-        if active_constraints is None:
-            self.active = active_objectives
-        elif active_objectives is None:
-            self.active = active_constraints
-        else:
-            self.active = np.logical_or(active_objectives, active_constraints)
 
     def filter_inactive_realizations(self, array: NDArray[T]) -> NDArray[T]:
         """Filter an array based on active realizations.
@@ -117,9 +68,7 @@ class EvaluatorContext:
         Returns:
             The filtered results.
         """
-        if self.active is not None:
-            return array[self.active[self.realizations], ...]
-        return array
+        return array[self.active[self.realizations], ...]
 
     def insert_inactive_realizations(
         self, array: NDArray[T], *, fill_value: float = 0.0
@@ -155,15 +104,13 @@ class EvaluatorContext:
         Returns:
             An expanded array matching the original number of variables.
         """
-        if self.active is not None:
-            expanded_array = np.full(
-                (self.realizations.shape[0], *array.shape[1:]),
-                fill_value=fill_value,
-                dtype=array.dtype,
-            )
-            expanded_array[self.active[self.realizations], ...] = array
-            return expanded_array
-        return array
+        expanded_array = np.full(
+            (self.realizations.shape[0], *array.shape[1:]),
+            fill_value=fill_value,
+            dtype=array.dtype,
+        )
+        expanded_array[self.active[self.realizations], ...] = array
+        return expanded_array
 
 
 @dataclass

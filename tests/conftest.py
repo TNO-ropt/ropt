@@ -58,20 +58,13 @@ def _function_runner(
         else None
     )
     for sim, realization in enumerate(evaluator_context.realizations):
-        for idx in range(objective_count):
-            if (
-                evaluator_context.active_objectives is None
-                or evaluator_context.active_objectives[idx, realization]
-            ):
+        if evaluator_context.active is None or evaluator_context.active[realization]:
+            for idx in range(objective_count):
                 function = functions[idx]
                 objective_results[sim, idx] = function(
                     variables[sim, :], int(realization)
                 )
-        for idx in range(constraint_count):
-            if (
-                evaluator_context.active_constraints is None
-                or evaluator_context.active_constraints[idx, int(realization)]
-            ):
+            for idx in range(constraint_count):
                 function = functions[idx + objective_count]
                 assert constraint_results is not None
                 constraint_results[sim, idx] = function(

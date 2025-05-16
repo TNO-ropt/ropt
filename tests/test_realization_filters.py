@@ -391,18 +391,6 @@ def test_sort_filter_mixed(  # noqa: C901
             assert result.realizations is not None
             assert result.realizations.objective_weights is not None
             filtered = result.realizations.objective_weights[0, :] == 0.0
-        if isinstance(result, GradientResults):
-            if evaluation_policy == "separate":
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, :, :2] == 0.0
-                )
-            else:
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, :, :2] != 0.0
-                )
-            assert np.all(
-                result.evaluations.perturbed_objectives[filtered, :, 2:] != 0.0
-            )
 
     # The first objective values should differ.
     assert objective_values[0] != objective_values[1]
@@ -601,7 +589,7 @@ def test_cvar_filter_on_constraints(
 
 
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
-def test_cvar_filter_mixed(  # noqa: C901
+def test_cvar_filter_mixed(
     enopt_config: Any,
     evaluator: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
@@ -689,18 +677,6 @@ def test_cvar_filter_mixed(  # noqa: C901
             assert result.realizations is not None
             assert result.realizations.objective_weights is not None
             filtered = result.realizations.objective_weights[0, :] == 0.0
-        if isinstance(result, GradientResults):
-            if evaluation_policy == "separate":
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, :, :2] == 0.0
-                )
-            else:
-                assert np.all(
-                    result.evaluations.perturbed_objectives[filtered, :, :2] != 0.0
-                )
-            assert np.all(
-                result.evaluations.perturbed_objectives[filtered, :, 2:] != 0.0
-            )
 
     # The first objective values should differ.
     assert objective_values[0] != objective_values[1]
