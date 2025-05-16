@@ -1866,36 +1866,10 @@ supplementary information.</p>
   vector.</li>
 <li>The perturbation index for each variable vector (if applicable). A value
   less than 0 indicates that the vector is not a perturbation.</li>
-<li>Boolean matrices (<code>active_objectives</code> and <code>active_constraints</code>) indicating
-  which objective/realization and constraint/realization evaluations are
-  required by the optimizer.</li>
 <li>A boolean vector (<code>active</code>) indicating which realizations require
   evaluation.</li>
 </ul>
-<p>The <code>active_objectives</code> and <code>active_constraints</code> matrices are structured
-such that each column corresponds to a realization, and each row corresponds
-to a objective or constraint. A <code>True</code> value signifies that the
-corresponding objective or constraint is essential for the optimizer and
-must be calculated for that realization. Checking if an objective or constraint
-must be calculated for a given control vector involves the following:</p>
-<ol>
-<li>Find the realization corresponding to the control in the <code>realizations</code>
-   property.</li>
-<li>Given that realization index, check in <code>active_objects</code> and
-   <code>active_constraints</code> if the objective or constraint should be calculated.</li>
-</ol>
 
-
-<details class="note" open>
-  <summary>The <code>active</code> property</summary>
-  <p>In many cases, evaluators may only be able to compute all objectives and
-constraints for a given realization or none at all. In these scenarios,
-the <code>active</code> property provides a simplified view, indicating only the
-realizations that need to be evaluated. <code>active</code> cannot be set when creating
-the evaluator context, it is calculated from <code>active_objectives</code> and
-<code>active_constraints</code>. It returns a vector where each entry indicates if
-a given realization is active or not.</p>
-</details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
     <table>
@@ -1943,38 +1917,13 @@ a given realization is active or not.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.evaluator.EvaluatorContext.active_objectives">active_objectives</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Indicates which objective/realization evaluations are
-                essential for the optimizer.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.evaluator.EvaluatorContext.active_constraints">active_constraints</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Indicates which constraint/realization evaluations
-                are essential for the optimizer.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
             <td><code><span title="ropt.evaluator.EvaluatorContext.active">active</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Indicates which realizations require evaluation (computed
-                from <code>active_objectives</code> and <code>active_constraints</code>).</p>
+                <p>Indicates which realizations require evaluation.</p>
               </div>
             </td>
           </tr>
