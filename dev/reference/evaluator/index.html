@@ -1861,13 +1861,13 @@ supplementary information.</p>
 <p>Specifically, it provides:</p>
 <ul>
 <li>The configuration object for the current optimization step.</li>
+<li>A boolean vector (<code>active</code>) indicating which realizations require
+  evaluation.</li>
 <li>The realization index for each variable vector. This can be used to
   determine the correct function from an ensemble to use with each variable
   vector.</li>
 <li>The perturbation index for each variable vector (if applicable). A value
   less than 0 indicates that the vector is not a perturbation.</li>
-<li>A boolean vector (<code>active</code>) indicating which realizations require
-  evaluation.</li>
 </ul>
 
 
@@ -1893,6 +1893,17 @@ supplementary information.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
+            <td><code><span title="ropt.evaluator.EvaluatorContext.active">active</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Indicates which realizations require evaluation.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code><span title="ropt.evaluator.EvaluatorContext.realizations">realizations</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.intc">intc</span>]</code>
@@ -1913,17 +1924,6 @@ supplementary information.</p>
                 <p>Perturbation numbers for each requested evaluation.
                 A value less than 0 indicates that the vector is
                 not a perturbation.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.evaluator.EvaluatorContext.active">active</span></code></td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Indicates which realizations require evaluation.</p>
               </div>
             </td>
           </tr>

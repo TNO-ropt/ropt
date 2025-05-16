@@ -3758,8 +3758,29 @@ arbitrary type supported by <code>numpy</code> (including objects):</p>
 used in the optimization process.</p>
 <div class="admonition info">
 <p class="admonition-title">Fields</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.Realizations--__tabbed_1_1" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_2" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_3" name="ropt.results.Realizations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Realizations--__tabbed_1_1">Failed Realizations</label><label for="ropt.results.Realizations--__tabbed_1_2">Objective Weights</label><label for="ropt.results.Realizations--__tabbed_1_3">Constraint Weights</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="ropt.results.Realizations--__tabbed_1_1" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_2" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_3" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_4" name="ropt.results.Realizations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Realizations--__tabbed_1_1">Active Realizations</label><label for="ropt.results.Realizations--__tabbed_1_2">Failed Realizations</label><label for="ropt.results.Realizations--__tabbed_1_3">Objective Weights</label><label for="ropt.results.Realizations--__tabbed_1_4">Constraint Weights</label></div>
 <div class="tabbed-content">
+<div class="tabbed-block">
+<p><code>active_realizations</code>: A boolean array indicating whether each
+realization's evaluation was evaluated. <code>True</code> indicates that a
+realization was evaluated:</p>
+<ul>
+<li>Shape <span class="arithmatex">\((n_r,)\)</span>, where:<ul>
+<li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
+</ul>
+</li>
+<li>Axis type:<ul>
+<li><a class="autorefs autorefs-internal" title="            REALIZATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.ResultAxis.REALIZATION"><code>ResultAxis.REALIZATION</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
 <div class="tabbed-block">
 <p><code>failed_realizations</code>: A boolean array indicating whether each
 realization's evaluation was successful. <code>True</code> indicates a failed
@@ -3856,6 +3877,17 @@ constraint calculation</p>
         </tr>
       </thead>
       <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.Realizations.active_realizations">active_realizations</span></code></td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.bool_">bool_</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Boolean array indicating active realizations.</p>
+              </div>
+            </td>
+          </tr>
           <tr class="doc-section-item">
             <td><code><span title="ropt.results.Realizations.failed_realizations">failed_realizations</span></code></td>
             <td>
