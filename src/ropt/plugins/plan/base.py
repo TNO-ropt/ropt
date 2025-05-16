@@ -167,9 +167,8 @@ class EvaluatorPlugin(Plugin):
         The `clients` parameter acts as a filter, determining which plan steps
         this evaluator should serve. It should be a set containing the
         `PlanStep` instances that should be handled. When an evaluation is
-        requested, this evaluator checks if the step that emitted the event is
-        present in the `client` set. If `clients` is `None`, all clients will be
-        served.
+        requested, this evaluator checks if the step  is present in the `client`
+        set. If `clients` is `None`, all clients will be served.
 
         Args:
             name:   The requested evaluator name (potentially plugin-specific).
