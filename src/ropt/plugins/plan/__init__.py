@@ -72,9 +72,9 @@ framework ([`Plan`][ropt.plan.Plan]).
         ([`DefaultStoreHandler`][ropt.plugins.plan._store.DefaultStoreHandler]).
 *   **Evaluators** (via
     [`DefaultEvaluatorPlugin`][ropt.plugins.plan.default.DefaultEvaluatorPlugin]):
-    *   `forwarding_evaluator`: Forwards calculations to a given evaluation
+    *   `function_evaluator`: Forwards calculations to a given evaluation
         function
-        ([`DefaultForwardingEvaluator`][ropt.plugins.plan._evaluator.DefaultForwardingEvaluator]).
+        ([`DefaultFunctionEvaluator`][ropt.plugins.plan._function_evaluator.DefaultFunctionEvaluator]).
 
 These built-in components allow for the construction of standard optimization
 workflows out-of-the-box, while the plugin architecture enables customization

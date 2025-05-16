@@ -192,7 +192,7 @@ class BasicOptimizer:
             )
 
         if custom_function is None:
-            plan.add_evaluator("forwarding_evaluator", evaluator=self._evaluator)
+            plan.add_evaluator("function_evaluator", evaluator=self._evaluator)
             optimizer = plan.add_step("optimizer")
             tracker = plan.add_event_handler(
                 "tracker",

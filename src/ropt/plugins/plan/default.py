@@ -22,15 +22,15 @@ standard optimization plans out-of-the-box.
       callback for each event
         ([`DefaultObserverHandler`][ropt.plugins.plan._observer.DefaultObserverHandler]).
 - **Evaluators:**
-    - `forwarding_evaluator`: Evaluator that forwards calculations to a given evaluation function.
-      ([`DefaultForwardingEvaluator`][ropt.plugins.plan._evaluator.DefaultForwardingEvaluator])
+    - `function_evaluator`: Evaluator that forwards calculations to a given evaluation function.
+      ([`DefaultFunctionEvaluator`][ropt.plugins.plan._function_evaluator.DefaultFunctionEvaluator])
 """
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Final
 
-from ._evaluator import DefaultForwardingEvaluator
+from ._function_evaluator import DefaultFunctionEvaluator
 from ._observer import DefaultObserverHandler
 from ._store import DefaultStoreHandler
 from ._tracker import DefaultTrackerHandler
@@ -54,7 +54,7 @@ _EVENT_HANDLER_OBJECTS: Final[dict[str, type[EventHandler]]] = {
 }
 
 _EVALUATOR_OBJECTS: Final[dict[str, type[Evaluator]]] = {
-    "forwarding_evaluator": DefaultForwardingEvaluator,
+    "function_evaluator": DefaultFunctionEvaluator,
 }
 
 
@@ -170,8 +170,8 @@ class DefaultEvaluatorPlugin(EvaluatorPlugin):
 
     **Supported Evaluators:**
 
-    - `forwarding_evaluator`: Creates a
-        [`DefaultForwardingEvaluator`][ropt.plugins.plan._evaluator.DefaultForwardingEvaluator]
+    - `function_evaluator`: Creates a
+        [`DefaultFunctionEvaluator`][ropt.plugins.plan._function_evaluator.DefaultFunctionEvaluator]
         instance, which uses function calls to calculated individual objectives
         and constraints.
     """

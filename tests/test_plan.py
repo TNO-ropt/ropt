@@ -40,7 +40,7 @@ def enopt_config_fixture() -> dict[str, Any]:
 
 def test_run_basic(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plan = Plan(PluginManager())
-    plan.add_evaluator("forwarding_evaluator", evaluator=evaluator())
+    plan.add_evaluator("function_evaluator", evaluator=evaluator())
     step = plan.add_step("optimizer")
     tracker = plan.add_event_handler("tracker", sources={step})
     step.run(config=EnOptConfig.model_validate(enopt_config))
@@ -58,17 +58,17 @@ def test_plan_evaluators(enopt_config: dict[str, Any], evaluator: Any) -> None:
     config = EnOptConfig.model_validate(enopt_config)
     plan = Plan(PluginManager())
     step1 = plan.add_step("optimizer")
-    plan.add_evaluator("forwarding_evaluator", evaluator=evaluator(), clients={step1})
+    plan.add_evaluator("function_evaluator", evaluator=evaluator(), clients={step1})
     step1.run(config=config)
 
     step2 = plan.add_step("optimizer")
     with pytest.raises(AttributeError, match="No suitable evaluator found."):
         step2.run(config=config)
 
-    plan.add_evaluator("forwarding_evaluator", evaluator=evaluator(), clients={step2})
+    plan.add_evaluator("function_evaluator", evaluator=evaluator(), clients={step2})
     step2.run(config=config)
 
-    plan.add_evaluator("forwarding_evaluator", evaluator=evaluator(), clients={step1})
+    plan.add_evaluator("function_evaluator", evaluator=evaluator(), clients={step1})
     with pytest.raises(
         AttributeError, match="Ambiguous request: multiple suitable evaluators found."
     ):
@@ -78,7 +78,7 @@ def test_plan_evaluators(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step1 = plan.add_step("optimizer")
     step2 = plan.add_step("optimizer")
     plan.add_evaluator(
-        "forwarding_evaluator", evaluator=evaluator(), clients={step1, step2}
+        "function_evaluator", evaluator=evaluator(), clients={step1, step2}
     )
     step1.run(config=config)
     step2.run(config=config)
@@ -90,7 +90,7 @@ def test_plan_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:
     config2["gradient"]["seed"] = 2
 
     plan = Plan(PluginManager())
-    plan.add_evaluator("forwarding_evaluator", evaluator=evaluator())
+    plan.add_evaluator("function_evaluator", evaluator=evaluator())
     step = plan.add_step("optimizer")
     tracker = plan.add_event_handler("tracker", sources={step})
 
@@ -112,7 +112,7 @@ def test_plan_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
 def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plan = Plan(PluginManager())
-    plan.add_evaluator("forwarding_evaluator", evaluator=evaluator())
+    plan.add_evaluator("function_evaluator", evaluator=evaluator())
     step = plan.add_step("optimizer")
     tracker = plan.add_event_handler("tracker", sources={step})
     step.run(config=EnOptConfig.model_validate(enopt_config))
@@ -134,7 +134,7 @@ def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> Non
 
 def test_reset_results(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plan = Plan(PluginManager())
-    plan.add_evaluator("forwarding_evaluator", evaluator=evaluator())
+    plan.add_evaluator("function_evaluator", evaluator=evaluator())
     step = plan.add_step("optimizer")
     tracker = plan.add_event_handler("tracker", sources={step})
     step.run(config=EnOptConfig.model_validate(enopt_config))
@@ -168,7 +168,7 @@ def test_two_optimizers_alternating(
     enopt_config2["optimizer"]["max_functions"] = 3
 
     plan = Plan(PluginManager())
-    plan.add_evaluator("forwarding_evaluator", evaluator=evaluator())
+    plan.add_evaluator("function_evaluator", evaluator=evaluator())
     step = plan.add_step("optimizer")
     tracker1 = plan.add_event_handler("tracker", sources={step})
     tracker2 = plan.add_event_handler("tracker", sources={step}, what="last")
@@ -217,7 +217,7 @@ def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -
     enopt_config2["optimizer"]["max_functions"] = 3
 
     plan = Plan(PluginManager())
-    plan.add_evaluator("forwarding_evaluator", evaluator=evaluator())
+    plan.add_evaluator("function_evaluator", evaluator=evaluator())
     step = plan.add_step("optimizer")
     tracker = plan.add_event_handler("tracker", sources={step}, what="last")
     plan.add_event_handler(
@@ -255,7 +255,7 @@ def test_restart_initial(enopt_config: dict[str, Any], evaluator: Any) -> None:
     enopt_config["optimizer"]["max_functions"] = 3
 
     plan = Plan(PluginManager())
-    plan.add_evaluator("forwarding_evaluator", evaluator=evaluator())
+    plan.add_evaluator("function_evaluator", evaluator=evaluator())
     step = plan.add_step("optimizer")
     plan.add_event_handler(
         "observer",
@@ -285,7 +285,7 @@ def test_restart_last(enopt_config: dict[str, Any], evaluator: Any) -> None:
     enopt_config["optimizer"]["max_functions"] = 3
 
     plan = Plan(PluginManager())
-    plan.add_evaluator("forwarding_evaluator", evaluator=evaluator())
+    plan.add_evaluator("function_evaluator", evaluator=evaluator())
     step = plan.add_step("optimizer")
     plan.add_event_handler(
         "observer",
@@ -320,7 +320,7 @@ def test_restart_optimum(enopt_config: dict[str, Any], evaluator: Any) -> None:
     enopt_config["optimizer"]["max_functions"] = 4
 
     plan = Plan(PluginManager())
-    plan.add_evaluator("forwarding_evaluator", evaluator=evaluator())
+    plan.add_evaluator("function_evaluator", evaluator=evaluator())
     step = plan.add_step("optimizer")
     plan.add_event_handler(
         "observer",
@@ -374,7 +374,7 @@ def test_restart_optimum_with_reset(
     enopt_config["optimizer"]["max_functions"] = max_functions
 
     plan = Plan(PluginManager())
-    plan.add_evaluator("forwarding_evaluator", evaluator=evaluator(new_functions))
+    plan.add_evaluator("function_evaluator", evaluator=evaluator(new_functions))
     step = plan.add_step("optimizer")
     plan.add_event_handler(
         "observer",
@@ -420,7 +420,7 @@ def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
     }
 
     plan = Plan(PluginManager())
-    plan.add_evaluator("forwarding_evaluator", evaluator=evaluator())
+    plan.add_evaluator("function_evaluator", evaluator=evaluator())
     step = plan.add_step("optimizer")
     plan.add_event_handler(
         "observer",
@@ -435,7 +435,7 @@ def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
 def test_evaluator_step(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plan = Plan(PluginManager())
-    plan.add_evaluator("forwarding_evaluator", evaluator=evaluator())
+    plan.add_evaluator("function_evaluator", evaluator=evaluator())
     step = plan.add_step("ensemble_evaluator")
     tracker = plan.add_event_handler("tracker", sources={step})
     step.run(config=EnOptConfig.model_validate(enopt_config))
@@ -453,7 +453,7 @@ def test_evaluator_step_multi(enopt_config: dict[str, Any], evaluator: Any) -> N
     enopt_config["optimizer"]["max_functions"] = 4
 
     plan = Plan(PluginManager())
-    plan.add_evaluator("forwarding_evaluator", evaluator=evaluator())
+    plan.add_evaluator("function_evaluator", evaluator=evaluator())
     step = plan.add_step("ensemble_evaluator")
     store = plan.add_event_handler("store", sources={step})
     step.run(
@@ -483,7 +483,7 @@ def test_exit_code(
     enopt_config["optimizer"][max_criterion] = 4
 
     plan = Plan(PluginManager())
-    plan.add_evaluator("forwarding_evaluator", evaluator=evaluator())
+    plan.add_evaluator("function_evaluator", evaluator=evaluator())
     step = plan.add_step("optimizer")
     exit_code = step.run(config=EnOptConfig.model_validate(enopt_config))
     assert exit_code == max_enum
@@ -510,7 +510,7 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
     enopt_config["optimizer"]["max_functions"] = 5
 
     outer_plan = Plan(PluginManager())
-    outer_plan.add_evaluator("forwarding_evaluator", evaluator=evaluator())
+    outer_plan.add_evaluator("function_evaluator", evaluator=evaluator())
     outer_step = outer_plan.add_step("optimizer")
     outer_tracker = outer_plan.add_event_handler("tracker", sources={outer_step})
     outer_plan.add_event_handler(
@@ -562,7 +562,7 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
     enopt_config["optimizer"]["max_functions"] = 5
 
     outer_plan = Plan(PluginManager())
-    outer_plan.add_evaluator("forwarding_evaluator", evaluator=evaluator())
+    outer_plan.add_evaluator("function_evaluator", evaluator=evaluator())
     outer_step = outer_plan.add_step("optimizer")
     outer_tracker = outer_plan.add_event_handler("tracker", sources={outer_step})
     outer_plan.add_event_handler(
@@ -609,7 +609,7 @@ def test_plan_abort(enopt_config: Any, evaluator: Any) -> None:
             raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
 
     plan = Plan(PluginManager())
-    plan.add_evaluator("forwarding_evaluator", evaluator=evaluator())
+    plan.add_evaluator("function_evaluator", evaluator=evaluator())
     step = plan.add_step("optimizer")
     tracker = plan.add_event_handler("tracker", sources={step})
     plan.add_event_handler(
@@ -625,3 +625,33 @@ def test_plan_abort(enopt_config: Any, evaluator: Any) -> None:
     step = plan.add_step("optimizer")
     with pytest.raises(PlanAborted, match="Plan was aborted by the previous step."):
         step.run(config=EnOptConfig.model_validate(enopt_config))
+
+
+def test_evaluator_cache(enopt_config: dict[str, Any], evaluator: Any) -> None:
+    completed_functions = 0
+
+    def _track_evaluations(event: Event) -> None:
+        nonlocal completed_functions
+
+        for item in event.data["results"]:
+            if isinstance(item, FunctionResults):
+                completed_functions += 1
+
+    enopt_config["gradient"]["evaluation_policy"] = "speculative"
+    enopt_config["optimizer"]["max_functions"] = 2
+
+    plan = Plan(PluginManager())
+    plan.add_evaluator("function_evaluator", evaluator=evaluator())
+    step = plan.add_step("optimizer")
+    tracker = plan.add_event_handler("tracker", sources={step}, what="last")
+    plan.add_event_handler(
+        "observer",
+        event_types={EventType.FINISHED_EVALUATION},
+        callback=_track_evaluations,
+    )
+    step.run(config=EnOptConfig.model_validate(enopt_config))
+    step.run(
+        config=EnOptConfig.model_validate(enopt_config),
+        variables=tracker["results"].evaluations.variables,
+    )
+    assert completed_functions == 4

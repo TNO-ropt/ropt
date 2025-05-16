@@ -1,4 +1,4 @@
-"""This module implements the default store event handler."""
+"""This module implements the default function evaluator."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from ropt.plan import Plan
 
 
-class DefaultForwardingEvaluator(Evaluator):
+class DefaultFunctionEvaluator(Evaluator):
     """An evaluator that forwards calls to an evaluator function.
 
     This class acts as an adapter, allowing a standard Python callable (which
@@ -40,7 +40,7 @@ class DefaultForwardingEvaluator(Evaluator):
         *,
         evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult],
     ) -> None:
-        """Initialize the DefaultForwardingEvaluator.
+        """Initialize the DefaultFunctionEvaluator.
 
         Args:
             plan:      The parent plan instance.

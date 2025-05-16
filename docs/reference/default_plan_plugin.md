@@ -28,6 +28,6 @@
     options:
         members: False
 
-::: ropt.plugins.plan._evaluator.DefaultForwardingEvaluator
+::: ropt.plugins.plan._function_evaluator.DefaultFunctionEvaluator
     options:
         members: False
