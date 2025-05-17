@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from functools import partial
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -11,10 +12,13 @@ from ropt.enums import EventType, OptimizerExitCode
 from ropt.exceptions import OptimizationAborted, PlanAborted
 from ropt.plan import BasicOptimizer, Event, Plan
 from ropt.plugins import PluginManager
+from ropt.plugins.plan.cached_evaluator import DefaultCachedEvaluator
 from ropt.results import FunctionResults
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
+
+    from ropt.evaluator import EvaluatorContext, EvaluatorResult
 
 # ruff: noqa: SLF001
 
@@ -655,8 +659,26 @@ def test_plan_abort(enopt_config: Any, evaluator: Any) -> None:
         step.run(config=EnOptConfig.model_validate(enopt_config))
 
 
-def test_evaluator_cache(enopt_config: dict[str, Any], evaluator: Any) -> None:
+def test_evaluator_cache(
+    enopt_config: dict[str, Any], evaluator: Any, monkeypatch: Any
+) -> None:
     completed_functions = 0
+
+    def _my_eval(
+        obj: DefaultCachedEvaluator,
+        variables: NDArray[np.float64],
+        context: EvaluatorContext,
+    ) -> EvaluatorResult:
+        results, cached = obj.eval_cached(variables, context)
+        cached_indices = list(cached.keys())
+        info = np.zeros(variables.shape[0], dtype=np.bool_)
+        info[cached_indices] = True
+        results.evaluation_info = {"cached": info}
+        if completed_functions == 2:
+            assert cached_indices == [0]
+        else:
+            assert cached_indices == []
+        return results
 
     def _track_evaluations(event: Event) -> None:
         nonlocal completed_functions
@@ -664,14 +686,27 @@ def test_evaluator_cache(enopt_config: dict[str, Any], evaluator: Any) -> None:
         for item in event.data["results"]:
             if isinstance(item, FunctionResults):
                 completed_functions += 1
+                if completed_functions == 3:
+                    assert item.evaluations.evaluation_info["cached"][0]
+                else:
+                    assert not item.evaluations.evaluation_info["cached"][0]
 
     enopt_config["gradient"]["evaluation_policy"] = "speculative"
     enopt_config["optimizer"]["max_functions"] = 2
 
     plan = Plan(PluginManager())
     step = plan.add_step("optimizer")
-    plan.add_evaluator("function_evaluator", evaluator=evaluator(), clients={step})
     tracker = plan.add_event_handler("tracker", sources={step}, what="last")
+    cached_evaluator = plan.add_evaluator(
+        "cached_evaluator", clients={step}, sources={tracker}
+    )
+
+    assert isinstance(cached_evaluator, DefaultCachedEvaluator)
+    monkeypatch.setattr(cached_evaluator, "eval", partial(_my_eval, cached_evaluator))
+
+    plan.add_evaluator(
+        "function_evaluator", evaluator=evaluator(), clients={cached_evaluator}
+    )
     plan.add_event_handler(
         "observer",
         event_types={EventType.FINISHED_EVALUATION},

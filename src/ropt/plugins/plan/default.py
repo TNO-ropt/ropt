@@ -24,6 +24,9 @@ standard optimization plans out-of-the-box.
 - **Evaluators:**
     - `function_evaluator`: Evaluator that forwards calculations to a given evaluation function.
       ([`DefaultFunctionEvaluator`][ropt.plugins.plan._function_evaluator.DefaultFunctionEvaluator])
+    - `caching_evaluator`: Evaluator that uses caching to find results that were
+      already evaluated before forwarding to another evaluator.
+      ([`DefaultCachedEvaluator`][ropt.plugins.plan.cached_evaluator.DefaultCachedEvaluator])
 """
 
 from __future__ import annotations
@@ -35,6 +38,7 @@ from ._observer import DefaultObserverHandler
 from ._store import DefaultStoreHandler
 from ._tracker import DefaultTrackerHandler
 from .base import EvaluatorPlugin, EventHandlerPlugin, PlanComponent, PlanStepPlugin
+from .cached_evaluator import DefaultCachedEvaluator
 from .ensemble_evaluator import DefaultEnsembleEvaluatorStep
 from .optimizer import DefaultOptimizerStep
 
@@ -55,6 +59,7 @@ _EVENT_HANDLER_OBJECTS: Final[dict[str, type[EventHandler]]] = {
 
 _EVALUATOR_OBJECTS: Final[dict[str, type[Evaluator]]] = {
     "function_evaluator": DefaultFunctionEvaluator,
+    "cached_evaluator": DefaultCachedEvaluator,
 }
 
 

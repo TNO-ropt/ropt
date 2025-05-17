@@ -31,3 +31,7 @@
 ::: ropt.plugins.plan._function_evaluator.DefaultFunctionEvaluator
     options:
         members: False
+
+::: ropt.plugins.plan.cached_evaluator.DefaultCachedEvaluator
+    options:
+        members: False

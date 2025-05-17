@@ -514,14 +514,10 @@ class Evaluator(ABC, PlanComponent):
             if not isinstance(client, PlanComponent | str):
                 msg = "A client must be plan component or a tag string."
                 raise TypeError(msg)
-        self.__clients = (
-            {
-                client.id if isinstance(client, PlanComponent) else client
-                for client in clients
-            }
-            if clients is not None
-            else None
-        )
+        self.__clients = {
+            client.id if isinstance(client, PlanComponent) else client
+            for client in clients
+        }
 
     @abstractmethod
     def eval(
@@ -564,3 +560,28 @@ class Evaluator(ABC, PlanComponent):
             The IDs of the clients, or the tags, this evaluator will handle.
         """
         return self.__clients
+
+    def add_client(self, client: PlanComponent | str) -> None:
+        """Add a client to the evaluator.
+
+        Args:
+            client: The client to add.
+        """
+        if not isinstance(client, PlanComponent | str):
+            msg = "A client must be plan component or a tag string."
+            raise TypeError(msg)
+        id_ = client.id if isinstance(client, PlanComponent) else client
+        self.__clients.add(id_)
+
+    def remove_client(self, client: PlanComponent | str) -> None:
+        """Remove a client from the evaluator.
+
+        Args:
+            client: The client to remove.
+        """
+        if not isinstance(client, PlanComponent | str):
+            msg = "A client must be plan component or a tag string."
+            raise TypeError(msg)
+        id_ = client.id if isinstance(client, PlanComponent) else client
+        if id_ in self.__clients:
+            self.__clients.remove(id_)
