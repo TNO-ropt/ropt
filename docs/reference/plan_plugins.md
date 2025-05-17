@@ -1,6 +1,7 @@
 ::: ropt.plugins.plan
     options:
         members: False
+::: ropt.plugins.plan.base.PlanComponent
 ::: ropt.plugins.plan.base.PlanStepPlugin
 ::: ropt.plugins.plan.base.EventHandlerPlugin
 ::: ropt.plugins.plan.base.EvaluatorPlugin

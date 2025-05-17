@@ -181,7 +181,53 @@ class EvaluatorPlugin(Plugin):
         """
 
 
-class PlanStep(ABC):
+class PlanComponent:
+    """Base class for components that are part of an optimization plan.
+
+    This class provides common functionality for components like steps, event
+    handlers, and evaluators that are managed within a
+    [`Plan`][ropt.plan.Plan].
+
+    Each `PlanComponent` is assigned a unique identifier (`id`) upon
+    initialization and maintains a reference to its parent `plan`.
+
+    Attributes:
+        id: A unique `uuid.UUID` identifying the component.
+        plan: The parent [`Plan`][ropt.plan.Plan] instance.
+    """
+
+    def __init__(self, plan: Plan) -> None:
+        """Initialize the PlanComponent.
+
+        This constructor is called by subclasses to set up common attributes.
+        It stores a reference to the parent `plan` and assigns a unique `id`.
+
+        Args:
+            plan: The parent [`Plan`][ropt.plan.Plan] instance.
+        """
+        self.__stored_plan = plan
+        self.__id: uuid.UUID = uuid.uuid4()
+
+    @property
+    def id(self) -> uuid.UUID:
+        """Return the unique identifier of the event handler.
+
+        Returns:
+            A UUID object representing the unique identifier of the event handler.
+        """
+        return self.__id
+
+    @property
+    def plan(self) -> Plan:
+        """Return the parent plan associated with this event handler.
+
+        Returns:
+            The [`Plan`][ropt.plan.Plan] object that owns this event handler.
+        """
+        return self.__stored_plan
+
+
+class PlanStep(ABC, PlanComponent):
     """Abstract base class for optimization plan steps.
 
     This class defines the fundamental interface for all executable steps within
@@ -212,26 +258,7 @@ class PlanStep(ABC):
         Args:
             plan: The [`Plan`][ropt.plan.Plan] instance that owns this step.
         """
-        self.__stored_plan = plan
-        self.__id: uuid.UUID = uuid.uuid4()
-
-    @property
-    def id(self) -> uuid.UUID:
-        """Return the unique identifier of the event handler.
-
-        Returns:
-            A UUID object representing the unique identifier of the event handler.
-        """
-        return self.__id
-
-    @property
-    def plan(self) -> Plan:
-        """Return the parent plan associated with this step.
-
-        Returns:
-            The [`Plan`][ropt.plan.Plan] object that owns and executes this step.
-        """
-        return self.__stored_plan
+        super().__init__(plan)
 
     def run(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
         """Execute this plan step.
@@ -255,7 +282,7 @@ class PlanStep(ABC):
         Returns:
             The result returned by the step's specific `run_step_from_plan` method.
         """
-        return self.__stored_plan.run_step(self, *args, **kwargs)
+        return self.plan.run_step(self, *args, **kwargs)
 
     @abstractmethod
     def run_step_from_plan(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
@@ -279,7 +306,7 @@ class PlanStep(ABC):
         """
 
 
-class EventHandler(ABC):
+class EventHandler(ABC, PlanComponent):
     """Abstract Base Class for Optimization Plan Result Handlers.
 
     This class defines the fundamental interface for all event handlers within
@@ -316,39 +343,20 @@ class EventHandler(ABC):
         received, this event handler checks if the step that emitted the event
         (`event.source`) is present in the `sources` set. If `sources` is
         `None`, events from all sources will be processed. The IDs of the source
-        steps are accessible via the `source_ids` property.
+        steps are accessible via the `sources` property.
 
         Args:
             plan:    The [`Plan`][ropt.plan.Plan] instance that owns this event handler.
             sources: Optional set of steps whose events should be processed.
         """
-        self.__stored_plan = plan
+        super().__init__(plan)
         self._sources = (
             {source.id for source in sources} if sources is not None else None
         )
         self.__stored_values: dict[str, Any] = {}
-        self.__id: uuid.UUID = uuid.uuid4()
 
     @property
-    def id(self) -> uuid.UUID:
-        """Return the unique identifier (UUID) of this event handler instance.
-
-        Returns:
-            The unique UUID object for this event handler.
-        """
-        return self.__id
-
-    @property
-    def plan(self) -> Plan:
-        """Return the parent plan associated with this event handler.
-
-        Returns:
-            The plan object that owns this event handler.
-        """
-        return self.__stored_plan
-
-    @property
-    def source_ids(self) -> set[uuid.UUID] | None:
+    def sources(self) -> set[uuid.UUID] | None:
         """Return the source IDs that are listened to.
 
         If it returns `None` any event will be responded to.
@@ -421,7 +429,7 @@ class EventHandler(ABC):
         self.__stored_values[key] = value
 
 
-class Evaluator(ABC):
+class Evaluator(ABC, PlanComponent):
     """abstract base class for evaluator components within an optimization plan.
 
     Subclasses must implement the abstract
@@ -443,18 +451,17 @@ class Evaluator(ABC):
         `PlanStep` instances that should be handled. When an evaluation is
         requested, this evaluator checks if the step that emitted the event is
         present in the `client` set. If `clients` is `None`, all clients will be
-        served. The IDs of the client steps are accessible via the `client_ids`
+        served. The IDs of the client steps are accessible via the `clients`
         property.
 
         Args:
             plan:    The [`Plan`][ropt.plan.Plan] instance that owns this evaluator.
             clients: The steps that use this evaluator.
         """
-        self.__stored_plan = plan
+        super().__init__(plan)
         self.__clients = (
             {client.id for client in clients} if clients is not None else None
         )
-        self.__id: uuid.UUID = uuid.uuid4()
 
     @abstractmethod
     def eval(
@@ -490,25 +497,7 @@ class Evaluator(ABC):
         """
 
     @property
-    def id(self) -> uuid.UUID:
-        """Return the unique identifier (UUID) of this evaluator instance.
-
-        Returns:
-            The unique UUID object for this evaluator.
-        """
-        return self.__id
-
-    @property
-    def plan(self) -> Plan:
-        """Return the parent plan associated with this event handler.
-
-        Returns:
-            The [`Plan`][ropt.plan.Plan] object that owns this event handler.
-        """
-        return self.__stored_plan
-
-    @property
-    def client_ids(self) -> set[uuid.UUID] | None:
+    def clients(self) -> set[uuid.UUID] | None:
         """Return the client IDs that are served.
 
         If it returns `None` any client will be served.

@@ -62,6 +62,6 @@ class DefaultObserverHandler(EventHandler):
             event: The event object emitted by the plan.
         """
         if (
-            self.source_ids is None or event.source in self.source_ids
+            self.sources is None or event.source in self.sources
         ) and event.event_type in self._event_types:
             self._callback(event)

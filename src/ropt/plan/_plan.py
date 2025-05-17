@@ -271,7 +271,7 @@ class Plan:
         evaluators = [
             evaluator
             for evaluator in self._evaluators.values()
-            if evaluator.client_ids is None or client.id in evaluator.client_ids
+            if evaluator.clients is None or client.id in evaluator.clients
         ]
         if not evaluators and self._parent is not None:
             evaluators = self._parent._get_evaluators(client)  # noqa: SLF001
@@ -286,9 +286,9 @@ class Plan:
         current plan and, if no suitable evaluator is found and a parent plan
         exists, continues recursively up the plan hierarchy.
 
-        An evaluator is considered suitable if its `client_ids` attribute is `None`
+        An evaluator is considered suitable if its `clients` attribute is `None`
         (indicating it serves all clients) or if the `id` of the `client` step
-        is present in the `client_ids` set of the evaluator.
+        is present in the `clients` set of the evaluator.
 
         The method expects to find exactly one suitable evaluator.
 

@@ -73,7 +73,7 @@ class DefaultStoreHandler(EventHandler):
             event: The event object emitted by the plan.
         """
         if event.event_type == EventType.FINISHED_EVALUATION and (
-            self.source_ids is None or event.source in self.source_ids
+            self.sources is None or event.source in self.sources
         ):
             if (results := event.data.get("results", None)) is None:
                 return

@@ -100,7 +100,7 @@ class DefaultTrackerHandler(EventHandler):
         if (
             event.event_type == EventType.FINISHED_EVALUATION
             and "results" in event.data
-            and (self.source_ids is None or event.source in self.source_ids)
+            and (self.sources is None or event.source in self.sources)
         ):
             results = event.data["results"]
             if self["results"] is None:
