@@ -1761,14 +1761,14 @@ instantiated via the <a class="autorefs autorefs-internal" title="            Pl
     passed to steps that need them.</li>
 </ol>
 <p><strong>Tags:</strong></p>
-<p>Steps, event handlers, and evaluators can be assigned tags. These tags can
-be used to identify the components instead of their unique IDs. Unlike ID's,
-tags do not need to be unique. This is useful when the components are
-created dynamically or if multiple components are to be identified as a
-group. For example, when specifying the source of events that a handler
-should process, its <code>sources</code> argument may contain both component objects,
-which identifies by their ID, or tags, which could refer to multiple
-components that have that tag.</p>
+<p>Steps, event handlers, and evaluators can be assigned one or more tags.
+These tags can be used to identify the components instead of their unique
+IDs. Unlike ID's, tags do not need to be unique. This is useful when the
+components are created dynamically or if multiple components are to be
+identified as a group. For example, when specifying the source of events
+that a handler should process, its <code>sources</code> argument may contain both
+component objects, which identifies by their ID, or tags, which could refer
+to multiple components that have that tag.</p>
 <p><strong>Executing a Plan:</strong></p>
 <p>Once a plan is assembled, the <a class="autorefs autorefs-internal" title="            run" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep.run"><code>run</code></a>
 method can be invoked for each step individually. This approach allows for
@@ -2020,7 +2020,7 @@ communication up the plan hierarchy.</p>
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_event_handler</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">tags</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">sources</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">PlanComponent</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EventHandler</span>
@@ -2070,14 +2070,14 @@ received, this event handler checks if the step that emitted the event
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>tag</code>
+                <code>tags</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional tag.</p>
+                <p>Optional tags</p>
               </div>
             </td>
             <td>
@@ -2156,7 +2156,7 @@ received, this event handler checks if the step that emitted the event
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_step</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlanStep</span>
 </span></code></pre></div>
 
@@ -2198,14 +2198,14 @@ the step's constructor.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>tag</code>
+                <code>tags</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional tag.</p>
+                <p>Optional tags</p>
               </div>
             </td>
             <td>
@@ -2269,7 +2269,7 @@ the step's constructor.</p>
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">add_evaluator</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">tags</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">clients</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">PlanComponent</span> <span class="o">|</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Evaluator</span>
@@ -2317,14 +2317,14 @@ set.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>tag</code>
+                <code>tags</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional tag.</p>
+                <p>Optional tags</p>
               </div>
             </td>
             <td>
@@ -2542,7 +2542,7 @@ that is configured to serve the specified <code>client</code>
 (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a>). The search starts in the
 current plan and, if no suitable evaluator is found and a parent plan
 exists, continues recursively up the plan hierarchy.</p>
-<p>An evaluator is considered suitable the <code>id</code> or <code>tag</code> of the <code>client</code>
+<p>An evaluator is considered suitable the <code>id</code> or <code>tags</code> of the <code>client</code>
 step is present in the <code>clients</code> set of the evaluator.</p>
 <p>The method expects to find exactly one suitable evaluator.</p>
 
