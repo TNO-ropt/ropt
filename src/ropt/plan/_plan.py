@@ -288,7 +288,7 @@ class Plan:
             raise PlanAborted(msg)
         return step.run_step_from_plan(**kwargs)
 
-    def _get_evaluators(self, client: PlanStep) -> list[Evaluator]:
+    def _get_evaluators(self, client: PlanComponent) -> list[Evaluator]:
         evaluators = [
             evaluator
             for evaluator in self._evaluators.values()
@@ -298,7 +298,7 @@ class Plan:
             evaluators = self._parent._get_evaluators(client)  # noqa: SLF001
         return evaluators
 
-    def get_evaluator(self, client: PlanStep) -> Evaluator:
+    def get_evaluator(self, client: PlanComponent) -> Evaluator:
         """Retrieve the appropriate evaluator for a given client step.
 
         This method searches for an [`Evaluator`][ropt.plugins.plan.base.Evaluator]
