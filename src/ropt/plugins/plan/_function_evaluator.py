@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Callable
 
-from ropt.plugins.plan.base import Evaluator, PlanStep
+from ropt.plugins.plan.base import Evaluator, PlanComponent
 
 if TYPE_CHECKING:
     import numpy as np
@@ -30,13 +30,14 @@ class DefaultFunctionEvaluator(Evaluator):
     structured as an `Evaluator` subclass into a `ropt` plan.
 
     The `clients` parameter acts as a filter, determining which plan steps this
-    evaluator should serve.If `clients` is `None`, all clients will be served.
+    evaluator should serve.
     """
 
     def __init__(
         self,
         plan: Plan,
-        clients: set[PlanStep] | None = None,
+        tags: set[str] | None = None,
+        clients: set[PlanComponent | str] | None = None,
         *,
         evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult],
     ) -> None:
@@ -44,10 +45,11 @@ class DefaultFunctionEvaluator(Evaluator):
 
         Args:
             plan:      The parent plan instance.
+            tags:      Optional tags
             clients:   The steps that are allowed to use this evaluator.
             evaluator: The callable that will perform the actual evaluation.
         """
-        super().__init__(plan, clients)
+        super().__init__(plan, tags, clients)
         self._evaluator = evaluator
 
     def eval(

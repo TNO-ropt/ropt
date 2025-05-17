@@ -35,7 +35,8 @@ class EventHandlerPlugin(Plugin):
         cls,
         name: str,
         plan: Plan,
-        sources: set[PlanStep] | None = None,
+        tags: set[str] | None = None,
+        sources: set[PlanComponent | str] | None = None,
         **kwargs: Any,  # noqa: ANN401
     ) -> EventHandler:
         """Create a EventHandler instance.
@@ -54,6 +55,11 @@ class EventHandlerPlugin(Plugin):
         Implementations can use this `name` to vary the created event handler if
         the plugin supports multiple event handler types.
 
+        The optional `tags` argument assigns the given string tags to the event
+        handler. Similar to its `id`, the `tags` can be used for identification.
+        However, unlike an `id`, a tag does not need to be unique, allowing
+        multiple components to be grouped under the same tag.
+
         The `sources` parameter acts as a filter, determining which plan steps
         this event handler should listen to. It should be a set containing the
         `PlanStep` instances whose event you want to receive. When an event is
@@ -67,10 +73,11 @@ class EventHandlerPlugin(Plugin):
         instance.
 
         Args:
-            name:   The requested event handler name (potentially plugin-specific).
-            plan:   The parent [`Plan`][ropt.plan.Plan] instance.
+            name:    The requested event handler name (potentially plugin-specific).
+            plan:    The parent [`Plan`][ropt.plan.Plan] instance.
+            tags:    Optional tags
             sources: The steps whose events should be processed.
-            kwargs: Additional arguments for custom configuration.
+            kwargs:  Additional arguments for custom configuration.
 
         Returns:
             An initialized instance of a `EventHandler` subclass.
@@ -95,6 +102,7 @@ class PlanStepPlugin(Plugin):
         cls,
         name: str,
         plan: Plan,
+        tags: set[str] | None = None,
         **kwargs: Any,  # noqa: ANN401
     ) -> PlanStep:
         """Create a PlanStep instance.
@@ -113,6 +121,11 @@ class PlanStepPlugin(Plugin):
         Implementations can use this `name` to vary the created step if the
         plugin supports multiple step types.
 
+        The optional `tags` argument assigns the given string tags to the plan
+        step. Similar to its `id`, the `tags` can be used for identification.
+        However, unlike an `id`, a tag does not need to be unique, allowing
+        multiple components to be grouped under the same tag.
+
         Any additional keyword arguments (`kwargs`) passed during the
         [`Plan.add_step`][ropt.plan.Plan.add_step] call are forwarded here,
         allowing for custom configuration of the step instance.
@@ -120,6 +133,7 @@ class PlanStepPlugin(Plugin):
         Args:
             name:   The requested step name (potentially plugin-specific).
             plan:   The parent [`Plan`][ropt.plan.Plan] instance.
+            tags:   Optional tags
             kwargs: Additional arguments for custom configuration.
 
         Returns:
@@ -146,7 +160,8 @@ class EvaluatorPlugin(Plugin):
         cls,
         name: str,
         plan: Plan,
-        clients: set[PlanStep] | None = None,
+        tags: set[str] | None = None,
+        clients: set[PlanComponent | str] | None = None,
         **kwargs: Any,  # noqa: ANN401
     ) -> Evaluator:
         """Create an Evaluator instance.
@@ -164,17 +179,23 @@ class EvaluatorPlugin(Plugin):
         Implementations can use this `name` to vary the created evaluator if
         the plugin supports multiple evaluator types.
 
+        The optional `tags` argument assigns the given string tags to the
+        evaluator. Similar to its `id`, the `tags` can be used for
+        identification. However, unlike an `id`, a tag does not need to be
+        unique, allowing multiple components to be grouped under the same tag.
+
         The `clients` parameter acts as a filter, determining which plan steps
         this evaluator should serve. It should be a set containing the
         `PlanStep` instances that should be handled. When an evaluation is
         requested, this evaluator checks if the step  is present in the `client`
-        set. If `clients` is `None`, all clients will be served.
+        set.
 
         Args:
-            name:   The requested evaluator name (potentially plugin-specific).
-            plan:   The parent [`Plan`][ropt.plan.Plan] instance.
+            name:    The requested evaluator name (potentially plugin-specific).
+            plan:    The parent [`Plan`][ropt.plan.Plan] instance.
+            tags:    Optional tags
             clients: The clients that should be served by this evaluator.
-            kwargs: Additional arguments for custom configuration.
+            kwargs:  Additional arguments for custom configuration.
 
         Returns:
             An initialized instance of an `Evaluator` subclass.
@@ -189,23 +210,24 @@ class PlanComponent:
     [`Plan`][ropt.plan.Plan].
 
     Each `PlanComponent` is assigned a unique identifier (`id`) upon
-    initialization and maintains a reference to its parent `plan`.
+    initialization, an optional tag (`tag`), and maintains a reference to its
+    parent `plan`.
 
-    Attributes:
-        id: A unique `uuid.UUID` identifying the component.
-        plan: The parent [`Plan`][ropt.plan.Plan] instance.
     """
 
-    def __init__(self, plan: Plan) -> None:
+    def __init__(self, plan: Plan, tags: set[str] | None) -> None:
         """Initialize the PlanComponent.
 
-        This constructor is called by subclasses to set up common attributes.
-        It stores a reference to the parent `plan` and assigns a unique `id`.
+        This constructor is called by subclasses to set up common attributes. It
+        stores a reference to the parent `plan`, an optional `tag`, and assigns
+        a unique `id`.
 
         Args:
             plan: The parent [`Plan`][ropt.plan.Plan] instance.
+            tags: Optional tags
         """
         self.__stored_plan = plan
+        self.__tags = set() if tags is None else tags
         self.__id: uuid.UUID = uuid.uuid4()
 
     @property
@@ -225,6 +247,15 @@ class PlanComponent:
             The [`Plan`][ropt.plan.Plan] object that owns this event handler.
         """
         return self.__stored_plan
+
+    @property
+    def tags(self) -> set[str]:
+        """Return the optional tags.
+
+        Returns:
+            The tags.
+        """
+        return self.__tags
 
 
 class PlanStep(ABC, PlanComponent):
@@ -249,7 +280,7 @@ class PlanStep(ABC, PlanComponent):
     method to define the step's specific behavior.
     """
 
-    def __init__(self, plan: Plan) -> None:
+    def __init__(self, plan: Plan, tags: set[str] | None = None) -> None:
         """Initialize the PlanStep.
 
         Associates the step with its parent [`Plan`][ropt.plan.Plan] and assigns
@@ -257,8 +288,9 @@ class PlanStep(ABC, PlanComponent):
 
         Args:
             plan: The [`Plan`][ropt.plan.Plan] instance that owns this step.
+            tags: Optional tags
         """
-        super().__init__(plan)
+        super().__init__(plan, tags)
 
     def run(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
         """Execute this plan step.
@@ -330,7 +362,12 @@ class EventHandler(ABC, PlanComponent):
     define their specific event processing logic.
     """
 
-    def __init__(self, plan: Plan, sources: set[PlanStep] | None = None) -> None:
+    def __init__(
+        self,
+        plan: Plan,
+        tags: set[str] | None = None,
+        sources: set[PlanComponent | str] | None = None,
+    ) -> None:
         """Initialize the EventHandler.
 
         Associates the event handler with its parent [`Plan`][ropt.plan.Plan],
@@ -339,30 +376,38 @@ class EventHandler(ABC, PlanComponent):
 
         The `sources` parameter acts as a filter, determining which plan steps
         this event handler should listen to. It should be a set containing the
-        `PlanStep` instances whose event you want to receive. When an event is
-        received, this event handler checks if the step that emitted the event
-        (`event.source`) is present in the `sources` set. If `sources` is
-        `None`, events from all sources will be processed. The IDs of the source
-        steps are accessible via the `sources` property.
+        components or tags that should be handled. When an event is received,
+        this event handler checks if the component, or one of its tag, is
+        present in the  `sources` set.
 
         Args:
             plan:    The [`Plan`][ropt.plan.Plan] instance that owns this event handler.
+            tags:    Optional tags
             sources: Optional set of steps whose events should be processed.
         """
-        super().__init__(plan)
+        super().__init__(plan, tags)
+        if sources is None:
+            sources = set()
+        for source in sources:
+            if not isinstance(source, PlanComponent | str):
+                msg = "A source must be plan component or a tag string."
+                raise TypeError(msg)
         self._sources = (
-            {source.id for source in sources} if sources is not None else None
+            {
+                source.id if isinstance(source, PlanComponent) else source
+                for source in sources
+            }
+            if sources is not None
+            else None
         )
         self.__stored_values: dict[str, Any] = {}
 
     @property
-    def sources(self) -> set[uuid.UUID] | None:
-        """Return the source IDs that are listened to.
-
-        If it returns `None` any event will be responded to.
+    def sources(self) -> set[uuid.UUID | str]:
+        """Return the source IDs or tags that are listened to.
 
         Returns:
-            The source IDs this event handler is interested in.
+            The source IDs or tags this event handler is interested in.
         """
         return self._sources
 
@@ -439,7 +484,12 @@ class Evaluator(ABC, PlanComponent):
     [`EvaluatorResult`][ropt.evaluator.EvaluatorResult].
     """
 
-    def __init__(self, plan: Plan, clients: set[PlanStep] | None = None) -> None:
+    def __init__(
+        self,
+        plan: Plan,
+        tags: set[str] | None = None,
+        clients: set[PlanComponent | str] | None = None,
+    ) -> None:
         """Initialize the Evaluator.
 
         Associates the evaluator with its parent [`Plan`][ropt.plan.Plan], and
@@ -447,20 +497,30 @@ class Evaluator(ABC, PlanComponent):
         property.
 
         The `clients` parameter acts as a filter, determining which plan steps
-        this evaluator should serve. It should be a set containing the
-        `PlanStep` instances that should be handled. When an evaluation is
-        requested, this evaluator checks if the step that emitted the event is
-        present in the `client` set. If `clients` is `None`, all clients will be
-        served. The IDs of the client steps are accessible via the `clients`
-        property.
+        this evaluator should serve. It should be a set containing the the
+        components or tags that should be handled. When an evaluation is
+        requested, this evaluator checks if the component, or one of its tags,
+        is present in the `client` set.
 
         Args:
             plan:    The [`Plan`][ropt.plan.Plan] instance that owns this evaluator.
+            tags:    Optional tags
             clients: The steps that use this evaluator.
         """
-        super().__init__(plan)
+        super().__init__(plan, tags)
+        if clients is None:
+            clients = set()
+        for client in clients:
+            if not isinstance(client, PlanComponent | str):
+                msg = "A client must be plan component or a tag string."
+                raise TypeError(msg)
         self.__clients = (
-            {client.id for client in clients} if clients is not None else None
+            {
+                client.id if isinstance(client, PlanComponent) else client
+                for client in clients
+            }
+            if clients is not None
+            else None
         )
 
     @abstractmethod
@@ -497,12 +557,10 @@ class Evaluator(ABC, PlanComponent):
         """
 
     @property
-    def clients(self) -> set[uuid.UUID] | None:
-        """Return the client IDs that are served.
-
-        If it returns `None` any client will be served.
+    def clients(self) -> set[uuid.UUID | str]:
+        """Return the client IDs or tags that are served.
 
         Returns:
-            The IDs of the clients this evaluator will handle.
+            The IDs of the clients, or the tags, this evaluator will handle.
         """
         return self.__clients

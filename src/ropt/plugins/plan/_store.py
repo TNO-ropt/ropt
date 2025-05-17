@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ropt.enums import EventType
-from ropt.plugins.plan.base import EventHandler, PlanStep
+from ropt.plugins.plan.base import EventHandler, PlanComponent
 
 if TYPE_CHECKING:
     from ropt.plan import Event, Plan
@@ -29,8 +29,8 @@ class DefaultStoreHandler(EventHandler):
     def __init__(
         self,
         plan: Plan,
-        *,
-        sources: set[PlanStep] | None = None,
+        tags: set[str] | None = None,
+        sources: set[PlanComponent | str] | None = None,
     ) -> None:
         """Initialize a default store event handler.
 
@@ -41,8 +41,7 @@ class DefaultStoreHandler(EventHandler):
         and appends the results contained within them to an internal tuple.
 
         The `sources` parameter acts as a filter, determining which plan steps
-        this event handler should listen to. If `sources` is `None`, events from
-        all sources will be processed.
+        or tags this event handler should listen to.
 
         The results are converted from the optimizer domain to the user domain
         *before* being stored. The accumulated results are stored as a tuple and
@@ -51,9 +50,10 @@ class DefaultStoreHandler(EventHandler):
 
         Args:
             plan:       The parent plan instance.
+            tags:       Optional tags
             sources:    Optional set of steps whose results should be stored.
         """
-        super().__init__(plan, sources)
+        super().__init__(plan, tags, sources)
         self["results"] = None
 
     def handle_event(self, event: Event) -> None:
@@ -72,9 +72,7 @@ class DefaultStoreHandler(EventHandler):
         Args:
             event: The event object emitted by the plan.
         """
-        if event.event_type == EventType.FINISHED_EVALUATION and (
-            self.sources is None or event.source in self.sources
-        ):
+        if event.event_type == EventType.FINISHED_EVALUATION:
             if (results := event.data.get("results", None)) is None:
                 return
             if event.config.transforms is not None:

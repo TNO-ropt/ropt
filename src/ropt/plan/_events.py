@@ -34,4 +34,5 @@ class Event:
     event_type: EventType
     config: EnOptConfig
     source: uuid.UUID
+    tags: set[str]
     data: dict[str, Any] = field(default_factory=dict)

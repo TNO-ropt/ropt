@@ -87,13 +87,15 @@ class DefaultOptimizerStep(PlanStep):
     def __init__(
         self,
         plan: Plan,
+        tags: set[str] | None = None,
     ) -> None:
         """Initialize a default optimizer step.
 
         Args:
             plan: The plan that runs this step.
+            tags: Optional tags
         """
-        super().__init__(plan)
+        super().__init__(plan, tags)
 
     def run_step_from_plan(
         self,
@@ -142,6 +144,7 @@ class DefaultOptimizerStep(PlanStep):
                 event_type=EventType.START_OPTIMIZER_STEP,
                 config=self._config,
                 source=self.id,
+                tags=self.tags,
             )
         )
 
@@ -184,6 +187,7 @@ class DefaultOptimizerStep(PlanStep):
                 event_type=EventType.FINISHED_OPTIMIZER_STEP,
                 config=self._config,
                 source=self.id,
+                tags=self.tags,
             )
         )
 
@@ -204,6 +208,7 @@ class DefaultOptimizerStep(PlanStep):
                     event_type=EventType.START_EVALUATION,
                     config=self._config,
                     source=self.id,
+                    tags=self.tags,
                 )
             )
         else:
@@ -217,6 +222,7 @@ class DefaultOptimizerStep(PlanStep):
                     event_type=EventType.FINISHED_EVALUATION,
                     config=self._config,
                     source=self.id,
+                    tags=self.tags,
                     data=data,
                 ),
             )

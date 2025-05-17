@@ -34,7 +34,7 @@ from ._function_evaluator import DefaultFunctionEvaluator
 from ._observer import DefaultObserverHandler
 from ._store import DefaultStoreHandler
 from ._tracker import DefaultTrackerHandler
-from .base import EvaluatorPlugin, EventHandlerPlugin, PlanStepPlugin
+from .base import EvaluatorPlugin, EventHandlerPlugin, PlanComponent, PlanStepPlugin
 from .ensemble_evaluator import DefaultEnsembleEvaluatorStep
 from .optimizer import DefaultOptimizerStep
 
@@ -86,7 +86,8 @@ class DefaultEventHandlerPlugin(EventHandlerPlugin):
         cls,
         name: str,
         plan: Plan,
-        sources: set[PlanStep] | None = None,
+        tags: set[str] | None = None,
+        sources: set[PlanComponent | str] | None = None,
         **kwargs: dict[str, Any],
     ) -> EventHandler:
         """Create an event handler.
@@ -98,7 +99,7 @@ class DefaultEventHandlerPlugin(EventHandlerPlugin):
         _, _, name = name.lower().rpartition("/")
         obj = _EVENT_HANDLER_OBJECTS.get(name)
         if obj is not None:
-            return obj(plan, sources=sources, **kwargs)
+            return obj(plan, tags, sources, **kwargs)
 
         msg = f"Unknown event handler object type: {name}"
         raise TypeError(msg)
@@ -134,7 +135,13 @@ class DefaultPlanStepPlugin(PlanStepPlugin):
     """
 
     @classmethod
-    def create(cls, name: str, plan: Plan, **kwargs: Any) -> PlanStep:  # noqa: ANN401
+    def create(
+        cls,
+        name: str,
+        plan: Plan,
+        tags: set[str] | None = None,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> PlanStep:
         """Create a step.
 
         See the [ropt.plugins.plan.base.PlanPlugin][] abstract base class.
@@ -144,7 +151,7 @@ class DefaultPlanStepPlugin(PlanStepPlugin):
         _, _, name = name.lower().rpartition("/")
         step_obj = _STEP_OBJECTS.get(name)
         if step_obj is not None:
-            return step_obj(plan, **kwargs)
+            return step_obj(plan, tags, **kwargs)
 
         msg = f"Unknown step type: {name}"
         raise TypeError(msg)
@@ -181,7 +188,8 @@ class DefaultEvaluatorPlugin(EvaluatorPlugin):
         cls,
         name: str,
         plan: Plan,
-        clients: set[PlanStep] | None = None,
+        tags: set[str] | None = None,
+        clients: set[PlanComponent | str] | None = None,
         **kwargs: Any,  # noqa: ANN401
     ) -> Evaluator:
         """Create a step.
@@ -193,7 +201,7 @@ class DefaultEvaluatorPlugin(EvaluatorPlugin):
         _, _, name = name.lower().rpartition("/")
         evaluator_obj = _EVALUATOR_OBJECTS.get(name)
         if evaluator_obj is not None:
-            return evaluator_obj(plan, clients=clients, **kwargs)
+            return evaluator_obj(plan, tags, clients, **kwargs)
 
         msg = f"Unknown evaluator type: {name}"
         raise TypeError(msg)

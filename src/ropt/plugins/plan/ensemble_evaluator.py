@@ -46,13 +46,15 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
     def __init__(
         self,
         plan: Plan,
+        tags: set[str] | None = None,
     ) -> None:
         """Initialize a default evaluator step.
 
         Args:
             plan: The plan that runs this step.
+            tags: Optional tags
         """
-        super().__init__(plan)
+        super().__init__(plan, tags)
 
     def run_step_from_plan(
         self,
@@ -88,6 +90,7 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
                 event_type=EventType.START_ENSEMBLE_EVALUATOR_STEP,
                 config=config,
                 source=self.id,
+                tags=self.tags,
             )
         )
 
@@ -113,6 +116,7 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
                 event_type=EventType.START_EVALUATION,
                 config=config,
                 source=self.id,
+                tags=self.tags,
             )
         )
         try:
@@ -138,6 +142,7 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
                 event_type=EventType.FINISHED_EVALUATION,
                 config=config,
                 source=self.id,
+                tags=self.tags,
                 data=data,
             )
         )
@@ -150,6 +155,7 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
                 event_type=EventType.FINISHED_ENSEMBLE_EVALUATOR_STEP,
                 config=config,
                 source=self.id,
+                tags=self.tags,
             )
         )
 

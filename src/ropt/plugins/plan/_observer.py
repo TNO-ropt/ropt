@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Callable
 
-from ropt.plugins.plan.base import EventHandler, PlanStep
+from ropt.plugins.plan.base import EventHandler, PlanComponent
 
 if TYPE_CHECKING:
     from ropt.enums import EventType
@@ -23,10 +23,11 @@ class DefaultObserverHandler(EventHandler):
     def __init__(
         self,
         plan: Plan,
+        tags: set[str] | None = None,
+        sources: set[PlanComponent | str] | None = None,
         *,
         event_types: set[EventType],
         callback: Callable[[Event], None],
-        sources: set[PlanStep] | None = None,
     ) -> None:
         """Initialize a default event handler.
 
@@ -40,11 +41,12 @@ class DefaultObserverHandler(EventHandler):
 
         Args:
             plan:        The parent plan instance.
+            tags:        Optional tags
             sources:     Optional set of steps whose results should be stored.
             event_types: The set of event types  to respond to.
             callback:    The callable to call.
         """
-        super().__init__(plan, sources)
+        super().__init__(plan, tags, sources)
         self._event_types = event_types
         self._callback = callback
 
@@ -61,7 +63,5 @@ class DefaultObserverHandler(EventHandler):
         Args:
             event: The event object emitted by the plan.
         """
-        if (
-            self.sources is None or event.source in self.sources
-        ) and event.event_type in self._event_types:
+        if event.event_type in self._event_types:
             self._callback(event)

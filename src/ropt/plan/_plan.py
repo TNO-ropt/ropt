@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from ropt.exceptions import PlanAborted
-from ropt.plugins.plan.base import Evaluator, EventHandler, PlanStep
+from ropt.plugins.plan.base import Evaluator, EventHandler, PlanComponent, PlanStep
 
 if TYPE_CHECKING:
     import uuid
@@ -38,6 +38,17 @@ class Plan:
         functions, constraints). Evaluators are added using the
         [`add_evaluator`][ropt.plan.Plan.add_evaluator] method and can be
         passed to steps that need them.
+
+    **Tags:**
+
+    Steps, event handlers, and evaluators can be assigned one or more tags.
+    These tags can be used to identify the components instead of their unique
+    IDs. Unlike ID's, tags do not need to be unique. This is useful when the
+    components are created dynamically or if multiple components are to be
+    identified as a group. For example, when specifying the source of events
+    that a handler should process, its `sources` argument may contain both
+    component objects, which identifies by their ID, or tags, which could refer
+    to multiple components that have that tag.
 
     **Executing a Plan:**
 
@@ -150,7 +161,8 @@ class Plan:
     def add_event_handler(
         self,
         name: str,
-        sources: set[PlanStep] | None = None,
+        tags: set[str] | None = None,
+        sources: set[PlanComponent | str] | None = None,
         **kwargs: Any,  # noqa: ANN401
     ) -> EventHandler:
         """Add an event handler to the plan.
@@ -169,6 +181,7 @@ class Plan:
 
         Args:
             name:    The name of the event handler to add.
+            tags:    Optional tags
             sources: The steps whose events should be processed.
             kwargs:  Additional arguments for the handler's constructor.
 
@@ -176,13 +189,18 @@ class Plan:
             The newly added event handler.
         """
         handler = self._plugin_manager.get_plugin("event_handler", method=name).create(
-            name, self, sources, **kwargs
+            name, self, tags, sources, **kwargs
         )
         assert isinstance(handler, EventHandler)
         self._handlers[handler.id] = handler
         return handler
 
-    def add_step(self, name: str, **kwargs: Any) -> PlanStep:  # noqa: ANN401
+    def add_step(
+        self,
+        name: str,
+        tags: set[str] | None = None,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> PlanStep:
         """Add a step to the plan.
 
         Registers a step with the plan. The step's type is determined by the
@@ -192,13 +210,14 @@ class Plan:
 
         Args:
             name:   The name of the step to add.
+            tags:   Optional tags
             kwargs: Additional arguments for the step's constructor.
 
         Returns:
             The newly added step.
         """
         step = self._plugin_manager.get_plugin("plan_step", method=name).create(
-            name, self, **kwargs
+            name, self, tags, **kwargs
         )
         assert isinstance(step, PlanStep)
         self._steps[step.id] = step
@@ -207,7 +226,8 @@ class Plan:
     def add_evaluator(
         self,
         name: str,
-        clients: set[PlanStep] | None = None,
+        tags: set[str] | None = None,
+        clients: set[PlanComponent | str] | None = None,
         **kwargs: Any,  # noqa: ANN401
     ) -> Evaluator:
         """Add an evaluator object to the plan.
@@ -220,10 +240,11 @@ class Plan:
         this evaluator should serve. It should be a set containing the
         `PlanStep` instances that should be handled. When an evaluation is
         requested, this evaluator checks if the step is present in the `client`
-        set. If `clients` is `None`, all clients will be served.
+        set.
 
         Args:
             name:    The name of the evaluator to add.
+            tags:    Optional tags
             clients: The clients that should be served by this evaluator.
             kwargs:  Additional arguments for the evaluators's constructor.
 
@@ -231,7 +252,7 @@ class Plan:
             The new evaluator object.
         """
         evaluator = self._plugin_manager.get_plugin("evaluator", method=name).create(
-            name, self, clients, **kwargs
+            name, self, tags, clients, **kwargs
         )
         assert isinstance(evaluator, Evaluator)
         self._evaluators[evaluator.id] = evaluator
@@ -271,7 +292,7 @@ class Plan:
         evaluators = [
             evaluator
             for evaluator in self._evaluators.values()
-            if evaluator.clients is None or client.id in evaluator.clients
+            if client.id in evaluator.clients or client.tags & evaluator.clients
         ]
         if not evaluators and self._parent is not None:
             evaluators = self._parent._get_evaluators(client)  # noqa: SLF001
@@ -286,9 +307,8 @@ class Plan:
         current plan and, if no suitable evaluator is found and a parent plan
         exists, continues recursively up the plan hierarchy.
 
-        An evaluator is considered suitable if its `clients` attribute is `None`
-        (indicating it serves all clients) or if the `id` of the `client` step
-        is present in the `clients` set of the evaluator.
+        An evaluator is considered suitable the `id` or `tags` of the `client`
+        step is present in the `clients` set of the evaluator.
 
         The method expects to find exactly one suitable evaluator.
 
@@ -351,6 +371,7 @@ class Plan:
             event: The event object to emit.
         """
         for handler in self._handlers.values():
-            handler.handle_event(event)
+            if event.source in handler.sources or event.tags & handler.sources:
+                handler.handle_event(event)
         if self._parent is not None:
             self._parent.emit_event(event)

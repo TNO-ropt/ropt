@@ -173,10 +173,6 @@ class BasicOptimizer:
             The `BasicOptimizer` instance, allowing for method chaining.
         """
         plan = Plan(self._plugin_manager)
-        for event_type, function in self._observers:
-            plan.add_event_handler(
-                "observer", event_types={event_type}, callback=function
-            )
 
         # Optionally run a custom step defined in the keyword arguments:
         custom_function: Callable[[Plan], OptimizerExitCode] | None = None
@@ -192,13 +188,24 @@ class BasicOptimizer:
             )
 
         if custom_function is None:
-            plan.add_evaluator("function_evaluator", evaluator=self._evaluator)
             optimizer = plan.add_step("optimizer")
             tracker = plan.add_event_handler(
                 "tracker",
                 constraint_tolerance=self._constraint_tolerance,
                 sources={optimizer},
             )
+            plan.add_evaluator(
+                "function_evaluator",
+                evaluator=self._evaluator,
+                clients={optimizer},
+            )
+            for event_type, function in self._observers:
+                plan.add_event_handler(
+                    "observer",
+                    event_types={event_type},
+                    callback=function,
+                    sources={optimizer},
+                )
             exit_code = optimizer.run(config=self._config)
             results = tracker["results"]
             variables = None if results is None else results.evaluations.variables

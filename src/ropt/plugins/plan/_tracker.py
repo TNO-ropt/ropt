@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Literal
 
 from ropt.enums import EventType
-from ropt.plugins.plan.base import EventHandler, PlanStep
+from ropt.plugins.plan.base import EventHandler, PlanComponent
 
 from ._utils import _get_last_result, _update_optimal_result
 
@@ -42,8 +42,9 @@ class DefaultTrackerHandler(EventHandler):
     def __init__(
         self,
         plan: Plan,
+        tags: set[str] | None = None,
+        sources: set[PlanComponent | str] | None = None,
         *,
-        sources: set[PlanStep] | None = None,
         what: Literal["best", "last"] = "best",
         constraint_tolerance: float | None = None,
     ) -> None:
@@ -61,8 +62,7 @@ class DefaultTrackerHandler(EventHandler):
         specified threshold.
 
         The `sources` parameter acts as a filter, determining which plan steps
-        this event handler should listen to. If `sources` is `None`, events from
-        all sources will be processed.
+        this event handler should listen to.
 
         Tracking logic (comparing 'best' or selecting 'last') operates on the
         results in the optimizer's domain. However, the final selected result
@@ -71,11 +71,12 @@ class DefaultTrackerHandler(EventHandler):
 
         Args:
             plan:                 The parent plan instance.
+            tags:                 Optional tags
             what:                 Criterion for selecting results ('best' or 'last').
             constraint_tolerance: Optional threshold for filtering constraint violations.
             sources:              Optional set of steps whose results should be tracked.
         """
-        super().__init__(plan, sources)
+        super().__init__(plan, tags, sources)
         self._what = what
         self._constraint_tolerance = constraint_tolerance
         self._tracked_results: FunctionResults | None = None
@@ -100,7 +101,6 @@ class DefaultTrackerHandler(EventHandler):
         if (
             event.event_type == EventType.FINISHED_EVALUATION
             and "results" in event.data
-            and (self.sources is None or event.source in self.sources)
         ):
             results = event.data["results"]
             if self["results"] is None:
