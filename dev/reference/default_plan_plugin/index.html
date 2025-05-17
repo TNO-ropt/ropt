@@ -1271,15 +1271,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._caching_evaluator.DefaultCachingEvaluator" class="md-nav__link">
-    <span class="md-ellipsis">
-      DefaultCachingEvaluator
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1632,15 +1623,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.plan._caching_evaluator.DefaultCachingEvaluator" class="md-nav__link">
-    <span class="md-ellipsis">
-      DefaultCachingEvaluator
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1702,9 +1684,6 @@ standard optimization plans out-of-the-box.</p>
 <li><strong>Evaluators:</strong><ul>
 <li><code>function_evaluator</code>: Evaluator that forwards calculations to a given evaluation function.
   (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan._function_evaluator.DefaultFunctionEvaluator" href="#ropt.plugins.plan._function_evaluator.DefaultFunctionEvaluator"><code>DefaultFunctionEvaluator</code></a>)</li>
-<li><code>caching_evaluator</code>: Evaluator that uses caching to find results that were
-  already evaluated before forwarding to another evaluator.
-  (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan._caching_evaluator.DefaultCachingEvaluator" href="#ropt.plugins.plan._caching_evaluator.DefaultCachingEvaluator"><code>DefaultCachingEvaluator</code></a>)</li>
 </ul>
 </li>
 </ul>
@@ -2623,49 +2602,6 @@ all arguments, to the wrapped <code>evaluator</code> function.</p>
 structured as an <code>Evaluator</code> subclass into a <code>ropt</code> plan.</p>
 <p>The <code>clients</code> parameter acts as a filter, determining which plan steps this
 evaluator should serve.If <code>clients</code> is <code>None</code>, all clients will be served.</p>
-
-
-
-
-
-
-
-
-
-
-  <div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ropt.plugins.plan._caching_evaluator.DefaultCachingEvaluator" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan._caching_evaluator.DefaultCachingEvaluator</span>
-
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator">Evaluator</a></code></p>
-
 
 
 
