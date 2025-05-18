@@ -188,7 +188,7 @@ class BasicOptimizer:
             )
 
         if custom_function is None:
-            optimizer = plan.add_step("optimizer")
+            optimizer = plan.add_step("optimizer", tags={"__basic_optimizer__"})
             tracker = plan.add_event_handler(
                 "tracker",
                 constraint_tolerance=self._constraint_tolerance,
