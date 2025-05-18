@@ -869,6 +869,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.get_event_handlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_event_handlers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.get_evaluator" class="md-nav__link">
     <span class="md-ellipsis">
       get_evaluator
@@ -890,15 +899,6 @@
   <a href="#ropt.plan.Plan.set_parent" class="md-nav__link">
     <span class="md-ellipsis">
       set_parent
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.emit_event" class="md-nav__link">
-    <span class="md-ellipsis">
-      emit_event
     </span>
   </a>
   
@@ -1598,6 +1598,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.get_event_handlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_event_handlers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.get_evaluator" class="md-nav__link">
     <span class="md-ellipsis">
       get_evaluator
@@ -1619,15 +1628,6 @@
   <a href="#ropt.plan.Plan.set_parent" class="md-nav__link">
     <span class="md-ellipsis">
       set_parent
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.emit_event" class="md-nav__link">
-    <span class="md-ellipsis">
-      emit_event
     </span>
   </a>
   
@@ -1780,10 +1780,10 @@ is used by the plan object to find and instantiate step, event handler, and
 evaluator objects. This manager can also be used by these components to
 implement further plugin-based functionality.</p>
 <p><strong>Events:</strong></p>
-<p>Steps can communicate events using the
-<a class="autorefs autorefs-internal" title="            emit_event" href="#ropt.plan.Plan.emit_event"><code>emit_event</code></a> method. Event handlers can respond
-to these events, enabling actions such as processing optimization results.
-Event handlers are added to the plan using the
+<p>Steps can communicate events by retrieving a list of handlers using the
+<a class="autorefs autorefs-internal" title="            get_event_handlers" href="#ropt.plan.Plan.get_event_handlers"><code>get_event_handlers</code></a> method. Event
+handlers can respond to these events, enabling actions such as processing
+optimization results. Event handlers are added to the plan using the
 <a class="autorefs autorefs-internal" title="            add_event_handler" href="#ropt.plan.Plan.add_event_handler"><code>add_event_handler</code></a> method. To connect
 the event handlers to steps, they generally accept a set of steps via the
 <code>sources</code> argument. The steps must be part of the same plan, or a child plan
@@ -2526,6 +2526,91 @@ method is returned by this method.</p>
 <div class="doc doc-object doc-function">
 
 
+<h3 id="ropt.plan.Plan.get_event_handlers" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_event_handlers</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_event_handlers</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">source</span><span class="p">:</span> <span class="n">PlanComponent</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Event</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the event handlers for a given source.</p>
+<p>When this method is called, all event handlers associated with the plan
+are searched for those that handle the <code>source</code>. Then, if the plan has a
+parent, the parent plan's <code>get_event_handlers</code> method is also called,
+find handlers further up the hierarchy.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>source</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanComponent" href="../plan_plugins/#ropt.plugins.plan.base.PlanComponent">PlanComponent</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The source of the event.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-external" title="typing.Callable" href="https://docs.python.org/3/library/typing.html#typing.Callable">Callable</a>[[<a class="autorefs autorefs-internal" title="            ropt.plan.Event
+
+
+  
+      dataclass
+  " href="#ropt.plan.Event">Event</a>], None]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A list of suitable handlers.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h3 id="ropt.plan.Plan.get_evaluator" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_evaluator</span>
 
@@ -2715,67 +2800,6 @@ evaluator object, if necessary.</p>
 
 </div>
 
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plan.Plan.emit_event" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">emit_event</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">emit_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Emit an event.</p>
-<p>Emits an event, triggering associated event handlers.</p>
-<p>When this method is called, all event handlers associated with the plan
-are invoked. Then, if the plan has a parent, the parent plan's
-<code>emit_event</code> method is also called, propagating the event up the
-hierarchy.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>event</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.plan.Event
-
-
-  
-      dataclass
-  " href="#ropt.plan.Event">Event</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The event object to emit.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
 
 
   </div>
@@ -2807,8 +2831,7 @@ hierarchy.</p>
 specific occurrences. Callbacks can be registered to react to these events
 and will receive an <code>Event</code> object containing relevant information.</p>
 <p>The specific data within the <code>Event</code> object varies depending on the event
-type. See the <a class="autorefs autorefs-internal" title="            EventType" href="../enums/#ropt.enums.EventType"><code>EventType</code></a> documentation for
-details.</p>
+type. See the <a class="autorefs autorefs-internal" title="            EventType" href="../enums/#ropt.enums.EventType"><code>EventType</code></a> documentation for details.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2840,17 +2863,6 @@ details.</p>
             <td>
               <div class="doc-md-description">
                 <p>The configuration used for the optimization.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plan.Event.source">source</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The ID of the step that triggered the event.</p>
               </div>
             </td>
           </tr>
