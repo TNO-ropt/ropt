@@ -85,12 +85,20 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
         Returns:
             An [`OptimizerExitCode`][ropt.enums.OptimizerExitCode] indicating the outcome.
         """
-        self.emit_event(
+        self._event_handlers = self.plan.get_event_handlers(
+            self,
+            {
+                EventType.START_ENSEMBLE_EVALUATOR_STEP,
+                EventType.FINISHED_ENSEMBLE_EVALUATOR_STEP,
+                EventType.START_EVALUATION,
+                EventType.FINISHED_EVALUATION,
+            },
+        )
+
+        self._emit_event(
             Event(
                 event_type=EventType.START_ENSEMBLE_EVALUATOR_STEP,
                 config=config,
-                source=self.id,
-                tags=self.tags,
             )
         )
 
@@ -111,12 +119,10 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
 
         exit_code = OptimizerExitCode.EVALUATOR_STEP_FINISHED
 
-        self.emit_event(
+        self._emit_event(
             Event(
                 event_type=EventType.START_EVALUATION,
                 config=config,
-                source=self.id,
-                tags=self.tags,
             )
         )
         try:
@@ -137,12 +143,10 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
 
         data: dict[str, Any] = {"results": results}
 
-        self.emit_event(
+        self._emit_event(
             Event(
                 event_type=EventType.FINISHED_EVALUATION,
                 config=config,
-                source=self.id,
-                tags=self.tags,
                 data=data,
             )
         )
@@ -150,21 +154,15 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
         if exit_code == OptimizerExitCode.USER_ABORT:
             self.plan.abort()
 
-        self.emit_event(
+        self._emit_event(
             Event(
                 event_type=EventType.FINISHED_ENSEMBLE_EVALUATOR_STEP,
                 config=config,
-                source=self.id,
-                tags=self.tags,
             )
         )
 
         return exit_code
 
-    def emit_event(self, event: Event) -> None:
-        """Emit an event.
-
-        Args:
-            event: The event to emit.
-        """
-        self.plan.emit_event(event)
+    def _emit_event(self, event: Event) -> None:
+        for handler in self._event_handlers.get(event.event_type, []):
+            handler(event)

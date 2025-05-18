@@ -138,13 +138,20 @@ class DefaultOptimizerStep(PlanStep):
         self._config = config
         self._nested_optimization = nested_optimization
         self._metadata = metadata
+        self._event_handlers = self.plan.get_event_handlers(
+            self,
+            {
+                EventType.START_OPTIMIZER_STEP,
+                EventType.FINISHED_OPTIMIZER_STEP,
+                EventType.START_EVALUATION,
+                EventType.FINISHED_EVALUATION,
+            },
+        )
 
-        self.emit_event(
+        self._emit_event(
             Event(
                 event_type=EventType.START_OPTIMIZER_STEP,
                 config=self._config,
-                source=self.id,
-                tags=self.tags,
             )
         )
 
@@ -182,33 +189,25 @@ class DefaultOptimizerStep(PlanStep):
         if exit_code == OptimizerExitCode.USER_ABORT:
             self.plan.abort()
 
-        self.emit_event(
+        self._emit_event(
             Event(
                 event_type=EventType.FINISHED_OPTIMIZER_STEP,
                 config=self._config,
-                source=self.id,
-                tags=self.tags,
             )
         )
 
         return exit_code
 
-    def emit_event(self, event: Event) -> None:
-        """Emit an event.
-
-        Args:
-            event: The event to emit.
-        """
-        self.plan.emit_event(event)
+    def _emit_event(self, event: Event) -> None:
+        for handler in self._event_handlers.get(event.event_type, []):
+            handler(event)
 
     def _signal_evaluation(self, results: tuple[Results, ...] | None = None) -> None:
         if results is None:
-            self.emit_event(
+            self._emit_event(
                 Event(
                     event_type=EventType.START_EVALUATION,
                     config=self._config,
-                    source=self.id,
-                    tags=self.tags,
                 )
             )
         else:
@@ -217,12 +216,10 @@ class DefaultOptimizerStep(PlanStep):
                     item.metadata = deepcopy(self._metadata)
 
             data: dict[str, Any] = {"results": results}
-            self.emit_event(
+            self._emit_event(
                 Event(
                     event_type=EventType.FINISHED_EVALUATION,
                     config=self._config,
-                    source=self.id,
-                    tags=self.tags,
                     data=data,
                 ),
             )

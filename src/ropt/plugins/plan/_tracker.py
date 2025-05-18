@@ -98,10 +98,7 @@ class DefaultTrackerHandler(EventHandler):
         Args:
             event: The event object emitted by the plan.
         """
-        if (
-            event.event_type == EventType.FINISHED_EVALUATION
-            and "results" in event.data
-        ):
+        if "results" in event.data:
             results = event.data["results"]
             if self["results"] is None:
                 self._tracked_results = None
@@ -125,3 +122,12 @@ class DefaultTrackerHandler(EventHandler):
                         event.config.transforms
                     )
                 self["results"] = filtered_results
+
+    @property
+    def event_types(self) -> set[EventType]:
+        """Return the event types that are handled.
+
+        Returns:
+            A set of event types that are handled.
+        """
+        return {EventType.FINISHED_EVALUATION}

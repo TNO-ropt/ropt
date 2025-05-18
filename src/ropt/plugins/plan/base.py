@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
+    from ropt.enums import EventType
     from ropt.evaluator import EvaluatorContext, EvaluatorResult
     from ropt.plan import Event, Plan
 
@@ -410,6 +411,15 @@ class EventHandler(ABC, PlanComponent):
             The source IDs or tags this event handler is interested in.
         """
         return self._sources
+
+    @property
+    @abstractmethod
+    def event_types(self) -> set[EventType]:
+        """Return the event types that are handled.
+
+        Returns:
+            A set of event types that are handled.
+        """
 
     @abstractmethod
     def handle_event(self, event: Event) -> None:

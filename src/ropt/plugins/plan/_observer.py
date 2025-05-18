@@ -65,3 +65,12 @@ class DefaultObserverHandler(EventHandler):
         """
         if event.event_type in self._event_types:
             self._callback(event)
+
+    @property
+    def event_types(self) -> set[EventType]:
+        """Return the event types that are handled.
+
+        Returns:
+            A set of event types that are handled.
+        """
+        return self._event_types

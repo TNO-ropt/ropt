@@ -576,9 +576,10 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
     def _track_evaluations(event: Event) -> None:
         for item in event.data["results"]:
             if isinstance(item, FunctionResults):
-                if event.source == "outer":
+                assert "inner" in item.metadata or "outer" in item.metadata
+                if "outer" in item.metadata:
                     assert item.metadata.get("outer") == 1
-                if event.source == "inner":
+                if "inner" in item.metadata:
                     assert item.metadata.get("inner") == "inner_meta_data"
 
     enopt_config["optimizer"]["tolerance"] = 1e-10

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Callable
 
 from ropt.exceptions import PlanAborted
 from ropt.plugins.plan.base import Evaluator, EventHandler, PlanComponent, PlanStep
@@ -10,6 +10,7 @@ from ropt.plugins.plan.base import Evaluator, EventHandler, PlanComponent, PlanS
 if TYPE_CHECKING:
     import uuid
 
+    from ropt.enums import EventType
     from ropt.plan import Event
     from ropt.plugins import PluginManager
 
@@ -66,10 +67,10 @@ class Plan:
 
     **Events:**
 
-    Steps can communicate events using the
-    [`emit_event`][ropt.plan.Plan.emit_event] method. Event handlers can respond
-    to these events, enabling actions such as processing optimization results.
-    Event handlers are added to the plan using the
+    Steps can communicate events by retrieving a list of handlers using the
+    [`get_event_handlers`][ropt.plan.Plan.get_event_handlers] method. Event
+    handlers can respond to these events, enabling actions such as processing
+    optimization results. Event handlers are added to the plan using the
     [`add_event_handler`][ropt.plan.Plan.add_event_handler] method. To connect
     the event handlers to steps, they generally accept a set of steps via the
     `sources` argument. The steps must be part of the same plan, or a child plan
@@ -288,6 +289,42 @@ class Plan:
             raise PlanAborted(msg)
         return step.run_step_from_plan(**kwargs)
 
+    def get_event_handlers(
+        self, source: PlanComponent, event_types: set[EventType]
+    ) -> dict[EventType, list[Callable[[Event], None]]]:
+        """Get the event handlers for a given source and event types.
+
+        When this method is called, all event handlers associated with the plan
+        are searched for those that handle the `source`. Then, if the plan has a
+        parent, the parent plan's `get_event_handlers` method is also called,
+        find handlers further up the hierarchy.
+
+        Args:
+            source:      The source of the event.
+            event_types: The event types that should be handled.
+
+        Returns:
+            A mapping of event types to a list of suitable handlers.
+        """
+        result: dict[EventType, list[Callable[[Event], None]]] = {}
+        for handler in self._handlers.values():
+            if (source.id in handler.sources or source.tags & handler.sources) and (
+                event_types & handler.event_types
+            ):
+                for event_type in handler.event_types:
+                    if event_type in result:
+                        result[event_type].append(handler.handle_event)
+                    else:
+                        result[event_type] = [handler.handle_event]
+        if self._parent is not None:
+            parent_handlers = self._parent.get_event_handlers(source, event_types)
+            for event_type, handlers in parent_handlers.items():
+                if event_type not in result:
+                    result[event_type] = handlers
+                else:
+                    result[event_type].extend(handlers)
+        return result
+
     def _get_evaluators(self, client: PlanComponent) -> list[Evaluator]:
         evaluators = [
             evaluator
@@ -356,22 +393,3 @@ class Plan:
             parent: The parent plan.
         """
         self._parent = parent
-
-    def emit_event(self, event: Event) -> None:
-        """Emit an event.
-
-        Emits an event, triggering associated event handlers.
-
-        When this method is called, all event handlers associated with the plan
-        are invoked. Then, if the plan has a parent, the parent plan's
-        `emit_event` method is also called, propagating the event up the
-        hierarchy.
-
-        Args:
-            event: The event object to emit.
-        """
-        for handler in self._handlers.values():
-            if event.source in handler.sources or event.tags & handler.sources:
-                handler.handle_event(event)
-        if self._parent is not None:
-            self._parent.emit_event(event)

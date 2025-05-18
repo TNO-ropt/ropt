@@ -72,14 +72,22 @@ class DefaultStoreHandler(EventHandler):
         Args:
             event: The event object emitted by the plan.
         """
-        if event.event_type == EventType.FINISHED_EVALUATION:
-            if (results := event.data.get("results", None)) is None:
-                return
-            if event.config.transforms is not None:
-                results = (
-                    item.transform_from_optimizer(event.config.transforms)
-                    for item in results
-                )
-            self["results"] = (
-                results if self["results"] is None else (*self["results"], *results)
+        if (results := event.data.get("results", None)) is None:
+            return
+        if event.config.transforms is not None:
+            results = (
+                item.transform_from_optimizer(event.config.transforms)
+                for item in results
             )
+        self["results"] = (
+            results if self["results"] is None else (*self["results"], *results)
+        )
+
+    @property
+    def event_types(self) -> set[EventType]:
+        """Return the event types that are handled.
+
+        Returns:
+            A set of event types that are handled.
+        """
+        return {EventType.FINISHED_EVALUATION}
