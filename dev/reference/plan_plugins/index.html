@@ -1174,6 +1174,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.EventHandler.event_types" class="md-nav__link">
+    <span class="md-ellipsis">
+      event_types
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.plugins.plan.base.EventHandler.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
@@ -1847,6 +1856,15 @@
   <a href="#ropt.plugins.plan.base.EventHandler.sources" class="md-nav__link">
     <span class="md-ellipsis">
       sources
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.base.EventHandler.event_types" class="md-nav__link">
+    <span class="md-ellipsis">
+      event_types
     </span>
   </a>
   
@@ -3449,6 +3467,54 @@ define their specific event processing logic.</p>
             <td>
               <div class="doc-md-description">
                 <p>The source IDs or tags this event handler is interested in.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.plugins.plan.base.EventHandler.event_types" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">event_types</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event_types</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">EventType</span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the event types that are handled.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            EventType (ropt.enums.EventType)" href="../enums/#ropt.enums.EventType">EventType</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A set of event types that are handled.</p>
               </div>
             </td>
           </tr>
