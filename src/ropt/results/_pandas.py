@@ -64,6 +64,8 @@ def _to_series(
     if data is None:
         return None
     if key:
+        if key not in data:
+            return None
         data = data[key]
     axes = result_field.get_axes(field)
     if names is None:
