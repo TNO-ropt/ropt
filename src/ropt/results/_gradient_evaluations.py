@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
-from ropt.enums import ResultAxis
+from ropt.enums import AxisName
 
 from ._result_field import ResultField
 from ._utils import _immutable_copy
@@ -32,7 +32,7 @@ class GradientEvaluations(ResultField):
             - Shape: $(n_v,)$, where:
                 - $n_v$ is the number of variables.
             - Axis type:
-                - [`ResultAxis.VARIABLE`][ropt.enums.ResultAxis.VARIABLE]
+                - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
         === "Perturbed Variables"
 
@@ -44,9 +44,9 @@ class GradientEvaluations(ResultField):
                 - $n_p$ is the number of perturbations.
                 - $n_v$ is the number of variables.
             - Axis type:
-                - [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]
-                - [`ResultAxis.PERTURBATION`][ropt.enums.ResultAxis.PERTURBATION]
-                - [`ResultAxis.VARIABLE`][ropt.enums.ResultAxis.VARIABLE]
+                - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
+                - [`AxisName.PERTURBATION`][ropt.enums.AxisName.PERTURBATION]
+                - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
         === "Perturbed Objectives"
 
@@ -59,9 +59,9 @@ class GradientEvaluations(ResultField):
                 - $n_p$ is the number of perturbations.
                 - $n_o$ is the number of objectives.
             - Axis types:
-                - [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]
-                - [`ResultAxis.PERTURBATION`][ropt.enums.ResultAxis.PERTURBATION]
-                - [`ResultAxis.OBJECTIVE`][ropt.enums.ResultAxis.OBJECTIVE]
+                - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
+                - [`AxisName.PERTURBATION`][ropt.enums.AxisName.PERTURBATION]
+                - [`AxisName.OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
 
         === "Perturbed Constraints"
 
@@ -74,9 +74,9 @@ class GradientEvaluations(ResultField):
                 - $n_p$ is the number of perturbations.
                 - $n_c$ is the number of constraints.
             - Axis types:
-                - [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]
-                - [`ResultAxis.PERTURBATION`][ropt.enums.ResultAxis.PERTURBATION]
-                - [`ResultAxis.NONLINEAR_CONSTRAINT`][ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT]
+                - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
+                - [`AxisName.PERTURBATION`][ropt.enums.AxisName.PERTURBATION]
+                - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
 
         === "Evaluation Info"
 
@@ -89,8 +89,8 @@ class GradientEvaluations(ResultField):
                 - $n_r$ is the number of realizations.
                 - $n_p$ is the number of perturbations.
             - Axis types:
-                - [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]
-                - [`ResultAxis.PERTURBATION`][ropt.enums.ResultAxis.PERTURBATION]
+                - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
+                - [`AxisName.PERTURBATION`][ropt.enums.AxisName.PERTURBATION]
 
 
     Attributes:
@@ -107,24 +107,24 @@ class GradientEvaluations(ResultField):
 
     variables: NDArray[np.float64] = field(
         metadata={
-            "__axes__": (ResultAxis.VARIABLE,),
+            "__axes__": (AxisName.VARIABLE,),
         },
     )
     perturbed_variables: NDArray[np.float64] = field(
         metadata={
             "__axes__": (
-                ResultAxis.REALIZATION,
-                ResultAxis.PERTURBATION,
-                ResultAxis.VARIABLE,
+                AxisName.REALIZATION,
+                AxisName.PERTURBATION,
+                AxisName.VARIABLE,
             ),
         },
     )
     perturbed_objectives: NDArray[np.float64] = field(
         metadata={
             "__axes__": (
-                ResultAxis.REALIZATION,
-                ResultAxis.PERTURBATION,
-                ResultAxis.OBJECTIVE,
+                AxisName.REALIZATION,
+                AxisName.PERTURBATION,
+                AxisName.OBJECTIVE,
             ),
         },
     )
@@ -132,9 +132,9 @@ class GradientEvaluations(ResultField):
         default=None,
         metadata={
             "__axes__": (
-                ResultAxis.REALIZATION,
-                ResultAxis.PERTURBATION,
-                ResultAxis.NONLINEAR_CONSTRAINT,
+                AxisName.REALIZATION,
+                AxisName.PERTURBATION,
+                AxisName.NONLINEAR_CONSTRAINT,
             ),
         },
     )
@@ -142,8 +142,8 @@ class GradientEvaluations(ResultField):
         default_factory=dict,
         metadata={
             "__axes__": (
-                ResultAxis.REALIZATION,
-                ResultAxis.PERTURBATION,
+                AxisName.REALIZATION,
+                AxisName.PERTURBATION,
             ),
         },
     )

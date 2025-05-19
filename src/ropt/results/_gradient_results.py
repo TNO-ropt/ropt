@@ -6,8 +6,6 @@ from typing import TYPE_CHECKING, TypeVar
 from ._results import Results
 
 if TYPE_CHECKING:
-    from ropt.transforms._transforms import OptModelTransforms
-
     from ._gradient_evaluations import GradientEvaluations
     from ._gradients import Gradients
     from ._realizations import Realizations
@@ -46,25 +44,24 @@ class GradientResults(Results):
     realizations: Realizations
     gradients: Gradients | None
 
-    def transform_from_optimizer(
-        self, transforms: OptModelTransforms
-    ) -> GradientResults:
+    def transform_from_optimizer(self) -> GradientResults:
         """Apply transformations from optimizer space.
-
-        Args:
-            transforms: The transforms to apply.
 
         Returns:
             The transformed results.
         """
+        assert self.config.transforms is not None
         return GradientResults(
+            config=self.config,
             batch_id=self.batch_id,
             metadata=self.metadata,
-            evaluations=self.evaluations.transform_from_optimizer(transforms),
+            evaluations=self.evaluations.transform_from_optimizer(
+                self.config.transforms
+            ),
             realizations=self.realizations,
             gradients=(
                 None
                 if self.gradients is None
-                else self.gradients.transform_from_optimizer(transforms)
+                else self.gradients.transform_from_optimizer(self.config.transforms)
             ),
         )

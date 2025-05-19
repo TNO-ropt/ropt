@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from ropt.enums import ResultAxis
+from ropt.enums import AxisName
 
 from ._result_field import ResultField
 from ._utils import _immutable_copy
@@ -61,7 +61,7 @@ class ConstraintInfo(ResultField):
             - Shape: $(n_v,)$, where:
                 - $n_v$ is the number of variables.
             - Axis type:
-                - [`ResultAxis.VARIABLE`][ropt.enums.ResultAxis.VARIABLE]
+                - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
         === "Linear Constraints"
 
@@ -70,7 +70,7 @@ class ConstraintInfo(ResultField):
             - Shape: $(n_l,)$, where:
                 - $n_l$ is the number of linear constraints.
             - Axis type:
-                - [`ResultAxis.LINEAR_CONSTRAINT`][ropt.enums.ResultAxis.LINEAR_CONSTRAINT]
+                - [`AxisName.LINEAR_CONSTRAINT`][ropt.enums.AxisName.LINEAR_CONSTRAINT]
 
         === "Nonlinear Constraints"
 
@@ -79,7 +79,7 @@ class ConstraintInfo(ResultField):
             - Shape: $(n_c,)$, where:
                 - $n_c$ is the number of non-linear constraints.
             - Axis type:
-                - [`ResultAxis.NONLINEAR_CONSTRAINT`][ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT]
+                - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
 
     Attributes:
          bound_lower:         Difference between variables and their lower bounds.
@@ -98,31 +98,31 @@ class ConstraintInfo(ResultField):
     """
 
     bound_lower: NDArray[np.float64] | None = field(
-        default=None, metadata={"__axes__": (ResultAxis.VARIABLE,)}
+        default=None, metadata={"__axes__": (AxisName.VARIABLE,)}
     )
     bound_upper: NDArray[np.float64] | None = field(
-        default=None, metadata={"__axes__": (ResultAxis.VARIABLE,)}
+        default=None, metadata={"__axes__": (AxisName.VARIABLE,)}
     )
     linear_lower: NDArray[np.float64] | None = field(
-        default=None, metadata={"__axes__": (ResultAxis.LINEAR_CONSTRAINT,)}
+        default=None, metadata={"__axes__": (AxisName.LINEAR_CONSTRAINT,)}
     )
     linear_upper: NDArray[np.float64] | None = field(
-        default=None, metadata={"__axes__": (ResultAxis.LINEAR_CONSTRAINT,)}
+        default=None, metadata={"__axes__": (AxisName.LINEAR_CONSTRAINT,)}
     )
     nonlinear_lower: NDArray[np.float64] | None = field(
-        default=None, metadata={"__axes__": (ResultAxis.NONLINEAR_CONSTRAINT,)}
+        default=None, metadata={"__axes__": (AxisName.NONLINEAR_CONSTRAINT,)}
     )
     nonlinear_upper: NDArray[np.float64] | None = field(
-        default=None, metadata={"__axes__": (ResultAxis.NONLINEAR_CONSTRAINT,)}
+        default=None, metadata={"__axes__": (AxisName.NONLINEAR_CONSTRAINT,)}
     )
     bound_violation: NDArray[np.float64] | None = field(
-        default=None, metadata={"__axes__": (ResultAxis.VARIABLE,)}
+        default=None, metadata={"__axes__": (AxisName.VARIABLE,)}
     )
     linear_violation: NDArray[np.float64] | None = field(
-        default=None, metadata={"__axes__": (ResultAxis.LINEAR_CONSTRAINT,)}
+        default=None, metadata={"__axes__": (AxisName.LINEAR_CONSTRAINT,)}
     )
     nonlinear_violation: NDArray[np.float64] | None = field(
-        default=None, metadata={"__axes__": (ResultAxis.NONLINEAR_CONSTRAINT,)}
+        default=None, metadata={"__axes__": (AxisName.NONLINEAR_CONSTRAINT,)}
     )
 
     def __post_init__(self) -> None:

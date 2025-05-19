@@ -1,11 +1,10 @@
-from collections.abc import Sequence
 from functools import partial
 from typing import Any, Literal
 
 import pytest
 
 from ropt.config.enopt import EnOptConfig
-from ropt.enums import ResultAxis
+from ropt.enums import AxisName
 from ropt.plan import BasicOptimizer
 from ropt.results import Results, results_to_dataframe
 
@@ -34,6 +33,9 @@ def enopt_config_fixture() -> dict[str, Any]:
             "perturbation_magnitudes": 0.01,
             "evaluation_policy": "speculative",
         },
+        "names": {
+            AxisName.VARIABLE: tuple(f"a:{idx}" for idx in range(1, 4)),
+        },
     }
 
 
@@ -42,16 +44,12 @@ def _handle_results(
     frames: list[pd.DataFrame],
     fields: set[str],
     result_type: Literal["functions", "gradients"],
-    variable_names: Sequence[str | int] | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> None:
-    names: dict[str, Sequence[str | int] | None] | None = (
-        None if variable_names is None else {ResultAxis.VARIABLE: variable_names}
-    )
     if metadata is not None:
         for item in results:
             item.metadata = metadata
-    frame = results_to_dataframe(results, fields, result_type=result_type, names=names)
+    frame = results_to_dataframe(results, fields, result_type=result_type)
     if not frame.empty:
         frames.append(frame)
 
@@ -66,6 +64,7 @@ def test_dataframe_results_no_results(enopt_config: Any, evaluator: Any) -> None
 
 
 def test_dataframe_results_function_results(enopt_config: Any, evaluator: Any) -> None:
+    del enopt_config["names"]
     config = EnOptConfig.model_validate(enopt_config)
     frames: list[pd.DataFrame] = []
     BasicOptimizer(config, evaluator()).set_results_callback(
@@ -98,7 +97,6 @@ def test_dataframe_results_function_results_formatted_names(
                 "evaluations.variables",
             },
             result_type="functions",
-            variable_names=[f"a:{idx}" for idx in range(1, 4)],
         ),
     ).run()
     frame = pd.concat(frames)
@@ -119,7 +117,6 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
                 "gradients.weighted_objective",
             },
             result_type="gradients",
-            variable_names=[f"a:{idx}" for idx in range(1, 4)],
         ),
     ).run()
     frame = pd.concat(frames)
@@ -130,6 +127,7 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
 
 
 def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
+    del enopt_config["names"]
     config = EnOptConfig.model_validate(enopt_config)
     frames: list[pd.DataFrame] = []
     BasicOptimizer(config, evaluator()).set_results_callback(

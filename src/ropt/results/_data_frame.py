@@ -6,7 +6,7 @@ from functools import partial
 from importlib.util import find_spec
 from typing import TYPE_CHECKING, Any, Final, Literal
 
-from ropt.enums import ResultAxis
+from ropt.enums import AxisName
 
 from ._function_results import FunctionResults
 from ._gradient_results import GradientResults
@@ -28,7 +28,6 @@ if _HAVE_PANDAS:
 def _get_function_results(
     results: Results,
     sub_fields: set[str],
-    names: dict[str, Sequence[str | int] | None] | None,
 ) -> pd.DataFrame:
     if (
         not sub_fields
@@ -40,19 +39,17 @@ def _get_function_results(
     functions = results.to_dataframe(
         "functions",
         select=_get_select("functions", sub_fields),
-        unstack=[ResultAxis.OBJECTIVE, ResultAxis.NONLINEAR_CONSTRAINT],
-        names=names,
+        unstack=[AxisName.OBJECTIVE, AxisName.NONLINEAR_CONSTRAINT],
     ).rename(columns=partial(_add_prefix, prefix="functions"))
 
     evaluations = results.to_dataframe(
         "evaluations",
         select=_get_select("evaluations", sub_fields),
         unstack=[
-            ResultAxis.VARIABLE,
-            ResultAxis.OBJECTIVE,
-            ResultAxis.NONLINEAR_CONSTRAINT,
+            AxisName.VARIABLE,
+            AxisName.OBJECTIVE,
+            AxisName.NONLINEAR_CONSTRAINT,
         ],
-        names=names,
     ).rename(columns=partial(_add_prefix, prefix="evaluations"))
 
     if results.constraint_info is not None:
@@ -60,11 +57,10 @@ def _get_function_results(
             "constraint_info",
             select=_get_select("constraint_info", sub_fields),
             unstack=[
-                ResultAxis.VARIABLE,
-                ResultAxis.LINEAR_CONSTRAINT,
-                ResultAxis.NONLINEAR_CONSTRAINT,
+                AxisName.VARIABLE,
+                AxisName.LINEAR_CONSTRAINT,
+                AxisName.NONLINEAR_CONSTRAINT,
             ],
-            names=names,
         ).rename(columns=partial(_add_prefix, prefix="constraint_info"))
 
         return _join_frames(functions, evaluations, constraint_info)
@@ -75,7 +71,6 @@ def _get_function_results(
 def _get_gradient_results(
     results: Results,
     sub_fields: set[str],
-    names: dict[str, Sequence[str | int] | None] | None,
 ) -> pd.DataFrame:
     if (
         not sub_fields
@@ -88,22 +83,20 @@ def _get_gradient_results(
         "gradients",
         select=_get_select("gradients", sub_fields),
         unstack=[
-            ResultAxis.OBJECTIVE,
-            ResultAxis.NONLINEAR_CONSTRAINT,
-            ResultAxis.VARIABLE,
+            AxisName.OBJECTIVE,
+            AxisName.NONLINEAR_CONSTRAINT,
+            AxisName.VARIABLE,
         ],
-        names=names,
     ).rename(columns=partial(_add_prefix, prefix="gradients"))
 
     evaluations = results.to_dataframe(
         "evaluations",
         select=_get_select("evaluations", sub_fields),
         unstack=[
-            ResultAxis.VARIABLE,
-            ResultAxis.OBJECTIVE,
-            ResultAxis.NONLINEAR_CONSTRAINT,
+            AxisName.VARIABLE,
+            AxisName.OBJECTIVE,
+            AxisName.NONLINEAR_CONSTRAINT,
         ],
-        names=names,
     ).rename(columns=partial(_add_prefix, prefix="evaluations"))
 
     return _join_frames(gradients, evaluations)
@@ -159,7 +152,6 @@ def results_to_dataframe(
     results: Sequence[Results],
     fields: set[str],
     result_type: Literal["functions", "gradients"],
-    names: dict[str, Sequence[str | int] | None] | None = None,
 ) -> pd.DataFrame:
     """Combine a sequence of results into a single pandas DataFrame.
 
@@ -193,17 +185,12 @@ def results_to_dataframe(
     The `result_type` argument specifies whether to include function evaluation
     results (`functions`) or gradient results (`gradients`).
 
-    The `names` argument is an optional dictionary that maps axis types to
-    names. These names are used to label the multi-index columns in the
-    resulting DataFrame. If not provided, numerical indices are used.
-
     Args:
         results:     A sequence of [`Results`][ropt.results.Results] objects
                      to combine.
         fields:      The names of the fields to include in the DataFrame.
         result_type: The type of results to include ("functions" or
                      "gradients").
-        names:       A dictionary mapping axis types to names.
 
     Returns:
         A `pandas` DataFrame containing the combined results.
@@ -226,9 +213,7 @@ def results_to_dataframe(
             frame = pd.concat(
                 [
                     frame,
-                    _add_metadata(
-                        _get_function_results(item, fields, names), item, fields
-                    ),
+                    _add_metadata(_get_function_results(item, fields), item, fields),
                 ]
             )
         elif (
@@ -239,9 +224,7 @@ def results_to_dataframe(
             frame = pd.concat(
                 [
                     frame,
-                    _add_metadata(
-                        _get_gradient_results(item, fields, names), item, fields
-                    ),
+                    _add_metadata(_get_gradient_results(item, fields), item, fields),
                 ]
             )
 

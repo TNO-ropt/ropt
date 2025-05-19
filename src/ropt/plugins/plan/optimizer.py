@@ -148,12 +148,7 @@ class DefaultOptimizerStep(PlanStep):
             },
         )
 
-        self._emit_event(
-            Event(
-                event_type=EventType.START_OPTIMIZER_STEP,
-                config=self._config,
-            )
-        )
+        self._emit_event(Event(event_type=EventType.START_OPTIMIZER_STEP))
 
         if variables is None:
             variables = self._config.variables.initial_values
@@ -189,12 +184,7 @@ class DefaultOptimizerStep(PlanStep):
         if exit_code == OptimizerExitCode.USER_ABORT:
             self.plan.abort()
 
-        self._emit_event(
-            Event(
-                event_type=EventType.FINISHED_OPTIMIZER_STEP,
-                config=self._config,
-            )
-        )
+        self._emit_event(Event(event_type=EventType.FINISHED_OPTIMIZER_STEP))
 
         return exit_code
 
@@ -204,12 +194,7 @@ class DefaultOptimizerStep(PlanStep):
 
     def _signal_evaluation(self, results: tuple[Results, ...] | None = None) -> None:
         if results is None:
-            self._emit_event(
-                Event(
-                    event_type=EventType.START_EVALUATION,
-                    config=self._config,
-                )
-            )
+            self._emit_event(Event(event_type=EventType.START_EVALUATION))
         else:
             if self._metadata is not None:
                 for item in results:
@@ -217,11 +202,7 @@ class DefaultOptimizerStep(PlanStep):
 
             data: dict[str, Any] = {"results": results}
             self._emit_event(
-                Event(
-                    event_type=EventType.FINISHED_EVALUATION,
-                    config=self._config,
-                    data=data,
-                ),
+                Event(event_type=EventType.FINISHED_EVALUATION, data=data),
             )
 
     def _run_nested_plan(

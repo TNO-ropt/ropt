@@ -5,9 +5,9 @@ from typing import TYPE_CHECKING, Any, cast
 import pandas as pd
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Sequence
+    from collections.abc import Iterable
 
-    from ropt.enums import ResultAxis
+    from ropt.enums import AxisName
 
     from ._result_field import ResultField
 
@@ -16,8 +16,8 @@ def _to_dataframe(
     result_field: ResultField,
     batch_id: int | None,
     select: Iterable[str],
-    unstack: Iterable[ResultAxis] | None,
-    names: dict[str, Sequence[str | int] | None] | None = None,
+    unstack: Iterable[AxisName] | None,
+    names: dict[str, tuple[str | int, ...]],
 ) -> pd.DataFrame:
     if unstack is None:
         unstack = []
@@ -54,7 +54,7 @@ def _to_series(
     result_field: ResultField,
     field: str,
     key: str | None,
-    names: dict[str, Sequence[str | int] | None] | None = None,
+    names: dict[str, tuple[str | int, ...]],
 ) -> pd.Series[Any] | None:
     try:
         data = getattr(result_field, field)
@@ -68,11 +68,9 @@ def _to_series(
             return None
         data = data[key]
     axes = result_field.get_axes(field)
-    if names is None:
-        names = {}
     indices = [
         pd.RangeIndex(data.shape[idx]) if index is None else index
-        for idx, index in enumerate(names.get(axis, None) for axis in axes)
+        for idx, index in enumerate(names.get(axis) for axis in axes)
     ]
     series: pd.Series[Any]
     if indices:

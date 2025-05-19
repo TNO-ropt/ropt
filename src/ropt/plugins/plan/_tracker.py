@@ -117,10 +117,8 @@ class DefaultTrackerHandler(EventHandler):
                     )
             if filtered_results is not None:
                 self._tracked_results = filtered_results
-                if event.config.transforms is not None:
-                    filtered_results = filtered_results.transform_from_optimizer(
-                        event.config.transforms
-                    )
+                if filtered_results.config.transforms is not None:
+                    filtered_results = filtered_results.transform_from_optimizer()
                 self["results"] = filtered_results
 
     @property

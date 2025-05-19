@@ -6,10 +6,10 @@ from importlib.util import find_spec
 from typing import TYPE_CHECKING, Any, Final, TypeVar
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Sequence
+    from collections.abc import Iterable
 
-    from ropt.enums import ResultAxis
-    from ropt.transforms._transforms import OptModelTransforms
+    from ropt.config.enopt import EnOptConfig
+    from ropt.enums import AxisName
 
 
 _HAVE_PANDAS: Final = find_spec("pandas") is not None
@@ -42,6 +42,11 @@ class Results(ABC):
         during optimization. This metadata can include various primitive values
         that are not directly interpreted by the optimization code but are
         useful for reporting and analysis.
+    *   **Configuration:** The configuration used for the optimization, which
+        is an instance of the [`EnOptConfig`][ropt.config.enopt.EnOptConfig]
+        class. This configuration contains all the necessary information about
+        the optimization setup, including variables, objectives, constraints,
+        and the optimizer itself.
 
     The derived classes, [`FunctionResults`][ropt.results.FunctionResults] and
     [`GradientResults`][ropt.results.GradientResults], extend this base class
@@ -55,10 +60,12 @@ class Results(ABC):
     `pandas` DataFrame for further data analysis and reporting.
 
     Attributes:
+        config:   The configuration used for the optimization.
         batch_id: The ID of the evaluation batch.
         metadata: A dictionary of metadata.
     """
 
+    config: EnOptConfig
     batch_id: int | None
     metadata: dict[str, Any]
 
@@ -66,8 +73,7 @@ class Results(ABC):
         self,
         field_name: str,
         select: Iterable[str],
-        unstack: Iterable[ResultAxis] | None = None,
-        names: dict[str, Sequence[str | int] | None] | None = None,
+        unstack: Iterable[AxisName] | None = None,
     ) -> pd.DataFrame:
         """Export a field to a pandas DataFrame.
 
@@ -80,10 +86,11 @@ class Results(ABC):
         Sub-fields may be multi-dimensional arrays, which are exported in a
         stacked manner. Using the axis types found in the metadata, the exporter
         constructs a multi-index labeled with the corresponding names provided
-        via the `names` argument. If `names` is `None`, numerical indices are
-        used. These multi-indices can optionally be unstacked into multiple
-        columns by providing the axis types to unstack via the `unstack`
-        argument.
+        via the `names` field in the configuration object. If `names` does not
+        contain a key/value pair for the the axis, numerical indices are used.
+        These multi-indices can optionally be unstacked into multiple columns by
+        providing the axis types to unstack
+        via the `unstack` argument.
 
         Info: The DataFrame Index
             The index of the resulting DataFrame may be a multi-index
@@ -96,7 +103,6 @@ class Results(ABC):
                         sub-fields are exported.
             unstack:    Select axes to unstack. By default, no axes are
                         unstacked.
-            names:      A dictionary mapping axis types to names.
 
         Raises:
             NotImplementedError: If the `pandas` module is not installed.
@@ -122,11 +128,11 @@ class Results(ABC):
             self.batch_id,
             select,
             unstack,
-            names,
+            self.config.names,
         )
 
     @abstractmethod
-    def transform_from_optimizer(self, transforms: OptModelTransforms) -> Results:
+    def transform_from_optimizer(self) -> Results:
         """Transform results from the optimizer domain to the user domain.
 
         During optimization, variables, objectives, and constraints are often
@@ -147,11 +153,8 @@ class Results(ABC):
         These transformations are defined and managed by the
         [`OptModelTransforms`][ropt.transforms.OptModelTransforms] object,
         which encapsulates the specific transformations for variables,
-        objectives, and nonlinear constraints.
-
-        Args:
-            transforms: The `OptModelTransforms` object containing the domain
-                transformations to apply.
+        objectives, and nonlinear constraints. This object is stored in with
+        the `EnOptConfig` object used to create the `Results` object.
 
         Returns:
             A new `FunctionResults` object with all relevant data transformed

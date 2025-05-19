@@ -72,13 +72,12 @@ class DefaultStoreHandler(EventHandler):
         Args:
             event: The event object emitted by the plan.
         """
-        if (results := event.data.get("results", None)) is None:
+        if (results := event.data.get("results")) is None:
             return
-        if event.config.transforms is not None:
-            results = (
-                item.transform_from_optimizer(event.config.transforms)
-                for item in results
-            )
+        results = (
+            item if item.config.transforms is None else item.transform_from_optimizer()
+            for item in results
+        )
         self["results"] = (
             results if self["results"] is None else (*self["results"], *results)
         )

@@ -6,7 +6,6 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from ropt.config.enopt import EnOptConfig
     from ropt.enums import EventType
 
 
@@ -23,10 +22,8 @@ class Event:
 
     Attributes:
         event_type: The type of event that occurred.
-        config:     The configuration used for the optimization.
         data:       A dictionary containing additional event-specific data.
     """
 
     event_type: EventType
-    config: EnOptConfig
     data: dict[str, Any] = field(default_factory=dict)

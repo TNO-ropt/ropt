@@ -142,16 +142,22 @@ class OptimizerExitCode(IntEnum):
     """Returned when an evaluation step terminates normally."""
 
 
-class ResultAxis(StrEnum):
-    """Enumerates the semantic meaning of axes in `Results` data arrays.
+class AxisName(StrEnum):
+    """Enumerates the semantic meaning of axes in data arrays.
 
-    [`Results`][ropt.results.Results] objects store optimization data (like
-    variable values, objective function values, constraint values, etc.) in
-    multidimensional NumPy arrays. This enumeration provides standardized labels
-    to identify what each dimension (axis) of these arrays represents.
+    The [`EnOptConfig`][ropt.config.enopt.EnOptConfig] configuration class
+    defines the optimization workflow, including variables, objectives,
+    constraints, realizations, and the optimizer. Each of these components can
+    have multiple instances, leading to multidimensional data arrays.
 
-    For example, an array might have dimensions corresponding to different
-    realizations, different objective functions, or different variables.
+    Similarly, [`Results`][ropt.results.Results] objects store optimization data
+    (like variable values, objective function values, constraint values, etc.)
+    in multidimensional NumPy arrays.
+
+    The `AxisName` enumeration  provides standardized labels to identify what
+    each dimension (axis) of these arrays represents. For example, an array
+    might have dimensions corresponding to different realizations, different
+    objective functions, or different variables.
 
     This information is stored as metadata within the `Results` object and can
     be accessed using methods like

@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from ropt.enums import ResultAxis
+from ropt.enums import AxisName
 
 from ._result_field import ResultField
 from ._utils import _immutable_copy
@@ -38,7 +38,7 @@ class Gradients(ResultField):
             - Shape: $(n_v,)$, where:
                 - $n_v$ is the number of variables.
             - Axis type:
-                - [`ResultAxis.VARIABLE`][ropt.enums.ResultAxis.VARIABLE]
+                - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
         === "Objective  Gradients"
 
@@ -50,8 +50,8 @@ class Gradients(ResultField):
                 - $n_o$ is the number of objectives.
                 - $n_v$ is the number of variables.
             - Axis types:
-                - [`ResultAxis.OBJECTIVE`][ropt.enums.ResultAxis.OBJECTIVE]
-                - [`ResultAxis.VARIABLE`][ropt.enums.ResultAxis.VARIABLE]
+                - [`AxisName.OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
+                - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
         === "Constraint Gradients"
 
@@ -63,8 +63,8 @@ class Gradients(ResultField):
                 - $n_c$ is the number of constraints.
                 - $n_v$ is the number of variables.
             - Axis types:
-                - [`ResultAxis.NONLINEAR_CONSTRAINT`][ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT]
-                - [`ResultAxis.VARIABLE`][ropt.enums.ResultAxis.VARIABLE]
+                - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
+                - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
     Attributes:
         weighted_objective: The weighted sum of the objective gradients.
@@ -73,13 +73,13 @@ class Gradients(ResultField):
     """
 
     weighted_objective: NDArray[np.float64] = field(
-        metadata={"__axes__": (ResultAxis.VARIABLE,)},
+        metadata={"__axes__": (AxisName.VARIABLE,)},
     )
     objectives: NDArray[np.float64] = field(
         metadata={
             "__axes__": (
-                ResultAxis.OBJECTIVE,
-                ResultAxis.VARIABLE,
+                AxisName.OBJECTIVE,
+                AxisName.VARIABLE,
             ),
         },
     )
@@ -87,8 +87,8 @@ class Gradients(ResultField):
         default=None,
         metadata={
             "__axes__": (
-                ResultAxis.NONLINEAR_CONSTRAINT,
-                ResultAxis.VARIABLE,
+                AxisName.NONLINEAR_CONSTRAINT,
+                AxisName.VARIABLE,
             ),
         },
     )

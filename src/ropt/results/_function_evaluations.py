@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
-from ropt.enums import ResultAxis
+from ropt.enums import AxisName
 
 from ._result_field import ResultField
 from ._utils import _immutable_copy
@@ -32,7 +32,7 @@ class FunctionEvaluations(ResultField):
             - Shape: $(n_v,)$, where:
                 - $n_v$ is the number of variables.
             - Axis type:
-                - [`ResultAxis.VARIABLE`][ropt.enums.ResultAxis.VARIABLE]
+                - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
         === "Objectives"
 
@@ -45,8 +45,8 @@ class FunctionEvaluations(ResultField):
                 - $n_r$ is the number of realizations.
                 - $n_o$ is the number of objectives.
             - Axis types:
-                - [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]
-                - [`ResultAxis.OBJECTIVE`][ropt.enums.ResultAxis.OBJECTIVE]
+                - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
+                - [`AxisName.OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
 
         === "Constraints"
 
@@ -60,8 +60,8 @@ class FunctionEvaluations(ResultField):
                 - $n_r$ is the number of realizations.
                 - $n_c$ is the number of constraints.
             - Axis types:
-                - [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]
-                - [`ResultAxis.NONLINEAR_CONSTRAINT`][ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT]
+                - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
+                - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
 
         === "Evaluation Info"
 
@@ -73,7 +73,7 @@ class FunctionEvaluations(ResultField):
             - Shape: $(n_r,)$, where:
                 - $n_r$ is the number of realizations.
             - Axis type:
-                - [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]
+                - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
 
     Attributes:
         variables:       The variable vector:
@@ -84,14 +84,14 @@ class FunctionEvaluations(ResultField):
 
     variables: NDArray[np.float64] = field(
         metadata={
-            "__axes__": (ResultAxis.VARIABLE,),
+            "__axes__": (AxisName.VARIABLE,),
         },
     )
     objectives: NDArray[np.float64] = field(
         metadata={
             "__axes__": (
-                ResultAxis.REALIZATION,
-                ResultAxis.OBJECTIVE,
+                AxisName.REALIZATION,
+                AxisName.OBJECTIVE,
             ),
         },
     )
@@ -99,15 +99,15 @@ class FunctionEvaluations(ResultField):
         default=None,
         metadata={
             "__axes__": (
-                ResultAxis.REALIZATION,
-                ResultAxis.NONLINEAR_CONSTRAINT,
+                AxisName.REALIZATION,
+                AxisName.NONLINEAR_CONSTRAINT,
             ),
         },
     )
     evaluation_info: dict[str, NDArray[Any]] = field(
         default_factory=dict,
         metadata={
-            "__axes__": (ResultAxis.REALIZATION,),
+            "__axes__": (AxisName.REALIZATION,),
         },
     )
 

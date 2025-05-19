@@ -4,7 +4,7 @@ from dataclasses import dataclass, fields
 from typing import TYPE_CHECKING, TypeVar
 
 if TYPE_CHECKING:
-    from ropt.enums import ResultAxis
+    from ropt.enums import AxisName
 
 TypeResultField = TypeVar("TypeResultField", bound="ResultField")
 
@@ -30,14 +30,14 @@ class ResultField:
     """
 
     @classmethod
-    def get_axes(cls, name: str) -> tuple[ResultAxis, ...]:
+    def get_axes(cls, name: str) -> tuple[AxisName, ...]:
         """Retrieve the axes associated with a specific field.
 
         Fields within a `ResultField` object that store multi-dimensional
         `numpy` arrays, contain metadata that describes the meaning of each
         dimension in the array. This method retrieves the axes of a field within
         a ResultField object from that meta-data, returning a tuple of
-        `ResultAxis`][ropt.enums.ResultAxis] enums.
+        `AxisName`][ropt.enums.AxisName] enums.
 
         Args:
             name: The name of the field (sub-field) within the
@@ -47,7 +47,7 @@ class ResultField:
             ValueError: If the provided field name is not recognized.
 
         Returns:
-            A tuple of [`ResultAxis`][ropt.enums.ResultAxis] enums, representing the axes of the field.
+            A tuple of [`AxisName`][ropt.enums.AxisName] enums, representing the axes of the field.
         """
         metadata = next(
             (item.metadata for item in fields(cls) if item.name == name), None

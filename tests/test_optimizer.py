@@ -261,8 +261,7 @@ def test_objective_with_scaler(
                 assert item.functions is not None
                 assert item.functions.objectives is not None
                 assert np.allclose(item.functions.objectives[-1], 1.0)
-                assert config.transforms is not None
-                transformed = item.transform_from_optimizer(config.transforms)
+                transformed = item.transform_from_optimizer()
                 assert transformed.functions is not None
                 assert transformed.functions.objectives is not None
                 assert np.allclose(transformed.functions.objectives[-1], init1)
@@ -319,8 +318,7 @@ def test_objective_with_lazy_scaler(
                 assert item.functions is not None
                 assert item.functions.objectives is not None
                 assert np.allclose(item.functions.objectives[-1], 1.0)
-                assert config.transforms is not None
-                transformed = item.transform_from_optimizer(config.transforms)
+                transformed = item.transform_from_optimizer()
                 assert transformed.functions is not None
                 assert transformed.functions.objectives is not None
                 assert np.allclose(transformed.functions.objectives[-1], init1)
@@ -412,7 +410,7 @@ def test_nonlinear_constraint_with_scaler(
                 assert item.functions is not None
                 assert item.functions.constraints is not None
                 assert np.allclose(item.functions.constraints, 1.0)
-                transformed = item.transform_from_optimizer(transforms)
+                transformed = item.transform_from_optimizer()
                 assert transformed.functions is not None
                 assert transformed.functions.constraints is not None
                 assert np.allclose(transformed.functions.constraints, scales)
@@ -494,7 +492,7 @@ def test_nonlinear_constraint_with_lazy_scaler(
                 assert item.functions is not None
                 assert item.functions.constraints is not None
                 assert np.allclose(item.functions.constraints, 1.0)
-                transformed = item.transform_from_optimizer(transforms)
+                transformed = item.transform_from_optimizer()
                 assert transformed.functions is not None
                 assert transformed.functions.constraints is not None
                 assert np.allclose(transformed.functions.constraints, scales)

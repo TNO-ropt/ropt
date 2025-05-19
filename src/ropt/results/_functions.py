@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
-from ropt.enums import ResultAxis
+from ropt.enums import AxisName
 
 from ._result_field import ResultField
 from ._utils import _immutable_copy
@@ -47,7 +47,7 @@ class Functions(ResultField):
             - Shape $(n_o,)$, where:
                 - $n_o$ is the number of objectives.
             - Axis type:
-                - [`ResultAxis.OBJECTIVE`][ropt.enums.ResultAxis.OBJECTIVE]
+                - [`AxisName.OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
 
         === "Constraints"
 
@@ -57,7 +57,7 @@ class Functions(ResultField):
             - Shape $(n_c,)$, where:
                 - $n_c$ is the number of constraints.
             - Axis type:
-                - [`ResultAxis.NONLINEAR_CONSTRAINT`][ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT]
+                - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
 
     Attributes:
         weighted_objective: The weighted sum of the objective values.
@@ -70,13 +70,13 @@ class Functions(ResultField):
     )
     objectives: NDArray[np.float64] = field(
         metadata={
-            "__axes__": (ResultAxis.OBJECTIVE,),
+            "__axes__": (AxisName.OBJECTIVE,),
         },
     )
     constraints: NDArray[np.float64] | None = field(
         default=None,
         metadata={
-            "__axes__": (ResultAxis.NONLINEAR_CONSTRAINT,),
+            "__axes__": (AxisName.NONLINEAR_CONSTRAINT,),
         },
     )
 

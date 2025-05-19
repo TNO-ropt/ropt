@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
-from ropt.enums import ResultAxis
+from ropt.enums import AxisName
 
 from ._result_field import ResultField
 from ._utils import _immutable_copy
@@ -31,7 +31,7 @@ class Realizations(ResultField):
             - Shape $(n_r,)$, where:
                 - $n_r$ is the number of realizations.
             - Axis type:
-                - [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]
+                - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
 
         === "Failed Realizations"
 
@@ -42,7 +42,7 @@ class Realizations(ResultField):
             - Shape $(n_r,)$, where:
                 - $n_r$ is the number of realizations.
             - Axis type:
-                - [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]
+                - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
 
         === "Objective Weights"
 
@@ -53,8 +53,8 @@ class Realizations(ResultField):
                 - $n_o$ is the number of objectives.
                 - $n_r$ is the number of realizations.
             - Axis types:
-                - [`ResultAxis.OBJECTIVE`][ropt.enums.ResultAxis.OBJECTIVE]
-                - [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]
+                - [`AxisName.OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
+                - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
 
             These weights may change during optimization, depending on the type of
             objective calculation
@@ -68,8 +68,8 @@ class Realizations(ResultField):
                 - $n_c$ is the number of constraints.
                 - $n_r$ is the number of realizations.
             - Axis types:
-                - [`ResultAxis.NONLINEAR_CONSTRAINT`][ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT]
-                - [`ResultAxis.REALIZATION`][ropt.enums.ResultAxis.REALIZATION]
+                - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
+                - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
 
             These weights may change during optimization, depending on the type of
             constraint calculation
@@ -83,20 +83,20 @@ class Realizations(ResultField):
 
     active_realizations: NDArray[np.bool_] = field(
         metadata={
-            "__axes__": (ResultAxis.REALIZATION,),
+            "__axes__": (AxisName.REALIZATION,),
         },
     )
     failed_realizations: NDArray[np.bool_] = field(
         metadata={
-            "__axes__": (ResultAxis.REALIZATION,),
+            "__axes__": (AxisName.REALIZATION,),
         },
     )
     objective_weights: NDArray[np.float64] | None = field(
         default=None,
         metadata={
             "__axes__": (
-                ResultAxis.OBJECTIVE,
-                ResultAxis.REALIZATION,
+                AxisName.OBJECTIVE,
+                AxisName.REALIZATION,
             ),
         },
     )
@@ -104,8 +104,8 @@ class Realizations(ResultField):
         default=None,
         metadata={
             "__axes__": (
-                ResultAxis.NONLINEAR_CONSTRAINT,
-                ResultAxis.REALIZATION,
+                AxisName.NONLINEAR_CONSTRAINT,
+                AxisName.REALIZATION,
             ),
         },
     )
