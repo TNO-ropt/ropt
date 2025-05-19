@@ -85,6 +85,22 @@ class DefaultCachedEvaluator(Evaluator):
         were computed anew. The cached evaluations can then be retrieved from
         the `FunctionResults` object, using the realization index.
 
+        Note:
+            If the configuration stored in the context contains realization
+            names, these are used to match the realizations of the requested
+            evaluations, with those in the cached results. This means that the
+            results may originate from a different optimization run, as long as
+            the realization names are still valid. However, in this case the
+            results used for finding cached values must also store the
+            realization names, otherwise the cached results will not be found.
+
+            If the configuration does not contain realization names, the
+            realization indices are used to match the realizations of the
+            requested evaluations. In this case the indices of the realizations
+            in the cached results must match those of the requested evaluations,
+            i.e. they must have been specified in the same order in the
+            respective configurations.
+
         Args:
             variables: Matrix of variables to evaluate (each row is a vector).
             context:   The evaluation context.
@@ -94,12 +110,23 @@ class DefaultCachedEvaluator(Evaluator):
         """
         cached: dict[int, tuple[int, FunctionResults]] = {}
 
+        realization_names = context.config.names.get("realization", None)
+
         for idx in range(variables.shape[0]):
-            results = _get_from_cache(
-                self._sources, variables[idx, :], context.realizations[idx]
+            realization_index = context.realizations[idx]
+            realization_name = (
+                realization_names[realization_index]
+                if realization_names is not None
+                else None
+            )
+            results, cached_realization_index = _get_from_cache(
+                self._sources,
+                variables[idx, :],
+                realization_index,
+                realization_name,
             )
             if results is not None:
-                cached[idx] = (context.realizations[idx], results)
+                cached[idx] = (cached_realization_index, results)
 
         if cached:
             active = np.ones(variables.shape[0], dtype=np.bool_)
@@ -172,14 +199,20 @@ _EPS: Final[float] = float(np.finfo(np.float64).eps)
 def _get_from_cache(
     sources: list[EventHandler],
     variables: NDArray[np.float64],
-    realization: NDArray[np.float64],
-) -> FunctionResults | None:
+    realization_index: int,
+    realization_name: str | None,
+) -> tuple[FunctionResults | None, int]:
     for results in _get_results(sources):
-        if results.realizations.active_realizations[realization] and np.allclose(
+        if realization_name is not None:
+            names: tuple[str | int, ...] = results.config.names.get("realization", ())
+            realization_index = list(names).index(realization_name)
+            if realization_index < 0:
+                continue
+        if results.realizations.active_realizations[realization_index] and np.allclose(
             results.evaluations.variables, variables, rtol=0.0, atol=_EPS
         ):
-            return results
-    return None
+            return results, realization_index
+    return None, -1
 
 
 def _get_results(sources: Sequence[EventHandler]) -> Iterable[FunctionResults]:

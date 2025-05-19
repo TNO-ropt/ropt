@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 from copy import deepcopy
 from functools import partial
 from typing import TYPE_CHECKING, Any
@@ -660,26 +661,53 @@ def test_plan_abort(enopt_config: Any, evaluator: Any) -> None:
         step.run(config=EnOptConfig.model_validate(enopt_config))
 
 
-def test_evaluator_cache(
-    enopt_config: dict[str, Any], evaluator: Any, monkeypatch: Any
-) -> None:
-    completed_functions = 0
+def _cached_eval(
+    obj: DefaultCachedEvaluator,
+    variables: NDArray[np.float64],
+    context: EvaluatorContext,
+) -> EvaluatorResult:
+    names = None
+    if context.config.names:
+        names = context.config.names["realization"]
+        # Fake that the realization names are flipped:
+        context = copy.deepcopy(context)
+        context.config.names["realization"] = ("b", "a")
 
-    def _my_eval(
-        obj: DefaultCachedEvaluator,
-        variables: NDArray[np.float64],
-        context: EvaluatorContext,
-    ) -> EvaluatorResult:
-        results, cached = obj.eval_cached(variables, context)
-        cached_indices = list(cached.keys())
-        info = np.zeros(variables.shape[0], dtype=np.bool_)
-        info[cached_indices] = True
-        results.evaluation_info = {"cached": info}
-        if completed_functions == 2:
-            assert cached_indices == [0]
-        else:
-            assert cached_indices == []
-        return results
+    results, cached = obj.eval_cached(variables, context)
+    cached_indices = list(cached.keys())
+    info = np.zeros(variables.shape[0], dtype=np.bool_)
+    info[cached_indices] = True
+    results.evaluation_info = {"cached": info}
+
+    realizations = context.realizations.copy()
+    realizations[cached_indices] = [item[0] for item in cached.values()]
+    if names is not None:
+        realizations = np.fromiter((names[idx] for idx in realizations), dtype="U1")
+    results.evaluation_info["realizations"] = realizations
+
+    return results
+
+
+@pytest.mark.parametrize("names", [None, ["a", "b"]])
+def test_evaluator_cache(
+    enopt_config: dict[str, Any],
+    evaluator: Any,
+    test_functions: Any,
+    monkeypatch: Any,
+    names: list[str] | None,
+) -> None:
+    enopt_config["realizations"] = {"weights": [0.75, 0.25]}
+    if names is not None:
+        enopt_config["names"] = {"realization": names}
+
+    completed_functions = 0
+    completed_test_functions = 0
+
+    def _test_function1(*args: Any, **kwargs: Any) -> float:
+        nonlocal completed_test_functions
+
+        completed_test_functions += 1
+        return float(test_functions[0](*args, **kwargs))
 
     def _track_evaluations(event: Event) -> None:
         nonlocal completed_functions
@@ -688,11 +716,22 @@ def test_evaluator_cache(
             if isinstance(item, FunctionResults):
                 completed_functions += 1
                 if completed_functions == 3:
-                    assert item.evaluations.evaluation_info["cached"][0]
+                    assert np.all(item.evaluations.evaluation_info["cached"])
+                    if names is not None:
+                        assert np.all(
+                            item.evaluations.evaluation_info["realizations"]
+                            == ["b", "a"]
+                        )
                 else:
-                    assert not item.evaluations.evaluation_info["cached"][0]
+                    assert not np.all(item.evaluations.evaluation_info["cached"])
+                    if names is not None:
+                        assert np.all(
+                            item.evaluations.evaluation_info["realizations"]
+                            == ["a", "b"]
+                        )
 
     enopt_config["gradient"]["evaluation_policy"] = "speculative"
+    enopt_config["gradient"]["number_of_perturbations"] = "1"
     enopt_config["optimizer"]["max_functions"] = 2
 
     plan = Plan(PluginManager())
@@ -703,10 +742,14 @@ def test_evaluator_cache(
     )
 
     assert isinstance(cached_evaluator, DefaultCachedEvaluator)
-    monkeypatch.setattr(cached_evaluator, "eval", partial(_my_eval, cached_evaluator))
+    monkeypatch.setattr(
+        cached_evaluator, "eval", partial(_cached_eval, cached_evaluator)
+    )
 
     plan.add_evaluator(
-        "function_evaluator", evaluator=evaluator(), clients={cached_evaluator}
+        "function_evaluator",
+        evaluator=evaluator((_test_function1, test_functions[1])),
+        clients={cached_evaluator},
     )
     plan.add_event_handler(
         "observer",
@@ -719,4 +762,9 @@ def test_evaluator_cache(
         config=EnOptConfig.model_validate(enopt_config),
         variables=tracker["results"].evaluations.variables,
     )
+
     assert completed_functions == 4
+
+    # Number of  test function calls:
+    # 3 evaluations * (1 function + 1 perturbation) * 2 realizations = 12
+    assert completed_test_functions == 12
