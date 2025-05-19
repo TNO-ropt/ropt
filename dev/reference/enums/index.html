@@ -1572,17 +1572,17 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ResultAxis" class="md-nav__link">
+  <a href="#ropt.enums.AxisName" class="md-nav__link">
     <span class="md-ellipsis">
-      ResultAxis
+      AxisName
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="ResultAxis">
+    <nav class="md-nav" aria-label="AxisName">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ResultAxis.VARIABLE" class="md-nav__link">
+  <a href="#ropt.enums.AxisName.VARIABLE" class="md-nav__link">
     <span class="md-ellipsis">
       VARIABLE
     </span>
@@ -1591,7 +1591,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ResultAxis.OBJECTIVE" class="md-nav__link">
+  <a href="#ropt.enums.AxisName.OBJECTIVE" class="md-nav__link">
     <span class="md-ellipsis">
       OBJECTIVE
     </span>
@@ -1600,7 +1600,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ResultAxis.LINEAR_CONSTRAINT" class="md-nav__link">
+  <a href="#ropt.enums.AxisName.LINEAR_CONSTRAINT" class="md-nav__link">
     <span class="md-ellipsis">
       LINEAR_CONSTRAINT
     </span>
@@ -1609,7 +1609,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT" class="md-nav__link">
+  <a href="#ropt.enums.AxisName.NONLINEAR_CONSTRAINT" class="md-nav__link">
     <span class="md-ellipsis">
       NONLINEAR_CONSTRAINT
     </span>
@@ -1618,7 +1618,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ResultAxis.REALIZATION" class="md-nav__link">
+  <a href="#ropt.enums.AxisName.REALIZATION" class="md-nav__link">
     <span class="md-ellipsis">
       REALIZATION
     </span>
@@ -1627,7 +1627,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ResultAxis.PERTURBATION" class="md-nav__link">
+  <a href="#ropt.enums.AxisName.PERTURBATION" class="md-nav__link">
     <span class="md-ellipsis">
       PERTURBATION
     </span>
@@ -2006,17 +2006,17 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ResultAxis" class="md-nav__link">
+  <a href="#ropt.enums.AxisName" class="md-nav__link">
     <span class="md-ellipsis">
-      ResultAxis
+      AxisName
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="ResultAxis">
+    <nav class="md-nav" aria-label="AxisName">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ResultAxis.VARIABLE" class="md-nav__link">
+  <a href="#ropt.enums.AxisName.VARIABLE" class="md-nav__link">
     <span class="md-ellipsis">
       VARIABLE
     </span>
@@ -2025,7 +2025,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ResultAxis.OBJECTIVE" class="md-nav__link">
+  <a href="#ropt.enums.AxisName.OBJECTIVE" class="md-nav__link">
     <span class="md-ellipsis">
       OBJECTIVE
     </span>
@@ -2034,7 +2034,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ResultAxis.LINEAR_CONSTRAINT" class="md-nav__link">
+  <a href="#ropt.enums.AxisName.LINEAR_CONSTRAINT" class="md-nav__link">
     <span class="md-ellipsis">
       LINEAR_CONSTRAINT
     </span>
@@ -2043,7 +2043,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT" class="md-nav__link">
+  <a href="#ropt.enums.AxisName.NONLINEAR_CONSTRAINT" class="md-nav__link">
     <span class="md-ellipsis">
       NONLINEAR_CONSTRAINT
     </span>
@@ -2052,7 +2052,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ResultAxis.REALIZATION" class="md-nav__link">
+  <a href="#ropt.enums.AxisName.REALIZATION" class="md-nav__link">
     <span class="md-ellipsis">
       REALIZATION
     </span>
@@ -2061,7 +2061,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.enums.ResultAxis.PERTURBATION" class="md-nav__link">
+  <a href="#ropt.enums.AxisName.PERTURBATION" class="md-nav__link">
     <span class="md-ellipsis">
       PERTURBATION
     </span>
@@ -2937,8 +2937,8 @@ details on the specific data they provide.</p>
 
 
 
-<h3 id="ropt.enums.ResultAxis" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ResultAxis</span>
+<h3 id="ropt.enums.AxisName" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">AxisName</span>
 
 
 </h3>
@@ -2949,18 +2949,23 @@ details on the specific data they provide.</p>
               Bases: <code><a class="autorefs autorefs-external" title="enum.StrEnum" href="https://docs.python.org/3/library/enum.html#enum.StrEnum">StrEnum</a></code></p>
 
 
-        <p>Enumerates the semantic meaning of axes in <code>Results</code> data arrays.</p>
-<p><a class="autorefs autorefs-internal" title="            ropt.results.Results
+        <p>Enumerates the semantic meaning of axes in data arrays.</p>
+<p>The <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> configuration class
+defines the optimization workflow, including variables, objectives,
+constraints, realizations, and the optimizer. Each of these components can
+have multiple instances, leading to multidimensional data arrays.</p>
+<p>Similarly, <a class="autorefs autorefs-internal" title="            ropt.results.Results
 
 
   
       dataclass
-  " href="../results/#ropt.results.Results"><code>Results</code></a> objects store optimization data (like
-variable values, objective function values, constraint values, etc.) in
-multidimensional NumPy arrays. This enumeration provides standardized labels
-to identify what each dimension (axis) of these arrays represents.</p>
-<p>For example, an array might have dimensions corresponding to different
-realizations, different objective functions, or different variables.</p>
+  " href="../results/#ropt.results.Results"><code>Results</code></a> objects store optimization data
+(like variable values, objective function values, constraint values, etc.)
+in multidimensional NumPy arrays.</p>
+<p>The <code>AxisName</code> enumeration  provides standardized labels to identify what
+each dimension (axis) of these arrays represents. For example, an array
+might have dimensions corresponding to different realizations, different
+objective functions, or different variables.</p>
 <p>This information is stored as metadata within the <code>Results</code> object and can
 be accessed using methods like
 <a class="autorefs autorefs-internal" title="            get_axes
@@ -2993,7 +2998,7 @@ or retrieve associated names (like variable names) from the configuration.</p>
 
 
 
-<h4 id="ropt.enums.ResultAxis.VARIABLE" class="doc doc-heading">
+<h4 id="ropt.enums.AxisName.VARIABLE" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">VARIABLE</span>
 
 
@@ -3018,7 +3023,7 @@ or retrieve associated names (like variable names) from the configuration.</p>
 
 
 
-<h4 id="ropt.enums.ResultAxis.OBJECTIVE" class="doc doc-heading">
+<h4 id="ropt.enums.AxisName.OBJECTIVE" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">OBJECTIVE</span>
 
 
@@ -3043,7 +3048,7 @@ or retrieve associated names (like variable names) from the configuration.</p>
 
 
 
-<h4 id="ropt.enums.ResultAxis.LINEAR_CONSTRAINT" class="doc doc-heading">
+<h4 id="ropt.enums.AxisName.LINEAR_CONSTRAINT" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">LINEAR_CONSTRAINT</span>
 
 
@@ -3068,7 +3073,7 @@ or retrieve associated names (like variable names) from the configuration.</p>
 
 
 
-<h4 id="ropt.enums.ResultAxis.NONLINEAR_CONSTRAINT" class="doc doc-heading">
+<h4 id="ropt.enums.AxisName.NONLINEAR_CONSTRAINT" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">NONLINEAR_CONSTRAINT</span>
 
 
@@ -3093,7 +3098,7 @@ or retrieve associated names (like variable names) from the configuration.</p>
 
 
 
-<h4 id="ropt.enums.ResultAxis.REALIZATION" class="doc doc-heading">
+<h4 id="ropt.enums.AxisName.REALIZATION" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">REALIZATION</span>
 
 
@@ -3118,7 +3123,7 @@ or retrieve associated names (like variable names) from the configuration.</p>
 
 
 
-<h4 id="ropt.enums.ResultAxis.PERTURBATION" class="doc doc-heading">
+<h4 id="ropt.enums.AxisName.PERTURBATION" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">PERTURBATION</span>
 
 
