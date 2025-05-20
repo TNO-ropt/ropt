@@ -758,16 +758,16 @@ def test_evaluator_cache(
         sources={step},
     )
     step.run(config=EnOptConfig.model_validate(enopt_config))
+    assert completed_test_functions == 8
+
+    completed_test_functions = 0
     step.run(
         config=EnOptConfig.model_validate(enopt_config),
         variables=tracker["results"].evaluations.variables,
     )
+    assert completed_test_functions == 6  # Two evaluations were cached
 
     assert completed_functions == 4
-
-    # Number of  test function calls:
-    # 3 evaluations * (1 function + 1 perturbation) * 2 realizations = 12
-    assert completed_test_functions == 12
 
 
 def test_evaluator_cache_with_store(
@@ -810,7 +810,5 @@ def test_evaluator_cache_with_store(
     assert completed_test_functions == 4
 
     completed_test_functions = 0
-    step.run(
-        config=EnOptConfig.model_validate(enopt_config),
-    )
+    step.run(config=EnOptConfig.model_validate(enopt_config))
     assert completed_test_functions == 2

@@ -129,9 +129,7 @@ class DefaultCachedEvaluator(Evaluator):
                 cached[idx] = (cached_realization_index, results)
 
         if cached:
-            active = np.ones(variables.shape[0], dtype=np.bool_)
-            active[list(cached.keys())] = False
-            context.active = active
+            context.active[list(cached.keys())] = False
         evaluator_result = self.plan.get_evaluator(self).eval(variables, context)
 
         for idx, (realization, item) in cached.items():
