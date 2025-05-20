@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Sequence
 
 from ropt.plugins.base import Plugin
 
@@ -571,27 +571,47 @@ class Evaluator(ABC, PlanComponent):
         """
         return self.__clients
 
-    def add_client(self, client: PlanComponent | str) -> None:
-        """Add a client to the evaluator.
+    def add_clients(
+        self,
+        clients: PlanComponent
+        | str
+        | Sequence[PlanComponent | str]
+        | set[PlanComponent | str],
+    ) -> None:
+        """Add one or more clients to the evaluator.
 
         Args:
-            client: The client to add.
+            clients: The clients to add.
         """
-        if not isinstance(client, PlanComponent | str):
-            msg = "A client must be plan component or a tag string."
-            raise TypeError(msg)
-        id_ = client.id if isinstance(client, PlanComponent) else client
-        self.__clients.add(id_)
+        clients = (
+            [clients] if isinstance(clients, PlanComponent | str) else list(clients)
+        )
+        for client in clients:
+            if not isinstance(client, PlanComponent | str):
+                msg = "A client must be plan component or a tag string."
+                raise TypeError(msg)
+            id_ = client.id if isinstance(client, PlanComponent) else client
+            self.__clients.add(id_)
 
-    def remove_client(self, client: PlanComponent | str) -> None:
-        """Remove a client from the evaluator.
+    def remove_clients(
+        self,
+        clients: PlanComponent
+        | str
+        | Sequence[PlanComponent | str]
+        | set[PlanComponent | str],
+    ) -> None:
+        """Remove one or more clients from the evaluator.
 
         Args:
-            client: The client to remove.
+            clients: The clients to remove.
         """
-        if not isinstance(client, PlanComponent | str):
-            msg = "A client must be plan component or a tag string."
-            raise TypeError(msg)
-        id_ = client.id if isinstance(client, PlanComponent) else client
-        if id_ in self.__clients:
-            self.__clients.remove(id_)
+        clients = (
+            [clients] if isinstance(clients, PlanComponent | str) else list(clients)
+        )
+        for client in clients:
+            if not isinstance(client, PlanComponent | str):
+                msg = "A client must be plan component or a tag string."
+                raise TypeError(msg)
+            id_ = client.id if isinstance(client, PlanComponent) else client
+            if id_ in self.__clients:
+                self.__clients.remove(id_)

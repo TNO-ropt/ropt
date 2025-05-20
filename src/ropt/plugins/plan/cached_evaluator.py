@@ -169,28 +169,32 @@ class DefaultCachedEvaluator(Evaluator):
         result, _ = self.eval_cached(variables, context)
         return result
 
-    def add_source(self, source: EventHandler) -> None:
-        """Add an `EventHandler` source to the evaluator.
+    def add_sources(self, sources: EventHandler | Sequence[EventHandler]) -> None:
+        """Add one or more `EventHandler` sources to the evaluator.
 
         This method allows adding additional sources of cached results to the
         evaluator. The sources are expected to be `EventHandler` instances that
         store `FunctionResults`.
 
         Args:
-            source: An `EventHandler` instance to add as a source.
+            sources: `EventHandler` instances to add as a source.
         """
-        self._sources.append(source)
+        if isinstance(sources, EventHandler):
+            sources = [sources]
+        self._sources.extend(sources)
 
-    def remove_source(self, source: EventHandler) -> None:
-        """Remove an `EventHandler` source from the evaluator.
+    def remove_sources(self, sources: EventHandler | Sequence[EventHandler]) -> None:
+        """Remove one or more `EventHandler` sources from the evaluator.
 
-        This method allows removing a previously added source of cached results
+        This method allows removing previously added sources of cached results
         from the evaluator.
 
         Args:
-            source: An `EventHandler` instance to remove as a source.
+            sources: `EventHandler` instances to remove as a source.
         """
-        self._sources.remove(source)
+        if isinstance(sources, EventHandler):
+            sources = [sources]
+        self._sources.extend(sources)
 
 
 _EPS: Final[float] = float(np.finfo(np.float64).eps)
