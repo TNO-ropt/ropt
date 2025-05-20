@@ -899,18 +899,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.evaluator.EvaluatorContext.filter_inactive_realizations" class="md-nav__link">
+  <a href="#ropt.evaluator.EvaluatorContext.get_active_evaluations" class="md-nav__link">
     <span class="md-ellipsis">
-      filter_inactive_realizations
+      get_active_evaluations
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.evaluator.EvaluatorContext.insert_inactive_realizations" class="md-nav__link">
+  <a href="#ropt.evaluator.EvaluatorContext.insert_inactive_results" class="md-nav__link">
     <span class="md-ellipsis">
-      insert_inactive_realizations
+      insert_inactive_results
     </span>
   </a>
   
@@ -1502,18 +1502,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.evaluator.EvaluatorContext.filter_inactive_realizations" class="md-nav__link">
+  <a href="#ropt.evaluator.EvaluatorContext.get_active_evaluations" class="md-nav__link">
     <span class="md-ellipsis">
-      filter_inactive_realizations
+      get_active_evaluations
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.evaluator.EvaluatorContext.insert_inactive_realizations" class="md-nav__link">
+  <a href="#ropt.evaluator.EvaluatorContext.insert_inactive_results" class="md-nav__link">
     <span class="md-ellipsis">
-      insert_inactive_realizations
+      insert_inactive_results
     </span>
   </a>
   
@@ -1861,7 +1861,7 @@ supplementary information.</p>
 <p>Specifically, it provides:</p>
 <ul>
 <li>The configuration object for the current optimization step.</li>
-<li>A boolean vector (<code>active</code>) indicating which realizations require
+<li>A boolean vector (<code>active</code>) indicating which variable rows require
   evaluation.</li>
 <li>The realization index for each variable vector. This can be used to
   determine the correct function from an ensemble to use with each variable
@@ -1899,7 +1899,7 @@ supplementary information.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Indicates which realizations require evaluation.</p>
+                <p>Indicates which variable rows require evaluation.</p>
               </div>
             </td>
           </tr>
@@ -1952,31 +1952,27 @@ supplementary information.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.evaluator.EvaluatorContext.filter_inactive_realizations" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">filter_inactive_realizations</span>
+<h3 id="ropt.evaluator.EvaluatorContext.get_active_evaluations" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_active_evaluations</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">filter_inactive_realizations</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">array</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">T</span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_active_evaluations</span><span class="p">(</span><span class="n">array</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">T</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">T</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Filter an array based on active realizations.</p>
+        <p>Filter an array based on the active property.</p>
 <p>This is a utility method, which can be used if only the active property
-is used to exclude realizations that are fully inactive, i.e. where none
-of the objects or constraints are needed.</p>
+is used to exclude variable rows that are inactive, i.e. where none of
+the objects or constraints are needed.</p>
 <p>This method filters a one- or two-dimensional array by retaining only
-those entries or rows that correspond to active realizations. The
-activity of realizations is determined by the <code>self.active</code> boolean
-array (where <code>True</code> indicates an active realization). The
-<code>self.realizations</code> array maps each input entry to its specific model
-realization index.</p>
-<p>If <code>self.active</code> is <code>None</code> (indicating that all model realizations are
-to be considered active), no filtering is applied, and the original
-input is returned</p>
+those entries or rows that correspond to active. The activity of
+realizations is determined by the <code>self.active</code> boolean array (where
+<code>True</code> indicates active).</p>
+<p>If <code>self.active</code> is <code>None</code> (indicating that all variable rows are to be
+considered active), no filtering is applied, and the original input is
+returned.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2040,37 +2036,27 @@ input is returned</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.evaluator.EvaluatorContext.insert_inactive_realizations" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">insert_inactive_realizations</span>
+<h3 id="ropt.evaluator.EvaluatorContext.insert_inactive_results" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">insert_inactive_results</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">insert_inactive_realizations</span><span class="p">(</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">insert_inactive_results</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">array</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">T</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Expand an array by inserting fill values for inactive realizations.</p>
+        <p>Expand an array by inserting fill values for inactive variables.</p>
 <p>This is a utility method, which can be used if only the active property
-is used to exclude realizations that are fully inactive, i.e. where none
-of the objects or constraints are needed.</p>
-<p>This method takes an array that typically has been processed for active
-realizations (e.g., after being filtered by
-<code>filter_inactive_realizations</code>) and expands it to its original
-dimensions by inserting a specified <code>fill_value</code> at positions
-corresponding to inactive realizations. If the array is one-dimensional,
-zero entries are inserted, if it is two-dimensional rows of zero values
-are inserted.</p>
-<p>The activity of realizations is determined by <code>self.active</code> (a boolean
-array indicating active model realizations) and <code>self.realizations</code> (an
-array mapping control vectors to model realization indices). The mask
-<code>self.active[self.realizations]</code> identifies which of the original
-control vectors were active.</p>
-<p>If <code>self.active</code> is <code>None</code> (implying all realizations were considered
-active or no filtering was applied), the input <code>array</code> is returned
-unchanged.</p>
+is used to exclude variable rows that are fully inactive.</p>
+<p>This method takes an array and expands it to its original dimensions by
+inserting a specified <code>fill_value</code> at positions corresponding to
+inactive rows. If the array is one-dimensional, zero entries are
+inserted, if it is two-dimensional rows of zero values are inserted.</p>
+<p>If <code>self.active</code> is <code>None</code> (implying all rows were considered active or
+no filtering was applied), the input <code>array</code> is returned unchanged.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
