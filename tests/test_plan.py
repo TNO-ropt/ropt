@@ -768,3 +768,49 @@ def test_evaluator_cache(
     # Number of  test function calls:
     # 3 evaluations * (1 function + 1 perturbation) * 2 realizations = 12
     assert completed_test_functions == 12
+
+
+def test_evaluator_cache_with_store(
+    enopt_config: dict[str, Any],
+    evaluator: Any,
+    test_functions: Any,
+    monkeypatch: Any,
+) -> None:
+    completed_test_functions = 0
+
+    def _test_function1(*args: Any, **kwargs: Any) -> float:
+        nonlocal completed_test_functions
+
+        completed_test_functions += 1
+        return float(test_functions[0](*args, **kwargs))
+
+    enopt_config["gradient"]["evaluation_policy"] = "speculative"
+    enopt_config["gradient"]["number_of_perturbations"] = "1"
+    enopt_config["optimizer"]["max_functions"] = 2
+
+    plan = Plan(PluginManager())
+    step = plan.add_step("optimizer")
+    store = plan.add_event_handler("store", sources={step})
+    cached_evaluator = plan.add_evaluator(
+        "cached_evaluator", clients={step}, sources={store}
+    )
+
+    assert isinstance(cached_evaluator, DefaultCachedEvaluator)
+    monkeypatch.setattr(
+        cached_evaluator, "eval", partial(_cached_eval, cached_evaluator)
+    )
+
+    plan.add_evaluator(
+        "function_evaluator",
+        evaluator=evaluator((_test_function1, test_functions[1])),
+        clients={cached_evaluator},
+    )
+
+    step.run(config=EnOptConfig.model_validate(enopt_config))
+    assert completed_test_functions == 4
+
+    completed_test_functions = 0
+    step.run(
+        config=EnOptConfig.model_validate(enopt_config),
+    )
+    assert completed_test_functions == 2
