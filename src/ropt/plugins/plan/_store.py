@@ -74,8 +74,9 @@ class DefaultStoreHandler(EventHandler):
         """
         if (results := event.data.get("results")) is None:
             return
+        transforms = event.data["config"].transforms
         results = (
-            item if item.config.transforms is None else item.transform_from_optimizer()
+            item if transforms is None else item.transform_from_optimizer(transforms)
             for item in results
         )
         self["results"] = tuple(

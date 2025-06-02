@@ -99,9 +99,9 @@ class Functions(ResultField):
         """Create a Functions object with the given information.
 
         Args:
-            weighted_objective:     The weighted objective.
-            objectives:             The objective functions for each realization.
-            constraints:            The constraint functions for each realization.
+            weighted_objective: The weighted objective.
+            objectives:         The objective functions for each realization.
+            constraints:        The constraint functions for each realization.
 
         Returns:
             A new Functions object.

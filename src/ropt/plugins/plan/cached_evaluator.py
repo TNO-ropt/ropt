@@ -206,7 +206,7 @@ def _get_from_cache(
 ) -> tuple[FunctionResults | None, int]:
     for results in _get_results(sources):
         if realization_name is not None:
-            names: tuple[str | int, ...] = results.config.names.get("realization", ())
+            names: tuple[str | int, ...] = results.names.get("realization", ())
             realization_index = list(names).index(realization_name)
             if realization_index < 0:
                 continue

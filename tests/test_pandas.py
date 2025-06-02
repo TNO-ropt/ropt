@@ -56,10 +56,11 @@ def function_result_fixture(enopt_config: dict[str, Any]) -> FunctionResults:
     functions = Functions.create(
         weighted_objective=np.array(1.0), objectives=np.array([1.0, 2.0])
     )
+    config = EnOptConfig.model_validate(enopt_config)
     return FunctionResults(
-        config=EnOptConfig.model_validate(enopt_config),
         batch_id=1,
         metadata={},
+        names=config.names,
         evaluations=evaluations,
         realizations=realizations,
         functions=functions,
@@ -78,10 +79,11 @@ def gradient_result_fixture(enopt_config: dict[str, Any]) -> GradientResults:
         weighted_objective=np.array([1.0, 2.0]),
         objectives=np.arange(4, dtype=np.float64).reshape((2, 2)),
     )
+    config = EnOptConfig.model_validate(enopt_config)
     return GradientResults(
-        config=EnOptConfig.model_validate(enopt_config),
         batch_id=1,
         metadata={},
+        names=config.names,
         evaluations=evaluations,
         realizations=Realizations(
             active_realizations=np.ones(36, dtype=np.bool_),
@@ -93,10 +95,7 @@ def gradient_result_fixture(enopt_config: dict[str, Any]) -> GradientResults:
 
 def test__to_series(gradient_result: GradientResults) -> None:
     series = _to_series(
-        gradient_result.evaluations,
-        "perturbed_variables",
-        None,
-        gradient_result.config.names,
+        gradient_result.evaluations, "perturbed_variables", None, gradient_result.names
     )
     assert series is not None
     assert len(series) == gradient_result.evaluations.perturbed_variables.size
@@ -105,10 +104,8 @@ def test__to_series(gradient_result: GradientResults) -> None:
         "perturbation",
         "variable",
     ]
-    for v_idx, var in enumerate(gradient_result.config.names[AxisName.VARIABLE]):
-        for r_idx, real in enumerate(
-            gradient_result.config.names[AxisName.REALIZATION]
-        ):
+    for v_idx, var in enumerate(gradient_result.names[AxisName.VARIABLE]):
+        for r_idx, real in enumerate(gradient_result.names[AxisName.REALIZATION]):
             for pert in range(gradient_result.evaluations.perturbed_variables.shape[1]):
                 assert (
                     series.loc[(real, pert, var)]
@@ -123,7 +120,7 @@ def test__to_series_evaluation_info(gradient_result: GradientResults) -> None:
         gradient_result.evaluations,
         "evaluation_info",
         "foo",
-        gradient_result.config.names,
+        gradient_result.names,
     )
     assert series is not None
     info = np.array(gradient_result.evaluations.evaluation_info["foo"])
@@ -132,7 +129,7 @@ def test__to_series_evaluation_info(gradient_result: GradientResults) -> None:
         "realization",
         "perturbation",
     ]
-    for r_idx, real in enumerate(gradient_result.config.names[AxisName.REALIZATION]):
+    for r_idx, real in enumerate(gradient_result.names[AxisName.REALIZATION]):
         for pert in range(gradient_result.evaluations.perturbed_variables.shape[1]):
             assert series.loc[(real, pert)] == info[r_idx, pert]
 
@@ -170,10 +167,10 @@ def test_to_dataframe_gradient(gradient_result: GradientResults) -> None:
         "objective",
     ]
     idx = 0
-    for var in gradient_result.config.names[AxisName.VARIABLE]:
-        for real in gradient_result.config.names[AxisName.REALIZATION]:
+    for var in gradient_result.names[AxisName.VARIABLE]:
+        for real in gradient_result.names[AxisName.REALIZATION]:
             for pert in range(gradient_result.evaluations.perturbed_variables.shape[1]):
-                for fnc in gradient_result.config.names[AxisName.OBJECTIVE]:
+                for fnc in gradient_result.names[AxisName.OBJECTIVE]:
                     assert frame.index[idx] == (1, var, real, pert, fnc)
                     idx += 1
 

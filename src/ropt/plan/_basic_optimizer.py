@@ -270,10 +270,11 @@ class BasicOptimizer:
         """
 
         def _results_callback(event: Event) -> None:
+            transforms = event.data["config"].transforms
             results = tuple(
                 item
-                if item.config.transforms is None
-                else item.transform_from_optimizer()
+                if transforms is None
+                else item.transform_from_optimizer(transforms)
                 for item in event.data.get("results", ())
             )
             callback(results)

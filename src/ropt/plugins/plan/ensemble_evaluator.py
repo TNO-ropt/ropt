@@ -95,7 +95,11 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
             },
         )
 
-        self._emit_event(Event(event_type=EventType.START_ENSEMBLE_EVALUATOR_STEP))
+        event_data: dict[str, Any] = {"config": config}
+
+        self._emit_event(
+            Event(event_type=EventType.START_ENSEMBLE_EVALUATOR_STEP, data=event_data)
+        )
 
         if variables is None:
             variables = config.variables.initial_values
@@ -114,7 +118,7 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
 
         exit_code = OptimizerExitCode.EVALUATOR_STEP_FINISHED
 
-        self._emit_event(Event(event_type=EventType.START_EVALUATION))
+        self._emit_event(Event(event_type=EventType.START_EVALUATION, data=event_data))
         try:
             results = ensemble_evaluator.calculate(
                 variables, compute_functions=True, compute_gradients=False
@@ -131,14 +135,20 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
             for item in results:
                 item.metadata = deepcopy(metadata)
 
-        data: dict[str, Any] = {"results": results}
+        event_data["results"] = results
 
-        self._emit_event(Event(event_type=EventType.FINISHED_EVALUATION, data=data))
+        self._emit_event(
+            Event(event_type=EventType.FINISHED_EVALUATION, data=event_data)
+        )
 
         if exit_code == OptimizerExitCode.USER_ABORT:
             self.plan.abort()
 
-        self._emit_event(Event(event_type=EventType.FINISHED_ENSEMBLE_EVALUATOR_STEP))
+        self._emit_event(
+            Event(
+                event_type=EventType.FINISHED_ENSEMBLE_EVALUATOR_STEP, data=event_data
+            )
+        )
 
         return exit_code
 
