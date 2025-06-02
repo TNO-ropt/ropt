@@ -271,7 +271,7 @@ class Plan:
         method is returned by this method.
 
         Args:
-            step:   Tthe step to run.
+            step:   The step to run.
             kwargs: Additional arguments to pass to the step's `run` method.
 
         Returns:
