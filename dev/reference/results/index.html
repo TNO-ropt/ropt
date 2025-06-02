@@ -1926,11 +1926,14 @@ data.</p>
     during optimization. This metadata can include various primitive values
     that are not directly interpreted by the optimization code but are
     useful for reporting and analysis.</li>
-<li><strong>Configuration:</strong> The configuration used for the optimization, which
-    is an instance of the <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>
-    class. This configuration contains all the necessary information about
-    the optimization setup, including variables, objectives, constraints,
-    and the optimizer itself.</li>
+<li><strong>Names</strong>: The optional <code>names</code> attribute is a dictionary that stores
+    the names of the various entities, such as variables, objectives, and
+    constraints. The supported name types are defined in the
+    <a class="autorefs autorefs-internal" title="            AxisName" href="../enums/#ropt.enums.AxisName"><code>AxisName</code></a> enumeration. This information is
+    optional, as it is not strictly necessary for the optimization, but it
+    can be useful for labeling and interpreting results. For instance, when
+    present, it is used to create a multi-index results that are exported as
+    data frames.</li>
 </ul>
 <p>The derived classes, <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
@@ -1964,17 +1967,6 @@ the contents of a specific field, or a subset of its sub-fields, to a
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.results.Results.config">config</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The configuration used for the optimization.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
             <td><code><span title="ropt.results.Results.batch_id">batch_id</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a> | None</code>
@@ -1993,6 +1985,17 @@ the contents of a specific field, or a subset of its sub-fields, to a
             <td>
               <div class="doc-md-description">
                 <p>A dictionary of metadata.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.results.Results.names">names</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>, ...]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional names of the various result axes.</p>
               </div>
             </td>
           </tr>
@@ -2030,7 +2033,9 @@ the contents of a specific field, or a subset of its sub-fields, to a
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">transform_from_optimizer</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Results</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">transform_from_optimizer</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">transforms</span><span class="p">:</span> <span class="n">OptModelTransforms</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Results</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2062,8 +2067,43 @@ objectives and constraints are transformed back to the user domain.</p>
       dataclass
   " href="../domain_transforms/#ropt.transforms.OptModelTransforms"><code>OptModelTransforms</code></a> object,
 which encapsulates the specific transformations for variables,
-objectives, and nonlinear constraints. This object is stored in with
-the <code>EnOptConfig</code> object used to create the <code>Results</code> object.</p>
+objectives, and nonlinear constraints.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>transforms</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.transforms.OptModelTransforms
+
+
+  
+      dataclass
+  " href="../domain_transforms/#ropt.transforms.OptModelTransforms">OptModelTransforms</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The transforms to apply.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2139,11 +2179,10 @@ subset can be selected using the <code>select</code> argument.</p>
 <p>Sub-fields may be multi-dimensional arrays, which are exported in a
 stacked manner. Using the axis types found in the metadata, the exporter
 constructs a multi-index labeled with the corresponding names provided
-via the <code>names</code> field in the configuration object. If <code>names</code> does not
-contain a key/value pair for the the axis, numerical indices are used.
-These multi-indices can optionally be unstacked into multiple columns by
-providing the axis types to unstack
-via the <code>unstack</code> argument.</p>
+via the <code>names</code> field. If <code>names</code> does not contain a key/value pair for
+the the axis, numerical indices are used. These multi-indices can
+optionally be unstacked into multiple columns by providing the axis
+types to unstack via the <code>unstack</code> argument.</p>
 
 
 <details class="info" open>
