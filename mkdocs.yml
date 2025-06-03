@@ -90,15 +90,8 @@ repo_name: TNO-ropt/ropt
 
 nav:
   - "About": index.md
-  - "Usage":
-      - "Introduction": usage/robust_optimization.md
-      - "Optimization":
-          - "BasicOptimizer": usage/basic_optimizer.md
-          - "Function Evaluation": usage/evaluation.md
-          - "Configuration": usage/configuration.md
-          - "Domain Transforms": usage/domain_transforms.md
-          - "Results": usage/results.md
-  - Reference:
+  - "Introduction": usage/robust_optimization.md
+  - "Reference":
       - "Configuration": reference/enopt_config.md
       - "Domain transforms": reference/domain_transforms.md
       - "Optimization":
