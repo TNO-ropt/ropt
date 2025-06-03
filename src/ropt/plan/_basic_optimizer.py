@@ -21,6 +21,7 @@ if TYPE_CHECKING:
     from ropt.evaluator import EvaluatorContext, EvaluatorResult
     from ropt.plan import Event
     from ropt.results import FunctionResults
+    from ropt.transforms import OptModelTransforms
 
 
 @dataclass(slots=True)
@@ -66,21 +67,22 @@ class BasicOptimizer:
 
     def __init__(
         self,
-        enopt_config: dict[str, Any] | EnOptConfig,
+        enopt_config: dict[str, Any],
         evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult],
         *,
+        transforms: OptModelTransforms | None = None,
         constraint_tolerance: float = 1e-10,
         **kwargs: Any,  # noqa: ANN401
     ) -> None:
         """Initialize a `BasicOptimizer` object.
 
         This constructor sets up the necessary components for a single
-        optimization run. It requires an optimization configuration and an
-        evaluator, which together define the optimization problem and how to
-        evaluate potential solutions. If a constraint value is within the
-        `constraint_tolerance` of zero, it is considered satisfied. The `kwargs`
-        may be used to define custom steps and event handlers to modify the
-        behavior of the optimization process.
+        optimization run. It requires an optimization configuration, optional
+        domain transforms, and an evaluator, which together define the
+        optimization problem and how to evaluate potential solutions. If a
+        constraint value is within the `constraint_tolerance` of zero, it is
+        considered satisfied. The `kwargs` may be used to define custom steps
+        and event handlers to modify the behavior of the optimization process.
 
         Note: Custom  steps
             The optional keyword arguments (`kwargs`) provide a mechanism to
@@ -104,11 +106,13 @@ class BasicOptimizer:
 
         Args:
             enopt_config:         The configuration for the optimization.
+            transforms:           The transforms to apply to the model.
             evaluator:            The evaluator object.
             constraint_tolerance: The constraint violation tolerance.
             kwargs:               Optional keyword arguments.
         """
-        self._config = EnOptConfig.model_validate(enopt_config)
+        self._config = EnOptConfig.model_validate(enopt_config, context=transforms)
+        self._transforms = transforms
         self._constraint_tolerance = constraint_tolerance
         self._evaluator = evaluator
         self._plugin_manager = PluginManager()
@@ -206,7 +210,7 @@ class BasicOptimizer:
                     callback=function,
                     sources={optimizer},
                 )
-            exit_code = optimizer.run(config=self._config)
+            exit_code = optimizer.run(config=self._config, transforms=self._transforms)
             results = tracker["results"]
             variables = None if results is None else results.evaluations.variables
         else:
@@ -270,7 +274,7 @@ class BasicOptimizer:
         """
 
         def _results_callback(event: Event) -> None:
-            transforms = event.data["config"].transforms
+            transforms = event.data["transforms"]
             results = tuple(
                 item
                 if transforms is None

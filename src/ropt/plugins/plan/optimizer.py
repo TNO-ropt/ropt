@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 
     from ropt.config.enopt import EnOptConfig
     from ropt.results import Results
+    from ropt.transforms import OptModelTransforms
 
 
 MetaDataType = dict[str, int | float | bool | str]
@@ -100,6 +101,7 @@ class DefaultOptimizerStep(PlanStep):
     def run_step_from_plan(
         self,
         config: EnOptConfig,
+        transforms: OptModelTransforms | None = None,
         variables: ArrayLike | None = None,
         nested_optimization: NestedOptimizationCallable | None = None,
         metadata: dict[str, Any] | None = None,
@@ -128,6 +130,8 @@ class DefaultOptimizerStep(PlanStep):
 
         Args:
             config:              Optimizer configuration.
+            transforms:          Optional transforms to apply to the variables,
+                                 objectives, and constraints.
             variables:           Optional initial variable vector(s) to start from.
             nested_optimization: Optional callable to run a nested plan.
             metadata:            Optional dictionary to attach to emitted `Results`.
@@ -136,6 +140,7 @@ class DefaultOptimizerStep(PlanStep):
             An exit code indicating the outcome of the optimization.
         """
         self._config = config
+        self._transforms = transforms
         self._nested_optimization = nested_optimization
         self._metadata = metadata
         self._event_handlers = self.plan.get_event_handlers(
@@ -148,7 +153,7 @@ class DefaultOptimizerStep(PlanStep):
             },
         )
 
-        event_data = {"config": config}
+        event_data: dict[str, Any] = {"config": config, "transforms": transforms}
 
         self._emit_event(
             Event(event_type=EventType.START_OPTIMIZER_STEP, data=event_data)
@@ -158,19 +163,17 @@ class DefaultOptimizerStep(PlanStep):
             variables = self._config.variables.initial_values
         else:
             variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
-            if (
-                self._config.transforms is not None
-                and self._config.transforms.variables is not None
-            ):
-                variables = self._config.transforms.variables.to_optimizer(variables)
+            if self._transforms is not None and self._transforms.variables is not None:
+                variables = self._transforms.variables.to_optimizer(variables)
 
         evaluator = self.plan.get_evaluator(self)
         ensemble_evaluator = EnsembleEvaluator(
-            self._config, evaluator.eval, self.plan.plugin_manager
+            self._config, self._transforms, evaluator.eval, self.plan.plugin_manager
         )
 
         ensemble_optimizer = EnsembleOptimizer(
             enopt_config=self._config,
+            transforms=self._transforms,
             ensemble_evaluator=ensemble_evaluator,
             plugin_manager=self.plan.plugin_manager,
             nested_optimizer=(
@@ -199,7 +202,10 @@ class DefaultOptimizerStep(PlanStep):
             handler(event)
 
     def _signal_evaluation(self, results: tuple[Results, ...] | None = None) -> None:
-        event_data: dict[str, Any] = {"config": self._config}
+        event_data: dict[str, Any] = {
+            "config": self._config,
+            "transforms": self._transforms,
+        }
         if results is None:
             self._emit_event(
                 Event(event_type=EventType.START_EVALUATION, data=event_data)

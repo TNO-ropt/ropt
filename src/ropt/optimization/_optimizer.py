@@ -24,6 +24,7 @@ if TYPE_CHECKING:
     from ropt.plugins import PluginManager
     from ropt.plugins.optimizer.base import Optimizer
     from ropt.results import Functions, Gradients, Results
+    from ropt.transforms._transforms import OptModelTransforms
 
 
 class SignalEvaluationCallback(Protocol):
@@ -87,9 +88,10 @@ class EnsembleOptimizer:
     classes are recommended for greater flexibility and ease of use.
     """
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         enopt_config: EnOptConfig,
+        transforms: OptModelTransforms | None,
         ensemble_evaluator: EnsembleEvaluator,
         plugin_manager: PluginManager,
         signal_evaluation: SignalEvaluationCallback | None = None,
@@ -106,9 +108,12 @@ class EnsembleOptimizer:
 
         1.  An [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object: This
             contains all configuration settings for the optimization.
-        2.  An [`EnsembleEvaluator`][ropt.ensemble_evaluator.EnsembleEvaluator]
+        2.  A [`OptModelTransforms`][ropt.transforms.OptModelTransforms] object:
+            This handles the transforms to apply to the variables, objectives and
+            constraints.
+        3.  An [`EnsembleEvaluator`][ropt.ensemble_evaluator.EnsembleEvaluator]
             object: This object is responsible for evaluating functions.
-        3.  A [`PluginManager`][ropt.plugins.PluginManager] object: This object
+        4.  A [`PluginManager`][ropt.plugins.PluginManager] object: This object
             provides access to optimizer plugins.
 
         Additionally, two optional callbacks can be provided to extend the
@@ -129,12 +134,14 @@ class EnsembleOptimizer:
 
         Args:
             enopt_config:       The ensemble optimization configuration.
+            transforms:         The transforms to apply to the model.
             ensemble_evaluator: The evaluator for function evaluations.
             plugin_manager:     The plugin manager.
             signal_evaluation:  Optional callback to signal evaluations.
             nested_optimizer:   Optional callback for nested optimizations.
         """
         self._enopt_config = enopt_config
+        self._transforms = transforms
         self._function_evaluator = ensemble_evaluator
         self._plugin_manager = plugin_manager
         self._signal_evaluation = signal_evaluation
@@ -265,7 +272,7 @@ class EnsembleOptimizer:
             functions=functions,
             gradients=gradients,
             nonlinear_constraint_bounds=_get_nonlinear_constraint_bounds(
-                self._enopt_config
+                self._enopt_config, self._transforms
             ),
         )
 
@@ -437,15 +444,12 @@ class _Redirector:
 
 
 def _get_nonlinear_constraint_bounds(
-    config: EnOptConfig,
+    config: EnOptConfig, transforms: OptModelTransforms | None = None
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]] | None:
     if config.nonlinear_constraints is None:
         return None
-    if (
-        config.transforms is not None
-        and config.transforms.nonlinear_constraints is not None
-    ):
-        return config.transforms.nonlinear_constraints.bounds_to_optimizer(
+    if transforms is not None and transforms.nonlinear_constraints is not None:
+        return transforms.nonlinear_constraints.bounds_to_optimizer(
             config.nonlinear_constraints.lower_bounds,
             config.nonlinear_constraints.upper_bounds,
         )

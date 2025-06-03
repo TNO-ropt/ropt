@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Self
+from typing import Any, Self
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict, ValidationInfo, model_validator
@@ -19,9 +19,6 @@ from ._realization_filter_config import RealizationFilterConfig  # noqa: TC001
 from ._realizations_config import RealizationsConfig
 from ._sampler_config import SamplerConfig
 from ._variables_config import VariablesConfig  # noqa: TC001
-
-if TYPE_CHECKING:
-    from ropt.transforms import OptModelTransforms
 
 
 class EnOptConfig(BaseModel):
@@ -84,17 +81,10 @@ class EnOptConfig(BaseModel):
     samplers: tuple[SamplerConfig, ...] = (SamplerConfig(),)
     names: dict[str, tuple[str | int, ...]] = {}
 
-    _transforms: OptModelTransforms | None = None
-
     model_config = ConfigDict(
         extra="forbid",
         validate_default=True,
     )
-
-    @model_validator(mode="after")
-    def _store_tranforms(self, info: ValidationInfo) -> Self:
-        self._transforms = info.context
-        return self
 
     @model_validator(mode="after")
     def _check_linear_constraints(self) -> Self:
@@ -158,18 +148,16 @@ class EnOptConfig(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def _fix_linear_constraints(self) -> Self:
+    def _fix_linear_constraints(self, info: ValidationInfo) -> Self:
         if self.linear_constraints is not None:
             self.linear_constraints = self.linear_constraints.apply_transformation(
-                self._transforms,
+                info.context,
             )
         return self
 
     @model_validator(mode="after")
-    def _gradient(self) -> Self:
-        self.gradient = self.gradient.fix_perturbations(
-            self.variables, self._transforms
-        )
+    def _gradient(self, info: ValidationInfo) -> Self:
+        self.gradient = self.gradient.fix_perturbations(self.variables, info.context)
         return self
 
     @model_validator(mode="wrap")  # type: ignore[arg-type]
@@ -177,22 +165,3 @@ class EnOptConfig(BaseModel):
         if isinstance(self, EnOptConfig):
             return self
         return handler(self)
-
-    @property
-    def transforms(self) -> OptModelTransforms | None:
-        """Provides access to the domain transformation object.
-
-        This property returns the
-        [`OptModelTransforms`][ropt.transforms.OptModelTransforms] object, if
-        one was provided via the `context` argument during the validation
-        (`model_validate`) of this `EnOptConfig` instance.
-
-        The transformation object encapsulates the mappings applied to
-        variables, objectives, and constraints between the user-defined domain
-        and the domain used by the optimizer. If no transformations were
-        provided, this property returns `None`.
-
-        Returns:
-            The `OptModelTransforms` object used during configuration, or `None`.
-        """
-        return self._transforms

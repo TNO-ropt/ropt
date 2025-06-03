@@ -162,6 +162,7 @@ class ConstraintInfo(ResultField):
     def create(
         cls,
         config: EnOptConfig,
+        transforms: OptModelTransforms | None,
         variables: NDArray[np.float64],
         constraints: NDArray[np.float64] | None,
     ) -> ConstraintInfo | None:
@@ -176,6 +177,7 @@ class ConstraintInfo(ResultField):
 
         Args:
             config:      The ensemble optimizer configuration object.
+            transforms:  The domain transforms to apply to the variables and constraints.
             variables:   The variables to check.
             constraints: The constraints to check (optional).
 
@@ -198,7 +200,7 @@ class ConstraintInfo(ResultField):
         if constraints is not None:
             assert config.nonlinear_constraints is not None
             lower_bounds, upper_bounds = _get_nonlinear_constraint_bounds(
-                config,
+                config, transforms
             )
             diffs["nonlinear_lower"] = constraints - lower_bounds
             diffs["nonlinear_upper"] = constraints - upper_bounds
@@ -245,14 +247,11 @@ class ConstraintInfo(ResultField):
 
 
 def _get_nonlinear_constraint_bounds(
-    config: EnOptConfig,
+    config: EnOptConfig, transforms: OptModelTransforms | None
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     assert config.nonlinear_constraints is not None
-    if (
-        config.transforms is not None
-        and config.transforms.nonlinear_constraints is not None
-    ):
-        return config.transforms.nonlinear_constraints.bounds_to_optimizer(
+    if transforms is not None and transforms.nonlinear_constraints is not None:
+        return transforms.nonlinear_constraints.bounds_to_optimizer(
             config.nonlinear_constraints.lower_bounds,
             config.nonlinear_constraints.upper_bounds,
         )

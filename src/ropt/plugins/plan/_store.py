@@ -74,7 +74,7 @@ class DefaultStoreHandler(EventHandler):
         """
         if (results := event.data.get("results")) is None:
             return
-        transforms = event.data["config"].transforms
+        transforms = event.data["transforms"]
         results = (
             item if transforms is None else item.transform_from_optimizer(transforms)
             for item in results

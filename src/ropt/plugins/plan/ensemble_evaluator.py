@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 
     from ropt.config.enopt import EnOptConfig
     from ropt.plan import Plan
+    from ropt.transforms import OptModelTransforms
 
 
 class DefaultEnsembleEvaluatorStep(PlanStep):
@@ -59,6 +60,7 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
     def run_step_from_plan(
         self,
         config: EnOptConfig,
+        transforms: OptModelTransforms | None = None,
         variables: ArrayLike | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> OptimizerExitCode:
@@ -78,9 +80,11 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
         `FINISHED_EVALUATION` event.
 
         Args:
-            config:    Optimizer configuration.
-            variables: Optional variable vector(s) to evaluate.
-            metadata:  Optional dictionary to attach to emitted `FunctionResults`.
+            config:     Optimizer configuration.
+            transforms: Optional transforms to apply to the variables,
+                        objectives, and constraints.
+            variables:  Optional variable vector(s) to evaluate.
+            metadata:   Optional dictionary to attach to emitted `FunctionResults`.
 
         Returns:
             An [`OptimizerExitCode`][ropt.enums.OptimizerExitCode] indicating the outcome.
@@ -95,7 +99,7 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
             },
         )
 
-        event_data: dict[str, Any] = {"config": config}
+        event_data: dict[str, Any] = {"config": config, "transforms": transforms}
 
         self._emit_event(
             Event(event_type=EventType.START_ENSEMBLE_EVALUATOR_STEP, data=event_data)
@@ -105,15 +109,12 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
             variables = config.variables.initial_values
         else:
             variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
-            if (
-                config.transforms is not None
-                and config.transforms.variables is not None
-            ):
-                variables = config.transforms.variables.to_optimizer(variables)
+            if transforms is not None and transforms.variables is not None:
+                variables = transforms.variables.to_optimizer(variables)
 
         evaluator = self.plan.get_evaluator(self)
         ensemble_evaluator = EnsembleEvaluator(
-            config, evaluator.eval, self.plan.plugin_manager
+            config, transforms, evaluator.eval, self.plan.plugin_manager
         )
 
         exit_code = OptimizerExitCode.EVALUATOR_STEP_FINISHED

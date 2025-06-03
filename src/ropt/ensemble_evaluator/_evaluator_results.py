@@ -8,6 +8,7 @@ from numpy.typing import NDArray
 
 from ropt.config.enopt import EnOptConfig
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
+from ropt.transforms import OptModelTransforms
 
 
 @dataclass(slots=True)
@@ -101,6 +102,7 @@ def _get_active_realizations(
 
 def _get_function_results(
     config: EnOptConfig,
+    transforms: OptModelTransforms | None,
     evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult],
     variables: NDArray[np.float64],
     active_realizations: NDArray[np.bool_],
@@ -114,20 +116,20 @@ def _get_function_results(
         realizations=realizations,
         active=active_realizations[realizations],
     )
-    if config.transforms is not None and config.transforms.variables:
-        variables = config.transforms.variables.from_optimizer(variables)
+    if transforms is not None and transforms.variables:
+        variables = transforms.variables.from_optimizer(variables)
     evaluator_result = evaluator(np.repeat(variables, realization_num, axis=0), context)
-    if config.transforms is not None:
-        if config.transforms.objectives is not None:
-            evaluator_result.objectives = config.transforms.objectives.to_optimizer(
+    if transforms is not None:
+        if transforms.objectives is not None:
+            evaluator_result.objectives = transforms.objectives.to_optimizer(
                 evaluator_result.objectives
             )
         if (
             evaluator_result.constraints is not None
-            and config.transforms.nonlinear_constraints is not None
+            and transforms.nonlinear_constraints is not None
         ):
             evaluator_result.constraints = (
-                config.transforms.nonlinear_constraints.to_optimizer(
+                transforms.nonlinear_constraints.to_optimizer(
                     evaluator_result.constraints
                 )
             )
@@ -157,6 +159,7 @@ def _get_function_results(
 
 def _get_gradient_results(
     config: EnOptConfig,
+    transforms: OptModelTransforms | None,
     evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult],
     perturbed_variables: NDArray[np.float64],
     active_realizations: NDArray[np.bool_],
@@ -173,20 +176,20 @@ def _get_gradient_results(
     variables: NDArray[np.float64] = perturbed_variables.reshape(
         -1, perturbed_variables.shape[-1]
     )
-    if config.transforms is not None and config.transforms.variables:
-        variables = config.transforms.variables.from_optimizer(variables)
+    if transforms is not None and transforms.variables:
+        variables = transforms.variables.from_optimizer(variables)
     evaluator_result = evaluator(variables, context)
-    if config.transforms is not None:
-        if config.transforms.objectives is not None:
-            evaluator_result.objectives = config.transforms.objectives.to_optimizer(
+    if transforms is not None:
+        if transforms.objectives is not None:
+            evaluator_result.objectives = transforms.objectives.to_optimizer(
                 evaluator_result.objectives
             )
         if (
             evaluator_result.constraints is not None
-            and config.transforms.nonlinear_constraints is not None
+            and transforms.nonlinear_constraints is not None
         ):
             evaluator_result.constraints = (
-                config.transforms.nonlinear_constraints.to_optimizer(
+                transforms.nonlinear_constraints.to_optimizer(
                     evaluator_result.constraints
                 )
             )
@@ -200,8 +203,9 @@ def _get_gradient_results(
     )
 
 
-def _get_function_and_gradient_results(
+def _get_function_and_gradient_results(  # noqa: PLR0913
     config: EnOptConfig,
+    transforms: OptModelTransforms | None,
     evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult],
     variables: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
@@ -233,20 +237,20 @@ def _get_function_and_gradient_results(
             perturbed_variables.reshape(-1, perturbed_variables.shape[-1]),
         ),
     )
-    if config.transforms is not None and config.transforms.variables:
-        all_variables = config.transforms.variables.from_optimizer(all_variables)
+    if transforms is not None and transforms.variables:
+        all_variables = transforms.variables.from_optimizer(all_variables)
     evaluator_result = evaluator(all_variables, context)
-    if config.transforms is not None:
-        if config.transforms.objectives is not None:
-            evaluator_result.objectives = config.transforms.objectives.to_optimizer(
+    if transforms is not None:
+        if transforms.objectives is not None:
+            evaluator_result.objectives = transforms.objectives.to_optimizer(
                 evaluator_result.objectives
             )
         if (
             evaluator_result.constraints is not None
-            and config.transforms.nonlinear_constraints is not None
+            and transforms.nonlinear_constraints is not None
         ):
             evaluator_result.constraints = (
-                config.transforms.nonlinear_constraints.to_optimizer(
+                transforms.nonlinear_constraints.to_optimizer(
                     evaluator_result.constraints
                 )
             )

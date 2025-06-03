@@ -136,7 +136,11 @@ def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> Non
     assert tracker["results"] is not None
     variables1 = tracker["results"].evaluations.variables
     tracker["variables"] = None
-    step.run(config=EnOptConfig.model_validate(enopt_config), variables=[0, 0, 0])
+    step.run(
+        config=EnOptConfig.model_validate(enopt_config),
+        transforms=None,
+        variables=[0, 0, 0],
+    )
     assert tracker["results"] is not None
     variables2 = tracker["results"].evaluations.variables
 
@@ -199,16 +203,19 @@ def test_two_optimizers_alternating(
     assert tracker2["results"] is not None
     step.run(
         config=EnOptConfig.model_validate(enopt_config2),
+        transforms=None,
         variables=tracker2["results"].evaluations.variables,
     )
     assert tracker2["results"] is not None
     step.run(
         config=EnOptConfig.model_validate(enopt_config1),
+        transforms=None,
         variables=tracker2["results"].evaluations.variables,
     )
     assert tracker2["results"] is not None
     step.run(
         config=EnOptConfig.model_validate(enopt_config2),
+        transforms=None,
         variables=tracker2["results"].evaluations.variables,
     )
     assert completed_functions == 14
@@ -248,6 +255,7 @@ def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -
     assert tracker["results"] is not None
     step.run(
         config=EnOptConfig.model_validate(enopt_config2),
+        transforms=None,
         variables=tracker["results"].evaluations.variables,
     )
 
@@ -320,7 +328,11 @@ def test_restart_last(enopt_config: dict[str, Any], evaluator: Any) -> None:
             if tracker["results"] is None
             else tracker["results"].evaluations.variables
         )
-        step.run(config=EnOptConfig.model_validate(enopt_config), variables=variables)
+        step.run(
+            config=EnOptConfig.model_validate(enopt_config),
+            transforms=None,
+            variables=variables,
+        )
 
     assert np.all(
         completed[3].evaluations.variables == completed[2].evaluations.variables
@@ -356,7 +368,11 @@ def test_restart_optimum(enopt_config: dict[str, Any], evaluator: Any) -> None:
             if tracker["results"] is None
             else tracker["results"].evaluations.variables
         )
-        step.run(config=EnOptConfig.model_validate(enopt_config), variables=variables)
+        step.run(
+            config=EnOptConfig.model_validate(enopt_config),
+            transforms=None,
+            variables=variables,
+        )
 
     assert np.all(
         completed[2].evaluations.variables == completed[4].evaluations.variables
@@ -414,7 +430,11 @@ def test_restart_optimum_with_reset(
             else tracker["results"].evaluations.variables
         )
         tracker["results"] = None
-        step.run(config=EnOptConfig.model_validate(enopt_config), variables=variables)
+        step.run(
+            config=EnOptConfig.model_validate(enopt_config),
+            transforms=None,
+            variables=variables,
+        )
 
     # The third evaluation is the optimum, and used to restart the second run:
     assert np.all(
@@ -455,7 +475,11 @@ def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
     )
     for idx in range(2):
         metadata["restart"] = idx
-        step.run(config=EnOptConfig.model_validate(enopt_config), metadata=metadata)
+        step.run(
+            config=EnOptConfig.model_validate(enopt_config),
+            transforms=None,
+            metadata=metadata,
+        )
     assert restarts == [0, 1]
 
 
@@ -469,7 +493,11 @@ def test_evaluator_step(enopt_config: dict[str, Any], evaluator: Any) -> None:
     assert np.allclose(tracker["results"].functions.weighted_objective, 1.66)
 
     tracker["results"] = None
-    step.run(config=EnOptConfig.model_validate(enopt_config), variables=[0, 0, 0])
+    step.run(
+        config=EnOptConfig.model_validate(enopt_config),
+        transforms=None,
+        variables=[0, 0, 0],
+    )
     assert tracker["results"].functions is not None
     assert np.allclose(tracker["results"].functions.weighted_objective, 1.75)
 
@@ -484,6 +512,7 @@ def test_evaluator_step_multi(enopt_config: dict[str, Any], evaluator: Any) -> N
     store = plan.add_event_handler("store", sources={step})
     step.run(
         config=EnOptConfig.model_validate(enopt_config),
+        transforms=None,
         variables=[[0, 0, 0.1], [0, 0, 0]],
     )
     values = [
@@ -554,7 +583,9 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
         inner_step = inner_plan.add_step("optimizer", tags={"inner"})
         inner_tracker = inner_plan.add_event_handler("tracker", sources={inner_step})
         inner_step.run(
-            config=EnOptConfig.model_validate(nested_config), variables=variables
+            config=EnOptConfig.model_validate(nested_config),
+            transforms=None,
+            variables=variables,
         )
         results = inner_tracker["results"]
         assert isinstance(results, FunctionResults | None)
@@ -562,6 +593,7 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
     outer_step.run(
         config=EnOptConfig.model_validate(enopt_config),
+        transforms=None,
         nested_optimization=_inner_optimization,
     )
     assert outer_tracker["results"] is not None
@@ -611,6 +643,7 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
         inner_tracker = inner_plan.add_event_handler("tracker", sources={inner_step})
         inner_step.run(
             config=EnOptConfig.model_validate(nested_config),
+            transforms=None,
             metadata={"inner": "inner_meta_data"},
             variables=variables,
         )
@@ -621,6 +654,7 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
 
     outer_step.run(
         config=EnOptConfig.model_validate(enopt_config),
+        transforms=None,
         nested_optimization=_inner_optimization,
         metadata={"outer": 1},
     )
@@ -763,6 +797,7 @@ def test_evaluator_cache(
     completed_test_functions = 0
     step.run(
         config=EnOptConfig.model_validate(enopt_config),
+        transforms=None,
         variables=tracker["results"].evaluations.variables,
     )
     assert completed_test_functions == 6  # Two evaluations were cached

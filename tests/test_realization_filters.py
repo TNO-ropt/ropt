@@ -139,10 +139,7 @@ def test_sort_filter_on_objectives(
 
     result_list: list[Results] = []
     results = (
-        BasicOptimizer(
-            enopt_config,
-            evaluator(functions),
-        )
+        BasicOptimizer(enopt_config, evaluator(functions))
         .set_results_callback(partial(_track_results, result_list=result_list))
         .run()
         .results
@@ -198,10 +195,7 @@ def test_sort_filter_on_objectives_with_constraints(
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
     results = (
-        BasicOptimizer(
-            enopt_config,
-            evaluator(functions),
-        )
+        BasicOptimizer(enopt_config, evaluator(functions))
         .set_results_callback(partial(_track_results, result_list=result_list))
         .run()
         .results
@@ -263,10 +257,7 @@ def test_sort_filter_on_constraints(
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
     results = (
-        BasicOptimizer(
-            enopt_config,
-            evaluator(functions),
-        )
+        BasicOptimizer(enopt_config, evaluator(functions))
         .set_results_callback(
             partial(_track_results, result_list=result_list),
         )
@@ -425,10 +416,7 @@ def test_cvar_filter_on_objectives(
     enopt_config["objectives"]["realization_filters"] = [0, 0]
     result_list: list[Results] = []
     results = (
-        BasicOptimizer(
-            enopt_config,
-            evaluator(functions),
-        )
+        BasicOptimizer(enopt_config, evaluator(functions))
         .set_results_callback(
             partial(_track_results, result_list=result_list),
         )
@@ -485,10 +473,7 @@ def test_cvar_filter_on_objectives_with_constraints(
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
     results = (
-        BasicOptimizer(
-            enopt_config,
-            evaluator(functions),
-        )
+        BasicOptimizer(enopt_config, evaluator(functions))
         .set_results_callback(
             partial(_track_results, result_list=result_list),
         )
@@ -552,10 +537,7 @@ def test_cvar_filter_on_constraints(
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
     results = (
-        BasicOptimizer(
-            enopt_config,
-            evaluator(functions),
-        )
+        BasicOptimizer(enopt_config, evaluator(functions))
         .set_results_callback(
             partial(_track_results, result_list=result_list),
         )
