@@ -79,6 +79,7 @@ class LinearConstraintsConfig(BaseModel):
             msg = "The lower bounds are larger than the upper bounds."
             raise ValueError(msg)
 
+        self.coefficients = immutable_array(self.coefficients)
         self.lower_bounds = immutable_array(lower_bounds)
         self.upper_bounds = immutable_array(upper_bounds)
         return self
@@ -92,11 +93,11 @@ class LinearConstraintsConfig(BaseModel):
                     self.coefficients, self.lower_bounds, self.upper_bounds
                 )
             )
-            values = self.model_dump(round_trip=True)
-            values.update(
-                coefficients=coefficients,
-                lower_bounds=lower_bounds,
-                upper_bounds=upper_bounds,
+            return self.model_copy(
+                update={
+                    "coefficients": immutable_array(coefficients),
+                    "lower_bounds": immutable_array(lower_bounds),
+                    "upper_bounds": immutable_array(upper_bounds),
+                }
             )
-            return LinearConstraintsConfig.model_construct(**values)
         return self

@@ -166,12 +166,8 @@ class GradientConfig(BaseModel):
     ) -> GradientConfig:
         variable_shape = (variables.initial_values.size,)
         magnitudes = np.broadcast_to(self.perturbation_magnitudes, variable_shape)
-        boundary_types = np.broadcast_to(
-            immutable_array(self.boundary_types), variable_shape
-        )
-        types = np.broadcast_to(
-            immutable_array(self.perturbation_types), variable_shape
-        )
+        boundary_types = np.broadcast_to(self.boundary_types, variable_shape)
+        types = np.broadcast_to(self.perturbation_types, variable_shape)
 
         magnitudes = np.where(
             types == PerturbationType.RELATIVE,
@@ -186,8 +182,8 @@ class GradientConfig(BaseModel):
 
         return self.model_copy(
             update={
-                "perturbation_magnitudes": magnitudes,
-                "boundary_types": boundary_types,
-                "perturbation_types": types,
+                "perturbation_magnitudes": immutable_array(magnitudes),
+                "boundary_types": immutable_array(boundary_types),
+                "perturbation_types": immutable_array(types),
             }
         )
