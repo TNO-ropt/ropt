@@ -1530,17 +1530,16 @@ function value found during the optimization process.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">exit_code</span><span class="p">:</span> <span class="n">OptimizerExitCode</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">exit_code</span><span class="p">:</span> <span class="n">ExitCode</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Return the exit code of the optimization run.</p>
-<p>This property provides access to the
-<a class="autorefs autorefs-internal" title="            OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode"><code>OptimizerExitCode</code></a> that indicates the
-outcome of the optimization process. It can be used to determine whether
-the optimization completed successfully, was aborted, or encountered an
-error.</p>
+<p>This property provides access to the <a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode</code></a>
+that indicates the outcome of the optimization process. It can be used
+to determine whether the optimization completed successfully, was
+aborted, or encountered an error.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -1554,7 +1553,7 @@ error.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            OptimizerExitCode (ropt.enums.OptimizerExitCode)" href="../enums/#ropt.enums.OptimizerExitCode">OptimizerExitCode</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1806,7 +1805,7 @@ exit code can be accessed via the corresponding properties.</p>
 <p>The provided callback function will be invoked repeatedly during the
 optimization process. If the callback returns <code>True</code>, the optimization
 will be aborted, and the <code>BasicOptimizer</code> will exit with an
-<a class="autorefs autorefs-internal" title="            OptimizerExitCode" href="../enums/#ropt.enums.OptimizerExitCode"><code>OptimizerExitCode.USER_ABORT</code></a>.</p>
+<a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode.USER_ABORT</code></a>.</p>
 <p>The callback function should have no arguments and return a boolean
 value.</p>
 
