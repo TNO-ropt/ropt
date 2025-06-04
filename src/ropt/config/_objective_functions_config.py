@@ -18,8 +18,8 @@ class ObjectiveFunctionsConfig(BaseModel):
     """Configuration class for objective functions.
 
     This class, `ObjectiveFunctionsConfig`, defines the configuration for
-    objective functions used in an
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
+    objective functions used in an [`EnOptConfig`][ropt.config.EnOptConfig]
+    object.
 
     `ropt` supports multi-objective optimization. Multiple objectives are
     combined into a single value by summing them after weighting. The `weights`
@@ -30,16 +30,15 @@ class ObjectiveFunctionsConfig(BaseModel):
 
     Objective functions can optionally be processed using realization filters
     and function estimators defined in the main
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig]. The `realization_filters`
-    and `function_estimators` attributes, if provided, must be arrays of integer
+    [`EnOptConfig`][ropt.config.EnOptConfig]. The `realization_filters` and
+    `function_estimators` attributes, if provided, must be arrays of integer
     indices. Each index in the `realization_filters` array corresponds to an
     objective function (by position) and specifies which filter from the parent
-    [`EnOptConfig.realization_filters`][ropt.config.enopt.EnOptConfig] tuple
-    should be applied to it. The same logic applies to the `function_estimators`
-    array and the parent
-    [`EnOptConfig.function_estimators`][ropt.config.enopt.EnOptConfig] tuple. If
-    an index is invalid (e.g., out of bounds for the corresponding parent
-    tuple), no filter or estimator is applied to that specific objective
+    [`EnOptConfig.realization_filters`][ropt.config.EnOptConfig] tuple should be
+    applied to it. The same logic applies to the `function_estimators` array and
+    the parent [`EnOptConfig.function_estimators`][ropt.config.EnOptConfig]
+    tuple. If an index is invalid (e.g., out of bounds for the corresponding
+    parent tuple), no filter or estimator is applied to that specific objective
     function. If these attributes are not provided (`None`), no filters or
     estimators are applied at all.
 

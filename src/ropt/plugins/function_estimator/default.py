@@ -5,7 +5,7 @@ from typing import Final
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.config.enopt import EnOptConfig
+from ropt.config import EnOptConfig
 from ropt.enums import ExitCode
 from ropt.exceptions import ConfigError, StepAborted
 
@@ -20,8 +20,8 @@ class DefaultFunctionEstimator(FunctionEstimator):
     This class provides methods for combining objective function values and
     gradients from an ensemble of realizations into a single representative
     value or gradient. The specific method is configured via the
-    [`FunctionEstimatorConfig`][ropt.config.enopt.FunctionEstimatorConfig]
-    in the main [`EnOptConfig`][ropt.config.enopt.EnOptConfig].
+    [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig] in the main
+    [`EnOptConfig`][ropt.config.EnOptConfig].
 
     **Supported Methods:**
 

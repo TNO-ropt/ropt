@@ -1,4 +1,4 @@
-::: ropt.config.enopt
+::: ropt.config
     options:
         members:
             - EnOptConfig
@@ -14,6 +14,6 @@
             - SamplerConfig
         group_by_category: false
         show_bases: false
-::: ropt.config.enopt.constants
+::: ropt.config.constants
 
 ::: ropt.config.options

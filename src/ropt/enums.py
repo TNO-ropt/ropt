@@ -6,7 +6,7 @@ from enum import IntEnum, StrEnum
 class VariableType(IntEnum):
     """Enumerates the types of optimization variables.
 
-    Specified in [`VariablesConfig`][ropt.config.enopt.VariablesConfig], this
+    Specified in [`VariablesConfig`][ropt.config.VariablesConfig], this
     information allows optimization backends to adapt their behavior.
     """
 
@@ -24,7 +24,7 @@ class BoundaryType(IntEnum):
     outside the defined lower and upper bounds. This enumeration defines
     different methods to adjust these perturbed values back within the valid
     range. The chosen strategy is configured in the
-    [`GradientConfig`][ropt.config.enopt.GradientConfig].
+    [`GradientConfig`][ropt.config.GradientConfig].
     """
 
     NONE = 1
@@ -61,7 +61,7 @@ class PerturbationType(IntEnum):
     Before a generated perturbation sample is added to a variable's current
     value (during gradient estimation, for example), it can be scaled. This
     enumeration defines the available scaling methods, configured in the
-    [`GradientConfig`][ropt.config.enopt.GradientConfig].
+    [`GradientConfig`][ropt.config.GradientConfig].
     """
 
     ABSOLUTE = 1
@@ -71,7 +71,7 @@ class PerturbationType(IntEnum):
     r"""Multiply the perturbation value $p_i$ by the range defined by the bounds
     of the variables $c_i$: $\hat{p}_i = (c_{i,\text{max}} - c_{i,\text{min}})
     \times p_i$. The bounds will generally be defined in the configuration for
-    the variables (see [`VariablesConfig`][ropt.config.enopt.VariablesConfig]).
+    the variables (see [`VariablesConfig`][ropt.config.VariablesConfig]).
     """
 
 
@@ -145,7 +145,7 @@ class ExitCode(IntEnum):
 class AxisName(StrEnum):
     """Enumerates the semantic meaning of axes in data arrays.
 
-    The [`EnOptConfig`][ropt.config.enopt.EnOptConfig] configuration class
+    The [`EnOptConfig`][ropt.config.EnOptConfig] configuration class
     defines the optimization workflow, including variables, objectives,
     constraints, realizations, and the optimizer. Each of these components can
     have multiple instances, leading to multidimensional data arrays.

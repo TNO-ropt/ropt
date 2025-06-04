@@ -18,7 +18,7 @@ class OptimizerConfig(BaseModel):
     """Configuration class for the optimization algorithm.
 
     This class, `OptimizerConfig`, defines the configuration for the optimization
-    algorithm used in an [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
+    algorithm used in an [`EnOptConfig`][ropt.config.EnOptConfig] object.
 
     While optimization methods can have diverse parameters, this class provides a
     standardized set of settings that are commonly used and forwarded to the

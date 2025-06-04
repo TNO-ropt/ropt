@@ -32,8 +32,8 @@ class EnOptConfig(BaseModel):
     `realization_filters`, `function_estimators`, and `samplers` are configured
     as tuples. Other configuration fields reference these objects by their index
     within the tuples. For example,
-    [`GradientConfig`][ropt.config.enopt.GradientConfig] uses a `samplers`
-    field, which is an array of indices specifying the sampler to use for each
+    [`GradientConfig`][ropt.config.GradientConfig] uses a `samplers` field,
+    which is an array of indices specifying the sampler to use for each
     variable.
 
     The optional `names` attribute is a dictionary that stores the names of the
@@ -49,9 +49,9 @@ class EnOptConfig(BaseModel):
         typically have a size determined by a configured property (e.g., the
         number of variables) or a size of one. In the latter case, the single
         value is broadcasted to all relevant elements. For example,
-        [`VariablesConfig`][ropt.config.enopt.VariablesConfig] defines
-        properties like initial values and bounds as `numpy` arrays, which must
-        either match the number of variables or have a size of one.
+        [`VariablesConfig`][ropt.config.VariablesConfig] defines properties like
+        initial values and bounds as `numpy` arrays, which must either match the
+        number of variables or have a size of one.
 
     Attributes:
         variables:             Configuration for the optimization variables.

@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from numpy.random import Generator
     from numpy.typing import NDArray
 
-    from ropt.config.enopt import EnOptConfig
+    from ropt.config import EnOptConfig
 
 
 class Sampler(ABC):
@@ -25,13 +25,12 @@ class Sampler(ABC):
     for the optimization process.
 
     Instances of `Sampler` subclasses are created by their corresponding
-    [`SamplerPlugin`][ropt.plugins.sampler.base.SamplerPlugin] factories.
-    They are initialized with an
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object detailing the
-    optimization setup, the `sampler_index` identifying the specific sampler
-    configuration to use from the config, an optional variable `mask` indicating
-    which variables this sampler instance handles, and a NumPy random number
-    generator (`rng`) for stochastic methods.
+    [`SamplerPlugin`][ropt.plugins.sampler.base.SamplerPlugin] factories. They
+    are initialized with an [`EnOptConfig`][ropt.config.EnOptConfig] object
+    detailing the optimization setup, the `sampler_index` identifying the
+    specific sampler configuration to use from the config, an optional variable
+    `mask` indicating which variables this sampler instance handles, and a NumPy
+    random number generator (`rng`) for stochastic methods.
 
     The core functionality, generating samples, is performed by the
     `generate_samples` method, which must be implemented by subclasses.
@@ -52,9 +51,9 @@ class Sampler(ABC):
         """Initialize the sampler object.
 
         The `samplers` field in the `enopt_config` is a tuple of sampler
-        configurations ([`SamplerConfig`][ropt.config.enopt.SamplerConfig]).
-        The `sampler_index` identifies which configuration from this tuple
-        should be used to initialize this specific sampler instance.
+        configurations ([`SamplerConfig`][ropt.config.SamplerConfig]). The
+        `sampler_index` identifies which configuration from this tuple should be
+        used to initialize this specific sampler instance.
 
         If a boolean `mask` array is provided, it indicates that this sampler
         instance is responsible for generating samples only for the subset of
@@ -80,7 +79,7 @@ class Sampler(ABC):
         - `n_variables` is the total number of optimization variables.
 
         If the `shared` flag is `True` in the associated
-        [`SamplerConfig`][ropt.config.enopt.SamplerConfig], the first dimension
+        [`SamplerConfig`][ropt.config.SamplerConfig], the first dimension
         (realizations) should have a size of 1. The framework will broadcast
         these shared samples across all realizations.
 
@@ -94,7 +93,7 @@ class Sampler(ABC):
             The generated samples represent *unscaled* perturbations. During the
             gradient estimation process, these samples will be multiplied element-wise
             by the `perturbation_magnitudes` defined in the
-            [`GradientConfig`][ropt.config.enopt.GradientConfig].
+            [`GradientConfig`][ropt.config.GradientConfig].
 
             Therefore, it is generally recommended that sampler implementations
             produce samples with a characteristic scale of approximately one

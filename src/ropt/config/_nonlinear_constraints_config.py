@@ -17,7 +17,7 @@ class NonlinearConstraintsConfig(BaseModel):
     r"""Configuration class for non-linear constraints.
 
     This class, `NonlinearConstraintsConfig`, defines non-linear constraints used
-    in an [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
+    in an [`EnOptConfig`][ropt.config.EnOptConfig] object.
 
     Non-linear constraints are defined by comparing a constraint function to a
     right-hand-side value, allowing for equality or inequality constraints. The
@@ -32,16 +32,15 @@ class NonlinearConstraintsConfig(BaseModel):
 
     Non-linear constraints can optionally be processed using realization filters
     and function estimators defined in the main
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig]. The `realization_filters`
-    and `function_estimators` attributes, if provided, must be arrays of integer
+    [`EnOptConfig`][ropt.config.EnOptConfig]. The `realization_filters` and
+    `function_estimators` attributes, if provided, must be arrays of integer
     indices. Each index in the `realization_filters` array corresponds to a
     constraint function (by position) and specifies which filter from the parent
-    [`EnOptConfig.realization_filters`][ropt.config.enopt.EnOptConfig] tuple
-    should be applied to it. The same logic applies to the `function_estimators`
-    array and the parent
-    [`EnOptConfig.function_estimators`][ropt.config.enopt.EnOptConfig] tuple. If
-    an index is invalid (e.g., out of bounds for the corresponding parent
-    tuple), no filter or estimator is applied to that specific constraint
+    [`EnOptConfig.realization_filters`][ropt.config.EnOptConfig] tuple should be
+    applied to it. The same logic applies to the `function_estimators` array and
+    the parent [`EnOptConfig.function_estimators`][ropt.config.EnOptConfig]
+    tuple. If an index is invalid (e.g., out of bounds for the corresponding
+    parent tuple), no filter or estimator is applied to that specific constraint
     function. If these attributes are not provided (`None`), no filters or
     estimators are applied at all.
 

@@ -12,7 +12,7 @@ from ropt.plugins.optimizer.base import OptimizerPlugin
 from ropt.plugins.optimizer.scipy import SciPyOptimizerPlugin
 
 if TYPE_CHECKING:
-    from ropt.config.enopt import EnOptConfig
+    from ropt.config import EnOptConfig
     from ropt.optimization import OptimizerCallback
 
 

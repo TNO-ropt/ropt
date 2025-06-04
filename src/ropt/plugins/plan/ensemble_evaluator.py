@@ -17,7 +17,7 @@ from ropt.results import FunctionResults
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
-    from ropt.config.enopt import EnOptConfig
+    from ropt.config import EnOptConfig
     from ropt.plan import Plan
     from ropt.transforms import OptModelTransforms
 
@@ -69,7 +69,7 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
 
         This method executes the core logic of the ensemble evaluator step. It
         requires an optimizer configuration
-        ([`EnOptConfig`][ropt.config.enopt.EnOptConfig]) and optionally accepts
+        ([`EnOptConfig`][ropt.config.EnOptConfig]) and optionally accepts
         specific variable vectors to evaluate.
 
         If `metadata` is provided, it is attached to the

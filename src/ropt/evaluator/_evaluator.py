@@ -4,7 +4,7 @@ from typing import Any, TypeVar
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.config.enopt import EnOptConfig
+from ropt.config import EnOptConfig
 
 T = TypeVar("T", bound=np.generic)
 

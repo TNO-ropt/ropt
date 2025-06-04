@@ -10,7 +10,7 @@ from numpy.typing import NDArray
 from scipy.stats import norm, rv_continuous, truncnorm, uniform
 from scipy.stats.qmc import Halton, LatinHypercube, QMCEngine, Sobol, scale
 
-from ropt.config.enopt import EnOptConfig
+from ropt.config import EnOptConfig
 
 from .base import Sampler, SamplerPlugin
 
@@ -60,11 +60,10 @@ class SciPySampler(Sampler):
     **Configuration:**
 
     The specific sampling method is chosen via the `method` field in the
-    [`SamplerConfig`][ropt.config.enopt.SamplerConfig]. Additional
-    method-specific parameters (e.g., distribution parameters like `loc`,
-    `scale`, `a`, `b` for `stats` methods, or engine parameters for `qmc`
-    methods) can be passed through the `options` dictionary within the
-    `SamplerConfig`. Refer to the
+    [`SamplerConfig`][ropt.config.SamplerConfig]. Additional method-specific
+    parameters (e.g., distribution parameters like `loc`, `scale`, `a`, `b` for
+    `stats` methods, or engine parameters for `qmc` methods) can be passed
+    through the `options` dictionary within the `SamplerConfig`. Refer to the
     [`scipy.stats`](https://docs.scipy.org/doc/scipy/reference/stats.html) and
     documentation for available options.
     """

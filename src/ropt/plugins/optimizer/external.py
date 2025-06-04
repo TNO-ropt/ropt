@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING, Any, Final, Self
 
 import numpy as np
 
-from ropt.config.enopt import EnOptConfig
+from ropt.config import EnOptConfig
 from ropt.exceptions import ConfigError, StepAborted
 from ropt.optimization import OptimizerCallback, OptimizerCallbackResult
 from ropt.plugins import PluginManager
@@ -41,8 +41,8 @@ class ExternalOptimizer(Optimizer):
     errors.
 
     Typically, the optimizer is specified within an
-    [`OptimizerConfig`][ropt.config.enopt.OptimizerConfig] via the `method`
-    field, which either provides the algorithm name directly or follows the form
+    [`OptimizerConfig`][ropt.config.OptimizerConfig] via the `method` field,
+    which either provides the algorithm name directly or follows the form
     `plugin-name/method-name`. In the first case, `ropt` searches among all
     available optimizer plugins to find the specified method. In the second
     case, it checks if the plugin identified by `plugin-name` contains

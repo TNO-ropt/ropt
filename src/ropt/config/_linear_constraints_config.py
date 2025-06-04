@@ -18,7 +18,7 @@ class LinearConstraintsConfig(BaseModel):
     r"""Configuration class for linear constraints.
 
     This class, `LinearConstraintsConfig`, defines linear constraints used in an
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
+    [`EnOptConfig`][ropt.config.EnOptConfig] object.
 
     Linear constraints are defined by a set of linear equations involving the
     optimization variables. These equations can represent equality or inequality

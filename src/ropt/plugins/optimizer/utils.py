@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.config.enopt import EnOptConfig
+from ropt.config import EnOptConfig
 
 _MESSAGES = {
     "bounds": "bound constraints",
@@ -499,7 +499,7 @@ def get_masked_linear_constraints(
     are removed entirely, as they become trivial constants.
 
     Args:
-        config: The [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object
+        config: The [`EnOptConfig`][ropt.config.EnOptConfig] object
                 containing the variable mask and linear constraints.
 
     Returns:

@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
-    from ropt.config.enopt import EnOptConfig
+    from ropt.config import EnOptConfig
     from ropt.optimization import OptimizerCallback
 
 
@@ -25,11 +25,10 @@ class Optimizer(ABC):
 
     Instances of `Optimizer` subclasses are created by their corresponding
     [`OptimizerPlugin`][ropt.plugins.optimizer.base.OptimizerPlugin] factories.
-    They are initialized with an
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object detailing the
-    optimization setup and an
-    [`OptimizerCallback`][ropt.optimization.OptimizerCallback] function.
-    The callback is crucial as it allows the optimizer to request function and
+    They are initialized with an [`EnOptConfig`][ropt.config.EnOptConfig] object
+    detailing the optimization setup and an
+    [`OptimizerCallback`][ropt.optimization.OptimizerCallback] function. The
+    callback is crucial as it allows the optimizer to request function and
     gradient evaluations from the `ropt` core during its execution.
 
     The optimization process itself is initiated by calling the `start` method,
@@ -91,9 +90,9 @@ class Optimizer(ABC):
 
         This is particularly relevant in ensemble-based optimization where
         evaluations might fail for all realizations. When `allow_nan` is `True`,
-        setting [`realization_min_success`][ropt.config.enopt.RealizationsConfig]
-        to zero allows the evaluation process to return `NaN` instead of raising
-        an error, enabling the optimizer to potentially continue.
+        setting [`realization_min_success`][ropt.config.RealizationsConfig] to
+        zero allows the evaluation process to return `NaN` instead of raising an
+        error, enabling the optimizer to potentially continue.
 
         Returns:
             `True` if the optimizer supports NaN function values.
@@ -165,9 +164,9 @@ class OptimizerPlugin(Plugin):
 
         This class method is intended to check if the `options` dictionary,
         typically provided in the
-        [`OptimizerConfig`][ropt.config.enopt.OptimizerConfig], contains valid
-        keys and values for the specified optimization `method` supported by
-        this plugin.
+        [`OptimizerConfig`][ropt.config.OptimizerConfig], contains valid keys
+        and values for the specified optimization `method` supported by this
+        plugin.
 
         This default implementation performs no validation. Subclasses should
         override this method to implement validation logic specific to the

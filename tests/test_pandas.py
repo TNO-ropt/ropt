@@ -15,7 +15,7 @@ from ropt.results import (
 )
 
 pandas = pytest.importorskip("pandas")
-from ropt.config.enopt import EnOptConfig
+from ropt.config import EnOptConfig
 from ropt.results._pandas import _to_series
 
 

@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from numpy.random import Generator
     from numpy.typing import NDArray
 
-    from ropt.config.enopt import EnOptConfig
+    from ropt.config import EnOptConfig
     from ropt.evaluator import EvaluatorContext, EvaluatorResult
     from ropt.plugins import PluginManager
     from ropt.plugins.function_estimator.base import FunctionEstimator
@@ -46,8 +46,8 @@ class EnsembleEvaluator:
 
     The `EnsembleEvaluator` class is responsible for calculating functions and
     gradients from an ensemble of functions. It leverages the settings defined
-    in an [`EnOptConfig`][ropt.config.enopt.EnOptConfig] configuration object to
-    guide the calculations.
+    in an [`EnOptConfig`][ropt.config.EnOptConfig] configuration object to guide
+    the calculations.
 
     The core functionality relies on an evaluator callable, (usually provided by
     an [`Evaluator`][ropt.plugins.plan.base.Evaluator] object), which is used to

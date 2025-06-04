@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
-    from ropt.config.enopt import EnOptConfig
+    from ropt.config import EnOptConfig
 
 
 class FunctionEstimator(ABC):
@@ -28,9 +28,9 @@ class FunctionEstimator(ABC):
     corresponding
     [`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.base.FunctionEstimatorPlugin]
     factories. They are initialized with an
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object detailing the
-    optimization setup and the `estimator_index` identifying the specific
-    estimator configuration to use from the config.
+    [`EnOptConfig`][ropt.config.EnOptConfig] object detailing the optimization
+    setup and the `estimator_index` identifying the specific estimator
+    configuration to use from the config.
 
     The core functionality involves combining results using realization weights,
     performed by the `calculate_function` and `calculate_gradient` methods,
@@ -49,9 +49,9 @@ class FunctionEstimator(ABC):
 
         The `function_estimators` field in the `enopt_config` is a tuple of
         estimator configurations
-        ([`FunctionEstimatorConfig`][ropt.config.enopt.FunctionEstimatorConfig]).
-        The `estimator_index` identifies which configuration from this tuple
-        should be used to initialize this specific estimator instance.
+        ([`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig]). The
+        `estimator_index` identifies which configuration from this tuple should
+        be used to initialize this specific estimator instance.
 
         Args:
             enopt_config:    The configuration of the optimizer.
@@ -94,9 +94,9 @@ class FunctionEstimator(ABC):
 
         Note: Interaction with `merge_realizations`
             The `merge_realizations` flag in the
-            [`GradientConfig`][ropt.config.enopt.GradientConfig] determines how
-            the initial gradient estimate(s) are computed by `ropt` *before*
-            being passed to this `calculate_gradient` method.
+            [`GradientConfig`][ropt.config.GradientConfig] determines how the
+            initial gradient estimate(s) are computed by `ropt` *before* being
+            passed to this `calculate_gradient` method.
 
             - If `False` (default): `ropt` estimates a separate gradient for each
               realization that has a non-zero weight. The implementation

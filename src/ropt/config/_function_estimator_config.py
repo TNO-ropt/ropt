@@ -11,10 +11,10 @@ class FunctionEstimatorConfig(BaseModel):
     """Configuration class for function estimators.
 
     This class, `FunctionEstimatorConfig`, defines the configuration for
-    function estimators used in an
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object. Function estimators
-    are configured as a tuple in the `function_estimators` field of the
-    `EnOptConfig`, defining the available estimators for the optimization.
+    function estimators used in an [`EnOptConfig`][ropt.config.EnOptConfig]
+    object. Function estimators are configured as a tuple in the
+    `function_estimators` field of the `EnOptConfig`, defining the available
+    estimators for the optimization.
 
     By default, objective and constraint functions, as well as their gradients,
     are calculated from individual realizations using a weighted sum. Function

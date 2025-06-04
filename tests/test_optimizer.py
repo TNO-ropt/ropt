@@ -6,8 +6,8 @@ import numpy as np
 import pytest
 from pydantic import ValidationError
 
-from ropt.config.enopt import EnOptConfig
-from ropt.config.enopt.constants import DEFAULT_SEED
+from ropt.config import EnOptConfig
+from ropt.config.constants import DEFAULT_SEED
 from ropt.enums import EventType, ExitCode
 from ropt.plan import BasicOptimizer
 from ropt.plugins._manager import PluginManager

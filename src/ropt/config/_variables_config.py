@@ -20,9 +20,9 @@ class VariablesConfig(BaseModel):
     r"""Configuration class for optimization variables.
 
     This class, `VariablesConfig`, defines the configuration for the
-    optimization variables used in an
-    [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object. It specifies the
-    initial values, bounds, types, and an optional mask for the variables.
+    optimization variables used in an [`EnOptConfig`][ropt.config.EnOptConfig]
+    object. It specifies the initial values, bounds, types, and an optional mask
+    for the variables.
 
     The `initial_values` field is a required `numpy` array that sets the
     starting values for the variables. The number of variables is determined by

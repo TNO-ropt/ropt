@@ -15,11 +15,11 @@ of `ropt` with custom realization filtering strategies.
   inherit from the
   [`RealizationFilter`][ropt.plugins.realization_filter.base.RealizationFilter]
   abstract base class. These classes are initialized with the optimization
-  configuration ([`EnOptConfig`][ropt.config.enopt.EnOptConfig]) and the index
-  of the specific filter configuration to use (`filter_index`). The core
-  functionality is provided by the `get_realization_weights` method, which
-  calculates and returns weights for each realization based on their objective
-  and constraint values.
+  configuration ([`EnOptConfig`][ropt.config.EnOptConfig]) and the index of the
+  specific filter configuration to use (`filter_index`). The core functionality
+  is provided by the `get_realization_weights` method, which calculates and
+  returns weights for each realization based on their objective and constraint
+  values.
 * **Discovery:** The [`PluginManager`][ropt.plugins.PluginManager] discovers
   available `RealizationFilterPlugin` implementations (typically via entry
   points) and uses them to create `RealizationFilter` instances as needed during

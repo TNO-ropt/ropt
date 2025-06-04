@@ -13,7 +13,7 @@ from ._utils import _immutable_copy
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt.config.enopt import EnOptConfig
+    from ropt.config import EnOptConfig
     from ropt.transforms import OptModelTransforms
 
 

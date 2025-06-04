@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.config.enopt import EnOptConfig
+from ropt.config import EnOptConfig
 from ropt.enums import BoundaryType
 from ropt.plugins.function_estimator.base import FunctionEstimator
 from ropt.plugins.sampler.base import Sampler

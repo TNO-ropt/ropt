@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from ropt.config.enopt import EnOptConfig
+    from ropt.config import EnOptConfig
     from ropt.ensemble_evaluator import EnsembleEvaluator
     from ropt.plugins import PluginManager
     from ropt.plugins.optimizer.base import Optimizer
@@ -106,8 +106,8 @@ class EnsembleOptimizer:
         The `EnsembleOptimizer` needs the following to define a single
         optimization run:
 
-        1.  An [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object: This
-            contains all configuration settings for the optimization.
+        1.  An [`EnOptConfig`][ropt.config.EnOptConfig] object: This contains
+            all configuration settings for the optimization.
         2.  A [`OptModelTransforms`][ropt.transforms.OptModelTransforms] object:
             This handles the transforms to apply to the variables, objectives and
             constraints.

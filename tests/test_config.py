@@ -4,7 +4,7 @@ from typing import Any
 import numpy as np
 import pytest
 
-from ropt.config.enopt import EnOptConfig, GradientConfig, LinearConstraintsConfig
+from ropt.config import EnOptConfig, GradientConfig, LinearConstraintsConfig
 from ropt.enums import BoundaryType, PerturbationType
 from ropt.transforms import OptModelTransforms, VariableScaler
 

@@ -14,7 +14,7 @@ third-party packages.
 * **Optimizer Implementation:** The actual optimization logic resides in classes
   that inherit from the [`Optimizer`][ropt.plugins.optimizer.base.Optimizer]
   abstract base class. These classes are initialized with the optimization
-  configuration ([`EnOptConfig`][ropt.config.enopt.EnOptConfig]) and an
+  configuration ([`EnOptConfig`][ropt.config.EnOptConfig]) and an
   [`OptimizerCallback`][ropt.optimization.OptimizerCallback]. The callback is
   used by the optimizer to request function and gradient evaluations from
   `ropt`. The optimization process is initiated by calling the optimizer's

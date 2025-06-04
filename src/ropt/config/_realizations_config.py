@@ -15,7 +15,7 @@ class RealizationsConfig(BaseModel):
     """Configuration class for realizations.
 
     This class, `RealizationsConfig`, defines the configuration for realizations
-    used in an [`EnOptConfig`][ropt.config.enopt.EnOptConfig] object.
+    used in an [`EnOptConfig`][ropt.config.EnOptConfig] object.
 
     To optimize an ensemble of functions, a set of realizations is defined. When
     the optimizer requests a function value or a gradient, these are calculated for

@@ -18,7 +18,7 @@ from ropt.results import FunctionResults
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
-    from ropt.config.enopt import EnOptConfig
+    from ropt.config import EnOptConfig
     from ropt.results import Results
     from ropt.transforms import OptModelTransforms
 
@@ -51,9 +51,9 @@ class DefaultOptimizerStep(PlanStep):
     """The default optimizer step for optimization plans.
 
     This step executes an optimization algorithm based on a provided
-    configuration ([`EnOptConfig`][ropt.config.enopt.EnOptConfig] or a
-    compatible dictionary). It iteratively performs function and potentially
-    gradient evaluations, yielding a sequence of
+    configuration ([`EnOptConfig`][ropt.config.EnOptConfig] or a compatible
+    dictionary). It iteratively performs function and potentially gradient
+    evaluations, yielding a sequence of
     [`FunctionResults`][ropt.results.FunctionResults] and
     [`GradientResults`][ropt.results.GradientResults] objects.
 
@@ -111,7 +111,7 @@ class DefaultOptimizerStep(PlanStep):
 
         This method executes the core logic of the optimizer step. It requires
         an optimizer configuration
-        ([`EnOptConfig`][ropt.config.enopt.EnOptConfig]) and optionally accepts
+        ([`EnOptConfig`][ropt.config.EnOptConfig]) and optionally accepts
         specific initial variable vectors, and/or a nested optimization plan,
         and metadata.
 

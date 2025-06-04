@@ -6,7 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt
 
-from ropt.config.enopt import EnOptConfig
+from ropt.config import EnOptConfig
 from ropt.enums import ExitCode
 from ropt.exceptions import ConfigError, StepAborted
 
@@ -31,9 +31,9 @@ class SortObjectiveOptions(_ConfigBaseModel):
     How it works:
 
     1. A weighted sum is calculated for each realization using the objective
-       values specified by the `sort` indices and the corresponding weights
-       from the main [`EnOptConfig`][ropt.config.enopt.EnOptConfig]. If only
-       one objective index is provided in `sort`, no weighting is applied.
+       values specified by the `sort` indices and the corresponding weights from
+       the main [`EnOptConfig`][ropt.config.EnOptConfig]. If only one objective
+       index is provided in `sort`, no weighting is applied.
     2. Realizations are sorted based on this calculated value (ascending).
     3. Realizations whose rank falls within the range [`first`, `last`]
        (inclusive) are selected.
@@ -94,7 +94,7 @@ class CVaRObjectiveOptions(_ConfigBaseModel):
 
     1. A weighted sum is calculated for each realization using the objective
        values specified by the `sort` indices and the corresponding weights
-       from the main [`EnOptConfig`][ropt.config.enopt.EnOptConfig]. If only
+       from the main [`EnOptConfig`][ropt.config.EnOptConfig]. If only
        one objective index is provided in `sort`, no weighting is applied.
     2. Realizations are conceptually sorted based on this calculated value
        (ascending, assuming minimization).
@@ -164,8 +164,8 @@ class DefaultRealizationFilter(RealizationFilter):
     This class provides several methods for calculating realization weights based
     on objective or constraint values. The specific method and its parameters
     are configured via the
-    [`RealizationFilterConfig`][ropt.config.enopt.RealizationFilterConfig]
-    in the main [`EnOptConfig`][ropt.config.enopt.EnOptConfig].
+    [`RealizationFilterConfig`][ropt.config.RealizationFilterConfig]
+    in the main [`EnOptConfig`][ropt.config.EnOptConfig].
 
     **Supported Methods:**
 

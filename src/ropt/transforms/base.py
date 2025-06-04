@@ -29,9 +29,9 @@ class VariableTransform(ABC):
       methods.
     - **Perturbation Magnitude Transformation:** Stochastic gradient-based
       algorithms use perturbations with specified magnitudes (see
-      [`perturbation_magnitudes`][ropt.config.enopt.GradientConfig]). These
-      magnitudes are typically defined in the user domain and must be
-      transformed to the optimizer domain using the
+      [`perturbation_magnitudes`][ropt.config.GradientConfig]). These magnitudes
+      are typically defined in the user domain and must be transformed to the
+      optimizer domain using the
       [`magnitudes_to_optimizer`][ropt.transforms.base.VariableTransform.magnitudes_to_optimizer]
       method.
     - **Bound Constraint Difference Transformation:** To report violations of

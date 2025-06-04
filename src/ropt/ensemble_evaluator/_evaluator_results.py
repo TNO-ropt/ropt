@@ -6,7 +6,7 @@ from typing import Any, Callable
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.config.enopt import EnOptConfig
+from ropt.config import EnOptConfig
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
 from ropt.transforms import OptModelTransforms
 
