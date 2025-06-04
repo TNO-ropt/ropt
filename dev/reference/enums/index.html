@@ -2728,18 +2728,17 @@ details on the specific data they provide.</p>
 
 
         <p>Enumerates the semantic meaning of axes in data arrays.</p>
-<p>The <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> configuration class
-defines the optimization workflow, including variables, objectives,
-constraints, realizations, and the optimizer. Each of these components can
-have multiple instances, leading to multidimensional data arrays.</p>
-<p>Similarly, <a class="autorefs autorefs-internal" title="            ropt.results.Results
+<p>The optimization workflow includes variables, objectives, constraints,
+realizations, and the optimizer. Each of these components can have multiple
+instances, leading to multidimensional data arrays. In particular, the
+<a class="autorefs autorefs-internal" title="            ropt.results.Results
 
 
   
       dataclass
-  " href="../results/#ropt.results.Results"><code>Results</code></a> objects store optimization data
-(like variable values, objective function values, constraint values, etc.)
-in multidimensional NumPy arrays.</p>
+  " href="../results/#ropt.results.Results"><code>Results</code></a> objects store optimization data (like
+variable values, objective function values, constraint values, etc.) in
+multidimensional NumPy arrays.</p>
 <p>The <code>AxisName</code> enumeration  provides standardized labels to identify what
 each dimension (axis) of these arrays represents. For example, an array
 might have dimensions corresponding to different realizations, different
