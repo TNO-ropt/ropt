@@ -60,8 +60,9 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
     def run_step_from_plan(
         self,
         config: EnOptConfig,
+        variables: ArrayLike,
+        *,
         transforms: OptModelTransforms | None = None,
-        variables: ArrayLike | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> ExitCode:
         """Run the ensemble evaluator step to perform ensemble evaluations.
@@ -71,19 +72,15 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
         ([`EnOptConfig`][ropt.config.enopt.EnOptConfig]) and optionally accepts
         specific variable vectors to evaluate.
 
-        If `variables` are not provided, the initial values specified in the
-        `config` are used. If `variables` are provided as a 2D array, each row
-        is treated as a separate vector for evaluation.
-
         If `metadata` is provided, it is attached to the
         [`Results`][ropt.results.Results] objects emitted via the
         `FINISHED_EVALUATION` event.
 
         Args:
             config:     Optimizer configuration.
+            variables:  Variable vector(s) to evaluate.
             transforms: Optional transforms to apply to the variables,
                         objectives, and constraints.
-            variables:  Optional variable vector(s) to evaluate.
             metadata:   Optional dictionary to attach to emitted `FunctionResults`.
 
         Returns:
@@ -105,12 +102,9 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
             Event(event_type=EventType.START_ENSEMBLE_EVALUATOR_STEP, data=event_data)
         )
 
-        if variables is None:
-            variables = config.variables.initial_values
-        else:
-            variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
-            if transforms is not None and transforms.variables is not None:
-                variables = transforms.variables.to_optimizer(variables)
+        variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
+        if transforms is not None and transforms.variables is not None:
+            variables = transforms.variables.to_optimizer(variables)
 
         evaluator = self.plan.get_evaluator(self)
         ensemble_evaluator = EnsembleEvaluator(

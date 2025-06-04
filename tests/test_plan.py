@@ -488,7 +488,7 @@ def test_evaluator_step(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step = plan.add_step("ensemble_evaluator")
     plan.add_evaluator("function_evaluator", evaluator=evaluator(), clients={step})
     tracker = plan.add_event_handler("tracker", sources={step})
-    step.run(config=EnOptConfig.model_validate(enopt_config))
+    step.run(config=EnOptConfig.model_validate(enopt_config), variables=[0.0, 0.0, 0.1])
     assert tracker["results"].functions is not None
     assert np.allclose(tracker["results"].functions.weighted_objective, 1.66)
 

@@ -297,9 +297,8 @@ class PlanStep(ABC, PlanComponent):
         """Execute this plan step.
 
         This method initiates the execution of the current plan step. It
-        delegates the actual execution to the parent
-        [`Plan`][ropt.plan.Plan] object's
-        [`run_step`][ropt.plan.Plan.run_step] method, passing itself
+        delegates the actual execution to the parent [`Plan`][ropt.plan.Plan]
+        object's [`run_step`][ropt.plan.Plan.run_step] method, passing itself
         (the step instance) along with any provided arguments.
 
         The parent `Plan` then calls the concrete

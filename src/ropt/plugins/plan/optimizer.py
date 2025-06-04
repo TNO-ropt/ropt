@@ -101,6 +101,7 @@ class DefaultOptimizerStep(PlanStep):
     def run_step_from_plan(
         self,
         config: EnOptConfig,
+        *,
         transforms: OptModelTransforms | None = None,
         variables: ArrayLike | None = None,
         nested_optimization: NestedOptimizationCallable | None = None,
