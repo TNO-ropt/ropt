@@ -114,7 +114,7 @@ class EventType(IntEnum):
     """Emitted immediately after an evaluation step finishes."""
 
 
-class OptimizerExitCode(IntEnum):
+class ExitCode(IntEnum):
     """Enumerates the reasons for terminating an optimization."""
 
     UNKNOWN = 0

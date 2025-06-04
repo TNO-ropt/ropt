@@ -7,8 +7,8 @@ from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt
 
 from ropt.config.enopt import EnOptConfig
-from ropt.enums import OptimizerExitCode
-from ropt.exceptions import ConfigError, OptimizationAborted
+from ropt.enums import ExitCode
+from ropt.exceptions import ConfigError, StepAborted
 
 from .base import RealizationFilter, RealizationFilterPlugin
 
@@ -266,7 +266,7 @@ class DefaultRealizationFilter(RealizationFilter):
                 raise ConfigError(msg)
 
         if not np.any(weights > 0):
-            raise OptimizationAborted(exit_code=OptimizerExitCode.TOO_FEW_REALIZATIONS)
+            raise StepAborted(exit_code=ExitCode.TOO_FEW_REALIZATIONS)
 
         return weights
 

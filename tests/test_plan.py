@@ -9,8 +9,8 @@ import numpy as np
 import pytest
 
 from ropt.config.enopt import EnOptConfig
-from ropt.enums import EventType, OptimizerExitCode
-from ropt.exceptions import OptimizationAborted, PlanAborted
+from ropt.enums import EventType, ExitCode
+from ropt.exceptions import PlanAborted, StepAborted
 from ropt.plan import BasicOptimizer, Event, Plan
 from ropt.plugins import PluginManager
 from ropt.plugins.plan.cached_evaluator import DefaultCachedEvaluator
@@ -524,15 +524,15 @@ def test_evaluator_step_multi(enopt_config: dict[str, Any], evaluator: Any) -> N
 @pytest.mark.parametrize(
     ("max_criterion", "max_enum"),
     [
-        ("max_functions", OptimizerExitCode.MAX_FUNCTIONS_REACHED),
-        ("max_batches", OptimizerExitCode.MAX_BATCHES_REACHED),
+        ("max_functions", ExitCode.MAX_FUNCTIONS_REACHED),
+        ("max_batches", ExitCode.MAX_BATCHES_REACHED),
     ],
 )
 def test_exit_code(
     enopt_config: dict[str, Any],
     evaluator: Any,
     max_criterion: str,
-    max_enum: OptimizerExitCode,
+    max_enum: ExitCode,
 ) -> None:
     enopt_config["gradient"]["evaluation_policy"] = "speculative"
     enopt_config["optimizer"][max_criterion] = 4
@@ -673,7 +673,7 @@ def test_plan_abort(enopt_config: Any, evaluator: Any) -> None:
 
         last_evaluation += 1
         if last_evaluation == 1:
-            raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
+            raise StepAborted(exit_code=ExitCode.USER_ABORT)
 
     plan = Plan(PluginManager())
     step = plan.add_step("optimizer")

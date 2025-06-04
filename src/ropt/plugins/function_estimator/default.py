@@ -6,8 +6,8 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.config.enopt import EnOptConfig
-from ropt.enums import OptimizerExitCode
-from ropt.exceptions import ConfigError, OptimizationAborted
+from ropt.enums import ExitCode
+from ropt.exceptions import ConfigError, StepAborted
 
 from .base import FunctionEstimator, FunctionEstimatorPlugin
 
@@ -124,7 +124,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
         self, functions: NDArray[np.float64], weights: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         if np.count_nonzero(weights) < _MIN_STDDEV_REALIZATIONS:
-            raise OptimizationAborted(exit_code=OptimizerExitCode.TOO_FEW_REALIZATIONS)
+            raise StepAborted(exit_code=ExitCode.TOO_FEW_REALIZATIONS)
         functions = np.nan_to_num(functions)
         *_, stddev = self._mean_stddev(functions, weights)
         return stddev
@@ -136,7 +136,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
         weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         if np.count_nonzero(weights) < _MIN_STDDEV_REALIZATIONS:
-            raise OptimizationAborted(exit_code=OptimizerExitCode.TOO_FEW_REALIZATIONS)
+            raise StepAborted(exit_code=ExitCode.TOO_FEW_REALIZATIONS)
         functions = np.nan_to_num(functions)
         norm, mean, stddev = self._mean_stddev(functions, weights)
         mean_gradient = np.dot(gradient, weights)

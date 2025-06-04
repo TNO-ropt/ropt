@@ -6,8 +6,8 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Self
 
 from ropt.config.enopt import EnOptConfig
-from ropt.enums import EventType, OptimizerExitCode
-from ropt.exceptions import OptimizationAborted
+from ropt.enums import EventType, ExitCode
+from ropt.exceptions import StepAborted
 from ropt.plugins import PluginManager
 
 from ._plan import Plan
@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 class _Results:
     results: FunctionResults | None
     variables: NDArray[np.float64] | None
-    exit_code: OptimizerExitCode = OptimizerExitCode.UNKNOWN
+    exit_code: ExitCode = ExitCode.UNKNOWN
 
 
 class BasicOptimizer:
@@ -150,14 +150,13 @@ class BasicOptimizer:
         return self._results.variables
 
     @property
-    def exit_code(self) -> OptimizerExitCode:
+    def exit_code(self) -> ExitCode:
         """Return the exit code of the optimization run.
 
-        This property provides access to the
-        [`OptimizerExitCode`][ropt.enums.OptimizerExitCode] that indicates the
-        outcome of the optimization process. It can be used to determine whether
-        the optimization completed successfully, was aborted, or encountered an
-        error.
+        This property provides access to the [`ExitCode`][ropt.enums.ExitCode]
+        that indicates the outcome of the optimization process. It can be used
+        to determine whether the optimization completed successfully, was
+        aborted, or encountered an error.
 
         Returns:
             The exit code of the optimization run.
@@ -179,7 +178,7 @@ class BasicOptimizer:
         plan = Plan(self._plugin_manager)
 
         # Optionally run a custom step defined in the keyword arguments:
-        custom_function: Callable[[Plan], OptimizerExitCode] | None = None
+        custom_function: Callable[[Plan], ExitCode] | None = None
         key, value = next(iter(self._kwargs.items()), (None, None))
         if key is not None and self._plugin_manager.is_supported(
             "plan_step", method=key
@@ -230,7 +229,7 @@ class BasicOptimizer:
         The provided callback function will be invoked repeatedly during the
         optimization process. If the callback returns `True`, the optimization
         will be aborted, and the `BasicOptimizer` will exit with an
-        [`OptimizerExitCode.USER_ABORT`][ropt.enums.OptimizerExitCode].
+        [`ExitCode.USER_ABORT`][ropt.enums.ExitCode].
 
         The callback function should have no arguments and return a boolean
         value.
@@ -244,7 +243,7 @@ class BasicOptimizer:
 
         def _check_abort_callback(_: Event) -> None:
             if callback():
-                raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
+                raise StepAborted(exit_code=ExitCode.USER_ABORT)
 
         self._observers.append((EventType.START_EVALUATION, _check_abort_callback))
         return self

@@ -9,8 +9,8 @@ from typing import TYPE_CHECKING, Protocol
 
 import numpy as np
 
-from ropt.enums import OptimizerExitCode
-from ropt.exceptions import OptimizationAborted
+from ropt.enums import ExitCode
+from ropt.exceptions import StepAborted
 from ropt.optimization import OptimizerCallbackResult
 from ropt.results import FunctionResults, GradientResults
 
@@ -179,7 +179,7 @@ class EnsembleOptimizer:
         """
         return self._optimizer.is_parallel
 
-    def start(self, variables: NDArray[np.float64]) -> OptimizerExitCode:
+    def start(self, variables: NDArray[np.float64]) -> ExitCode:
         """Start the optimization process.
 
         This method initiates the optimization process using the provided
@@ -190,15 +190,15 @@ class EnsembleOptimizer:
             variables: The initial variables for the optimization.
 
         Returns:
-            An [`OptimizerExitCode`][ropt.enums.OptimizerExitCode] indicating
-            the reason for termination.
+            An [`ExitCode`][ropt.enums.ExitCode] indicating the reason for
+            termination.
         """
         self._fixed_variables = variables.copy()
-        exit_code = OptimizerExitCode.OPTIMIZER_STEP_FINISHED
+        exit_code = ExitCode.OPTIMIZER_STEP_FINISHED
         try:
             with self._redirector.start():
                 self._optimizer.start(variables)
-        except OptimizationAborted as exc:
+        except StepAborted as exc:
             exit_code = exc.exit_code
         return exit_code
 
@@ -226,11 +226,9 @@ class EnsembleOptimizer:
                 variables = variables[0, ...]
             nested_results, aborted = self._nested_optimizer(variables)
             if aborted:
-                raise OptimizationAborted(exit_code=OptimizerExitCode.USER_ABORT)
+                raise StepAborted(exit_code=ExitCode.USER_ABORT)
             if nested_results is None:
-                raise OptimizationAborted(
-                    exit_code=OptimizerExitCode.NESTED_OPTIMIZER_FAILED
-                )
+                raise StepAborted(exit_code=ExitCode.NESTED_OPTIMIZER_FAILED)
             variables = nested_results.evaluations.variables
             self._fixed_variables = variables.copy()
 
@@ -295,10 +293,10 @@ class EnsembleOptimizer:
     def _check_stopping_criteria(self) -> None:
         max_functions = self._enopt_config.optimizer.max_functions
         if max_functions is not None and self._completed_functions >= max_functions:
-            raise OptimizationAborted(exit_code=OptimizerExitCode.MAX_FUNCTIONS_REACHED)
+            raise StepAborted(exit_code=ExitCode.MAX_FUNCTIONS_REACHED)
         max_batches = self._enopt_config.optimizer.max_batches
         if max_batches is not None and self._completed_batches >= max_batches:
-            raise OptimizationAborted(exit_code=OptimizerExitCode.MAX_BATCHES_REACHED)
+            raise StepAborted(exit_code=ExitCode.MAX_BATCHES_REACHED)
 
     def _run_evaluations(
         self,
@@ -326,7 +324,7 @@ class EnsembleOptimizer:
                 self._enopt_config.realizations.realization_min_success < 1
                 and not self._allow_nan
             )
-            exit_code: OptimizerExitCode | None = None
+            exit_code: ExitCode | None = None
             for result in results:
                 assert isinstance(result, FunctionResults | GradientResults)
                 if (
@@ -339,14 +337,14 @@ class EnsembleOptimizer:
                         and np.all(result.realizations.failed_realizations)
                     )
                 ):
-                    exit_code = OptimizerExitCode.TOO_FEW_REALIZATIONS
+                    exit_code = ExitCode.TOO_FEW_REALIZATIONS
                     break
 
             if self._signal_evaluation:
                 self._signal_evaluation(results)
 
             if exit_code is not None:
-                raise OptimizationAborted(exit_code=exit_code)
+                raise StepAborted(exit_code=exit_code)
 
         return results
 

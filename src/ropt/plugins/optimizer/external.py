@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING, Any, Final, Self
 import numpy as np
 
 from ropt.config.enopt import EnOptConfig
-from ropt.exceptions import ConfigError, OptimizationAborted
+from ropt.exceptions import ConfigError, StepAborted
 from ropt.optimization import OptimizerCallback, OptimizerCallbackResult
 from ropt.plugins import PluginManager
 
@@ -288,7 +288,7 @@ class _PluginOptimizer:
             },
         )
         if response == "abort":
-            raise OptimizationAborted(response)
+            raise StepAborted(response)
         functions = response["functions"]
         gradients = response["gradients"]
         nonlinear_constraint_bounds = response["nonlinear_constraint_bounds"]
@@ -326,7 +326,7 @@ class _PluginOptimizer:
                 optimizer.start(
                     np.array(self._request("initial_values"), dtype=np.float64)
                 )
-            except OptimizationAborted:
+            except StepAborted:
                 return 0
             except Exception as exc:  # noqa: BLE001
                 assert self._request({"error": str(exc)}) == "abort"  # noqa: PT017

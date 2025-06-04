@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ropt.ensemble_evaluator import EnsembleEvaluator
-from ropt.enums import EventType, OptimizerExitCode
-from ropt.exceptions import OptimizationAborted
+from ropt.enums import EventType, ExitCode
+from ropt.exceptions import StepAborted
 from ropt.plan import Event
 from ropt.plugins.plan.base import PlanStep
 from ropt.results import FunctionResults
@@ -63,7 +63,7 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
         transforms: OptModelTransforms | None = None,
         variables: ArrayLike | None = None,
         metadata: dict[str, Any] | None = None,
-    ) -> OptimizerExitCode:
+    ) -> ExitCode:
         """Run the ensemble evaluator step to perform ensemble evaluations.
 
         This method executes the core logic of the ensemble evaluator step. It
@@ -87,7 +87,7 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
             metadata:   Optional dictionary to attach to emitted `FunctionResults`.
 
         Returns:
-            An [`OptimizerExitCode`][ropt.enums.OptimizerExitCode] indicating the outcome.
+            An [`ExitCode`][ropt.enums.ExitCode] indicating the outcome.
         """
         self._event_handlers = self.plan.get_event_handlers(
             self,
@@ -117,20 +117,20 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
             config, transforms, evaluator.eval, self.plan.plugin_manager
         )
 
-        exit_code = OptimizerExitCode.EVALUATOR_STEP_FINISHED
+        exit_code = ExitCode.EVALUATOR_STEP_FINISHED
 
         self._emit_event(Event(event_type=EventType.START_EVALUATION, data=event_data))
         try:
             results = ensemble_evaluator.calculate(
                 variables, compute_functions=True, compute_gradients=False
             )
-        except OptimizationAborted as exc:
+        except StepAborted as exc:
             exit_code = exc.exit_code
 
         assert results
         assert isinstance(results[0], FunctionResults)
         if results[0].functions is None:
-            exit_code = OptimizerExitCode.TOO_FEW_REALIZATIONS
+            exit_code = ExitCode.TOO_FEW_REALIZATIONS
 
         if metadata is not None:
             for item in results:
@@ -142,7 +142,7 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
             Event(event_type=EventType.FINISHED_EVALUATION, data=event_data)
         )
 
-        if exit_code == OptimizerExitCode.USER_ABORT:
+        if exit_code == ExitCode.USER_ABORT:
             self.plan.abort()
 
         self._emit_event(

@@ -9,7 +9,7 @@ import numpy as np
 from numpy.typing import NDArray  # noqa: TC002
 
 from ropt.ensemble_evaluator import EnsembleEvaluator
-from ropt.enums import EventType, OptimizerExitCode
+from ropt.enums import EventType, ExitCode
 from ropt.optimization import EnsembleOptimizer
 from ropt.plan import Event, Plan
 from ropt.plugins.plan.base import PlanStep
@@ -105,7 +105,7 @@ class DefaultOptimizerStep(PlanStep):
         variables: ArrayLike | None = None,
         nested_optimization: NestedOptimizationCallable | None = None,
         metadata: dict[str, Any] | None = None,
-    ) -> OptimizerExitCode:
+    ) -> ExitCode:
         """Run the optimizer step to perform an optimization.
 
         This method executes the core logic of the optimizer step. It requires
@@ -188,7 +188,7 @@ class DefaultOptimizerStep(PlanStep):
 
         exit_code = ensemble_optimizer.start(variables)
 
-        if exit_code == OptimizerExitCode.USER_ABORT:
+        if exit_code == ExitCode.USER_ABORT:
             self.plan.abort()
 
         self._emit_event(
