@@ -1796,7 +1796,7 @@ input variable vector evaluated.</p>
         <p>Run the ensemble evaluator step to perform ensemble evaluations.</p>
 <p>This method executes the core logic of the ensemble evaluator step. It
 requires an optimizer configuration
-(<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>) and optionally accepts
+(<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>) and optionally accepts
 specific variable vectors to evaluate.</p>
 <p>If <code>metadata</code> is provided, it is attached to the
 <a class="autorefs autorefs-internal" title="            ropt.results.Results
@@ -1824,7 +1824,7 @@ specific variable vectors to evaluate.</p>
                 <code>config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.EnOptConfig)" href="../enopt_config/#ropt.config.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1946,9 +1946,9 @@ specific variable vectors to evaluate.</p>
 
         <p>The default optimizer step for optimization plans.</p>
 <p>This step executes an optimization algorithm based on a provided
-configuration (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> or a
-compatible dictionary). It iteratively performs function and potentially
-gradient evaluations, yielding a sequence of
+configuration (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> or a compatible
+dictionary). It iteratively performs function and potentially gradient
+evaluations, yielding a sequence of
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
@@ -2064,7 +2064,7 @@ then executed, passing the new plan and the variables. The
         <p>Run the optimizer step to perform an optimization.</p>
 <p>This method executes the core logic of the optimizer step. It requires
 an optimizer configuration
-(<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>) and optionally accepts
+(<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>) and optionally accepts
 specific initial variable vectors, and/or a nested optimization plan,
 and metadata.</p>
 <p>If <code>variables</code> are not provided, the initial values specified in the
@@ -2106,7 +2106,7 @@ contain the results of the nested optimization.</p>
                 <code>config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.EnOptConfig)" href="../enopt_config/#ropt.config.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">

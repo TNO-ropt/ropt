@@ -1652,7 +1652,7 @@ third-party packages.</p>
 <li><strong>Optimizer Implementation:</strong> The actual optimization logic resides in classes
   that inherit from the <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.Optimizer" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a>
   abstract base class. These classes are initialized with the optimization
-  configuration (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>) and an
+  configuration (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>) and an
   <a class="autorefs autorefs-internal" title="            ropt.optimization.OptimizerCallback" href="../optimization/#ropt.optimization.OptimizerCallback"><code>OptimizerCallback</code></a>. The callback is
   used by the optimizer to request function and gradient evaluations from
   <code>ropt</code>. The optimization process is initiated by calling the optimizer's
@@ -1791,7 +1791,7 @@ an optimization step requires an optimizer provided by this plugin.</p>
                 <code>config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.EnOptConfig)" href="../enopt_config/#ropt.config.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1873,9 +1873,9 @@ an optimization step requires an optimizer provided by this plugin.</p>
         <p>Validate the optimizer-specific options for a given method.</p>
 <p>This class method is intended to check if the <code>options</code> dictionary,
 typically provided in the
-<a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../enopt_config/#ropt.config.enopt.OptimizerConfig"><code>OptimizerConfig</code></a>, contains valid
-keys and values for the specified optimization <code>method</code> supported by
-this plugin.</p>
+<a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../enopt_config/#ropt.config.OptimizerConfig"><code>OptimizerConfig</code></a>, contains valid keys
+and values for the specified optimization <code>method</code> supported by this
+plugin.</p>
 <p>This default implementation performs no validation. Subclasses should
 override this method to implement validation logic specific to the
 methods they support, potentially using schema validation tools like
@@ -1989,11 +1989,10 @@ classes derived from <code>Optimizer</code> that encapsulate the logic of specif
 optimization algorithms.</p>
 <p>Instances of <code>Optimizer</code> subclasses are created by their corresponding
 <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.OptimizerPlugin" href="#ropt.plugins.optimizer.base.OptimizerPlugin"><code>OptimizerPlugin</code></a> factories.
-They are initialized with an
-<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object detailing the
-optimization setup and an
-<a class="autorefs autorefs-internal" title="            ropt.optimization.OptimizerCallback" href="../optimization/#ropt.optimization.OptimizerCallback"><code>OptimizerCallback</code></a> function.
-The callback is crucial as it allows the optimizer to request function and
+They are initialized with an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object
+detailing the optimization setup and an
+<a class="autorefs autorefs-internal" title="            ropt.optimization.OptimizerCallback" href="../optimization/#ropt.optimization.OptimizerCallback"><code>OptimizerCallback</code></a> function. The
+callback is crucial as it allows the optimizer to request function and
 gradient evaluations from the <code>ropt</code> core during its execution.</p>
 <p>The optimization process itself is initiated by calling the <code>start</code> method,
 which must be implemented by subclasses.</p>
@@ -2045,9 +2044,9 @@ objective function values, its implementation should override this
 property to return <code>True</code>.</p>
 <p>This is particularly relevant in ensemble-based optimization where
 evaluations might fail for all realizations. When <code>allow_nan</code> is <code>True</code>,
-setting <a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../enopt_config/#ropt.config.enopt.RealizationsConfig"><code>realization_min_success</code></a>
-to zero allows the evaluation process to return <code>NaN</code> instead of raising
-an error, enabling the optimizer to potentially continue.</p>
+setting <a class="autorefs autorefs-internal" title="            RealizationsConfig" href="../enopt_config/#ropt.config.RealizationsConfig"><code>realization_min_success</code></a> to
+zero allows the evaluation process to return <code>NaN</code> instead of raising an
+error, enabling the optimizer to potentially continue.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2173,7 +2172,7 @@ forwarded to the optimizer.</p>
                 <code>config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.EnOptConfig)" href="../enopt_config/#ropt.config.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2882,7 +2881,7 @@ A similar structure is used for <code>required_constraints</code>.</p>
                 <code>config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.EnOptConfig)" href="../enopt_config/#ropt.config.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3156,11 +3155,11 @@ are removed entirely, as they become trivial constants.</p>
                 <code>config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.EnOptConfig)" href="../enopt_config/#ropt.config.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object
+                <p>The <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object
     containing the variable mask and linear constraints.</p>
               </div>
             </td>

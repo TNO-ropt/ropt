@@ -1222,8 +1222,8 @@ optimization independently and communicates with this class over pipes to
 request function evaluations, report optimizer states, and handle any
 errors.</p>
 <p>Typically, the optimizer is specified within an
-<a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../enopt_config/#ropt.config.enopt.OptimizerConfig"><code>OptimizerConfig</code></a> via the <code>method</code>
-field, which either provides the algorithm name directly or follows the form
+<a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../enopt_config/#ropt.config.OptimizerConfig"><code>OptimizerConfig</code></a> via the <code>method</code> field,
+which either provides the algorithm name directly or follows the form
 <code>plugin-name/method-name</code>. In the first case, <code>ropt</code> searches among all
 available optimizer plugins to find the specified method. In the second
 case, it checks if the plugin identified by <code>plugin-name</code> contains

@@ -1359,11 +1359,11 @@ custom strategies for aggregating ensemble results.</p>
   that inherit from the
   <a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.base.FunctionEstimator" href="#ropt.plugins.function_estimator.base.FunctionEstimator"><code>FunctionEstimator</code></a>
   abstract base class. These classes are initialized with the optimization
-  configuration (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>) and the index
-  of the specific estimator configuration to use (<code>estimator_index</code>). The core
-  functionality is provided by the <code>calculate_function</code> and
-  <code>calculate_gradient</code> methods, which combine the function values and gradients
-  from multiple realizations, respectively, using realization weights.</li>
+  configuration (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>) and the index of the
+  specific estimator configuration to use (<code>estimator_index</code>). The core
+  functionality is provided by the <code>calculate_function</code> and <code>calculate_gradient</code>
+  methods, which combine the function values and gradients from multiple
+  realizations, respectively, using realization weights.</li>
 <li><strong>Discovery:</strong> The <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> discovers
   available <code>FunctionEstimatorPlugin</code> implementations (typically via entry
   points) and uses them to create <code>FunctionEstimator</code> instances as needed
@@ -1493,7 +1493,7 @@ plugin.</p>
                 <code>enopt_config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.EnOptConfig)" href="../enopt_config/#ropt.config.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1587,9 +1587,9 @@ value is then used by the core optimization algorithm.</p>
 corresponding
 <a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.base.FunctionEstimatorPlugin" href="#ropt.plugins.function_estimator.base.FunctionEstimatorPlugin"><code>FunctionEstimatorPlugin</code></a>
 factories. They are initialized with an
-<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> object detailing the
-optimization setup and the <code>estimator_index</code> identifying the specific
-estimator configuration to use from the config.</p>
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object detailing the optimization
+setup and the <code>estimator_index</code> identifying the specific estimator
+configuration to use from the config.</p>
 <p>The core functionality involves combining results using realization weights,
 performed by the <code>calculate_function</code> and <code>calculate_gradient</code> methods,
 which must be implemented by subclasses.</p>
@@ -1637,9 +1637,9 @@ which must be implemented by subclasses.</p>
         <p>Initialize the function estimator object.</p>
 <p>The <code>function_estimators</code> field in the <code>enopt_config</code> is a tuple of
 estimator configurations
-(<a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="../enopt_config/#ropt.config.enopt.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a>).
-The <code>estimator_index</code> identifies which configuration from this tuple
-should be used to initialize this specific estimator instance.</p>
+(<a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="../enopt_config/#ropt.config.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a>). The
+<code>estimator_index</code> identifies which configuration from this tuple should
+be used to initialize this specific estimator instance.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1658,7 +1658,7 @@ should be used to initialize this specific estimator instance.</p>
                 <code>enopt_config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.enopt.EnOptConfig)" href="../enopt_config/#ropt.config.enopt.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.EnOptConfig)" href="../enopt_config/#ropt.config.EnOptConfig">EnOptConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1825,9 +1825,9 @@ the chain rule applies).</p>
 <details class="note" open>
   <summary>Interaction with <code>merge_realizations</code></summary>
   <p>The <code>merge_realizations</code> flag in the
-<a class="autorefs autorefs-internal" title="            GradientConfig" href="../enopt_config/#ropt.config.enopt.GradientConfig"><code>GradientConfig</code></a> determines how
-the initial gradient estimate(s) are computed by <code>ropt</code> <em>before</em>
-being passed to this <code>calculate_gradient</code> method.</p>
+<a class="autorefs autorefs-internal" title="            GradientConfig" href="../enopt_config/#ropt.config.GradientConfig"><code>GradientConfig</code></a> determines how the
+initial gradient estimate(s) are computed by <code>ropt</code> <em>before</em> being
+passed to this <code>calculate_gradient</code> method.</p>
 <ul>
 <li>If <code>False</code> (default): <code>ropt</code> estimates a separate gradient for each
   realization that has a non-zero weight. The implementation

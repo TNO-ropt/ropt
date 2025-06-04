@@ -1926,7 +1926,7 @@
 
 
         <p>Enumerates the types of optimization variables.</p>
-<p>Specified in <a class="autorefs autorefs-internal" title="            VariablesConfig" href="../enopt_config/#ropt.config.enopt.VariablesConfig"><code>VariablesConfig</code></a>, this
+<p>Specified in <a class="autorefs autorefs-internal" title="            VariablesConfig" href="../enopt_config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a>, this
 information allows optimization backends to adapt their behavior.</p>
 
 
@@ -2027,7 +2027,7 @@ information allows optimization backends to adapt their behavior.</p>
 outside the defined lower and upper bounds. This enumeration defines
 different methods to adjust these perturbed values back within the valid
 range. The chosen strategy is configured in the
-<a class="autorefs autorefs-internal" title="            GradientConfig" href="../enopt_config/#ropt.config.enopt.GradientConfig"><code>GradientConfig</code></a>.</p>
+<a class="autorefs autorefs-internal" title="            GradientConfig" href="../enopt_config/#ropt.config.GradientConfig"><code>GradientConfig</code></a>.</p>
 
 
 
@@ -2165,7 +2165,7 @@ range. The chosen strategy is configured in the
 <p>Before a generated perturbation sample is added to a variable's current
 value (during gradient estimation, for example), it can be scaled. This
 enumeration defines the available scaling methods, configured in the
-<a class="autorefs autorefs-internal" title="            GradientConfig" href="../enopt_config/#ropt.config.enopt.GradientConfig"><code>GradientConfig</code></a>.</p>
+<a class="autorefs autorefs-internal" title="            GradientConfig" href="../enopt_config/#ropt.config.GradientConfig"><code>GradientConfig</code></a>.</p>
 
 
 
@@ -2231,7 +2231,7 @@ enumeration defines the available scaling methods, configured in the
         <p>Multiply the perturbation value <span class="arithmatex">\(p_i\)</span> by the range defined by the bounds
 of the variables <span class="arithmatex">\(c_i\)</span>: <span class="arithmatex">\(\hat{p}_i = (c_{i,\text{max}} - c_{i,\text{min}})
 \times p_i\)</span>. The bounds will generally be defined in the configuration for
-the variables (see <a class="autorefs autorefs-internal" title="            VariablesConfig" href="../enopt_config/#ropt.config.enopt.VariablesConfig"><code>VariablesConfig</code></a>).</p>
+the variables (see <a class="autorefs autorefs-internal" title="            VariablesConfig" href="../enopt_config/#ropt.config.VariablesConfig"><code>VariablesConfig</code></a>).</p>
 
     </div>
 
@@ -2728,7 +2728,7 @@ details on the specific data they provide.</p>
 
 
         <p>Enumerates the semantic meaning of axes in data arrays.</p>
-<p>The <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a> configuration class
+<p>The <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> configuration class
 defines the optimization workflow, including variables, objectives,
 constraints, realizations, and the optimizer. Each of these components can
 have multiple instances, leading to multidimensional data arrays.</p>

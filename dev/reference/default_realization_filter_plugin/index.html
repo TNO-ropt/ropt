@@ -1292,8 +1292,8 @@
 <p>This class provides several methods for calculating realization weights based
 on objective or constraint values. The specific method and its parameters
 are configured via the
-<a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="../enopt_config/#ropt.config.enopt.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>
-in the main <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>.</p>
+<a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="../enopt_config/#ropt.config.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>
+in the main <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>.</p>
 <p><strong>Supported Methods:</strong></p>
 <ul>
 <li>
@@ -1384,9 +1384,9 @@ values and assigns weights only to those within a specified rank range.</p>
 <p>How it works:</p>
 <ol>
 <li>A weighted sum is calculated for each realization using the objective
-   values specified by the <code>sort</code> indices and the corresponding weights
-   from the main <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>. If only
-   one objective index is provided in <code>sort</code>, no weighting is applied.</li>
+   values specified by the <code>sort</code> indices and the corresponding weights from
+   the main <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>. If only one objective
+   index is provided in <code>sort</code>, no weighting is applied.</li>
 <li>Realizations are sorted based on this calculated value (ascending).</li>
 <li>Realizations whose rank falls within the range [<code>first</code>, <code>last</code>]
    (inclusive) are selected.</li>
@@ -1601,7 +1601,7 @@ realizations.</p>
 <ol>
 <li>A weighted sum is calculated for each realization using the objective
    values specified by the <code>sort</code> indices and the corresponding weights
-   from the main <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.enopt.EnOptConfig"><code>EnOptConfig</code></a>. If only
+   from the main <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>. If only
    one objective index is provided in <code>sort</code>, no weighting is applied.</li>
 <li>Realizations are conceptually sorted based on this calculated value
    (ascending, assuming minimization).</li>
