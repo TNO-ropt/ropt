@@ -88,7 +88,7 @@ class EnsembleEvaluator:
         self._evaluator = evaluator
         self._realization_filters = self._init_realization_filters(plugin_manager)
         self._function_estimators = self._init_function_estimators(plugin_manager)
-        rng = default_rng(config.gradient.seed)
+        rng = default_rng(config.variables.seed)
         self._samplers = self._init_samplers(rng, plugin_manager)
         self._cache_for_gradient: FunctionResults | None = None
 
@@ -656,8 +656,8 @@ class EnsembleEvaluator:
     ) -> list[Sampler]:
         samplers: list[Sampler] = []
         for idx, sampler_config in enumerate(self._config.samplers):
-            variable_indices = _get_mask(
-                idx, self._config.gradient.samplers, self._config.variables.mask
+            variable_indices = np.asarray(
+                self._config.variables.mask & (self._config.variables.samplers == idx)
             )
             if variable_indices is None or variable_indices.size:
                 plugin = plugin_manager.get_plugin(
@@ -665,13 +665,3 @@ class EnsembleEvaluator:
                 )
                 samplers.append(plugin.create(self._config, idx, variable_indices, rng))
         return samplers
-
-
-def _get_mask(
-    idx: int, gradient_indices: NDArray[np.intc] | None, mask: NDArray[np.bool_] | None
-) -> NDArray[np.bool_] | None:
-    if gradient_indices is None:
-        return mask
-    if mask is None:
-        return np.asarray(gradient_indices == idx)
-    return np.asarray(mask & (gradient_indices == idx))

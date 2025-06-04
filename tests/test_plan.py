@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 from copy import deepcopy
 from functools import partial
 from typing import TYPE_CHECKING, Any
@@ -33,12 +32,10 @@ def enopt_config_fixture() -> dict[str, Any]:
         },
         "variables": {
             "initial_values": [0.0, 0.0, 0.1],
+            "perturbation_magnitudes": 0.01,
         },
         "objectives": {
             "weights": [0.75, 0.25],
-        },
-        "gradient": {
-            "perturbation_magnitudes": 0.01,
         },
     }
 
@@ -102,9 +99,9 @@ def test_plan_evaluators(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
 
 def test_plan_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:
-    enopt_config["gradient"]["seed"] = 1
+    enopt_config["variables"]["seed"] = 1
     config2 = deepcopy(enopt_config)
-    config2["gradient"]["seed"] = 2
+    config2["variables"]["seed"] = 2
 
     plan = Plan(PluginManager())
     step = plan.add_step("optimizer")
@@ -178,7 +175,7 @@ def test_two_optimizers_alternating(
                 completed_functions += 1
 
     enopt_config["variables"]["initial_values"] = [0.0, 0.2, 0.1]
-    enopt_config["gradient"]["evaluation_policy"] = "speculative"
+    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
     del enopt_config["optimizer"]["tolerance"]
 
     enopt_config1 = deepcopy(enopt_config)
@@ -235,7 +232,7 @@ def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -
             item for item in event.data["results"] if isinstance(item, FunctionResults)
         ]
 
-    enopt_config["gradient"]["evaluation_policy"] = "speculative"
+    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
     enopt_config["optimizer"]["max_functions"] = 2
 
     enopt_config2 = deepcopy(enopt_config)
@@ -278,7 +275,7 @@ def test_restart_initial(enopt_config: dict[str, Any], evaluator: Any) -> None:
             item for item in event.data["results"] if isinstance(item, FunctionResults)
         ]
 
-    enopt_config["gradient"]["evaluation_policy"] = "speculative"
+    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
     enopt_config["optimizer"]["max_functions"] = 3
 
     plan = Plan(PluginManager())
@@ -309,7 +306,7 @@ def test_restart_last(enopt_config: dict[str, Any], evaluator: Any) -> None:
             item for item in event.data["results"] if isinstance(item, FunctionResults)
         ]
 
-    enopt_config["gradient"]["evaluation_policy"] = "speculative"
+    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
     enopt_config["optimizer"]["max_functions"] = 3
 
     plan = Plan(PluginManager())
@@ -349,7 +346,7 @@ def test_restart_optimum(enopt_config: dict[str, Any], evaluator: Any) -> None:
             item for item in event.data["results"] if isinstance(item, FunctionResults)
         ]
 
-    enopt_config["gradient"]["evaluation_policy"] = "speculative"
+    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
     enopt_config["optimizer"]["max_functions"] = 4
 
     plan = Plan(PluginManager())
@@ -408,7 +405,7 @@ def test_restart_optimum_with_reset(
         ),
     )
 
-    enopt_config["gradient"]["evaluation_policy"] = "speculative"
+    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
     enopt_config["optimizer"]["max_functions"] = max_functions
 
     plan = Plan(PluginManager())
@@ -503,7 +500,7 @@ def test_evaluator_step(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
 
 def test_evaluator_step_multi(enopt_config: dict[str, Any], evaluator: Any) -> None:
-    enopt_config["gradient"]["evaluation_policy"] = "speculative"
+    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
     enopt_config["optimizer"]["max_functions"] = 4
 
     plan = Plan(PluginManager())
@@ -534,7 +531,7 @@ def test_exit_code(
     max_criterion: str,
     max_enum: ExitCode,
 ) -> None:
-    enopt_config["gradient"]["evaluation_policy"] = "speculative"
+    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
     enopt_config["optimizer"][max_criterion] = 4
 
     plan = Plan(PluginManager())
@@ -557,7 +554,7 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
                 completed_functions += 1
 
     enopt_config["optimizer"]["tolerance"] = 1e-10
-    enopt_config["gradient"]["evaluation_policy"] = "speculative"
+    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
     enopt_config["optimizer"]["max_functions"] = 4
     enopt_config["variables"]["mask"] = [True, False, True]
     nested_config = deepcopy(enopt_config)
@@ -616,7 +613,7 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
                     assert item.metadata.get("inner") == "inner_meta_data"
 
     enopt_config["optimizer"]["tolerance"] = 1e-10
-    enopt_config["gradient"]["evaluation_policy"] = "speculative"
+    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
     enopt_config["optimizer"]["max_functions"] = 4
     enopt_config["variables"]["mask"] = [True, False, True]
     nested_config = deepcopy(enopt_config)
@@ -700,13 +697,6 @@ def _cached_eval(
     variables: NDArray[np.float64],
     context: EvaluatorContext,
 ) -> EvaluatorResult:
-    names = None
-    if context.config.names:
-        names = context.config.names["realization"]
-        # Fake that the realization names are flipped:
-        context = copy.deepcopy(context)
-        context.config.names["realization"] = ("b", "a")
-
     results, cached = obj.eval_cached(variables, context)
     cached_indices = list(cached.keys())
     info = np.zeros(variables.shape[0], dtype=np.bool_)
@@ -715,8 +705,10 @@ def _cached_eval(
 
     realizations = context.realizations.copy()
     realizations[cached_indices] = [item[0] for item in cached.values()]
-    if names is not None:
-        realizations = np.fromiter((names[idx] for idx in realizations), dtype="U1")
+    if obj._names is not None:
+        realizations = np.fromiter(
+            (obj._names[idx] for idx in realizations), dtype="U1"
+        )
     results.evaluation_info["realizations"] = realizations
 
     return results
@@ -751,20 +743,14 @@ def test_evaluator_cache(
                 completed_functions += 1
                 if completed_functions == 3:
                     assert np.all(item.evaluations.evaluation_info["cached"])
-                    if names is not None:
-                        assert np.all(
-                            item.evaluations.evaluation_info["realizations"]
-                            == ["b", "a"]
-                        )
                 else:
                     assert not np.all(item.evaluations.evaluation_info["cached"])
-                    if names is not None:
-                        assert np.all(
-                            item.evaluations.evaluation_info["realizations"]
-                            == ["a", "b"]
-                        )
+                if names is not None:
+                    assert np.all(
+                        item.evaluations.evaluation_info["realizations"] == ["a", "b"]
+                    )
 
-    enopt_config["gradient"]["evaluation_policy"] = "speculative"
+    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
     enopt_config["gradient"]["number_of_perturbations"] = "1"
     enopt_config["optimizer"]["max_functions"] = 2
 
@@ -772,7 +758,7 @@ def test_evaluator_cache(
     step = plan.add_step("optimizer")
     tracker = plan.add_event_handler("tracker", sources={step}, what="last")
     cached_evaluator = plan.add_evaluator(
-        "cached_evaluator", clients={step}, sources={tracker}
+        "cached_evaluator", clients={step}, sources={tracker}, names=names
     )
 
     assert isinstance(cached_evaluator, DefaultCachedEvaluator)
@@ -819,8 +805,10 @@ def test_evaluator_cache_with_store(
         completed_test_functions += 1
         return float(test_functions[0](*args, **kwargs))
 
-    enopt_config["gradient"]["evaluation_policy"] = "speculative"
-    enopt_config["gradient"]["number_of_perturbations"] = "1"
+    enopt_config["gradient"] = {
+        "evaluation_policy": "speculative",
+        "number_of_perturbations": "1",
+    }
     enopt_config["optimizer"]["max_functions"] = 2
 
     plan = Plan(PluginManager())

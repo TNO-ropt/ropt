@@ -33,12 +33,12 @@ def enopt_config_fixture() -> dict[str, Any]:
         ],
         "gradient": {
             "number_of_perturbations": 3,
-            "perturbation_magnitudes": 0.01,
         },
         "variables": {
             "initial_values": [0, 0, 0],
             "upper_bounds": 1.0,
             "lower_bounds": -1.0,
+            "perturbation_magnitudes": 0.01,
         },
     }
 
@@ -135,7 +135,7 @@ def test_sampler_indexed(enopt_config: Any) -> None:
     samplers: list[dict[str, Any]] = enopt_config["samplers"]
     samplers.append(copy.deepcopy(samplers[0]))
     samplers[1]["options"] = {"scale": -1}
-    enopt_config["gradient"]["samplers"] = [0, 1, 1]
+    enopt_config["variables"]["samplers"] = [0, 1, 1]
     config = EnOptConfig.model_validate(enopt_config)
     sampler1 = MockedSampler(config, 0, np.array([0]), rng)
     sampler2 = MockedSampler(config, 1, np.array([1, 2]), rng)
@@ -149,7 +149,7 @@ def test_sampler_indexed(enopt_config: Any) -> None:
 
 
 def test_sampler_order(enopt_config: Any, evaluator: Any) -> None:
-    enopt_config["gradient"]["samplers"] = [0, 0, 1]
+    enopt_config["variables"]["samplers"] = [0, 0, 1]
     enopt_config["samplers"] = [
         {"method": "norm"},
         {"method": "uniform"},
@@ -163,7 +163,7 @@ def test_sampler_order(enopt_config: Any, evaluator: Any) -> None:
         {"method": "uniform"},
         {"method": "norm"},
     ]
-    enopt_config["gradient"]["samplers"] = [1, 1, 0]
+    enopt_config["variables"]["samplers"] = [1, 1, 0]
     variables2 = BasicOptimizer(enopt_config, evaluator()).run().variables
     assert variables2 is not None
     assert np.allclose(variables2, [0, 0, 0.5], atol=0.025)

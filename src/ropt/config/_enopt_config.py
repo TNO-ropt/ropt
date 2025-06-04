@@ -4,10 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Self
 
-import numpy as np
-from pydantic import BaseModel, ConfigDict, ValidationInfo, model_validator
-
-from ropt.enums import PerturbationType
+from pydantic import BaseModel, ConfigDict, model_validator
 
 from ._function_estimator_config import FunctionEstimatorConfig
 from ._gradient_config import GradientConfig
@@ -96,68 +93,6 @@ class EnOptConfig(BaseModel):
             ):
                 msg = f"the coefficients matrix should have {variable_count} columns"
                 raise ValueError(msg)
-        return self
-
-    @model_validator(mode="after")
-    def _check_magnitudes(self) -> Self:
-        size = self.gradient.perturbation_magnitudes.size
-        if size not in (1, self.variables.initial_values.size):
-            msg = (
-                "the perturbation magnitudes cannot be broadcasted "
-                f"to a length of {self.variables.initial_values.size}"
-            )
-            raise ValueError(msg)
-        return self
-
-    @model_validator(mode="after")
-    def _check_boundary_types(self) -> Self:
-        size = self.gradient.boundary_types.size
-        if size not in (1, self.variables.initial_values.size):
-            msg = (
-                "perturbation boundary_types must have "
-                f"{self.variables.initial_values.size} items, or a single item"
-            )
-            raise ValueError(msg)
-        return self
-
-    @model_validator(mode="after")
-    def _check_perturbation_types(self) -> Self:
-        size = self.gradient.perturbation_types.size
-        if size not in (1, self.variables.initial_values.size):
-            msg = (
-                "perturbation types must have "
-                f"{self.variables.initial_values.size} items, or a single item"
-            )
-            raise ValueError(msg)
-        return self
-
-    @model_validator(mode="after")
-    def _check_relative_magnitudes(self) -> Self:
-        types = np.broadcast_to(
-            self.gradient.perturbation_types, (self.variables.initial_values.size,)
-        )
-        relative = types == PerturbationType.RELATIVE
-        if not np.all(
-            np.logical_and(
-                np.isfinite(self.variables.lower_bounds[relative]),
-                np.isfinite(self.variables.upper_bounds[relative]),
-            ),
-        ):
-            msg = "The variable bounds must be finite to use relative perturbations"
-            raise ValueError(msg)
-        return self
-
-    @model_validator(mode="after")
-    def _fix_linear_constraints(self, info: ValidationInfo) -> Self:
-        if self.linear_constraints is not None:
-            self.linear_constraints = self.linear_constraints.apply_transformation(
-                info.context,
-            )
-        return self
-
-    @model_validator(mode="after")
-    def _gradient(self, info: ValidationInfo) -> Self:
-        self.gradient = self.gradient.fix_perturbations(self.variables, info.context)
         return self
 
     @model_validator(mode="wrap")  # type: ignore[arg-type]

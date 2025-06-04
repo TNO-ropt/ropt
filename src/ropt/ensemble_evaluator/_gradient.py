@@ -2,7 +2,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.config import EnOptConfig
-from ropt.enums import BoundaryType
+from ropt.enums import BoundaryType, PerturbationType
 from ropt.plugins.function_estimator.base import FunctionEstimator
 from ropt.plugins.sampler.base import Sampler
 
@@ -66,29 +66,29 @@ def _perturb_variables(
     variables: NDArray[np.float64],
     samplers: list[Sampler],
 ) -> NDArray[np.float64]:
-    if config.gradient.samplers is None:
-        samples = samplers[0].generate_samples()
-    else:
-        # The results should be independent of the order of the samplers,
-        # reordering would affect the random numbers they are based on. We
-        # obtain a consistent order by running multiple samplers in the order
-        # that they appear in the config.gradient.samplers array:
-        unique, indices = np.unique(
-            np.compress(
-                config.gradient.samplers >= 0,
-                config.gradient.samplers,
-            ),
-            return_index=True,
-        )
-        sampler_indices = unique[np.argsort(indices)]
-        samples = samplers[sampler_indices[0]].generate_samples()
-        for sampler_idx in sampler_indices[1:]:
-            samples += samplers[sampler_idx].generate_samples()
+    # The results should be independent of the order of the samplers,
+    # reordering would affect the random numbers they are based on. We
+    # obtain a consistent order by running multiple samplers in the order
+    # that they appear in the config.variables.samplers array:
+    unique, indices = np.unique(
+        np.compress(config.variables.samplers >= 0, config.variables.samplers),
+        return_index=True,
+    )
+    sampler_indices = unique[np.argsort(indices)]
+    samples = samplers[sampler_indices[0]].generate_samples()
+    for sampler_idx in sampler_indices[1:]:
+        samples += samplers[sampler_idx].generate_samples()
+    magnitudes = np.where(
+        config.variables.perturbation_types == PerturbationType.RELATIVE,
+        (config.variables.upper_bounds - config.variables.lower_bounds)
+        * config.variables.perturbation_magnitudes,
+        config.variables.perturbation_magnitudes,
+    )
     return _apply_bounds(
-        variables + config.gradient.perturbation_magnitudes * samples,
+        variables + magnitudes * samples,
         config.variables.lower_bounds,
         config.variables.upper_bounds,
-        config.gradient.boundary_types,
+        config.variables.boundary_types,
     )
 
 

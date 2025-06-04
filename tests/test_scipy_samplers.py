@@ -17,6 +17,7 @@ def enopt_config_fixture() -> dict[str, Any]:
     return {
         "variables": {
             "initial_values": [0.0, 0.0, 0.1],
+            "perturbation_magnitudes": 0.01,
         },
         "optimizer": {
             "tolerance": 1e-4,
@@ -24,9 +25,6 @@ def enopt_config_fixture() -> dict[str, Any]:
         },
         "objectives": {
             "weights": [0.75, 0.25],
-        },
-        "gradient": {
-            "perturbation_magnitudes": 0.01,
         },
     }
 
@@ -44,7 +42,7 @@ def test_scipy_samplers_unconstrained(
 def test_scipy_indexed_sampler(enopt_config: Any, evaluator: Any) -> None:
     # Removing the second variable will fix its value, since it will not be
     # perturbed and its gradient will always be zero.
-    enopt_config["gradient"]["samplers"] = [0, -1, 0]
+    enopt_config["variables"]["samplers"] = [0, -1, 0]
     enopt_config["variables"]["initial_values"][1] = 0.1
 
     variables = BasicOptimizer(enopt_config, evaluator()).run().variables

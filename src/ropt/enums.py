@@ -145,14 +145,12 @@ class ExitCode(IntEnum):
 class AxisName(StrEnum):
     """Enumerates the semantic meaning of axes in data arrays.
 
-    The [`EnOptConfig`][ropt.config.EnOptConfig] configuration class
-    defines the optimization workflow, including variables, objectives,
-    constraints, realizations, and the optimizer. Each of these components can
-    have multiple instances, leading to multidimensional data arrays.
-
-    Similarly, [`Results`][ropt.results.Results] objects store optimization data
-    (like variable values, objective function values, constraint values, etc.)
-    in multidimensional NumPy arrays.
+    The optimization workflow includes variables, objectives, constraints,
+    realizations, and the optimizer. Each of these components can have multiple
+    instances, leading to multidimensional data arrays. In particular, the
+    [`Results`][ropt.results.Results] objects store optimization data (like
+    variable values, objective function values, constraint values, etc.) in
+    multidimensional NumPy arrays.
 
     The `AxisName` enumeration  provides standardized labels to identify what
     each dimension (axis) of these arrays represents. For example, an array

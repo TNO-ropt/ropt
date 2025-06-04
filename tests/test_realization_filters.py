@@ -24,7 +24,6 @@ def enopt_config_fixture() -> dict[str, Any]:
         },
         "gradient": {
             "number_of_perturbations": 5,
-            "perturbation_magnitudes": 0.01,
             "evaluation_policy": "speculative",
         },
         "realizations": {
@@ -32,6 +31,7 @@ def enopt_config_fixture() -> dict[str, Any]:
         },
         "variables": {
             "initial_values": 3 * [0],
+            "perturbation_magnitudes": 0.01,
         },
     }
 

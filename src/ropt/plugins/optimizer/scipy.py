@@ -166,8 +166,7 @@ class SciPyOptimizer(Optimizer):
         self._cached_function = None
         self._cached_gradient = None
 
-        if self._config.variables.mask is not None:
-            initial_values = initial_values[..., self._config.variables.mask]
+        initial_values = initial_values[..., self._config.variables.mask]
 
         if self._method == "differential_evolution":
             if self._parallel:
@@ -219,11 +218,12 @@ class SciPyOptimizer(Optimizer):
             np.isfinite(self._config.variables.lower_bounds).any()
             or np.isfinite(self._config.variables.upper_bounds).any()
         ):
-            lower_bounds = self._config.variables.lower_bounds
-            upper_bounds = self._config.variables.upper_bounds
-            if self._config.variables.mask is not None:
-                lower_bounds = lower_bounds[self._config.variables.mask]
-                upper_bounds = upper_bounds[self._config.variables.mask]
+            lower_bounds = self._config.variables.lower_bounds[
+                self._config.variables.mask
+            ]
+            upper_bounds = self._config.variables.upper_bounds[
+                self._config.variables.mask
+            ]
             return Bounds(lower_bounds, upper_bounds)
         return None
 
@@ -528,11 +528,7 @@ class SciPyOptimizer(Optimizer):
         if self._config.optimizer.output_dir is not None:
             options["disp"] = True
 
-        if (
-            self._method == "differential_evolution"
-            and self._config.variables.types is not None
-            and "integrality" not in options
-        ):
+        if self._method == "differential_evolution" and "integrality" not in options:
             options["integrality"] = (
                 self._config.variables.types == VariableType.INTEGER
             )

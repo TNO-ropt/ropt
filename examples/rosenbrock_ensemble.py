@@ -24,8 +24,6 @@ UNCERTAINTY = 0.1
 CONFIG: dict[str, Any] = {
     "variables": {
         "initial_values": 2 * np.arange(DIM) / DIM + 0.5,
-    },
-    "gradient": {
         "perturbation_magnitudes": 1e-6,
     },
 }
@@ -110,12 +108,11 @@ def main(argv: list[str] | None = None) -> None:
     if argv is not None and "--merge" in argv:
         realizations = 50
         CONFIG["realizations"] = {"weights": [1.0] * realizations}
-        CONFIG["gradient"]["number_of_perturbations"] = 1
-        CONFIG["gradient"]["merge_realizations"] = True
+        CONFIG["gradient"] = {"number_of_perturbations": 1, "merge_realizations": True}
     else:
         realizations = 10
         CONFIG["realizations"] = {"weights": [1.0] * realizations}
-        CONFIG["gradient"]["number_of_perturbations"] = 5
+        CONFIG["gradient"] = {"number_of_perturbations": 5}
 
     optimal_result = run_optimization(CONFIG)
     assert optimal_result is not None

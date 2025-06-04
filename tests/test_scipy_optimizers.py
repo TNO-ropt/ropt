@@ -33,6 +33,7 @@ def enopt_config_fixture() -> dict[str, Any]:
     return {
         "variables": {
             "initial_values": [0.0, 0.0, 0.1],
+            "perturbation_magnitudes": 0.01,
         },
         "optimizer": {
             "tolerance": 1e-4,
@@ -40,9 +41,6 @@ def enopt_config_fixture() -> dict[str, Any]:
         },
         "objectives": {
             "weights": [0.75, 0.25],
-        },
-        "gradient": {
-            "perturbation_magnitudes": 0.01,
         },
     }
 
@@ -420,7 +418,7 @@ def test_scipy_evaluation_policy_separate(
     enopt_config: Any, method: str, evaluator: Any
 ) -> None:
     enopt_config["optimizer"]["method"] = method
-    enopt_config["gradient"]["evaluation_policy"] = "separate"
+    enopt_config["gradient"] = {"evaluation_policy": "separate"}
 
     variables = BasicOptimizer(enopt_config, evaluator()).run().variables
     assert variables is not None
@@ -436,7 +434,7 @@ def test_scipy_speculative(
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
     enopt_config["optimizer"]["method"] = "slsqp"
-    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
+    enopt_config["gradient"] = {"evaluation_policy": evaluation_policy}
 
     def _observer(results: tuple[Results, ...]) -> None:
         assert len(results) == 2 if evaluation_policy == "speculative" else 1

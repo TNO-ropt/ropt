@@ -278,17 +278,15 @@ class EnsembleOptimizer:
         self, variables: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         mask = self._enopt_config.variables.mask
-        if mask is not None:
-            if variables.ndim > 1:
-                tmp_variables = np.repeat(
-                    self._fixed_variables[np.newaxis, :], variables.shape[0], axis=0
-                )
-                tmp_variables[:, mask] = variables
-            else:
-                tmp_variables = self._fixed_variables.copy()
-                tmp_variables[mask] = variables
-            return tmp_variables
-        return variables.copy()
+        if variables.ndim > 1:
+            tmp_variables = np.repeat(
+                self._fixed_variables[np.newaxis, :], variables.shape[0], axis=0
+            )
+            tmp_variables[:, mask] = variables
+        else:
+            tmp_variables = self._fixed_variables.copy()
+            tmp_variables[mask] = variables
+        return tmp_variables
 
     def _check_stopping_criteria(self) -> None:
         max_functions = self._enopt_config.optimizer.max_functions

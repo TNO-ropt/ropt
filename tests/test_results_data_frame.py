@@ -24,12 +24,12 @@ def enopt_config_fixture() -> dict[str, Any]:
             "initial_values": [0.0, 0.0, 0.1],
             "upper_bounds": 1.0,
             "lower_bounds": -1.0,
+            "perturbation_magnitudes": 0.01,
         },
         "objectives": {
             "weights": [0.75, 0.25],
         },
         "gradient": {
-            "perturbation_magnitudes": 0.01,
             "evaluation_policy": "speculative",
         },
         "names": {

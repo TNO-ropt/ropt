@@ -4,7 +4,11 @@ from typing import Any
 import numpy as np
 import pytest
 
-from ropt.config import EnOptConfig, GradientConfig, LinearConstraintsConfig
+from ropt.config import (
+    EnOptConfig,
+    LinearConstraintsConfig,
+    VariablesConfig,
+)
 from ropt.enums import BoundaryType, PerturbationType
 from ropt.transforms import OptModelTransforms, VariableScaler
 
@@ -65,9 +69,9 @@ def test_check_linear_constraints_vector_shapes() -> None:
 
 
 def test_check_perturbations() -> None:
-    GradientConfig()
-    gradients = GradientConfig(perturbation_magnitudes=np.array([0.1]))
-    assert gradients.perturbation_magnitudes == np.array([0.1])
+    VariablesConfig()
+    variables = VariablesConfig(perturbation_magnitudes=np.array([0.1]))
+    assert variables.perturbation_magnitudes == np.array([0.1])
 
 
 def test_check_config(enopt_config: Any) -> None:
@@ -88,31 +92,31 @@ def test_check_config_linear_constraints(enopt_config: Any) -> None:
 
 
 def test_check_config_perturbations(enopt_config: Any) -> None:
-    enopt_config["gradient"] = {
-        "perturbation_magnitudes": [1] * 2,
-        "boundary_types": [BoundaryType.TRUNCATE_BOTH] * 2,
-        "perturbation_types": [PerturbationType.ABSOLUTE] * 2,
-    }
+    enopt_config["variables"].update(
+        {
+            "perturbation_magnitudes": [1] * 2,
+            "boundary_types": [BoundaryType.TRUNCATE_BOTH] * 2,
+            "perturbation_types": [PerturbationType.ABSOLUTE] * 2,
+        }
+    )
     EnOptConfig.model_validate(enopt_config)
 
     config_copy = copy.deepcopy(enopt_config)
-    config_copy["gradient"]["perturbation_magnitudes"] = [1] * 3
+    config_copy["variables"]["perturbation_magnitudes"] = [1] * 3
     with pytest.raises(
         ValueError,
-        match="the perturbation magnitudes cannot be broadcasted to a length of 2",
+        match="operands could not be broadcast together",
     ):
         EnOptConfig.model_validate(config_copy)
 
     config_copy = copy.deepcopy(enopt_config)
-    config_copy["gradient"]["boundary_types"] = [BoundaryType.TRUNCATE_BOTH] * 3
-    with pytest.raises(
-        ValueError, match="perturbation boundary_types must have 2 items"
-    ):
+    config_copy["variables"]["boundary_types"] = [BoundaryType.TRUNCATE_BOTH] * 3
+    with pytest.raises(ValueError, match="operands could not be broadcast together"):
         EnOptConfig.model_validate(config_copy)
 
     config_copy = copy.deepcopy(enopt_config)
-    config_copy["gradient"]["perturbation_types"] = [PerturbationType.ABSOLUTE] * 3
-    with pytest.raises(ValueError, match="perturbation types must have 2 items"):
+    config_copy["variables"]["perturbation_types"] = [PerturbationType.ABSOLUTE] * 3
+    with pytest.raises(ValueError, match="operands could not be broadcast together"):
         EnOptConfig.model_validate(config_copy)
 
 
@@ -137,10 +141,15 @@ def test_check_config_min_success(enopt_config: Any) -> None:
 
 
 def test_perturbation_types(enopt_config: Any) -> None:
-    enopt_config["gradient"] = {
-        "perturbation_magnitudes": [0.1, 0.01],
-        "perturbation_types": [PerturbationType.ABSOLUTE, PerturbationType.RELATIVE],
-    }
+    enopt_config["variables"].update(
+        {
+            "perturbation_magnitudes": [0.1, 0.01],
+            "perturbation_types": [
+                PerturbationType.ABSOLUTE,
+                PerturbationType.RELATIVE,
+            ],
+        }
+    )
     enopt_config["variables"]["lower_bounds"] = [0.0, 600]
     enopt_config["variables"]["upper_bounds"] = [1.0, np.inf]
     with pytest.raises(
@@ -152,23 +161,30 @@ def test_perturbation_types(enopt_config: Any) -> None:
     enopt_config["variables"]["initial_values"] = [0.0, 0.0, 0.0]
     enopt_config["variables"]["lower_bounds"] = [0.0, 100.0, 0.0]
     enopt_config["variables"]["upper_bounds"] = [np.inf, 600.0, 1.0]
-    enopt_config["gradient"] = {
-        "perturbation_magnitudes": [0.1, 0.01, 1.0],
-        "perturbation_types": [
-            PerturbationType.ABSOLUTE,
-            PerturbationType.RELATIVE,
-            PerturbationType.ABSOLUTE,
-        ],
-    }
+    enopt_config["variables"].update(
+        {
+            "perturbation_magnitudes": [0.1, 0.01, 1.0],
+            "perturbation_types": [
+                PerturbationType.ABSOLUTE,
+                PerturbationType.RELATIVE,
+                PerturbationType.ABSOLUTE,
+            ],
+        }
+    )
     config = EnOptConfig.model_validate(enopt_config)
-    assert np.allclose(config.gradient.perturbation_magnitudes, [0.1, 5.0, 1.0])
+    assert np.allclose(config.variables.perturbation_magnitudes, [0.1, 0.01, 1.0])
 
 
 def test_perturbation_types_with_scaler(enopt_config: Any) -> None:
-    enopt_config["gradient"] = {
-        "perturbation_magnitudes": [0.1, 0.01],
-        "perturbation_types": [PerturbationType.ABSOLUTE, PerturbationType.RELATIVE],
-    }
+    enopt_config["variables"].update(
+        {
+            "perturbation_magnitudes": [0.1, 0.01],
+            "perturbation_types": [
+                PerturbationType.ABSOLUTE,
+                PerturbationType.RELATIVE,
+            ],
+        }
+    )
     enopt_config["variables"]["lower_bounds"] = [0.0, 600]
     enopt_config["variables"]["upper_bounds"] = [1.0, np.inf]
     with pytest.raises(
@@ -181,18 +197,20 @@ def test_perturbation_types_with_scaler(enopt_config: Any) -> None:
     enopt_config["variables"]["lower_bounds"] = [0.0, 100.0, 0.0]
     enopt_config["variables"]["upper_bounds"] = [np.inf, 600.0, 1.0]
 
-    enopt_config["gradient"] = {
-        "perturbation_magnitudes": [0.1, 0.01, 1.0],
-        "perturbation_types": [
-            PerturbationType.ABSOLUTE,
-            PerturbationType.RELATIVE,
-            PerturbationType.ABSOLUTE,
-        ],
-    }
+    enopt_config["variables"].update(
+        {
+            "perturbation_magnitudes": [0.1, 0.01, 1.0],
+            "perturbation_types": [
+                PerturbationType.ABSOLUTE,
+                PerturbationType.RELATIVE,
+                PerturbationType.ABSOLUTE,
+            ],
+        }
+    )
     config = EnOptConfig.model_validate(
         enopt_config,
         context=OptModelTransforms(
             variables=VariableScaler(np.array([1.0, 1.0, 50.0]), None)
         ),
     )
-    assert np.allclose(config.gradient.perturbation_magnitudes, [0.1, 5.0, 0.02])
+    assert np.allclose(config.variables.perturbation_magnitudes, [0.1, 0.01, 0.02])

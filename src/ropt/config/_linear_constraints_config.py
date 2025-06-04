@@ -2,22 +2,20 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Self
+from typing import Self
 
 import numpy as np
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, ValidationInfo, model_validator
 
 from ropt.config.utils import broadcast_1d_array, immutable_array
 from ropt.config.validated_types import Array1D, Array2D  # noqa: TC001
-
-if TYPE_CHECKING:
-    from ropt.transforms import OptModelTransforms
 
 
 class LinearConstraintsConfig(BaseModel):
     r"""Configuration class for linear constraints.
 
     This class, `LinearConstraintsConfig`, defines linear constraints used in an
+    optimization, for instance as part of an
     [`EnOptConfig`][ropt.config.EnOptConfig] object.
 
     Linear constraints are defined by a set of linear equations involving the
@@ -71,33 +69,25 @@ class LinearConstraintsConfig(BaseModel):
     )
 
     @model_validator(mode="after")
-    def _broadcast_and_check(self) -> Self:
-        size = 0 if self.coefficients is None else self.coefficients.shape[0]
+    def _broadcast_and_check(self, info: ValidationInfo) -> Self:
+        coefficients = self.coefficients
+        size = 0 if coefficients is None else coefficients.shape[0]
         lower_bounds = broadcast_1d_array(self.lower_bounds, "lower_bounds", size)
         upper_bounds = broadcast_1d_array(self.upper_bounds, "upper_bounds", size)
+
+        if info.context is not None and info.context.variables is not None:
+            coefficients, lower_bounds, upper_bounds = (
+                info.context.variables.linear_constraints_to_optimizer(
+                    coefficients, lower_bounds, upper_bounds
+                )
+            )
+
         if np.any(lower_bounds > upper_bounds):
             msg = "The lower bounds are larger than the upper bounds."
             raise ValueError(msg)
 
-        self.coefficients = immutable_array(self.coefficients)
+        self.coefficients = immutable_array(coefficients)
         self.lower_bounds = immutable_array(lower_bounds)
         self.upper_bounds = immutable_array(upper_bounds)
-        return self
 
-    def apply_transformation(
-        self, transforms: OptModelTransforms | None
-    ) -> LinearConstraintsConfig:
-        if transforms is not None and transforms.variables is not None:
-            coefficients, lower_bounds, upper_bounds = (
-                transforms.variables.linear_constraints_to_optimizer(
-                    self.coefficients, self.lower_bounds, self.upper_bounds
-                )
-            )
-            return self.model_copy(
-                update={
-                    "coefficients": immutable_array(coefficients),
-                    "lower_bounds": immutable_array(lower_bounds),
-                    "upper_bounds": immutable_array(upper_bounds),
-                }
-            )
         return self

@@ -41,12 +41,10 @@ def enopt_config_fixture() -> dict[str, Any]:
         },
         "variables": {
             "initial_values": [0.0, 0.0, 0.1],
+            "perturbation_magnitudes": 0.01,
         },
         "objectives": {
             "weights": [0.75, 0.25],
-        },
-        "gradient": {
-            "perturbation_magnitudes": 0.01,
         },
     }
 
@@ -119,7 +117,7 @@ def test_max_functions_not_exceeded(
 
     max_functions = 100
     enopt_config["optimizer"]["max_functions"] = max_functions
-    enopt_config["gradient"]["evaluation_policy"] = "separate"
+    enopt_config["gradient"] = {"evaluation_policy": "separate"}
     enopt_config["optimizer"]["method"] = f"{external}{_SLSQP}"
     optimizer = BasicOptimizer(enopt_config, evaluator()).set_results_callback(
         track_results
@@ -730,7 +728,7 @@ def test_rng(enopt_config: Any, evaluator: Any, external: str) -> None:
     assert np.allclose(variables2, [0.0, 0.0, 0.5], atol=0.02)
     assert np.all(variables1 == variables2)
 
-    enopt_config["gradient"]["seed"] = (1, DEFAULT_SEED)
+    enopt_config["variables"]["seed"] = (1, DEFAULT_SEED)
     variables3 = BasicOptimizer(enopt_config, evaluator()).run().variables
     assert variables3 is not None
     assert np.allclose(variables3, [0.0, 0.0, 0.5], atol=0.02)

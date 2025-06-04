@@ -19,8 +19,6 @@ DIM = 5
 CONFIG: dict[str, Any] = {
     "variables": {
         "initial_values": 2 * np.arange(DIM) / DIM + 0.5,
-    },
-    "gradient": {
         "perturbation_magnitudes": 1e-6,
     },
 }

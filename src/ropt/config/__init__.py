@@ -4,10 +4,11 @@ This module defines a set of classes that are used to configure various aspects
 of an optimization process, including variables, objectives, constraints,
 realizations, samplers, and more.
 
-The central configuration class is [`EnOptConfig`][ropt.config.EnOptConfig],
-which encapsulates the complete configuration for a single optimization step. It
-is designed to be flexible and extensible, allowing users to customize the
-optimization process to their specific needs.
+The central configuration class for optimization is
+[`EnOptConfig`][ropt.config.EnOptConfig], which encapsulates the complete
+configuration for a single optimization step. It is designed to be flexible and
+extensible, allowing users to customize the optimization process to their
+specific needs.
 
 These configuration classes are built using
 [`pydantic`](https://docs.pydantic.dev/), which provides robust data validation
@@ -28,17 +29,6 @@ values using the `model_validate` method provided by `pydantic`.
 - **Centralized Configuration:** The
   [`EnOptConfig`][ropt.config.EnOptConfig] class provides a single point
   of entry for configuring an optimization step.
-- **Domain Transformations:**  The optimization process supports domain
-  transformations, as detailed in the [`ropt.transforms`][ropt.transforms]
-  module. These transformations map variables, objectives, and constraints
-  between the user-defined domain and the domain used by the optimizer. This
-  capability is valuable for operations such as scaling, shifting, or other
-  adjustments that can enhance the performance and stability of the optimization
-  algorithm. Domain transformations are implemented through a set of classes
-  that define the necessary mappings. When creating an `EnOptConfig` object,
-  transformation objects can be provided to automatically apply these
-  transformations during configuration validation.
-
 
 **Parsing and Validation**
 
