@@ -144,8 +144,6 @@ class SciPyOptimizer(Optimizer):
             self._supported_constraints,
             self._required_constraints,
         )
-        self._bounds = self._initialize_bounds()
-        self._constraints = self._initialize_constraints()
         self._options = self._parse_options()
         self._parallel = (
             self._config.optimizer.parallel and self._method == "differential_evolution"
@@ -166,7 +164,8 @@ class SciPyOptimizer(Optimizer):
         self._cached_function = None
         self._cached_gradient = None
 
-        initial_values = initial_values[self._config.variables.mask]
+        self._bounds = self._initialize_bounds()
+        self._constraints = self._initialize_constraints(initial_values)
 
         if self._method == "differential_evolution":
             if self._parallel:
@@ -174,7 +173,7 @@ class SciPyOptimizer(Optimizer):
                 self._options["workers"] = 1
             differential_evolution(
                 func=self._function,
-                x0=initial_values,
+                x0=initial_values[self._config.variables.mask],
                 bounds=self._bounds,
                 constraints=self._constraints,
                 polish=False,
@@ -184,7 +183,7 @@ class SciPyOptimizer(Optimizer):
         else:
             minimize(
                 fun=self._function,
-                x0=initial_values,
+                x0=initial_values[self._config.variables.mask],
                 tol=self._config.optimizer.tolerance,
                 method=self._method,
                 bounds=self._bounds,
@@ -245,7 +244,7 @@ class SciPyOptimizer(Optimizer):
         return None
 
     def _initialize_constraints(
-        self,
+        self, initial_values: NDArray[np.float64]
     ) -> list[dict[str, _ConstraintType] | NonlinearConstraint | LinearConstraint]:
         self._normalized_constraints = None
 
@@ -254,7 +253,9 @@ class SciPyOptimizer(Optimizer):
             tuple[NDArray[np.float64], NDArray[np.float64]] | None
         ) = None
         if self._config.linear_constraints is not None:
-            lin_coef, lin_lower, lin_upper = get_masked_linear_constraints(self._config)
+            lin_coef, lin_lower, lin_upper = get_masked_linear_constraints(
+                self._config, initial_values
+            )
             self._linear_constraint_bounds = (lin_lower, lin_upper)
         nonlinear_bounds = (
             None

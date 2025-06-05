@@ -478,7 +478,7 @@ class NormalizedConstraints:
 
 
 def get_masked_linear_constraints(
-    config: EnOptConfig,
+    config: EnOptConfig, initial_values: NDArray[np.float64]
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
     """Adjust linear constraints based on a variable mask.
 
@@ -499,8 +499,9 @@ def get_masked_linear_constraints(
     are removed entirely, as they become trivial constants.
 
     Args:
-        config: The [`EnOptConfig`][ropt.config.EnOptConfig] object
-                containing the variable mask and linear constraints.
+        config:         The [`EnOptConfig`][ropt.config.EnOptConfig] object
+                        containing the variable mask and linear constraints.
+        initial_values: The initial values to use.
 
     Returns:
         The adjusted coefficients and bounds.
@@ -516,9 +517,7 @@ def get_masked_linear_constraints(
         coefficients = coefficients[keep_rows, :]
         lower_bounds = lower_bounds[keep_rows]
         upper_bounds = upper_bounds[keep_rows]
-        offsets = np.matmul(
-            coefficients[:, ~mask], config.variables.initial_values[~mask]
-        )
+        offsets = np.matmul(coefficients[:, ~mask], initial_values[~mask])
         coefficients = coefficients[:, mask]
     else:
         offsets = 0
