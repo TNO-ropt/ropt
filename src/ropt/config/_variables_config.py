@@ -39,9 +39,8 @@ class VariablesConfig(BaseModel):
     to specify the initial values, bounds, types, and an optional mask for the
     variables.
 
-    The `initial_values` field is a required `numpy` array that sets the
-    starting values for the variables. The number of variables is determined by
-    the length of this array.
+    The `variables` field is required and determines the number of variables,
+    including both free and fixed variables.
 
     The `lower_bounds` and `upper_bounds` fields define the bounds for each
     variable. These are also `numpy` arrays and are broadcasted to match the
@@ -98,7 +97,7 @@ class VariablesConfig(BaseModel):
 
     Attributes:
         types:                    Optional variable types.
-        initial_values:           Initial values for the variables.
+        variable_count:           Number of variables.
         lower_bounds:             Lower bounds for the variables (default: $-\infty$).
         upper_bounds:             Upper bounds for the variables (default: $+\infty$).
         mask:                     Optional boolean mask indicating free variables.
@@ -115,8 +114,8 @@ class VariablesConfig(BaseModel):
         seed:                     Seed for the random number generator used by the samplers.
     """
 
+    variable_count: int
     types: ArrayEnum = np.array(VariableType.REAL)
-    initial_values: Array1D = np.array(0.0)
     lower_bounds: Array1D = np.array(-np.inf)
     upper_bounds: Array1D = np.array(np.inf)
     mask: Array1DBool = np.array(1)
@@ -153,16 +152,13 @@ class VariablesConfig(BaseModel):
     @model_validator(mode="after")
     def _broadcast_and_transform(self, info: ValidationInfo) -> Self:
         lower_bounds = broadcast_1d_array(
-            self.lower_bounds, "lower_bounds", self.initial_values.size
+            self.lower_bounds, "lower_bounds", self.variable_count
         )
         upper_bounds = broadcast_1d_array(
-            self.upper_bounds, "upper_bounds", self.initial_values.size
+            self.upper_bounds, "upper_bounds", self.variable_count
         )
 
         if info.context is not None and info.context.variables is not None:
-            self.initial_values = immutable_array(
-                info.context.variables.to_optimizer(self.initial_values)
-            )
             lower_bounds = info.context.variables.to_optimizer(lower_bounds)
             upper_bounds = info.context.variables.to_optimizer(upper_bounds)
 
@@ -173,20 +169,20 @@ class VariablesConfig(BaseModel):
         self.lower_bounds = immutable_array(lower_bounds)
         self.upper_bounds = immutable_array(upper_bounds)
 
-        self.types = broadcast_1d_array(self.types, "types", self.initial_values.size)
-        self.mask = broadcast_1d_array(self.mask, "mask", self.initial_values.size)
+        self.types = broadcast_1d_array(self.types, "types", self.variable_count)
+        self.mask = broadcast_1d_array(self.mask, "mask", self.variable_count)
 
         self.perturbation_magnitudes = np.broadcast_to(
-            self.perturbation_magnitudes, self.initial_values.shape
+            self.perturbation_magnitudes, (self.variable_count,)
         )
         self.boundary_types = np.broadcast_to(
-            self.boundary_types, self.initial_values.shape
+            self.boundary_types, (self.variable_count,)
         )
         self.perturbation_types = np.broadcast_to(
-            self.perturbation_types, self.initial_values.shape
+            self.perturbation_types, (self.variable_count,)
         )
 
-        self.samplers = np.broadcast_to(self.samplers, self.initial_values.shape)
+        self.samplers = np.broadcast_to(self.samplers, (self.variable_count,))
 
         if info.context is not None and info.context.variables is not None:
             absolute = self.perturbation_types == PerturbationType.ABSOLUTE

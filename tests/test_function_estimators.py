@@ -8,6 +8,8 @@ from numpy.typing import NDArray
 from ropt.exceptions import ConfigError
 from ropt.plan import BasicOptimizer
 
+initial_values = 3 * [0]
+
 
 @pytest.fixture(name="enopt_config")
 def enopt_config_fixture() -> dict[str, Any]:
@@ -24,7 +26,7 @@ def enopt_config_fixture() -> dict[str, Any]:
         },
         "realizations": {"weights": 5 * [1.0]},
         "variables": {
-            "initial_values": 3 * [0],
+            "variable_count": len(initial_values),
             "perturbation_magnitudes": 0.01,
         },
     }
@@ -47,7 +49,7 @@ def test_stddev_function_estimator_merge_error(
             "realizations in the gradient."
         ),
     ):
-        BasicOptimizer(enopt_config, evaluator(test_functions)).run()
+        BasicOptimizer(enopt_config, evaluator(test_functions)).run(initial_values)
 
 
 def test_mean_stddev_function_estimator(
@@ -59,7 +61,11 @@ def test_mean_stddev_function_estimator(
     enopt_config["objectives"]["weights"].extend([0.75, 0.25])
     enopt_config["objectives"]["function_estimators"] = [0, 0, 1, 1]
     enopt_config["function_estimators"] = [{"method": "mean"}, {"method": "stddev"}]
-    variables = BasicOptimizer(enopt_config, evaluator(test_functions)).run().variables
+    variables = (
+        BasicOptimizer(enopt_config, evaluator(test_functions))
+        .run(initial_values)
+        .variables
+    )
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -97,6 +103,8 @@ def test_stddev_function_estimator(
 
     enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
     enopt_config["function_estimators"] = [{"method": "stddev"}]
-    variables = BasicOptimizer(enopt_config, evaluator(functions)).run().variables
+    variables = (
+        BasicOptimizer(enopt_config, evaluator(functions)).run(initial_values).variables
+    )
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)

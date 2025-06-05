@@ -259,7 +259,7 @@ def test_variable_perturbation_enopt() -> None:
 
     config_dict = {
         "variables": {
-            "initial_values": [0.0] * len(variables),
+            "variable_count": len(variables),
             "lower_bounds": 0.0,
             "perturbation_magnitudes": 0.05,
         },

@@ -12,6 +12,8 @@ pytest.importorskip("pandas")
 
 import pandas as pd
 
+initial_values = [0.0, 0.0, 0.1]
+
 
 @pytest.fixture(name="enopt_config")
 def enopt_config_fixture() -> dict[str, Any]:
@@ -21,7 +23,7 @@ def enopt_config_fixture() -> dict[str, Any]:
             "max_functions": 3,
         },
         "variables": {
-            "initial_values": [0.0, 0.0, 0.1],
+            "variable_count": 3,
             "upper_bounds": 1.0,
             "lower_bounds": -1.0,
             "perturbation_magnitudes": 0.01,
@@ -57,7 +59,7 @@ def test_dataframe_results_no_results(enopt_config: Any, evaluator: Any) -> None
     frames: list[pd.DataFrame] = []
     BasicOptimizer(enopt_config, evaluator()).set_results_callback(
         partial(_handle_results, frames=frames, fields=set(), result_type="functions"),
-    ).run()
+    ).run(initial_values)
     assert not frames
 
 
@@ -73,7 +75,7 @@ def test_dataframe_results_function_results(enopt_config: Any, evaluator: Any) -
             },
             result_type="functions",
         ),
-    ).run()
+    ).run(initial_values)
     frame = pd.concat(frames)
     assert len(frame) == 3
     assert list(frame.columns.get_level_values(level=0)) == [
@@ -94,7 +96,7 @@ def test_dataframe_results_function_results_formatted_names(
             },
             result_type="functions",
         ),
-    ).run()
+    ).run(initial_values)
     frame = pd.concat(frames)
     assert len(frame) == 3
     assert list(frame.columns.get_level_values(level=0)) == [
@@ -113,7 +115,7 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
             },
             result_type="gradients",
         ),
-    ).run()
+    ).run(initial_values)
     frame = pd.concat(frames)
     assert len(frame) == 3
     assert list(frame.columns.get_level_values(level=0)) == [
@@ -136,7 +138,7 @@ def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
             result_type="functions",
             metadata={"foo": {"bar": 1}},
         ),
-    ).run()
+    ).run(initial_values)
     frame = pd.concat(frames)
     assert len(frame) == 3
     assert list(frame.columns.get_level_values(level=0)) == [

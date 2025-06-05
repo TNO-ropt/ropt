@@ -18,12 +18,14 @@ pandas = pytest.importorskip("pandas")
 from ropt.config import EnOptConfig
 from ropt.results._pandas import _to_series
 
+initial_values = [0.0, 0.0]
+
 
 @pytest.fixture(name="enopt_config")
 def enopt_config_fixture() -> dict[str, Any]:
     return {
         "variables": {
-            "initial_values": [0.0, 0.0],
+            "variable_count": len(initial_values),
         },
         "objectives": {
             "weights": [0.75, 0.25],

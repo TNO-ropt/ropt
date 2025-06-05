@@ -16,9 +16,10 @@ from ropt.results import FunctionResults, Results
 
 DIM = 5
 
+initial_values = 2 * np.arange(DIM) / DIM + 0.5
 CONFIG: dict[str, Any] = {
     "variables": {
-        "initial_values": 2 * np.arange(DIM) / DIM + 0.5,
+        "variable_count": len(initial_values),
         "perturbation_magnitudes": 1e-6,
     },
 }
@@ -67,7 +68,10 @@ def run_optimization(config: dict[str, Any]) -> FunctionResults:
         The optimal results.
     """
     optimal_result = (
-        BasicOptimizer(config, rosenbrock).set_results_callback(report).run().results
+        BasicOptimizer(config, rosenbrock)
+        .set_results_callback(report)
+        .run(initial_values)
+        .results
     )
     assert optimal_result is not None
     assert optimal_result.functions is not None

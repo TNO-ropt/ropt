@@ -12,12 +12,14 @@ from ropt.config import (
 from ropt.enums import BoundaryType, PerturbationType
 from ropt.transforms import OptModelTransforms, VariableScaler
 
+initial_values = np.array([1, 2])
+
 
 @pytest.fixture(name="enopt_config")
 def enopt_config_fixture() -> dict[str, Any]:
     return {
         "variables": {
-            "initial_values": np.array([1, 2]),
+            "variable_count": len(initial_values),
         },
         "objectives": {
             "weights": [1.0],
@@ -69,8 +71,10 @@ def test_check_linear_constraints_vector_shapes() -> None:
 
 
 def test_check_perturbations() -> None:
-    VariablesConfig()
-    variables = VariablesConfig(perturbation_magnitudes=np.array([0.1]))
+    VariablesConfig(variable_count=1)
+    variables = VariablesConfig(
+        variable_count=1, perturbation_magnitudes=np.array([0.1])
+    )
     assert variables.perturbation_magnitudes == np.array([0.1])
 
 
@@ -158,7 +162,7 @@ def test_perturbation_types(enopt_config: Any) -> None:
     ):
         config = EnOptConfig.model_validate(enopt_config)
 
-    enopt_config["variables"]["initial_values"] = [0.0, 0.0, 0.0]
+    enopt_config["variables"]["variable_count"] = 3
     enopt_config["variables"]["lower_bounds"] = [0.0, 100.0, 0.0]
     enopt_config["variables"]["upper_bounds"] = [np.inf, 600.0, 1.0]
     enopt_config["variables"].update(
@@ -193,7 +197,7 @@ def test_perturbation_types_with_scaler(enopt_config: Any) -> None:
     ):
         config = EnOptConfig.model_validate(enopt_config)
 
-    enopt_config["variables"]["initial_values"] = [0.0, 0.0, 0.0]
+    enopt_config["variables"]["variable_count"] = 3
     enopt_config["variables"]["lower_bounds"] = [0.0, 100.0, 0.0]
     enopt_config["variables"]["upper_bounds"] = [np.inf, 600.0, 1.0]
 

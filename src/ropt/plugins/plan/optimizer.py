@@ -101,9 +101,9 @@ class DefaultOptimizerStep(PlanStep):
     def run_step_from_plan(
         self,
         config: EnOptConfig,
+        variables: ArrayLike,
         *,
         transforms: OptModelTransforms | None = None,
-        variables: ArrayLike | None = None,
         nested_optimization: NestedOptimizationCallable | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> ExitCode:
@@ -160,12 +160,12 @@ class DefaultOptimizerStep(PlanStep):
             Event(event_type=EventType.START_OPTIMIZER_STEP, data=event_data)
         )
 
-        if variables is None:
-            variables = self._config.variables.initial_values
-        else:
-            variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
-            if self._transforms is not None and self._transforms.variables is not None:
-                variables = self._transforms.variables.to_optimizer(variables)
+        variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
+        if variables.shape != (self._config.variables.variable_count,):
+            msg = "The input variables have the wrong shape"
+            raise ValueError(msg)
+        if self._transforms is not None and self._transforms.variables is not None:
+            variables = self._transforms.variables.to_optimizer(variables)
 
         evaluator = self.plan.get_evaluator(self)
         ensemble_evaluator = EnsembleEvaluator(

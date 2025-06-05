@@ -15,6 +15,8 @@ from ropt.plugins.sampler.base import Sampler, SamplerPlugin
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
+initial_values = [0.0, 0.0, 0.0]
+
 
 @pytest.fixture(name="enopt_config")
 def enopt_config_fixture() -> dict[str, Any]:
@@ -35,7 +37,7 @@ def enopt_config_fixture() -> dict[str, Any]:
             "number_of_perturbations": 3,
         },
         "variables": {
-            "initial_values": [0, 0, 0],
+            "variable_count": len(initial_values),
             "upper_bounds": 1.0,
             "lower_bounds": -1.0,
             "perturbation_magnitudes": 0.01,
@@ -56,12 +58,13 @@ class MockedSampler(Sampler):
         self._mask = mask
         # This sampler only works if the number of perturbation equals the
         # number of variables:
-        assert enopt_config.gradient.number_of_perturbations == len(
-            enopt_config.variables.initial_values
+        assert (
+            enopt_config.gradient.number_of_perturbations
+            == enopt_config.variables.variable_count
         )
 
     def generate_samples(self) -> NDArray[np.float64]:
-        variable_count = self._config.variables.initial_values.size
+        variable_count = self._config.variables.variable_count
         realization_count = self._config.realizations.weights.size
         perturbation_count = self._config.gradient.number_of_perturbations
 
@@ -154,7 +157,7 @@ def test_sampler_order(enopt_config: Any, evaluator: Any) -> None:
         {"method": "norm"},
         {"method": "uniform"},
     ]
-    variables1 = BasicOptimizer(enopt_config, evaluator()).run().variables
+    variables1 = BasicOptimizer(enopt_config, evaluator()).run(initial_values).variables
     assert variables1 is not None
     assert np.allclose(variables1, [0, 0, 0.5], atol=0.025)
 
@@ -164,7 +167,7 @@ def test_sampler_order(enopt_config: Any, evaluator: Any) -> None:
         {"method": "norm"},
     ]
     enopt_config["variables"]["samplers"] = [1, 1, 0]
-    variables2 = BasicOptimizer(enopt_config, evaluator()).run().variables
+    variables2 = BasicOptimizer(enopt_config, evaluator()).run(initial_values).variables
     assert variables2 is not None
     assert np.allclose(variables2, [0, 0, 0.5], atol=0.025)
 

@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Self
 
+import numpy as np
+
 from ropt.config import EnOptConfig
 from ropt.enums import EventType, ExitCode
 from ropt.exceptions import StepAborted
@@ -15,8 +17,7 @@ from ._plan import Plan
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    import numpy as np
-    from numpy.typing import NDArray
+    from numpy.typing import ArrayLike, NDArray
 
     from ropt.evaluator import EvaluatorContext, EvaluatorResult
     from ropt.plan import Event
@@ -163,7 +164,7 @@ class BasicOptimizer:
         """
         return self._results.exit_code
 
-    def run(self) -> Self:
+    def run(self, initial_values: ArrayLike) -> Self:
         """Run the optimization process.
 
         This method initiates the optimization workflow defined by the
@@ -209,7 +210,11 @@ class BasicOptimizer:
                     callback=function,
                     sources={optimizer},
                 )
-            exit_code = optimizer.run(config=self._config, transforms=self._transforms)
+            exit_code = optimizer.run(
+                variables=np.asarray(initial_values, dtype=np.float64),
+                config=self._config,
+                transforms=self._transforms,
+            )
             results = tracker["results"]
             variables = None if results is None else results.evaluations.variables
         else:

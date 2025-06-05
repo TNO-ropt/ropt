@@ -37,37 +37,7 @@ The configuration classes are built using
 The primary configuration class is [`EnOptConfig`][ropt.config.EnOptConfig], and
 it contains nested configuration classes for various aspects of the
 optimization. To parse a configuration from a dictionary, use the
-[`model_validate`][pydantic.BaseModel.model_validate] class method:
-
-```py
-from ropt.config import EnOptConfig
-
-config_dict = {
-    "variables": {
-        "initial_values": [10.0, 10.0],
-    }
-}
-config = EnOptConfig.model_validate(config_dict)
-config.variables.initial_values  # [10.0, 10.0]
-```
-
-Domain transformation objects from the [`ropt.transforms`][ropt.transforms]
-module can be passed to the `model_validate` method via the `context` parameter:
-
-```py
-from ropt.config import EnOptConfig
-from ropt.transforms import OptModelTransforms, VariableScaler
-
-config_dict = {
-    "variables": {
-        "initial_values": [10.0, 10.0],
-    }
-}
-scaler = VariableScaler([10.0, 5.0], None)
-config = EnOptConfig.model_validate(
-    config_dict, context=OptModelTransforms(variables=scaler)
-)
-config.variables.initial_values  # [1.0, 2.0]
+[`model_validate`][pydantic.BaseModel.model_validate] class method.
 ```
 
 

@@ -12,6 +12,8 @@ from ropt.plugins.realization_filter.default import (
 )
 from ropt.results import FunctionResults, GradientResults, Results
 
+initial_values = 3 * [0]
+
 
 @pytest.fixture(name="enopt_config")
 def enopt_config_fixture() -> dict[str, Any]:
@@ -30,7 +32,7 @@ def enopt_config_fixture() -> dict[str, Any]:
             "weights": 5 * [1.0],
         },
         "variables": {
-            "initial_values": 3 * [0],
+            "variable_count": 3,
             "perturbation_magnitudes": 0.01,
         },
     }
@@ -121,7 +123,9 @@ def test_sort_filter_on_objectives(
 
     enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
 
-    variables = BasicOptimizer(enopt_config, evaluator(functions)).run().variables
+    variables = (
+        BasicOptimizer(enopt_config, evaluator(functions)).run(initial_values).variables
+    )
     assert variables is not None
     assert not np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -141,7 +145,7 @@ def test_sort_filter_on_objectives(
     results = (
         BasicOptimizer(enopt_config, evaluator(functions))
         .set_results_callback(partial(_track_results, result_list=result_list))
-        .run()
+        .run(initial_values)
         .results
     )
     assert results is not None
@@ -197,7 +201,7 @@ def test_sort_filter_on_objectives_with_constraints(
     results = (
         BasicOptimizer(enopt_config, evaluator(functions))
         .set_results_callback(partial(_track_results, result_list=result_list))
-        .run()
+        .run(initial_values)
         .results
     )
     assert results is not None
@@ -261,7 +265,7 @@ def test_sort_filter_on_constraints(
         .set_results_callback(
             partial(_track_results, result_list=result_list),
         )
-        .run()
+        .run(initial_values)
         .results
     )
     assert results is not None
@@ -333,7 +337,7 @@ def test_sort_filter_mixed(  # noqa: C901
     results = (
         BasicOptimizer(enopt_config, evaluator(functions))
         .set_results_callback(_add_objective)
-        .run()
+        .run(initial_values)
         .results
     )
     assert results is not None
@@ -371,7 +375,7 @@ def test_sort_filter_mixed(  # noqa: C901
     results = (
         BasicOptimizer(enopt_config, evaluator(functions))
         .set_results_callback(_add_objective)
-        .run()
+        .run(initial_values)
         .results
     )
     assert results is not None
@@ -400,7 +404,9 @@ def test_cvar_filter_on_objectives(
 
     enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
 
-    variables = BasicOptimizer(enopt_config, evaluator(functions)).run().variables
+    variables = (
+        BasicOptimizer(enopt_config, evaluator(functions)).run(initial_values).variables
+    )
     assert variables is not None
     assert not np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -420,7 +426,7 @@ def test_cvar_filter_on_objectives(
         .set_results_callback(
             partial(_track_results, result_list=result_list),
         )
-        .run()
+        .run(initial_values)
         .results
     )
     assert results is not None
@@ -477,7 +483,7 @@ def test_cvar_filter_on_objectives_with_constraints(
         .set_results_callback(
             partial(_track_results, result_list=result_list),
         )
-        .run()
+        .run(initial_values)
         .results
     )
     assert results is not None
@@ -541,7 +547,7 @@ def test_cvar_filter_on_constraints(
         .set_results_callback(
             partial(_track_results, result_list=result_list),
         )
-        .run()
+        .run(initial_values)
         .results
     )
     assert results is not None
@@ -611,7 +617,7 @@ def test_cvar_filter_mixed(
     results = (
         BasicOptimizer(enopt_config, evaluator(functions))
         .set_results_callback(_add_objective)
-        .run()
+        .run(initial_values)
         .results
     )
     assert results is not None
@@ -648,7 +654,7 @@ def test_cvar_filter_mixed(
     results = (
         BasicOptimizer(enopt_config, evaluator(functions))
         .set_results_callback(_add_objective)
-        .run()
+        .run(initial_values)
         .results
     )
     assert results is not None

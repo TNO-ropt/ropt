@@ -11,12 +11,14 @@ from ropt.results import GradientResults, Results
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
+initial_values = [0.0, 0.0, 0.1]
+
 
 @pytest.fixture(name="enopt_config")
 def enopt_config_fixture() -> dict[str, Any]:
     return {
         "variables": {
-            "initial_values": [0.0, 0.0, 0.1],
+            "variable_count": len(initial_values),
             "perturbation_magnitudes": 0.01,
         },
         "optimizer": {
@@ -34,7 +36,7 @@ def test_scipy_samplers_unconstrained(
     enopt_config: Any, method: str, evaluator: Any
 ) -> None:
     enopt_config["samplers"] = [{"method": method}]
-    variables = BasicOptimizer(enopt_config, evaluator()).run().variables
+    variables = BasicOptimizer(enopt_config, evaluator()).run(initial_values).variables
     assert variables is not None
     assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
 
@@ -43,9 +45,11 @@ def test_scipy_indexed_sampler(enopt_config: Any, evaluator: Any) -> None:
     # Removing the second variable will fix its value, since it will not be
     # perturbed and its gradient will always be zero.
     enopt_config["variables"]["samplers"] = [0, -1, 0]
-    enopt_config["variables"]["initial_values"][1] = 0.1
 
-    variables = BasicOptimizer(enopt_config, evaluator()).run().variables
+    initial = initial_values.copy()
+    initial[1] = 0.1
+
+    variables = BasicOptimizer(enopt_config, evaluator()).run(initial).variables
     assert variables is not None
     assert pytest.approx(variables[0]) != 0.0
     assert pytest.approx(variables[1]) == 0.1
@@ -68,7 +72,7 @@ def test_scipy_samplers_shared(enopt_config: Any, method: str, evaluator: Any) -
     variables1 = (
         BasicOptimizer(enopt_config, evaluator())
         .set_results_callback(partial(_observer, tag="result1"))
-        .run()
+        .run(initial_values)
         .variables
     )
     assert variables1 is not None
@@ -77,7 +81,7 @@ def test_scipy_samplers_shared(enopt_config: Any, method: str, evaluator: Any) -
     variables2 = (
         BasicOptimizer(enopt_config, evaluator())
         .set_results_callback(partial(_observer, tag="result2"))
-        .run()
+        .run(initial_values)
         .variables
     )
     assert variables2 is not None

@@ -102,7 +102,7 @@ class SciPySampler(Sampler):
 
         # noqa
         """
-        variable_count = self._enopt_config.variables.initial_values.size
+        variable_count = self._enopt_config.variables.variable_count
         realization_count = self._enopt_config.realizations.weights.size
         perturbation_count = self._enopt_config.gradient.number_of_perturbations
 
@@ -140,7 +140,7 @@ class SciPySampler(Sampler):
             sampler = _STATS_SAMPLERS[self._method]
         elif self._method in _QMC_ENGINES:
             sample_dim = (
-                self._enopt_config.variables.initial_values.size
+                self._enopt_config.variables.variable_count
                 if self._mask is None
                 else self._mask.sum()
             )

@@ -85,14 +85,13 @@ class EnOptConfig(BaseModel):
 
     @model_validator(mode="after")
     def _check_linear_constraints(self) -> Self:
-        if self.linear_constraints is not None:
-            variable_count = self.variables.initial_values.size
-            if (
-                self.linear_constraints.coefficients.shape[0] > 0
-                and self.linear_constraints.coefficients.shape[1] != variable_count
-            ):
-                msg = f"the coefficients matrix should have {variable_count} columns"
-                raise ValueError(msg)
+        if self.linear_constraints is not None and (
+            self.linear_constraints.coefficients.shape[0] > 0
+            and self.linear_constraints.coefficients.shape[1]
+            != self.variables.variable_count
+        ):
+            msg = f"the coefficients matrix should have {self.variables.variable_count} columns"
+            raise ValueError(msg)
         return self
 
     @model_validator(mode="wrap")  # type: ignore[arg-type]

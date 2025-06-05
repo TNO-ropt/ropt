@@ -102,7 +102,10 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
             Event(event_type=EventType.START_ENSEMBLE_EVALUATOR_STEP, data=event_data)
         )
 
-        variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
+        variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=2)
+        if variables.shape[-1] != config.variables.variable_count:
+            msg = "The input variables have the wrong shape"
+            raise ValueError(msg)
         if transforms is not None and transforms.variables is not None:
             variables = transforms.variables.to_optimizer(variables)
 

@@ -14,9 +14,10 @@ from ropt.evaluator import EvaluatorContext, EvaluatorResult
 from ropt.plan import BasicOptimizer
 from ropt.results import FunctionResults, Results
 
+initial_values = 2 * [0.0]
 CONFIG: dict[str, Any] = {
     "variables": {
-        "initial_values": 2 * [0.0],
+        "variable_count": len(initial_values),
         "types": VariableType.INTEGER,
         "lower_bounds": [0.0, 0.0],
         "upper_bounds": [10.0, 10.0],
@@ -63,7 +64,10 @@ def report(results: tuple[Results, ...]) -> None:
 def run_optimization() -> None:
     """Run the optimization."""
     optimal_result = (
-        BasicOptimizer(CONFIG, function).set_results_callback(report).run().results
+        BasicOptimizer(CONFIG, function)
+        .set_results_callback(report)
+        .run(initial_values)
+        .results
     )
     assert optimal_result is not None
     assert optimal_result.functions is not None
