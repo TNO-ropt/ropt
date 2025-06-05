@@ -166,7 +166,7 @@ class SciPyOptimizer(Optimizer):
         self._cached_function = None
         self._cached_gradient = None
 
-        initial_values = initial_values[..., self._config.variables.mask]
+        initial_values = initial_values[self._config.variables.mask]
 
         if self._method == "differential_evolution":
             if self._parallel:
