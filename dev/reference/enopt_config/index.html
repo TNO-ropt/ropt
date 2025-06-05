@@ -1689,134 +1689,20 @@ values using the <code>model_validate</code> method provided by <code>pydantic</
 The primary configuration class is <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>, and
 it contains nested configuration classes for various aspects of the
 optimization. To parse a configuration from a dictionary, use the
-<a class="autorefs autorefs-external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel.model_validate"><code>model_validate</code></a> class method:</p>
-<div class="language-py highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnOptConfig</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">config_dict</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="s2">&quot;initial_values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">],</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="p">}</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">config</span> <span class="o">=</span> <span class="n">EnOptConfig</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">config_dict</span><span class="p">)</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">config</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">initial_values</span>  <span class="c1"># [10.0, 10.0]</span>
-</span></code></pre></div>
-<p>Domain transformation objects from the <a class="autorefs autorefs-internal" title="            ropt.transforms" href="../domain_transforms/#ropt.transforms"><code>ropt.transforms</code></a>
-module can be passed to the <code>model_validate</code> method via the <code>context</code> parameter:</p>
-<div class="language-py highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnOptConfig</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.transforms</span><span class="w"> </span><span class="kn">import</span> <span class="n">OptModelTransforms</span><span class="p">,</span> <span class="n">VariableScaler</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">config_dict</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>        <span class="s2">&quot;initial_values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">],</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="p">}</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">}</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="n">scaler</span> <span class="o">=</span> <span class="n">VariableScaler</span><span class="p">([</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="n">config</span> <span class="o">=</span> <span class="n">EnOptConfig</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="n">config_dict</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">OptModelTransforms</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="n">scaler</span><span class="p">)</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="p">)</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="n">config</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">initial_values</span>  <span class="c1"># [1.0, 2.0]</span>
-</span></code></pre></div>
-
-
-<p><span class="doc-section-title">Classes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.EnOptConfig)" href="#ropt.config.EnOptConfig">EnOptConfig</a></code></td>
-            <td>
-              <div class="doc-md-description">
-                <p>The main configuration class for an optimization step.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><a class="autorefs autorefs-internal" title="            VariablesConfig (ropt.config.VariablesConfig)" href="#ropt.config.VariablesConfig">VariablesConfig</a></code></td>
-            <td>
-              <div class="doc-md-description">
-                <p>Configuration for variables.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><a class="autorefs autorefs-internal" title="            ObjectiveFunctionsConfig (ropt.config.ObjectiveFunctionsConfig)" href="#ropt.config.ObjectiveFunctionsConfig">ObjectiveFunctionsConfig</a></code></td>
-            <td>
-              <div class="doc-md-description">
-                <p>Configuration for objective functions.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><a class="autorefs autorefs-internal" title="            LinearConstraintsConfig (ropt.config.LinearConstraintsConfig)" href="#ropt.config.LinearConstraintsConfig">LinearConstraintsConfig</a></code></td>
-            <td>
-              <div class="doc-md-description">
-                <p>Configuration for linear constraints.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><a class="autorefs autorefs-internal" title="            NonlinearConstraintsConfig (ropt.config.NonlinearConstraintsConfig)" href="#ropt.config.NonlinearConstraintsConfig">NonlinearConstraintsConfig</a></code></td>
-            <td>
-              <div class="doc-md-description">
-                <p>Configuration for non-linear constraints.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><a class="autorefs autorefs-internal" title="            RealizationsConfig (ropt.config.RealizationsConfig)" href="#ropt.config.RealizationsConfig">RealizationsConfig</a></code></td>
-            <td>
-              <div class="doc-md-description">
-                <p>Configuration for realizations.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><a class="autorefs autorefs-internal" title="            OptimizerConfig (ropt.config.OptimizerConfig)" href="#ropt.config.OptimizerConfig">OptimizerConfig</a></code></td>
-            <td>
-              <div class="doc-md-description">
-                <p>Configuration for the optimizer.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><a class="autorefs autorefs-internal" title="            GradientConfig (ropt.config.GradientConfig)" href="#ropt.config.GradientConfig">GradientConfig</a></code></td>
-            <td>
-              <div class="doc-md-description">
-                <p>Configuration for gradient calculations.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig (ropt.config.FunctionEstimatorConfig)" href="#ropt.config.FunctionEstimatorConfig">FunctionEstimatorConfig</a></code></td>
-            <td>
-              <div class="doc-md-description">
-                <p>Configuration for function estimators.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><a class="autorefs autorefs-internal" title="            RealizationFilterConfig (ropt.config.RealizationFilterConfig)" href="#ropt.config.RealizationFilterConfig">RealizationFilterConfig</a></code></td>
-            <td>
-              <div class="doc-md-description">
-                <p>Configuration for realization filters.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><a class="autorefs autorefs-internal" title="            SamplerConfig (ropt.config.SamplerConfig)" href="#ropt.config.SamplerConfig">SamplerConfig</a></code></td>
-            <td>
-              <div class="doc-md-description">
-                <p>Configuration for samplers.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+<a class="autorefs autorefs-external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel.model_validate"><code>model_validate</code></a> class method.
+```</p>
+<p>Classes:
+    EnOptConfig:                The main configuration class for an optimization step.
+    VariablesConfig:            Configuration for variables.
+    ObjectiveFunctionsConfig:   Configuration for objective functions.
+    LinearConstraintsConfig:    Configuration for linear constraints.
+    NonlinearConstraintsConfig: Configuration for non-linear constraints.
+    RealizationsConfig:         Configuration for realizations.
+    OptimizerConfig:            Configuration for the optimizer.
+    GradientConfig:             Configuration for gradient calculations.
+    FunctionEstimatorConfig:    Configuration for function estimators.
+    RealizationFilterConfig:    Configuration for realization filters.
+    SamplerConfig:              Configuration for samplers.</p>
 
 
 
@@ -2058,9 +1944,8 @@ number of variables or have a size of one.</p>
 variables. It is used in an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object
 to specify the initial values, bounds, types, and an optional mask for the
 variables.</p>
-<p>The <code>initial_values</code> field is a required <code>numpy</code> array that sets the
-starting values for the variables. The number of variables is determined by
-the length of this array.</p>
+<p>The <code>variables</code> field is required and determines the number of variables,
+including both free and fixed variables.</p>
 <p>The <code>lower_bounds</code> and <code>upper_bounds</code> fields define the bounds for each
 variable. These are also <code>numpy</code> arrays and are broadcasted to match the
 number of variables. By default, they are set to negative and positive
@@ -2142,18 +2027,13 @@ parallel plan evaluations.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.VariablesConfig.initial_values">initial_values</span></code></td>
+            <td><code><span title="ropt.config.VariablesConfig.variable_count">variable_count</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            Array1D
-
-
-  
-      module-attribute
-   (ropt.config.validated_types.Array1D)" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Initial values for the variables.</p>
+                <p>Number of variables.</p>
               </div>
             </td>
           </tr>
