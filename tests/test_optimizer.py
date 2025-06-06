@@ -754,18 +754,18 @@ def test_rng(enopt_config: Any, evaluator: Any, external: str) -> None:
     assert not np.all(variables3 == variables1)
 
 
-def test_zero_weight_objective(
+def test_arbitrary_objective_weights(
     enopt_config: Any, evaluator: Any, external: str, test_functions: Any
 ) -> None:
     enopt_config["optimizer"]["method"] = f"{external}{_SLSQP}"
-    test_functions = (
+    new_functions = (
         *test_functions,
         lambda variables, _: test_functions[1](variables, None),
     )
 
     enopt_config["objectives"]["weights"] = [0.75, 0.25, -0.25]
     variables = (
-        BasicOptimizer(enopt_config, evaluator(test_functions))
+        BasicOptimizer(enopt_config, evaluator(new_functions))
         .run(initial_values)
         .variables
     )
@@ -774,9 +774,22 @@ def test_zero_weight_objective(
 
     enopt_config["objectives"]["weights"] = [0.75, 0.25, 0.0]
     variables = (
-        BasicOptimizer(enopt_config, evaluator(test_functions))
+        BasicOptimizer(enopt_config, evaluator(new_functions))
         .run(initial_values)
         .variables
     )
     assert variables is not None
     assert np.allclose(variables, [0, 0, 0.5], atol=0.02)
+
+    enopt_config["objectives"]["weights"] = [0.75, 0.5, -0.25]
+    variables = (
+        BasicOptimizer(enopt_config, evaluator(new_functions))
+        .run(initial_values)
+        .variables
+    )
+    assert variables is not None
+    assert np.allclose(variables, [0, 0, 0.5], atol=0.02)
+
+    enopt_config["objectives"]["weights"] = [-0.75, -0.25]
+    with pytest.raises(ValidationError, match="The sum of weights is not positive"):
+        EnOptConfig.model_validate(enopt_config)

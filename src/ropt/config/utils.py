@@ -32,7 +32,7 @@ def normalize(array: NDArray[np.float64]) -> NDArray[np.float64]:
                     (i.e., less than or equal to machine epsilon).
     """
     if array.sum() < np.finfo(np.float64).eps:
-        msg = "the sum of weights is not positive"
+        msg = "The sum of weights is not positive"
         raise ValueError(msg)
     return immutable_array(array / array.sum())
 
