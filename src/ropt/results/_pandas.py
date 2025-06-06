@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
 import pandas as pd
 
@@ -29,18 +29,12 @@ def _to_dataframe(
             raise ValueError(msg)
         series = _to_series(result_field, split_field if key else field, key, names)
         if series is not None:
-            series = pd.concat(
+            frame = pd.concat(
                 {(0 if batch_id is None else batch_id): series}, names=["batch_id"]
-            )
-            assert series is not None
-            frame = series.to_frame()
-            for axis in unstack:
-                if axis.value in frame.index.names:
-                    frame = cast(
-                        "pd.DataFrame",
-                        frame.unstack(axis.value, sort=False),  # type:ignore[call-arg]  # noqa: PD010
-                    )
-            frame.columns = frame.columns.to_flat_index()  # type:ignore[no-untyped-call]
+            ).to_frame()
+            levels = [axis.value for axis in unstack if axis.value in frame.index.names]
+            frame = frame.unstack(levels, sort=False)  # noqa: PD010
+            frame.columns = frame.columns.to_flat_index()
             if joined_frame.empty:
                 joined_frame = frame
             else:
@@ -69,13 +63,13 @@ def _to_series(
         data = data[key]
     axes = result_field.get_axes(field)
     indices = [
-        pd.RangeIndex(data.shape[idx]) if index is None else index
+        list(range(data.shape[idx])) if index is None else index
         for idx, index in enumerate(names.get(axis) for axis in axes)
     ]
     series: pd.Series[Any]
     if indices:
         multi_index = pd.MultiIndex.from_product(
-            indices, names=(axis.value for axis in axes)
+            indices, names=tuple(axis.value for axis in axes)
         )
         series = pd.Series(
             data.flatten(), index=multi_index, name=f"{field}.{key}" if key else field
