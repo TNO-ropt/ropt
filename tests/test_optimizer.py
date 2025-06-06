@@ -752,3 +752,31 @@ def test_rng(enopt_config: Any, evaluator: Any, external: str) -> None:
     assert variables3 is not None
     assert np.allclose(variables3, [0.0, 0.0, 0.5], atol=0.02)
     assert not np.all(variables3 == variables1)
+
+
+def test_zero_weight_objective(
+    enopt_config: Any, evaluator: Any, external: str, test_functions: Any
+) -> None:
+    enopt_config["optimizer"]["method"] = f"{external}{_SLSQP}"
+    test_functions = (
+        *test_functions,
+        lambda variables, _: test_functions[1](variables, None),
+    )
+
+    enopt_config["objectives"]["weights"] = [0.75, 0.25, -0.25]
+    variables = (
+        BasicOptimizer(enopt_config, evaluator(test_functions))
+        .run(initial_values)
+        .variables
+    )
+    assert variables is not None
+    assert not np.allclose(variables, [0, 0, 0.5], atol=0.02)
+
+    enopt_config["objectives"]["weights"] = [0.75, 0.25, 0.0]
+    variables = (
+        BasicOptimizer(enopt_config, evaluator(test_functions))
+        .run(initial_values)
+        .variables
+    )
+    assert variables is not None
+    assert np.allclose(variables, [0, 0, 0.5], atol=0.02)
