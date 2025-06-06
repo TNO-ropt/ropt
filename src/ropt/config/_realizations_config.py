@@ -53,14 +53,18 @@ class RealizationsConfig(BaseModel):
         arbitrary_types_allowed=True,
         extra="forbid",
         validate_default=True,
+        frozen=True,
     )
 
     @model_validator(mode="after")
     def _broadcast_normalize_and_check(self) -> Self:
-        self.weights = normalize(self.weights)
-        if (
-            self.realization_min_success is None
-            or self.realization_min_success > self.weights.size
-        ):
-            self.realization_min_success = self.weights.size
-        return self
+        weights = normalize(self.weights)
+        realization_min_success = self.realization_min_success
+        if realization_min_success is None or realization_min_success > weights.size:
+            realization_min_success = weights.size
+        return self.model_copy(
+            update={
+                "weights": weights,
+                "realization_min_success": realization_min_success,
+            }
+        )

@@ -19,6 +19,7 @@ class _ConfigBaseModel(BaseModel):
         extra="forbid",
         str_min_length=1,
         str_strip_whitespace=True,
+        frozen=True,
     )
 
 
@@ -48,7 +49,7 @@ class SortObjectiveOptions(_ConfigBaseModel):
         last:  The ending rank (0-based index) of realizations to select after sorting.
     """
 
-    sort: list[NonNegativeInt]
+    sort: tuple[NonNegativeInt]
     first: NonNegativeInt
     last: NonNegativeInt
 
@@ -113,7 +114,7 @@ class CVaRObjectiveOptions(_ConfigBaseModel):
                     worst realizations to consider. Defaults to 0.5.
     """
 
-    sort: list[NonNegativeInt]
+    sort: tuple[NonNegativeInt]
     percentile: Annotated[float, Field(gt=0.0, le=1.0)] = 0.5
 
 

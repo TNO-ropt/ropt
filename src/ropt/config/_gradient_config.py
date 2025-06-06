@@ -76,13 +76,17 @@ class GradientConfig(BaseModel):
         arbitrary_types_allowed=True,
         extra="forbid",
         validate_default=True,
+        frozen=True,
     )
 
     @model_validator(mode="after")
     def _check_perturbation_min_success(self) -> Self:
+        perturbation_min_success = self.perturbation_min_success
         if (
-            self.perturbation_min_success is None
-            or self.perturbation_min_success > self.number_of_perturbations
+            perturbation_min_success is None
+            or perturbation_min_success > self.number_of_perturbations
         ):
-            self.perturbation_min_success = self.number_of_perturbations
-        return self
+            perturbation_min_success = self.number_of_perturbations
+        return self.model_copy(
+            update={"perturbation_min_success": perturbation_min_success}
+        )

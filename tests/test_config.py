@@ -71,9 +71,9 @@ def test_check_linear_constraints_vector_shapes() -> None:
 
 
 def test_check_perturbations() -> None:
-    VariablesConfig(variable_count=1)
-    variables = VariablesConfig(
-        variable_count=1, perturbation_magnitudes=np.array([0.1])
+    VariablesConfig.model_validate({"variable_count": 1})
+    variables = VariablesConfig.model_validate(
+        {"variable_count": 1, "perturbation_magnitudes": np.array([0.1])}
     )
     assert variables.perturbation_magnitudes == np.array([0.1])
 
@@ -109,18 +109,22 @@ def test_check_config_perturbations(enopt_config: Any) -> None:
     config_copy["variables"]["perturbation_magnitudes"] = [1] * 3
     with pytest.raises(
         ValueError,
-        match="operands could not be broadcast together",
+        match="perturbation_magnitudes cannot be broadcasted to a length of 2",
     ):
         EnOptConfig.model_validate(config_copy)
 
     config_copy = copy.deepcopy(enopt_config)
     config_copy["variables"]["boundary_types"] = [BoundaryType.TRUNCATE_BOTH] * 3
-    with pytest.raises(ValueError, match="operands could not be broadcast together"):
+    with pytest.raises(
+        ValueError, match="boundary_types cannot be broadcasted to a length of 2"
+    ):
         EnOptConfig.model_validate(config_copy)
 
     config_copy = copy.deepcopy(enopt_config)
     config_copy["variables"]["perturbation_types"] = [PerturbationType.ABSOLUTE] * 3
-    with pytest.raises(ValueError, match="operands could not be broadcast together"):
+    with pytest.raises(
+        ValueError, match="perturbation_types cannot be broadcasted to a length of 2"
+    ):
         EnOptConfig.model_validate(config_copy)
 
 

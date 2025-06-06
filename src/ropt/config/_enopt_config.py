@@ -65,22 +65,23 @@ class EnOptConfig(BaseModel):
     """
 
     variables: VariablesConfig
-    objectives: ObjectiveFunctionsConfig = ObjectiveFunctionsConfig()
+    objectives: ObjectiveFunctionsConfig = ObjectiveFunctionsConfig.model_validate({})
     linear_constraints: LinearConstraintsConfig | None = None
     nonlinear_constraints: NonlinearConstraintsConfig | None = None
-    realizations: RealizationsConfig = RealizationsConfig()
-    optimizer: OptimizerConfig = OptimizerConfig()
-    gradient: GradientConfig = GradientConfig()
+    realizations: RealizationsConfig = RealizationsConfig.model_validate({})
+    optimizer: OptimizerConfig = OptimizerConfig.model_validate({})
+    gradient: GradientConfig = GradientConfig.model_validate({})
     realization_filters: tuple[RealizationFilterConfig, ...] = ()
     function_estimators: tuple[FunctionEstimatorConfig, ...] = (
-        FunctionEstimatorConfig(),
+        FunctionEstimatorConfig.model_validate({}),
     )
-    samplers: tuple[SamplerConfig, ...] = (SamplerConfig(),)
+    samplers: tuple[SamplerConfig, ...] = (SamplerConfig.model_validate({}),)
     names: dict[str, tuple[str | int, ...]] = {}
 
     model_config = ConfigDict(
         extra="forbid",
         validate_default=True,
+        frozen=True,
     )
 
     @model_validator(mode="after")

@@ -7,7 +7,7 @@ from typing import Self
 import numpy as np
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from ropt.config.utils import immutable_array, normalize
+from ropt.config.utils import broadcast_1d_array, normalize
 from ropt.config.validated_types import (  # noqa: TC001
     Array1D,
     Array1DInt,
@@ -57,15 +57,20 @@ class ObjectiveFunctionsConfig(BaseModel):
         arbitrary_types_allowed=True,
         extra="forbid",
         validate_default=True,
+        frozen=True,
     )
 
     @model_validator(mode="after")
     def _broadcast_and_normalize(self) -> Self:
-        self.weights = normalize(self.weights)
-        self.realization_filters = immutable_array(
-            np.broadcast_to(self.realization_filters, self.weights.shape)
+        weights = normalize(self.weights)
+        return self.model_copy(
+            update={
+                "weights": normalize(self.weights),
+                "realization_filters": broadcast_1d_array(
+                    self.realization_filters, "realization_filters", weights.size
+                ),
+                "function_estimators": broadcast_1d_array(
+                    self.function_estimators, "function_estimators", weights.size
+                ),
+            }
         )
-        self.function_estimators = immutable_array(
-            np.broadcast_to(self.function_estimators, self.weights.shape)
-        )
-        return self

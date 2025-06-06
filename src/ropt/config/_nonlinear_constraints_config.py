@@ -7,7 +7,7 @@ from typing import Self
 import numpy as np
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from ropt.config.utils import broadcast_arrays, immutable_array
+from ropt.config.utils import broadcast_1d_array, broadcast_arrays
 from ropt.config.validated_types import (  # noqa: TC001
     Array1D,
     Array1DInt,
@@ -62,6 +62,7 @@ class NonlinearConstraintsConfig(BaseModel):
         arbitrary_types_allowed=True,
         extra="forbid",
         validate_default=True,
+        frozen=True,
     )
 
     @model_validator(mode="after")
@@ -69,12 +70,15 @@ class NonlinearConstraintsConfig(BaseModel):
         lower_bounds, upper_bounds = broadcast_arrays(
             self.lower_bounds, self.upper_bounds
         )
-        self.lower_bounds = immutable_array(lower_bounds)
-        self.upper_bounds = immutable_array(upper_bounds)
-        self.realization_filters = immutable_array(
-            np.broadcast_to(self.realization_filters, self.lower_bounds.shape)
+        return self.model_copy(
+            update={
+                "lower_bounds": lower_bounds,
+                "upper_bounds": upper_bounds,
+                "realization_filters": broadcast_1d_array(
+                    self.realization_filters, "realization_filters", lower_bounds.size
+                ),
+                "function_estimators": broadcast_1d_array(
+                    self.function_estimators, "function_estimators", lower_bounds.size
+                ),
+            }
         )
-        self.function_estimators = immutable_array(
-            np.broadcast_to(self.function_estimators, self.lower_bounds.shape)
-        )
-        return self

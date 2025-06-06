@@ -66,6 +66,7 @@ class LinearConstraintsConfig(BaseModel):
         arbitrary_types_allowed=True,
         extra="forbid",
         validate_default=True,
+        frozen=True,
     )
 
     @model_validator(mode="after")
@@ -81,13 +82,18 @@ class LinearConstraintsConfig(BaseModel):
                     coefficients, lower_bounds, upper_bounds
                 )
             )
+            coefficients = immutable_array(coefficients)
+            lower_bounds = immutable_array(lower_bounds)
+            upper_bounds = immutable_array(upper_bounds)
 
         if np.any(lower_bounds > upper_bounds):
             msg = "The lower bounds are larger than the upper bounds."
             raise ValueError(msg)
 
-        self.coefficients = immutable_array(coefficients)
-        self.lower_bounds = immutable_array(lower_bounds)
-        self.upper_bounds = immutable_array(upper_bounds)
-
-        return self
+        return self.model_copy(
+            update={
+                "coefficients": coefficients,
+                "lower_bounds": lower_bounds,
+                "upper_bounds": upper_bounds,
+            }
+        )

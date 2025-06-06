@@ -58,7 +58,7 @@ class OptionsSchemaModel(BaseModel):
 
     methods: dict[str, MethodSchemaModel[Any]]
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", frozen=True)
 
     def get_options_model(self, method: str) -> type[BaseModel]:
         """Creates a Pydantic model for validating options of a specific method.
@@ -121,7 +121,7 @@ class MethodSchemaModel(BaseModel, Generic[T]):
     options: dict[str, T]
     url: HttpUrl | None = None
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", frozen=True)
 
 
 def gen_options_table(schema: dict[str, Any]) -> str:

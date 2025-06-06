@@ -13,7 +13,11 @@ from pydantic import (
     model_validator,
 )
 
-from ropt.config.utils import broadcast_1d_array, check_enum_values, immutable_array
+from ropt.config.utils import (
+    broadcast_1d_array,
+    check_enum_values,
+    immutable_array,
+)
 from ropt.config.validated_types import (  # noqa: TC001  # noqa: TC001
     Array1D,
     Array1DBool,
@@ -129,6 +133,7 @@ class VariablesConfig(BaseModel):
         arbitrary_types_allowed=True,
         extra="forbid",
         validate_default=True,
+        frozen=True,
     )
 
     @field_validator("types", mode="after")
@@ -151,61 +156,57 @@ class VariablesConfig(BaseModel):
 
     @model_validator(mode="after")
     def _broadcast_and_transform(self, info: ValidationInfo) -> Self:
-        lower_bounds = broadcast_1d_array(
-            self.lower_bounds, "lower_bounds", self.variable_count
+        dim = self.variable_count
+        lower_bounds = broadcast_1d_array(self.lower_bounds, "lower_bounds", dim)
+        upper_bounds = broadcast_1d_array(self.upper_bounds, "upper_bounds", dim)
+        types = broadcast_1d_array(self.types, "types", dim)
+        mask = broadcast_1d_array(self.mask, "mask", dim)
+        perturbation_magnitudes = broadcast_1d_array(
+            self.perturbation_magnitudes, "perturbation_magnitudes", dim
         )
-        upper_bounds = broadcast_1d_array(
-            self.upper_bounds, "upper_bounds", self.variable_count
+        perturbation_types = broadcast_1d_array(
+            self.perturbation_types, "perturbation_types", dim
         )
+        boundary_types = broadcast_1d_array(self.boundary_types, "boundary_types", dim)
+        samplers = broadcast_1d_array(self.samplers, "samplers", dim)
 
         if info.context is not None and info.context.variables is not None:
-            lower_bounds = info.context.variables.to_optimizer(lower_bounds)
-            upper_bounds = info.context.variables.to_optimizer(upper_bounds)
+            lower_bounds = immutable_array(
+                info.context.variables.to_optimizer(lower_bounds)
+            )
+            upper_bounds = immutable_array(
+                info.context.variables.to_optimizer(upper_bounds)
+            )
+            absolute = perturbation_types == PerturbationType.ABSOLUTE
+            transformed = info.context.variables.magnitudes_to_optimizer(
+                perturbation_magnitudes
+            )
+            perturbation_magnitudes = immutable_array(
+                np.where(absolute, transformed, perturbation_magnitudes)
+            )
 
         if np.any(lower_bounds > upper_bounds):
             msg = "The lower bounds are larger than the upper bounds."
             raise ValueError(msg)
 
-        self.lower_bounds = immutable_array(lower_bounds)
-        self.upper_bounds = immutable_array(upper_bounds)
-
-        self.types = broadcast_1d_array(self.types, "types", self.variable_count)
-        self.mask = broadcast_1d_array(self.mask, "mask", self.variable_count)
-
-        self.perturbation_magnitudes = np.broadcast_to(
-            self.perturbation_magnitudes, (self.variable_count,)
-        )
-        self.boundary_types = np.broadcast_to(
-            self.boundary_types, (self.variable_count,)
-        )
-        self.perturbation_types = np.broadcast_to(
-            self.perturbation_types, (self.variable_count,)
-        )
-
-        self.samplers = np.broadcast_to(self.samplers, (self.variable_count,))
-
-        if info.context is not None and info.context.variables is not None:
-            absolute = self.perturbation_types == PerturbationType.ABSOLUTE
-            transformed = info.context.variables.magnitudes_to_optimizer(
-                self.perturbation_magnitudes
-            )
-            self.perturbation_magnitudes = np.where(
-                absolute, transformed, self.perturbation_magnitudes
-            )
-
-        relative = self.perturbation_types == PerturbationType.RELATIVE
+        relative = perturbation_types == PerturbationType.RELATIVE
         if not np.all(
             np.logical_and(
-                np.isfinite(self.lower_bounds[relative]),
-                np.isfinite(self.upper_bounds[relative]),
+                np.isfinite(lower_bounds[relative]), np.isfinite(upper_bounds[relative])
             ),
         ):
             msg = "The variable bounds must be finite to use relative perturbations"
             raise ValueError(msg)
 
-        self.perturbation_magnitudes = immutable_array(self.perturbation_magnitudes)
-        self.boundary_types = immutable_array(self.boundary_types)
-        self.perturbation_types = immutable_array(self.perturbation_types)
-        self.samplers = immutable_array(self.samplers)
-
-        return self
+        return self.model_copy(
+            update={
+                "types": types,
+                "lower_bounds": lower_bounds,
+                "upper_bounds": upper_bounds,
+                "mask": mask,
+                "perturbation_magnitudes": perturbation_magnitudes,
+                "perturbation_types": perturbation_types,
+                "boundary_types": boundary_types,
+                "samplers": samplers,
+            }
+        )
