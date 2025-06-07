@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Any, Literal
+from typing import Any, Final, Literal
 
 import pytest
 
@@ -13,6 +13,10 @@ pytest.importorskip("pandas")
 import pandas as pd
 
 initial_values = [0.0, 0.0, 0.1]
+
+_NAMES: Final[dict[str, tuple[str | int, ...]]] = {
+    AxisName.VARIABLE: tuple(f"a:{idx}" for idx in range(1, 4)),
+}
 
 
 @pytest.fixture(name="enopt_config")
@@ -34,9 +38,6 @@ def enopt_config_fixture() -> dict[str, Any]:
         "gradient": {
             "evaluation_policy": "speculative",
         },
-        "names": {
-            AxisName.VARIABLE: tuple(f"a:{idx}" for idx in range(1, 4)),
-        },
     }
 
 
@@ -46,10 +47,13 @@ def _handle_results(
     fields: set[str],
     result_type: Literal["functions", "gradients"],
     metadata: dict[str, Any] | None = None,
+    names: dict[str, tuple[str | int, ...]] | None = None,
 ) -> None:
-    if metadata is not None:
-        for item in results:
+    for item in results:
+        if metadata is not None:
             item.metadata = metadata
+        if names is not None:
+            item.names = _NAMES
     frame = results_to_dataframe(results, fields, result_type=result_type)
     if not frame.empty:
         frames.append(frame)
@@ -64,7 +68,6 @@ def test_dataframe_results_no_results(enopt_config: Any, evaluator: Any) -> None
 
 
 def test_dataframe_results_function_results(enopt_config: Any, evaluator: Any) -> None:
-    del enopt_config["names"]
     frames: list[pd.DataFrame] = []
     BasicOptimizer(enopt_config, evaluator()).set_results_callback(
         partial(
@@ -95,6 +98,7 @@ def test_dataframe_results_function_results_formatted_names(
                 "evaluations.variables",
             },
             result_type="functions",
+            names=_NAMES,
         ),
     ).run(initial_values)
     frame = pd.concat(frames)
@@ -114,6 +118,7 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
                 "gradients.weighted_objective",
             },
             result_type="gradients",
+            names=_NAMES,
         ),
     ).run(initial_values)
     frame = pd.concat(frames)
@@ -124,7 +129,6 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
 
 
 def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
-    del enopt_config["names"]
     frames: list[pd.DataFrame] = []
     BasicOptimizer(enopt_config, evaluator()).set_results_callback(
         partial(

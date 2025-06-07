@@ -33,14 +33,6 @@ class EnOptConfig(BaseModel):
     which is an array of indices specifying the sampler to use for each
     variable.
 
-    The optional `names` attribute is a dictionary that stores the names of the
-    various entities, such as variables, objectives, and constraints. The
-    supported name types are defined in the [`AxisName`][ropt.enums.AxisName]
-    enumeration. This information is optional, as it is not strictly necessary
-    for the optimization, but it can be useful for labeling and interpreting
-    results. For instance, when present, it is used to create a multi-index
-    results that are exported as data frames.
-
     Info:
         Many nested configuration classes use `numpy` arrays. These arrays
         typically have a size determined by a configured property (e.g., the
@@ -61,7 +53,6 @@ class EnOptConfig(BaseModel):
         realization_filters:   Configuration for realization filters.
         function_estimators:   Configuration for function estimators.
         samplers:              Configuration for samplers.
-        names:                 Optional mapping of axis types to names.
     """
 
     variables: VariablesConfig
@@ -76,7 +67,6 @@ class EnOptConfig(BaseModel):
         FunctionEstimatorConfig.model_validate({}),
     )
     samplers: tuple[SamplerConfig, ...] = (SamplerConfig.model_validate({}),)
-    names: dict[str, tuple[str | int, ...]] = {}
 
     model_config = ConfigDict(
         extra="forbid",

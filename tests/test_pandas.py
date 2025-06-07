@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Final
 
 import numpy as np
 import pytest
@@ -15,10 +15,15 @@ from ropt.results import (
 )
 
 pandas = pytest.importorskip("pandas")
-from ropt.config import EnOptConfig
 from ropt.results._pandas import _to_series
 
 initial_values = [0.0, 0.0]
+
+NAMES: Final[dict[str, tuple[str | int, ...]]] = {
+    AxisName.VARIABLE: ("va", "vb"),
+    AxisName.REALIZATION: ("ra", "rb", "rc"),
+    AxisName.OBJECTIVE: ("fa", "fb"),
+}
 
 
 @pytest.fixture(name="enopt_config")
@@ -36,16 +41,11 @@ def enopt_config_fixture() -> dict[str, Any]:
         "gradient": {
             "number_of_perturbations": 5,
         },
-        "names": {
-            AxisName.VARIABLE: ("va", "vb"),
-            AxisName.REALIZATION: ("ra", "rb", "rc"),
-            AxisName.OBJECTIVE: ("fa", "fb"),
-        },
     }
 
 
 @pytest.fixture(name="function_result")
-def function_result_fixture(enopt_config: dict[str, Any]) -> FunctionResults:
+def function_result_fixture() -> FunctionResults:
     evaluations = FunctionEvaluations.create(
         variables=np.array([1.0, 2.0]),
         objectives=np.arange(6, dtype=np.float64).reshape((3, 2)),
@@ -58,11 +58,10 @@ def function_result_fixture(enopt_config: dict[str, Any]) -> FunctionResults:
     functions = Functions.create(
         weighted_objective=np.array(1.0), objectives=np.array([1.0, 2.0])
     )
-    config = EnOptConfig.model_validate(enopt_config)
     return FunctionResults(
         batch_id=1,
         metadata={},
-        names=config.names,
+        names=NAMES,
         evaluations=evaluations,
         realizations=realizations,
         functions=functions,
@@ -70,7 +69,7 @@ def function_result_fixture(enopt_config: dict[str, Any]) -> FunctionResults:
 
 
 @pytest.fixture(name="gradient_result")
-def gradient_result_fixture(enopt_config: dict[str, Any]) -> GradientResults:
+def gradient_result_fixture() -> GradientResults:
     evaluations = GradientEvaluations(
         variables=np.array([1.0, 2.0]),
         perturbed_variables=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
@@ -81,11 +80,10 @@ def gradient_result_fixture(enopt_config: dict[str, Any]) -> GradientResults:
         weighted_objective=np.array([1.0, 2.0]),
         objectives=np.arange(4, dtype=np.float64).reshape((2, 2)),
     )
-    config = EnOptConfig.model_validate(enopt_config)
     return GradientResults(
         batch_id=1,
         metadata={},
-        names=config.names,
+        names=NAMES,
         evaluations=evaluations,
         realizations=Realizations(
             active_realizations=np.ones(36, dtype=np.bool_),

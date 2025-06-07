@@ -728,8 +728,6 @@ def test_evaluator_cache(
     names: list[str] | None,
 ) -> None:
     enopt_config["realizations"] = {"weights": [0.75, 0.25]}
-    if names is not None:
-        enopt_config["names"] = {"realization": names}
 
     completed_functions = 0
     completed_test_functions = 0
@@ -744,6 +742,8 @@ def test_evaluator_cache(
         nonlocal completed_functions
 
         for item in event.data["results"]:
+            if names is not None:
+                item.names = {"realization": names}
             if isinstance(item, FunctionResults):
                 completed_functions += 1
                 if completed_functions == 3:

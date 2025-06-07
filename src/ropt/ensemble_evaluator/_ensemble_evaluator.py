@@ -214,7 +214,7 @@ class EnsembleEvaluator:
         return FunctionResults(
             batch_id=f_eval_results.batch_id,
             metadata={},
-            names=self._config.names,
+            names={},
             evaluations=evaluations,
             realizations=Realizations(
                 active_realizations=active_realizations,
@@ -294,7 +294,7 @@ class EnsembleEvaluator:
             GradientResults(
                 batch_id=g_eval_results.batch_id,
                 metadata={},
-                names=self._config.names,
+                names={},
                 evaluations=GradientEvaluations.create(
                     variables=variables,
                     perturbed_variables=perturbed_variables,
@@ -365,7 +365,7 @@ class EnsembleEvaluator:
         function_results = FunctionResults(
             batch_id=f_eval_results.batch_id,
             metadata={},
-            names=self._config.names,
+            names={},
             evaluations=evaluations,
             realizations=Realizations(
                 active_realizations=active_realizations,
@@ -411,7 +411,7 @@ class EnsembleEvaluator:
         gradient_results = GradientResults(
             batch_id=g_eval_results.batch_id,
             metadata={},
-            names=self._config.names,
+            names={},
             evaluations=GradientEvaluations.create(
                 variables=variables,
                 perturbed_variables=perturbed_variables,
