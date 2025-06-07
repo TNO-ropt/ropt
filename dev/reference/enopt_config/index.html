@@ -1745,13 +1745,6 @@ within the tuples. For example,
 <a class="autorefs autorefs-internal" title="            GradientConfig" href="#ropt.config.GradientConfig"><code>GradientConfig</code></a> uses a <code>samplers</code> field,
 which is an array of indices specifying the sampler to use for each
 variable.</p>
-<p>The optional <code>names</code> attribute is a dictionary that stores the names of the
-various entities, such as variables, objectives, and constraints. The
-supported name types are defined in the <a class="autorefs autorefs-internal" title="            AxisName" href="../enums/#ropt.enums.AxisName"><code>AxisName</code></a>
-enumeration. This information is optional, as it is not strictly necessary
-for the optimization, but it can be useful for labeling and interpreting
-results. For instance, when present, it is used to create a multi-index
-results that are exported as data frames.</p>
 
 
 <details class="info" open>
@@ -1882,17 +1875,6 @@ number of variables or have a size of one.</p>
             <td>
               <div class="doc-md-description">
                 <p>Configuration for samplers.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.EnOptConfig.names">names</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>, ...]]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional mapping of axis types to names.</p>
               </div>
             </td>
           </tr>
