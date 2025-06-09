@@ -710,10 +710,13 @@ def _cached_eval(
 
     realizations = context.realizations.copy()
     realizations[cached_indices] = [item[0] for item in cached.values()]
-    if obj._names is not None:
-        realizations = np.fromiter(
-            (obj._names[idx] for idx in realizations), dtype="U1"
-        )
+    names = (
+        None
+        if context.config.names is None
+        else context.config.names.get("realization")
+    )
+    if names is not None:
+        realizations = np.fromiter((names[idx] for idx in realizations), dtype="U1")
     results.evaluation_info["realizations"] = realizations
 
     return results
@@ -763,7 +766,7 @@ def test_evaluator_cache(
     step = plan.add_step("optimizer")
     tracker = plan.add_event_handler("tracker", sources={step}, what="last")
     cached_evaluator = plan.add_evaluator(
-        "cached_evaluator", clients={step}, sources={tracker}, names=names
+        "cached_evaluator", clients={step}, sources={tracker}
     )
 
     assert isinstance(cached_evaluator, DefaultCachedEvaluator)

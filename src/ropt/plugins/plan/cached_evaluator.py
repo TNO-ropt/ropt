@@ -49,7 +49,6 @@ class DefaultCachedEvaluator(Evaluator):
         clients: set[PlanComponent | str] | None = None,
         *,
         sources: list[EventHandler] | None = None,
-        names: list[int | str] | None = None,
     ) -> None:
         """Initialize the DefaultCachedEvaluator.
 
@@ -62,11 +61,9 @@ class DefaultCachedEvaluator(Evaluator):
             tags:    Optional tags for this evaluator.
             clients: Plan components (steps or tags) this evaluator serves.
             sources: `EventHandler` instances for retrieving cached results.
-            names:   Optional names of the realizations.
         """
         super().__init__(plan, tags, clients)
         self._sources: list[EventHandler] = [] if sources is None else sources
-        self._names = names
 
     def eval_cached(
         self, variables: NDArray[np.float64], context: EvaluatorContext
@@ -89,13 +86,13 @@ class DefaultCachedEvaluator(Evaluator):
         the `FunctionResults` object, using the realization index.
 
         Note:
-            If the object was initialized with realization names, these are used
-            to match the realizations of the requested evaluations, with those
-            in the cached results. This means that the results may originate
-            from a different optimization run, as long as the realization names
-            are still valid. However, in this case the results used for finding
-            cached values must also store the realization names, otherwise the
-            cached results will not be found.
+            If the optimization was initialized with realization names in the
+            configuration, these are used to match the realizations of the
+            requested evaluations, with those in the cached results. This means
+            that the results may originate from a different optimization run, as
+            long as the realization names are still valid. However, in this case
+            the results used for finding cached values must also store the
+            realization names, otherwise the cached results will not be found.
 
             If the configuration does not contain realization names, the
             realization indices are used to match the realizations of the
@@ -113,11 +110,10 @@ class DefaultCachedEvaluator(Evaluator):
         """
         cached: dict[int, tuple[int, FunctionResults]] = {}
 
+        names = context.config.names.get("realization")
         for idx in range(variables.shape[0]):
             realization_index = context.realizations[idx]
-            realization_name = (
-                self._names[realization_index] if self._names is not None else None
-            )
+            realization_name = names[realization_index] if names is not None else None
             results, cached_realization_index = _get_from_cache(
                 self._sources,
                 variables[idx, :],
