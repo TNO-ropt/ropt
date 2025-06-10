@@ -72,10 +72,8 @@ class EnOptConfig(BaseModel):
     optimizer: OptimizerConfig = OptimizerConfig.model_validate({})
     gradient: GradientConfig = GradientConfig.model_validate({})
     realization_filters: tuple[RealizationFilterConfig, ...] = ()
-    function_estimators: tuple[FunctionEstimatorConfig, ...] = (
-        FunctionEstimatorConfig.model_validate({}),
-    )
-    samplers: tuple[SamplerConfig, ...] = (SamplerConfig.model_validate({}),)
+    function_estimators: tuple[FunctionEstimatorConfig, ...] = ()
+    samplers: tuple[SamplerConfig, ...] = ()
     names: dict[str, tuple[str | int, ...]] = {}
 
     model_config = ConfigDict(
@@ -93,6 +91,19 @@ class EnOptConfig(BaseModel):
         ):
             msg = f"the coefficients matrix should have {self.variables.variable_count} columns"
             raise ValueError(msg)
+        return self
+
+    @model_validator(mode="after")
+    def _defaults(self) -> Self:
+        updates: dict[str, Any] = {}
+        if not self.function_estimators:
+            updates["function_estimators"] = (
+                FunctionEstimatorConfig.model_validate({}),
+            )
+        if not self.samplers:
+            updates["samplers"] = (SamplerConfig.model_validate({}),)
+        if updates:
+            return self.model_copy(update=updates)
         return self
 
     @model_validator(mode="wrap")  # type: ignore[arg-type]
