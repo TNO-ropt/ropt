@@ -114,7 +114,7 @@ convention = "google"
 
 [tool.mypy]
 strict = true
-plugins = ["numpy.typing.mypy_plugin", "pydantic.mypy"]
+plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
 module = ["scipy.*"]
