@@ -234,8 +234,10 @@ class ConstraintInfo(ResultField):
                 )
             )
 
-        if transforms.nonlinear_constraints is not None:
-            assert self.nonlinear_lower is not None
+        if (
+            transforms.nonlinear_constraints is not None
+            and self.nonlinear_lower is not None
+        ):
             assert self.nonlinear_upper is not None
             diffs["nonlinear_lower"], diffs["nonlinear_upper"] = (
                 transforms.nonlinear_constraints.nonlinear_constraint_diffs_from_optimizer(
