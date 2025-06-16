@@ -1383,6 +1383,92 @@ optimization tasks, allowing users to focus on defining the optimization
 problem and analyzing the results.</p>
 
 
+<details class="note" open>
+  <summary>Customization</summary>
+  <p>The optimization workflow executed by <code>BasicOptimizer</code> can be tailored
+in two main ways: by adding event handlers to the default workflow or by
+running an entirely different workflow. Customization can be configured
+using the <code>ROPT_OPTIONS</code> environment variable or a JSON configuration
+file.</p>
+<p>The <code>ROPT_OPTIONS</code> environment variable may contain a comma-separated
+list of options that are each parsed to obtain event handlers or plan
+steps. In addition if a JSON configuration file is found at
+<code>&lt;sys.prefix&gt;/share/ropt/options.json</code> (where <code>&lt;sys.prefix&gt;</code> is the
+Python installation prefix), it will read it to find additional handlers
+to install.</p>
+<ol>
+<li>
+<p><strong>Adding Custom Event Handlers (via <code>ROPT_OPTIONS</code> or JSON
+    configuration)</strong></p>
+<p>This method allows for custom processing of events emitted by the
+<em>default</em> optimization workflow, without replacing the workflow
+itself. This is useful for tasks like custom logging or data
+processing.</p>
+<p>Event handlers can be specified in two ways, and handlers from both
+sources will be combined:</p>
+<ul>
+<li>
+<p><strong><code>ROPT_OPTIONS</code> Environment Variable</strong>: If <code>ROPT_OPTIONS</code>
+    contains a comma-separated list of event handler names (and
+    these names do not match the "Custom Step Execution" format
+    described above), these handlers will be added to the default
+    optimization workflow. Each name must correspond to a registered
+    <code>EventHandler</code>.</p>
+</li>
+<li>
+<p><strong>JSON Configuration File</strong>: If a JSON configuration file is
+    found , <code>BasicOptimizer</code> will look for specific keys to load
+    additional event handlers. If this JSON file contains a
+    <code>basic_optimizer</code> key, and nested within it an <code>event_handlers</code>
+    key, the value of <code>event_handlers</code> should be a list of strings.
+    Each string in this list should be the name of a registered
+    <code>EventHandler</code>. These handlers will be added to those found via
+    <code>ROPT_OPTIONS</code>.</p>
+<p>Example <code>shared/ropt/options.json</code>:
+<div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nt">&quot;basic_optimizer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="nt">&quot;event_handlers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">            </span><span class="s2">&quot;custom_logger&quot;</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">            </span><span class="s2">&quot;extra/event_processor&quot;</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">        </span><span class="p">]</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">}</span>
+</span></code></pre></div></p>
+</li>
+</ul>
+<p>Note that if a custom optimization workflow is installed (see
+below), these custom handlers will be ignored.</p>
+</li>
+<li>
+<p><strong>Custom Step Execution (via <code>ROPT_OPTIONS</code>)</strong></p>
+<p>If the <code>ROPT_OPTIONS</code> environment variable contains an option in the
+format <code>step-name args</code> (where <code>args</code> is an optional list of
+space-separated argument strings), the named step will be executed
+<em>instead</em> of the standard optimization workflow.</p>
+<p>The custom step (<code>step-name</code>) must adhere to the following:</p>
+<ul>
+<li>It must be a registered <code>PlanStep</code>.</li>
+<li>Its <code>run</code> method  must accept:<ul>
+<li>An <code>evaluator</code> keyword argument, which will receive the
+    evaluator function passed to <code>BasicOptimizer</code>.</li>
+<li>An <code>args</code> keyword argument, which will receive the list of
+    argument strings parsed from <code>ROPT_OPTIONS</code>.</li>
+</ul>
+</li>
+<li>
+<p>This method must return a <em>callable</em> that:</p>
+<ul>
+<li>Accepts a <a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> object as its only argument.</li>
+<li>Returns an optimization <a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode</code></a>.</li>
+</ul>
+<p>This callable will then be executed by <code>BasicOptimizer</code> in place
+of its default workflow.</p>
+</li>
+</ul>
+</li>
+</ol>
+</details>
+
 
 
 
@@ -1587,8 +1673,7 @@ aborted, or encountered an error.</p>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">transforms</span><span class="p">:</span> <span class="n">OptModelTransforms</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="n">constraint_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">,</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1599,32 +1684,8 @@ optimization run. It requires an optimization configuration, optional
 domain transforms, and an evaluator, which together define the
 optimization problem and how to evaluate potential solutions. If a
 constraint value is within the <code>constraint_tolerance</code> of zero, it is
-considered satisfied. The <code>kwargs</code> may be used to define custom steps
-and event handlers to modify the behavior of the optimization process.</p>
+considered satisfied.</p>
 
-
-<details class="note" open>
-  <summary>Custom  steps</summary>
-  <p>The optional keyword arguments (<code>kwargs</code>) provide a mechanism to
-inject a custom step into the optimization process. The behavior is
-as follows:</p>
-<ol>
-<li><strong>Custom Step Execution:</strong> If a single keyword argument is
-    provided, the <code>BasicOptimizer</code> checks if a step with the same
-    name exists. If so, that step is executed immediately, receiving
-    the key-value pair as a keyword input, in addition to the
-    evaluator function (via the <code>evaluator</code> keyword). Only one
-    custom step can be executed this way, if other keyword arguments
-    are present an error is raised. The custom step receives the
-    <code>Plan</code> object and may return a custom function to execute.</li>
-<li><strong>Default Optimization:</strong> If no custom step is run, or if the
-    custom step does not return a custom run function, the default
-    optimization process is used.</li>
-<li><strong>Callback Installation and Execution:</strong> Finally, any callbacks
-    added via <code>set_abort_callback</code> or <code>set_results_callback</code> are
-    installed, and the appropriate run function is executed.</li>
-</ol>
-</details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>
@@ -1655,27 +1716,6 @@ as follows:</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>transforms</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.transforms.OptModelTransforms
-
-
-  
-      dataclass
-  " href="../domain_transforms/#ropt.transforms.OptModelTransforms">OptModelTransforms</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The transforms to apply to the model.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
                 <code>evaluator</code>
             </td>
             <td>
@@ -1702,6 +1742,27 @@ as follows:</p>
           </tr>
           <tr class="doc-section-item">
             <td>
+                <code>transforms</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.transforms.OptModelTransforms
+
+
+  
+      dataclass
+  " href="../domain_transforms/#ropt.transforms.OptModelTransforms">OptModelTransforms</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The transforms to apply to the model.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
                 <code>constraint_tolerance</code>
             </td>
             <td>
@@ -1714,22 +1775,6 @@ as follows:</p>
             </td>
             <td>
                   <code>1e-10</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>kwargs</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional keyword arguments.</p>
-              </div>
-            </td>
-            <td>
-                  <code>{}</code>
             </td>
           </tr>
       </tbody>
