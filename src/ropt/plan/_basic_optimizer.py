@@ -2,8 +2,14 @@
 
 from __future__ import annotations
 
+import json
+import os
+import sys
+from contextlib import suppress
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Self
+from functools import cache
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Iterator, Self
 
 import numpy as np
 
@@ -64,6 +70,89 @@ class BasicOptimizer:
     `BasicOptimizer` reduces the boilerplate code required for simple
     optimization tasks, allowing users to focus on defining the optimization
     problem and analyzing the results.
+
+    Note: Customization
+        The optimization workflow executed by `BasicOptimizer` can be tailored
+        in two main ways: by adding event handlers to the default workflow or by
+        running an entirely different workflow. Customization can be configured
+        using environment variables or a JSON configuration file.
+
+        The `ROPT_HANDLERS` environment variable may contain a comma-separated
+        list of options that are each parsed to obtain event handlers or plan
+        steps. In addition if a JSON configuration file is found at
+        `<sys.prefix>/share/ropt/options.json` (where `<sys.prefix>` is the
+        Python installation prefix), it will read it to find additional handlers
+        to install.
+
+        1.  **Adding Custom Event Handlers (via `ROPT_HANDLERS` or JSON
+            configuration)**
+
+            This method allows for custom processing of events emitted by the
+            *default* optimization workflow, without replacing the workflow
+            itself. This is useful for tasks like custom logging or data
+            processing.
+
+            Event handlers can be specified in two ways, and handlers from both
+            sources will be combined:
+
+            *   **`ROPT_HANDLERS` Environment Variable**: If `ROPT_HANDLERS`
+                contains a comma-separated list of event handler names (and
+                these names do not match the "Custom Step Execution" format
+                described above), these handlers will be added to the default
+                optimization workflow. Each name must correspond to a registered
+                `EventHandler`.
+
+            *   **JSON Configuration File**: If a JSON configuration file is
+                found at `<sys.prefix>/share/ropt/options.json` (where
+                `<sys.prefix>` is the Python installation prefix),
+                `BasicOptimizer` will look for specific keys to load additional
+                event handlers. If this JSON file contains a `basic_optimizer`
+                key, and nested within it an `event_handlers` key, the value of
+                `event_handlers` should be a list of strings. Each string in
+                this list should be the name of a registered `EventHandler`.
+                These handlers will be added to those found via `ROPT_HANDLERS`.
+
+                Example `shared/ropt/options.json`: ```json {
+                    "basic_optimizer": {
+                        "event_handlers": [
+                            "custom_logger", "extra/event_processor"
+                        ]
+                    }
+                }
+                ```
+
+            Note that if a custom optimization workflow is installed using the
+            `ROPT_SCRIPT` environment variable (see below), these custom
+            handlers will be ignored.
+
+        2.  **Custom Step Execution (via `ROPT_SCRIPT`)**
+
+            If the `ROPT_SCRIPT` environment variable contains an option in the
+            format `step-name=script.py` (where `script.py` may be any file),
+            the named step will be executed *instead* of the standard
+            optimization workflow, passing it the name of the script that
+            defines the new optimization workflow.
+
+            The custom step (`step-name`) must adhere to the following:
+
+            *   It must be a registered `PlanStep`.
+            *   Its `run` method  must accept: *   An `evaluator` keyword
+                argument, which will receive the
+                    evaluator function passed to `BasicOptimizer`.
+                *   A `script` keyword argument, which will receive the name of
+                    script passed via `ROPT_SCRIPT`.
+            *   This method must return a *callable* that: *   Accepts a
+                [`Plan`][ropt.plan.Plan] object as its only argument. *
+                Returns an optimization [`ExitCode`][ropt.enums.ExitCode].
+
+                This callable will then be executed by `BasicOptimizer` in place
+                of its default workflow.
+
+            As a short-cut is possible to also define `ROPT_SCRIPT` with only
+            the name of the script (i.e. `ROPT_SCRIPT=script.py`). In this case
+            a step with the name `run_plan` is assumed to exists and will be
+            used.
+
     """
 
     def __init__(
@@ -73,7 +162,6 @@ class BasicOptimizer:
         *,
         transforms: OptModelTransforms | None = None,
         constraint_tolerance: float = 1e-10,
-        **kwargs: Any,  # noqa: ANN401
     ) -> None:
         """Initialize a `BasicOptimizer` object.
 
@@ -82,35 +170,13 @@ class BasicOptimizer:
         domain transforms, and an evaluator, which together define the
         optimization problem and how to evaluate potential solutions. If a
         constraint value is within the `constraint_tolerance` of zero, it is
-        considered satisfied. The `kwargs` may be used to define custom steps
-        and event handlers to modify the behavior of the optimization process.
-
-        Note: Custom  steps
-            The optional keyword arguments (`kwargs`) provide a mechanism to
-            inject a custom step into the optimization process. The behavior is
-            as follows:
-
-            1.  **Custom Step Execution:** If a single keyword argument is
-                provided, the `BasicOptimizer` checks if a step with the same
-                name exists. If so, that step is executed immediately, receiving
-                the key-value pair as a keyword input, in addition to the
-                evaluator function (via the `evaluator` keyword). Only one
-                custom step can be executed this way, if other keyword arguments
-                are present an error is raised. The custom step receives the
-                `Plan` object and may return a custom function to execute.
-            2.  **Default Optimization:** If no custom step is run, or if the
-                custom step does not return a custom run function, the default
-                optimization process is used.
-            3.  **Callback Installation and Execution:** Finally, any callbacks
-                added via `set_abort_callback` or `set_results_callback` are
-                installed, and the appropriate run function is executed.
+        considered satisfied.
 
         Args:
             enopt_config:         The configuration for the optimization.
-            transforms:           The transforms to apply to the model.
             evaluator:            The evaluator object.
+            transforms:           The transforms to apply to the model.
             constraint_tolerance: The constraint violation tolerance.
-            kwargs:               Optional keyword arguments.
         """
         self._config = EnOptConfig.model_validate(enopt_config, context=transforms)
         self._transforms = transforms
@@ -119,7 +185,6 @@ class BasicOptimizer:
         self._plugin_manager = PluginManager()
         self._observers: list[tuple[EventType, Callable[[Event], None]]] = []
         self._results: _Results
-        self._kwargs: dict[str, Any] = kwargs
 
     @property
     def results(self) -> FunctionResults | None:
@@ -178,21 +243,11 @@ class BasicOptimizer:
         """
         plan = Plan(self._plugin_manager)
 
-        # Optionally run a custom step defined in the keyword arguments:
-        custom_function: Callable[[Plan], ExitCode] | None = None
-        key, value = next(iter(self._kwargs.items()), (None, None))
-        if key is not None and self._plugin_manager.is_supported(
-            "plan_step", method=key
-        ):
-            if len(self._kwargs) > 1:
-                msg = "Only one custom step is allowed."
-                raise TypeError(msg)
-            custom_function = plan.add_step(key).run(
-                evaluator=self._evaluator, **{key: value}
-            )
+        # Optionally run a custom step defined via the environment:
+        custom_function = self._get_custom_run_step(plan)
 
         if custom_function is None:
-            optimizer = plan.add_step("optimizer", tags={"__basic_optimizer__"})
+            optimizer = plan.add_step("optimizer")
             tracker = plan.add_event_handler(
                 "tracker",
                 constraint_tolerance=self._constraint_tolerance,
@@ -210,6 +265,10 @@ class BasicOptimizer:
                     callback=function,
                     sources={optimizer},
                 )
+
+            for handler in self._custom_event_handlers():
+                plan.add_event_handler(handler, sources={optimizer})
+
             exit_code = optimizer.run(
                 variables=np.asarray(initial_values, dtype=np.float64),
                 config=self._config,
@@ -289,3 +348,33 @@ class BasicOptimizer:
 
         self._observers.append((EventType.FINISHED_EVALUATION, _results_callback))
         return self
+
+    def _get_custom_run_step(self, plan: Plan) -> Callable[[Plan], ExitCode] | None:
+        if "ROPT_SCRIPT" in os.environ:
+            plan_step, sep, script = os.environ["ROPT_SCRIPT"].partition("=")
+            if not sep:
+                plan_step, script = "run_plan", plan_step
+            if self._plugin_manager.is_supported("plan_step", plan_step):
+                step: Callable[[Plan], ExitCode] = plan.add_step(plan_step).run(
+                    evaluator=self._evaluator, script=script
+                )
+                return step
+        return None
+
+    def _custom_event_handlers(self) -> Iterator[str]:
+        handlers = os.environ.get("ROPT_HANDLERS", "").split(",")
+        handlers += _get_option("event_handlers")
+        for handler in dict.fromkeys(handlers):
+            if self._plugin_manager.is_supported("event_handler", handler):
+                yield handler
+
+
+@cache
+def _get_option(option: str) -> list[str]:
+    path = Path(sys.prefix) / "share" / "ropt" / "options.json"
+    with (
+        suppress(OSError, json.JSONDecodeError),
+        path.open("r", encoding="utf-8") as file_obj,
+    ):
+        return list(json.load(file_obj).get("basic_optimizer", {}).get(option, []))
+    return []
