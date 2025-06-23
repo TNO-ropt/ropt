@@ -20,7 +20,6 @@ if TYPE_CHECKING:
 
     from ropt.evaluator import EvaluatorContext, EvaluatorResult
 
-# ruff: noqa: SLF001
 
 initial_values = np.array([0.0, 0.0, 0.1])
 

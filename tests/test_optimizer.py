@@ -715,7 +715,7 @@ def test_parallelize(enopt_config: Any, evaluator: Any, external: str) -> None:
     enopt_config["optimizer"]["parallel"] = False
     variables = (
         BasicOptimizer(enopt_config, evaluator())
-        .run([0.2] + initial_values[1:])
+        .run([0.2, *initial_values[1:]])
         .variables
     )
     assert variables is not None
@@ -724,7 +724,7 @@ def test_parallelize(enopt_config: Any, evaluator: Any, external: str) -> None:
     enopt_config["optimizer"]["parallel"] = True
     variables = (
         BasicOptimizer(enopt_config, evaluator())
-        .run([0.2] + initial_values[1:])
+        .run([0.2, *initial_values[1:]])
         .variables
     )
     assert variables is not None

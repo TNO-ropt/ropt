@@ -573,7 +573,7 @@ class EnsembleEvaluator:
     ) -> NDArray[np.float64]:
         if mask is None:
             return gradients
-        shape = gradients.shape[:-1] + (mask.size,)
+        shape = (*gradients.shape[:-1], mask.size)
         result = np.zeros(shape, dtype=np.float64)
         result[..., mask] = gradients
         return result

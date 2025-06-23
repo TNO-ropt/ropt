@@ -183,7 +183,7 @@ def test_scipy_bound_constraints(
     enopt_config["variables"]["upper_bounds"] = [0.5, 0.5, 0.2]
     variables = (
         BasicOptimizer(enopt_config, evaluator())
-        .run([0.2] + initial_values[1:])
+        .run([0.2, *initial_values[1:]])
         .variables
     )
     assert variables is not None

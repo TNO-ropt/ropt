@@ -119,7 +119,7 @@ def _get_select(field_name: str, sub_fields: set[str]) -> list[str]:
 
 def _add_prefix(name: tuple[str, ...] | str, prefix: str) -> tuple[str, ...] | str:
     return (
-        (f"{prefix}.{name[0]}",) + name[1:]
+        (f"{prefix}.{name[0]}", *name[1:])
         if isinstance(name, tuple)
         else f"{prefix}.{name}"
     )

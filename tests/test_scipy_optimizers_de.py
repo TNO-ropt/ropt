@@ -48,7 +48,7 @@ def test_scipy_bound_constraints_de(enopt_config: Any, evaluator: Any) -> None:
 
     variables = (
         BasicOptimizer(enopt_config, evaluator())
-        .run([0.2] + initial_values[1:])
+        .run([0.2, *initial_values[1:]])
         .variables
     )
     assert variables is not None
@@ -64,7 +64,7 @@ def test_scipy_bound_constraints_differential_evolution_de(
     enopt_config["realizations"] = {"realization_min_success": 0}
     variables1 = (
         BasicOptimizer(enopt_config, evaluator())
-        .run([0.2] + initial_values[1:])
+        .run([0.2, *initial_values[1:]])
         .variables
     )
     assert variables1 is not None
@@ -82,7 +82,7 @@ def test_scipy_bound_constraints_differential_evolution_de(
 
     variables2 = (
         BasicOptimizer(enopt_config, evaluator((_add_nan, test_functions[1])))
-        .run([0.2] + initial_values[1:])
+        .run([0.2, *initial_values[1:]])
         .variables
     )
     assert variables2 is not None
