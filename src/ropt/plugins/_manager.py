@@ -6,8 +6,6 @@ from functools import cache
 from importlib.metadata import entry_points
 from typing import TYPE_CHECKING, Any, Final, Literal
 
-from ropt.exceptions import ConfigError
-
 from .function_estimator.base import FunctionEstimatorPlugin
 from .optimizer.base import OptimizerPlugin
 from .plan.base import EvaluatorPlugin, EventHandlerPlugin, PlanStepPlugin
@@ -123,7 +121,7 @@ class PluginManager:
         name_lower = name.lower()
         if name_lower in self._plugins[plugin_type]:
             msg = f"Duplicate plugin name: {name_lower}"
-            raise ConfigError(msg)
+            raise ValueError(msg)
         if prioritize:
             plugins = self._plugins[plugin_type]
             self._plugins[plugin_type] = {name_lower: plugin}
@@ -140,7 +138,7 @@ class PluginManager:
         else:
             if split_method[0] == "default":
                 msg = "Cannot specify 'default' method without a plugin name"
-                raise ConfigError(msg)
+                raise ValueError(msg)
             for plugin in self._plugins[plugin_type].values():
                 if plugin.allows_discovery() and plugin.is_supported(split_method[0]):
                     return plugin
@@ -172,14 +170,14 @@ class PluginManager:
             The plugin class that matches the criteria.
 
         Raises:
-            ConfigError: If no matching plugin is found for the given type and
-                         method, or if "default" is used as a method name without
-                         specifying a plugin name.
+            ValueError: If no matching plugin is found for the given type and
+                        method, or if "default" is used as a method name without
+                        specifying a plugin name.
         """
         if (plugin := self._get_plugin(plugin_type, method)) is not None:
             return plugin
         msg = f"Method not found: {method}"
-        raise ConfigError(msg)
+        raise ValueError(msg)
 
     def is_supported(self, plugin_type: PluginType, method: str) -> bool:
         """Check if a specific plugin method is available.

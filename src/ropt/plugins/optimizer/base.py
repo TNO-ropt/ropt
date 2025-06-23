@@ -173,12 +173,14 @@ class OptimizerPlugin(Plugin):
         methods they support, potentially using schema validation tools like
         Pydantic.
 
+        The raised exception must be a ValueError, or derive from a ValueError.
+
         Args:
             method:  The specific optimization method name (e.g., "slsqp",
                      "my_optimizer/variant1").
             options: The dictionary or a list of strings of options.
 
         Raises:
-            Exception: If the provided options are invalid for the specified
-                       method.
+            ValueError: If the provided options are invalid for the specified
+                        method.
         """

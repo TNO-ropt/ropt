@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING, Any, Final, Self
 import numpy as np
 
 from ropt.config import EnOptConfig
-from ropt.exceptions import ConfigError, StepAborted
+from ropt.exceptions import StepAborted
 from ropt.optimization import OptimizerCallback, OptimizerCallbackResult
 from ropt.plugins import PluginManager
 
@@ -97,7 +97,7 @@ class ExternalOptimizer(Optimizer):
                     self._process_pid = process.pid
                 except FileNotFoundError as exc:
                     msg = "The plugin runner binary was not found"
-                    raise ConfigError(msg) from exc
+                    raise ValueError(msg) from exc
 
                 answer: str | list[Any] | dict[str, Any] | None = None
                 exception: BaseException | None = None

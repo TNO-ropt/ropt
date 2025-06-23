@@ -3,10 +3,6 @@
 from .enums import ExitCode
 
 
-class ConfigError(Exception):
-    """Raised when an configuration error occurs."""
-
-
 class StepAborted(Exception):  # noqa: N818
     """Raised when a step is aborted prematurely.
 

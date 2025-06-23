@@ -7,7 +7,7 @@ from numpy.typing import NDArray
 
 from ropt.config import EnOptConfig
 from ropt.enums import ExitCode
-from ropt.exceptions import ConfigError, StepAborted
+from ropt.exceptions import StepAborted
 
 from .base import FunctionEstimator, FunctionEstimatorPlugin
 
@@ -60,7 +60,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
                 "The stddev estimator does not support merging "
                 "realizations in the gradient."
             )
-            raise ConfigError(msg)
+            raise ValueError(msg)
 
     def calculate_function(
         self, functions: NDArray[np.float64], weights: NDArray[np.float64]
@@ -79,7 +79,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
         if estimator_method == "stddev":
             return self._calculate_function_stddev(functions, weights)
         msg = f"Function estimator method not supported: {estimator_method}"
-        raise ConfigError(msg)
+        raise ValueError(msg)
 
     def calculate_gradient(
         self,
@@ -101,7 +101,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
         if estimator_method == "stddev":
             return self._calculate_gradient_stddev(functions, gradient, weights)
         msg = f"Function estimator method not supported: {estimator_method}"
-        raise ConfigError(msg)
+        raise ValueError(msg)
 
     @staticmethod
     def _calculate_function_mean(

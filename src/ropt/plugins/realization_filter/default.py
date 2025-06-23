@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt
 
 from ropt.config import EnOptConfig
 from ropt.enums import ExitCode
-from ropt.exceptions import ConfigError, StepAborted
+from ropt.exceptions import StepAborted
 
 from .base import RealizationFilter, RealizationFilterPlugin
 
@@ -237,7 +237,7 @@ class DefaultRealizationFilter(RealizationFilter):
                 self._filter_options = CVaRConstraintOptions.model_validate(options)
             case _:
                 msg = f"Realization filter not supported: {self._method}"
-                raise ConfigError(msg)
+                raise ValueError(msg)
 
     def get_realization_weights(  # D107
         self,
@@ -264,7 +264,7 @@ class DefaultRealizationFilter(RealizationFilter):
                 weights = self._cvar_constraint(constraints)
             case _:
                 msg = f"Realization filter not supported: {self._method}"
-                raise ConfigError(msg)
+                raise ValueError(msg)
 
         if not np.any(weights > 0):
             raise StepAborted(exit_code=ExitCode.TOO_FEW_REALIZATIONS)
@@ -277,11 +277,11 @@ class DefaultRealizationFilter(RealizationFilter):
         realizations = self._enopt_config.realizations.weights.size
         msg = f"Invalid range of realizations: [{options.first}, {options.last}]"
         if options.first < 0 or options.first >= realizations:
-            raise ConfigError(msg)
+            raise ValueError(msg)
         if options.last < 0 or options.last >= realizations:
-            raise ConfigError(msg)
+            raise ValueError(msg)
         if options.last < options.first:
-            raise ConfigError(msg)
+            raise ValueError(msg)
 
     def _sort_objectives(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
         assert isinstance(self._filter_options, SortObjectiveOptions)

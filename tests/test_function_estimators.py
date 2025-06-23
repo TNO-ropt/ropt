@@ -5,7 +5,6 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from ropt.exceptions import ConfigError
 from ropt.plan import BasicOptimizer
 
 initial_values = 3 * [0]
@@ -43,7 +42,7 @@ def test_stddev_function_estimator_merge_error(
     enopt_config["objectives"]["function_estimators"] = [0, 0, 1, 1]
     enopt_config["function_estimators"] = [{"method": "mean"}, {"method": "stddev"}]
     with pytest.raises(
-        ConfigError,
+        ValueError,
         match=(
             "The stddev estimator does not support merging "
             "realizations in the gradient."

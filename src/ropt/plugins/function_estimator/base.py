@@ -111,9 +111,9 @@ class FunctionEstimator(ABC):
             with a low number of perturbations (potentially just one) but is
             generally only suitable for estimators performing averaging-like
             operations. Estimator implementations should check this flag during
-            initialization (`__init__`) and raise a
-            [`ConfigError`][ropt.exceptions.ConfigError] if `merge_realizations=True`
-            is incompatible with the estimator's logic (e.g., standard deviation).
+            initialization (`__init__`) and raise a `ValueError` if
+            `merge_realizations=True` is incompatible with the estimator's logic
+            (e.g., standard deviation).
 
         Args:
             functions: The functions for each realization.
