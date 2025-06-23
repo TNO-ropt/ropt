@@ -194,14 +194,9 @@ def test_single_perturbation(enopt_config: Any, evaluator: Any, external: str) -
 def test_external_error(enopt_config: Any, evaluator: Any, external: str) -> None:
     enopt_config["optimizer"]["method"] = f"{external}{_SLSQP}"
     enopt_config["optimizer"]["options"] = {"ftol": "foo"}
-    err = "could not convert string to float: 'foo'"
-    if external:
-        err = f"External optimizer error: {err}"
-        with pytest.raises(RuntimeError, match=err):
-            BasicOptimizer(enopt_config, evaluator()).run(initial_values)
-    else:
-        with pytest.raises(ValueError, match=err):
-            BasicOptimizer(enopt_config, evaluator()).run(initial_values)
+    err = "Input should be a valid number, unable to parse string as a number"
+    with pytest.raises(ValueError, match=err):
+        BasicOptimizer(enopt_config, evaluator()).run(initial_values)
 
 
 class ObjectiveScaler(ObjectiveTransform):
@@ -712,7 +707,7 @@ def test_parallelize(enopt_config: Any, evaluator: Any, external: str) -> None:
     enopt_config["optimizer"] = {
         "method": f"{external}{_DIFFERENTIAL_EVOLUTION}",
         "max_iterations": 15,
-        "options": {"seed": 123, "tol": 1e-10},
+        "options": {"rng": 123, "tol": 1e-10},
     }
     enopt_config["variables"]["lower_bounds"] = [0.15, 0.0, 0.0]
     enopt_config["variables"]["upper_bounds"] = [0.5, 0.5, 0.2]

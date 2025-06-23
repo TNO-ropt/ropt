@@ -156,9 +156,19 @@ class EnsembleOptimizer:
 
         # Whether NaN values are allowed:
         self._allow_nan = False
-        self._optimizer: Optimizer = self._plugin_manager.get_plugin(
+
+        plugin = self._plugin_manager.get_plugin(
             "optimizer", method=self._enopt_config.optimizer.method
-        ).create(self._enopt_config, self._optimizer_callback)
+        )
+
+        # Validate the optimizer options:
+        plugin.validate_options(
+            self._enopt_config.optimizer.method, self._enopt_config.optimizer.options
+        )
+
+        self._optimizer: Optimizer = plugin.create(
+            self._enopt_config, self._optimizer_callback
+        )
         self._allow_nan = self._optimizer.allow_nan
 
         # Optional redirection of standard output:

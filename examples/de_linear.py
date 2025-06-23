@@ -24,7 +24,7 @@ CONFIG: dict[str, Any] = {
     },
     "optimizer": {
         "method": "differential_evolution",
-        "options": {"integrality": [True, True], "rng": 4},
+        "options": {"rng": 4},
         "max_functions": 5,
         "parallel": False,
     },
