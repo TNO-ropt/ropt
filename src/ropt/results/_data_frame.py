@@ -104,6 +104,8 @@ def _get_gradient_results(
 
 def _join_frames(*args: pd.DataFrame) -> pd.DataFrame:
     frames = [frame for frame in args if not frame.empty]
+    if not frames:
+        return pd.DataFrame()
     return (
         frames[0].join(list(frames[1:]), how="outer") if len(frames) > 1 else frames[0]
     )
