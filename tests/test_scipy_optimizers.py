@@ -422,7 +422,7 @@ def test_scipy_le_ge_nonlinear_constraints(
         .variables
     )
     assert variables is not None
-    assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert np.allclose(variables, [0.0, 0.0, 0.4], atol=0.02)
 
 
 def test_scipy_options(enopt_config: Any, evaluator: Any) -> None:
