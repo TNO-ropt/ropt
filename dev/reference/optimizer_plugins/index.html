@@ -1880,6 +1880,7 @@ plugin.</p>
 override this method to implement validation logic specific to the
 methods they support, potentially using schema validation tools like
 Pydantic.</p>
+<p>The raised exception must be a ValueError, or derive from a ValueError.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1941,12 +1942,12 @@ Pydantic.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#Exception">Exception</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
             </td>
             <td>
               <div class="doc-md-description">
                 <p>If the provided options are invalid for the specified
-       method.</p>
+        method.</p>
               </div>
             </td>
           </tr>

@@ -1842,9 +1842,9 @@ passed to this <code>calculate_gradient</code> method.</p>
 with a low number of perturbations (potentially just one) but is
 generally only suitable for estimators performing averaging-like
 operations. Estimator implementations should check this flag during
-initialization (<code>__init__</code>) and raise a
-<a class="autorefs autorefs-internal" title="            ConfigError" href="../exceptions/#ropt.exceptions.ConfigError"><code>ConfigError</code></a> if <code>merge_realizations=True</code>
-is incompatible with the estimator's logic (e.g., standard deviation).</p>
+initialization (<code>__init__</code>) and raise a <code>ValueError</code> if
+<code>merge_realizations=True</code> is incompatible with the estimator's logic
+(e.g., standard deviation).</p>
 </details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
