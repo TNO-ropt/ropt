@@ -1883,6 +1883,14 @@ Pydantic.</p>
 <p>The raised exception must be a ValueError, or derive from a ValueError.</p>
 
 
+<details class="note" open>
+  <summary>Note</summary>
+  <p>It is expected that the optimizer either receives a dictionary, or a
+list of options. This method should test if the type of the options
+is as expected, and raise a <code>ValueError</code> with an appropriate message
+if this is not the case.</p>
+</details>
+
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>
       <thead>

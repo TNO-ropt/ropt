@@ -774,9 +774,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.PluginManager.is_supported" class="md-nav__link">
+  <a href="#ropt.plugins.PluginManager.get_plugin_name" class="md-nav__link">
     <span class="md-ellipsis">
-      is_supported
+      get_plugin_name
     </span>
   </a>
   
@@ -1299,9 +1299,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.PluginManager.is_supported" class="md-nav__link">
+  <a href="#ropt.plugins.PluginManager.get_plugin_name" class="md-nav__link">
     <span class="md-ellipsis">
-      is_supported
+      get_plugin_name
     </span>
   </a>
   
@@ -1434,8 +1434,8 @@ must inherit from:</p>
 <p>The <a class="autorefs autorefs-internal" title="            get_plugin" href="#ropt.plugins.PluginManager.get_plugin"><code>PluginManager.get_plugin</code></a> method
 is used internally by <code>ropt</code> to retrieve the appropriate plugin implementation
 based on a specified type and method name. The
-<a class="autorefs autorefs-internal" title="            is_supported" href="#ropt.plugins.PluginManager.is_supported"><code>PluginManager.is_supported</code></a> method
-can check if a specific method is available.</p>
+<a class="autorefs autorefs-internal" title="            get_plugin_name" href="#ropt.plugins.PluginManager.get_plugin_name"><code>PluginManager.get_plugin_name</code></a>
+method can be used to find the name of a plugin that supports a given method.</p>
 <p>Plugins can implement multiple named methods. To request a specific method
 (<code>method-name</code>) from a particular plugin (<code>plugin-name</code>), use the format
 <code>"plugin-name/method-name"</code>. If only a method name is provided, the plugin
@@ -1518,10 +1518,11 @@ as optimizers, samplers, and plan components.</p>
 <code>ropt.plugins.*</code> groups (e.g., <code>ropt.plugins.optimizer</code>). Plugins found
 this way are loaded and stored internally, categorized by their type.</p>
 <p>The primary way to interact with the manager is through the
-<a class="autorefs autorefs-internal" title="            get_plugin" href="#ropt.plugins.PluginManager.get_plugin"><code>get_plugin</code></a> method, which retrieves
-a specific plugin class based on its type and a method name it supports.
-The <a class="autorefs autorefs-internal" title="            is_supported" href="#ropt.plugins.PluginManager.is_supported"><code>is_supported</code></a> method can be
-used to check for the availability of a plugin method without retrieving it.</p>
+<a class="autorefs autorefs-internal" title="            get_plugin" href="#ropt.plugins.PluginManager.get_plugin"><code>get_plugin</code></a> method, which
+retrieves a specific plugin class based on its type and a method name it
+supports. The
+<a class="autorefs autorefs-internal" title="            get_plugin_name" href="#ropt.plugins.PluginManager.get_plugin_name"><code>get_plugin_name</code></a> method can
+be used to find the name of a plugin that supports a given method.</p>
 <p><strong>Example: Registering a Custom Optimizer Plugin</strong></p>
 <p>To make a custom optimizer plugin available to <code>ropt</code>, you would typically
 define an entry point in your package's <code>pyproject.toml</code>:</p>
@@ -1723,17 +1724,19 @@ specified <code>plugin_type</code> and supports the given <code>method</code>.</
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.PluginManager.is_supported" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">is_supported</span>
+<h4 id="ropt.plugins.PluginManager.get_plugin_name" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_plugin_name</span>
 
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">is_supported</span><span class="p">(</span><span class="n">plugin_type</span><span class="p">:</span> <span class="n">PluginType</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_plugin_name</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">plugin_type</span><span class="p">:</span> <span class="n">PluginType</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Check if a specific plugin method is available.</p>
+        <p>Return the name of the plugin that supports a given method.</p>
 <p>Verifies whether a plugin of the specified <code>plugin_type</code> supports the
 given <code>method</code>. This is useful for checking availability before attempting
 to retrieve a plugin with <a class="autorefs autorefs-internal" title="            get_plugin" href="#ropt.plugins.PluginManager.get_plugin"><code>get_plugin</code></a>.</p>
@@ -1810,11 +1813,11 @@ to retrieve a plugin with <a class="autorefs autorefs-internal" title="         
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>True</code> if a matching plugin supports the specified method.</p>
+                <p>The name of a matching plugin supporting the specified method, or <code>None</code>.</p>
               </div>
             </td>
           </tr>
@@ -1964,8 +1967,8 @@ explicit plugin name.</p>
         <p>Verify if this plugin supports a specific named method.</p>
 <p>This class method is used by the
 <a class="autorefs autorefs-internal" title="            PluginManager" href="#ropt.plugins.PluginManager"><code>PluginManager</code></a> (specifically its
-<a class="autorefs autorefs-internal" title="            is_supported" href="#ropt.plugins.PluginManager.is_supported"><code>is_supported</code></a> method) to
-determine if this plugin class provides the functionality associated
+<a class="autorefs autorefs-internal" title="            get_plugin_name" href="#ropt.plugins.PluginManager.get_plugin_name"><code>get_plugin_name</code></a> method)
+to determine if this plugin class provides the functionality associated
 with the given <code>method</code> name.</p>
 
 
