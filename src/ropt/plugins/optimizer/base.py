@@ -175,6 +175,12 @@ class OptimizerPlugin(Plugin):
 
         The raised exception must be a ValueError, or derive from a ValueError.
 
+        Note:
+            It is expected that the optimizer either receives a dictionary, or a
+            list of options. This method should test if the type of the options
+            is as expected, and raise a `ValueError` with an appropriate message
+            if this is not the case.
+
         Args:
             method:  The specific optimization method name (e.g., "slsqp",
                      "my_optimizer/variant1").

@@ -573,6 +573,9 @@ class SciPyOptimizerPlugin(OptimizerPlugin):
         # noqa
         """
         if options is not None:
+            if not isinstance(options, dict):
+                msg = "SciPy optimizer options must be a dictionary"
+                raise ValueError(msg)
             OptionsSchemaModel.model_validate(_OPTIONS_SCHEMA).get_options_model(
                 method
             ).model_validate(options)

@@ -59,6 +59,18 @@ def test_scipy_invalid_options(enopt_config: Any) -> None:
         )
 
 
+def test_scipy_invalid_options_type(enopt_config: Any) -> None:
+    enopt_config["optimizer"]["options"] = ["foo=1"]
+    enopt_config["optimizer"]["method"] = "slsqp"
+
+    with pytest.raises(
+        ValueError, match="SciPy optimizer options must be a dictionary"
+    ):
+        PluginManager().get_plugin("optimizer", "slsqp").validate_options(
+            "slsqp", enopt_config["optimizer"]["options"]
+        )
+
+
 @pytest.mark.parametrize("method", sorted(_SUPPORTED - _REQUIRES_BOUNDS))
 def test_scipy_unconstrained(enopt_config: Any, method: str, evaluator: Any) -> None:
     enopt_config["optimizer"]["method"] = method
