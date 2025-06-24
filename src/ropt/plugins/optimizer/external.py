@@ -221,7 +221,7 @@ class ExternalOptimizerPlugin(OptimizerPlugin):
 
         # noqa
         """
-        return PluginManager().is_supported("optimizer", method)
+        return PluginManager().get_plugin_name("optimizer", method) is not None
 
     @classmethod
     def allows_discovery(cls) -> bool:

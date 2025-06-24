@@ -31,8 +31,8 @@ class Plugin(ABC):
 
         This class method is used by the
         [`PluginManager`][ropt.plugins.PluginManager] (specifically its
-        [`is_supported`][ropt.plugins.PluginManager.is_supported] method) to
-        determine if this plugin class provides the functionality associated
+        [`get_plugin_name`][ropt.plugins.PluginManager.get_plugin_name] method)
+        to determine if this plugin class provides the functionality associated
         with the given `method` name.
 
         Args:

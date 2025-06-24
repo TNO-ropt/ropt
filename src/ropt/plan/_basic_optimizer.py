@@ -354,7 +354,7 @@ class BasicOptimizer:
             plan_step, sep, script = os.environ["ROPT_SCRIPT"].partition("=")
             if not sep:
                 plan_step, script = "run_plan", plan_step
-            if self._plugin_manager.is_supported("plan_step", plan_step):
+            if self._plugin_manager.get_plugin_name("plan_step", plan_step) is not None:
                 step: Callable[[Plan], ExitCode] = plan.add_step(plan_step).run(
                     evaluator=self._evaluator, script=script
                 )
@@ -365,7 +365,10 @@ class BasicOptimizer:
         handlers = os.environ.get("ROPT_HANDLERS", "").split(",")
         handlers += _get_option("event_handlers")
         for handler in dict.fromkeys(handlers):
-            if self._plugin_manager.is_supported("event_handler", handler):
+            if (
+                self._plugin_manager.get_plugin_name("event_handler", handler)
+                is not None
+            ):
                 yield handler
 
 

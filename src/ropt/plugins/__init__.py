@@ -45,8 +45,8 @@ must inherit from:
 The [`PluginManager.get_plugin`][ropt.plugins.PluginManager.get_plugin] method
 is used internally by `ropt` to retrieve the appropriate plugin implementation
 based on a specified type and method name. The
-[`PluginManager.is_supported`][ropt.plugins.PluginManager.is_supported] method
-can check if a specific method is available.
+[`PluginManager.get_plugin_name`][ropt.plugins.PluginManager.get_plugin_name]
+method can be used to find the name of a plugin that supports a given method.
 
 Plugins can implement multiple named methods. To request a specific method
 (`method-name`) from a particular plugin (`plugin-name`), use the format

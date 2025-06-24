@@ -71,10 +71,11 @@ class PluginManager:
     this way are loaded and stored internally, categorized by their type.
 
     The primary way to interact with the manager is through the
-    [`get_plugin`][ropt.plugins.PluginManager.get_plugin] method, which retrieves
-    a specific plugin class based on its type and a method name it supports.
-    The [`is_supported`][ropt.plugins.PluginManager.is_supported] method can be
-    used to check for the availability of a plugin method without retrieving it.
+    [`get_plugin`][ropt.plugins.PluginManager.get_plugin] method, which
+    retrieves a specific plugin class based on its type and a method name it
+    supports. The
+    [`get_plugin_name`][ropt.plugins.PluginManager.get_plugin_name] method can
+    be used to find the name of a plugin that supports a given method.
 
     **Example: Registering a Custom Optimizer Plugin**
 
@@ -129,19 +130,23 @@ class PluginManager:
         else:
             self._plugins[plugin_type][name_lower] = plugin
 
-    def _get_plugin(self, plugin_type: PluginType, method: str) -> Any | None:  # noqa: ANN401
+    def _get_plugin(
+        self, plugin_type: PluginType, method: str
+    ) -> tuple[str, Any] | None:
         split_method = method.split("/", maxsplit=1)
         if len(split_method) > 1:
-            plugin = self._plugins[plugin_type].get(split_method[0].lower())
-            if plugin and plugin.is_supported(split_method[1]):
-                return plugin
+            plugin_name, method = split_method
+            plugin = self._plugins[plugin_type].get(plugin_name)
+            if plugin and plugin.is_supported(method):
+                return plugin_name, plugin
         else:
-            if split_method[0] == "default":
+            method = split_method[0]
+            if method == "default":
                 msg = "Cannot specify 'default' method without a plugin name"
                 raise ValueError(msg)
-            for plugin in self._plugins[plugin_type].values():
-                if plugin.allows_discovery() and plugin.is_supported(split_method[0]):
-                    return plugin
+            for plugin_name, plugin in self._plugins[plugin_type].items():
+                if plugin.allows_discovery() and plugin.is_supported(method):
+                    return plugin_name, plugin
         return None
 
     def get_plugin(self, plugin_type: PluginType, method: str) -> Any:  # noqa: ANN401
@@ -174,13 +179,14 @@ class PluginManager:
                         method, or if "default" is used as a method name without
                         specifying a plugin name.
         """
-        if (plugin := self._get_plugin(plugin_type, method)) is not None:
-            return plugin
+        plugin = self._get_plugin(plugin_type, method)
+        if plugin is not None:
+            return plugin[1]
         msg = f"Method not found: {method}"
         raise ValueError(msg)
 
-    def is_supported(self, plugin_type: PluginType, method: str) -> bool:
-        """Check if a specific plugin method is available.
+    def get_plugin_name(self, plugin_type: PluginType, method: str) -> str | None:
+        """Return the name of the plugin that supports a given method.
 
         Verifies whether a plugin of the specified `plugin_type` supports the
         given `method`. This is useful for checking availability before attempting
@@ -199,9 +205,12 @@ class PluginManager:
                          with the plugin name and a slash (`/`).
 
         Returns:
-            `True` if a matching plugin supports the specified method.
+            The name of a matching plugin supporting the specified method, or `None`.
         """
-        return self._get_plugin(plugin_type, method) is not None
+        plugin = self._get_plugin(plugin_type, method)
+        if plugin is None:
+            return None
+        return plugin[0]
 
 
 @cache  # Without the cache, repeated calls are very slow
