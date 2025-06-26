@@ -144,6 +144,28 @@ def test_failed_realizations(enopt_config: Any, evaluator: Any, external: str) -
     assert optimizer.exit_code == ExitCode.TOO_FEW_REALIZATIONS
 
 
+def test_failed_realizations_constraints(
+    enopt_config: Any, evaluator: Any, test_functions: Any, external: str
+) -> None:
+    def _observer(results: tuple[Results, ...]) -> None:
+        assert isinstance(results[0], FunctionResults)
+        assert results[0].functions is None
+
+    enopt_config["optimizer"]["method"] = f"{external}{_SLSQP}"
+    enopt_config["nonlinear_constraints"] = {
+        "lower_bounds": 0.0,
+        "upper_bounds": 0.4,
+    }
+
+    functions = (*test_functions, lambda _0, _1: np.array(np.nan))
+
+    optimizer = BasicOptimizer(enopt_config, evaluator(functions)).set_results_callback(
+        _observer
+    )
+    optimizer.run(initial_values)
+    assert optimizer.exit_code == ExitCode.TOO_FEW_REALIZATIONS
+
+
 def test_all_failed_realizations_not_supported(
     enopt_config: Any, evaluator: Any, external: str
 ) -> None:
