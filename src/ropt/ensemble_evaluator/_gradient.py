@@ -6,8 +6,8 @@ from ropt.enums import BoundaryType, PerturbationType
 from ropt.plugins.function_estimator.base import FunctionEstimator
 from ropt.plugins.sampler.base import Sampler
 
-SVD_TOLERANCE = 0.999
-MIRROR_REPEAT = 3
+_SVD_TOLERANCE = 0.999
+_MIRROR_REPEAT = 3
 
 
 def _apply_bounds(
@@ -34,10 +34,10 @@ def _apply_bounds(
     mask2 = np.logical_and(
         truncation_types == BoundaryType.MIRROR_BOTH, variables > upper_bounds
     )
-    for _ in range(MIRROR_REPEAT):
+    for _ in range(_MIRROR_REPEAT):
         variables = mirror(variables, mask1, variables < lower_bounds, lower_bounds)
         variables = mirror(variables, mask1, variables > upper_bounds, upper_bounds)
-    for _ in range(MIRROR_REPEAT):
+    for _ in range(_MIRROR_REPEAT):
         variables = mirror(variables, mask2, variables > upper_bounds, upper_bounds)
         variables = mirror(variables, mask2, variables < lower_bounds, lower_bounds)
 
@@ -52,7 +52,7 @@ def _invert_linear_equations(
     u = u[:, : sigma.size]
     v = v[: sigma.size, :]
     sigma2 = sigma**2
-    select = np.cumsum(sigma2) / np.sum(sigma2) < SVD_TOLERANCE
+    select = np.cumsum(sigma2) / np.sum(sigma2) < _SVD_TOLERANCE
     select[np.argmin(select)] = True  # Add the element that passes the tolerance
     sigma_inv = np.diag(
         np.divide(1.0, sigma, out=np.zeros_like(sigma), where=(sigma > 0) & select)
