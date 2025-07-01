@@ -167,7 +167,10 @@ class DefaultOptimizerStep(PlanStep):
         if self._transforms is not None and self._transforms.variables is not None:
             variables = self._transforms.variables.to_optimizer(variables)
 
-        evaluator = self.plan.get_evaluator(self)
+        evaluator = next(self.plan.get_evaluators(self), None)
+        if evaluator is None:
+            msg = "No suitable evaluator found."
+            raise AttributeError(msg)
         ensemble_evaluator = EnsembleEvaluator(
             self._config, self._transforms, evaluator.eval, self.plan.plugin_manager
         )
@@ -200,7 +203,7 @@ class DefaultOptimizerStep(PlanStep):
 
     def _emit_event(self, event: Event) -> None:
         for handler in self._event_handlers.get(event.event_type, []):
-            handler(event)
+            handler.handle_event(event)
 
     def _signal_evaluation(self, results: tuple[Results, ...] | None = None) -> None:
         event_data: dict[str, Any] = {

@@ -125,7 +125,11 @@ class DefaultCachedEvaluator(Evaluator):
 
         if cached:
             context.active[list(cached.keys())] = False
-        evaluator_result = self.plan.get_evaluator(self).eval(variables, context)
+        evaluator = next(self.plan.get_evaluators(self), None)
+        if evaluator is None:
+            msg = "No suitable evaluator found."
+            raise AttributeError(msg)
+        evaluator_result = evaluator.eval(variables, context)
 
         for idx, (realization, item) in cached.items():
             objectives = item.evaluations.objectives

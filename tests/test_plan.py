@@ -83,12 +83,6 @@ def test_plan_evaluators(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plan.add_evaluator("function_evaluator", evaluator=evaluator(), clients={step2})
     step2.run(variables=initial_values, config=config)
 
-    plan.add_evaluator("function_evaluator", evaluator=evaluator(), clients={step1})
-    with pytest.raises(
-        AttributeError, match="Ambiguous request: multiple suitable evaluators found."
-    ):
-        step1.run(variables=initial_values, config=config)
-
     plan = Plan(PluginManager())
     step1 = plan.add_step("optimizer")
     step2 = plan.add_step("optimizer")

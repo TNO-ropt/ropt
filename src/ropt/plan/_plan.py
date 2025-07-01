@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable
+from collections import defaultdict
+from typing import TYPE_CHECKING, Any, Iterator
 
 from ropt.exceptions import PlanAborted
 from ropt.plugins.plan.base import Evaluator, EventHandler, PlanComponent, PlanStep
@@ -11,7 +12,6 @@ if TYPE_CHECKING:
     import uuid
 
     from ropt.enums import EventType
-    from ropt.plan import Event
     from ropt.plugins import PluginManager
 
 
@@ -290,7 +290,7 @@ class Plan:
 
     def get_event_handlers(
         self, source: PlanComponent, event_types: set[EventType]
-    ) -> dict[EventType, list[Callable[[Event], None]]]:
+    ) -> dict[EventType, list[EventHandler]]:
         """Get the event handlers for a given source and event types.
 
         When this method is called, all event handlers associated with the plan
@@ -305,67 +305,41 @@ class Plan:
         Returns:
             A mapping of event types to a list of suitable handlers.
         """
-        result: dict[EventType, list[Callable[[Event], None]]] = {}
+        result: defaultdict[EventType, list[EventHandler]] = defaultdict(list)
         for handler in self._handlers.values():
             if (source.id in handler.sources or source.tags & handler.sources) and (
                 event_types & handler.event_types
             ):
                 for event_type in handler.event_types:
-                    if event_type in result:
-                        result[event_type].append(handler.handle_event)
-                    else:
-                        result[event_type] = [handler.handle_event]
+                    result[event_type].append(handler)
         if self._parent is not None:
             parent_handlers = self._parent.get_event_handlers(source, event_types)
             for event_type, handlers in parent_handlers.items():
-                if event_type not in result:
-                    result[event_type] = handlers
-                else:
-                    result[event_type].extend(handlers)
-        return result
+                result[event_type].extend(handlers)
+        return dict(result)
 
-    def _get_evaluators(self, client: PlanComponent) -> list[Evaluator]:
-        evaluators = [
-            evaluator
-            for evaluator in self._evaluators.values()
-            if client.id in evaluator.clients or client.tags & evaluator.clients
-        ]
-        if not evaluators and self._parent is not None:
-            evaluators = self._parent._get_evaluators(client)  # noqa: SLF001
-        return evaluators
+    def get_evaluators(self, client: PlanComponent) -> Iterator[Evaluator]:
+        """Yield suitable evaluators for a given client step.
 
-    def get_evaluator(self, client: PlanComponent) -> Evaluator:
-        """Retrieve the appropriate evaluator for a given client step.
-
-        This method searches for an [`Evaluator`][ropt.plugins.plan.base.Evaluator]
-        that is configured to serve the specified `client`
+        This method searches for [`Evaluator`][ropt.plugins.plan.base.Evaluator] objects
+        that are configured to serve the specified `client`
         ([`PlanStep`][ropt.plugins.plan.base.PlanStep]). The search starts in the
-        current plan and, if no suitable evaluator is found and a parent plan
-        exists, continues recursively up the plan hierarchy.
+        current plan and continues recursively up the plan hierarchy.
 
         An evaluator is considered suitable the `id` or `tags` of the `client`
         step is present in the `clients` set of the evaluator.
 
-        The method expects to find exactly one suitable evaluator.
-
         Args:
             client: The step for which an evaluator is being requested.
 
-        Returns:
-            The single evaluator instance configured to serve the client.
-
-        Raises:
-            AttributeError: If no suitable evaluator is found, or if multiple
-                            suitable evaluators are found.
+        Yields:
+            The evaluators instances configured to serve the client.
         """
-        evaluators = self._get_evaluators(client)
-        if not evaluators:
-            msg = "No suitable evaluator found."
-            raise AttributeError(msg)
-        if len(evaluators) > 1:
-            msg = "Ambiguous request: multiple suitable evaluators found."
-            raise AttributeError(msg)
-        return evaluators[0]
+        for evaluator in self._evaluators.values():
+            if client.id in evaluator.clients or client.tags & evaluator.clients:
+                yield evaluator
+        if self._parent is not None:
+            yield from self._parent.get_evaluators(client)
 
     def abort(self) -> None:
         """Abort the plan.

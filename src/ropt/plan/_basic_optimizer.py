@@ -305,7 +305,7 @@ class BasicOptimizer:
             The `BasicOptimizer` instance, allowing for method chaining.
         """
 
-        def _check_abort_callback(_: Event) -> None:
+        def _check_abort_callback(event: Event) -> None:  # noqa: ARG001
             if callback():
                 raise StepAborted(exit_code=ExitCode.USER_ABORT)
 

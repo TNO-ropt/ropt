@@ -25,4 +25,8 @@ from ._basic_optimizer import BasicOptimizer
 from ._events import Event
 from ._plan import Plan
 
-__all__ = ["BasicOptimizer", "Event", "Plan"]
+__all__ = [
+    "BasicOptimizer",
+    "Event",
+    "Plan",
+]
