@@ -708,6 +708,30 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#ropt.evaluator.EvaluatorCallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      EvaluatorCallback
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EvaluatorCallback">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.evaluator.EvaluatorCallback.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1311,6 +1335,30 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#ropt.evaluator.EvaluatorCallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      EvaluatorCallback
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EvaluatorCallback">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.evaluator.EvaluatorCallback.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1460,7 +1508,7 @@ estimators, and samplers.</p>
                 <code>evaluator</code>
             </td>
             <td>
-                  <code><span title="ropt.evaluator.EvaluatorCallback">EvaluatorCallback</span></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorCallback" href="#ropt.evaluator.EvaluatorCallback">EvaluatorCallback</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2063,6 +2111,155 @@ input vectors.</p>
 
 
 
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.evaluator.EvaluatorCallback" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.evaluator.EvaluatorCallback</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" title="typing.Protocol" href="https://docs.python.org/3/library/typing.html#typing.Protocol">Protocol</a></code></p>
+
+
+        <p>Defines the call signature for evaluator callbacks.</p>
+<p>Events handlers define a callback to handler events emitted during the
+optimization process.</p>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.evaluator.EvaluatorCallback.__call__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__call__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__call__</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">EvaluatorContext</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluatorResult</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Handle an event.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>variables</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The variables to pass to the evaluation function.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>context</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
+
+
+  
+      dataclass
+   (ropt.evaluator._evaluator.EvaluatorContext)" href="#ropt.evaluator.EvaluatorContext">EvaluatorContext</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The evaluator context to pass.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
+
+
+  
+      dataclass
+   (ropt.evaluator._evaluator.EvaluatorResult)" href="#ropt.evaluator.EvaluatorResult">EvaluatorResult</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The results of the evaluation.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
 
 
 
