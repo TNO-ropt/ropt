@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 import numpy as np
 from numpy.random import default_rng
@@ -33,7 +33,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config import EnOptConfig
-    from ropt.evaluator import EvaluatorContext, EvaluatorResult
+    from ropt.evaluator import EvaluatorCallback
     from ropt.plugins import PluginManager
     from ropt.plugins.function_estimator.base import FunctionEstimator
     from ropt.plugins.realization_filter.base import RealizationFilter
@@ -60,7 +60,7 @@ class EnsembleEvaluator:
         self,
         config: EnOptConfig,
         transforms: OptModelTransforms | None,
-        evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult],
+        evaluator: EvaluatorCallback,
         plugin_manager: PluginManager,
     ) -> None:
         """Initialize the EnsembleEvaluator.

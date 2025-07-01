@@ -9,7 +9,7 @@ from contextlib import suppress
 from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterator, Self
+from typing import TYPE_CHECKING, Any, Callable, Iterator, Self
 
 import numpy as np
 
@@ -21,11 +21,9 @@ from ropt.plugins import PluginManager
 from ._plan import Plan
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     from numpy.typing import ArrayLike, NDArray
 
-    from ropt.evaluator import EvaluatorContext, EvaluatorResult
+    from ropt.evaluator import EvaluatorCallback
     from ropt.plan import Event
     from ropt.results import FunctionResults
     from ropt.transforms import OptModelTransforms
@@ -158,7 +156,7 @@ class BasicOptimizer:
     def __init__(
         self,
         enopt_config: dict[str, Any],
-        evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult],
+        evaluator: EvaluatorCallback,
         *,
         transforms: OptModelTransforms | None = None,
         constraint_tolerance: float = 1e-10,
@@ -312,10 +310,7 @@ class BasicOptimizer:
         self._observers.append((EventType.START_EVALUATION, _check_abort_callback))
         return self
 
-    def set_results_callback(
-        self,
-        callback: Callable[..., None],
-    ) -> Self:
+    def set_results_callback(self, callback: Callable[..., None]) -> Self:
         """Set a callback to report new results.
 
         The provided callback function will be invoked whenever new results

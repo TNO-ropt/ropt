@@ -321,13 +321,13 @@ class Plan:
     def get_evaluators(self, client: PlanComponent) -> Iterator[Evaluator]:
         """Yield suitable evaluators for a given client step.
 
-        This method searches for [`Evaluator`][ropt.plugins.plan.base.Evaluator] objects
-        that are configured to serve the specified `client`
-        ([`PlanStep`][ropt.plugins.plan.base.PlanStep]). The search starts in the
-        current plan and continues recursively up the plan hierarchy.
+        This method searches for [`Evaluator`][ropt.plugins.plan.base.Evaluator]
+        objects that are configured to serve the specified `client`
+        ([`PlanStep`][ropt.plugins.plan.base.PlanStep]). The search starts in
+        the current plan and continues recursively up the plan hierarchy.
 
-        An evaluator is considered suitable the `id` or `tags` of the `client`
-        step is present in the `clients` set of the evaluator.
+        An evaluator is considered suitable if the `id` or `tags` of the
+        `client` step is present in the `clients` set of the evaluator.
 
         Args:
             client: The step for which an evaluator is being requested.

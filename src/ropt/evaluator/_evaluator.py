@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, TypeVar
+from typing import Any, Protocol, TypeVar
 
 import numpy as np
 from numpy.typing import NDArray
@@ -136,3 +136,24 @@ class EvaluatorResult:
     constraints: NDArray[np.float64] | None = None
     batch_id: int | None = None
     evaluation_info: dict[str, NDArray[Any]] = field(default_factory=dict)
+
+
+class EvaluatorCallback(Protocol):
+    """Defines the call signature for evaluator callbacks.
+
+    Events handlers define a callback to handler events emitted during the
+    optimization process.
+    """
+
+    def __call__(
+        self, variables: NDArray[np.float64], context: EvaluatorContext
+    ) -> EvaluatorResult:
+        """Handle an event.
+
+        Args:
+            variables: The variables to pass to the evaluation function.
+            context:   The evaluator context to pass.
+
+        Returns:
+            The results of the evaluation.
+        """

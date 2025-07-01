@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 from ropt.plugins.plan.base import Evaluator, PlanComponent
 
@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
-    from ropt.evaluator import EvaluatorContext, EvaluatorResult
+    from ropt.evaluator import EvaluatorCallback, EvaluatorContext, EvaluatorResult
     from ropt.plan import Plan
 
 
@@ -39,7 +39,7 @@ class DefaultFunctionEvaluator(Evaluator):
         tags: set[str] | None = None,
         clients: set[PlanComponent | str] | None = None,
         *,
-        evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult],
+        evaluator: EvaluatorCallback,
     ) -> None:
         """Initialize the DefaultFunctionEvaluator.
 

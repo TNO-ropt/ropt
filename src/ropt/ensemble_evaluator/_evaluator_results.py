@@ -1,13 +1,13 @@
 from collections.abc import Generator
 from dataclasses import InitVar, dataclass
 from itertools import zip_longest
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
 
 from ropt.config import EnOptConfig
-from ropt.evaluator import EvaluatorContext, EvaluatorResult
+from ropt.evaluator import EvaluatorCallback, EvaluatorContext
 from ropt.transforms import OptModelTransforms
 
 
@@ -103,7 +103,7 @@ def _get_active_realizations(
 def _get_function_results(
     config: EnOptConfig,
     transforms: OptModelTransforms | None,
-    evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult],
+    evaluator: EvaluatorCallback,
     variables: NDArray[np.float64],
     active_realizations: NDArray[np.bool_],
 ) -> Generator[tuple[int, _FunctionEvaluatorResults], None, None]:
@@ -160,7 +160,7 @@ def _get_function_results(
 def _get_gradient_results(
     config: EnOptConfig,
     transforms: OptModelTransforms | None,
-    evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult],
+    evaluator: EvaluatorCallback,
     perturbed_variables: NDArray[np.float64],
     active_realizations: NDArray[np.bool_],
 ) -> _GradientEvaluatorResults:
@@ -206,7 +206,7 @@ def _get_gradient_results(
 def _get_function_and_gradient_results(  # noqa: PLR0913
     config: EnOptConfig,
     transforms: OptModelTransforms | None,
-    evaluator: Callable[[NDArray[np.float64], EvaluatorContext], EvaluatorResult],
+    evaluator: EvaluatorCallback,
     variables: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
     active_realizations: NDArray[np.bool_],
