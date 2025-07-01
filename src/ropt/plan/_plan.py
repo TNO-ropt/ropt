@@ -88,10 +88,9 @@ class Plan:
     **Nested Plans:**
 
     Multiple plans can be defined. A step within one plan can trigger the
-    execution of another plan, enabling nested workflows. In nested plans, the
-    [`set_parent`][ropt.plan.Plan.set_parent] method establishes a parent-child
-    relationship. This allows events to propagate up the hierarchy to the parent
-    plan.
+    execution of another plan, enabling nested workflows. Nested plans are
+    created with the `parent` argument set to the parent plan, to allow events
+    to propagate up the hierarchy .
 
     **Aborting a Plan:**
 
@@ -380,16 +379,3 @@ class Plan:
         the plan has been aborted.
         """
         self._aborted = True
-
-    def set_parent(self, parent: Plan) -> None:
-        """Set the parent of the plan.
-
-        Establishes a parent-child relationship between this plan and another
-        plan. This enables event propagation up the plan hierarchy. It also
-        allows the `get_evaluation` method to inquire the parent for an
-        evaluator object, if necessary.
-
-        Args:
-            parent: The parent plan.
-        """
-        self._parent = parent

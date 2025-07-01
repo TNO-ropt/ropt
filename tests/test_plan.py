@@ -547,6 +547,19 @@ def test_exit_code(
     assert exit_code == max_enum
 
 
+def test_dual_plans(enopt_config: dict[str, Any], evaluator: Any) -> None:
+    plan1 = Plan(PluginManager())
+    tracker = plan1.add_event_handler("tracker", sources={"step"})
+    plan1.add_evaluator("function_evaluator", evaluator=evaluator(), clients={"step"})
+    plan2 = Plan(PluginManager(), parent=plan1)
+    step = plan2.add_step("optimizer", tags={"step"})
+    step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
+    assert tracker["results"] is not None
+    assert np.allclose(
+        tracker["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+    )
+
+
 def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
     completed_functions = 0
 

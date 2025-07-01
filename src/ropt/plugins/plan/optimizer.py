@@ -226,8 +226,7 @@ class DefaultOptimizerStep(PlanStep):
     ) -> tuple[FunctionResults | None, bool]:
         if self._nested_optimization is None:
             return None, False
-        nested_plan = Plan(self.plan.plugin_manager)
-        nested_plan.set_parent(self.plan)
+        nested_plan = Plan(self.plan.plugin_manager, parent=self.plan)
         results = self._nested_optimization(nested_plan, variables)
         if nested_plan.aborted:
             self.plan.abort()
