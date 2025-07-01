@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.15">
     
     
       
@@ -668,15 +668,6 @@
   <a href="#ropt.plan.Plan.abort" class="md-nav__link">
     <span class="md-ellipsis">
       abort
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.set_parent" class="md-nav__link">
-    <span class="md-ellipsis">
-      set_parent
     </span>
   </a>
   
@@ -1402,15 +1393,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.set_parent" class="md-nav__link">
-    <span class="md-ellipsis">
-      set_parent
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1575,10 +1557,9 @@ connect to the steps in the plan, or in child plans, via the <code>clients</code
 argument.</p>
 <p><strong>Nested Plans:</strong></p>
 <p>Multiple plans can be defined. A step within one plan can trigger the
-execution of another plan, enabling nested workflows. In nested plans, the
-<a class="autorefs autorefs-internal" title="            set_parent" href="#ropt.plan.Plan.set_parent"><code>set_parent</code></a> method establishes a parent-child
-relationship. This allows events to propagate up the hierarchy to the parent
-plan.</p>
+execution of another plan, enabling nested workflows. Nested plans are
+created with the <code>parent</code> argument set to the parent plan, to allow events
+to propagate up the hierarchy .</p>
 <p><strong>Aborting a Plan:</strong></p>
 <p>A plan's execution can be terminated, either programmatically from within a
 step or event handler, or externally by directly calling the
@@ -2539,61 +2520,6 @@ the plan has been aborted.</p>
 
 </div>
 
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plan.Plan.set_parent" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">set_parent</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_parent</span><span class="p">(</span><span class="n">parent</span><span class="p">:</span> <span class="n">Plan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Set the parent of the plan.</p>
-<p>Establishes a parent-child relationship between this plan and another
-plan. This enables event propagation up the plan hierarchy. It also
-allows the <code>get_evaluation</code> method to inquire the parent for an
-evaluator object, if necessary.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>parent</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.plan.Plan (ropt.plan._plan.Plan)" href="#ropt.plan.Plan">Plan</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The parent plan.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
 
 
   </div>
@@ -2786,7 +2712,7 @@ type. See the <a class="autorefs autorefs-internal" title="            EventType
       <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.expand", "navigation.footer", "navigation.sections", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      <script src="../../assets/javascripts/bundle.56ea9cef.min.js"></script>
       
         <script src="../../javascripts/mathjax.js"></script>
       
