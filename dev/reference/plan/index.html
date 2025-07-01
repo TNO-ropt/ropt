@@ -2442,10 +2442,10 @@ find handlers further up the hierarchy.</p>
     <div class="doc doc-contents ">
 
         <p>Yield suitable evaluators for a given client step.</p>
-<p>This method searches for <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator"><code>Evaluator</code></a> objects
-that are configured to serve the specified <code>client</code>
-(<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a>). The search starts in the
-current plan and continues recursively up the plan hierarchy.</p>
+<p>This method searches for <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator"><code>Evaluator</code></a>
+objects that are configured to serve the specified <code>client</code>
+(<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a>). The search starts in
+the current plan and continues recursively up the plan hierarchy.</p>
 <p>An evaluator is considered suitable if the <code>id</code> or <code>tags</code> of the
 <code>client</code> step is present in the <code>clients</code> set of the evaluator.</p>
 
