@@ -2280,10 +2280,11 @@ set.</p>
     <div class="doc doc-contents ">
 
         <p>Run a step in the plan.</p>
-<p>Executes a specific step within the plan. The step's <code>run</code> method is
-called with the provided keyword arguments. If the plan has been
-aborted, a <a class="autorefs autorefs-internal" title="            PlanAborted" href="../exceptions/#ropt.exceptions.PlanAborted"><code>PlanAborted</code></a> exception is
-raised before the step is executed.</p>
+<p>Executes a specific step within the plan. The step's
+<code>run_step_from_plan</code> method is called with the provided keyword
+arguments. If the plan has been aborted, a
+<a class="autorefs autorefs-internal" title="            PlanAborted" href="../exceptions/#ropt.exceptions.PlanAborted"><code>PlanAborted</code></a> exception is raised before
+the step is executed.</p>
 <p>The step is executed only once. The value returned by the step's <code>run</code>
 method is returned by this method.</p>
 
