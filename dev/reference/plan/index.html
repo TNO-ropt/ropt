@@ -2285,8 +2285,8 @@ set.</p>
 arguments. If the plan has been aborted, a
 <a class="autorefs autorefs-internal" title="            PlanAborted" href="../exceptions/#ropt.exceptions.PlanAborted"><code>PlanAborted</code></a> exception is raised before
 the step is executed.</p>
-<p>The step is executed only once. The value returned by the step's <code>run</code>
-method is returned by this method.</p>
+<p>The step is executed only once. The value returned by the step's
+<code>run_step_from_plan</code> method is returned by this method.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2325,7 +2325,7 @@ method is returned by this method.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Additional arguments to pass to the step's <code>run</code> method.</p>
+                <p>Additional arguments to pass to the step.</p>
               </div>
             </td>
             <td>
