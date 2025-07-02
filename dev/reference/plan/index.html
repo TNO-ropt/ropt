@@ -602,6 +602,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.event_handlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      event_handlers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.evaluators" class="md-nav__link">
+    <span class="md-ellipsis">
+      evaluators
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
@@ -641,24 +659,6 @@
   <a href="#ropt.plan.Plan.run_step" class="md-nav__link">
     <span class="md-ellipsis">
       run_step
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.get_event_handlers" class="md-nav__link">
-    <span class="md-ellipsis">
-      get_event_handlers
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.get_evaluators" class="md-nav__link">
-    <span class="md-ellipsis">
-      get_evaluators
     </span>
   </a>
   
@@ -1322,6 +1322,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.event_handlers" class="md-nav__link">
+    <span class="md-ellipsis">
+      event_handlers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plan.Plan.evaluators" class="md-nav__link">
+    <span class="md-ellipsis">
+      evaluators
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.plan.Plan.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
@@ -1361,24 +1379,6 @@
   <a href="#ropt.plan.Plan.run_step" class="md-nav__link">
     <span class="md-ellipsis">
       run_step
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.get_event_handlers" class="md-nav__link">
-    <span class="md-ellipsis">
-      get_event_handlers
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.get_evaluators" class="md-nav__link">
-    <span class="md-ellipsis">
-      get_evaluators
     </span>
   </a>
   
@@ -1541,8 +1541,13 @@ evaluator objects. This manager can also be used by these components to
 implement further plugin-based functionality.</p>
 <p><strong>Events:</strong></p>
 <p>Steps can communicate events by retrieving a list of handlers using the
-<a class="autorefs autorefs-internal" title="            get_event_handlers" href="#ropt.plan.Plan.get_event_handlers"><code>get_event_handlers</code></a> method. Event
-handlers can respond to these events, enabling actions such as processing
+<a class="autorefs autorefs-internal" title="            event_handlers
+
+
+  
+      property
+  " href="#ropt.plan.Plan.event_handlers"><code>event_handlers</code></a> property. Event handlers
+can respond to these events, enabling actions such as processing
 optimization results. Event handlers are added to the plan using the
 <a class="autorefs autorefs-internal" title="            add_event_handler" href="#ropt.plan.Plan.add_event_handler"><code>add_event_handler</code></a> method. To connect
 the event handlers to steps, they generally accept a set of steps via the
@@ -1557,9 +1562,7 @@ connect to the steps in the plan, or in child plans, via the <code>clients</code
 argument.</p>
 <p><strong>Nested Plans:</strong></p>
 <p>Multiple plans can be defined. A step within one plan can trigger the
-execution of another plan, enabling nested workflows. Nested plans are
-created with the <code>parent</code> argument set to the parent plan, to allow events
-to propagate up the hierarchy .</p>
+execution of another plan, enabling nested workflows.</p>
 <p><strong>Aborting a Plan:</strong></p>
 <p>A plan's execution can be terminated, either programmatically from within a
 step or event handler, or externally by directly calling the
@@ -1691,6 +1694,100 @@ associated with this plan.</p>
 
 </div>
 
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.plan.Plan.event_handlers" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">event_handlers</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event_handlers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the event handlers available to this plan.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.EventHandler" href="../plan_plugins/#ropt.plugins.plan.base.EventHandler">EventHandler</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A list of handlers.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.plan.Plan.evaluators" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">evaluators</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">evaluators</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Evaluator</span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the evaluators available to this plan.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator">Evaluator</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A list of evaluators instances.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+    </div>
+
+</div>
+
 
 
 <div class="doc doc-object doc-function">
@@ -1703,19 +1800,19 @@ associated with this plan.</p>
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">plugin_manager</span><span class="p">:</span> <span class="n">PluginManager</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">parent</span><span class="p">:</span> <span class="n">Plan</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">event_handlers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">evaluators</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Evaluator</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Initialize a plan object.</p>
 <p>Constructs a new plan, associating it with an evaluator, and optionally
-with a plugin manager and/or a parent plan.</p>
+with a plugin manager and/or a event handlers and evaluators.</p>
 <p>The <code>plugin_manager</code> is used by the plan, and possibly by steps and
 event handlers to add plugin functionality.</p>
-<p>If a <code>parent</code> plan is specified, this plan becomes a child, enabling
-communication up the plan hierarchy.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1747,14 +1844,30 @@ communication up the plan hierarchy.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>parent</code>
+                <code>event_handlers</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.plan.Plan (ropt.plan._plan.Plan)" href="#ropt.plan.Plan">Plan</a> | None</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.EventHandler" href="../plan_plugins/#ropt.plugins.plan.base.EventHandler">EventHandler</a>] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An optional parent plan.</p>
+                <p>Event handlers to add to the plan.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>evaluators</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator">Evaluator</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Evaluators to add to the plan.</p>
               </div>
             </td>
             <td>
@@ -2261,184 +2374,6 @@ method is returned by this method.</p>
             <td>
               <div class="doc-md-description">
                 <p>If the plan has been aborted.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plan.Plan.get_event_handlers" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_event_handlers</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_event_handlers</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">source</span><span class="p">:</span> <span class="n">PlanComponent</span><span class="p">,</span> <span class="n">event_types</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">EventType</span><span class="p">]</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">EventType</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">EventHandler</span><span class="p">]]</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Get the event handlers for a given source and event types.</p>
-<p>When this method is called, all event handlers associated with the plan
-are searched for those that handle the <code>source</code>. Then, if the plan has a
-parent, the parent plan's <code>get_event_handlers</code> method is also called,
-find handlers further up the hierarchy.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>source</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanComponent" href="../plan_plugins/#ropt.plugins.plan.base.PlanComponent">PlanComponent</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The source of the event.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>event_types</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            EventType (ropt.enums.EventType)" href="../enums/#ropt.enums.EventType">EventType</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The event types that should be handled.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-internal" title="            EventType (ropt.enums.EventType)" href="../enums/#ropt.enums.EventType">EventType</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.EventHandler" href="../plan_plugins/#ropt.plugins.plan.base.EventHandler">EventHandler</a>]]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A mapping of event types to a list of suitable handlers.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plan.Plan.get_evaluators" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_evaluators</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_evaluators</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">client</span><span class="p">:</span> <span class="n">PlanComponent</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Evaluator</span><span class="p">]</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Yield suitable evaluators for a given client step.</p>
-<p>This method searches for <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator"><code>Evaluator</code></a>
-objects that are configured to serve the specified <code>client</code>
-(<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a>). The search starts in
-the current plan and continues recursively up the plan hierarchy.</p>
-<p>An evaluator is considered suitable if the <code>id</code> or <code>tags</code> of the
-<code>client</code> step is present in the <code>clients</code> set of the evaluator.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>client</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanComponent" href="../plan_plugins/#ropt.plugins.plan.base.PlanComponent">PlanComponent</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The step for which an evaluator is being requested.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Yields:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator">Evaluator</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The evaluators instances configured to serve the client.</p>
               </div>
             </td>
           </tr>
