@@ -13,10 +13,10 @@
 
 ::: ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep
     options:
-        members: [run_step_from_plan]
+        members: [run]
 ::: ropt.plugins.plan.optimizer.DefaultOptimizerStep
     options:
-        members: [run_step_from_plan]
+        members: [run]
 
 ::: ropt.plugins.plan._tracker.DefaultTrackerHandler
     options:

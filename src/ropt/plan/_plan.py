@@ -2,16 +2,12 @@
 
 from __future__ import annotations
 
-from collections import defaultdict
-from typing import TYPE_CHECKING, Any, Iterator
+from typing import TYPE_CHECKING, Any
 
 from ropt.exceptions import PlanAborted
 from ropt.plugins.plan.base import Evaluator, EventHandler, PlanComponent, PlanStep
 
 if TYPE_CHECKING:
-    import uuid
-
-    from ropt.enums import EventType
     from ropt.plugins import PluginManager
 
 
@@ -68,8 +64,8 @@ class Plan:
     **Events:**
 
     Steps can communicate events by retrieving a list of handlers using the
-    [`get_event_handlers`][ropt.plan.Plan.get_event_handlers] method. Event
-    handlers can respond to these events, enabling actions such as processing
+    [`event_handlers`][ropt.plan.Plan.event_handlers] property. Event handlers
+    can respond to these events, enabling actions such as processing
     optimization results. Event handlers are added to the plan using the
     [`add_event_handler`][ropt.plan.Plan.add_event_handler] method. To connect
     the event handlers to steps, they generally accept a set of steps via the
@@ -88,9 +84,7 @@ class Plan:
     **Nested Plans:**
 
     Multiple plans can be defined. A step within one plan can trigger the
-    execution of another plan, enabling nested workflows. Nested plans are
-    created with the `parent` argument set to the parent plan, to allow events
-    to propagate up the hierarchy .
+    execution of another plan, enabling nested workflows.
 
     **Aborting a Plan:**
 
@@ -111,29 +105,33 @@ class Plan:
     def __init__(
         self,
         plugin_manager: PluginManager,
-        parent: Plan | None = None,
+        *,
+        event_handlers: list[EventHandler] | None = None,
+        evaluators: list[Evaluator] | None = None,
     ) -> None:
         """Initialize a plan object.
 
         Constructs a new plan, associating it with an evaluator, and optionally
-        with a plugin manager and/or a parent plan.
+        with a plugin manager and/or a event handlers and evaluators.
 
         The `plugin_manager` is used by the plan, and possibly by steps and
         event handlers to add plugin functionality.
 
-        If a `parent` plan is specified, this plan becomes a child, enabling
-        communication up the plan hierarchy.
-
         Args:
             plugin_manager: A plugin manager.
-            parent:         An optional parent plan.
+            event_handlers: Event handlers to add to the plan.
+            evaluators:     Evaluators to add to the plan.
         """
         self._plugin_manager = plugin_manager
         self._aborted = False
-        self._parent = parent
-        self._handlers: dict[uuid.UUID, EventHandler] = {}
-        self._steps: dict[uuid.UUID, PlanStep] = {}
-        self._evaluators: dict[uuid.UUID, Evaluator] = {}
+        self._handlers: list[EventHandler] = []
+        self._parent_handlers: list[EventHandler] = (
+            [] if event_handlers is None else event_handlers
+        )
+        self._evaluators: list[Evaluator] = []
+        self._parent_evaluators: list[Evaluator] = (
+            [] if evaluators is None else evaluators
+        )
 
     @property
     def aborted(self) -> bool:
@@ -192,7 +190,7 @@ class Plan:
             name, self, tags, sources, **kwargs
         )
         assert isinstance(handler, EventHandler)
-        self._handlers[handler.id] = handler
+        self._handlers.append(handler)
         return handler
 
     def add_step(
@@ -220,7 +218,6 @@ class Plan:
             name, self, tags, **kwargs
         )
         assert isinstance(step, PlanStep)
-        self._steps[step.id] = step
         return step
 
     def add_evaluator(
@@ -255,91 +252,41 @@ class Plan:
             name, self, tags, clients, **kwargs
         )
         assert isinstance(evaluator, Evaluator)
-        self._evaluators[evaluator.id] = evaluator
+        self._evaluators.append(evaluator)
         return evaluator
 
-    def run_step(self, step: PlanStep, **kwargs: Any) -> Any:  # noqa: ANN401
-        """Run a step in the plan.
+    def pre_run(self) -> None:
+        """Run checks before executing a step.
 
-        Executes a specific step within the plan. The step's `run` method is
-        called with the provided keyword arguments. If the plan has been
-        aborted, a [`PlanAborted`][ropt.exceptions.PlanAborted] exception is
-        raised before the step is executed.
-
-        The step is executed only once. The value returned by the step's `run`
-        method is returned by this method.
-
-        Args:
-            step:   The step to run.
-            kwargs: Additional arguments to pass to the step's `run` method.
-
-        Returns:
-            Any: The value returned by the step's `run` method.
+        This method must be called by the `run` method of step before executing
+        its function. If the plan has been aborted, a
+        [`PlanAborted`][ropt.exceptions.PlanAborted] exception is raised before
+        the step is executed.
 
         Raises:
-            AttributeError: If the provided `step` ID is not valid.
-            PlanAborted:    If the plan has been aborted.
+            PlanAborted: If the plan has been aborted.
         """
-        if step.id not in self._steps:
-            msg = "not a valid step"
-            raise AttributeError(msg)
         if self._aborted:
             msg = "Plan was aborted by the previous step."
             raise PlanAborted(msg)
-        return step.run_step_from_plan(**kwargs)
 
-    def get_event_handlers(
-        self, source: PlanComponent, event_types: set[EventType]
-    ) -> dict[EventType, list[EventHandler]]:
-        """Get the event handlers for a given source and event types.
-
-        When this method is called, all event handlers associated with the plan
-        are searched for those that handle the `source`. Then, if the plan has a
-        parent, the parent plan's `get_event_handlers` method is also called,
-        find handlers further up the hierarchy.
-
-        Args:
-            source:      The source of the event.
-            event_types: The event types that should be handled.
+    @property
+    def event_handlers(self) -> list[EventHandler]:
+        """Get the event handlers available to this plan.
 
         Returns:
-            A mapping of event types to a list of suitable handlers.
+            A list of handlers.
         """
-        result: defaultdict[EventType, list[EventHandler]] = defaultdict(list)
-        for handler in self._handlers.values():
-            if (source.id in handler.sources or source.tags & handler.sources) and (
-                event_types & handler.event_types
-            ):
-                for event_type in handler.event_types:
-                    result[event_type].append(handler)
-        if self._parent is not None:
-            parent_handlers = self._parent.get_event_handlers(source, event_types)
-            for event_type, handlers in parent_handlers.items():
-                result[event_type].extend(handlers)
-        return dict(result)
+        return self._handlers + self._parent_handlers
 
-    def get_evaluators(self, client: PlanComponent) -> Iterator[Evaluator]:
-        """Yield suitable evaluators for a given client step.
+    @property
+    def evaluators(self) -> list[Evaluator]:
+        """Get the evaluators available to this plan.
 
-        This method searches for [`Evaluator`][ropt.plugins.plan.base.Evaluator]
-        objects that are configured to serve the specified `client`
-        ([`PlanStep`][ropt.plugins.plan.base.PlanStep]). The search starts in
-        the current plan and continues recursively up the plan hierarchy.
-
-        An evaluator is considered suitable if the `id` or `tags` of the
-        `client` step is present in the `clients` set of the evaluator.
-
-        Args:
-            client: The step for which an evaluator is being requested.
-
-        Yields:
-            The evaluators instances configured to serve the client.
+        Returns:
+            A list of evaluators instances.
         """
-        for evaluator in self._evaluators.values():
-            if client.id in evaluator.clients or client.tags & evaluator.clients:
-                yield evaluator
-        if self._parent is not None:
-            yield from self._parent.get_evaluators(client)
+        return self._evaluators + self._parent_evaluators
 
     def abort(self) -> None:
         """Abort the plan.

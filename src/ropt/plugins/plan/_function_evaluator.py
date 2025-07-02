@@ -44,7 +44,7 @@ class DefaultFunctionEvaluator(Evaluator):
         """Initialize the DefaultFunctionEvaluator.
 
         Args:
-            plan:      The parent plan instance.
+            plan:      The plan instance this evaluator belongs to.
             tags:      Optional tags
             clients:   The steps that are allowed to use this evaluator.
             evaluator: The callable that will perform the actual evaluation.

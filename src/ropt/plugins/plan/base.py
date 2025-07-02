@@ -233,19 +233,19 @@ class PlanComponent:
 
     @property
     def id(self) -> uuid.UUID:
-        """Return the unique identifier of the event handler.
+        """Return the unique identifier of the component.
 
         Returns:
-            A UUID object representing the unique identifier of the event handler.
+            A UUID object representing the unique identifier of the component.
         """
         return self.__id
 
     @property
     def plan(self) -> Plan:
-        """Return the parent plan associated with this event handler.
+        """Return the parent plan associated with this component.
 
         Returns:
-            The [`Plan`][ropt.plan.Plan] object that owns this event handler.
+            The [`Plan`][ropt.plan.Plan] object that owns this component.
         """
         return self.__stored_plan
 
@@ -270,15 +270,12 @@ class PlanStep(ABC, PlanComponent):
     `PlanStep` objects are typically created by corresponding
     [`PlanStepPlugin`][ropt.plugins.plan.base.PlanStepPlugin] factories, which
     are managed by the [`PluginManager`][ropt.plugins.PluginManager]. Once
-    instantiated and added to a `Plan`, their
-    [`run_step_from_plan`][ropt.plugins.plan.base.PlanStep.run_step_from_plan]
-    method is called by the plan during execution. This is generally done
-    indirectly by calling the [`run`][ropt.plugins.plan.base.PlanStep.run]
-    method on the step object.
+    instantiated and added to a `Plan`, they may be executed using their `run`
+    method.
 
     Subclasses must implement the abstract
-    [`run_step_from_plan`][ropt.plugins.plan.base.PlanStep.run_step_from_plan]
-    method to define the step's specific behavior.
+    [`run`][ropt.plugins.plan.base.PlanStep.run] method to define the step's
+    specific behavior.
     """
 
     def __init__(self, plan: Plan, tags: set[str] | None = None) -> None:
@@ -293,45 +290,25 @@ class PlanStep(ABC, PlanComponent):
         """
         super().__init__(plan, tags)
 
-    def run(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
-        """Execute this plan step.
-
-        This method initiates the execution of the current plan step. It
-        delegates the actual execution to the parent [`Plan`][ropt.plan.Plan]
-        object's [`run_step`][ropt.plan.Plan.run_step] method, passing itself
-        (the step instance) along with any provided arguments.
-
-        The parent `Plan` then calls the concrete
-        [`run_step_from_plan`][ropt.plugins.plan.base.PlanStep.run_step_from_plan]
-        method implemented by the subclass of this `PlanStep`. This allows the
-        plan to do some bookkeeping, for instance to check if the plan was
-        aborted.
-
-        Args:
-            *args:    Positional arguments to be passed to the step's specific `run_step` method.
-            **kwargs: Keyword arguments to be passed to the step's specific `run_step` method.
-
-        Returns:
-            The result returned by the step's specific `run_step_from_plan` method.
-        """
-        return self.plan.run_step(self, *args, **kwargs)
-
     @abstractmethod
-    def run_step_from_plan(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
+    def run(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
         """Execute the logic defined by this plan step.
 
         This abstract method must be implemented by concrete `PlanStep`
         subclasses to define the specific action the step performs within the
         optimization [`Plan`][ropt.plan.Plan].
 
-        The `Plan` object calls this method during its execution sequence,
-        passing any arguments provided when the step was invoked via
-        [`Plan.run_step`][ropt.plan.Plan.run_step]. The return value and type
-        can vary depending on the specific step implementation.
+        The return value and type can vary depending on the specific step
+        implementation.
+
+        Warning: Calling the plan's `pre_run` method.
+            At the beginning of this function it essential to call the plan's
+            `pre_run` method. This will assure that the plan performs some checks,
+            such as checking if the plan was aborted by an earlier step
 
         Args:
-            args:   Positional arguments passed from `Plan.run_step`.
-            kwargs: Keyword arguments passed from `Plan.run_step`.
+            args:   Positional arguments.
+            kwargs: Keyword arguments.
 
         Returns:
             The result of the step's execution, if any.

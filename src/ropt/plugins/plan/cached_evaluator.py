@@ -125,7 +125,15 @@ class DefaultCachedEvaluator(Evaluator):
 
         if cached:
             context.active[list(cached.keys())] = False
-        evaluator = next(self.plan.get_evaluators(self), None)
+
+        evaluator = next(
+            (
+                item
+                for item in self.plan.evaluators
+                if self.id in item.clients or self.tags & item.clients
+            ),
+            None,
+        )
         if evaluator is None:
             msg = "No suitable evaluator found."
             raise AttributeError(msg)

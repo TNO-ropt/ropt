@@ -545,7 +545,11 @@ def test_dual_plans(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plan1 = Plan(PluginManager())
     tracker = plan1.add_event_handler("tracker", sources={"step"})
     plan1.add_evaluator("function_evaluator", evaluator=evaluator(), clients={"step"})
-    plan2 = Plan(PluginManager(), parent=plan1)
+    plan2 = Plan(
+        PluginManager(),
+        event_handlers=plan1.event_handlers,
+        evaluators=plan1.evaluators,
+    )
     step = plan2.add_step("optimizer", tags={"step"})
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
     assert tracker["results"] is not None
@@ -700,7 +704,9 @@ def test_plan_abort(enopt_config: Any, evaluator: Any) -> None:
 
     step = plan.add_step("optimizer")
     with pytest.raises(PlanAborted, match="Plan was aborted by the previous step."):
-        step.run(config=EnOptConfig.model_validate(enopt_config))
+        step.run(
+            variables=initial_values, config=EnOptConfig.model_validate(enopt_config)
+        )
 
 
 def _cached_eval(

@@ -98,7 +98,7 @@ class DefaultOptimizerStep(PlanStep):
         """
         super().__init__(plan, tags)
 
-    def run_step_from_plan(
+    def run(
         self,
         config: EnOptConfig,
         variables: ArrayLike,
@@ -140,19 +140,12 @@ class DefaultOptimizerStep(PlanStep):
         Returns:
             An exit code indicating the outcome of the optimization.
         """
+        self.plan.pre_run()
+
         self._config = config
         self._transforms = transforms
         self._nested_optimization = nested_optimization
         self._metadata = metadata
-        self._event_handlers = self.plan.get_event_handlers(
-            self,
-            {
-                EventType.START_OPTIMIZER_STEP,
-                EventType.FINISHED_OPTIMIZER_STEP,
-                EventType.START_EVALUATION,
-                EventType.FINISHED_EVALUATION,
-            },
-        )
 
         event_data: dict[str, Any] = {"config": config, "transforms": transforms}
 
@@ -167,7 +160,14 @@ class DefaultOptimizerStep(PlanStep):
         if self._transforms is not None and self._transforms.variables is not None:
             variables = self._transforms.variables.to_optimizer(variables)
 
-        evaluator = next(self.plan.get_evaluators(self), None)
+        evaluator = next(
+            (
+                item
+                for item in self.plan.evaluators
+                if self.id in item.clients or self.tags & item.clients
+            ),
+            None,
+        )
         if evaluator is None:
             msg = "No suitable evaluator found."
             raise AttributeError(msg)
@@ -202,8 +202,11 @@ class DefaultOptimizerStep(PlanStep):
         return exit_code
 
     def _emit_event(self, event: Event) -> None:
-        for handler in self._event_handlers.get(event.event_type, []):
-            handler.handle_event(event)
+        for handler in self.plan.event_handlers:
+            if (event.event_type in handler.event_types) and (
+                self.id in handler.sources or self.tags & handler.sources
+            ):
+                handler.handle_event(event)
 
     def _signal_evaluation(self, results: tuple[Results, ...] | None = None) -> None:
         event_data: dict[str, Any] = {
@@ -229,7 +232,11 @@ class DefaultOptimizerStep(PlanStep):
     ) -> tuple[FunctionResults | None, bool]:
         if self._nested_optimization is None:
             return None, False
-        nested_plan = Plan(self.plan.plugin_manager, parent=self.plan)
+        nested_plan = Plan(
+            self.plan.plugin_manager,
+            event_handlers=self.plan.event_handlers,
+            evaluators=self.plan.evaluators,
+        )
         results = self._nested_optimization(nested_plan, variables)
         if nested_plan.aborted:
             self.plan.abort()

@@ -98,31 +98,29 @@ class DefaultTrackerHandler(EventHandler):
         Args:
             event: The event object emitted by the plan.
         """
-        if "results" in event.data:
-            results = event.data["results"]
-            if self["results"] is None:
-                self._tracked_results = None
-            filtered_results: FunctionResults | None = None
-            match self._what:
-                case "best":
-                    filtered_results = _update_optimal_result(
-                        self._tracked_results,
-                        results,
-                        self._constraint_tolerance,
-                    )
-                case "last":
-                    filtered_results = _get_last_result(
-                        results,
-                        self._constraint_tolerance,
-                    )
-            if filtered_results is not None:
-                self._tracked_results = filtered_results
-                transforms = event.data["transforms"]
-                if transforms is not None:
-                    filtered_results = filtered_results.transform_from_optimizer(
-                        transforms
-                    )
-                self["results"] = filtered_results
+        if (results := event.data.get("results")) is None:
+            return
+        if self["results"] is None:
+            self._tracked_results = None
+        filtered_results: FunctionResults | None = None
+        match self._what:
+            case "best":
+                filtered_results = _update_optimal_result(
+                    self._tracked_results,
+                    results,
+                    self._constraint_tolerance,
+                )
+            case "last":
+                filtered_results = _get_last_result(
+                    results,
+                    self._constraint_tolerance,
+                )
+        if filtered_results is not None:
+            self._tracked_results = filtered_results
+            transforms = event.data["transforms"]
+            if transforms is not None:
+                filtered_results = filtered_results.transform_from_optimizer(transforms)
+            self["results"] = filtered_results
 
     @property
     def event_types(self) -> set[EventType]:
