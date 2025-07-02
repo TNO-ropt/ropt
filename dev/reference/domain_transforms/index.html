@@ -1834,7 +1834,7 @@ for:</p>
     relevant optimization steps within the <a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> via the
     configuraiton object. (See, for example, the default implementation of an
     optimizer step in
-    <a class="autorefs autorefs-internal" title="            run" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep.run"><code>DefaultOptimizerStep.run</code></a>).</li>
+    <a class="autorefs autorefs-internal" title="            run" href="../default_plan_plugin/#ropt.plugins.plan.optimizer.DefaultOptimizerStep.run"><code>DefaultOptimizerStep.run</code></a>).</li>
 <li><strong>Evaluation:</strong> When the optimizer requests an evaluation of a variable
     vector, the following occurs:<ul>
 <li><strong>Transformation to the User Domain:</strong> The variable vector is
@@ -1866,7 +1866,7 @@ for:</p>
   " href="../results/#ropt.results.Results.transform_from_optimizer"><code>transform_from_optimizer</code></a>
     method is used to create new <code>Results</code> objects with the transformed values.
     For example,
-    <a class="autorefs autorefs-internal" title="            run" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep.run"><code>DefaultOptimizerStep.run</code></a>
+    <a class="autorefs autorefs-internal" title="            run" href="../default_plan_plugin/#ropt.plugins.plan.optimizer.DefaultOptimizerStep.run"><code>DefaultOptimizerStep.run</code></a>
     emits events that include a dictionary with a <code>"results"</code> key That contains
     <code>Results</code> objects in the  optimizer domain. To obtain results in the user
     domain they must be converted using the

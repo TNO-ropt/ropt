@@ -656,9 +656,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.run_step" class="md-nav__link">
+  <a href="#ropt.plan.Plan.pre_run" class="md-nav__link">
     <span class="md-ellipsis">
-      run_step
+      pre_run
     </span>
   </a>
   
@@ -1376,9 +1376,9 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plan.Plan.run_step" class="md-nav__link">
+  <a href="#ropt.plan.Plan.pre_run" class="md-nav__link">
     <span class="md-ellipsis">
-      run_step
+      pre_run
     </span>
   </a>
   
@@ -1530,7 +1530,12 @@ that a handler should process, its <code>sources</code> argument may contain bot
 component objects, which identifies by their ID, or tags, which could refer
 to multiple components that have that tag.</p>
 <p><strong>Executing a Plan:</strong></p>
-<p>Once a plan is assembled, the <a class="autorefs autorefs-internal" title="            run" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep.run"><code>run</code></a>
+<p>Once a plan is assembled, the <a class="autorefs autorefs-internal" title="            run
+
+
+  
+      abstractmethod
+  " href="../plan_plugins/#ropt.plugins.plan.base.PlanStep.run"><code>run</code></a>
 method can be invoked for each step individually. This approach allows for
 the integration of complex logic and custom functions, leveraging the full
 capabilities of Python.</p>
@@ -2269,94 +2274,21 @@ set.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plan.Plan.run_step" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run_step</span>
+<h3 id="ropt.plan.Plan.pre_run" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">pre_run</span>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run_step</span><span class="p">(</span><span class="n">step</span><span class="p">:</span> <span class="n">PlanStep</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">pre_run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Run a step in the plan.</p>
-<p>Executes a specific step within the plan. The step's
-<code>run_step_from_plan</code> method is called with the provided keyword
-arguments. If the plan has been aborted, a
+        <p>Run checks before executing a step.</p>
+<p>This method must be called by the <code>run</code> method of step before executing
+its function. If the plan has been aborted, a
 <a class="autorefs autorefs-internal" title="            PlanAborted" href="../exceptions/#ropt.exceptions.PlanAborted"><code>PlanAborted</code></a> exception is raised before
 the step is executed.</p>
-<p>The step is executed only once. The value returned by the step's
-<code>run_step_from_plan</code> method is returned by this method.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>step</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The step to run.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>kwargs</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Additional arguments to pass to the step.</p>
-              </div>
-            </td>
-            <td>
-                  <code>{}</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>Any</code></td>            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The value returned by the step's <code>run</code> method.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
 
 
 <p><span class="doc-section-title">Raises:</span></p>

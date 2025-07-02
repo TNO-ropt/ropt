@@ -918,15 +918,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.PlanStep.run_step_from_plan" class="md-nav__link">
-    <span class="md-ellipsis">
-      run_step_from_plan
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1624,15 +1615,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.plan.base.PlanStep.run_step_from_plan" class="md-nav__link">
-    <span class="md-ellipsis">
-      run_step_from_plan
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1840,7 +1822,12 @@ following abstract base classes:</p>
 <ul>
 <li><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="#ropt.plugins.plan.base.PlanStep"><code>PlanStep</code></a>: The abstract base class
   that all concrete plan step implementations must inherit from. It defines
-  the <a class="autorefs autorefs-internal" title="            run" href="#ropt.plugins.plan.base.PlanStep.run"><code>run</code></a> method where the step's
+  the <a class="autorefs autorefs-internal" title="            run
+
+
+  
+      abstractmethod
+  " href="#ropt.plugins.plan.base.PlanStep.run"><code>run</code></a> method where the step's
   logic resides.</li>
 <li><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.EventHandler" href="#ropt.plugins.plan.base.EventHandler"><code>EventHandler</code></a>: The abstract base
   class for all event handlers. It defines the
@@ -2857,24 +2844,16 @@ functions, must inherit from this base class.</p>
 <p><code>PlanStep</code> objects are typically created by corresponding
 <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStepPlugin" href="#ropt.plugins.plan.base.PlanStepPlugin"><code>PlanStepPlugin</code></a> factories, which
 are managed by the <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>. Once
-instantiated and added to a <code>Plan</code>, their
-<a class="autorefs autorefs-internal" title="            run_step_from_plan
-
-
-  
-      abstractmethod
-  " href="#ropt.plugins.plan.base.PlanStep.run_step_from_plan"><code>run_step_from_plan</code></a>
-method is called by the plan during execution. This is generally done
-indirectly by calling the <a class="autorefs autorefs-internal" title="            run" href="#ropt.plugins.plan.base.PlanStep.run"><code>run</code></a>
-method on the step object.</p>
+instantiated and added to a <code>Plan</code>, they may be executed using their <code>run</code>
+method.</p>
 <p>Subclasses must implement the abstract
-<a class="autorefs autorefs-internal" title="            run_step_from_plan
+<a class="autorefs autorefs-internal" title="            run
 
 
   
       abstractmethod
-  " href="#ropt.plugins.plan.base.PlanStep.run_step_from_plan"><code>run_step_from_plan</code></a>
-method to define the step's specific behavior.</p>
+  " href="#ropt.plugins.plan.base.PlanStep.run"><code>run</code></a> method to define the step's
+specific behavior.</p>
 
 
 
@@ -2971,116 +2950,12 @@ a unique ID. The parent plan is accessible via the <code>plan</code> property.</
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
 
 
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Execute this plan step.</p>
-<p>This method initiates the execution of the current plan step. It
-delegates the actual execution to the parent <a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a>
-object's <a class="autorefs autorefs-internal" title="            run_step" href="../plan/#ropt.plan.Plan.run_step"><code>run_step</code></a> method, passing itself
-(the step instance) along with any provided arguments.</p>
-<p>The parent <code>Plan</code> then calls the concrete
-<a class="autorefs autorefs-internal" title="            run_step_from_plan
-
-
-  
-      abstractmethod
-  " href="#ropt.plugins.plan.base.PlanStep.run_step_from_plan"><code>run_step_from_plan</code></a>
-method implemented by the subclass of this <code>PlanStep</code>. This allows the
-plan to do some bookkeeping, for instance to check if the plan was
-aborted.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>*args</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Positional arguments to be passed to the step's specific <code>run_step</code> method.</p>
-              </div>
-            </td>
-            <td>
-                  <code>()</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>**kwargs</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Keyword arguments to be passed to the step's specific <code>run_step</code> method.</p>
-              </div>
-            </td>
-            <td>
-                  <code>{}</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The result returned by the step's specific <code>run_step_from_plan</code> method.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plugins.plan.base.PlanStep.run_step_from_plan" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run_step_from_plan</span>
-
-
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run_step_from_plan</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3089,11 +2964,16 @@ aborted.</p>
 <p>This abstract method must be implemented by concrete <code>PlanStep</code>
 subclasses to define the specific action the step performs within the
 optimization <a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a>.</p>
-<p>The <code>Plan</code> object calls this method during its execution sequence,
-passing any arguments provided when the step was invoked via
-<a class="autorefs autorefs-internal" title="            run_step" href="../plan/#ropt.plan.Plan.run_step"><code>Plan.run_step</code></a>. The return value and type
-can vary depending on the specific step implementation.</p>
+<p>The return value and type can vary depending on the specific step
+implementation.</p>
 
+
+<details class="warning" open>
+  <summary>Calling the plan's <code>pre_run</code> method.</summary>
+  <p>At the beginning of this function it essential to call the plan's
+<code>pre_run</code> method. This will assure that the plan performs some checks,
+such as checking if the plan was aborted by an earlier step</p>
+</details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>
@@ -3115,7 +2995,7 @@ can vary depending on the specific step implementation.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Positional arguments passed from <code>Plan.run_step</code>.</p>
+                <p>Positional arguments.</p>
               </div>
             </td>
             <td>
@@ -3131,7 +3011,7 @@ can vary depending on the specific step implementation.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Keyword arguments passed from <code>Plan.run_step</code>.</p>
+                <p>Keyword arguments.</p>
               </div>
             </td>
             <td>
