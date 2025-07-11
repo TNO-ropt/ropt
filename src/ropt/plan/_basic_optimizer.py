@@ -9,7 +9,7 @@ from contextlib import suppress
 from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Iterator, Self
+from typing import TYPE_CHECKING, Any, Self
 
 import numpy as np
 
@@ -21,6 +21,8 @@ from ropt.plugins import PluginManager
 from ._plan import Plan
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Iterator
+
     from numpy.typing import ArrayLike, NDArray
 
     from ropt.evaluator import EvaluatorCallback

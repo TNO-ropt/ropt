@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 from ropt.plugins.plan.base import EventHandler, PlanComponent
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from ropt.enums import EventType
     from ropt.plan import Event, Plan
 

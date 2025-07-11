@@ -13,9 +13,12 @@ Classes:
 from __future__ import annotations
 
 from textwrap import dedent
-from typing import Any, Callable, Generic, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from pydantic import BaseModel, ConfigDict, HttpUrl, create_model, model_validator
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 T = TypeVar("T")
 
@@ -75,7 +78,7 @@ class OptionsSchemaModel(BaseModel):
         options: dict[str, Any] | None = None
         for method_name, method_schema in self.methods.items():
             options = {
-                option: (Union[type_, None], None)
+                option: (type_ | None, None)
                 for option, type_ in method_schema.options.items()
             }
             if method_name.lower() == method.lower():

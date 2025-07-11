@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import uuid
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Sequence
+from typing import TYPE_CHECKING, Any
 
 from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     import numpy as np
     from numpy.typing import NDArray
 

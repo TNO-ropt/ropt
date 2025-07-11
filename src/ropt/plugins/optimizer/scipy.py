@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import copy
+from collections.abc import Callable
 from functools import partial
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Final, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Final, Literal
 
 import numpy as np
 from numpy.typing import NDArray

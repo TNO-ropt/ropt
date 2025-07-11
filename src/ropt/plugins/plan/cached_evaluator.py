@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Final, Iterable, Sequence
+from typing import TYPE_CHECKING, Final
 
 import numpy as np
 from numpy.typing import NDArray
@@ -11,6 +11,8 @@ from ropt.plugins.plan.base import Evaluator, EventHandler, PlanComponent
 from ropt.results import FunctionResults
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
+
     from numpy.typing import NDArray
 
     from ropt.evaluator import EvaluatorContext, EvaluatorResult

@@ -85,13 +85,8 @@ exclude = ["src/ropt/version.py", "build"]
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
-    "AIR",    # airflow-variable-name-task-id-mismatch
     "COM812", # missing-trailing-comma
     "E501",   # line-too-lone
-    "ISC001", # single-line-implicit-string-concatenation   
-    "DJ",     # flake8-django
-    "FA",     # flake8-future-annotations
-    "UP",     # pyupgrade 
     "S101",   # assert
 ]
 
