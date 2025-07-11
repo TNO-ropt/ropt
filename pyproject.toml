@@ -74,8 +74,6 @@ write_to = "src/ropt/version.py"
 markers = ["slow: slow test marker", "external: external optimizer marker"]
 filterwarnings = [
     "error",
-    'ignore:\nPyarrow will become a required dependency of pandas.*:DeprecationWarning',
-    'ignore:datetime.datetime.utcfromtimestamp\(\) is deprecated.*:DeprecationWarning',  # 3.12
     'ignore:numpy.ndarray size changed, may indicate binary incompatibility.*:RuntimeWarning',
 ]
 
