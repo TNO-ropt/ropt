@@ -11,7 +11,7 @@ from collections.abc import Sequence
 from collections.abc import Sequence as AbstractSequence
 from collections.abc import Set as AbstractSet
 from enum import IntEnum
-from typing import Any, TypeVar, cast
+from typing import Any, TypeVar
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
@@ -168,11 +168,11 @@ T = TypeVar("T")
 
 def _convert_set(value: T | set[T] | Sequence[T]) -> set[T]:
     if isinstance(value, str):
-        return {cast("T", value)}
+        return {value}
     return set(value) if isinstance(value, AbstractSequence | AbstractSet) else {value}
 
 
 def _convert_tuple(value: T | Sequence[T]) -> tuple[T, ...]:
     if isinstance(value, str):
-        return (cast("T", value),)
+        return (value,)
     return tuple(value) if isinstance(value, AbstractSequence) else (value,)
