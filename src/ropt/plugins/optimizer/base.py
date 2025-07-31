@@ -181,6 +181,10 @@ class OptimizerPlugin(Plugin):
             is as expected, and raise a `ValueError` with an appropriate message
             if this is not the case.
 
+        Warning: Handling the default method
+            The the method string may be set to "default", in which case it should
+            be mapped to the correct default method of the backend.
+
         Args:
             method:  The specific optimization method name (e.g., "slsqp",
                      "my_optimizer/variant1").

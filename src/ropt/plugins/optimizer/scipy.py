@@ -44,6 +44,7 @@ _SUPPORTED_METHODS: Final[set[str]] = {
         "differential_evolution",
     )
 }
+_DEFAULT_METHOD: Final = "slsqp"
 
 
 # Categorize the methods by the types of constraint they support or require.
@@ -134,7 +135,7 @@ class SciPyOptimizer(Optimizer):
         self._config = config
         _, _, self._method = self._config.optimizer.method.lower().rpartition("/")
         if self._method == "default":
-            self._method = "slsqp"
+            self._method = _DEFAULT_METHOD
         if self._method not in _SUPPORTED_METHODS:
             msg = f"SciPy optimizer algorithm {self._method} is not supported"
             raise NotImplementedError(msg)
@@ -577,7 +578,7 @@ class SciPyOptimizerPlugin(OptimizerPlugin):
                 msg = "SciPy optimizer options must be a dictionary"
                 raise ValueError(msg)
             OptionsSchemaModel.model_validate(_OPTIONS_SCHEMA).get_options_model(
-                method
+                _DEFAULT_METHOD if method == "default" else method
             ).model_validate(options)
 
 
