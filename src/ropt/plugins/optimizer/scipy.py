@@ -577,6 +577,7 @@ class SciPyOptimizerPlugin(OptimizerPlugin):
             if not isinstance(options, dict):
                 msg = "SciPy optimizer options must be a dictionary"
                 raise ValueError(msg)
+            *_, method = method.rpartition("/")
             OptionsSchemaModel.model_validate(_OPTIONS_SCHEMA).get_options_model(
                 _DEFAULT_METHOD if method == "default" else method
             ).model_validate(options)
