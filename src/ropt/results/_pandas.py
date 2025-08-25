@@ -34,13 +34,15 @@ def _to_dataframe(
             )
             assert series is not None
             frame = series.to_frame()
-            for axis in unstack:
-                if axis.value in frame.index.names:
-                    frame = cast(
-                        "pd.DataFrame",
-                        frame.unstack(axis.value, sort=False),  # type:ignore[call-arg]  # noqa: PD010
-                    )
-            frame.columns = frame.columns.to_flat_index()  # type:ignore[no-untyped-call]
+            levels = [axis.value for axis in unstack if axis.value in frame.index.names]
+            if levels:
+                frame = frame.reset_index().pivot_table(
+                    index=[col for col in frame.index.names if col not in levels],
+                    columns=levels,
+                    aggfunc="first",
+                    sort=False,
+                )
+            frame.columns = frame.columns.to_flat_index()
             if joined_frame.empty:
                 joined_frame = frame
             else:
