@@ -33,7 +33,13 @@ def _to_dataframe(
                 {(0 if batch_id is None else batch_id): series}, names=["batch_id"]
             ).to_frame()
             levels = [axis.value for axis in unstack if axis.value in frame.index.names]
-            frame = frame.unstack(levels, sort=False)  # noqa: PD010
+            if levels:
+                frame = frame.reset_index().pivot_table(
+                    index=[col for col in frame.index.names if col not in levels],
+                    columns=levels,
+                    aggfunc="first",
+                    sort=False,
+                )
             frame.columns = frame.columns.to_flat_index()
             if joined_frame.empty:
                 joined_frame = frame
