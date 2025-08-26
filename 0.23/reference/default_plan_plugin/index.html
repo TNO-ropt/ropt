@@ -1,0 +1,2643 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../function_estimator_plugins/">
+      
+      
+        <link rel="next" href="../scipy_optimizer_plugin/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.18">
+    
+    
+      
+        <title>Default Plan Plugins - ropt Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.7e37652d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ropt.plugins.plan.default" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="ropt Documentation" class="md-header__button md-logo" aria-label="ropt Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ropt Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Default Plan Plugins
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="lime"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/TNO-ropt/ropt" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    TNO-ropt/ropt
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  About
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../usage/robust_optimization/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Introduction
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../enopt_config/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="ropt Documentation" class="md-nav__button md-logo" aria-label="ropt Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    ropt Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/TNO-ropt/ropt" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    TNO-ropt/ropt
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    About
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/robust_optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../enopt_config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Configuration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../domain_transforms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Domain transforms
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Optimization
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            Optimization
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Optimization Plans
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../basic_optimizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Basic Optimizer
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Optimization
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../evaluator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Function Evaluations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Optimization Results
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Plugins
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Plugins
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plugin_manager/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Plugins
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plan_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Plan Plugins
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../optimizer_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Optimizer Plugins
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sampler_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Sampler Plugins
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../realization_filter_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Realization Filter Plugins
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../function_estimator_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Function estimator Plugins
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Default Plugins
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            Default Plugins
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Default Plan Plugins
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Default Plan Plugins
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default" class="md-nav__link">
+    <span class="md-ellipsis">
+      default
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultPlanStepPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultPlanStepPlugin
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultEventHandlerPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultEventHandlerPlugin
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultEvaluatorPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultEvaluatorPlugin
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultEnsembleEvaluatorStep
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DefaultEnsembleEvaluatorStep">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      run
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultOptimizerStep
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DefaultOptimizerStep">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      run
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan._tracker.DefaultTrackerHandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultTrackerHandler
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan._store.DefaultStoreHandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultStoreHandler
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan._observer.DefaultObserverHandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultObserverHandler
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan._function_evaluator.DefaultFunctionEvaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultFunctionEvaluator
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.cached_evaluator.DefaultCachedEvaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultCachedEvaluator
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scipy_optimizer_plugin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SciPy Optimizer Plugin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scipy_sampler_plugin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SciPy Sampler Plugin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_realization_filter_plugin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Default Realization Filter Plugin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_function_estimator_plugin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Default Function Estimator Plugin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../external_optimizer_plugin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    External Optimizer Plugin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../enums/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Enumerations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Exceptions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Utilities
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default" class="md-nav__link">
+    <span class="md-ellipsis">
+      default
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultPlanStepPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultPlanStepPlugin
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultEventHandlerPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultEventHandlerPlugin
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.default.DefaultEvaluatorPlugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultEvaluatorPlugin
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultEnsembleEvaluatorStep
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DefaultEnsembleEvaluatorStep">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      run
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultOptimizerStep
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DefaultOptimizerStep">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      run
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan._tracker.DefaultTrackerHandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultTrackerHandler
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan._store.DefaultStoreHandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultStoreHandler
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan._observer.DefaultObserverHandler" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultObserverHandler
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan._function_evaluator.DefaultFunctionEvaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultFunctionEvaluator
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.plan.cached_evaluator.DefaultCachedEvaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      DefaultCachedEvaluator
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>Default Plan Plugins</h1>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="ropt.plugins.plan.default" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.plugins.plan.default</span>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>This module provides the default plugin implementations for steps and event handlers.</p>
+<p>It defines <code>DefaultPlanStepPlugin</code> and <code>DefaultEventHandlerPlugin</code>, which serve
+as factories for the built-in plan components, enabling the creation of
+standard optimization plans out-of-the-box.</p>
+<p><strong>Supported Components:</strong></p>
+<ul>
+<li><strong>Steps:</strong><ul>
+<li><code>ensemble_evaluator</code>: Performs ensemble evaluations
+    (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep" href="#ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep"><code>DefaultEnsembleEvaluatorStep</code></a>).</li>
+<li><code>optimizer</code>: Runs an optimization algorithm using a configured optimizer
+    plugin
+    (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.optimizer.DefaultOptimizerStep" href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep"><code>DefaultOptimizerStep</code></a>).</li>
+</ul>
+</li>
+<li><strong>Handlers:</strong><ul>
+<li><code>tracker</code>: Tracks the 'best' or 'last' valid result based on objective
+    value and constraints
+    (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan._tracker.DefaultTrackerHandler" href="#ropt.plugins.plan._tracker.DefaultTrackerHandler"><code>DefaultTrackerHandler</code></a>).</li>
+<li><code>store</code>: Accumulates all results from specified sources
+    (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan._store.DefaultStoreHandler" href="#ropt.plugins.plan._store.DefaultStoreHandler"><code>DefaultStoreHandler</code></a>).</li>
+<li><code>observer</code>: Listens for events from specified sources, and calls a
+  callback for each event
+    (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan._observer.DefaultObserverHandler" href="#ropt.plugins.plan._observer.DefaultObserverHandler"><code>DefaultObserverHandler</code></a>).</li>
+</ul>
+</li>
+<li><strong>Evaluators:</strong><ul>
+<li><code>function_evaluator</code>: Evaluator that forwards calculations to a given evaluation function.
+  (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan._function_evaluator.DefaultFunctionEvaluator" href="#ropt.plugins.plan._function_evaluator.DefaultFunctionEvaluator"><code>DefaultFunctionEvaluator</code></a>)</li>
+<li><code>caching_evaluator</code>: Evaluator that uses caching to find results that were
+  already evaluated before forwarding to another evaluator.
+  (<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.cached_evaluator.DefaultCachedEvaluator" href="#ropt.plugins.plan.cached_evaluator.DefaultCachedEvaluator"><code>DefaultCachedEvaluator</code></a>)</li>
+</ul>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.plan.default.DefaultPlanStepPlugin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan.default.DefaultPlanStepPlugin</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStepPlugin" href="../plan_plugins/#ropt.plugins.plan.base.PlanStepPlugin">PlanStepPlugin</a></code></p>
+
+
+        <p>The default plugin for creating built-in plan steps.</p>
+<p>This plugin acts as a factory for the standard <code>PlanStep</code> implementations
+provided by <code>ropt</code>. It allows the
+<a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> to instantiate these steps
+when requested by a <a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a>.</p>
+<p><strong>Supported Steps:</strong></p>
+<ul>
+<li><code>ensemble_evaluator</code>: Creates a
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep" href="#ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep"><code>DefaultEnsembleEvaluatorStep</code></a>
+    instance, which performs ensemble evaluations.</li>
+<li><code>optimizer</code>: Creates a
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.plan.optimizer.DefaultOptimizerStep" href="#ropt.plugins.plan.optimizer.DefaultOptimizerStep"><code>DefaultOptimizerStep</code></a>
+    instance, which runs an optimization algorithm using a configured
+    optimizer plugin.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.plan.default.DefaultEventHandlerPlugin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan.default.DefaultEventHandlerPlugin</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.EventHandlerPlugin" href="../plan_plugins/#ropt.plugins.plan.base.EventHandlerPlugin">EventHandlerPlugin</a></code></p>
+
+
+        <p>The default plugin for creating built-in event handlers.</p>
+<p>This plugin acts as a factory for the standard <code>EventHandler</code>
+implementations provided by <code>ropt</code>. It allows the
+<a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> to instantiate these event
+handlers when requested by a <a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a>.</p>
+<p><strong>Supported Handlers:</strong></p>
+<ul>
+<li><code>tracker</code>: Creates a
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.plan._tracker.DefaultTrackerHandler" href="#ropt.plugins.plan._tracker.DefaultTrackerHandler"><code>DefaultTrackerHandler</code></a>
+    instance, which tracks either the 'best' or 'last' valid result based on
+    objective value and constraints.</li>
+<li><code>store</code>: Creates a
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.plan._store.DefaultStoreHandler" href="#ropt.plugins.plan._store.DefaultStoreHandler"><code>DefaultStoreHandler</code></a>
+    instance, which accumulates all results received from specified sources.</li>
+<li><code>observer</code>: Creates a
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.plan._observer.DefaultObserverHandler" href="#ropt.plugins.plan._observer.DefaultObserverHandler"><code>DefaultObserverHandler</code></a>
+    instance, which calls a callback for each event received from specified
+    sources.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.plan.default.DefaultEvaluatorPlugin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan.default.DefaultEvaluatorPlugin</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.EvaluatorPlugin" href="../plan_plugins/#ropt.plugins.plan.base.EvaluatorPlugin">EvaluatorPlugin</a></code></p>
+
+
+        <p>The default plugin for creating evaluators.</p>
+<p>This plugin acts as a factory for the standard evaluator implementations
+provided by <code>ropt</code>. It allows the
+<a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> to instantiate these steps
+when requested by a <a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a>.</p>
+<p><strong>Supported Evaluators:</strong></p>
+<ul>
+<li><code>function_evaluator</code>: Creates a
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.plan._function_evaluator.DefaultFunctionEvaluator" href="#ropt.plugins.plan._function_evaluator.DefaultFunctionEvaluator"><code>DefaultFunctionEvaluator</code></a>
+    instance, which uses function calls to calculated individual objectives
+    and constraints.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code></p>
+
+
+        <p>The default ensemble evaluator step for optimization plans.</p>
+<p>This step performs one or more ensemble evaluations based on the provided
+<code>variables</code>. It yields a tuple of
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> objects, one for each
+input variable vector evaluated.</p>
+<p>The step emits the following events:</p>
+<ul>
+<li><a class="autorefs autorefs-internal" title="            START_ENSEMBLE_EVALUATOR_STEP
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.START_ENSEMBLE_EVALUATOR_STEP"><code>START_ENSEMBLE_EVALUATOR_STEP</code></a>:
+  Emitted before the evaluation process begins.</li>
+<li><a class="autorefs autorefs-internal" title="            START_EVALUATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.START_EVALUATION"><code>START_EVALUATION</code></a>: Emitted
+  just before the underlying ensemble evaluation is called.</li>
+<li><a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a>: Emitted
+  after the evaluation completes, carrying the generated <code>FunctionResults</code>
+  in its <code>data</code> dictionary under the key <code>"results"</code>. Event handlers
+  typically listen for this event.</li>
+<li><a class="autorefs autorefs-internal" title="            FINISHED_ENSEMBLE_EVALUATOR_STEP
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.FINISHED_ENSEMBLE_EVALUATOR_STEP"><code>FINISHED_ENSEMBLE_EVALUATOR_STEP</code></a>:
+  Emitted after the entire step, including result emission, is finished.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.plan.ensemble_evaluator.DefaultEnsembleEvaluatorStep.run" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">transforms</span><span class="p">:</span> <span class="n">OptModelTransforms</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExitCode</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Run the ensemble evaluator step to perform ensemble evaluations.</p>
+<p>This method executes the core logic of the ensemble evaluator step. It
+requires an optimizer configuration
+(<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>) and optionally accepts
+specific variable vectors to evaluate.</p>
+<p>If <code>metadata</code> is provided, it is attached to the
+<a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.Results"><code>Results</code></a> objects emitted via the
+<code>FINISHED_EVALUATION</code> event.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>config</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.EnOptConfig)" href="../enopt_config/#ropt.config.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optimizer configuration.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>variables</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.ArrayLike">ArrayLike</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Variable vector(s) to evaluate.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>transforms</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.transforms.OptModelTransforms
+
+
+  
+      dataclass
+  " href="../domain_transforms/#ropt.transforms.OptModelTransforms">OptModelTransforms</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional transforms to apply to the variables,
+        objectives, and constraints.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>metadata</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional dictionary to attach to emitted <code>FunctionResults</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An <a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> indicating the outcome.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.plan.optimizer.DefaultOptimizerStep" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan.optimizer.DefaultOptimizerStep</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.PlanStep" href="../plan_plugins/#ropt.plugins.plan.base.PlanStep">PlanStep</a></code></p>
+
+
+        <p>The default optimizer step for optimization plans.</p>
+<p>This step executes an optimization algorithm based on a provided
+configuration (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> or a compatible
+dictionary). It iteratively performs function and potentially gradient
+evaluations, yielding a sequence of
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> and
+<a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.GradientResults"><code>GradientResults</code></a> objects.</p>
+<p>While initial variable values are typically specified in the configuration,
+they can be overridden by passing them directly to the <code>run</code> method.</p>
+<p>The step emits the following events during its execution:</p>
+<ul>
+<li><a class="autorefs autorefs-internal" title="            START_OPTIMIZER_STEP
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.START_OPTIMIZER_STEP"><code>START_OPTIMIZER_STEP</code></a>:
+  Emitted just before the optimization process begins.</li>
+<li><a class="autorefs autorefs-internal" title="            START_EVALUATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.START_EVALUATION"><code>START_EVALUATION</code></a>: Emitted
+  immediately before an ensemble evaluation (for functions or gradients)
+  is requested from the underlying optimizer.</li>
+<li><a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a>: Emitted
+  after an evaluation completes. This event carries the generated
+  <a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.Results"><code>Results</code></a> object(s) in its <code>data</code> dictionary
+  under the key <code>"results"</code>. Event handlers typically listen for this event
+  to process or track optimization progress.</li>
+<li><a class="autorefs autorefs-internal" title="            FINISHED_OPTIMIZER_STEP
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.FINISHED_OPTIMIZER_STEP"><code>FINISHED_OPTIMIZER_STEP</code></a>:
+  Emitted after the entire optimization process concludes (successfully,
+  or due to termination conditions or errors).</li>
+</ul>
+<p>This step also supports <strong>nested optimization</strong>. If a <code>nested_optimization</code>
+function is provided to the <code>run</code> method, the optimizer will execute a
+nested optimization at as part of each function evaluation. Each nested
+optimization run is done by creating a new plan. The provided function is
+then executed, passing the new plan and the variables. The
+<code>nested_optimization</code> function is expected to return a single
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object.</p>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.plan.optimizer.DefaultOptimizerStep.run" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">transforms</span><span class="p">:</span> <span class="n">OptModelTransforms</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">nested_optimization</span><span class="p">:</span> <span class="n">NestedOptimizationCallable</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExitCode</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Run the optimizer step to perform an optimization.</p>
+<p>This method executes the core logic of the optimizer step. It requires
+an optimizer configuration
+(<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>) and optionally accepts
+specific initial variable vectors, and/or a nested optimization plan,
+and metadata.</p>
+<p>If <code>variables</code> are not provided, the initial values specified in the
+<code>config</code> are used. If <code>variables</code> are provided, they override the
+config's initial values.</p>
+<p>If <code>metadata</code> is provided, it is attached to the
+<a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.Results"><code>Results</code></a> objects emitted via the
+<code>FINISHED_EVALUATION</code> event.</p>
+<p>If a <code>nested_optimization</code> callable is provided, a fresh plan will be
+constructed, and the callable will be called passing that plan and the
+initial variables to use. The callable should return a a single
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object that should
+contain the results of the nested optimization.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>config</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.EnOptConfig)" href="../enopt_config/#ropt.config.EnOptConfig">EnOptConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optimizer configuration.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>transforms</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.transforms.OptModelTransforms
+
+
+  
+      dataclass
+  " href="../domain_transforms/#ropt.transforms.OptModelTransforms">OptModelTransforms</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional transforms to apply to the variables,
+                 objectives, and constraints.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>variables</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.ArrayLike">ArrayLike</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional initial variable vector(s) to start from.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>nested_optimization</code>
+            </td>
+            <td>
+                  <code><span title="ropt.plugins.plan.optimizer.NestedOptimizationCallable">NestedOptimizationCallable</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional callable to run a nested plan.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>metadata</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional dictionary to attach to emitted <code>Results</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An exit code indicating the outcome of the optimization.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.plan._tracker.DefaultTrackerHandler" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan._tracker.DefaultTrackerHandler</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.EventHandler" href="../plan_plugins/#ropt.plugins.plan.base.EventHandler">EventHandler</a></code></p>
+
+
+        <p>The default event handler for tracking optimization results.</p>
+<p>This event handler listens for
+<a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events
+emitted by specified <code>sources</code> (plan steps). It processes the
+<a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.Results"><code>Results</code></a> objects contained within these events and
+selects a single <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object to
+retain based on defined criteria.</p>
+<p>The criteria for selection are:</p>
+<ul>
+<li><strong><code>what='best'</code> (default):</strong> Tracks the result with the lowest weighted
+  objective value encountered so far.</li>
+<li><strong><code>what='last'</code>:</strong> Tracks the most recently received valid result.</li>
+</ul>
+<p>Optionally, results can be filtered based on constraint violations using the
+<code>constraint_tolerance</code> parameter. If provided, any result violating
+constraints beyond this tolerance is ignored.</p>
+<p>The selected result (in the optimizer domain) is stored internally. The
+result accessible via dictionary access (<code>handler["results"]</code>) is the
+selected result, potentially transformed to the user domain.</p>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.plan._store.DefaultStoreHandler" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan._store.DefaultStoreHandler</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.EventHandler" href="../plan_plugins/#ropt.plugins.plan.base.EventHandler">EventHandler</a></code></p>
+
+
+        <p>The default event handler for storing optimization results.</p>
+<p>This event handler listens for
+<a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events
+emitted by specified <code>sources</code> (plan steps). It collects all
+<a class="autorefs autorefs-internal" title="            ropt.results.Results
+
+
+  
+      dataclass
+  " href="../results/#ropt.results.Results"><code>Results</code></a> objects contained within these events and
+stores them sequentially in memory.</p>
+<p>The <code>sources</code> parameter filters which steps' results are collected. The
+accumulated results are stored as a tuple and can be accessed via dictionary
+access using the key <code>"results"</code> (e.g., <code>handler["results"]</code>). Each time new
+results are received from a valid source, they are appended to this tuple.</p>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.plan._observer.DefaultObserverHandler" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan._observer.DefaultObserverHandler</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.EventHandler" href="../plan_plugins/#ropt.plugins.plan.base.EventHandler">EventHandler</a></code></p>
+
+
+        <p>The default event handler for observing events.</p>
+<p>This event handler listens for events emitted by specified <code>sources</code> (plan
+steps) and forwards them to one or more callback functions.</p>
+<p>The <code>sources</code> parameter filters which events are observed.</p>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.plan._function_evaluator.DefaultFunctionEvaluator" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan._function_evaluator.DefaultFunctionEvaluator</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator">Evaluator</a></code></p>
+
+
+        <p>An evaluator that forwards calls to an evaluator function.</p>
+<p>This class acts as an adapter, allowing a standard Python callable (which
+matches the signature of the <code>eval</code> method) to be used as an
+<a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator"><code>Evaluator</code></a> within an optimization
+<a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a>.</p>
+<p>It is initialized with an <code>evaluator</code> callable. When the <code>eval</code> method of
+this class is invoked by the plan, it simply delegates the call, along with
+all arguments, to the wrapped <code>evaluator</code> function.</p>
+<p>This is useful for integrating existing evaluation logic that is not already
+structured as an <code>Evaluator</code> subclass into a <code>ropt</code> plan.</p>
+<p>The <code>clients</code> parameter acts as a filter, determining which plan steps this
+evaluator should serve.</p>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.plan.cached_evaluator.DefaultCachedEvaluator" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.plan.cached_evaluator.DefaultCachedEvaluator</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.plan.base.Evaluator" href="../plan_plugins/#ropt.plugins.plan.base.Evaluator">Evaluator</a></code></p>
+
+
+        <p>An evaluator that caches results to avoid redundant computations.</p>
+<p>This evaluator attempts to retrieve previously computed function results
+from a cache before delegating to another evaluator. The cache is populated
+from <code>FunctionResults</code> objects stored by <code>EventHandler</code> instances specified
+as <code>sources</code>.</p>
+<p>When an evaluation is requested, for each variable vector and its
+corresponding realization, this evaluator searches through the <code>results</code>
+attribute of its <code>sources</code>. If a <code>FunctionResults</code> object is found where the
+<code>variables</code> match the input (within a small tolerance) and the <code>realization</code>
+also matches, the cached <code>objectives</code> and <code>constraints</code> from that
+<code>FunctionResults</code> object are used.</p>
+<p>If some, but not all, requested evaluations are found in the cache, this
+evaluator will mark the cached ones as inactive for the next evaluator in
+the chain and then call that evaluator to compute only the missing results.
+The final combined results (cached and newly computed) are then returned.</p>
+<p>This is particularly useful in scenarios where the same variable sets might
+be evaluated multiple times, for example, in iterative optimization
+algorithms or when restarting optimizations.</p>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../function_estimator_plugins/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Function estimator Plugins">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Function estimator Plugins
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../scipy_optimizer_plugin/" class="md-footer__link md-footer__link--next" aria-label="Next: SciPy Optimizer Plugin">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                SciPy Optimizer Plugin
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.expand", "navigation.footer", "navigation.sections", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.92b07e13.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
