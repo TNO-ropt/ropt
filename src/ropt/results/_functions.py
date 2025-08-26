@@ -124,22 +124,21 @@ class Functions(ResultField):
         if transforms.objectives is None and transforms.nonlinear_constraints is None:
             return self
 
+        objectives = self.objectives
+        weighted_objective = self.weighted_objective
+        if transforms.objectives is not None:
+            objectives = transforms.objectives.from_optimizer(self.objectives)
+            assert transforms.objective_weights is not None
+            weighted_objective = (transforms.objective_weights * objectives).sum()
+
+        constraints = (
+            self.constraints
+            if self.constraints is None or transforms.nonlinear_constraints is None
+            else transforms.nonlinear_constraints.from_optimizer(self.constraints)
+        )
+
         return Functions(
-            weighted_objective=(
-                self.weighted_objective
-                if transforms.objectives is None
-                else transforms.objectives.weighted_objective_from_optimizer(
-                    self.weighted_objective
-                )
-            ),
-            objectives=(
-                self.objectives
-                if transforms.objectives is None
-                else transforms.objectives.from_optimizer(self.objectives)
-            ),
-            constraints=(
-                self.constraints
-                if self.constraints is None or transforms.nonlinear_constraints is None
-                else transforms.nonlinear_constraints.from_optimizer(self.constraints)
-            ),
+            weighted_objective=weighted_objective,
+            objectives=objectives,
+            constraints=constraints,
         )

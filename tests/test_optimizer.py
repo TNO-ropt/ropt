@@ -259,7 +259,8 @@ def test_objective_with_scaler(
 
     init1 = test_functions[1](initial_values, None)
     transforms = OptModelTransforms(
-        objectives=ObjectiveScaler(np.array([init1, init1]))
+        objectives=ObjectiveScaler(np.array([init1, init1])),
+        objective_weights=EnOptConfig.model_validate(enopt_config).objectives.weights,
     )
 
     checked = False
@@ -305,7 +306,10 @@ def test_objective_with_lazy_scaler(
     assert np.allclose(objectives1, [0.5, 4.5], atol=0.02)
 
     objective_transform = ObjectiveScaler(np.array([1.0, 1.0]))
-    transforms = OptModelTransforms(objectives=objective_transform)
+    transforms = OptModelTransforms(
+        objectives=objective_transform,
+        objective_weights=EnOptConfig.model_validate(enopt_config).objectives.weights,
+    )
 
     init1 = test_functions[1](initial_values, None)
 

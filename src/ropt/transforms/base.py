@@ -209,22 +209,10 @@ class ObjectiveTransform(ABC):
     This class defines the interface for transforming objective values between
     the user-defined domain and the optimizer's internal domain. Concrete
     implementations of this class handle the specific logic for each type of
-    objective transformation.
-
-    When implementing an objective transformation, the following aspects must be
-    considered:
-
-    - **Objective Value Transformation:** Mapping objective values between the
-      user and optimizer domains. This is achieved by overriding the
-      [`to_optimizer`][ropt.transforms.base.ObjectiveTransform.to_optimizer]
-      and
-      [`from_optimizer`][ropt.transforms.base.ObjectiveTransform.from_optimizer]
-      methods.
-    - **Weighted Objective Transformation:** The optimizer works with a
-      single, weighted objective value. If the transformation affects the
-      weighted objective, the
-      [`weighted_objective_from_optimizer`][ropt.transforms.base.ObjectiveTransform.weighted_objective_from_optimizer]
-      method should be overridden to handle this.
+    objective transformation. This is achieved by overriding the
+    [`to_optimizer`][ropt.transforms.base.ObjectiveTransform.to_optimizer] and
+    [`from_optimizer`][ropt.transforms.base.ObjectiveTransform.from_optimizer]
+    methods.
     """
 
     @abstractmethod
@@ -267,32 +255,6 @@ class ObjectiveTransform(ABC):
         Returns:
             The transformed objective values in the user domain.
         """
-
-    def weighted_objective_from_optimizer(
-        self, weighted_objective: NDArray[np.float64]
-    ) -> NDArray[np.float64]:
-        """Transform the weighted objective to the user domain.
-
-        The optimizer uses a single, weighted objective value evaluated in the
-        optimizer domain. This method reverses that transformation, mapping the
-        weighted objective back to the user domain.
-
-        For example, if the transformation to the optimizer domain involved a
-        sign change to convert a maximization problem into a minimization
-        problem, this method would change the sign back.
-
-        Note:
-            This method may be applied to the weighted objective itself or to
-            its gradient. Therefore, the input may be a scalar or a vector of
-            values.
-
-        Args:
-            weighted_objective: The weighted objective value(s) to transform.
-
-        Returns:
-            The transformed weighted objective value(s).
-        """
-        return weighted_objective
 
 
 class NonLinearConstraintTransform(ABC):

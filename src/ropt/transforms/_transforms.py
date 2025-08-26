@@ -6,6 +6,9 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    import numpy as np
+    from numpy.typing import NDArray
+
     from .base import (
         NonLinearConstraintTransform,
         ObjectiveTransform,
@@ -35,3 +38,18 @@ class OptModelTransforms:
 
     If `None`, no transformation is applied to nonlinear constraints.
     """
+
+    objective_weights: NDArray[np.float64] | None = None
+    """Objective weights that are used by the objective transform.
+
+    May be `None` if `objectives` is `None`.
+
+    The weights will be normalized to sum to 1.
+    """
+
+    def __post_init__(self) -> None:
+        if self.objective_weights is not None:
+            self.objective_weights = (
+                self.objective_weights / self.objective_weights.sum()
+            )
+            self.objective_weights.setflags(write=False)
