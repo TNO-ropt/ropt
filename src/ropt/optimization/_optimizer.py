@@ -34,10 +34,7 @@ class SignalEvaluationCallback(Protocol):
     custom handling or tracking of evaluation events.
     """
 
-    def __call__(
-        self,
-        results: tuple[Results, ...] | None = None,
-    ) -> None:
+    def __call__(self, results: tuple[Results, ...] | None = None, /) -> None:
         """Callback protocol for signaling the start and end of evaluations.
 
         This callback is invoked by the ensemble optimizer before and after

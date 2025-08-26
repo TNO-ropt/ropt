@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, assert_never
 
 from ropt.enums import EventType
 from ropt.plugins.plan.base import EventHandler, PlanComponent
@@ -115,6 +115,9 @@ class DefaultTrackerHandler(EventHandler):
                     results,
                     self._constraint_tolerance,
                 )
+            case _ as unreachable:
+                assert_never(unreachable)
+
         if filtered_results is not None:
             self._tracked_results = filtered_results
             transforms = event.data["transforms"]

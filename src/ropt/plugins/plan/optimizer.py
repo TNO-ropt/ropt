@@ -30,7 +30,7 @@ class NestedOptimizationCallable(Protocol):
     """Protocol for nested optimizer function calls."""
 
     def __call__(
-        self, plan: Plan, variables: NDArray[np.float64]
+        self, plan: Plan, variables: NDArray[np.float64], /
     ) -> FunctionResults | None:
         """Run a nested optimization using the given plan and variables.
 

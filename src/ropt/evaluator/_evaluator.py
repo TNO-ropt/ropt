@@ -146,7 +146,7 @@ class EvaluatorCallback(Protocol):
     """
 
     def __call__(
-        self, variables: NDArray[np.float64], context: EvaluatorContext
+        self, variables: NDArray[np.float64], context: EvaluatorContext, /
     ) -> EvaluatorResult:
         """Handle an event.
 
