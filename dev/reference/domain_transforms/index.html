@@ -539,6 +539,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.transforms.OptModelTransforms.objective_weights" class="md-nav__link">
+    <span class="md-ellipsis">
+      objective_weights
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -636,15 +645,6 @@
   <a href="#ropt.transforms.base.ObjectiveTransform.from_optimizer" class="md-nav__link">
     <span class="md-ellipsis">
       from_optimizer
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.transforms.base.ObjectiveTransform.weighted_objective_from_optimizer" class="md-nav__link">
-    <span class="md-ellipsis">
-      weighted_objective_from_optimizer
     </span>
   </a>
   
@@ -1498,6 +1498,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.transforms.OptModelTransforms.objective_weights" class="md-nav__link">
+    <span class="md-ellipsis">
+      objective_weights
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1595,15 +1604,6 @@
   <a href="#ropt.transforms.base.ObjectiveTransform.from_optimizer" class="md-nav__link">
     <span class="md-ellipsis">
       from_optimizer
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.transforms.base.ObjectiveTransform.weighted_objective_from_optimizer" class="md-nav__link">
-    <span class="md-ellipsis">
-      weighted_objective_from_optimizer
     </span>
   </a>
   
@@ -2056,6 +2056,33 @@ objectives.</p>
         <p>A <code>NonLinearConstraintTransform</code> object that defines the transformation
 for nonlinear constraints.</p>
 <p>If <code>None</code>, no transformation is applied to nonlinear constraints.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.transforms.OptModelTransforms.objective_weights" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">objective_weights</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
+      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">objective_weights</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Objective weights that are used by the objective transform.</p>
+<p>May be <code>None</code> if <code>objectives</code> is <code>None</code>.</p>
+<p>The weights will be normalized to sum to 1.</p>
 
     </div>
 
@@ -2791,32 +2818,20 @@ their upper bounds.</p>
 <p>This class defines the interface for transforming objective values between
 the user-defined domain and the optimizer's internal domain. Concrete
 implementations of this class handle the specific logic for each type of
-objective transformation.</p>
-<p>When implementing an objective transformation, the following aspects must be
-considered:</p>
-<ul>
-<li><strong>Objective Value Transformation:</strong> Mapping objective values between the
-  user and optimizer domains. This is achieved by overriding the
-  <a class="autorefs autorefs-internal" title="            to_optimizer
+objective transformation. This is achieved by overriding the
+<a class="autorefs autorefs-internal" title="            to_optimizer
 
 
   
       abstractmethod
-  " href="#ropt.transforms.base.ObjectiveTransform.to_optimizer"><code>to_optimizer</code></a>
-  and
-  <a class="autorefs autorefs-internal" title="            from_optimizer
+  " href="#ropt.transforms.base.ObjectiveTransform.to_optimizer"><code>to_optimizer</code></a> and
+<a class="autorefs autorefs-internal" title="            from_optimizer
 
 
   
       abstractmethod
   " href="#ropt.transforms.base.ObjectiveTransform.from_optimizer"><code>from_optimizer</code></a>
-  methods.</li>
-<li><strong>Weighted Objective Transformation:</strong> The optimizer works with a
-  single, weighted objective value. If the transformation affects the
-  weighted objective, the
-  <a class="autorefs autorefs-internal" title="            weighted_objective_from_optimizer" href="#ropt.transforms.base.ObjectiveTransform.weighted_objective_from_optimizer"><code>weighted_objective_from_optimizer</code></a>
-  method should be overridden to handle this.</li>
-</ul>
+methods.</p>
 
 
 
@@ -3001,95 +3016,6 @@ after calling this method.</p>
             <td>
               <div class="doc-md-description">
                 <p>The transformed objective values in the user domain.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.transforms.base.ObjectiveTransform.weighted_objective_from_optimizer" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">weighted_objective_from_optimizer</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">weighted_objective_from_optimizer</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">weighted_objective</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Transform the weighted objective to the user domain.</p>
-<p>The optimizer uses a single, weighted objective value evaluated in the
-optimizer domain. This method reverses that transformation, mapping the
-weighted objective back to the user domain.</p>
-<p>For example, if the transformation to the optimizer domain involved a
-sign change to convert a maximization problem into a minimization
-problem, this method would change the sign back.</p>
-
-
-<details class="note" open>
-  <summary>Note</summary>
-  <p>This method may be applied to the weighted objective itself or to
-its gradient. Therefore, the input may be a scalar or a vector of
-values.</p>
-</details>
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>weighted_objective</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The weighted objective value(s) to transform.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The transformed weighted objective value(s).</p>
               </div>
             </td>
           </tr>
