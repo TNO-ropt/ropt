@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any, Final, TypeVar
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+    from ropt.config import EnOptConfig
     from ropt.enums import AxisName
     from ropt.transforms import OptModelTransforms
 
@@ -134,7 +135,9 @@ class Results(ABC):
         )
 
     @abstractmethod
-    def transform_from_optimizer(self, transforms: OptModelTransforms) -> Results:
+    def transform_from_optimizer(
+        self, config: EnOptConfig, transforms: OptModelTransforms
+    ) -> Results:
         """Transform results from the optimizer domain to the user domain.
 
         During optimization, variables, objectives, and constraints are often
@@ -158,6 +161,7 @@ class Results(ABC):
         objectives, and nonlinear constraints.
 
         Args:
+            config:     The configuration used by the source of the results.
             transforms: The transforms to apply.
 
         Returns:

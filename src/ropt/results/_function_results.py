@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, TypeVar
 from ._results import Results
 
 if TYPE_CHECKING:
+    from ropt.config import EnOptConfig
     from ropt.transforms import OptModelTransforms
 
     from ._constraint_info import ConstraintInfo
@@ -54,11 +55,12 @@ class FunctionResults(Results):
     constraint_info: ConstraintInfo | None = None
 
     def transform_from_optimizer(
-        self, transforms: OptModelTransforms
+        self, config: EnOptConfig, transforms: OptModelTransforms
     ) -> FunctionResults:
         """Apply transformations from optimizer space.
 
         Args:
+            config:     The configuration used by the source of the results.
             transforms: The transforms to apply.
 
         Returns:
@@ -73,7 +75,7 @@ class FunctionResults(Results):
             functions=(
                 None
                 if self.functions is None
-                else self.functions.transform_from_optimizer(transforms)
+                else self.functions.transform_from_optimizer(config, transforms)
             ),
             constraint_info=(
                 None

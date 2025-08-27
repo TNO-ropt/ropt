@@ -259,8 +259,7 @@ def test_objective_with_scaler(
 
     init1 = test_functions[1](initial_values, None)
     transforms = OptModelTransforms(
-        objectives=ObjectiveScaler(np.array([init1, init1])),
-        objective_weights=EnOptConfig.model_validate(enopt_config).objectives.weights,
+        objectives=ObjectiveScaler(np.array([init1, init1]))
     )
 
     checked = False
@@ -274,7 +273,9 @@ def test_objective_with_scaler(
                 assert item.functions is not None
                 assert item.functions.objectives is not None
                 assert np.allclose(item.functions.objectives[-1], 1.0)
-                transformed = item.transform_from_optimizer(event.data["transforms"])
+                transformed = item.transform_from_optimizer(
+                    event.data["config"], event.data["transforms"]
+                )
                 assert transformed.functions is not None
                 assert transformed.functions.objectives is not None
                 assert np.allclose(transformed.functions.objectives[-1], init1)
@@ -306,10 +307,7 @@ def test_objective_with_lazy_scaler(
     assert np.allclose(objectives1, [0.5, 4.5], atol=0.02)
 
     objective_transform = ObjectiveScaler(np.array([1.0, 1.0]))
-    transforms = OptModelTransforms(
-        objectives=objective_transform,
-        objective_weights=EnOptConfig.model_validate(enopt_config).objectives.weights,
-    )
+    transforms = OptModelTransforms(objectives=objective_transform)
 
     init1 = test_functions[1](initial_values, None)
 
@@ -331,7 +329,9 @@ def test_objective_with_lazy_scaler(
                 assert item.functions is not None
                 assert item.functions.objectives is not None
                 assert np.allclose(item.functions.objectives[-1], 1.0)
-                transformed = item.transform_from_optimizer(event.data["transforms"])
+                transformed = item.transform_from_optimizer(
+                    event.data["config"], event.data["transforms"]
+                )
                 assert transformed.functions is not None
                 assert transformed.functions.objectives is not None
                 assert np.allclose(transformed.functions.objectives[-1], init1)
@@ -421,7 +421,9 @@ def test_nonlinear_constraint_with_scaler(
                 assert item.functions is not None
                 assert item.functions.constraints is not None
                 assert np.allclose(item.functions.constraints, 1.0)
-                transformed = item.transform_from_optimizer(event.data["transforms"])
+                transformed = item.transform_from_optimizer(
+                    event.data["config"], event.data["transforms"]
+                )
                 assert transformed.functions is not None
                 assert transformed.functions.constraints is not None
                 assert np.allclose(transformed.functions.constraints, scales)
@@ -505,7 +507,9 @@ def test_nonlinear_constraint_with_lazy_scaler(
                 assert item.functions is not None
                 assert item.functions.constraints is not None
                 assert np.allclose(item.functions.constraints, 1.0)
-                transformed = item.transform_from_optimizer(event.data["transforms"])
+                transformed = item.transform_from_optimizer(
+                    event.data["config"], event.data["transforms"]
+                )
                 assert transformed.functions is not None
                 assert transformed.functions.constraints is not None
                 assert np.allclose(transformed.functions.constraints, scales)

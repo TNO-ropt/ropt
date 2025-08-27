@@ -13,6 +13,7 @@ from ._utils import _immutable_copy
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
+    from ropt.config import EnOptConfig
     from ropt.transforms import OptModelTransforms
 
 
@@ -125,10 +126,13 @@ class Gradients(ResultField):
             constraints=constraints,
         )
 
-    def transform_from_optimizer(self, transforms: OptModelTransforms) -> Gradients:
+    def transform_from_optimizer(
+        self, config: EnOptConfig, transforms: OptModelTransforms
+    ) -> Gradients:
         """Apply transformations from optimizer space.
 
         Args:
+            config:     The configuration used by the source of the results.
             transforms: The transforms to apply.
 
         Returns:
@@ -140,9 +144,8 @@ class Gradients(ResultField):
             objectives = np.moveaxis(self.objectives, 0, -1)
             objectives = transforms.objectives.from_optimizer(objectives)
             objectives = np.moveaxis(objectives, 0, -1)
-            assert transforms.objective_weights is not None
             weighted_objective = (
-                transforms.objective_weights[:, np.newaxis] * objectives
+                config.objectives.weights[:, np.newaxis] * objectives
             ).sum(axis=0)
 
         constraints: NDArray[np.float64] | None = self.constraints

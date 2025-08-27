@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
+    from ropt.config import EnOptConfig
     from ropt.transforms import OptModelTransforms
 
 
@@ -112,10 +113,13 @@ class Functions(ResultField):
             constraints=constraints,
         )
 
-    def transform_from_optimizer(self, transforms: OptModelTransforms) -> Functions:
+    def transform_from_optimizer(
+        self, config: EnOptConfig, transforms: OptModelTransforms
+    ) -> Functions:
         """Apply transformations from optimizer space.
 
         Args:
+            config:     The configuration used by the source of the results.
             transforms: The transforms to apply.
 
         Returns:
@@ -128,8 +132,7 @@ class Functions(ResultField):
         weighted_objective = self.weighted_objective
         if transforms.objectives is not None:
             objectives = transforms.objectives.from_optimizer(self.objectives)
-            assert transforms.objective_weights is not None
-            weighted_objective = (transforms.objective_weights * objectives).sum()
+            weighted_objective = (config.objectives.weights * objectives).sum()
 
         constraints = (
             self.constraints

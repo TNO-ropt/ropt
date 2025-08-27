@@ -338,7 +338,7 @@ class BasicOptimizer:
             results = tuple(
                 item
                 if transforms is None
-                else item.transform_from_optimizer(transforms)
+                else item.transform_from_optimizer(event.data["config"], transforms)
                 for item in event.data.get("results", ())
             )
             callback(results)

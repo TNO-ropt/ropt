@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, TypeVar
 from ._results import Results
 
 if TYPE_CHECKING:
+    from ropt.config import EnOptConfig
     from ropt.transforms import OptModelTransforms
 
     from ._gradient_evaluations import GradientEvaluations
@@ -47,11 +48,12 @@ class GradientResults(Results):
     gradients: Gradients | None
 
     def transform_from_optimizer(
-        self, transforms: OptModelTransforms
+        self, config: EnOptConfig, transforms: OptModelTransforms
     ) -> GradientResults:
         """Apply transformations from optimizer space.
 
         Args:
+            config:     The configuration used by the source of the results.
             transforms: The transforms to apply.
 
         Returns:
@@ -66,6 +68,6 @@ class GradientResults(Results):
             gradients=(
                 None
                 if self.gradients is None
-                else self.gradients.transform_from_optimizer(transforms)
+                else self.gradients.transform_from_optimizer(config, transforms)
             ),
         )
