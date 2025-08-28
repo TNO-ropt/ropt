@@ -1487,6 +1487,7 @@ corresponding plugin type:</p>
 
 
 
+
   <div class="doc doc-children">
 
 
@@ -1534,6 +1535,7 @@ define an entry point in your package's <code>pyproject.toml</code>:</p>
 <code>plugin_manager.get_plugin("optimizer", "my_optimizer/some_method")</code> or
 potentially <code>plugin_manager.get_plugin("optimizer", "some_method")</code> if
 discovery is allowed and the method is unique.</p>
+
 
 
 
@@ -1928,6 +1930,7 @@ named methods (functionalities) they provide. They can optionally override
 the <code>allows_discovery</code> class method if they should not be automatically
 selected by the plugin manager when a method name is provided without an
 explicit plugin name.</p>
+
 
 
 
