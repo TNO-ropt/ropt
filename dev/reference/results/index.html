@@ -2688,14 +2688,13 @@ averaging. The optimizer may handle multiple objectives and constraints.
 Multiple objectives are combined into a single weighted sum, which is stored
 in the <code>weighted_objective</code> field. Multiple constraints are handled
 individually by the optimizer.</p>
-<div class="admonition info">
-<p class="admonition-title">Fields</p>
+<p><strong>Result descriptions</strong></p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.Functions--__tabbed_1_1" name="ropt.results.Functions--__tabbed_1" type="radio" /><input id="ropt.results.Functions--__tabbed_1_2" name="ropt.results.Functions--__tabbed_1" type="radio" /><input id="ropt.results.Functions--__tabbed_1_3" name="ropt.results.Functions--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Functions--__tabbed_1_1">Weighted Objective</label><label for="ropt.results.Functions--__tabbed_1_2">Objectives</label><label for="ropt.results.Functions--__tabbed_1_3">Constraints</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<p><code>weighted_objective</code>: The overall objective calculated as a weighted
-sum over the objectives. This is a single floating point values. It
-is defined as a <code>numpy</code> array of dimensions 0, hence it has no axes:</p>
+<p><code>weighted_objective</code>: The overall objective calculated as a weighted sum
+over the objectives. This is a single floating point values. It is
+defined as a <code>numpy</code> array of dimensions 0, hence it has no axes:</p>
 <ul>
 <li>Shape: <span class="arithmatex">\(()\)</span></li>
 <li>Axis type: <code>None</code></li>
@@ -2740,7 +2739,6 @@ one-dimensional array of floating point values:</p>
 </ul>
 </li>
 </ul>
-</div>
 </div>
 </div>
 </div>
@@ -2854,8 +2852,7 @@ The optimizer may handle multiple objectives and constraints. Multiple
 objective gradients are combined into a single weighted sum, which is stored
 in the <code>weighted_objective</code> field. Multiple constraint gradients are handled
 individually by the optimizer.</p>
-<div class="admonition info">
-<p class="admonition-title">Fields</p>
+<p><strong>Result descriptions</strong></p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.Gradients--__tabbed_1_1" name="ropt.results.Gradients--__tabbed_1" type="radio" /><input id="ropt.results.Gradients--__tabbed_1_2" name="ropt.results.Gradients--__tabbed_1" type="radio" /><input id="ropt.results.Gradients--__tabbed_1_3" name="ropt.results.Gradients--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Gradients--__tabbed_1_1">Weighted Objective Gradient</label><label for="ropt.results.Gradients--__tabbed_1_2">Objective  Gradients</label><label for="ropt.results.Gradients--__tabbed_1_3">Constraint Gradients</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -2879,9 +2876,8 @@ respect to each variable:</p>
 </ul>
 </div>
 <div class="tabbed-block">
-<p><code>objectives</code>: The calculated gradients of each objective with
-respect to each variable. This is a two-dimensional array of
-floating point values:</p>
+<p><code>objectives</code>: The calculated gradients of each objective with respect to
+each variable. This is a two-dimensional array of floating point values:</p>
 <ul>
 <li>Shape <span class="arithmatex">\((n_o, n_v)\)</span>, where:<ul>
 <li><span class="arithmatex">\(n_o\)</span> is the number of objectives.</li>
@@ -2935,7 +2931,6 @@ floating point values:</p>
 </ul>
 </li>
 </ul>
-</div>
 </div>
 </div>
 </div>
@@ -3044,8 +3039,7 @@ floating point values:</p>
         <p>Stores the results of function evaluations.</p>
 <p>The <code>FunctionEvaluations</code> class stores the results of evaluating the
 objective and constraint functions for a set of variables.</p>
-<div class="admonition info">
-<p class="admonition-title">Fields</p>
+<p><strong>Result descriptions</strong></p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="ropt.results.FunctionEvaluations--__tabbed_1_1" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_2" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_3" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.FunctionEvaluations--__tabbed_1_4" name="ropt.results.FunctionEvaluations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.FunctionEvaluations--__tabbed_1_1">Variables</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_2">Objectives</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_3">Constraints</label><label for="ropt.results.FunctionEvaluations--__tabbed_1_4">Evaluation Info</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -3070,9 +3064,9 @@ were evaluated:</p>
 </div>
 <div class="tabbed-block">
 <p><code>objectives</code>: The calculated objective function values for each
-realization. This is a two-dimensional array of floating point
-values where each row corresponds to a realization and each column
-corresponds to an objective:</p>
+realization. This is a two-dimensional array of floating point values
+where each row corresponds to a realization and each column corresponds
+to an objective:</p>
 <ul>
 <li>Shape <span class="arithmatex">\((n_r, n_o)\)</span>, where:<ul>
 <li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
@@ -3100,9 +3094,9 @@ corresponds to an objective:</p>
 </div>
 <div class="tabbed-block">
 <p><code>constraints</code>: The calculated constraint function values for each
-realization. Only provided if non-linear constraints are defined.
-This is a two-dimensional array of floating point values where each
-row corresponds to a realization and each column corresponds to a
+realization. Only provided if non-linear constraints are defined. This
+is a two-dimensional array of floating point values where each row
+corresponds to a realization and each column corresponds to a
 constraint:</p>
 <ul>
 <li>Shape <span class="arithmatex">\((n_r, n_c)\)</span>, where:<ul>
@@ -3130,10 +3124,10 @@ constraint:</p>
 </ul>
 </div>
 <div class="tabbed-block">
-<p><code>evaluation_info</code>: Optional metadata associated with each
-realization, potentially provided by the evaluator. If provided,
-each value in the info dictionary must be a one-dimensional array of
-arbitrary type supported by <code>numpy</code> (including objects):</p>
+<p><code>evaluation_info</code>: Optional metadata associated with each realization,
+potentially provided by the evaluator. If provided, each value in the
+info dictionary must be a one-dimensional array of arbitrary type
+supported by <code>numpy</code> (including objects):</p>
 <ul>
 <li>Shape: <span class="arithmatex">\((n_r,)\)</span>, where:<ul>
 <li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
@@ -3150,7 +3144,6 @@ arbitrary type supported by <code>numpy</code> (including objects):</p>
 </ul>
 </li>
 </ul>
-</div>
 </div>
 </div>
 </div>
@@ -3271,8 +3264,7 @@ arbitrary type supported by <code>numpy</code> (including objects):</p>
 <p>The <code>GradientEvaluations</code> class stores the results of evaluating the
 objective and constraint functions for perturbed variables, which is
 necessary for gradient calculations.</p>
-<div class="admonition info">
-<p class="admonition-title">Fields</p>
+<p><strong>Result descriptions</strong></p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:5"><input checked="checked" id="ropt.results.GradientEvaluations--__tabbed_1_1" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_2" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_3" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_4" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><input id="ropt.results.GradientEvaluations--__tabbed_1_5" name="ropt.results.GradientEvaluations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.GradientEvaluations--__tabbed_1_1">Variables</label><label for="ropt.results.GradientEvaluations--__tabbed_1_2">Perturbed Variables</label><label for="ropt.results.GradientEvaluations--__tabbed_1_3">Perturbed Objectives</label><label for="ropt.results.GradientEvaluations--__tabbed_1_4">Perturbed Constraints</label><label for="ropt.results.GradientEvaluations--__tabbed_1_5">Evaluation Info</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -3295,8 +3287,8 @@ necessary for gradient calculations.</p>
 </ul>
 </div>
 <div class="tabbed-block">
-<p><code>perturbed_variables</code>: A three-dimensional array of perturbed
-variable values for each realization and perturbation:</p>
+<p><code>perturbed_variables</code>: A three-dimensional array of perturbed variable
+values for each realization and perturbation:</p>
 <ul>
 <li>Shape: <span class="arithmatex">\((n_r, n_p, n_v)\)</span>, where:<ul>
 <li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
@@ -3405,10 +3397,10 @@ perturbation:</p>
 </ul>
 </div>
 <div class="tabbed-block">
-<p><code>evaluation_info</code>: Optional metadata associated with each
-realization, potentially provided by the evaluator. If provided,
-each value in the info dictionary must be a two-dimensional array of
-arbitrary type supported by <code>numpy</code> (including objects):</p>
+<p><code>evaluation_info</code>: Optional metadata associated with each realization,
+potentially provided by the evaluator. If provided, each value in the
+info dictionary must be a two-dimensional array of arbitrary type
+supported by <code>numpy</code> (including objects):</p>
 <ul>
 <li>Shape: <span class="arithmatex">\((n_r, n_p)\)</span>, where:<ul>
 <li><span class="arithmatex">\(n_r\)</span> is the number of realizations.</li>
@@ -3433,7 +3425,6 @@ arbitrary type supported by <code>numpy</code> (including objects):</p>
 </ul>
 </li>
 </ul>
-</div>
 </div>
 </div>
 </div>
@@ -3568,8 +3559,7 @@ arbitrary type supported by <code>numpy</code> (including objects):</p>
         <p>Stores information about the realizations.</p>
 <p>The <code>Realizations</code> class stores data related to the individual realizations
 used in the optimization process.</p>
-<div class="admonition info">
-<p class="admonition-title">Fields</p>
+<p><strong>Result descriptions</strong></p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="ropt.results.Realizations--__tabbed_1_1" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_2" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_3" name="ropt.results.Realizations--__tabbed_1" type="radio" /><input id="ropt.results.Realizations--__tabbed_1_4" name="ropt.results.Realizations--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Realizations--__tabbed_1_1">Active Realizations</label><label for="ropt.results.Realizations--__tabbed_1_2">Failed Realizations</label><label for="ropt.results.Realizations--__tabbed_1_3">Objective Weights</label><label for="ropt.results.Realizations--__tabbed_1_4">Constraint Weights</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -3615,8 +3605,8 @@ realization, while <code>False</code> indicates a successful one:</p>
 </ul>
 </div>
 <div class="tabbed-block">
-<p><code>objective_weights</code>: A two-dimensional array of weights used for
-each objective in each realization:</p>
+<p><code>objective_weights</code>: A two-dimensional array of weights used for each
+objective in each realization:</p>
 <ul>
 <li>Shape <span class="arithmatex">\((n_o, n_r)\)</span>, where:<ul>
 <li><span class="arithmatex">\(n_o\)</span> is the number of objectives.</li>
@@ -3645,8 +3635,8 @@ each objective in each realization:</p>
 objective calculation</p>
 </div>
 <div class="tabbed-block">
-<p><code>constraint_weights</code>: A two-dimensional array of weights used for
-each constraint in each realization:</p>
+<p><code>constraint_weights</code>: A two-dimensional array of weights used for each
+constraint in each realization:</p>
 <ul>
 <li>Shape <span class="arithmatex">\((n_c, n_r)\)</span>, where:<ul>
 <li><span class="arithmatex">\(n_c\)</span> is the number of constraints.</li>
@@ -3673,7 +3663,6 @@ each constraint in each realization:</p>
 </ul>
 <p>These weights may change during optimization, depending on the type of
 constraint calculation</p>
-</div>
 </div>
 </div>
 </div>
@@ -3810,11 +3799,9 @@ depends on the bound type:</p>
 <p>Constraint violations are calculated based on the constraint differences. If
 a bound is violated, the violation value is the absolute value of the
 difference. If the bound is not violated, the violation value is zero.</p>
-<div class="admonition info">
-<p class="admonition-title">Fields</p>
-<p>The class stores the following information for bound, linear constraint,
-and non-linear constraint differences and violations as one-dimensional
-vectors:</p>
+<p><strong>Result descriptions</strong></p>
+<p>The class stores the following information for bound, linear constraint, and
+non-linear constraint differences and violations as one-dimensional vectors:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.ConstraintInfo--__tabbed_1_1" name="ropt.results.ConstraintInfo--__tabbed_1" type="radio" /><input id="ropt.results.ConstraintInfo--__tabbed_1_2" name="ropt.results.ConstraintInfo--__tabbed_1" type="radio" /><input id="ropt.results.ConstraintInfo--__tabbed_1_3" name="ropt.results.ConstraintInfo--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.ConstraintInfo--__tabbed_1_1">Bound Constraints</label><label for="ropt.results.ConstraintInfo--__tabbed_1_2">Linear Constraints</label><label for="ropt.results.ConstraintInfo--__tabbed_1_3">Nonlinear Constraints</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -3876,7 +3863,6 @@ vectors:</p>
 </ul>
 </li>
 </ul>
-</div>
 </div>
 </div>
 </div>
