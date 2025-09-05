@@ -22,58 +22,58 @@ class FunctionEvaluations(ResultField):
     The `FunctionEvaluations` class stores the results of evaluating the
     objective and constraint functions for a set of variables.
 
-    !!! info "Fields"
+    **Result descriptions**
 
-        === "Variables"
+    === "Variables"
 
-            `variables`: The vector of variable values at which the functions
-            were evaluated:
+        `variables`: The vector of variable values at which the functions
+        were evaluated:
 
-            - Shape: $(n_v,)$, where:
-                - $n_v$ is the number of variables.
-            - Axis type:
-                - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
+        - Shape: $(n_v,)$, where:
+            - $n_v$ is the number of variables.
+        - Axis type:
+            - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
-        === "Objectives"
+    === "Objectives"
 
-            `objectives`: The calculated objective function values for each
-            realization. This is a two-dimensional array of floating point
-            values where each row corresponds to a realization and each column
-            corresponds to an objective:
+        `objectives`: The calculated objective function values for each
+        realization. This is a two-dimensional array of floating point values
+        where each row corresponds to a realization and each column corresponds
+        to an objective:
 
-            - Shape $(n_r, n_o)$, where:
-                - $n_r$ is the number of realizations.
-                - $n_o$ is the number of objectives.
-            - Axis types:
-                - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
-                - [`AxisName.OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
+        - Shape $(n_r, n_o)$, where:
+            - $n_r$ is the number of realizations.
+            - $n_o$ is the number of objectives.
+        - Axis types:
+            - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
+            - [`AxisName.OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
 
-        === "Constraints"
+    === "Constraints"
 
-            `constraints`: The calculated constraint function values for each
-            realization. Only provided if non-linear constraints are defined.
-            This is a two-dimensional array of floating point values where each
-            row corresponds to a realization and each column corresponds to a
-            constraint:
+        `constraints`: The calculated constraint function values for each
+        realization. Only provided if non-linear constraints are defined. This
+        is a two-dimensional array of floating point values where each row
+        corresponds to a realization and each column corresponds to a
+        constraint:
 
-            - Shape $(n_r, n_c)$, where:
-                - $n_r$ is the number of realizations.
-                - $n_c$ is the number of constraints.
-            - Axis types:
-                - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
-                - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
+        - Shape $(n_r, n_c)$, where:
+            - $n_r$ is the number of realizations.
+            - $n_c$ is the number of constraints.
+        - Axis types:
+            - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
+            - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
 
-        === "Evaluation Info"
+    === "Evaluation Info"
 
-            `evaluation_info`: Optional metadata associated with each
-            realization, potentially provided by the evaluator. If provided,
-            each value in the info dictionary must be a one-dimensional array of
-            arbitrary type supported by `numpy` (including objects):
+        `evaluation_info`: Optional metadata associated with each realization,
+        potentially provided by the evaluator. If provided, each value in the
+        info dictionary must be a one-dimensional array of arbitrary type
+        supported by `numpy` (including objects):
 
-            - Shape: $(n_r,)$, where:
-                - $n_r$ is the number of realizations.
-            - Axis type:
-                - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
+        - Shape: $(n_r,)$, where:
+            - $n_r$ is the number of realizations.
+        - Axis type:
+            - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
 
     Attributes:
         variables:       The variable vector:

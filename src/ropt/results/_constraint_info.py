@@ -48,38 +48,37 @@ class ConstraintInfo(ResultField):
     difference. If the bound is not violated, the violation value is zero.
 
 
-    !!! info "Fields"
+    **Result descriptions**
 
-        The class stores the following information for bound, linear constraint,
-        and non-linear constraint differences and violations as one-dimensional
-        vectors:
+    The class stores the following information for bound, linear constraint, and
+    non-linear constraint differences and violations as one-dimensional vectors:
 
-        === "Bound Constraints"
+    === "Bound Constraints"
 
-            - Differences: `bound_lower` and `bound_upper`
-            - Violations: `bound_violation`
-            - Shape: $(n_v,)$, where:
-                - $n_v$ is the number of variables.
-            - Axis type:
-                - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
+        - Differences: `bound_lower` and `bound_upper`
+        - Violations: `bound_violation`
+        - Shape: $(n_v,)$, where:
+            - $n_v$ is the number of variables.
+        - Axis type:
+            - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
-        === "Linear Constraints"
+    === "Linear Constraints"
 
-            - Differences: `linear_lower` and `linear_upper`
-            - Violations: `linear_violation`
-            - Shape: $(n_l,)$, where:
-                - $n_l$ is the number of linear constraints.
-            - Axis type:
-                - [`AxisName.LINEAR_CONSTRAINT`][ropt.enums.AxisName.LINEAR_CONSTRAINT]
+        - Differences: `linear_lower` and `linear_upper`
+        - Violations: `linear_violation`
+        - Shape: $(n_l,)$, where:
+            - $n_l$ is the number of linear constraints.
+        - Axis type:
+            - [`AxisName.LINEAR_CONSTRAINT`][ropt.enums.AxisName.LINEAR_CONSTRAINT]
 
-        === "Nonlinear Constraints"
+    === "Nonlinear Constraints"
 
-            - Differences: `nonlinear_lower` and `nonlinear_upper`
-            - Violations: `nonlinear_violation`
-            - Shape: $(n_c,)$, where:
-                - $n_c$ is the number of non-linear constraints.
-            - Axis type:
-                - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
+        - Differences: `nonlinear_lower` and `nonlinear_upper`
+        - Violations: `nonlinear_violation`
+        - Shape: $(n_c,)$, where:
+            - $n_c$ is the number of non-linear constraints.
+        - Axis type:
+            - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
 
     Attributes:
          bound_lower:         Difference between variables and their lower bounds.

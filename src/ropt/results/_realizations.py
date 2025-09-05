@@ -20,59 +20,59 @@ class Realizations(ResultField):
     The `Realizations` class stores data related to the individual realizations
     used in the optimization process.
 
-    !!! info "Fields"
+    **Result descriptions**
 
-        === "Active Realizations"
+    === "Active Realizations"
 
-            `active_realizations`: A boolean array indicating whether each
-            realization's evaluation was evaluated. `True` indicates that a
-            realization was evaluated:
+        `active_realizations`: A boolean array indicating whether each
+        realization's evaluation was evaluated. `True` indicates that a
+        realization was evaluated:
 
-            - Shape $(n_r,)$, where:
-                - $n_r$ is the number of realizations.
-            - Axis type:
-                - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
+        - Shape $(n_r,)$, where:
+            - $n_r$ is the number of realizations.
+        - Axis type:
+            - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
 
-        === "Failed Realizations"
+    === "Failed Realizations"
 
-            `failed_realizations`: A boolean array indicating whether each
-            realization's evaluation was successful. `True` indicates a failed
-            realization, while `False` indicates a successful one:
+        `failed_realizations`: A boolean array indicating whether each
+        realization's evaluation was successful. `True` indicates a failed
+        realization, while `False` indicates a successful one:
 
-            - Shape $(n_r,)$, where:
-                - $n_r$ is the number of realizations.
-            - Axis type:
-                - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
+        - Shape $(n_r,)$, where:
+            - $n_r$ is the number of realizations.
+        - Axis type:
+            - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
 
-        === "Objective Weights"
+    === "Objective Weights"
 
-            `objective_weights`: A two-dimensional array of weights used for
-            each objective in each realization:
+        `objective_weights`: A two-dimensional array of weights used for each
+        objective in each realization:
 
-            - Shape $(n_o, n_r)$, where:
-                - $n_o$ is the number of objectives.
-                - $n_r$ is the number of realizations.
-            - Axis types:
-                - [`AxisName.OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
-                - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
+        - Shape $(n_o, n_r)$, where:
+            - $n_o$ is the number of objectives.
+            - $n_r$ is the number of realizations.
+        - Axis types:
+            - [`AxisName.OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
+            - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
 
-            These weights may change during optimization, depending on the type of
-            objective calculation
+        These weights may change during optimization, depending on the type of
+        objective calculation
 
-        === "Constraint Weights"
+    === "Constraint Weights"
 
-            `constraint_weights`: A two-dimensional array of weights used for
-            each constraint in each realization:
+        `constraint_weights`: A two-dimensional array of weights used for each
+        constraint in each realization:
 
-            - Shape $(n_c, n_r)$, where:
-                - $n_c$ is the number of constraints.
-                - $n_r$ is the number of realizations.
-            - Axis types:
-                - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
-                - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
+        - Shape $(n_c, n_r)$, where:
+            - $n_c$ is the number of constraints.
+            - $n_r$ is the number of realizations.
+        - Axis types:
+            - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
+            - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]
 
-            These weights may change during optimization, depending on the type of
-            constraint calculation
+        These weights may change during optimization, depending on the type of
+        constraint calculation
 
     Attributes:
         active_realizations: Boolean array indicating active realizations.

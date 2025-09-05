@@ -29,36 +29,36 @@ class Functions(ResultField):
     individually by the optimizer.
 
 
-    !!! info "Fields"
+    **Result descriptions**
 
-        === "Weighted Objective"
+    === "Weighted Objective"
 
-            `weighted_objective`: The overall objective calculated as a weighted
-            sum over the objectives. This is a single floating point values. It
-            is defined as a `numpy` array of dimensions 0, hence it has no axes:
+        `weighted_objective`: The overall objective calculated as a weighted sum
+        over the objectives. This is a single floating point values. It is
+        defined as a `numpy` array of dimensions 0, hence it has no axes:
 
-            - Shape: $()$
-            - Axis type: `None`
+        - Shape: $()$
+        - Axis type: `None`
 
-        === "Objectives"
+    === "Objectives"
 
-            `objectives`: The calculated objective function values. This is a
-            one-dimensional array of floating point values:
+        `objectives`: The calculated objective function values. This is a
+        one-dimensional array of floating point values:
 
-            - Shape $(n_o,)$, where:
-                - $n_o$ is the number of objectives.
-            - Axis type:
-                - [`AxisName.OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
+        - Shape $(n_o,)$, where:
+            - $n_o$ is the number of objectives.
+        - Axis type:
+            - [`AxisName.OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE]
 
-        === "Constraints"
+    === "Constraints"
 
-            `constraints`: The calculated constraint function values. This is a
-            one-dimensional array of floating point values:
+        `constraints`: The calculated constraint function values. This is a
+        one-dimensional array of floating point values:
 
-            - Shape $(n_c,)$, where:
-                - $n_c$ is the number of constraints.
-            - Axis type:
-                - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
+        - Shape $(n_c,)$, where:
+            - $n_c$ is the number of constraints.
+        - Axis type:
+            - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
 
     Attributes:
         weighted_objective: The weighted sum of the objective values.
