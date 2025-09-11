@@ -44,8 +44,7 @@ def test_stddev_function_estimator_merge_error(
     with pytest.raises(
         ValueError,
         match=(
-            "The stddev estimator does not support merging "
-            "realizations in the gradient."
+            "The stddev estimator does not support merging realizations in the gradient"
         ),
     ):
         BasicOptimizer(enopt_config, evaluator(test_functions)).run(initial_values)

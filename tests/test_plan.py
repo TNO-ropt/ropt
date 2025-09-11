@@ -77,7 +77,7 @@ def test_plan_evaluators(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step1.run(variables=initial_values, config=config)
 
     step2 = plan.add_step("optimizer")
-    with pytest.raises(AttributeError, match="No suitable evaluator found."):
+    with pytest.raises(AttributeError, match="No suitable evaluator found"):
         step2.run(variables=initial_values, config=config)
 
     plan.add_evaluator("function_evaluator", evaluator=evaluator(), clients={step2})
@@ -703,7 +703,7 @@ def test_plan_abort(enopt_config: Any, evaluator: Any) -> None:
     assert plan.aborted
 
     step = plan.add_step("optimizer")
-    with pytest.raises(PlanAborted, match="Plan was aborted by the previous step."):
+    with pytest.raises(PlanAborted, match="Plan was aborted by the previous step"):
         step.run(
             variables=initial_values, config=EnOptConfig.model_validate(enopt_config)
         )
