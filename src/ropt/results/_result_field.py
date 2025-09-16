@@ -55,4 +55,5 @@ class ResultField:
         if metadata is None:
             msg = f"Unknown field name: {name}"
             raise ValueError(msg)
-        return metadata.get("__axes__", ())
+        axes: tuple[AxisName, ...] = metadata.get("__axes__", ())
+        return axes
