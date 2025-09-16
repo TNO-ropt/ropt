@@ -50,6 +50,16 @@ class EnOptConfig(BaseModel):
         initial values and bounds as `numpy` arrays, which must either match the
         number of variables or have a size of one.
 
+    Warning:
+        `EnOptConfig` objects are immutable and hold the in-memory configuration
+        for an optimization step. For persistence, do not serialize the object
+        itself. Instead, store the original dictionary used for its creation.
+
+        Round-trip serialization (e.g., to/from JSON) is not a supported use
+        case and may lead to data loss due to the complex types it contains,
+        such as `numpy` arrays, or to unexpected behavior because of the
+        transformations that are applied to the input upon creation.
+
     Attributes:
         variables:             Configuration for the optimization variables.
         objectives:            Configuration for the objective functions.

@@ -39,20 +39,6 @@ it contains nested configuration classes for various aspects of the
 optimization. To parse a configuration from a dictionary, use the
 [`model_validate`][pydantic.BaseModel.model_validate] class method.
 ```
-
-
-Classes:
-    EnOptConfig:                The main configuration class for an optimization step.
-    VariablesConfig:            Configuration for variables.
-    ObjectiveFunctionsConfig:   Configuration for objective functions.
-    LinearConstraintsConfig:    Configuration for linear constraints.
-    NonlinearConstraintsConfig: Configuration for non-linear constraints.
-    RealizationsConfig:         Configuration for realizations.
-    OptimizerConfig:            Configuration for the optimizer.
-    GradientConfig:             Configuration for gradient calculations.
-    FunctionEstimatorConfig:    Configuration for function estimators.
-    RealizationFilterConfig:    Configuration for realization filters.
-    SamplerConfig:              Configuration for samplers.
 """
 
 from ._enopt_config import EnOptConfig

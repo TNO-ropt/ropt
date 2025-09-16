@@ -71,13 +71,6 @@ for:
     domain they must be converted using the
     [`transform_from_optimizer`][ropt.results.Results.transform_from_optimizer]
     method.
-
-
-Classes:
-    OptModelTransforms: A data class for conveniently grouping and passing
-                        multiple transformation objects.
-    VariableScaler:     A concrete implementation of `VariableTransform`
-                        that performs linear scaling and shifting.
 """
 
 from ._transforms import OptModelTransforms
