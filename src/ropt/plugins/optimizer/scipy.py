@@ -736,5 +736,4 @@ _OPTIONS_SCHEMA: dict[str, Any] = {
 if __name__ == "__main__":
     from ropt.config.options import gen_options_table
 
-    with Path("scipy.md").open("w", encoding="utf-8") as fp:
-        fp.write(gen_options_table(_OPTIONS_SCHEMA))
+    Path("scipy.md").write_text(gen_options_table(_OPTIONS_SCHEMA), encoding="utf-8")
