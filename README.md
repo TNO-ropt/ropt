@@ -10,7 +10,7 @@ Detailed documentation and examples can be found in the online
 
 
 ## Dependencies
-`ropt` has been tested with Python versions 3.11-3.13.
+`ropt` has been tested with Python versions 3.11-3.14.
 
 `ropt` requires one or more optimization plugins to function. By default, a
 plugin based on optimizers included with [SciPy](https://scipy.org/) is
