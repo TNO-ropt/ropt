@@ -11,8 +11,7 @@ def test_scipy_options_table() -> None:
     md_file = Path(__file__).parent.parent / "docs" / "snippets" / "scipy.md"
     if not md_file.exists():
         pytest.fail(f"File not found: {md_file}\n{msg}")
-    with md_file.open() as fp:
-        saved = fp.read()
+    saved = md_file.read_text()
     generated = gen_options_table(_OPTIONS_SCHEMA)
     if saved.strip() != generated.strip():
         pytest.fail(
