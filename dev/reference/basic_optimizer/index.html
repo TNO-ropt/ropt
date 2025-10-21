@@ -1407,14 +1407,15 @@ sources will be combined:</p>
 </li>
 <li>
 <p><strong>JSON Configuration File</strong>: If a JSON configuration file is
-    found at <code>&lt;sys.prefix&gt;/share/ropt/options.json</code> (where
-    <code>&lt;sys.prefix&gt;</code> is the Python installation prefix),
-    <code>BasicOptimizer</code> will look for specific keys to load additional
-    event handlers. If this JSON file contains a <code>basic_optimizer</code>
-    key, and nested within it an <code>event_handlers</code> key, the value of
-    <code>event_handlers</code> should be a list of strings. Each string in
-    this list should be the name of a registered <code>EventHandler</code>.
-    These handlers will be added to those found via <code>ROPT_HANDLERS</code>.</p>
+    found at <code>&lt;prefix&gt;/share/ropt/options.json</code> (where <code>&lt;prefix&gt;</code> is
+    the Python installation prefix or a system-wide data
+    prefix.<sup id="ropt.plan.BasicOptimizer--fnref:1"><a class="footnote-ref" href="#ropt.plan.BasicOptimizer--fn:1">1</a></sup>), <code>BasicOptimizer</code> will look for specific keys to
+    load additional event handlers. If this JSON file contains a
+    <code>basic_optimizer</code> key, and nested within it an <code>event_handlers</code>
+    key, the value of <code>event_handlers</code> should be a list of strings.
+    Each string in this list should be the name of a registered
+    <code>EventHandler</code>. These handlers will be added to
+    those found via <code>ROPT_HANDLERS</code>.</p>
 <p>Example <code>shared/ropt/options.json</code>:</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nt">&quot;basic_optimizer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -1462,6 +1463,18 @@ a step with the name <code>run_plan</code> is assumed to exists and will be
 used.</p>
 </li>
 </ol>
+<div class="footnote">
+<hr />
+<ol>
+<li id="ropt.plan.BasicOptimizer--fn:1">
+<p>The exact path to Python installation prefix, or the system's
+data prefix can be found using the Python <code>sysconfig</code> module:
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">sysconfig</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_paths</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">get_paths</span><span class="p">()[</span><span class="s2">&quot;data&quot;</span><span class="p">])</span>
+</span></code></pre></div>&#160;<a class="footnote-backref" href="#ropt.plan.BasicOptimizer--fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 </details>
 
 
