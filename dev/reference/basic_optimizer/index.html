@@ -1387,18 +1387,10 @@ problem and analyzing the results.</p>
   <summary>Customization</summary>
   <p>The optimization workflow executed by <code>BasicOptimizer</code> can be tailored
 in two main ways: by adding event handlers to the default workflow or by
-running an entirely different workflow. Customization can be configured
-using environment variables or a JSON configuration file.</p>
-<p>The <code>ROPT_HANDLERS</code> environment variable may contain a comma-separated
-list of options that are each parsed to obtain event handlers or plan
-steps. In addition if a JSON configuration file is found at
-<code>&lt;sys.prefix&gt;/share/ropt/options.json</code> (where <code>&lt;sys.prefix&gt;</code> is the
-Python installation prefix), it will read it to find additional handlers
-to install.</p>
+running an entirely different workflow:</p>
 <ol>
 <li>
-<p><strong>Adding Custom Event Handlers (via <code>ROPT_HANDLERS</code> or JSON
-    configuration)</strong></p>
+<p><strong>Adding Custom Event Handlers</strong></p>
 <p>This method allows for custom processing of events emitted by the
 <em>default</em> optimization workflow, without replacing the workflow
 itself. This is useful for tasks like custom logging or data
@@ -1407,11 +1399,10 @@ processing.</p>
 sources will be combined:</p>
 <ul>
 <li>
-<p><strong><code>ROPT_HANDLERS</code> Environment Variable</strong>: If <code>ROPT_HANDLERS</code>
-    contains a comma-separated list of event handler names (and
-    these names do not match the "Custom Step Execution" format
-    described above), these handlers will be added to the default
-    optimization workflow. Each name must correspond to a registered
+<p><strong>Environment Variable</strong>: If the <code>ROPT_HANDLERS</code> environment
+    variable contains a comma-separated list of event handler names,
+    these handlers will be added to the default optimization
+    workflow. Each name must correspond to a registered
     <code>EventHandler</code>.</p>
 </li>
 <li>
@@ -1424,21 +1415,21 @@ sources will be combined:</p>
     <code>event_handlers</code> should be a list of strings. Each string in
     this list should be the name of a registered <code>EventHandler</code>.
     These handlers will be added to those found via <code>ROPT_HANDLERS</code>.</p>
-<p>Example <code>shared/ropt/options.json</code>: <code>json {
-    "basic_optimizer": {
-        "event_handlers": [
-            "custom_logger", "extra/event_processor"
-        ]
-    }
-}</code></p>
+<p>Example <code>shared/ropt/options.json</code>:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nt">&quot;basic_optimizer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="nt">&quot;event_handlers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;custom_logger&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;extra/event_processor&quot;</span><span class="p">]</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">}</span>
+</span></code></pre></div>
 </li>
 </ul>
 <p>Note that if a custom optimization workflow is installed using the
 <code>ROPT_SCRIPT</code> environment variable (see below), these custom
-handlers will be ignored.</p>
+handlers will not be installed.</p>
 </li>
 <li>
-<p><strong>Custom Step Execution (via <code>ROPT_SCRIPT</code>)</strong></p>
+<p><strong>Custom Step Execution</strong></p>
 <p>If the <code>ROPT_SCRIPT</code> environment variable contains an option in the
 format <code>step-name=script.py</code> (where <code>script.py</code> may be any file),
 the named step will be executed <em>instead</em> of the standard
@@ -1447,17 +1438,20 @@ defines the new optimization workflow.</p>
 <p>The custom step (<code>step-name</code>) must adhere to the following:</p>
 <ul>
 <li>It must be a registered <code>PlanStep</code>.</li>
-<li>Its <code>run</code> method  must accept: *   An <code>evaluator</code> keyword
-    argument, which will receive the
-        evaluator function passed to <code>BasicOptimizer</code>.<ul>
+<li>Its <code>run</code> method  must accept<ol>
+<li>An <code>evaluator</code> keyword argument, which will receive the
+     evaluator function passed to <code>BasicOptimizer</code>.</li>
 <li>A <code>script</code> keyword argument, which will receive the name of
-    script passed via <code>ROPT_SCRIPT</code>.</li>
-</ul>
+     script passed via <code>ROPT_SCRIPT</code>.</li>
+</ol>
 </li>
 <li>
-<p>This method must return a <em>callable</em> that: *   Accepts a
-    <a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> object as its only argument. *
-    Returns an optimization <a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode</code></a>.</p>
+<p>This method must return a <em>callable</em> that:</p>
+<ol>
+<li>Accepts a <a class="autorefs autorefs-internal" title="            ropt.plan.Plan" href="../plan/#ropt.plan.Plan"><code>Plan</code></a> object as its only
+     argument.</li>
+<li>Returns an optimization <a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode</code></a>.</li>
+</ol>
 <p>This callable will then be executed by <code>BasicOptimizer</code> in place
 of its default workflow.</p>
 </li>
