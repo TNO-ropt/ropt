@@ -54,6 +54,7 @@ plugins:
 markdown_extensions:
   - admonition
   - def_list
+  - footnotes
   - pymdownx.arithmatex:
       generic: true
   - pymdownx.details

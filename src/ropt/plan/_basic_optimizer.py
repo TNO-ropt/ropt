@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import os
-import sys
+import sysconfig
 from contextlib import suppress
 from dataclasses import dataclass
 from functools import cache
@@ -74,18 +74,9 @@ class BasicOptimizer:
     Note: Customization
         The optimization workflow executed by `BasicOptimizer` can be tailored
         in two main ways: by adding event handlers to the default workflow or by
-        running an entirely different workflow. Customization can be configured
-        using environment variables or a JSON configuration file.
+        running an entirely different workflow:
 
-        The `ROPT_HANDLERS` environment variable may contain a comma-separated
-        list of options that are each parsed to obtain event handlers or plan
-        steps. In addition if a JSON configuration file is found at
-        `<sys.prefix>/share/ropt/options.json` (where `<sys.prefix>` is the
-        Python installation prefix), it will read it to find additional handlers
-        to install.
-
-        1.  **Adding Custom Event Handlers (via `ROPT_HANDLERS` or JSON
-            configuration)**
+        1.  **Adding Custom Event Handlers**
 
             This method allows for custom processing of events emitted by the
             *default* optimization workflow, without replacing the workflow
@@ -95,37 +86,38 @@ class BasicOptimizer:
             Event handlers can be specified in two ways, and handlers from both
             sources will be combined:
 
-            *   **`ROPT_HANDLERS` Environment Variable**: If `ROPT_HANDLERS`
-                contains a comma-separated list of event handler names (and
-                these names do not match the "Custom Step Execution" format
-                described above), these handlers will be added to the default
-                optimization workflow. Each name must correspond to a registered
+            *   **Environment Variable**: If the `ROPT_HANDLERS` environment
+                variable contains a comma-separated list of event handler names,
+                these handlers will be added to the default optimization
+                workflow. Each name must correspond to a registered
                 `EventHandler`.
 
             *   **JSON Configuration File**: If a JSON configuration file is
-                found at `<sys.prefix>/share/ropt/options.json` (where
-                `<sys.prefix>` is the Python installation prefix),
-                `BasicOptimizer` will look for specific keys to load additional
-                event handlers. If this JSON file contains a `basic_optimizer`
-                key, and nested within it an `event_handlers` key, the value of
-                `event_handlers` should be a list of strings. Each string in
-                this list should be the name of a registered `EventHandler`.
-                These handlers will be added to those found via `ROPT_HANDLERS`.
+                found at `<prefix>/share/ropt/options.json` (where `<prefix>` is
+                the Python installation prefix or a system-wide data
+                prefix.[^1]), `BasicOptimizer` will look for specific keys to
+                load additional event handlers. If this JSON file contains a
+                `basic_optimizer` key, and nested within it an `event_handlers`
+                key, the value of `event_handlers` should be a list of strings.
+                Each string in this list should be the name of a registered
+                `EventHandler`. These handlers will be added to
+                those found via `ROPT_HANDLERS`.
 
-                Example `shared/ropt/options.json`: ```json {
+                Example `shared/ropt/options.json`:
+
+                ```json
+                {
                     "basic_optimizer": {
-                        "event_handlers": [
-                            "custom_logger", "extra/event_processor"
-                        ]
+                        "event_handlers": ["custom_logger", "extra/event_processor"]
                     }
                 }
                 ```
 
             Note that if a custom optimization workflow is installed using the
             `ROPT_SCRIPT` environment variable (see below), these custom
-            handlers will be ignored.
+            handlers will not be installed.
 
-        2.  **Custom Step Execution (via `ROPT_SCRIPT`)**
+        2.  **Custom Step Execution**
 
             If the `ROPT_SCRIPT` environment variable contains an option in the
             format `step-name=script.py` (where `script.py` may be any file),
@@ -136,14 +128,15 @@ class BasicOptimizer:
             The custom step (`step-name`) must adhere to the following:
 
             *   It must be a registered `PlanStep`.
-            *   Its `run` method  must accept: *   An `evaluator` keyword
-                argument, which will receive the
-                    evaluator function passed to `BasicOptimizer`.
-                *   A `script` keyword argument, which will receive the name of
-                    script passed via `ROPT_SCRIPT`.
-            *   This method must return a *callable* that: *   Accepts a
-                [`Plan`][ropt.plan.Plan] object as its only argument. *
-                Returns an optimization [`ExitCode`][ropt.enums.ExitCode].
+            *   Its `run` method  must accept
+                1.   An `evaluator` keyword argument, which will receive the
+                     evaluator function passed to `BasicOptimizer`.
+                2.   A `script` keyword argument, which will receive the name of
+                     script passed via `ROPT_SCRIPT`.
+            *   This method must return a *callable* that:
+                1.   Accepts a [`Plan`][ropt.plan.Plan] object as its only
+                     argument.
+                2.   Returns an optimization [`ExitCode`][ropt.enums.ExitCode].
 
                 This callable will then be executed by `BasicOptimizer` in place
                 of its default workflow.
@@ -153,6 +146,13 @@ class BasicOptimizer:
             a step with the name `run_plan` is assumed to exists and will be
             used.
 
+            [^1]:
+                The exact path to Python installation prefix, or the system's
+                data prefix can be found using the Python `sysconfig` module:
+                ```python
+                from sysconfig import get_paths
+                print(get_paths()["data"])
+                ```
     """
 
     def __init__(
@@ -371,7 +371,8 @@ class BasicOptimizer:
 
 @cache
 def _get_option(option: str) -> list[str]:
-    path = Path(sys.prefix) / "share" / "ropt" / "options.json"
+    data_path = Path(sysconfig.get_paths()["data"])
+    path = data_path / "share" / "ropt" / "options.json"
     with (
         suppress(OSError, json.JSONDecodeError),
         path.open("r", encoding="utf-8") as file_obj,
