@@ -28,10 +28,15 @@ class EnOptConfig(BaseModel):
 
     `realization_filters`, `function_estimators`, and `samplers` are configured
     as tuples. Other configuration fields reference these objects by their index
-    within the tuples. For example,
-    [`GradientConfig`][ropt.config.GradientConfig] uses a `samplers` field,
-    which is an array of indices specifying the sampler to use for each
-    variable.
+    within the tuples. This makes it possible to share these objects between
+    entities. For example, [`VariablesConfig`][ropt.config.VariablesConfig] has
+    a `samplers` field, which is an array of indices specifying the sampler to
+    use for each variable. If only a single sampler is needed, the `samplers`
+    field in `EnOptConfig` should contain a single sampler configuration, and
+    the `samplers` field in the `VariablesConfig` configuration contains only
+    zeros to specify that each variable should use this entry. In case of
+    multiple samplers, multiple sampler configurations are defined, and each
+    entry in `samplers` array in `VariablesConfig` points to desired sampler.
 
     The optional `names` attribute is a dictionary that stores the names of the
     various entities, such as variables, objectives, and constraints. The
