@@ -212,23 +212,18 @@ class PlanComponent:
     [`Plan`][ropt.plan.Plan].
 
     Each `PlanComponent` is assigned a unique identifier (`id`) upon
-    initialization, an optional tag (`tag`), and maintains a reference to its
-    parent `plan`.
+    initialization, an optional tag (`tag`).
 
     """
 
-    def __init__(self, plan: Plan | None, tags: set[str] | None) -> None:
+    def __init__(self, tags: set[str] | None) -> None:
         """Initialize the PlanComponent.
 
-        This constructor is called by subclasses to set up common attributes. It
-        stores a reference to the parent `plan`, an optional `tag`, and assigns
-        a unique `id`.
+        This constructor is called by subclasses to set up common attributes.
 
         Args:
-            plan: The parent [`Plan`][ropt.plan.Plan] instance.
             tags: Optional tags
         """
-        self.__stored_plan = plan
         self.__tags = set() if tags is None else tags
         self.__id: uuid.UUID = uuid.uuid4()
 
@@ -240,16 +235,6 @@ class PlanComponent:
             A UUID object representing the unique identifier of the component.
         """
         return self.__id
-
-    @property
-    def plan(self) -> Plan:
-        """Return the parent plan associated with this component.
-
-        Returns:
-            The [`Plan`][ropt.plan.Plan] object that owns this component.
-        """
-        assert self.__stored_plan is not None
-        return self.__stored_plan
 
     @property
     def tags(self) -> set[str]:
@@ -290,7 +275,17 @@ class PlanStep(ABC, PlanComponent):
             plan: The [`Plan`][ropt.plan.Plan] instance that owns this step.
             tags: Optional tags
         """
-        super().__init__(plan, tags)
+        super().__init__(tags)
+        self._plan = plan
+
+    @property
+    def plan(self) -> Plan:
+        """Return the parent plan associated with this component.
+
+        Returns:
+            The [`Plan`][ropt.plan.Plan] object that owns this component.
+        """
+        return self._plan
 
     @abstractmethod
     def run(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
@@ -362,7 +357,7 @@ class EventHandler(ABC, PlanComponent):
             tags:    Optional tags
             sources: Optional set of steps whose events should be processed.
         """
-        super().__init__(None, tags)
+        super().__init__(tags)
         if sources is None:
             sources = set()
         for source in sources:
@@ -488,7 +483,7 @@ class Evaluator(ABC, PlanComponent):
             tags:    Optional tags
             clients: The steps that use this evaluator.
         """
-        super().__init__(None, tags)
+        super().__init__(tags)
         if clients is None:
             clients = set()
         for client in clients:
