@@ -1269,19 +1269,19 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.StepAborted" class="md-nav__link">
+  <a href="#ropt.exceptions.OperationAborted" class="md-nav__link">
     <span class="md-ellipsis">
       
-        StepAborted
+        OperationAborted
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="StepAborted">
+    <nav class="md-nav" aria-label="OperationAborted">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.StepAborted.__init__" class="md-nav__link">
+  <a href="#ropt.exceptions.OperationAborted.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -1382,19 +1382,19 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.StepAborted" class="md-nav__link">
+  <a href="#ropt.exceptions.OperationAborted" class="md-nav__link">
     <span class="md-ellipsis">
       
-        StepAborted
+        OperationAborted
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="StepAborted">
+    <nav class="md-nav" aria-label="OperationAborted">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.exceptions.StepAborted.__init__" class="md-nav__link">
+  <a href="#ropt.exceptions.OperationAborted.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -1473,8 +1473,8 @@
 
 
 
-<h3 id="ropt.exceptions.StepAborted" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">StepAborted</span>
+<h3 id="ropt.exceptions.OperationAborted" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">OperationAborted</span>
 
 
 </h3>
@@ -1486,10 +1486,10 @@
 
 
 
-        <p>Raised when a step is aborted prematurely.</p>
-<p>This exception signals that a plan step could not complete its intended task
-due to a specific condition (e.g., insufficient valid realizations, user
-request).</p>
+        <p>Raised when an operation is aborted prematurely.</p>
+<p>This exception signals that an optimization or another operation could not
+complete its intended task due to a specific condition (e.g., insufficient
+valid realizations, user request).</p>
 <p>It must be initialized with an <a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode</code></a> indicating
 the reason for the abortion.</p>
 
@@ -1517,7 +1517,7 @@ the reason for the abortion.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.exceptions.StepAborted.__init__" class="doc doc-heading">
+<h4 id="ropt.exceptions.OperationAborted.__init__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
 
@@ -1527,7 +1527,7 @@ the reason for the abortion.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the StepAborted exception.</p>
+        <p>Initialize the OperationAborted exception.</p>
 <p>Stores the reason for the abortion, which can be accessed via the
 <code>exit_code</code> attribute.</p>
 
@@ -1552,7 +1552,7 @@ the reason for the abortion.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The code indicating why the optimization step was aborted.</p>
+                <p>The code indicating why the operation was aborted.</p>
               </div>
             </td>
             <td>

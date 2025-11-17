@@ -2588,8 +2588,6 @@ registered to listen for specific event types.</p>
   " href="../workflows/#ropt.optimization.Event"><code>Event</code></a> object containing:</p>
 <ul>
 <li><code>event_type</code>: The type of the event (a value from this enumeration).</li>
-<li><code>config</code>: The configuration object associated with the source.</li>
-<li><code>source</code>: The unique ID (UUID) of the plan component that emitted the event.</li>
 <li><code>data</code>: A dictionary containing event-specific data, such as
   <a class="autorefs autorefs-internal" title="            ropt.results.Results
 
@@ -2598,8 +2596,6 @@ registered to listen for specific event types.</p>
       dataclass
   " href="../results/#ropt.results.Results"><code>Results</code></a> objects.</li>
 </ul>
-<p>Refer to the documentation of individual event types and plan components for
-details on the specific data they provide.</p>
 
 
 

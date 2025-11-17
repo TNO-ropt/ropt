@@ -2230,12 +2230,8 @@ the plugin supports multiple event handler types.</p>
 
         <p>Abstract base class for evaluator plugins.</p>
 <p>This class defines the interface for plugins responsible for creating
-plan-aware <a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.Evaluator" href="#ropt.plugins.evaluator.base.Evaluator"><code>Evaluator</code></a> instances within
+<a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.Evaluator" href="#ropt.plugins.evaluator.base.Evaluator"><code>Evaluator</code></a> instances within
 an optimization workflow.</p>
-<p>During plan setup, the <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>
-identifies the appropriate evaluator plugin based on a requested name and
-uses its <code>create</code> class method to instantiate the actual <code>Evaluator</code> object
-that will perform evaluations during plan execution.</p>
 
 
 
@@ -3095,7 +3091,7 @@ data available to other components of plan.</p>
 
 
 
-        <p>abstract base class for evaluator components within an optimization plan.</p>
+        <p>Abstract base class for evaluator components within an optimization workflow.</p>
 <p>Subclasses must implement the abstract
 <a class="autorefs autorefs-internal" title="            eval
 

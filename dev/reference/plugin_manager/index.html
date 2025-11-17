@@ -1665,8 +1665,7 @@ custom or third-party components, installed as separate packages.</p>
 <p><code>ropt</code> supports several types of plugins, each addressing a specific aspect of
 the optimization workflow:</p>
 <ul>
-<li>Define components for constructing and executing
-  optimization plans
+<li>Define components for constructing and executing optimization workflows
   (<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.base.EventHandlerPlugin" href="../workflow_plugins/#ropt.plugins.event_handler.base.EventHandlerPlugin"><code>EventHandlerPlugin</code></a>,
   <a class="autorefs autorefs-internal" title="            ropt.plugins.operation.base.OperationPlugin" href="../workflow_plugins/#ropt.plugins.operation.base.OperationPlugin"><code>OperationPlugin</code></a> and
   <a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.EvaluatorPlugin" href="../workflow_plugins/#ropt.plugins.evaluator.base.EvaluatorPlugin"><code>EvaluatorPlugin</code></a>).</li>
@@ -1685,7 +1684,7 @@ discovered automatically using Python's standard entry points mechanism.</p>
 <p>Each plugin type has a corresponding abstract base class that custom plugins
 must inherit from:</p>
 <ul>
-<li><strong>Plan:</strong> <a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.base.EventHandlerPlugin" href="../workflow_plugins/#ropt.plugins.event_handler.base.EventHandlerPlugin"><code>EventHandlerPlugin</code></a>,
+<li><strong>Workflow:</strong> <a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.base.EventHandlerPlugin" href="../workflow_plugins/#ropt.plugins.event_handler.base.EventHandlerPlugin"><code>EventHandlerPlugin</code></a>,
   <a class="autorefs autorefs-internal" title="            ropt.plugins.operation.base.OperationPlugin" href="../workflow_plugins/#ropt.plugins.operation.base.OperationPlugin"><code>OperationPlugin</code></a>, and
   <a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.EvaluatorPlugin" href="../workflow_plugins/#ropt.plugins.evaluator.base.EvaluatorPlugin"><code>EvaluatorPlugin</code></a></li>
 <li><strong>Optimizer:</strong>
@@ -1714,7 +1713,7 @@ method generally implement a <code>create</code> factory method that will be use
 that implement the desired functionality. These objects must inherit from the base class for the
 corresponding plugin type:</p>
 <ul>
-<li><strong>Plan:</strong> <a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.base.EventHandler" href="../workflow_plugins/#ropt.plugins.event_handler.base.EventHandler"><code>EventHandler</code></a> and
+<li><strong>Workflow:</strong> <a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.base.EventHandler" href="../workflow_plugins/#ropt.plugins.event_handler.base.EventHandler"><code>EventHandler</code></a> and
   <a class="autorefs autorefs-internal" title="            ropt.plugins.operation.base.Operation" href="../workflow_plugins/#ropt.plugins.operation.base.Operation"><code>Operation</code></a></li>
 <li><strong>Optimizer:</strong>
   <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.Optimizer" href="../optimizer_plugins/#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a></li>
@@ -1727,10 +1726,10 @@ corresponding plugin type:</p>
 <p><strong>Pre-installed Plugins Included with <code>ropt</code></strong></p>
 <p><code>ropt</code> comes bundled with a set of pre-installed plugins:</p>
 <ul>
-<li><strong>Plan:</strong> The built-in
+<li><strong>Workflow:</strong> The built-in
   <a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.default.DefaultEventHandlerPlugin" href="../default_workflow_plugins/#ropt.plugins.event_handler.default.DefaultEventHandlerPlugin"><code>default</code></a> event handler
   and <a class="autorefs autorefs-internal" title="            ropt.plugins.operation.default.DefaultOperationPlugin" href="../default_workflow_plugins/#ropt.plugins.operation.default.DefaultOperationPlugin"><code>default</code></a> step plugins,
-  providing components for executing complex optimization plans.</li>
+  providing components for executing complex optimization workflows.</li>
 <li><strong>Optimizer:</strong> The <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.scipy.SciPyOptimizer" href="../scipy_optimizer_plugin/#ropt.plugins.optimizer.scipy.SciPyOptimizer"><code>scipy</code></a>
   plugin, leveraging algorithms from <code>scipy.optimize</code>, and the
   <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.external.ExternalOptimizer" href="../external_optimizer_plugin/#ropt.plugins.optimizer.external.ExternalOptimizer"><code>ExternalOptimizer</code></a>,
@@ -1781,7 +1780,7 @@ corresponding plugin type:</p>
 <p>The <code>PluginManager</code> is responsible for finding available plugins based on
 Python's entry points mechanism and providing access to them. It serves as
 a central registry for different types of plugins used within <code>ropt</code>, such
-as optimizers, samplers, and plan components.</p>
+as optimizers, samplers, and workflow components.</p>
 <p>Upon initialization, the manager scans for entry points defined under the
 <code>ropt.plugins.*</code> groups (e.g., <code>ropt.plugins.optimizer</code>). Plugins found
 this way are loaded and stored internally, categorized by their type.</p>
@@ -2369,11 +2368,11 @@ role in the optimization process:</p>
   (<a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.base.RealizationFilterPlugin" href="../realization_filter_plugins/#ropt.plugins.realization_filter.base.RealizationFilterPlugin"><code>RealizationFilterPlugin</code></a>).</li>
 <li><code>"function_estimator"</code>: Plugins for estimating objective functions and gradients
   (<a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.base.FunctionEstimatorPlugin" href="../function_estimator_plugins/#ropt.plugins.function_estimator.base.FunctionEstimatorPlugin"><code>FunctionEstimatorPlugin</code></a>).</li>
-<li><code>"event_handler"</code>: Plugins that create event handlers for processing plan
+<li><code>"event_handler"</code>: Plugins that create event handlers for processing optimization
   results (<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.base.EventHandlerPlugin" href="../workflow_plugins/#ropt.plugins.event_handler.base.EventHandlerPlugin"><code>EventHandlerPlugin</code></a>).</li>
-<li><code>"operation"</code>: Plugins that define executable steps within an optimization plan
+<li><code>"operation"</code>: Plugins that define executable steps within an optimization workflow
   (<a class="autorefs autorefs-internal" title="            ropt.plugins.operation.base.OperationPlugin" href="../workflow_plugins/#ropt.plugins.operation.base.OperationPlugin"><code>OperationPlugin</code></a>).</li>
-<li><code>"evaluator"</code>: Plugins that define evaluators within an optimization plan
+<li><code>"evaluator"</code>: Plugins that define evaluators within an optimization workflow
   (<a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.EvaluatorPlugin" href="../workflow_plugins/#ropt.plugins.evaluator.base.EvaluatorPlugin"><code>EvaluatorPlugin</code></a>).</li>
 </ul>
 

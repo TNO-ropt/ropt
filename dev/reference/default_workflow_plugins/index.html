@@ -2801,10 +2801,8 @@ matches the signature of the <code>eval</code> method) to be used as an
 <a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.Evaluator" href="../workflow_plugins/#ropt.plugins.evaluator.base.Evaluator"><code>Evaluator</code></a> within an optimization
 workflow.</p>
 <p>It is initialized with an <code>evaluator</code> callable. When the <code>eval</code> method of
-this class is invoked by the plan, it simply delegates the call, along with
-all arguments, to the wrapped <code>evaluator</code> function.</p>
-<p>This is useful for integrating existing evaluation logic that is not already
-structured as an <code>Evaluator</code> subclass into a <code>ropt</code> plan.</p>
+this class is invoked, it simply delegates the call, along with all
+arguments, to the wrapped <code>evaluator</code> function.</p>
 
 
 

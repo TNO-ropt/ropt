@@ -1552,9 +1552,7 @@
         <p>A class for executing single optimization runs.</p>
 <p>The <code>BasicOptimizer</code> is designed to simplify the process of setting up and
 executing optimization workflows that consist primarily of a single
-optimization run. It offers a more streamlined approach compared to directly
-defining and managing a full <code>Plan</code> object, making it ideal for
-straightforward optimization tasks.</p>
+optimization run.</p>
 <p>This class provides a user-friendly interface for common optimization
 operations, including:</p>
 <ul>
@@ -1571,8 +1569,8 @@ operations, including:</p>
   results, corresponding variables, and the optimization's exit code are
   readily accessible.</li>
 <li><strong>Customizable Steps and Handlers:</strong> While designed for single runs, it
-  allows for the addition of custom plan steps and event handlers to the
-  underlying <code>Plan</code> for more complex scenarios.</li>
+  allows for the addition of custom operations and event handlers for more
+  complex scenarios.</li>
 </ul>
 <p>By encapsulating the core elements of an optimization run, the
 <code>BasicOptimizer</code> reduces the boilerplate code required for simple
@@ -1989,11 +1987,11 @@ considered satisfied.</p>
     <div class="doc doc-contents ">
 
         <p>Run the optimization process.</p>
-<p>This method initiates the optimization workflow defined by the
-<code>BasicOptimizer</code> object. It executes the underlying <code>Plan</code>, which
-manages the optimization steps, result handling, and event processing.
-After the optimization is complete, the optimal results, variables, and
-exit code can be accessed via the corresponding properties.</p>
+<p>This method initiates and executes the optimization workflow defined by
+the <code>BasicOptimizer</code> object. It manages the optimization, result
+handling, and event processing. After the optimization is complete, the
+optimal results, variables, and exit code can be accessed via the
+corresponding properties.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
