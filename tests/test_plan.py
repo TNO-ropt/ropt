@@ -44,11 +44,11 @@ def enopt_config_fixture() -> dict[str, Any]:
 def test_run_basic(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plugin_manager = PluginManager()
     plan = Plan(plugin_manager)
+    tracker = plugin_manager.event_handler("tracker")
     step = plan.add_step(
         "optimizer",
         evaluator=plugin_manager.evaluator("function_evaluator", evaluator=evaluator()),
-    )
-    tracker = plan.add_event_handler("tracker", sources={step})
+    ).add_event_handler(tracker)
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
     assert tracker["results"] is not None
     assert np.allclose(
@@ -67,11 +67,11 @@ def test_plan_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:
     config2["variables"]["seed"] = 2
 
     plan = Plan(plugin_manager)
+    tracker = plugin_manager.event_handler("tracker")
     step = plan.add_step(
         "optimizer",
         evaluator=plugin_manager.evaluator("function_evaluator", evaluator=evaluator()),
-    )
-    tracker = plan.add_event_handler("tracker", sources={step})
+    ).add_event_handler(tracker)
 
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
     assert tracker["results"] is not None
@@ -92,11 +92,11 @@ def test_plan_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:
 def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plugin_manager = PluginManager()
     plan = Plan(plugin_manager)
+    tracker = plugin_manager.event_handler("tracker")
     step = plan.add_step(
         "optimizer",
         evaluator=plugin_manager.evaluator("function_evaluator", evaluator=evaluator()),
-    )
-    tracker = plan.add_event_handler("tracker", sources={step})
+    ).add_event_handler(tracker)
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
     assert tracker["results"] is not None
     variables1 = tracker["results"].evaluations.variables
@@ -121,11 +121,11 @@ def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> Non
 def test_reset_results(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plugin_manager = PluginManager()
     plan = Plan(plugin_manager)
+    tracker = plugin_manager.event_handler("tracker")
     step = plan.add_step(
         "optimizer",
         evaluator=plugin_manager.evaluator("function_evaluator", evaluator=evaluator()),
-    )
-    tracker = plan.add_event_handler("tracker", sources={step})
+    ).add_event_handler(tracker)
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
     saved_results = deepcopy(tracker["results"])
     tracker["results"] = None
@@ -156,18 +156,25 @@ def test_two_optimizers_alternating(
     enopt_config2["optimizer"]["max_functions"] = 3
 
     plugin_manager = PluginManager()
+    tracker1 = plugin_manager.event_handler("tracker")
+    tracker2 = plugin_manager.event_handler("tracker", what="last")
     plan = Plan(plugin_manager)
-    step = plan.add_step(
-        "optimizer",
-        evaluator=plugin_manager.evaluator("function_evaluator", evaluator=evaluator()),
-    )
-    tracker1 = plan.add_event_handler("tracker", sources={step})
-    tracker2 = plan.add_event_handler("tracker", sources={step}, what="last")
-    plan.add_event_handler(
-        "observer",
-        event_types={EventType.FINISHED_EVALUATION},
-        callback=_track_evaluations,
-        sources={step},
+    step = (
+        plan.add_step(
+            "optimizer",
+            evaluator=plugin_manager.evaluator(
+                "function_evaluator", evaluator=evaluator()
+            ),
+        )
+        .add_event_handler(tracker1)
+        .add_event_handler(tracker2)
+        .add_event_handler(
+            plugin_manager.event_handler(
+                "observer",
+                event_types={EventType.FINISHED_EVALUATION},
+                callback=_track_evaluations,
+            )
+        )
     )
     step.run(
         variables=[0.0, 0.2, 0.1], config=EnOptConfig.model_validate(enopt_config1)
@@ -215,16 +222,21 @@ def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -
 
     plugin_manager = PluginManager()
     plan = Plan(plugin_manager)
-    step = plan.add_step(
-        "optimizer",
-        evaluator=plugin_manager.evaluator("function_evaluator", evaluator=evaluator()),
-    )
-    tracker = plan.add_event_handler("tracker", sources={step}, what="last")
-    plan.add_event_handler(
+    tracker = plugin_manager.event_handler("tracker", what="last")
+    observer = plugin_manager.event_handler(
         "observer",
         event_types={EventType.FINISHED_EVALUATION},
         callback=_track_evaluations,
-        sources={step},
+    )
+    step = (
+        plan.add_step(
+            "optimizer",
+            evaluator=plugin_manager.evaluator(
+                "function_evaluator", evaluator=evaluator()
+            ),
+        )
+        .add_event_handler(tracker)
+        .add_event_handler(observer)
     )
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
     assert tracker["results"] is not None
@@ -262,12 +274,12 @@ def test_restart_initial(enopt_config: dict[str, Any], evaluator: Any) -> None:
         "optimizer",
         evaluator=plugin_manager.evaluator("function_evaluator", evaluator=evaluator()),
     )
-    plan.add_event_handler(
+    observer = plugin_manager.event_handler(
         "observer",
         event_types={EventType.FINISHED_EVALUATION},
         callback=_track_evaluations,
-        sources={step},
     )
+    step.add_event_handler(observer)
     for _ in range(2):
         step.run(
             variables=initial_values, config=EnOptConfig.model_validate(enopt_config)
@@ -297,13 +309,13 @@ def test_restart_last(enopt_config: dict[str, Any], evaluator: Any) -> None:
         "optimizer",
         evaluator=plugin_manager.evaluator("function_evaluator", evaluator=evaluator()),
     )
-    plan.add_event_handler(
+    observer = plugin_manager.event_handler(
         "observer",
         event_types={EventType.FINISHED_EVALUATION},
         callback=_track_evaluations,
-        sources={step},
     )
-    tracker = plan.add_event_handler("tracker", sources={step}, what="last")
+    tracker = plugin_manager.event_handler("tracker", what="last")
+    step.add_event_handler(observer).add_event_handler(tracker)
     for _ in range(2):
         variables = (
             initial_values
@@ -340,13 +352,15 @@ def test_restart_optimum(enopt_config: dict[str, Any], evaluator: Any) -> None:
         "optimizer",
         evaluator=plugin_manager.evaluator("function_evaluator", evaluator=evaluator()),
     )
-    plan.add_event_handler(
-        "observer",
-        event_types={EventType.FINISHED_EVALUATION},
-        callback=_track_evaluations,
-        sources={step},
+    step.add_event_handler(
+        plugin_manager.event_handler(
+            "observer",
+            event_types={EventType.FINISHED_EVALUATION},
+            callback=_track_evaluations,
+        )
     )
-    tracker = plan.add_event_handler("tracker", sources={step})
+    tracker = plugin_manager.event_handler("tracker")
+    step.add_event_handler(tracker)
     for _ in range(2):
         variables = (
             initial_values
@@ -404,13 +418,15 @@ def test_restart_optimum_with_reset(
             "function_evaluator", evaluator=evaluator(new_functions)
         ),
     )
-    plan.add_event_handler(
-        "observer",
-        event_types={EventType.FINISHED_EVALUATION},
-        callback=_track_evaluations,
-        sources={step},
+    step.add_event_handler(
+        plugin_manager.event_handler(
+            "observer",
+            event_types={EventType.FINISHED_EVALUATION},
+            callback=_track_evaluations,
+        )
     )
-    tracker = plan.add_event_handler("tracker", sources={step})
+    tracker = plugin_manager.event_handler("tracker")
+    step.add_event_handler(tracker)
     for _ in range(3):
         variables = (
             initial_values
@@ -458,11 +474,12 @@ def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
         "optimizer",
         evaluator=plugin_manager.evaluator("function_evaluator", evaluator=evaluator()),
     )
-    plan.add_event_handler(
-        "observer",
-        event_types={EventType.FINISHED_EVALUATION},
-        callback=_track_results,
-        sources={step},
+    step.add_event_handler(
+        plugin_manager.event_handler(
+            "observer",
+            event_types={EventType.FINISHED_EVALUATION},
+            callback=_track_results,
+        )
     )
     for idx in range(2):
         metadata["restart"] = idx
@@ -478,11 +495,11 @@ def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
 def test_evaluator_step(enopt_config: dict[str, Any], evaluator: Any) -> None:
     plugin_manager = PluginManager()
     plan = Plan(plugin_manager)
+    tracker = plugin_manager.event_handler("tracker")
     step = plan.add_step(
         "ensemble_evaluator",
         evaluator=plugin_manager.evaluator("function_evaluator", evaluator=evaluator()),
-    )
-    tracker = plan.add_event_handler("tracker", sources={step})
+    ).add_event_handler(tracker)
     step.run(config=EnOptConfig.model_validate(enopt_config), variables=[0.0, 0.0, 0.1])
     assert tracker["results"].functions is not None
     assert np.allclose(tracker["results"].functions.weighted_objective, 1.66)
@@ -503,11 +520,11 @@ def test_evaluator_step_multi(enopt_config: dict[str, Any], evaluator: Any) -> N
 
     plugin_manager = PluginManager()
     plan = Plan(plugin_manager)
+    store = plugin_manager.event_handler("store")
     step = plan.add_step(
         "ensemble_evaluator",
         evaluator=plugin_manager.evaluator("function_evaluator", evaluator=evaluator()),
-    )
-    store = plan.add_event_handler("store", sources={step})
+    ).add_event_handler(store)
     step.run(
         config=EnOptConfig.model_validate(enopt_config),
         transforms=None,
@@ -572,25 +589,24 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
         "function_evaluator", evaluator=evaluator()
     )
     outer_step = outer_plan.add_step("optimizer", evaluator=function_evaluator)
-    outer_tracker = outer_plan.add_event_handler("tracker", sources={outer_step})
-    outer_plan.add_event_handler(
+    outer_tracker = plugin_manager.event_handler("tracker")
+    observer = plugin_manager.event_handler(
         "observer",
         event_types={EventType.FINISHED_EVALUATION},
         callback=_track_evaluations,
-        sources={outer_step, "inner"},
     )
+    outer_step.add_event_handler(observer).add_event_handler(outer_tracker)
 
     def _inner_optimization(
         variables: NDArray[np.float64],
     ) -> tuple[FunctionResults | None, bool]:
-        inner_plan = Plan(
-            plugin_manager,
-            event_handlers=outer_plan.event_handlers,
+        inner_plan = Plan(plugin_manager)
+        inner_tracker = plugin_manager.event_handler("tracker")
+        inner_step = (
+            inner_plan.add_step("optimizer", evaluator=function_evaluator)
+            .add_event_handler(observer)
+            .add_event_handler(inner_tracker)
         )
-        inner_step = inner_plan.add_step(
-            "optimizer", tags={"inner"}, evaluator=function_evaluator
-        )
-        inner_tracker = inner_plan.add_event_handler("tracker", sources={inner_step})
         exit_code = inner_step.run(
             config=EnOptConfig.model_validate(nested_config),
             variables=variables,
@@ -637,25 +653,24 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
         "function_evaluator", evaluator=evaluator()
     )
     outer_step = outer_plan.add_step("optimizer", evaluator=function_evaluator)
-    outer_tracker = outer_plan.add_event_handler("tracker", sources={outer_step})
-    outer_plan.add_event_handler(
+    outer_tracker = plugin_manager.event_handler("tracker")
+    observer = plugin_manager.event_handler(
         "observer",
         event_types={EventType.FINISHED_EVALUATION},
         callback=_track_evaluations,
-        sources={outer_step, "inner"},
     )
+    outer_step.add_event_handler(observer).add_event_handler(outer_tracker)
 
     def _inner_optimization(
         variables: NDArray[np.float64],
     ) -> tuple[FunctionResults | None, bool]:
-        inner_plan = Plan(
-            plugin_manager,
-            event_handlers=outer_plan.event_handlers,
+        inner_plan = Plan(plugin_manager)
+        inner_tracker = plugin_manager.event_handler("tracker")
+        inner_step = (
+            inner_plan.add_step("optimizer", evaluator=function_evaluator)
+            .add_event_handler(observer)
+            .add_event_handler(inner_tracker)
         )
-        inner_step = inner_plan.add_step(
-            "optimizer", tags={"inner"}, evaluator=function_evaluator
-        )
-        inner_tracker = inner_plan.add_event_handler("tracker", sources={inner_step})
         exit_code = inner_step.run(
             config=EnOptConfig.model_validate(nested_config),
             metadata={"inner": "inner_meta_data"},
@@ -692,16 +707,22 @@ def test_plan_abort(enopt_config: Any, evaluator: Any) -> None:
 
     plugin_manager = PluginManager()
     plan = Plan(plugin_manager)
-    step = plan.add_step(
-        "optimizer",
-        evaluator=plugin_manager.evaluator("function_evaluator", evaluator=evaluator()),
-    )
-    tracker = plan.add_event_handler("tracker", sources={step})
-    plan.add_event_handler(
-        "observer",
-        event_types={EventType.FINISHED_EVALUATION},
-        callback=_observer,
-        sources={step},
+    tracker = plugin_manager.event_handler("tracker")
+    step = (
+        plan.add_step(
+            "optimizer",
+            evaluator=plugin_manager.evaluator(
+                "function_evaluator", evaluator=evaluator()
+            ),
+        )
+        .add_event_handler(tracker)
+        .add_event_handler(
+            plugin_manager.event_handler(
+                "observer",
+                event_types={EventType.FINISHED_EVALUATION},
+                callback=_observer,
+            )
+        )
     )
     exit_code = step.run(
         variables=initial_values, config=EnOptConfig.model_validate(enopt_config)
@@ -778,7 +799,7 @@ def test_evaluator_cache(
 
     plugin_manager = PluginManager()
     plan = Plan(plugin_manager)
-    tracker = plan.add_event_handler("tracker", sources={"step"}, what="last")
+    tracker = plugin_manager.event_handler("tracker", what="last")
 
     function_evaluator = plugin_manager.evaluator(
         "function_evaluator", evaluator=evaluator((_test_function1, test_functions[1]))
@@ -791,13 +812,16 @@ def test_evaluator_cache(
         cached_evaluator, "eval", partial(_cached_eval, cached_evaluator)
     )
 
-    step = plan.add_step("optimizer", evaluator=cached_evaluator, tags={"step"})
-
-    plan.add_event_handler(
-        "observer",
-        event_types={EventType.FINISHED_EVALUATION},
-        callback=_track_evaluations,
-        sources={step},
+    step = (
+        plan.add_step("optimizer", evaluator=cached_evaluator)
+        .add_event_handler(
+            plugin_manager.event_handler(
+                "observer",
+                event_types={EventType.FINISHED_EVALUATION},
+                callback=_track_evaluations,
+            )
+        )
+        .add_event_handler(tracker)
     )
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
     assert completed_test_functions == 8
@@ -834,14 +858,16 @@ def test_evaluator_cache_with_store(
 
     plugin_manager = PluginManager()
     plan = Plan(plugin_manager)
-    store = plan.add_event_handler("store", sources={"step"})
+    store = plugin_manager.event_handler("store")
     function_evaluator = plugin_manager.evaluator(
         "function_evaluator", evaluator=evaluator((_test_function1, test_functions[1]))
     )
     cached_evaluator = plugin_manager.evaluator(
         "cached_evaluator", evaluator=function_evaluator, sources={store}
     )
-    step = plan.add_step("optimizer", tags={"step"}, evaluator=cached_evaluator)
+    step = plan.add_step(
+        "optimizer", tags={"step"}, evaluator=cached_evaluator
+    ).add_event_handler(store)
 
     assert isinstance(cached_evaluator, DefaultCachedEvaluator)
     monkeypatch.setattr(

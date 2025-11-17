@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from ropt.plugins.plan.base import EventHandler, PlanComponent, PlanStep
+from ropt.plugins.plan.base import PlanStep
 
 if TYPE_CHECKING:
     from ropt.plugins import PluginManager
@@ -93,12 +93,7 @@ class Plan:
     these values using the `[]` operator.
     """
 
-    def __init__(
-        self,
-        plugin_manager: PluginManager,
-        *,
-        event_handlers: list[EventHandler] | None = None,
-    ) -> None:
+    def __init__(self, plugin_manager: PluginManager) -> None:
         """Initialize a plan object.
 
         Constructs a new plan, associating it with  a plugin manager and event handlers.
@@ -111,10 +106,6 @@ class Plan:
             event_handlers: Event handlers to add to the plan.
         """
         self._plugin_manager = plugin_manager
-        self._handlers: list[EventHandler] = []
-        self._parent_handlers: list[EventHandler] = (
-            [] if event_handlers is None else event_handlers
-        )
 
     @property
     def plugin_manager(self) -> PluginManager:
@@ -127,44 +118,6 @@ class Plan:
             The plugin manager stored by the plan.
         """
         return self._plugin_manager
-
-    def add_event_handler(
-        self,
-        name: str,
-        *,
-        tags: set[str] | None = None,
-        sources: set[PlanComponent | str] | None = None,
-        **kwargs: Any,  # noqa: ANN401
-    ) -> EventHandler:
-        """Add an event handler to the plan.
-
-        Constructs and registers an event handler with the plan. The handler's
-        type is determined by the provided `name`, which the plugin system uses
-        to locate the corresponding handler class. Any additional keyword
-        arguments are passed to the handler's constructor.
-
-        The `sources` parameter acts as a filter, determining which plan steps
-        this event handler should listen to. It should be a set containing the
-        `PlanStep` instances whose event you want to receive. When an event is
-        received, this event handler checks if the step that emitted the event
-        (`event.source`) is present in the `sources` set. If `sources` is
-        `None`, events from all sources will be processed.
-
-        Args:
-            name:    The name of the event handler to add.
-            tags:    Optional tags
-            sources: The steps whose events should be processed.
-            kwargs:  Additional arguments for the handler's constructor.
-
-        Returns:
-            The newly added event handler.
-        """
-        handler = self._plugin_manager.get_plugin("event_handler", method=name).create(
-            name, tags=tags, sources=sources, **kwargs
-        )
-        assert isinstance(handler, EventHandler)
-        self._handlers.append(handler)
-        return handler
 
     def add_step(
         self,
@@ -193,12 +146,3 @@ class Plan:
         )
         assert isinstance(step, PlanStep)
         return step
-
-    @property
-    def event_handlers(self) -> list[EventHandler]:
-        """Get the event handlers available to this plan.
-
-        Returns:
-            A list of handlers.
-        """
-        return self._handlers + self._parent_handlers

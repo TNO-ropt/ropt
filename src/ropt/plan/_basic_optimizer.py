@@ -250,22 +250,23 @@ class BasicOptimizer:
             evaluator = self._plugin_manager.evaluator(
                 "function_evaluator", evaluator=self._evaluator
             )
-            optimizer = plan.add_step("optimizer", evaluator=evaluator)
-            tracker = plan.add_event_handler(
+            tracker = self._plugin_manager.event_handler(
                 "tracker",
                 constraint_tolerance=self._constraint_tolerance,
-                sources={optimizer},
             )
+            optimizer = plan.add_step(
+                "optimizer", evaluator=evaluator
+            ).add_event_handler(tracker)
             for event_type, function in self._observers:
-                plan.add_event_handler(
-                    "observer",
-                    event_types={event_type},
-                    callback=function,
-                    sources={optimizer},
+                optimizer.add_event_handler(
+                    self._plugin_manager.event_handler(
+                        "observer",
+                        event_types={event_type},
+                        callback=function,
+                    )
                 )
-
             for handler in self._custom_event_handlers():
-                plan.add_event_handler(handler, sources={optimizer})
+                optimizer.add_event_handler(self._plugin_manager.event_handler(handler))
 
             exit_code = optimizer.run(
                 variables=np.asarray(initial_values, dtype=np.float64),

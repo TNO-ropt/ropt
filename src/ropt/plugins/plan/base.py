@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 
 from ropt.plugins.base import Plugin
 
@@ -277,6 +277,7 @@ class PlanStep(ABC, PlanComponent):
         """
         super().__init__(tags)
         self._plan = plan
+        self._event_handlers: list[EventHandler] = []
 
     @property
     def plan(self) -> Plan:
@@ -286,6 +287,25 @@ class PlanStep(ABC, PlanComponent):
             The [`Plan`][ropt.plan.Plan] object that owns this component.
         """
         return self._plan
+
+    def add_event_handler(self, handler: EventHandler) -> Self:
+        """Add a handler.
+
+        Args:
+            handler: The handler to add.
+        """
+        if isinstance(handler, EventHandler):
+            self._event_handlers.append(handler)
+        return self
+
+    @property
+    def event_handlers(self) -> list[EventHandler]:
+        """Get the event handlers available to this plan.
+
+        Returns:
+            A list of handlers.
+        """
+        return self._event_handlers
 
     @abstractmethod
     def run(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401

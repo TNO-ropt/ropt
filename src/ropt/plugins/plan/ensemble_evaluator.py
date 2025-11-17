@@ -141,8 +141,6 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
         return exit_code
 
     def _emit_event(self, event: Event) -> None:
-        for handler in self.plan.event_handlers:
-            if (event.event_type in handler.event_types) and (
-                self.id in handler.sources or self.tags & handler.sources
-            ):
+        for handler in self.event_handlers:
+            if event.event_type in handler.event_types:
                 handler.handle_event(event)

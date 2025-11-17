@@ -8,7 +8,13 @@ from typing import TYPE_CHECKING, Any, Final, Literal
 
 from .function_estimator.base import FunctionEstimatorPlugin
 from .optimizer.base import OptimizerPlugin
-from .plan.base import Evaluator, EvaluatorPlugin, EventHandlerPlugin, PlanStepPlugin
+from .plan.base import (
+    Evaluator,
+    EvaluatorPlugin,
+    EventHandler,
+    EventHandlerPlugin,
+    PlanStepPlugin,
+)
 from .realization_filter.base import RealizationFilterPlugin
 from .sampler.base import SamplerPlugin
 
@@ -222,6 +228,19 @@ class PluginManager:
         evaluator = self.get_plugin("evaluator", method=method).create(method, **kwargs)
         assert isinstance(evaluator, Evaluator)
         return evaluator
+
+    def event_handler(self, method: str, **kwargs: Any) -> EventHandler:  # noqa: ANN401
+        """Create a new event handler.
+
+        Args:
+            method: The method string to find the handler.
+            kwargs: Optional keyword arguments passed to the handler init.
+        """
+        handler = self.get_plugin("event_handler", method=method).create(
+            method, **kwargs
+        )
+        assert isinstance(handler, EventHandler)
+        return handler
 
 
 @cache  # Without the cache, repeated calls are very slow
