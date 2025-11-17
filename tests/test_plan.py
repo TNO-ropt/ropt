@@ -576,9 +576,11 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
     nested_config["variables"]["mask"] = [False, True, False]
     enopt_config["optimizer"]["max_functions"] = 5
 
-    outer_plan = Plan(PluginManager())
+    plugin_manager = PluginManager()
+
+    outer_plan = Plan(plugin_manager)
     outer_step = outer_plan.add_step("optimizer")
-    outer_plan.add_evaluator(
+    function_evaluator = outer_plan.add_evaluator(
         "function_evaluator", evaluator=evaluator(), clients={outer_step, "inner"}
     )
     outer_tracker = outer_plan.add_event_handler("tracker", sources={outer_step})
@@ -590,18 +592,22 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
     )
 
     def _inner_optimization(
-        inner_plan: Plan, variables: NDArray[np.float64]
-    ) -> FunctionResults | None:
+        variables: NDArray[np.float64],
+    ) -> tuple[FunctionResults | None, bool]:
+        inner_plan = Plan(
+            plugin_manager,
+            event_handlers=outer_plan.event_handlers,
+            evaluators=[function_evaluator],
+        )
         inner_step = inner_plan.add_step("optimizer", tags={"inner"})
         inner_tracker = inner_plan.add_event_handler("tracker", sources={inner_step})
         inner_step.run(
             config=EnOptConfig.model_validate(nested_config),
-            transforms=None,
             variables=variables,
         )
         results = inner_tracker["results"]
         assert isinstance(results, FunctionResults | None)
-        return results
+        return results, inner_plan.aborted
 
     outer_step.run(
         config=EnOptConfig.model_validate(enopt_config),
@@ -634,7 +640,9 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
     nested_config["variables"]["mask"] = [False, True, False]
     enopt_config["optimizer"]["max_functions"] = 5
 
-    outer_plan = Plan(PluginManager())
+    plugin_manager = PluginManager()
+
+    outer_plan = Plan(plugin_manager)
     outer_step = outer_plan.add_step("optimizer")
     outer_plan.add_evaluator(
         "function_evaluator", evaluator=evaluator(), clients={outer_step, "inner"}
@@ -648,20 +656,24 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
     )
 
     def _inner_optimization(
-        inner_plan: Plan, variables: NDArray[np.float64]
-    ) -> FunctionResults | None:
+        variables: NDArray[np.float64],
+    ) -> tuple[FunctionResults | None, bool]:
+        inner_plan = Plan(
+            plugin_manager,
+            event_handlers=outer_plan.event_handlers,
+            evaluators=outer_plan.evaluators,
+        )
         inner_step = inner_plan.add_step("optimizer", tags={"inner"})
         inner_tracker = inner_plan.add_event_handler("tracker", sources={inner_step})
         inner_step.run(
             config=EnOptConfig.model_validate(nested_config),
-            transforms=None,
             metadata={"inner": "inner_meta_data"},
             variables=variables,
         )
         results = inner_tracker["results"]
         assert isinstance(results, FunctionResults)
         assert results.metadata["inner"] == "inner_meta_data"
-        return results
+        return results, inner_plan.aborted
 
     outer_step.run(
         config=EnOptConfig.model_validate(enopt_config),

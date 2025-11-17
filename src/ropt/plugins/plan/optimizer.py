@@ -30,20 +30,26 @@ class NestedOptimizationCallable(Protocol):
     """Protocol for nested optimizer function calls."""
 
     def __call__(
-        self, plan: Plan, variables: NDArray[np.float64], /
-    ) -> FunctionResults | None:
-        """Run a nested optimization using the given plan and variables.
+        self, variables: NDArray[np.float64], /
+    ) -> tuple[FunctionResults | None, bool]:
+        """Run a nested optimization using the given variables.
 
         This functions defines the signature of the callable that defines a
         nested optimization in a
         [`DefaultOptimizerStep`][ropt.plugins.plan.optimizer.DefaultOptimizerStep].
 
+        It accepts the variables to evaluate and returns a tuple. The first
+        element is a `FunctionResults` object containing the results of the
+        nested optimization, or `None` if the evaluation failed. The second
+        element is a boolean flag indicating whether the optimization was
+        aborted by the user.
+
         Args:
-            plan:      The plan that is used to run the nested optimization.
             variables: The matrix of variables to start the nested optimization.
 
         Returns:
-            A function results object, with the results of the nested optimization.
+            A tuple with the function results object, and a flag indicating
+            whether the optimization was aborted.
         """
 
 
@@ -181,7 +187,9 @@ class DefaultOptimizerStep(PlanStep):
             ensemble_evaluator=ensemble_evaluator,
             plugin_manager=self.plan.plugin_manager,
             nested_optimizer=(
-                self._run_nested_plan if self._nested_optimization is not None else None
+                self._run_nested_optimization
+                if self._nested_optimization is not None
+                else None
             ),
             signal_evaluation=self._signal_evaluation,
         )
@@ -227,20 +235,15 @@ class DefaultOptimizerStep(PlanStep):
                 Event(event_type=EventType.FINISHED_EVALUATION, data=event_data),
             )
 
-    def _run_nested_plan(
+    def _run_nested_optimization(
         self, variables: NDArray[np.float64]
     ) -> tuple[FunctionResults | None, bool]:
         if self._nested_optimization is None:
             return None, False
-        nested_plan = Plan(
-            self.plan.plugin_manager,
-            event_handlers=self.plan.event_handlers,
-            evaluators=self.plan.evaluators,
-        )
-        results = self._nested_optimization(nested_plan, variables)
-        if nested_plan.aborted:
+        results, aborted = self._nested_optimization(variables)
+        if aborted:
             self.plan.abort()
-        if not isinstance(results, FunctionResults):
-            msg = "Nested optimization must return a FunctionResults object."
+        if not isinstance(results, FunctionResults | None):
+            msg = "Nested optimization must return a FunctionResults object or None ."
             raise TypeError(msg)
-        return results, nested_plan.aborted
+        return results, aborted
