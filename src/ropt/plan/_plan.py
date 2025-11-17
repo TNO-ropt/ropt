@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from ropt.exceptions import PlanAborted
 from ropt.plugins.plan.base import Evaluator, EventHandler, PlanComponent, PlanStep
 
 if TYPE_CHECKING:
@@ -86,14 +85,6 @@ class Plan:
     Multiple plans can be defined. A step within one plan can trigger the
     execution of another plan, enabling nested workflows.
 
-    **Aborting a Plan:**
-
-    A plan's execution can be terminated, either programmatically from within a
-    step or event handler, or externally by directly calling the
-    [`abort`][ropt.plan.Plan.abort] method. The
-    [`aborted`][ropt.plan.Plan.aborted] property can be used to check if a plan
-    has been aborted.
-
     **Handler Data:**
 
     Individual event handlers may store values that they accumulate or calculate
@@ -123,7 +114,6 @@ class Plan:
             evaluators:     Evaluators to add to the plan.
         """
         self._plugin_manager = plugin_manager
-        self._aborted = False
         self._handlers: list[EventHandler] = []
         self._parent_handlers: list[EventHandler] = (
             [] if event_handlers is None else event_handlers
@@ -132,17 +122,6 @@ class Plan:
         self._parent_evaluators: list[Evaluator] = (
             [] if evaluators is None else evaluators
         )
-
-    @property
-    def aborted(self) -> bool:
-        """Check if the plan was aborted.
-
-        Determines whether the plan's execution has been aborted.
-
-        Returns:
-            bool: `True` if the plan was aborted; otherwise, `False`.
-        """
-        return self._aborted
 
     @property
     def plugin_manager(self) -> PluginManager:
@@ -258,21 +237,6 @@ class Plan:
         self._evaluators.append(evaluator)
         return evaluator
 
-    def pre_run(self) -> None:
-        """Run checks before executing a step.
-
-        This method must be called by the `run` method of step before executing
-        its function. If the plan has been aborted, a
-        [`PlanAborted`][ropt.exceptions.PlanAborted] exception is raised before
-        the step is executed.
-
-        Raises:
-            PlanAborted: If the plan has been aborted.
-        """
-        if self._aborted:
-            msg = "Plan was aborted by the previous step."
-            raise PlanAborted(msg)
-
     @property
     def event_handlers(self) -> list[EventHandler]:
         """Get the event handlers available to this plan.
@@ -290,16 +254,3 @@ class Plan:
             A list of evaluators instances.
         """
         return self._evaluators + self._parent_evaluators
-
-    def abort(self) -> None:
-        """Abort the plan.
-
-        Prevents further steps in the plan from being executed. This method does
-        not interrupt a currently running step but ensures that no subsequent
-        steps will be initiated. It can be used to halt the plan's execution due
-        to a step failure or external intervention.
-
-        The [`aborted`][ropt.plan.Plan.aborted] property can be used to check if
-        the plan has been aborted.
-        """
-        self._aborted = True

@@ -147,8 +147,6 @@ class DefaultOptimizerStep(PlanStep):
         Returns:
             An exit code indicating the outcome of the optimization.
         """
-        self.plan.pre_run()
-
         self._config = config
         self._transforms = transforms
         self._nested_optimization = nested_optimization
@@ -201,9 +199,6 @@ class DefaultOptimizerStep(PlanStep):
 
         exit_code = ensemble_optimizer.start(variables)
 
-        if exit_code == ExitCode.USER_ABORT:
-            self.plan.abort()
-
         self._emit_event(
             Event(event_type=EventType.FINISHED_OPTIMIZER_STEP, data=event_data)
         )
@@ -242,8 +237,6 @@ class DefaultOptimizerStep(PlanStep):
         if self._nested_optimization is None:
             return None, False
         results, aborted = self._nested_optimization(variables)
-        if aborted:
-            self.plan.abort()
         if not isinstance(results, FunctionResults | None):
             msg = "Nested optimization must return a FunctionResults object or None ."
             raise TypeError(msg)

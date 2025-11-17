@@ -87,8 +87,6 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
         Returns:
             An [`ExitCode`][ropt.enums.ExitCode] indicating the outcome.
         """
-        self.plan.pre_run()
-
         event_data: dict[str, Any] = {"config": config, "transforms": transforms}
 
         self._emit_event(
@@ -141,9 +139,6 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
         self._emit_event(
             Event(event_type=EventType.FINISHED_EVALUATION, data=event_data)
         )
-
-        if exit_code == ExitCode.USER_ABORT:
-            self.plan.abort()
 
         self._emit_event(
             Event(

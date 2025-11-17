@@ -9,7 +9,7 @@ import pytest
 
 from ropt.config import EnOptConfig
 from ropt.enums import EventType, ExitCode
-from ropt.exceptions import PlanAborted, StepAborted
+from ropt.exceptions import StepAborted
 from ropt.plan import BasicOptimizer, Event, Plan
 from ropt.plugins import PluginManager
 from ropt.plugins.plan.cached_evaluator import DefaultCachedEvaluator
@@ -601,13 +601,13 @@ def test_nested_plan(enopt_config: dict[str, Any], evaluator: Any) -> None:
         )
         inner_step = inner_plan.add_step("optimizer", tags={"inner"})
         inner_tracker = inner_plan.add_event_handler("tracker", sources={inner_step})
-        inner_step.run(
+        exit_code = inner_step.run(
             config=EnOptConfig.model_validate(nested_config),
             variables=variables,
         )
         results = inner_tracker["results"]
         assert isinstance(results, FunctionResults | None)
-        return results, inner_plan.aborted
+        return results, exit_code == ExitCode.USER_ABORT
 
     outer_step.run(
         config=EnOptConfig.model_validate(enopt_config),
@@ -665,7 +665,7 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
         )
         inner_step = inner_plan.add_step("optimizer", tags={"inner"})
         inner_tracker = inner_plan.add_event_handler("tracker", sources={inner_step})
-        inner_step.run(
+        exit_code = inner_step.run(
             config=EnOptConfig.model_validate(nested_config),
             metadata={"inner": "inner_meta_data"},
             variables=variables,
@@ -673,7 +673,7 @@ def test_nested_plan_metadata(enopt_config: dict[str, Any], evaluator: Any) -> N
         results = inner_tracker["results"]
         assert isinstance(results, FunctionResults)
         assert results.metadata["inner"] == "inner_meta_data"
-        return results, inner_plan.aborted
+        return results, exit_code == ExitCode.USER_ABORT
 
     outer_step.run(
         config=EnOptConfig.model_validate(enopt_config),
@@ -709,16 +709,12 @@ def test_plan_abort(enopt_config: Any, evaluator: Any) -> None:
         callback=_observer,
         sources={step},
     )
-    step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
+    exit_code = step.run(
+        variables=initial_values, config=EnOptConfig.model_validate(enopt_config)
+    )
     assert tracker["results"] is not None
+    assert exit_code == ExitCode.USER_ABORT
     assert last_evaluation == 1
-    assert plan.aborted
-
-    step = plan.add_step("optimizer")
-    with pytest.raises(PlanAborted, match="Plan was aborted by the previous step"):
-        step.run(
-            variables=initial_values, config=EnOptConfig.model_validate(enopt_config)
-        )
 
 
 def _cached_eval(
