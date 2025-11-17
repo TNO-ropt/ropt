@@ -19,7 +19,7 @@ from ._variables_config import VariablesConfig  # noqa: TC001
 
 
 class EnOptConfig(BaseModel):
-    """The primary configuration class for an optimization step.
+    """The primary configuration class for an optimization run.
 
     `EnOptConfig` orchestrates the configuration of an entire optimization
     workflow. It contains nested configuration classes that define specific
@@ -57,7 +57,7 @@ class EnOptConfig(BaseModel):
 
     Warning:
         `EnOptConfig` objects are immutable and hold the in-memory configuration
-        for an optimization step. For persistence, do not serialize the object
+        for an optimization run. For persistence, do not serialize the object
         itself. Instead, store the original dictionary used for its creation.
 
         Round-trip serialization (e.g., to/from JSON) is not a supported use

@@ -21,7 +21,7 @@ third-party packages.
   `start` method.
 * **Discovery:** The [`PluginManager`][ropt.plugins.PluginManager] discovers
   available `OptimizerPlugin` implementations (typically via entry points) and
-  uses them to create `Optimizer` instances as needed during plan execution.
+  uses them to create `Optimizer` instances as needed during workflow execution.
 
 **Utilities:**
 

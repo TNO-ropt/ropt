@@ -206,7 +206,7 @@ def create_output_path(
     Args:
         base_name: The core name for the path.
         base_dir:  Optional parent directory for the path.
-        name:      Optional identifier (e.g., step name) to include in the path.
+        name:      Optional identifier to include in the path.
         suffix:    Optional file extension or suffix for the path.
 
     Returns:

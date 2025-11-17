@@ -1,4 +1,4 @@
-"""This module implements the default evaluator step."""
+"""This module implements the default evaluator."""
 
 from __future__ import annotations
 
@@ -9,9 +9,9 @@ import numpy as np
 
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, ExitCode
-from ropt.exceptions import StepAborted
+from ropt.exceptions import OperationAborted
 from ropt.optimization import Event
-from ropt.plugins.plan.base import Evaluator, PlanStep
+from ropt.plugins.operation.base import Operation
 from ropt.results import FunctionResults
 
 if TYPE_CHECKING:
@@ -19,20 +19,21 @@ if TYPE_CHECKING:
 
     from ropt.config import EnOptConfig
     from ropt.plugins import PluginManager
+    from ropt.plugins.evaluator.base import Evaluator
     from ropt.transforms import OptModelTransforms
 
 
-class DefaultEnsembleEvaluatorStep(PlanStep):
-    """The default ensemble evaluator step for optimization plans.
+class DefaultEnsembleEvaluatorOperation(Operation):
+    """The default ensemble evaluator operation for optimization workflows.
 
-    This step performs one or more ensemble evaluations based on the provided
-    `variables`. It yields a tuple of
+    This operation performs one or more ensemble evaluations based on the
+    provided `variables`. It yields a tuple of
     [`FunctionResults`][ropt.results.FunctionResults] objects, one for each
     input variable vector evaluated.
 
-    The step emits the following events:
+    The operation emits the following events:
 
-    - [`START_ENSEMBLE_EVALUATOR_STEP`][ropt.enums.EventType.START_ENSEMBLE_EVALUATOR_STEP]:
+    - [`START_ENSEMBLE_EVALUATOR`][ropt.enums.EventType.START_ENSEMBLE_EVALUATOR]:
       Emitted before the evaluation process begins.
     - [`START_EVALUATION`][ropt.enums.EventType.START_EVALUATION]: Emitted
       just before the underlying ensemble evaluation is called.
@@ -40,12 +41,12 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
       after the evaluation completes, carrying the generated `FunctionResults`
       in its `data` dictionary under the key `"results"`. Event handlers
       typically listen for this event.
-    - [`FINISHED_ENSEMBLE_EVALUATOR_STEP`][ropt.enums.EventType.FINISHED_ENSEMBLE_EVALUATOR_STEP]:
-      Emitted after the entire step, including result emission, is finished.
+    - [`FINISHED_ENSEMBLE_EVALUATOR`][ropt.enums.EventType.FINISHED_ENSEMBLE_EVALUATOR]:
+      Emitted after the entire operation, including result emission, is finished.
     """
 
     def __init__(self, *, evaluator: Evaluator, plugin_manager: PluginManager) -> None:
-        """Initialize a default evaluator step.
+        """Initialize a default evaluator.
 
         Args:
             evaluator:      The evaluator object to run function evaluations.
@@ -63,9 +64,9 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
         transforms: OptModelTransforms | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> ExitCode:
-        """Run the ensemble evaluator step to perform ensemble evaluations.
+        """Run the ensemble evaluator.
 
-        This method executes the core logic of the ensemble evaluator step. It
+        This method executes the core logic of the ensemble evaluator. It
         requires an optimizer configuration
         ([`EnOptConfig`][ropt.config.EnOptConfig]) and optionally accepts
         specific variable vectors to evaluate.
@@ -87,7 +88,7 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
         event_data: dict[str, Any] = {"config": config, "transforms": transforms}
 
         self._emit_event(
-            Event(event_type=EventType.START_ENSEMBLE_EVALUATOR_STEP, data=event_data)
+            Event(event_type=EventType.START_ENSEMBLE_EVALUATOR, data=event_data)
         )
 
         variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=2)
@@ -101,14 +102,14 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
             config, transforms, self._evaluator.eval, self._plugin_manager
         )
 
-        exit_code = ExitCode.EVALUATOR_STEP_FINISHED
+        exit_code = ExitCode.ENSEMBLE_EVALUATOR_FINISHED
 
         self._emit_event(Event(event_type=EventType.START_EVALUATION, data=event_data))
         try:
             results = ensemble_evaluator.calculate(
                 variables, compute_functions=True, compute_gradients=False
             )
-        except StepAborted as exc:
+        except OperationAborted as exc:
             exit_code = exc.exit_code
 
         assert results
@@ -127,9 +128,7 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
         )
 
         self._emit_event(
-            Event(
-                event_type=EventType.FINISHED_ENSEMBLE_EVALUATOR_STEP, data=event_data
-            )
+            Event(event_type=EventType.FINISHED_ENSEMBLE_EVALUATOR, data=event_data)
         )
 
         return exit_code

@@ -23,7 +23,7 @@ custom strategies for aggregating ensemble results.
 * **Discovery:** The [`PluginManager`][ropt.plugins.PluginManager] discovers
   available `FunctionEstimatorPlugin` implementations (typically via entry
   points) and uses them to create `FunctionEstimator` instances as needed
-  during plan execution.
+  during workflow execution.
 
 **Built-in Function Estimator Plugins:**
 

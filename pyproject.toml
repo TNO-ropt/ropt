@@ -44,13 +44,13 @@ default = "ropt.plugins.realization_filter.default:DefaultRealizationFilterPlugi
 default = "ropt.plugins.function_estimator.default:DefaultFunctionEstimatorPlugin"
 
 [project.entry-points."ropt.plugins.event_handler"]
-default = "ropt.plugins.plan.default:DefaultEventHandlerPlugin"
+default = "ropt.plugins.event_handler.default:DefaultEventHandlerPlugin"
 
-[project.entry-points."ropt.plugins.plan_step"]
-default = "ropt.plugins.plan.default:DefaultPlanStepPlugin"
+[project.entry-points."ropt.plugins.operation"]
+default = "ropt.plugins.operation.default:DefaultOperationPlugin"
 
 [project.entry-points."ropt.plugins.evaluator"]
-default = "ropt.plugins.plan.default:DefaultEvaluatorPlugin"
+default = "ropt.plugins.evaluator.default:DefaultEvaluatorPlugin"
 
 [project.scripts]
 ropt_plugin_optimizer = "ropt.plugins.optimizer.external:ropt_plugin_optimizer"

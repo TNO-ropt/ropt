@@ -122,11 +122,6 @@ class OptimizerPlugin(Plugin):
     This class defines the interface for plugins responsible for creating
     [`Optimizer`][ropt.plugins.optimizer.base.Optimizer] instances. These plugins
     act as factories for specific optimization algorithms or backends.
-
-    During plan execution, the [`PluginManager`][ropt.plugins.PluginManager]
-    identifies the appropriate optimizer plugin based on the configuration and
-    uses its `create` class method to instantiate the actual `Optimizer` object
-    that will perform the optimization.
     """
 
     @classmethod
@@ -142,7 +137,7 @@ class OptimizerPlugin(Plugin):
         specific `Optimizer` subclass.
 
         The [`PluginManager`][ropt.plugins.PluginManager] calls this method when
-        an optimization step requires an optimizer provided by this plugin.
+        an optimization workflow requires an optimizer provided by this plugin.
 
         Args:
             config:             The  configuration object containing the

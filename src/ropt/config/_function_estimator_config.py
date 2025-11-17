@@ -12,9 +12,9 @@ class FunctionEstimatorConfig(BaseModel):
 
     This class, `FunctionEstimatorConfig`, defines the configuration for
     function estimators. Function estimators are generally configured as a tuple
-    of `FunctionEstimatorConfig` objects in a configuration class of a plan
-    step. For instance, `function_estimators` field of the `EnOptConfig` defines
-    the available estimators for the optimization.
+    of `FunctionEstimatorConfig` objects in a configuration class of an
+    optimization operation. For instance, `function_estimators` field of the
+    `EnOptConfig` defines the available estimators for the optimization.
 
     By default, objective and constraint functions, as well as their gradients,
     are calculated from individual realizations using a weighted sum. Function

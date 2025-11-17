@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ropt.plugins.plan.base import EventHandler
+from .base import EventHandler
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -16,8 +16,8 @@ if TYPE_CHECKING:
 class DefaultObserverHandler(EventHandler):
     """The default event handler for observing events.
 
-    This event handler listens for events emitted by specified steps and
-    forwards them to one or more callback functions.
+    This event handler listens for events and forwards them to one or more
+    callback functions.
     """
 
     def __init__(
@@ -25,11 +25,10 @@ class DefaultObserverHandler(EventHandler):
     ) -> None:
         """Initialize a default event handler.
 
-        This event handler responds to events received from specified `sources` (plan
-        steps) and calls `callback` if the event type matches `event_types`.
+        This event handler responds to events by calling `callback` if the event
+        type matches `event_types`.
 
         Args:
-            plan:        The parent plan instance.
             event_types: The set of event types  to respond to.
             callback:    The callable to call.
         """
@@ -38,15 +37,15 @@ class DefaultObserverHandler(EventHandler):
         self._callback = callback
 
     def handle_event(self, event: Event) -> None:
-        """Handle incoming events from the plan.
+        """Handle incoming events.
 
-        This method processes events emitted by a step.
+        This method processes events emitted from within the workflow.
 
         If a event containing results is received, and its type equals the
         stored event type, the stored callback is called.
 
         Args:
-            event: The event object emitted by the plan.
+            event: The event object emitted from the workflow.
         """
         if event.event_type in self._event_types:
             self._callback(event)

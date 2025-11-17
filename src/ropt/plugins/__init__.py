@@ -7,11 +7,10 @@ custom or third-party components, installed as separate packages.
 `ropt` supports several types of plugins, each addressing a specific aspect of
 the optimization workflow:
 
-* [`plan`][ropt.plugins.plan]: Defines components for constructing and executing
-  optimization plans
-  ([`EventHandlerPlugin`][ropt.plugins.plan.base.EventHandlerPlugin],
-  [`PlanStepPlugin`][ropt.plugins.plan.base.PlanStepPlugin] and
-  [`EvaluatorPlugin`][ropt.plugins.plan.base.EvaluatorPlugin]).
+* Define components for constructing and executing optimization workflows
+  ([`EventHandlerPlugin`][ropt.plugins.event_handler.base.EventHandlerPlugin],
+  [`OperationPlugin`][ropt.plugins.operation.base.OperationPlugin] and
+  [`EvaluatorPlugin`][ropt.plugins.evaluator.base.EvaluatorPlugin]).
 * [`optimizer`][ropt.plugins.optimizer]: Implements optimization algorithms.
 * [`sampler`][ropt.plugins.sampler]: Generates parameter perturbations, which
   are used for gradient estimation.
@@ -29,9 +28,9 @@ discovered automatically using Python's standard entry points mechanism.
 Each plugin type has a corresponding abstract base class that custom plugins
 must inherit from:
 
-* **Plan:** [`EventHandlerPlugin`][ropt.plugins.plan.base.EventHandlerPlugin],
-  [`PlanStepPlugin`][ropt.plugins.plan.base.PlanStepPlugin], and
-  [`EvaluatorPlugin`][ropt.plugins.plan.base.EvaluatorPlugin]
+* **Workflow:** [`EventHandlerPlugin`][ropt.plugins.event_handler.base.EventHandlerPlugin],
+  [`OperationPlugin`][ropt.plugins.operation.base.OperationPlugin], and
+  [`EvaluatorPlugin`][ropt.plugins.evaluator.base.EvaluatorPlugin]
 * **Optimizer:**
   [`OptimizerPlugin`][ropt.plugins.optimizer.base.OptimizerPlugin]
 * **Sampler:** [`SamplerPlugin`][ropt.plugins.sampler.base.SamplerPlugin]
@@ -61,8 +60,8 @@ method generally implement a `create` factory method that will be used to instan
 that implement the desired functionality. These objects must inherit from the base class for the
 corresponding plugin type:
 
-* **Plan:** [`EventHandler`][ropt.plugins.plan.base.EventHandler] and
-  [`PlanStep`][ropt.plugins.plan.base.PlanStep]
+* **Workflow:** [`EventHandler`][ropt.plugins.event_handler.base.EventHandler] and
+  [`Operation`][ropt.plugins.operation.base.Operation]
 * **Optimizer:**
   [`Optimizer`][ropt.plugins.optimizer.base.Optimizer]
 * **Sampler:** [`Sampler`][ropt.plugins.sampler.base.Sampler]
@@ -75,10 +74,10 @@ corresponding plugin type:
 
 `ropt` comes bundled with a set of pre-installed plugins:
 
-* **Plan:** The built-in
-  [`default`][ropt.plugins.plan.default.DefaultEventHandlerPlugin] event handler
-  and [`default`][ropt.plugins.plan.default.DefaultPlanStepPlugin] step plugins,
-  providing components for executing complex optimization plans.
+* **Workflow:** The built-in
+  [`default`][ropt.plugins.event_handler.default.DefaultEventHandlerPlugin] event handler
+  and [`default`][ropt.plugins.operation.default.DefaultOperationPlugin] plugins,
+  providing components for executing complex optimization workflows.
 * **Optimizer:** The [`scipy`][ropt.plugins.optimizer.scipy.SciPyOptimizer]
   plugin, leveraging algorithms from `scipy.optimize`, and the
   [`ExternalOptimizer`][ropt.plugins.optimizer.external.ExternalOptimizer],

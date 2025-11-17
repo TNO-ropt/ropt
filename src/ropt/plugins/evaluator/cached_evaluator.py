@@ -7,8 +7,10 @@ from typing import TYPE_CHECKING, Final
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.plugins.plan.base import Evaluator, EventHandler
+from ropt.plugins.event_handler.base import EventHandler
 from ropt.results import FunctionResults
+
+from .base import Evaluator
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Sequence

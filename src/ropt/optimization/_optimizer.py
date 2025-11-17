@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Protocol
 import numpy as np
 
 from ropt.enums import ExitCode
-from ropt.exceptions import StepAborted
+from ropt.exceptions import OperationAborted
 from ropt.optimization import OptimizerCallbackResult
 from ropt.results import FunctionResults, GradientResults
 
@@ -81,8 +81,8 @@ class EnsembleOptimizer:
     The [`EnsembleOptimizer`][ropt.optimization.EnsembleOptimizer] class
     provides the core functionality for running ensemble-based optimizations.
     Direct use of this class is generally discouraged. Instead, use the
-    [`BasicOptimizer`][ropt.plan.BasicOptimizer] class or build a workflow
-    containing optimization steps.
+    [`BasicOptimizer`][ropt.optimization.BasicOptimizer] class or build a
+    workflow containing the optimization steps.
     """
 
     def __init__(  # noqa: PLR0913
@@ -201,11 +201,11 @@ class EnsembleOptimizer:
             termination.
         """
         self._fixed_variables = variables.copy()
-        exit_code = ExitCode.OPTIMIZER_STEP_FINISHED
+        exit_code = ExitCode.OPTIMIZER_FINISHED
         try:
             with self._redirector.start():
                 self._optimizer.start(variables)
-        except StepAborted as exc:
+        except OperationAborted as exc:
             exit_code = exc.exit_code
         return exit_code
 
@@ -222,8 +222,8 @@ class EnsembleOptimizer:
 
         variables = self._get_completed_variables(variables)
 
-        # Run any nested steps, when this improves the objective, this may
-        # change the fixed variables and the current optimal result:
+        # Run any nested optimizations, when this improves the objective, this
+        # may change the fixed variables and the current optimal result:
         if self._nested_optimizer is not None:
             # Nested optimization does not support parallel evaluation:
             if variables.ndim > 1:
@@ -233,9 +233,9 @@ class EnsembleOptimizer:
                 variables = variables[0, ...]
             nested_results, aborted = self._nested_optimizer(variables)
             if aborted:
-                raise StepAborted(exit_code=ExitCode.USER_ABORT)
+                raise OperationAborted(exit_code=ExitCode.USER_ABORT)
             if nested_results is None:
-                raise StepAborted(exit_code=ExitCode.NESTED_OPTIMIZER_FAILED)
+                raise OperationAborted(exit_code=ExitCode.NESTED_OPTIMIZER_FAILED)
             variables = nested_results.evaluations.variables
             self._fixed_variables = variables.copy()
 
@@ -298,10 +298,10 @@ class EnsembleOptimizer:
     def _check_stopping_criteria(self) -> None:
         max_functions = self._enopt_config.optimizer.max_functions
         if max_functions is not None and self._completed_functions >= max_functions:
-            raise StepAborted(exit_code=ExitCode.MAX_FUNCTIONS_REACHED)
+            raise OperationAborted(exit_code=ExitCode.MAX_FUNCTIONS_REACHED)
         max_batches = self._enopt_config.optimizer.max_batches
         if max_batches is not None and self._completed_batches >= max_batches:
-            raise StepAborted(exit_code=ExitCode.MAX_BATCHES_REACHED)
+            raise OperationAborted(exit_code=ExitCode.MAX_BATCHES_REACHED)
 
     def _run_evaluations(
         self,
@@ -349,7 +349,7 @@ class EnsembleOptimizer:
                 self._signal_evaluation(results)
 
             if exit_code is not None:
-                raise StepAborted(exit_code=exit_code)
+                raise OperationAborted(exit_code=exit_code)
 
         return results
 

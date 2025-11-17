@@ -6,7 +6,7 @@ realizations, samplers, and more.
 
 The central configuration class for optimization is
 [`EnOptConfig`][ropt.config.EnOptConfig], which encapsulates the complete
-configuration for a single optimization step. It is designed to be flexible and
+configuration for a single optimization run. It is designed to be flexible and
 extensible, allowing users to customize the optimization process to their
 specific needs.
 
@@ -28,7 +28,7 @@ values using the `model_validate` method provided by `pydantic`.
   customization of the optimization process.
 - **Centralized Configuration:** The
   [`EnOptConfig`][ropt.config.EnOptConfig] class provides a single point
-  of entry for configuring an optimization step.
+  of entry for configuring an optimization run.
 
 **Parsing and Validation**
 

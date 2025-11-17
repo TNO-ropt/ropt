@@ -50,7 +50,7 @@ class EnsembleEvaluator:
     the calculations.
 
     The core functionality relies on an evaluator callable, (usually provided by
-    an [`Evaluator`][ropt.plugins.plan.base.Evaluator] object), which is used to
+    an [`Evaluator`][ropt.plugins.evaluator.base.Evaluator] object), which is used to
     evaluate the individual functions within the ensemble. The evaluator
     provides the raw function values, which are then processed by the
     `EnsembleEvaluator` to produce the final function and gradient estimates.
@@ -73,7 +73,7 @@ class EnsembleEvaluator:
         and the gradient settings. The `transforms` object defines the domain
         transforms that should be applied to variables, objectives and
         constraints. The `evaluator` callable is usually provide by a
-        [`Evaluator`][ropt.plugins.plan.base.Evaluator] object. The
+        [`Evaluator`][ropt.plugins.evaluator.base.Evaluator] object. The
         `plugin_manager` is used to load the realization filters, function
         estimators, and samplers.
 

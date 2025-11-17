@@ -126,7 +126,7 @@ def test_max_functions_not_exceeded(
     )
     optimizer.run(initial_values)
     assert last_evaluation + 1 < 2 * max_functions
-    assert optimizer.exit_code == ExitCode.OPTIMIZER_STEP_FINISHED
+    assert optimizer.exit_code == ExitCode.OPTIMIZER_FINISHED
 
 
 def test_failed_realizations(enopt_config: Any, evaluator: Any, external: str) -> None:

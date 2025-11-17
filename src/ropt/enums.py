@@ -76,23 +76,18 @@ class PerturbationType(IntEnum):
 
 
 class EventType(IntEnum):
-    """Enumerates the types of events emitted during optimization plan execution.
+    """Enumerates the types of events emitted during optimization workflow execution.
 
     Events signal significant occurrences within the optimization process, such
-    as the start or end of a plan step or an evaluation. Callbacks can be
+    as the start or end of an optimization or an evaluation. Callbacks can be
     registered to listen for specific event types.
 
     When an event occurs, registered callbacks receive an
     [`Event`][ropt.optimization.Event] object containing:
 
     - `event_type`: The type of the event (a value from this enumeration).
-    - `config`: The configuration object associated with the source.
-    - `source`: The unique ID (UUID) of the plan component that emitted the event.
     - `data`: A dictionary containing event-specific data, such as
       [`Results`][ropt.results.Results] objects.
-
-    Refer to the documentation of individual event types and plan components for
-    details on the specific data they provide.
     """
 
     START_EVALUATION = 1
@@ -101,17 +96,17 @@ class EventType(IntEnum):
     FINISHED_EVALUATION = 2
     """Emitted after finishing the evaluation."""
 
-    START_OPTIMIZER_STEP = 3
-    """Emitted just before starting an optimizer step."""
+    START_OPTIMIZER = 3
+    """Emitted just before starting an optimizer."""
 
-    FINISHED_OPTIMIZER_STEP = 4
-    """Emitted immediately after an optimizer step finishes."""
+    FINISHED_OPTIMIZER = 4
+    """Emitted immediately after an optimizer finishes."""
 
-    START_ENSEMBLE_EVALUATOR_STEP = 5
-    """Emitted just before starting an evaluation step."""
+    START_ENSEMBLE_EVALUATOR = 5
+    """Emitted just before starting an evaluation."""
 
-    FINISHED_ENSEMBLE_EVALUATOR_STEP = 6
-    """Emitted immediately after an evaluation step finishes."""
+    FINISHED_ENSEMBLE_EVALUATOR = 6
+    """Emitted immediately after an evaluation finishes."""
 
 
 class ExitCode(IntEnum):
@@ -135,10 +130,10 @@ class ExitCode(IntEnum):
     USER_ABORT = 5
     """Returned when the optimization is aborted by the user."""
 
-    OPTIMIZER_STEP_FINISHED = 6
+    OPTIMIZER_FINISHED = 6
     """Returned when an optimization step terminates normally."""
 
-    EVALUATOR_STEP_FINISHED = 7
+    ENSEMBLE_EVALUATOR_FINISHED = 7
     """Returned when an evaluation step terminates normally."""
 
 

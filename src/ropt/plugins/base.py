@@ -10,8 +10,7 @@ class Plugin(ABC):
 
     This class serves as the fundamental building block for all plugins within
     the `ropt` framework. Any class intended to function as a plugin (e.g., an
-    optimizer, sampler, step, or event handler) must inherit from this base
-    class.
+    optimizer, sampler, or event handler) must inherit from this base class.
 
     It defines the core interface that all plugins must adhere to, ensuring
     consistency and enabling the [`PluginManager`][ropt.plugins.PluginManager]

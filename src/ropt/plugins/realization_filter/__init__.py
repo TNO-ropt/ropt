@@ -22,8 +22,7 @@ of `ropt` with custom realization filtering strategies.
   values.
 * **Discovery:** The [`PluginManager`][ropt.plugins.PluginManager] discovers
   available `RealizationFilterPlugin` implementations (typically via entry
-  points) and uses them to create `RealizationFilter` instances as needed during
-  plan execution.
+  points) and uses them to create `RealizationFilter` instances as needed.
 
 **Built-in Realization Filter Plugins:**
 

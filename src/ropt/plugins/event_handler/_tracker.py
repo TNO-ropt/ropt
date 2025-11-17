@@ -5,9 +5,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Literal, assert_never
 
 from ropt.enums import EventType
-from ropt.plugins.plan.base import EventHandler
 
 from ._utils import _get_last_result, _update_optimal_result
+from .base import EventHandler
 
 if TYPE_CHECKING:
     from ropt.optimization import Event
@@ -19,7 +19,7 @@ class DefaultTrackerHandler(EventHandler):
 
     This event handler listens for
     [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events
-    emitted by specified steps. It processes the
+    emitted from within an optimization workflow. It processes the
     [`Results`][ropt.results.Results] objects contained within these events and
     selects a single [`FunctionResults`][ropt.results.FunctionResults] object to
     retain based on defined criteria.
@@ -48,9 +48,8 @@ class DefaultTrackerHandler(EventHandler):
         """Initialize a default tracker event handler.
 
         This event handler monitors [`Results`][ropt.results.Results] objects
-        from specified `steps and selects a single
-        [`FunctionResults`][ropt.results.FunctionResults] object to retain based
-        on the `what` criterion ('best' or 'last').
+        and selects a single [`FunctionResults`][ropt.results.FunctionResults]
+        object to retain based on the `what` criterion ('best' or 'last').
 
         The 'best' result is the one with the lowest weighted objective value
         encountered so far. The 'last' result is the most recently received
@@ -64,7 +63,6 @@ class DefaultTrackerHandler(EventHandler):
         transformed to the user's domain.
 
         Args:
-            plan:                 The parent plan instance.
             what:                 Criterion for selecting results ('best' or 'last').
             constraint_tolerance: Optional threshold for filtering constraint violations.
         """
@@ -75,19 +73,18 @@ class DefaultTrackerHandler(EventHandler):
         self["results"] = None
 
     def handle_event(self, event: Event) -> None:
-        """Handle incoming events from the plan.
+        """Handle incoming events.
 
-        This method processes events emitted by the parent plan. It specifically
-        listens for
-        [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events
-        originating from steps that are included in the connected steps.
+        This method processes incoming
+        [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION]
+        events.
 
         If a relevant event containing results is received, this method updates
         the tracked result (`self["results"]`) based on the `what` criterion
         ('best' or 'last') and the optional `constraint_tolerance`.
 
         Args:
-            event: The event object emitted by the plan.
+            event: The event object.
         """
         if (results := event.data.get("results")) is None:
             return

@@ -1,4 +1,4 @@
-"""This module implements the default optimizer step."""
+"""This module implements the default optimizer operation."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from numpy.typing import NDArray  # noqa: TC002
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, ExitCode
 from ropt.optimization import EnsembleOptimizer, Event
-from ropt.plugins.plan.base import Evaluator, PlanStep
+from ropt.plugins.operation.base import Operation
 from ropt.results import FunctionResults
 
 if TYPE_CHECKING:
@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 
     from ropt.config import EnOptConfig
     from ropt.plugins import PluginManager
+    from ropt.plugins.evaluator.base import Evaluator
     from ropt.results import Results
     from ropt.transforms import OptModelTransforms
 
@@ -36,7 +37,7 @@ class NestedOptimizationCallable(Protocol):
 
         This functions defines the signature of the callable that defines a
         nested optimization in a
-        [`DefaultOptimizerStep`][ropt.plugins.plan.optimizer.DefaultOptimizerStep].
+        [`DefaultOptimizerOperation`][ropt.plugins.operation.optimizer.DefaultOptimizerOperation].
 
         It accepts the variables to evaluate and returns a tuple. The first
         element is a `FunctionResults` object containing the results of the
@@ -53,10 +54,10 @@ class NestedOptimizationCallable(Protocol):
         """
 
 
-class DefaultOptimizerStep(PlanStep):
-    """The default optimizer step for optimization plans.
+class DefaultOptimizerOperation(Operation):
+    """The default optimizer operation.
 
-    This step executes an optimization algorithm based on a provided
+    This operation executes an optimization algorithm based on a provided
     configuration ([`EnOptConfig`][ropt.config.EnOptConfig] or a compatible
     dictionary). It iteratively performs function and potentially gradient
     evaluations, yielding a sequence of
@@ -66,9 +67,9 @@ class DefaultOptimizerStep(PlanStep):
     While initial variable values are typically specified in the configuration,
     they can be overridden by passing them directly to the `run` method.
 
-    The step emits the following events during its execution:
+    The following events are emitted during execution:
 
-    - [`START_OPTIMIZER_STEP`][ropt.enums.EventType.START_OPTIMIZER_STEP]:
+    - [`START_OPTIMIZER`][ropt.enums.EventType.START_OPTIMIZER]:
       Emitted just before the optimization process begins.
     - [`START_EVALUATION`][ropt.enums.EventType.START_EVALUATION]: Emitted
       immediately before an ensemble evaluation (for functions or gradients)
@@ -78,21 +79,20 @@ class DefaultOptimizerStep(PlanStep):
       [`Results`][ropt.results.Results] object(s) in its `data` dictionary
       under the key `"results"`. Event handlers typically listen for this event
       to process or track optimization progress.
-    - [`FINISHED_OPTIMIZER_STEP`][ropt.enums.EventType.FINISHED_OPTIMIZER_STEP]:
+    - [`FINISHED_OPTIMIZER`][ropt.enums.EventType.FINISHED_OPTIMIZER]:
       Emitted after the entire optimization process concludes (successfully,
       or due to termination conditions or errors).
 
-    This step also supports **nested optimization**. If a `nested_optimization`
-    function is provided to the `run` method, the optimizer will execute a
-    nested optimization at as part of each function evaluation. Each nested
-    optimization run is done by creating a new plan. The provided function is
-    then executed, passing the new plan and the variables. The
-    `nested_optimization` function is expected to return a single
-    [`FunctionResults`][ropt.results.FunctionResults] object.
+    This operation also supports **nested optimization**. If a
+    `nested_optimization` function is provided to the `run` method, the
+    optimizer will execute a nested optimization at as part of each function
+    evaluation. The `nested_optimization` function is expected to return a
+    single [`FunctionResults`][ropt.results.FunctionResults] object and a flag
+    that indicates whether the optimization was aborted by the user.
     """
 
     def __init__(self, *, evaluator: Evaluator, plugin_manager: PluginManager) -> None:
-        """Initialize a default optimizer step.
+        """Initialize a default optimizer.
 
         Args:
             evaluator:      The evaluator object to run function evaluations.
@@ -111,13 +111,13 @@ class DefaultOptimizerStep(PlanStep):
         nested_optimization: NestedOptimizationCallable | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> ExitCode:
-        """Run the optimizer step to perform an optimization.
+        """Run the operation to perform an optimization.
 
-        This method executes the core logic of the optimizer step. It requires
-        an optimizer configuration
+        This method executes the core logic of the optimizer operation. It
+        requires an optimizer configuration
         ([`EnOptConfig`][ropt.config.EnOptConfig]) and optionally accepts
-        specific initial variable vectors, and/or a nested optimization plan,
-        and metadata.
+        specific initial variable vectors, and/or a nested optimization
+        workflow, and metadata.
 
         If `variables` are not provided, the initial values specified in the
         `config` are used. If `variables` are provided, they override the
@@ -127,18 +127,18 @@ class DefaultOptimizerStep(PlanStep):
         [`Results`][ropt.results.Results] objects emitted via the
         `FINISHED_EVALUATION` event.
 
-        If a `nested_optimization` callable is provided, a fresh plan will be
-        constructed, and the callable will be called passing that plan and the
-        initial variables to use. The callable should return a a single
-        [`FunctionResults`][ropt.results.FunctionResults] object that should
-        contain the results of the nested optimization.
+        If a `nested_optimization` callable is provided, a callable will be
+        called passing the initial variables to use. The callable should return
+        a a single [`FunctionResults`][ropt.results.FunctionResults] object that
+        should contain the results of the nested optimization, and a flag
+        indicating whether the optimization was aborted by the user.
 
         Args:
             config:              Optimizer configuration.
             transforms:          Optional transforms to apply to the variables,
                                  objectives, and constraints.
             variables:           Optional initial variable vector(s) to start from.
-            nested_optimization: Optional callable to run a nested plan.
+            nested_optimization: Optional callable to run a nested optimization.
             metadata:            Optional dictionary to attach to emitted `Results`.
 
         Returns:
@@ -151,9 +151,7 @@ class DefaultOptimizerStep(PlanStep):
 
         event_data: dict[str, Any] = {"config": config, "transforms": transforms}
 
-        self._emit_event(
-            Event(event_type=EventType.START_OPTIMIZER_STEP, data=event_data)
-        )
+        self._emit_event(Event(event_type=EventType.START_OPTIMIZER, data=event_data))
 
         variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
         if variables.shape != (self._config.variables.variable_count,):
@@ -189,7 +187,7 @@ class DefaultOptimizerStep(PlanStep):
         exit_code = ensemble_optimizer.start(variables)
 
         self._emit_event(
-            Event(event_type=EventType.FINISHED_OPTIMIZER_STEP, data=event_data)
+            Event(event_type=EventType.FINISHED_OPTIMIZER, data=event_data)
         )
 
         return exit_code

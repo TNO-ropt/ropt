@@ -62,11 +62,6 @@ class RealizationFilterPlugin(Plugin):
     [`RealizationFilter`][ropt.plugins.realization_filter.base.RealizationFilter]
     instances. These plugins act as factories for specific realization filtering
     strategies.
-
-    During plan execution, the [`PluginManager`][ropt.plugins.PluginManager]
-    identifies the appropriate realization filter plugin based on the
-    configuration and uses its `create` class method to instantiate the actual
-    `RealizationFilter` object that will calculate the realization weights.
     """
 
     @classmethod
@@ -80,8 +75,7 @@ class RealizationFilterPlugin(Plugin):
         instance of their specific `RealizationFilter` subclass.
 
         The [`PluginManager`][ropt.plugins.PluginManager] calls this method when
-        an optimization step requires realization weights calculated by this
-        plugin.
+        an optimization requires realization weights calculated by this plugin.
 
         Args:
             enopt_config: The main EnOpt configuration object.

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ropt.plugins.plan.base import Evaluator
+from .base import Evaluator
 
 if TYPE_CHECKING:
     import numpy as np
@@ -18,15 +18,12 @@ class DefaultFunctionEvaluator(Evaluator):
 
     This class acts as an adapter, allowing a standard Python callable (which
     matches the signature of the `eval` method) to be used as an
-    [`Evaluator`][ropt.plugins.plan.base.Evaluator] within an optimization
+    [`Evaluator`][ropt.plugins.evaluator.base.Evaluator] within an optimization
     workflow.
 
     It is initialized with an `evaluator` callable. When the `eval` method of
-    this class is invoked by the plan, it simply delegates the call, along with
-    all arguments, to the wrapped `evaluator` function.
-
-    This is useful for integrating existing evaluation logic that is not already
-    structured as an `Evaluator` subclass into a `ropt` plan.
+    this class is invoked, it simply delegates the call, along with all
+    arguments, to the wrapped `evaluator` function.
     """
 
     def __init__(self, *, evaluator: EvaluatorCallback) -> None:
@@ -36,7 +33,7 @@ class DefaultFunctionEvaluator(Evaluator):
             evaluator: The callable that will perform the actual evaluation.
         """
         super().__init__()
-        self._evaluator = evaluator
+        self._evaluator_callback = evaluator
 
     def eval(
         self, variables: NDArray[np.float64], context: EvaluatorContext
@@ -50,4 +47,4 @@ class DefaultFunctionEvaluator(Evaluator):
         Returns:
             The result of calling the wrapped evaluator function.
         """
-        return self._evaluator(variables, context)
+        return self._evaluator_callback(variables, context)

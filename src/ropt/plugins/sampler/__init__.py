@@ -18,7 +18,7 @@ vectors. This module allows for the extension of `ropt` with custom samplers.
   sampler's `generate_samples` method.
 * **Discovery:** The [`PluginManager`][ropt.plugins.PluginManager] discovers
   available `SamplerPlugin` implementations (typically via entry points) and
-  uses them to create `Sampler` instances as needed during plan execution.
+  uses them to create `Sampler` instances as needed.
 
 **Built-in Sampler Plugins:**
 

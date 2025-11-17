@@ -1,4 +1,4 @@
-"""This module defines the abstract base class for optimization steps."""
+"""This module defines utilities for event handlers."""
 
 from __future__ import annotations
 

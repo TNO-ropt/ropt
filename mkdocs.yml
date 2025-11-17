@@ -109,7 +109,7 @@ nav:
           - "Realization Filter Plugins": reference/realization_filter_plugins.md
           - "Function estimator Plugins": reference/function_estimator_plugins.md
       - "Default Plugins":
-          - "Default Plan Plugins": reference/default_plan_plugin.md
+          - "Default Workflow Plugins": reference/default_workflow_plugins.md
           - "SciPy Optimizer Plugin": reference/scipy_optimizer_plugin.md
           - "SciPy Sampler Plugin": reference/scipy_sampler_plugin.md
           - "Default Realization Filter Plugin": reference/default_realization_filter_plugin.md

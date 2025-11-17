@@ -5,7 +5,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ropt.enums import EventType
-from ropt.plugins.plan.base import EventHandler
+
+from .base import EventHandler
 
 if TYPE_CHECKING:
     from ropt.optimization import Event
@@ -16,9 +17,9 @@ class DefaultStoreHandler(EventHandler):
 
     This event handler listens for
     [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events
-    emitted by specified steps. It collects all
-    [`Results`][ropt.results.Results] objects contained within these events and
-    stores them sequentially in memory.
+    emitted by specified operations from within an optimization workflow. It
+    collects all [`Results`][ropt.results.Results] objects contained within
+    these events and stores them sequentially in memory.
 
     The accumulated results are stored as a tuple and can be accessed via
     dictionary access using the key `"results"` (e.g., `handler["results"]`).
@@ -30,8 +31,7 @@ class DefaultStoreHandler(EventHandler):
         """Initialize a default store event handler.
 
         This event handler collects and stores all
-        [`Results`][ropt.results.Results] objects received from specified steps.
-        It listens for
+        [`Results`][ropt.results.Results] objects it receives. It listens for
         [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events
         and appends the results contained within them to an internal tuple.
 
@@ -39,27 +39,22 @@ class DefaultStoreHandler(EventHandler):
         *before* being stored. The accumulated results are stored as a tuple and
         can be accessed via dictionary access using the key `"results"` (e.g.,
         `handler["results"]`). Initially, `handler["results"]` is `None`.
-
-        Args:
-            plan:       The parent plan instance.
         """
         super().__init__()
         self["results"] = None
 
     def handle_event(self, event: Event) -> None:
-        """Handle incoming events from the plan.
+        """Handle incoming events.
 
-        This method processes events emitted by the parent plan. It specifically
-        listens for
-        [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events
-        originating from steps that are connected to the handler.
+        This method processes events it receives. It specifically listens for
+        [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events.
 
         If a relevant event containing results is received, this method
         retrieves the results, optionally transforms them to the user domain and
         appends them to the tuple stored in `self["results"]`.
 
         Args:
-            event: The event object emitted by the plan.
+            event: The event object.
         """
         if (results := event.data.get("results")) is None:
             return
