@@ -11,7 +11,7 @@ from numpy.typing import NDArray
 
 from ropt.enums import VariableType
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.plan import BasicOptimizer
+from ropt.optimization import BasicOptimizer
 from ropt.results import FunctionResults, Results
 
 initial_values = 2 * [0.0]

@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
     from ropt.enums import EventType
     from ropt.evaluator import EvaluatorContext, EvaluatorResult
-    from ropt.plan import Event
+    from ropt.optimization import Event
 
 
 class EventHandlerPlugin(Plugin):
@@ -22,7 +22,7 @@ class EventHandlerPlugin(Plugin):
 
     This class defines the interface for plugins responsible for creating
     [`EventHandler`][ropt.plugins.plan.base.EventHandler] instances within an
-    optimization plan ([`Plan`][ropt.plan.Plan]).
+    optimization workflow.
 
     During plan setup, the [`PluginManager`][ropt.plugins.PluginManager]
     identifies the appropriate event handler plugin based on a requested name
@@ -44,19 +44,10 @@ class EventHandlerPlugin(Plugin):
         implementations must override this method to return an instance of their
         specific `EventHandler` subclass.
 
-        The [`PluginManager`][ropt.plugins.PluginManager] calls this method when
-        a plan requests an event handler provided by this plugin via
-        [`Plan.add_event_handler`][ropt.plan.Plan.add_event_handler].
-
         The `name` argument specifies the requested event handler, potentially
         in the format `"plugin-name/method-name"` or just `"method-name"`.
         Implementations can use this `name` to vary the created event handler if
         the plugin supports multiple event handler types.
-
-        Any additional keyword arguments (`kwargs`) passed during the
-        [`Plan.add_event_handler`][ropt.plan.Plan.add_event_handler] call are
-        forwarded here, allowing for custom configuration of the event handler
-        instance.
 
         Args:
             name:    The requested event handler name (potentially plugin-specific).
@@ -72,11 +63,6 @@ class PlanStepPlugin(Plugin):
 
     This class defines the interface for plugins that act as factories for
     [`PlanStep`][ropt.plugins.plan.base.PlanStep] objects.
-
-    The [`PluginManager`][ropt.plugins.PluginManager] uses the `create` class
-    method of these plugins to instantiate `PlanStep` objects when they are
-    added to an optimization [`Plan`][ropt.plan.Plan] via
-    [`Plan.add_step`][ropt.plan.Plan.add_step].
     """
 
     @classmethod
@@ -93,18 +79,10 @@ class PlanStepPlugin(Plugin):
         implementations must override this method to return an instance of
         their specific `PlanStep` subclass.
 
-        The [`PluginManager`][ropt.plugins.PluginManager] calls this method
-        when a plan requests a step provided by this plugin via
-        [`Plan.add_step`][ropt.plan.Plan.add_step].
-
         The `name` argument specifies the requested step, potentially in the
         format `"plugin-name/method-name"` or just `"method-name"`.
         Implementations can use this `name` to vary the created step if the
         plugin supports multiple step types.
-
-        Any additional keyword arguments (`kwargs`) passed during the
-        [`Plan.add_step`][ropt.plan.Plan.add_step] call are forwarded here,
-        allowing for custom configuration of the step instance.
 
         Args:
             name:   The requested step name (potentially plugin-specific).
@@ -120,7 +98,7 @@ class EvaluatorPlugin(Plugin):
 
     This class defines the interface for plugins responsible for creating
     plan-aware [`Evaluator`][ropt.plugins.plan.base.Evaluator] instances within
-    an optimization plan ([`Plan`][ropt.plan.Plan]).
+    an optimization workflow.
 
     During plan setup, the [`PluginManager`][ropt.plugins.PluginManager]
     identifies the appropriate evaluator plugin based on a requested name and
@@ -163,8 +141,7 @@ class PlanComponent:
     """Base class for components that are part of an optimization plan.
 
     This class provides common functionality for components like steps, event
-    handlers, and evaluators that are managed within a
-    [`Plan`][ropt.plan.Plan].
+    handlers, and evaluators that are managed within an optimization workflow.
 
     Each `PlanComponent` is assigned a unique identifier (`id`) upon
     initialization.
@@ -192,9 +169,9 @@ class PlanStep(ABC, PlanComponent):
     """Abstract base class for optimization plan steps.
 
     This class defines the fundamental interface for all executable steps within
-    an optimization [`Plan`][ropt.plan.Plan]. Concrete step implementations,
-    which perform specific actions like running an optimizer or evaluating
-    functions, must inherit from this base class.
+    an optimization workflow. Concrete step implementations, which perform
+    specific actions like running an optimizer or evaluating functions, must
+    inherit from this base class.
 
     `PlanStep` objects are typically created by corresponding
     [`PlanStepPlugin`][ropt.plugins.plan.base.PlanStepPlugin] factories, which
@@ -208,14 +185,7 @@ class PlanStep(ABC, PlanComponent):
     """
 
     def __init__(self) -> None:
-        """Initialize the PlanStep.
-
-        Associates the step with its parent [`Plan`][ropt.plan.Plan] and assigns
-        a unique ID. The parent plan is accessible via the `plan` property.
-
-        Args:
-            plan: The [`Plan`][ropt.plan.Plan] instance that owns this step.
-        """
+        """Initialize the PlanStep."""
         super().__init__()
         self._event_handlers: list[EventHandler] = []
 
@@ -244,7 +214,7 @@ class PlanStep(ABC, PlanComponent):
 
         This abstract method must be implemented by concrete `PlanStep`
         subclasses to define the specific action the step performs within the
-        optimization [`Plan`][ropt.plan.Plan].
+        optimization workflow.
 
         The return value and type can vary depending on the specific step
         implementation.
@@ -267,16 +237,16 @@ class EventHandler(ABC, PlanComponent):
     """Abstract Base Class for Optimization Plan Result Handlers.
 
     This class defines the fundamental interface for all event handlers within
-    an optimization [`Plan`][ropt.plan.Plan]. Concrete handler implementations,
-    which process events emitted during plan execution (e.g., tracking results,
-    storing data, logging), must inherit from this base class.
+    an optimization workflow. Concrete handler implementations, which process
+    events emitted during plan execution (e.g., tracking results, storing data,
+    logging), must inherit from this base class.
 
     `EventHandler` objects are typically created by corresponding
     [`EventHandlerPlugin`][ropt.plugins.plan.base.EventHandlerPlugin] factories,
     managed by the [`PluginManager`][ropt.plugins.PluginManager]. Once
     instantiated and added to a `Plan`, their
     [`handle_event`][ropt.plugins.plan.base.EventHandler.handle_event] method is
-    called by the plan whenever an [`Event`][ropt.plan.Event] is emitted.
+    called by the plan whenever an [`Event`][ropt.optimization.Event] is emitted.
 
     Handlers can also store state using dictionary-like access (`[]`), allowing
     them to accumulate information or make data available to subsequent steps
@@ -311,8 +281,8 @@ class EventHandler(ABC, PlanComponent):
 
         This abstract method must be implemented by concrete `EventHandler`
         subclasses. It defines the event handler's core logic for reacting to
-        [`Event`][ropt.plan.Event] objects emitted during the execution of the
-        parent [`Plan`][ropt.plan.Plan].
+        [`Event`][ropt.optimization.Event] objects emitted by steps in the optimization
+        workflow.
 
         Implementations should inspect the `event` object (its `event_type` and
         `data`) and perform actions accordingly, such as storing results,

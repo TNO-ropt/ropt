@@ -9,7 +9,7 @@ from pydantic import ValidationError
 from ropt.config import EnOptConfig
 from ropt.config.constants import DEFAULT_SEED
 from ropt.enums import EventType, ExitCode
-from ropt.plan import BasicOptimizer
+from ropt.optimization import BasicOptimizer
 from ropt.plugins._manager import PluginManager
 from ropt.results import FunctionResults, GradientResults, Results
 from ropt.transforms import OptModelTransforms, VariableScaler
@@ -18,7 +18,7 @@ from ropt.transforms.base import NonLinearConstraintTransform, ObjectiveTransfor
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
 
-    from ropt.plan import Event
+    from ropt.optimization import Event
 
 _SLSQP = "slsqp"
 _DIFFERENTIAL_EVOLUTION = "differential_evolution"

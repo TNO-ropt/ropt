@@ -25,17 +25,3 @@ class StepAborted(Exception):  # noqa: N818
         """
         self.exit_code = exit_code
         super().__init__()
-
-
-class PlanAborted(Exception):  # noqa: N818
-    """Raised when an optimization plan is aborted prematurely.
-
-    This exception signals that the execution of a [`Plan`][ropt.plan.Plan] was
-    stopped before completion. This typically occurs when a step or event
-    handler within the plan explicitly sets the plan's `aborted` flag (e.g., due
-    to a user request via a signal or an unrecoverable error condition detected
-    by an event handler).
-
-    Any subsequent attempts to execute further steps in an already aborted plan
-    will raise this exception.
-    """

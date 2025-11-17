@@ -10,7 +10,7 @@ import pytest
 from ropt.config import EnOptConfig
 from ropt.enums import EventType, ExitCode
 from ropt.exceptions import StepAborted
-from ropt.plan import BasicOptimizer, Event
+from ropt.optimization import BasicOptimizer, Event
 from ropt.plugins import PluginManager
 from ropt.plugins.plan.cached_evaluator import DefaultCachedEvaluator
 from ropt.results import FunctionResults

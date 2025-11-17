@@ -8,7 +8,7 @@ from ropt.enums import EventType
 from ropt.plugins.plan.base import EventHandler
 
 if TYPE_CHECKING:
-    from ropt.plan import Event
+    from ropt.optimization import Event
 
 
 class DefaultStoreHandler(EventHandler):

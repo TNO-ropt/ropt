@@ -10,8 +10,7 @@ from numpy.typing import NDArray  # noqa: TC002
 
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, ExitCode
-from ropt.optimization import EnsembleOptimizer
-from ropt.plan import Event
+from ropt.optimization import EnsembleOptimizer, Event
 from ropt.plugins.plan.base import Evaluator, PlanStep
 from ropt.results import FunctionResults
 

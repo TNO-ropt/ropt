@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt.plan import BasicOptimizer
+from ropt.optimization import BasicOptimizer
 from ropt.plugins.sampler.scipy import _SUPPORTED_METHODS
 from ropt.results import GradientResults, Results
 

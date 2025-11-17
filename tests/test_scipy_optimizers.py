@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from pydantic import ValidationError
 
-from ropt.plan import BasicOptimizer
+from ropt.optimization import BasicOptimizer
 from ropt.plugins import PluginManager
 from ropt.plugins.optimizer.scipy import (
     _CONSTRAINT_REQUIRES_BOUNDS,

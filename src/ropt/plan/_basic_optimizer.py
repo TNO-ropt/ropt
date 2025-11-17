@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
 
     from ropt.evaluator import EvaluatorCallback
-    from ropt.plan import Event
+    from ropt.optimization import Event
     from ropt.results import FunctionResults
     from ropt.transforms import OptModelTransforms
 
@@ -131,10 +131,8 @@ class BasicOptimizer:
                      evaluator function passed to `BasicOptimizer`.
                 2.   A `script` keyword argument, which will receive the name of
                      script passed via `ROPT_SCRIPT`.
-            *   This method must return a *callable* that:
-                1.   Accepts a [`Plan`][ropt.plan.Plan] object as its only
-                     argument.
-                2.   Returns an optimization [`ExitCode`][ropt.enums.ExitCode].
+            *   This method must return a *callable* that returns an
+                optimization [`ExitCode`][ropt.enums.ExitCode].
 
                 This callable will then be executed by `BasicOptimizer` in place
                 of its default workflow.

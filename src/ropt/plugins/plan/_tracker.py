@@ -10,7 +10,7 @@ from ropt.plugins.plan.base import EventHandler
 from ._utils import _get_last_result, _update_optimal_result
 
 if TYPE_CHECKING:
-    from ropt.plan import Event
+    from ropt.optimization import Event
     from ropt.results import FunctionResults
 
 

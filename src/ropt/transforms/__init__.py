@@ -39,12 +39,11 @@ for:
     [`EnOptConfig`][ropt.config.EnOptConfig] during configuration validation,
     using an [`OptModelTransforms`][ropt.transforms.OptModelTransforms]
     instance. This ensures that the entire optimization process is aware of and
-    configured for the transformed space. The trnsformation objects are stored
+    configured for the transformed space. The transformation objects are stored
     in the configuration object.
-2.  **Optimization Plan:** The same transformation objects are passed to the
-    relevant optimization steps within the [`Plan`][ropt.plan.Plan] via the
-    configuraiton object. (See, for example, the default implementation of an
-    optimizer step in
+2.  **Optimization Workflow:** The same transformation objects are passed to the
+    relevant optimization steps via the configuration object. (See, for example,
+    the default implementation of an optimizer step in
     [`DefaultOptimizerStep.run`][ropt.plugins.plan.optimizer.DefaultOptimizerStep.run]).
 3.  **Evaluation:** When the optimizer requests an evaluation of a variable
     vector, the following occurs:

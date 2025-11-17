@@ -19,7 +19,7 @@ class DefaultFunctionEvaluator(Evaluator):
     This class acts as an adapter, allowing a standard Python callable (which
     matches the signature of the `eval` method) to be used as an
     [`Evaluator`][ropt.plugins.plan.base.Evaluator] within an optimization
-    [`Plan`][ropt.plan.Plan].
+    workflow.
 
     It is initialized with an `evaluator` callable. When the `eval` method of
     this class is invoked by the plan, it simply delegates the call, along with

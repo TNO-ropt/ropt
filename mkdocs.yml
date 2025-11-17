@@ -96,14 +96,14 @@ nav:
       - "Configuration": reference/enopt_config.md
       - "Domain transforms": reference/domain_transforms.md
       - "Optimization":
-          - "Optimization Plans": reference/plan.md
+          - "Optimization Workflows": reference/workflows.md
           - "Basic Optimizer": reference/basic_optimizer.md
           - "Optimization": reference/optimization.md
           - "Function Evaluations": reference/evaluator.md
           - "Optimization Results": reference/results.md
       - "Plugins":
           - "Plugins": reference/plugin_manager.md
-          - "Plan Plugins": reference/plan_plugins.md
+          - "Workflow Plugins": reference/workflow_plugins.md
           - "Optimizer Plugins": reference/optimizer_plugins.md
           - "Sampler Plugins": reference/sampler_plugins.md
           - "Realization Filter Plugins": reference/realization_filter_plugins.md

@@ -1,10 +1,9 @@
 """Framework and Implementations for Optimization Plan Plugins.
 
 This module provides the core components and default implementations for
-extending `ropt`'s optimization plan capabilities ([`Plan`][ropt.plan.Plan])
-through plugins. It allows users to define custom sequences of operations
-(steps) and ways to process the results and events generated during plan
-execution (handlers).
+extending `ropt`'s optimization workflow capabilities through plugins. It allows
+users to define custom sequences of operations (steps) and ways to process the
+results and events generated during plan execution (handlers).
 
 **Core Concepts:**
 
@@ -48,8 +47,8 @@ following abstract base classes:
       performing function computations.
 
 By inheriting from these classes, developers can create custom steps and
-handlers that integrate seamlessly into the `ropt` optimization plan execution
-framework ([`Plan`][ropt.plan.Plan]).
+handlers that integrate seamlessly into the `ropt` optimization workflow
+framework.
 
 
 **Built-in Plan Plugins:**

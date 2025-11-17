@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from ropt.plan import BasicOptimizer
+from ropt.optimization import BasicOptimizer
 from ropt.plugins.realization_filter.default import (
     _get_cvar_weights_from_percentile,
     _sort_and_select,

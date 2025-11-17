@@ -1,8 +1,5 @@
 r"""Code for executing optimization plans.
 
-The [`Plan`][ropt.plan.Plan] class orchestrates optimization workflows by
-managing steps and event handlers.
-
 A plan consists of [`PlanStep`][ropt.plugins.plan.base.PlanStep] objects, which
 define individual actions, and
 [`EventHandler`][ropt.plugins.plan.base.EventHandler] objects, which process and
@@ -21,12 +18,8 @@ process by providing a convenient way to build and execute straightforward plans
 involving a single optimization.
 """
 
-from ._basic_optimizer import BasicOptimizer
-from ._events import Event
-from ._plan import Plan
+from ropt.optimization._basic_optimizer import BasicOptimizer
 
 __all__ = [
     "BasicOptimizer",
-    "Event",
-    "Plan",
 ]

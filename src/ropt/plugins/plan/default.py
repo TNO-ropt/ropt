@@ -66,9 +66,7 @@ class DefaultEventHandlerPlugin(EventHandlerPlugin):
     """The default plugin for creating built-in event handlers.
 
     This plugin acts as a factory for the standard `EventHandler`
-    implementations provided by `ropt`. It allows the
-    [`PluginManager`][ropt.plugins.PluginManager] to instantiate these event
-    handlers when requested by a [`Plan`][ropt.plan.Plan].
+    implementations provided by `ropt`.
 
     **Supported Handlers:**
 
@@ -116,9 +114,7 @@ class DefaultPlanStepPlugin(PlanStepPlugin):
     """The default plugin for creating built-in plan steps.
 
     This plugin acts as a factory for the standard `PlanStep` implementations
-    provided by `ropt`. It allows the
-    [`PluginManager`][ropt.plugins.PluginManager] to instantiate these steps
-    when requested by a [`Plan`][ropt.plan.Plan].
+    provided by `ropt`.
 
     **Supported Steps:**
 
@@ -166,9 +162,7 @@ class DefaultEvaluatorPlugin(EvaluatorPlugin):
     """The default plugin for creating evaluators.
 
     This plugin acts as a factory for the standard evaluator implementations
-    provided by `ropt`. It allows the
-    [`PluginManager`][ropt.plugins.PluginManager] to instantiate these steps
-    when requested by a [`Plan`][ropt.plan.Plan].
+    provided by `ropt`.
 
     **Supported Evaluators:**
 

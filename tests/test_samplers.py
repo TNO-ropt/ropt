@@ -9,7 +9,7 @@ from numpy.random import Generator, default_rng
 
 from ropt.config import EnOptConfig
 from ropt.ensemble_evaluator._gradient import _perturb_variables
-from ropt.plan import BasicOptimizer
+from ropt.optimization import BasicOptimizer
 from ropt.plugins.sampler.base import Sampler, SamplerPlugin
 
 if TYPE_CHECKING:

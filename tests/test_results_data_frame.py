@@ -4,7 +4,7 @@ from typing import Any, Literal
 import pytest
 
 from ropt.enums import AxisName
-from ropt.plan import BasicOptimizer
+from ropt.optimization import BasicOptimizer
 from ropt.results import Results, results_to_dataframe
 
 # Requires pandas:
