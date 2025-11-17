@@ -10,7 +10,7 @@ from ropt.plugins.plan.base import EventHandler, PlanComponent
 from ._utils import _get_last_result, _update_optimal_result
 
 if TYPE_CHECKING:
-    from ropt.plan import Event, Plan
+    from ropt.plan import Event
     from ropt.results import FunctionResults
 
 
@@ -41,7 +41,6 @@ class DefaultTrackerHandler(EventHandler):
 
     def __init__(
         self,
-        plan: Plan,
         tags: set[str] | None = None,
         sources: set[PlanComponent | str] | None = None,
         *,
@@ -76,7 +75,7 @@ class DefaultTrackerHandler(EventHandler):
             constraint_tolerance: Optional threshold for filtering constraint violations.
             sources:              Optional set of steps whose results should be tracked.
         """
-        super().__init__(plan, tags, sources)
+        super().__init__(tags, sources)
         self._what = what
         self._constraint_tolerance = constraint_tolerance
         self._tracked_results: FunctionResults | None = None

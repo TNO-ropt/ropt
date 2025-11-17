@@ -90,7 +90,6 @@ class DefaultEventHandlerPlugin(EventHandlerPlugin):
     def create(
         cls,
         name: str,
-        plan: Plan,
         tags: set[str] | None = None,
         sources: set[PlanComponent | str] | None = None,
         **kwargs: dict[str, Any],
@@ -104,7 +103,7 @@ class DefaultEventHandlerPlugin(EventHandlerPlugin):
         _, _, name = name.lower().rpartition("/")
         obj = _EVENT_HANDLER_OBJECTS.get(name)
         if obj is not None:
-            return obj(plan, tags, sources, **kwargs)
+            return obj(tags, sources, **kwargs)
 
         msg = f"Unknown event handler object type: {name}"
         raise TypeError(msg)

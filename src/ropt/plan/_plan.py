@@ -187,7 +187,7 @@ class Plan:
             The newly added event handler.
         """
         handler = self._plugin_manager.get_plugin("event_handler", method=name).create(
-            name, self, tags, sources, **kwargs
+            name, tags, sources, **kwargs
         )
         assert isinstance(handler, EventHandler)
         self._handlers.append(handler)

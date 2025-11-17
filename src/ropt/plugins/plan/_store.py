@@ -8,7 +8,7 @@ from ropt.enums import EventType
 from ropt.plugins.plan.base import EventHandler, PlanComponent
 
 if TYPE_CHECKING:
-    from ropt.plan import Event, Plan
+    from ropt.plan import Event
 
 
 class DefaultStoreHandler(EventHandler):
@@ -28,7 +28,6 @@ class DefaultStoreHandler(EventHandler):
 
     def __init__(
         self,
-        plan: Plan,
         tags: set[str] | None = None,
         sources: set[PlanComponent | str] | None = None,
     ) -> None:
@@ -53,7 +52,7 @@ class DefaultStoreHandler(EventHandler):
             tags:       Optional tags
             sources:    Optional set of steps whose results should be stored.
         """
-        super().__init__(plan, tags, sources)
+        super().__init__(tags, sources)
         self["results"] = None
 
     def handle_event(self, event: Event) -> None:

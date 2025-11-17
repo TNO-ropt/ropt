@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
     from ropt.enums import EventType
-    from ropt.plan import Event, Plan
+    from ropt.plan import Event
 
 
 class DefaultObserverHandler(EventHandler):
@@ -24,7 +24,6 @@ class DefaultObserverHandler(EventHandler):
 
     def __init__(
         self,
-        plan: Plan,
         tags: set[str] | None = None,
         sources: set[PlanComponent | str] | None = None,
         *,
@@ -48,7 +47,7 @@ class DefaultObserverHandler(EventHandler):
             event_types: The set of event types  to respond to.
             callback:    The callable to call.
         """
-        super().__init__(plan, tags, sources)
+        super().__init__(tags, sources)
         self._event_types = event_types
         self._callback = callback
 

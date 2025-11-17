@@ -37,7 +37,6 @@ class EventHandlerPlugin(Plugin):
     def create(
         cls,
         name: str,
-        plan: Plan,
         tags: set[str] | None = None,
         sources: set[PlanComponent | str] | None = None,
         **kwargs: Any,  # noqa: ANN401
@@ -77,7 +76,6 @@ class EventHandlerPlugin(Plugin):
 
         Args:
             name:    The requested event handler name (potentially plugin-specific).
-            plan:    The parent [`Plan`][ropt.plan.Plan] instance.
             tags:    Optional tags
             sources: The steps whose events should be processed.
             kwargs:  Additional arguments for custom configuration.
@@ -218,7 +216,7 @@ class PlanComponent:
 
     """
 
-    def __init__(self, plan: Plan, tags: set[str] | None) -> None:
+    def __init__(self, plan: Plan | None, tags: set[str] | None) -> None:
         """Initialize the PlanComponent.
 
         This constructor is called by subclasses to set up common attributes. It
@@ -249,6 +247,7 @@ class PlanComponent:
         Returns:
             The [`Plan`][ropt.plan.Plan] object that owns this component.
         """
+        assert self.__stored_plan is not None
         return self.__stored_plan
 
     @property
@@ -343,15 +342,13 @@ class EventHandler(ABC, PlanComponent):
 
     def __init__(
         self,
-        plan: Plan,
         tags: set[str] | None = None,
         sources: set[PlanComponent | str] | None = None,
     ) -> None:
         """Initialize the EventHandler.
 
-        Associates the event handler with its parent [`Plan`][ropt.plan.Plan],
-        assigns a unique ID, and initializes an internal dictionary for storing
-        state. The parent plan is accessible via the `plan` property.
+        Assigns a unique ID and initializes an internal dictionary for storing
+        state.
 
         The `sources` parameter acts as a filter, determining which plan steps
         this event handler should listen to. It should be a set containing the
@@ -360,11 +357,10 @@ class EventHandler(ABC, PlanComponent):
         present in the  `sources` set.
 
         Args:
-            plan:    The [`Plan`][ropt.plan.Plan] instance that owns this event handler.
             tags:    Optional tags
             sources: Optional set of steps whose events should be processed.
         """
-        super().__init__(plan, tags)
+        super().__init__(None, tags)
         if sources is None:
             sources = set()
         for source in sources:
