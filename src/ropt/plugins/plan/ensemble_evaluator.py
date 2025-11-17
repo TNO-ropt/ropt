@@ -11,7 +11,7 @@ from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, ExitCode
 from ropt.exceptions import StepAborted
 from ropt.plan import Event
-from ropt.plugins.plan.base import PlanStep
+from ropt.plugins.plan.base import Evaluator, PlanStep
 from ropt.results import FunctionResults
 
 if TYPE_CHECKING:
@@ -48,15 +48,18 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
         self,
         plan: Plan,
         *,
+        evaluator: Evaluator,
         tags: set[str] | None = None,
     ) -> None:
         """Initialize a default evaluator step.
 
         Args:
-            plan: The plan that runs this step.
-            tags: Optional tags
+            plan:      The plan that runs this step.
+            evaluator: The evaluator object to run function evaluations.
+            tags:      Optional tags
         """
         super().__init__(plan, tags=tags)
+        self._evaluator = evaluator
 
     def run(
         self,
@@ -100,19 +103,8 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
         if transforms is not None and transforms.variables is not None:
             variables = transforms.variables.to_optimizer(variables)
 
-        evaluator = next(
-            (
-                item
-                for item in self.plan.evaluators
-                if self.id in item.clients or self.tags & item.clients
-            ),
-            None,
-        )
-        if evaluator is None:
-            msg = "No suitable evaluator found."
-            raise AttributeError(msg)
         ensemble_evaluator = EnsembleEvaluator(
-            config, transforms, evaluator.eval, self.plan.plugin_manager
+            config, transforms, self._evaluator.eval, self.plan.plugin_manager
         )
 
         exit_code = ExitCode.EVALUATOR_STEP_FINISHED

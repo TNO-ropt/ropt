@@ -12,7 +12,7 @@ from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, ExitCode
 from ropt.optimization import EnsembleOptimizer
 from ropt.plan import Event, Plan
-from ropt.plugins.plan.base import PlanStep
+from ropt.plugins.plan.base import Evaluator, PlanStep
 from ropt.results import FunctionResults
 
 if TYPE_CHECKING:
@@ -95,15 +95,18 @@ class DefaultOptimizerStep(PlanStep):
         self,
         plan: Plan,
         *,
+        evaluator: Evaluator,
         tags: set[str] | None = None,
     ) -> None:
         """Initialize a default optimizer step.
 
         Args:
-            plan: The plan that runs this step.
-            tags: Optional tags
+            plan:      The plan that runs this step.
+            evaluator: The evaluator object to run function evaluations.
+            tags:      Optional tags
         """
         super().__init__(plan, tags=tags)
+        self._evaluator = evaluator
 
     def run(
         self,
@@ -165,19 +168,11 @@ class DefaultOptimizerStep(PlanStep):
         if self._transforms is not None and self._transforms.variables is not None:
             variables = self._transforms.variables.to_optimizer(variables)
 
-        evaluator = next(
-            (
-                item
-                for item in self.plan.evaluators
-                if self.id in item.clients or self.tags & item.clients
-            ),
-            None,
-        )
-        if evaluator is None:
-            msg = "No suitable evaluator found."
-            raise AttributeError(msg)
         ensemble_evaluator = EnsembleEvaluator(
-            self._config, self._transforms, evaluator.eval, self.plan.plugin_manager
+            self._config,
+            self._transforms,
+            self._evaluator.eval,
+            self.plan.plugin_manager,
         )
 
         ensemble_optimizer = EnsembleOptimizer(

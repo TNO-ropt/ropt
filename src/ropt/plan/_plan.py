@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from ropt.plugins.plan.base import Evaluator, EventHandler, PlanComponent, PlanStep
+from ropt.plugins.plan.base import EventHandler, PlanComponent, PlanStep
 
 if TYPE_CHECKING:
     from ropt.plugins import PluginManager
@@ -98,12 +98,10 @@ class Plan:
         plugin_manager: PluginManager,
         *,
         event_handlers: list[EventHandler] | None = None,
-        evaluators: list[Evaluator] | None = None,
     ) -> None:
         """Initialize a plan object.
 
-        Constructs a new plan, associating it with an evaluator, and optionally
-        with a plugin manager and/or a event handlers and evaluators.
+        Constructs a new plan, associating it with  a plugin manager and event handlers.
 
         The `plugin_manager` is used by the plan, and possibly by steps and
         event handlers to add plugin functionality.
@@ -111,16 +109,11 @@ class Plan:
         Args:
             plugin_manager: A plugin manager.
             event_handlers: Event handlers to add to the plan.
-            evaluators:     Evaluators to add to the plan.
         """
         self._plugin_manager = plugin_manager
         self._handlers: list[EventHandler] = []
         self._parent_handlers: list[EventHandler] = (
             [] if event_handlers is None else event_handlers
-        )
-        self._evaluators: list[Evaluator] = []
-        self._parent_evaluators: list[Evaluator] = (
-            [] if evaluators is None else evaluators
         )
 
     @property
@@ -201,42 +194,6 @@ class Plan:
         assert isinstance(step, PlanStep)
         return step
 
-    def add_evaluator(
-        self,
-        name: str,
-        *,
-        tags: set[str] | None = None,
-        clients: set[PlanComponent | str] | None = None,
-        **kwargs: Any,  # noqa: ANN401
-    ) -> Evaluator:
-        """Add an evaluator object to the plan.
-
-        Creates an evaluator of a type that is determined by the provided `name`,
-        which the plugin system uses to locate the corresponding evaluator class.
-        Any additional keyword arguments are passed to the evaluators's constructor.
-
-        The `clients` parameter acts as a filter, determining which plan steps
-        this evaluator should serve. It should be a set containing the
-        `PlanStep` instances that should be handled. When an evaluation is
-        requested, this evaluator checks if the step is present in the `client`
-        set.
-
-        Args:
-            name:    The name of the evaluator to add.
-            tags:    Optional tags
-            clients: The clients that should be served by this evaluator.
-            kwargs:  Additional arguments for the evaluators's constructor.
-
-        Returns:
-            The new evaluator object.
-        """
-        evaluator = self._plugin_manager.get_plugin("evaluator", method=name).create(
-            name, tags=tags, clients=clients, **kwargs
-        )
-        assert isinstance(evaluator, Evaluator)
-        self._evaluators.append(evaluator)
-        return evaluator
-
     @property
     def event_handlers(self) -> list[EventHandler]:
         """Get the event handlers available to this plan.
@@ -245,12 +202,3 @@ class Plan:
             A list of handlers.
         """
         return self._handlers + self._parent_handlers
-
-    @property
-    def evaluators(self) -> list[Evaluator]:
-        """Get the evaluators available to this plan.
-
-        Returns:
-            A list of evaluators instances.
-        """
-        return self._evaluators + self._parent_evaluators

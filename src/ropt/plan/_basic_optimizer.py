@@ -247,16 +247,14 @@ class BasicOptimizer:
         custom_function = self._get_custom_run_step(plan)
 
         if custom_function is None:
-            optimizer = plan.add_step("optimizer")
+            evaluator = self._plugin_manager.evaluator(
+                "function_evaluator", evaluator=self._evaluator
+            )
+            optimizer = plan.add_step("optimizer", evaluator=evaluator)
             tracker = plan.add_event_handler(
                 "tracker",
                 constraint_tolerance=self._constraint_tolerance,
                 sources={optimizer},
-            )
-            plan.add_evaluator(
-                "function_evaluator",
-                evaluator=self._evaluator,
-                clients={optimizer},
             )
             for event_type, function in self._observers:
                 plan.add_event_handler(

@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, Final, Literal
 
 from .function_estimator.base import FunctionEstimatorPlugin
 from .optimizer.base import OptimizerPlugin
-from .plan.base import EvaluatorPlugin, EventHandlerPlugin, PlanStepPlugin
+from .plan.base import Evaluator, EvaluatorPlugin, EventHandlerPlugin, PlanStepPlugin
 from .realization_filter.base import RealizationFilterPlugin
 from .sampler.base import SamplerPlugin
 
@@ -211,6 +211,17 @@ class PluginManager:
         if plugin is None:
             return None
         return plugin[0]
+
+    def evaluator(self, method: str, **kwargs: Any) -> Evaluator:  # noqa: ANN401
+        """Create a new evaluator.
+
+        Args:
+            method: The method string to find the evaluator.
+            kwargs: Optional keyword arguments passed to the evaluator init.
+        """
+        evaluator = self.get_plugin("evaluator", method=method).create(method, **kwargs)
+        assert isinstance(evaluator, Evaluator)
+        return evaluator
 
 
 @cache  # Without the cache, repeated calls are very slow
