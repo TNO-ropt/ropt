@@ -865,9 +865,9 @@ def test_evaluator_cache_with_store(
     cached_evaluator = plugin_manager.evaluator(
         "cached_evaluator", evaluator=function_evaluator, sources={store}
     )
-    step = plan.add_step(
-        "optimizer", tags={"step"}, evaluator=cached_evaluator
-    ).add_event_handler(store)
+    step = plan.add_step("optimizer", evaluator=cached_evaluator).add_event_handler(
+        store
+    )
 
     assert isinstance(cached_evaluator, DefaultCachedEvaluator)
     monkeypatch.setattr(

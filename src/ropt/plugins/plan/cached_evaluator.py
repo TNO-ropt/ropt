@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Final
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.plugins.plan.base import Evaluator, EventHandler, PlanComponent
+from ropt.plugins.plan.base import Evaluator, EventHandler
 from ropt.results import FunctionResults
 
 if TYPE_CHECKING:
@@ -44,12 +44,7 @@ class DefaultCachedEvaluator(Evaluator):
     """
 
     def __init__(
-        self,
-        *,
-        evaluator: Evaluator,
-        tags: set[str] | None = None,
-        clients: set[PlanComponent | str] | None = None,
-        sources: list[EventHandler] | None = None,
+        self, *, evaluator: Evaluator, sources: list[EventHandler] | None = None
     ) -> None:
         """Initialize the DefaultCachedEvaluator.
 
@@ -58,12 +53,10 @@ class DefaultCachedEvaluator(Evaluator):
         `["results"]` attribute.
 
         Args:
-            tags:      Optional tags for this evaluator.
             evaluator: The evaluator to cache.
-            clients:   Plan components (steps or tags) this evaluator serves.
             sources:   `EventHandler` instances for retrieving cached results.
         """
-        super().__init__(tags=tags, clients=clients)
+        super().__init__()
         self._evaluator = evaluator
         self._sources: list[EventHandler] = [] if sources is None else sources
 

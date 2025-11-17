@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ropt.plugins.plan.base import Evaluator, PlanComponent
+from ropt.plugins.plan.base import Evaluator
 
 if TYPE_CHECKING:
     import numpy as np
@@ -27,26 +27,15 @@ class DefaultFunctionEvaluator(Evaluator):
 
     This is useful for integrating existing evaluation logic that is not already
     structured as an `Evaluator` subclass into a `ropt` plan.
-
-    The `clients` parameter acts as a filter, determining which plan steps this
-    evaluator should serve.
     """
 
-    def __init__(
-        self,
-        *,
-        tags: set[str] | None = None,
-        clients: set[PlanComponent | str] | None = None,
-        evaluator: EvaluatorCallback,
-    ) -> None:
+    def __init__(self, *, evaluator: EvaluatorCallback) -> None:
         """Initialize the DefaultFunctionEvaluator.
 
         Args:
-            tags:      Optional tags
-            clients:   The steps that are allowed to use this evaluator.
             evaluator: The callable that will perform the actual evaluation.
         """
-        super().__init__(tags=tags, clients=clients)
+        super().__init__()
         self._evaluator = evaluator
 
     def eval(

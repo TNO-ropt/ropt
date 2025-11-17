@@ -44,21 +44,14 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
       Emitted after the entire step, including result emission, is finished.
     """
 
-    def __init__(
-        self,
-        plan: Plan,
-        *,
-        evaluator: Evaluator,
-        tags: set[str] | None = None,
-    ) -> None:
+    def __init__(self, plan: Plan, *, evaluator: Evaluator) -> None:
         """Initialize a default evaluator step.
 
         Args:
             plan:      The plan that runs this step.
             evaluator: The evaluator object to run function evaluations.
-            tags:      Optional tags
         """
-        super().__init__(plan, tags=tags)
+        super().__init__(plan)
         self._evaluator = evaluator
 
     def run(

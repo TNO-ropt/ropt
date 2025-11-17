@@ -9,8 +9,6 @@ from typing import TYPE_CHECKING, Any, Self
 from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
-
     import numpy as np
     from numpy.typing import NDArray
 
@@ -37,9 +35,6 @@ class EventHandlerPlugin(Plugin):
     def create(
         cls,
         name: str,
-        *,
-        tags: set[str] | None = None,
-        sources: set[PlanComponent | str] | None = None,
         **kwargs: Any,  # noqa: ANN401
     ) -> EventHandler:
         """Create a EventHandler instance.
@@ -58,18 +53,6 @@ class EventHandlerPlugin(Plugin):
         Implementations can use this `name` to vary the created event handler if
         the plugin supports multiple event handler types.
 
-        The optional `tags` argument assigns the given string tags to the event
-        handler. Similar to its `id`, the `tags` can be used for identification.
-        However, unlike an `id`, a tag does not need to be unique, allowing
-        multiple components to be grouped under the same tag.
-
-        The `sources` parameter acts as a filter, determining which plan steps
-        this event handler should listen to. It should be a set containing the
-        `PlanStep` instances whose event you want to receive. When an event is
-        received, this event handler checks if the step that emitted the event
-        (`event.source`) is present in the `sources` set. If `sources` is
-        `None`, events from all sources will be processed.
-
         Any additional keyword arguments (`kwargs`) passed during the
         [`Plan.add_event_handler`][ropt.plan.Plan.add_event_handler] call are
         forwarded here, allowing for custom configuration of the event handler
@@ -77,8 +60,6 @@ class EventHandlerPlugin(Plugin):
 
         Args:
             name:    The requested event handler name (potentially plugin-specific).
-            tags:    Optional tags
-            sources: The steps whose events should be processed.
             kwargs:  Additional arguments for custom configuration.
 
         Returns:
@@ -104,8 +85,6 @@ class PlanStepPlugin(Plugin):
         cls,
         name: str,
         plan: Plan,
-        *,
-        tags: set[str] | None = None,
         **kwargs: Any,  # noqa: ANN401
     ) -> PlanStep:
         """Create a PlanStep instance.
@@ -124,11 +103,6 @@ class PlanStepPlugin(Plugin):
         Implementations can use this `name` to vary the created step if the
         plugin supports multiple step types.
 
-        The optional `tags` argument assigns the given string tags to the plan
-        step. Similar to its `id`, the `tags` can be used for identification.
-        However, unlike an `id`, a tag does not need to be unique, allowing
-        multiple components to be grouped under the same tag.
-
         Any additional keyword arguments (`kwargs`) passed during the
         [`Plan.add_step`][ropt.plan.Plan.add_step] call are forwarded here,
         allowing for custom configuration of the step instance.
@@ -136,7 +110,6 @@ class PlanStepPlugin(Plugin):
         Args:
             name:   The requested step name (potentially plugin-specific).
             plan:   The parent [`Plan`][ropt.plan.Plan] instance.
-            tags:   Optional tags
             kwargs: Additional arguments for custom configuration.
 
         Returns:
@@ -162,9 +135,6 @@ class EvaluatorPlugin(Plugin):
     def create(
         cls,
         name: str,
-        *,
-        tags: set[str] | None = None,
-        clients: set[PlanComponent | str] | None = None,
         **kwargs: Any,  # noqa: ANN401
     ) -> Evaluator:
         """Create an Evaluator instance.
@@ -182,21 +152,8 @@ class EvaluatorPlugin(Plugin):
         Implementations can use this `name` to vary the created evaluator if
         the plugin supports multiple evaluator types.
 
-        The optional `tags` argument assigns the given string tags to the
-        evaluator. Similar to its `id`, the `tags` can be used for
-        identification. However, unlike an `id`, a tag does not need to be
-        unique, allowing multiple components to be grouped under the same tag.
-
-        The `clients` parameter acts as a filter, determining which plan steps
-        this evaluator should serve. It should be a set containing the
-        `PlanStep` instances that should be handled. When an evaluation is
-        requested, this evaluator checks if the step  is present in the `client`
-        set.
-
         Args:
             name:    The requested evaluator name (potentially plugin-specific).
-            tags:    Optional tags
-            clients: The clients that should be served by this evaluator.
             kwargs:  Additional arguments for custom configuration.
 
         Returns:
@@ -212,19 +169,15 @@ class PlanComponent:
     [`Plan`][ropt.plan.Plan].
 
     Each `PlanComponent` is assigned a unique identifier (`id`) upon
-    initialization, an optional tag (`tag`).
+    initialization.
 
     """
 
-    def __init__(self, tags: set[str] | None) -> None:
+    def __init__(self) -> None:
         """Initialize the PlanComponent.
 
         This constructor is called by subclasses to set up common attributes.
-
-        Args:
-            tags: Optional tags
         """
-        self.__tags = set() if tags is None else tags
         self.__id: uuid.UUID = uuid.uuid4()
 
     @property
@@ -235,15 +188,6 @@ class PlanComponent:
             A UUID object representing the unique identifier of the component.
         """
         return self.__id
-
-    @property
-    def tags(self) -> set[str]:
-        """Return the optional tags.
-
-        Returns:
-            The tags.
-        """
-        return self.__tags
 
 
 class PlanStep(ABC, PlanComponent):
@@ -265,7 +209,7 @@ class PlanStep(ABC, PlanComponent):
     specific behavior.
     """
 
-    def __init__(self, plan: Plan, *, tags: set[str] | None = None) -> None:
+    def __init__(self, plan: Plan) -> None:
         """Initialize the PlanStep.
 
         Associates the step with its parent [`Plan`][ropt.plan.Plan] and assigns
@@ -273,9 +217,8 @@ class PlanStep(ABC, PlanComponent):
 
         Args:
             plan: The [`Plan`][ropt.plan.Plan] instance that owns this step.
-            tags: Optional tags
         """
-        super().__init__(tags)
+        super().__init__()
         self._plan = plan
         self._event_handlers: list[EventHandler] = []
 
@@ -356,52 +299,14 @@ class EventHandler(ABC, PlanComponent):
     define their specific event processing logic.
     """
 
-    def __init__(
-        self,
-        *,
-        tags: set[str] | None = None,
-        sources: set[PlanComponent | str] | None = None,
-    ) -> None:
+    def __init__(self) -> None:
         """Initialize the EventHandler.
 
         Assigns a unique ID and initializes an internal dictionary for storing
         state.
-
-        The `sources` parameter acts as a filter, determining which plan steps
-        this event handler should listen to. It should be a set containing the
-        components or tags that should be handled. When an event is received,
-        this event handler checks if the component, or one of its tag, is
-        present in the  `sources` set.
-
-        Args:
-            tags:    Optional tags
-            sources: Optional set of steps whose events should be processed.
         """
-        super().__init__(tags)
-        if sources is None:
-            sources = set()
-        for source in sources:
-            if not isinstance(source, PlanComponent | str):
-                msg = "A source must be plan component or a tag string."
-                raise TypeError(msg)
-        self._sources = (
-            {
-                source.id if isinstance(source, PlanComponent) else source
-                for source in sources
-            }
-            if sources is not None
-            else None
-        )
+        super().__init__()
         self.__stored_values: dict[str, Any] = {}
-
-    @property
-    def sources(self) -> set[uuid.UUID | str]:
-        """Return the source IDs or tags that are listened to.
-
-        Returns:
-            The source IDs or tags this event handler is interested in.
-        """
-        return self._sources
 
     @property
     @abstractmethod
@@ -485,35 +390,9 @@ class Evaluator(ABC, PlanComponent):
     [`EvaluatorResult`][ropt.evaluator.EvaluatorResult].
     """
 
-    def __init__(
-        self,
-        *,
-        tags: set[str] | None = None,
-        clients: set[PlanComponent | str] | None = None,
-    ) -> None:
-        """Initialize the Evaluator.
-
-        The `clients` parameter acts as a filter, determining which plan steps
-        this evaluator should serve. It should be a set containing the the
-        components or tags that should be handled. When an evaluation is
-        requested, this evaluator checks if the component, or one of its tags,
-        is present in the `client` set.
-
-        Args:
-            tags:    Optional tags
-            clients: The steps that use this evaluator.
-        """
-        super().__init__(tags)
-        if clients is None:
-            clients = set()
-        for client in clients:
-            if not isinstance(client, PlanComponent | str):
-                msg = "A client must be plan component or a tag string."
-                raise TypeError(msg)
-        self.__clients = {
-            client.id if isinstance(client, PlanComponent) else client
-            for client in clients
-        }
+    def __init__(self) -> None:
+        """Initialize the Evaluator."""
+        super().__init__()
 
     @abstractmethod
     def eval(
@@ -547,57 +426,3 @@ class Evaluator(ABC, PlanComponent):
             results of the realizations once and return them for both
             objectives.
         """
-
-    @property
-    def clients(self) -> set[uuid.UUID | str]:
-        """Return the client IDs or tags that are served.
-
-        Returns:
-            The IDs of the clients, or the tags, this evaluator will handle.
-        """
-        return self.__clients
-
-    def add_clients(
-        self,
-        clients: PlanComponent
-        | str
-        | Sequence[PlanComponent | str]
-        | set[PlanComponent | str],
-    ) -> None:
-        """Add one or more clients to the evaluator.
-
-        Args:
-            clients: The clients to add.
-        """
-        clients = (
-            [clients] if isinstance(clients, PlanComponent | str) else list(clients)
-        )
-        for client in clients:
-            if not isinstance(client, PlanComponent | str):
-                msg = "A client must be plan component or a tag string."
-                raise TypeError(msg)
-            id_ = client.id if isinstance(client, PlanComponent) else client
-            self.__clients.add(id_)
-
-    def remove_clients(
-        self,
-        clients: PlanComponent
-        | str
-        | Sequence[PlanComponent | str]
-        | set[PlanComponent | str],
-    ) -> None:
-        """Remove one or more clients from the evaluator.
-
-        Args:
-            clients: The clients to remove.
-        """
-        clients = (
-            [clients] if isinstance(clients, PlanComponent | str) else list(clients)
-        )
-        for client in clients:
-            if not isinstance(client, PlanComponent | str):
-                msg = "A client must be plan component or a tag string."
-                raise TypeError(msg)
-            id_ = client.id if isinstance(client, PlanComponent) else client
-            if id_ in self.__clients:
-                self.__clients.remove(id_)

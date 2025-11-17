@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Literal, assert_never
 
 from ropt.enums import EventType
-from ropt.plugins.plan.base import EventHandler, PlanComponent
+from ropt.plugins.plan.base import EventHandler
 
 from ._utils import _get_last_result, _update_optimal_result
 
@@ -19,7 +19,7 @@ class DefaultTrackerHandler(EventHandler):
 
     This event handler listens for
     [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events
-    emitted by specified `sources` (plan steps). It processes the
+    emitted by specified steps. It processes the
     [`Results`][ropt.results.Results] objects contained within these events and
     selects a single [`FunctionResults`][ropt.results.FunctionResults] object to
     retain based on defined criteria.
@@ -41,8 +41,6 @@ class DefaultTrackerHandler(EventHandler):
 
     def __init__(
         self,
-        tags: set[str] | None = None,
-        sources: set[PlanComponent | str] | None = None,
         *,
         what: Literal["best", "last"] = "best",
         constraint_tolerance: float | None = None,
@@ -50,7 +48,7 @@ class DefaultTrackerHandler(EventHandler):
         """Initialize a default tracker event handler.
 
         This event handler monitors [`Results`][ropt.results.Results] objects
-        from specified `sources` (plan steps) and selects a single
+        from specified `steps and selects a single
         [`FunctionResults`][ropt.results.FunctionResults] object to retain based
         on the `what` criterion ('best' or 'last').
 
@@ -60,9 +58,6 @@ class DefaultTrackerHandler(EventHandler):
         `constraint_tolerance` to ignore those violating constraints beyond the
         specified threshold.
 
-        The `sources` parameter acts as a filter, determining which plan steps
-        this event handler should listen to.
-
         Tracking logic (comparing 'best' or selecting 'last') operates on the
         results in the optimizer's domain. However, the final selected result
         that is made accessible via dictionary access (`handler["results"]`) is
@@ -70,12 +65,10 @@ class DefaultTrackerHandler(EventHandler):
 
         Args:
             plan:                 The parent plan instance.
-            tags:                 Optional tags
             what:                 Criterion for selecting results ('best' or 'last').
             constraint_tolerance: Optional threshold for filtering constraint violations.
-            sources:              Optional set of steps whose results should be tracked.
         """
-        super().__init__(tags=tags, sources=sources)
+        super().__init__()
         self._what = what
         self._constraint_tolerance = constraint_tolerance
         self._tracked_results: FunctionResults | None = None
@@ -87,8 +80,7 @@ class DefaultTrackerHandler(EventHandler):
         This method processes events emitted by the parent plan. It specifically
         listens for
         [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events
-        originating from steps that are included in the `sources` set configured
-        during initialization.
+        originating from steps that are included in the connected steps.
 
         If a relevant event containing results is received, this method updates
         the tracked result (`self["results"]`) based on the `what` criterion

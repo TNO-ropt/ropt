@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ropt.plugins.plan.base import EventHandler, PlanComponent
+from ropt.plugins.plan.base import EventHandler
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -16,47 +16,31 @@ if TYPE_CHECKING:
 class DefaultObserverHandler(EventHandler):
     """The default event handler for observing events.
 
-    This event handler listens for events emitted by specified `sources` (plan
-    steps) and forwards them to one or more callback functions.
-
-    The `sources` parameter filters which events are observed.
+    This event handler listens for events emitted by specified steps and
+    forwards them to one or more callback functions.
     """
 
     def __init__(
-        self,
-        *,
-        tags: set[str] | None = None,
-        sources: set[PlanComponent | str] | None = None,
-        event_types: set[EventType],
-        callback: Callable[[Event], None],
+        self, *, event_types: set[EventType], callback: Callable[[Event], None]
     ) -> None:
         """Initialize a default event handler.
 
         This event handler responds to events received from specified `sources` (plan
         steps) and calls `callback` if the event type matches `event_types`.
 
-        The `sources` parameter acts as a filter, determining which plan steps
-        this event handler should listen to. If the event type
-        (event.event_type) is present in the `event_types` set, the handler will
-        call `callback`; otherwise, it ignores the event.
-
         Args:
             plan:        The parent plan instance.
-            tags:        Optional tags
-            sources:     Optional set of steps whose results should be stored.
             event_types: The set of event types  to respond to.
             callback:    The callable to call.
         """
-        super().__init__(tags=tags, sources=sources)
+        super().__init__()
         self._event_types = event_types
         self._callback = callback
 
     def handle_event(self, event: Event) -> None:
         """Handle incoming events from the plan.
 
-        This method processes events emitted by the parent plan. It specifically
-        listens for events originating from steps that are included in the
-        `sources` set configured during initialization.
+        This method processes events emitted by a step.
 
         If a event containing results is received, and its type equals the
         stored event type, the stored callback is called.

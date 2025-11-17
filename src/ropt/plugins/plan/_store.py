@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ropt.enums import EventType
-from ropt.plugins.plan.base import EventHandler, PlanComponent
+from ropt.plugins.plan.base import EventHandler
 
 if TYPE_CHECKING:
     from ropt.plan import Event
@@ -16,32 +16,24 @@ class DefaultStoreHandler(EventHandler):
 
     This event handler listens for
     [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events
-    emitted by specified `sources` (plan steps). It collects all
+    emitted by specified steps. It collects all
     [`Results`][ropt.results.Results] objects contained within these events and
     stores them sequentially in memory.
 
-    The `sources` parameter filters which steps' results are collected. The
-    accumulated results are stored as a tuple and can be accessed via dictionary
-    access using the key `"results"` (e.g., `handler["results"]`). Each time new
-    results are received from a valid source, they are appended to this tuple.
+    The accumulated results are stored as a tuple and can be accessed via
+    dictionary access using the key `"results"` (e.g., `handler["results"]`).
+    Each time new results are received from a valid source, they are appended to
+    this tuple.
     """
 
-    def __init__(
-        self,
-        *,
-        tags: set[str] | None = None,
-        sources: set[PlanComponent | str] | None = None,
-    ) -> None:
+    def __init__(self) -> None:
         """Initialize a default store event handler.
 
         This event handler collects and stores all
-        [`Results`][ropt.results.Results] objects received from specified
-        `sources` (plan steps). It listens for
+        [`Results`][ropt.results.Results] objects received from specified steps.
+        It listens for
         [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events
         and appends the results contained within them to an internal tuple.
-
-        The `sources` parameter acts as a filter, determining which plan steps
-        or tags this event handler should listen to.
 
         The results are converted from the optimizer domain to the user domain
         *before* being stored. The accumulated results are stored as a tuple and
@@ -50,10 +42,8 @@ class DefaultStoreHandler(EventHandler):
 
         Args:
             plan:       The parent plan instance.
-            tags:       Optional tags
-            sources:    Optional set of steps whose results should be stored.
         """
-        super().__init__(tags=tags, sources=sources)
+        super().__init__()
         self["results"] = None
 
     def handle_event(self, event: Event) -> None:
@@ -62,8 +52,7 @@ class DefaultStoreHandler(EventHandler):
         This method processes events emitted by the parent plan. It specifically
         listens for
         [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events
-        originating from steps that are included in the `sources` set configured
-        during initialization.
+        originating from steps that are connected to the handler.
 
         If a relevant event containing results is received, this method
         retrieves the results, optionally transforms them to the user domain and

@@ -35,19 +35,6 @@ class Plan:
         [`add_evaluator`][ropt.plan.Plan.add_evaluator] method and can be
         passed to steps that need them.
 
-    **Tags:**
-
-    Steps, event handlers, and evaluators can be assigned one or more tags.
-    These tags can be used to identify the components instead of their unique
-    IDs. Unlike ID's, tags do not need to be unique. This is useful when the
-    components are created dynamically or if multiple components are to be
-    identified as a group. For example, when specifying the source of events
-    that a handler should process, its `sources` argument may contain both
-    component objects, which identifies by their ID, or tags, which could refer
-    to multiple components that have that tag.
-
-    **Executing a Plan:**
-
     Once a plan is assembled, the [`run`][ropt.plugins.plan.base.PlanStep.run]
     method can be invoked for each step individually. This approach allows for
     the integration of complex logic and custom functions, leveraging the full
@@ -65,20 +52,15 @@ class Plan:
     Steps can communicate events by retrieving a list of handlers using the
     [`event_handlers`][ropt.plan.Plan.event_handlers] property. Event handlers
     can respond to these events, enabling actions such as processing
-    optimization results. Event handlers are added to the plan using the
-    [`add_event_handler`][ropt.plan.Plan.add_event_handler] method. To connect
-    the event handlers to steps, they generally accept a set of steps via the
-    `sources` argument. The steps must be part of the same plan, or a child plan
-    (if existent).
+    optimization results. Event handlers are added to a step using the
+    [`add_event_handler`][ropt.plan.Plan.add_event_handler] method.
 
     **Evaluators:**
 
     Evaluators ([`Evaluator`][ropt.plugins.plan.base.Evaluator]) are key
     components responsible for performing function evaluations, such as
     computing objective functions or constraint values. They are added to the
-    plan using the [`add_evaluator`][ropt.plan.Plan.add_evaluator] method. They
-    connect to the steps in the plan, or in child plans, via the `clients`
-    argument.
+    step using the [`add_evaluator`][ropt.plan.Plan.add_evaluator] method.
 
     **Nested Plans:**
 
@@ -122,8 +104,6 @@ class Plan:
     def add_step(
         self,
         name: str,
-        *,
-        tags: set[str] | None = None,
         **kwargs: Any,  # noqa: ANN401
     ) -> PlanStep:
         """Add a step to the plan.
@@ -135,14 +115,13 @@ class Plan:
 
         Args:
             name:   The name of the step to add.
-            tags:   Optional tags
             kwargs: Additional arguments for the step's constructor.
 
         Returns:
             The newly added step.
         """
         step = self._plugin_manager.get_plugin("plan_step", method=name).create(
-            name, self, tags=tags, **kwargs
+            name, self, **kwargs
         )
         assert isinstance(step, PlanStep)
         return step
