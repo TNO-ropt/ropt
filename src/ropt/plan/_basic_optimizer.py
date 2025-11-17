@@ -18,8 +18,6 @@ from ropt.enums import EventType, ExitCode
 from ropt.exceptions import StepAborted
 from ropt.plugins import PluginManager
 
-from ._plan import Plan
-
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
@@ -241,10 +239,8 @@ class BasicOptimizer:
         Returns:
             The `BasicOptimizer` instance, allowing for method chaining.
         """
-        plan = Plan(self._plugin_manager)
-
         # Optionally run a custom step defined via the environment:
-        custom_function = self._get_custom_run_step(plan)
+        custom_function = self._get_custom_run_step()
 
         if custom_function is None:
             evaluator = self._plugin_manager.evaluator(
@@ -254,8 +250,8 @@ class BasicOptimizer:
                 "tracker",
                 constraint_tolerance=self._constraint_tolerance,
             )
-            optimizer = plan.add_step(
-                "optimizer", evaluator=evaluator
+            optimizer = self._plugin_manager.step(
+                "optimizer", evaluator=evaluator, plugin_manager=self._plugin_manager
             ).add_event_handler(tracker)
             for event_type, function in self._observers:
                 optimizer.add_event_handler(
@@ -276,7 +272,7 @@ class BasicOptimizer:
             results = tracker["results"]
             variables = None if results is None else results.evaluations.variables
         else:
-            exit_code = custom_function(plan)
+            exit_code = custom_function()
             results = None
             variables = None
 
@@ -345,13 +341,13 @@ class BasicOptimizer:
         self._observers.append((EventType.FINISHED_EVALUATION, _results_callback))
         return self
 
-    def _get_custom_run_step(self, plan: Plan) -> Callable[[Plan], ExitCode] | None:
+    def _get_custom_run_step(self) -> Callable[[], ExitCode] | None:
         if "ROPT_SCRIPT" in os.environ:
             plan_step, sep, script = os.environ["ROPT_SCRIPT"].partition("=")
             if not sep:
                 plan_step, script = "run_plan", plan_step
             if self._plugin_manager.get_plugin_name("plan_step", plan_step) is not None:
-                step: Callable[[Plan], ExitCode] = plan.add_step(plan_step).run(
+                step: Callable[[], ExitCode] = self._plugin_manager.step(plan_step).run(
                     evaluator=self._evaluator, script=script
                 )
                 return step

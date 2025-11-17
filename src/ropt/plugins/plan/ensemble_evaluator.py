@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ropt.config import EnOptConfig
-    from ropt.plan import Plan
+    from ropt.plugins import PluginManager
     from ropt.transforms import OptModelTransforms
 
 
@@ -44,15 +44,16 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
       Emitted after the entire step, including result emission, is finished.
     """
 
-    def __init__(self, plan: Plan, *, evaluator: Evaluator) -> None:
+    def __init__(self, *, evaluator: Evaluator, plugin_manager: PluginManager) -> None:
         """Initialize a default evaluator step.
 
         Args:
-            plan:      The plan that runs this step.
-            evaluator: The evaluator object to run function evaluations.
+            evaluator:      The evaluator object to run function evaluations.
+            plugin_manager: The plugin manager used to retrieve optimizer components
         """
-        super().__init__(plan)
+        super().__init__()
         self._evaluator = evaluator
+        self._plugin_manager = plugin_manager
 
     def run(
         self,
@@ -97,7 +98,7 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
             variables = transforms.variables.to_optimizer(variables)
 
         ensemble_evaluator = EnsembleEvaluator(
-            config, transforms, self._evaluator.eval, self.plan.plugin_manager
+            config, transforms, self._evaluator.eval, self._plugin_manager
         )
 
         exit_code = ExitCode.EVALUATOR_STEP_FINISHED

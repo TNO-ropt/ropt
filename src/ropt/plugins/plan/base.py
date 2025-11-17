@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
     from ropt.enums import EventType
     from ropt.evaluator import EvaluatorContext, EvaluatorResult
-    from ropt.plan import Event, Plan
+    from ropt.plan import Event
 
 
 class EventHandlerPlugin(Plugin):
@@ -84,7 +84,6 @@ class PlanStepPlugin(Plugin):
     def create(
         cls,
         name: str,
-        plan: Plan,
         **kwargs: Any,  # noqa: ANN401
     ) -> PlanStep:
         """Create a PlanStep instance.
@@ -109,7 +108,6 @@ class PlanStepPlugin(Plugin):
 
         Args:
             name:   The requested step name (potentially plugin-specific).
-            plan:   The parent [`Plan`][ropt.plan.Plan] instance.
             kwargs: Additional arguments for custom configuration.
 
         Returns:
@@ -209,7 +207,7 @@ class PlanStep(ABC, PlanComponent):
     specific behavior.
     """
 
-    def __init__(self, plan: Plan) -> None:
+    def __init__(self) -> None:
         """Initialize the PlanStep.
 
         Associates the step with its parent [`Plan`][ropt.plan.Plan] and assigns
@@ -219,17 +217,7 @@ class PlanStep(ABC, PlanComponent):
             plan: The [`Plan`][ropt.plan.Plan] instance that owns this step.
         """
         super().__init__()
-        self._plan = plan
         self._event_handlers: list[EventHandler] = []
-
-    @property
-    def plan(self) -> Plan:
-        """Return the parent plan associated with this component.
-
-        Returns:
-            The [`Plan`][ropt.plan.Plan] object that owns this component.
-        """
-        return self._plan
 
     def add_event_handler(self, handler: EventHandler) -> Self:
         """Add a handler.

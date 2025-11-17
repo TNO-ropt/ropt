@@ -11,7 +11,7 @@ from numpy.typing import NDArray  # noqa: TC002
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, ExitCode
 from ropt.optimization import EnsembleOptimizer
-from ropt.plan import Event, Plan
+from ropt.plan import Event
 from ropt.plugins.plan.base import Evaluator, PlanStep
 from ropt.results import FunctionResults
 
@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ropt.config import EnOptConfig
+    from ropt.plugins import PluginManager
     from ropt.results import Results
     from ropt.transforms import OptModelTransforms
 
@@ -91,15 +92,16 @@ class DefaultOptimizerStep(PlanStep):
     [`FunctionResults`][ropt.results.FunctionResults] object.
     """
 
-    def __init__(self, plan: Plan, *, evaluator: Evaluator) -> None:
+    def __init__(self, *, evaluator: Evaluator, plugin_manager: PluginManager) -> None:
         """Initialize a default optimizer step.
 
         Args:
-            plan:      The plan that runs this step.
-            evaluator: The evaluator object to run function evaluations.
+            evaluator:      The evaluator object to run function evaluations.
+            plugin_manager: The plugin manager used to retrieve optimizer components
         """
-        super().__init__(plan)
+        super().__init__()
         self._evaluator = evaluator
+        self._plugin_manager = plugin_manager
 
     def run(
         self,
@@ -165,14 +167,14 @@ class DefaultOptimizerStep(PlanStep):
             self._config,
             self._transforms,
             self._evaluator.eval,
-            self.plan.plugin_manager,
+            self._plugin_manager,
         )
 
         ensemble_optimizer = EnsembleOptimizer(
             enopt_config=self._config,
             transforms=self._transforms,
             ensemble_evaluator=ensemble_evaluator,
-            plugin_manager=self.plan.plugin_manager,
+            plugin_manager=self._plugin_manager,
             nested_optimizer=(
                 self._run_nested_optimization
                 if self._nested_optimization is not None

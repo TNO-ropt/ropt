@@ -43,7 +43,6 @@ from .ensemble_evaluator import DefaultEnsembleEvaluatorStep
 from .optimizer import DefaultOptimizerStep
 
 if TYPE_CHECKING:
-    from ropt.plan import Plan
     from ropt.plugins.plan.base import Evaluator, EventHandler, PlanStep
 
 _STEP_OBJECTS: Final[dict[str, type[PlanStep]]] = {
@@ -136,7 +135,6 @@ class DefaultPlanStepPlugin(PlanStepPlugin):
     def create(
         cls,
         name: str,
-        plan: Plan,
         **kwargs: Any,  # noqa: ANN401
     ) -> PlanStep:
         """Create a step.
@@ -148,7 +146,7 @@ class DefaultPlanStepPlugin(PlanStepPlugin):
         _, _, name = name.lower().rpartition("/")
         step_obj = _STEP_OBJECTS.get(name)
         if step_obj is not None:
-            return step_obj(plan, **kwargs)
+            return step_obj(**kwargs)
 
         msg = f"Unknown step type: {name}"
         raise TypeError(msg)

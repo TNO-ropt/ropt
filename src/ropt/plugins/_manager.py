@@ -13,6 +13,7 @@ from .plan.base import (
     EvaluatorPlugin,
     EventHandler,
     EventHandlerPlugin,
+    PlanStep,
     PlanStepPlugin,
 )
 from .realization_filter.base import RealizationFilterPlugin
@@ -241,6 +242,17 @@ class PluginManager:
         )
         assert isinstance(handler, EventHandler)
         return handler
+
+    def step(self, method: str, **kwargs: Any) -> PlanStep:  # noqa: ANN401
+        """Create a new plan step.
+
+        Args:
+            method: The method string to find the step.
+            kwargs: Optional keyword arguments passed to the step init.
+        """
+        step = self.get_plugin("plan_step", method=method).create(method, **kwargs)
+        assert isinstance(step, PlanStep)
+        return step
 
 
 @cache  # Without the cache, repeated calls are very slow

@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
-
-from ropt.plugins.plan.base import PlanStep
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ropt.plugins import PluginManager
@@ -100,28 +98,3 @@ class Plan:
             The plugin manager stored by the plan.
         """
         return self._plugin_manager
-
-    def add_step(
-        self,
-        name: str,
-        **kwargs: Any,  # noqa: ANN401
-    ) -> PlanStep:
-        """Add a step to the plan.
-
-        Registers a step with the plan. The step's type is determined by the
-        provided `name`, which the plugin system uses to locate the
-        corresponding step class. Any additional keyword arguments are passed to
-        the step's constructor.
-
-        Args:
-            name:   The name of the step to add.
-            kwargs: Additional arguments for the step's constructor.
-
-        Returns:
-            The newly added step.
-        """
-        step = self._plugin_manager.get_plugin("plan_step", method=name).create(
-            name, self, **kwargs
-        )
-        assert isinstance(step, PlanStep)
-        return step
