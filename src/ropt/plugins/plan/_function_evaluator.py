@@ -11,7 +11,6 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.evaluator import EvaluatorCallback, EvaluatorContext, EvaluatorResult
-    from ropt.plan import Plan
 
 
 class DefaultFunctionEvaluator(Evaluator):
@@ -35,7 +34,6 @@ class DefaultFunctionEvaluator(Evaluator):
 
     def __init__(
         self,
-        plan: Plan,
         *,
         tags: set[str] | None = None,
         clients: set[PlanComponent | str] | None = None,
@@ -44,12 +42,11 @@ class DefaultFunctionEvaluator(Evaluator):
         """Initialize the DefaultFunctionEvaluator.
 
         Args:
-            plan:      The plan instance this evaluator belongs to.
             tags:      Optional tags
             clients:   The steps that are allowed to use this evaluator.
             evaluator: The callable that will perform the actual evaluation.
         """
-        super().__init__(plan, tags=tags, clients=clients)
+        super().__init__(tags=tags, clients=clients)
         self._evaluator = evaluator
 
     def eval(

@@ -252,7 +252,7 @@ class Plan:
             The new evaluator object.
         """
         evaluator = self._plugin_manager.get_plugin("evaluator", method=name).create(
-            name, self, tags=tags, clients=clients, **kwargs
+            name, tags=tags, clients=clients, **kwargs
         )
         assert isinstance(evaluator, Evaluator)
         self._evaluators.append(evaluator)

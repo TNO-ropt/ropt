@@ -16,7 +16,6 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.evaluator import EvaluatorContext, EvaluatorResult
-    from ropt.plan import Plan
 
 
 class DefaultCachedEvaluator(Evaluator):
@@ -46,8 +45,8 @@ class DefaultCachedEvaluator(Evaluator):
 
     def __init__(
         self,
-        plan: Plan,
         *,
+        evaluator: Evaluator,
         tags: set[str] | None = None,
         clients: set[PlanComponent | str] | None = None,
         sources: list[EventHandler] | None = None,
@@ -59,12 +58,13 @@ class DefaultCachedEvaluator(Evaluator):
         `["results"]` attribute.
 
         Args:
-            plan:    The parent plan instance.
-            tags:    Optional tags for this evaluator.
-            clients: Plan components (steps or tags) this evaluator serves.
-            sources: `EventHandler` instances for retrieving cached results.
+            tags:      Optional tags for this evaluator.
+            evaluator: The evaluator to cache.
+            clients:   Plan components (steps or tags) this evaluator serves.
+            sources:   `EventHandler` instances for retrieving cached results.
         """
-        super().__init__(plan, tags=tags, clients=clients)
+        super().__init__(tags=tags, clients=clients)
+        self._evaluator = evaluator
         self._sources: list[EventHandler] = [] if sources is None else sources
 
     def eval_cached(
@@ -128,18 +128,7 @@ class DefaultCachedEvaluator(Evaluator):
         if cached:
             context.active[list(cached.keys())] = False
 
-        evaluator = next(
-            (
-                item
-                for item in self.plan.evaluators
-                if self.id in item.clients or self.tags & item.clients
-            ),
-            None,
-        )
-        if evaluator is None:
-            msg = "No suitable evaluator found."
-            raise AttributeError(msg)
-        evaluator_result = evaluator.eval(variables, context)
+        evaluator_result = self._evaluator.eval(variables, context)
 
         for idx, (realization, item) in cached.items():
             objectives = item.evaluations.objectives
@@ -161,10 +150,10 @@ class DefaultCachedEvaluator(Evaluator):
         `sources`.
 
         If a result is found in the cache, it's used directly. If not, the
-        evaluation is delegated to the next evaluator in the plan.
-        The `context.active` array is updated to indicate to the subsequent
-        evaluator which evaluations are still pending; evaluations found in
-        the cache are marked as inactive.
+        evaluation is delegated to the stored evaluator. The `context.active`
+        array is updated to indicate to the subsequent evaluator which
+        evaluations are still pending; evaluations found in the cache are marked
+        as inactive.
 
         Args:
             variables: Matrix of variables to evaluate (each row is a vector).

@@ -193,7 +193,6 @@ class DefaultEvaluatorPlugin(EvaluatorPlugin):
     def create(
         cls,
         name: str,
-        plan: Plan,
         *,
         tags: set[str] | None = None,
         clients: set[PlanComponent | str] | None = None,
@@ -208,7 +207,7 @@ class DefaultEvaluatorPlugin(EvaluatorPlugin):
         _, _, name = name.lower().rpartition("/")
         evaluator_obj = _EVALUATOR_OBJECTS.get(name)
         if evaluator_obj is not None:
-            return evaluator_obj(plan, tags=tags, clients=clients, **kwargs)
+            return evaluator_obj(tags=tags, clients=clients, **kwargs)
 
         msg = f"Unknown evaluator type: {name}"
         raise TypeError(msg)

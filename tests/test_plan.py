@@ -789,19 +789,23 @@ def test_evaluator_cache(
     plan = Plan(PluginManager())
     step = plan.add_step("optimizer")
     tracker = plan.add_event_handler("tracker", sources={step}, what="last")
+
+    function_evaluator = plan.add_evaluator(
+        "function_evaluator",
+        evaluator=evaluator((_test_function1, test_functions[1])),
+        clients={"cached_evaluator"},
+    )
     cached_evaluator = plan.add_evaluator(
-        "cached_evaluator", clients={step}, sources={tracker}
+        "cached_evaluator",
+        clients={step},
+        sources={tracker},
+        evaluator=function_evaluator,
+        tags={"cached_evaluator"},
     )
 
     assert isinstance(cached_evaluator, DefaultCachedEvaluator)
     monkeypatch.setattr(
         cached_evaluator, "eval", partial(_cached_eval, cached_evaluator)
-    )
-
-    plan.add_evaluator(
-        "function_evaluator",
-        evaluator=evaluator((_test_function1, test_functions[1])),
-        clients={cached_evaluator},
     )
     plan.add_event_handler(
         "observer",
@@ -846,19 +850,22 @@ def test_evaluator_cache_with_store(
     plan = Plan(PluginManager())
     step = plan.add_step("optimizer")
     store = plan.add_event_handler("store", sources={step})
+    function_evaluator = plan.add_evaluator(
+        "function_evaluator",
+        evaluator=evaluator((_test_function1, test_functions[1])),
+        clients={"cached_evaluator"},
+    )
     cached_evaluator = plan.add_evaluator(
-        "cached_evaluator", clients={step}, sources={store}
+        "cached_evaluator",
+        evaluator=function_evaluator,
+        clients={step},
+        sources={store},
+        tags={"cached_evaluator"},
     )
 
     assert isinstance(cached_evaluator, DefaultCachedEvaluator)
     monkeypatch.setattr(
         cached_evaluator, "eval", partial(_cached_eval, cached_evaluator)
-    )
-
-    plan.add_evaluator(
-        "function_evaluator",
-        evaluator=evaluator((_test_function1, test_functions[1])),
-        clients={cached_evaluator},
     )
 
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))

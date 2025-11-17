@@ -162,7 +162,6 @@ class EvaluatorPlugin(Plugin):
     def create(
         cls,
         name: str,
-        plan: Plan,
         *,
         tags: set[str] | None = None,
         clients: set[PlanComponent | str] | None = None,
@@ -196,7 +195,6 @@ class EvaluatorPlugin(Plugin):
 
         Args:
             name:    The requested evaluator name (potentially plugin-specific).
-            plan:    The parent [`Plan`][ropt.plan.Plan] instance.
             tags:    Optional tags
             clients: The clients that should be served by this evaluator.
             kwargs:  Additional arguments for custom configuration.
@@ -474,16 +472,11 @@ class Evaluator(ABC, PlanComponent):
 
     def __init__(
         self,
-        plan: Plan,
         *,
         tags: set[str] | None = None,
         clients: set[PlanComponent | str] | None = None,
     ) -> None:
         """Initialize the Evaluator.
-
-        Associates the evaluator with its parent [`Plan`][ropt.plan.Plan], and
-        assigns a unique ID. The parent plan is accessible via the `plan`
-        property.
 
         The `clients` parameter acts as a filter, determining which plan steps
         this evaluator should serve. It should be a set containing the the
@@ -492,11 +485,10 @@ class Evaluator(ABC, PlanComponent):
         is present in the `client` set.
 
         Args:
-            plan:    The [`Plan`][ropt.plan.Plan] instance that owns this evaluator.
             tags:    Optional tags
             clients: The steps that use this evaluator.
         """
-        super().__init__(plan, tags)
+        super().__init__(None, tags)
         if clients is None:
             clients = set()
         for client in clients:
