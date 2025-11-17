@@ -24,9 +24,9 @@ class DefaultObserverHandler(EventHandler):
 
     def __init__(
         self,
+        *,
         tags: set[str] | None = None,
         sources: set[PlanComponent | str] | None = None,
-        *,
         event_types: set[EventType],
         callback: Callable[[Event], None],
     ) -> None:
@@ -47,7 +47,7 @@ class DefaultObserverHandler(EventHandler):
             event_types: The set of event types  to respond to.
             callback:    The callable to call.
         """
-        super().__init__(tags, sources)
+        super().__init__(tags=tags, sources=sources)
         self._event_types = event_types
         self._callback = callback
 

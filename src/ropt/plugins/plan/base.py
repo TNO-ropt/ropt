@@ -37,6 +37,7 @@ class EventHandlerPlugin(Plugin):
     def create(
         cls,
         name: str,
+        *,
         tags: set[str] | None = None,
         sources: set[PlanComponent | str] | None = None,
         **kwargs: Any,  # noqa: ANN401
@@ -103,6 +104,7 @@ class PlanStepPlugin(Plugin):
         cls,
         name: str,
         plan: Plan,
+        *,
         tags: set[str] | None = None,
         **kwargs: Any,  # noqa: ANN401
     ) -> PlanStep:
@@ -161,6 +163,7 @@ class EvaluatorPlugin(Plugin):
         cls,
         name: str,
         plan: Plan,
+        *,
         tags: set[str] | None = None,
         clients: set[PlanComponent | str] | None = None,
         **kwargs: Any,  # noqa: ANN401
@@ -279,7 +282,7 @@ class PlanStep(ABC, PlanComponent):
     specific behavior.
     """
 
-    def __init__(self, plan: Plan, tags: set[str] | None = None) -> None:
+    def __init__(self, plan: Plan, *, tags: set[str] | None = None) -> None:
         """Initialize the PlanStep.
 
         Associates the step with its parent [`Plan`][ropt.plan.Plan] and assigns
@@ -342,6 +345,7 @@ class EventHandler(ABC, PlanComponent):
 
     def __init__(
         self,
+        *,
         tags: set[str] | None = None,
         sources: set[PlanComponent | str] | None = None,
     ) -> None:
@@ -471,6 +475,7 @@ class Evaluator(ABC, PlanComponent):
     def __init__(
         self,
         plan: Plan,
+        *,
         tags: set[str] | None = None,
         clients: set[PlanComponent | str] | None = None,
     ) -> None:

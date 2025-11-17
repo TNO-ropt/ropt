@@ -36,9 +36,9 @@ class DefaultFunctionEvaluator(Evaluator):
     def __init__(
         self,
         plan: Plan,
+        *,
         tags: set[str] | None = None,
         clients: set[PlanComponent | str] | None = None,
-        *,
         evaluator: EvaluatorCallback,
     ) -> None:
         """Initialize the DefaultFunctionEvaluator.
@@ -49,7 +49,7 @@ class DefaultFunctionEvaluator(Evaluator):
             clients:   The steps that are allowed to use this evaluator.
             evaluator: The callable that will perform the actual evaluation.
         """
-        super().__init__(plan, tags, clients)
+        super().__init__(plan, tags=tags, clients=clients)
         self._evaluator = evaluator
 
     def eval(

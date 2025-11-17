@@ -75,7 +75,7 @@ class DefaultTrackerHandler(EventHandler):
             constraint_tolerance: Optional threshold for filtering constraint violations.
             sources:              Optional set of steps whose results should be tracked.
         """
-        super().__init__(tags, sources)
+        super().__init__(tags=tags, sources=sources)
         self._what = what
         self._constraint_tolerance = constraint_tolerance
         self._tracked_results: FunctionResults | None = None

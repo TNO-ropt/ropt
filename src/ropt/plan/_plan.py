@@ -159,6 +159,7 @@ class Plan:
     def add_event_handler(
         self,
         name: str,
+        *,
         tags: set[str] | None = None,
         sources: set[PlanComponent | str] | None = None,
         **kwargs: Any,  # noqa: ANN401
@@ -187,7 +188,7 @@ class Plan:
             The newly added event handler.
         """
         handler = self._plugin_manager.get_plugin("event_handler", method=name).create(
-            name, tags, sources, **kwargs
+            name, tags=tags, sources=sources, **kwargs
         )
         assert isinstance(handler, EventHandler)
         self._handlers.append(handler)
@@ -196,6 +197,7 @@ class Plan:
     def add_step(
         self,
         name: str,
+        *,
         tags: set[str] | None = None,
         **kwargs: Any,  # noqa: ANN401
     ) -> PlanStep:
@@ -215,7 +217,7 @@ class Plan:
             The newly added step.
         """
         step = self._plugin_manager.get_plugin("plan_step", method=name).create(
-            name, self, tags, **kwargs
+            name, self, tags=tags, **kwargs
         )
         assert isinstance(step, PlanStep)
         return step
@@ -223,6 +225,7 @@ class Plan:
     def add_evaluator(
         self,
         name: str,
+        *,
         tags: set[str] | None = None,
         clients: set[PlanComponent | str] | None = None,
         **kwargs: Any,  # noqa: ANN401
@@ -249,7 +252,7 @@ class Plan:
             The new evaluator object.
         """
         evaluator = self._plugin_manager.get_plugin("evaluator", method=name).create(
-            name, self, tags, clients, **kwargs
+            name, self, tags=tags, clients=clients, **kwargs
         )
         assert isinstance(evaluator, Evaluator)
         self._evaluators.append(evaluator)

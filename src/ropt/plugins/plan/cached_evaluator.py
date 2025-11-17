@@ -47,9 +47,9 @@ class DefaultCachedEvaluator(Evaluator):
     def __init__(
         self,
         plan: Plan,
+        *,
         tags: set[str] | None = None,
         clients: set[PlanComponent | str] | None = None,
-        *,
         sources: list[EventHandler] | None = None,
     ) -> None:
         """Initialize the DefaultCachedEvaluator.
@@ -64,7 +64,7 @@ class DefaultCachedEvaluator(Evaluator):
             clients: Plan components (steps or tags) this evaluator serves.
             sources: `EventHandler` instances for retrieving cached results.
         """
-        super().__init__(plan, tags, clients)
+        super().__init__(plan, tags=tags, clients=clients)
         self._sources: list[EventHandler] = [] if sources is None else sources
 
     def eval_cached(

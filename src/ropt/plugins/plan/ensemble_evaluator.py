@@ -47,6 +47,7 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
     def __init__(
         self,
         plan: Plan,
+        *,
         tags: set[str] | None = None,
     ) -> None:
         """Initialize a default evaluator step.
@@ -55,7 +56,7 @@ class DefaultEnsembleEvaluatorStep(PlanStep):
             plan: The plan that runs this step.
             tags: Optional tags
         """
-        super().__init__(plan, tags)
+        super().__init__(plan, tags=tags)
 
     def run(
         self,

@@ -28,6 +28,7 @@ class DefaultStoreHandler(EventHandler):
 
     def __init__(
         self,
+        *,
         tags: set[str] | None = None,
         sources: set[PlanComponent | str] | None = None,
     ) -> None:
@@ -52,7 +53,7 @@ class DefaultStoreHandler(EventHandler):
             tags:       Optional tags
             sources:    Optional set of steps whose results should be stored.
         """
-        super().__init__(tags, sources)
+        super().__init__(tags=tags, sources=sources)
         self["results"] = None
 
     def handle_event(self, event: Event) -> None:

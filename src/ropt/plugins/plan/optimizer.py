@@ -94,6 +94,7 @@ class DefaultOptimizerStep(PlanStep):
     def __init__(
         self,
         plan: Plan,
+        *,
         tags: set[str] | None = None,
     ) -> None:
         """Initialize a default optimizer step.
@@ -102,7 +103,7 @@ class DefaultOptimizerStep(PlanStep):
             plan: The plan that runs this step.
             tags: Optional tags
         """
-        super().__init__(plan, tags)
+        super().__init__(plan, tags=tags)
 
     def run(
         self,
