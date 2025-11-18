@@ -1918,7 +1918,7 @@ of an optimization process, including variables, objectives, constraints,
 realizations, samplers, and more.</p>
 <p>The central configuration class for optimization is
 <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>, which encapsulates the complete
-configuration for a single optimization step. It is designed to be flexible and
+configuration for a single optimization run. It is designed to be flexible and
 extensible, allowing users to customize the optimization process to their
 specific needs.</p>
 <p>These configuration classes are built using
@@ -1937,7 +1937,7 @@ values using the <code>model_validate</code> method provided by <code>pydantic</
   customization of the optimization process.</li>
 <li><strong>Centralized Configuration:</strong> The
   <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> class provides a single point
-  of entry for configuring an optimization step.</li>
+  of entry for configuring an optimization run.</li>
 </ul>
 <p><strong>Parsing and Validation</strong></p>
 <p>The configuration classes are built using
@@ -1980,7 +1980,7 @@ optimization. To parse a configuration from a dictionary, use the
 
 
 
-        <p>The primary configuration class for an optimization step.</p>
+        <p>The primary configuration class for an optimization run.</p>
 <p><code>EnOptConfig</code> orchestrates the configuration of an entire optimization
 workflow. It contains nested configuration classes that define specific
 aspects of the optimization, such as variables, objectives, constraints,
@@ -2019,7 +2019,7 @@ number of variables or have a size of one.</p>
 <details class="warning" open>
   <summary>Warning</summary>
   <p><code>EnOptConfig</code> objects are immutable and hold the in-memory configuration
-for an optimization step. For persistence, do not serialize the object
+for an optimization run. For persistence, do not serialize the object
 itself. Instead, store the original dictionary used for its creation.</p>
 <p>Round-trip serialization (e.g., to/from JSON) is not a supported use
 case and may lead to data loss due to the complex types it contains,

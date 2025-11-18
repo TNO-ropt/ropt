@@ -1712,13 +1712,13 @@
 
     <div class="doc doc-contents first">
 
-        <p>This module provides the default plugin implementations for actions.</p>
+        <p>This module provides the default plugin implementations for operations.</p>
 <p><strong>Supported Components:</strong>
-    - <code>ensemble_evaluator</code>: Performs ensemble evaluations
-        (<a class="autorefs autorefs-internal" title="            ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorOperation" href="#ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorOperation"><code>DefaultEnsembleEvaluatorOperation</code></a>).
-    - <code>optimizer</code>: Runs an optimization algorithm using a configured optimizer
-        plugin
-        (<a class="autorefs autorefs-internal" title="            ropt.plugins.operation.optimizer.DefaultOptimizerOperation" href="#ropt.plugins.operation.optimizer.DefaultOptimizerOperation"><code>DefaultOptimizerOperation</code></a>).</p>
+  - <code>ensemble_evaluator</code>: Performs ensemble evaluations
+      (<a class="autorefs autorefs-internal" title="            ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorOperation" href="#ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorOperation"><code>DefaultEnsembleEvaluatorOperation</code></a>).
+  - <code>optimizer</code>: Runs an optimization algorithm using a configured optimizer
+      plugin
+      (<a class="autorefs autorefs-internal" title="            ropt.plugins.operation.optimizer.DefaultOptimizerOperation" href="#ropt.plugins.operation.optimizer.DefaultOptimizerOperation"><code>DefaultOptimizerOperation</code></a>).</p>
 
 
 
@@ -1867,10 +1867,10 @@
 
 
 
-        <p>The default plugin for creating built-in plan steps.</p>
+        <p>The default plugin for creating workflow operations.</p>
 <p>This plugin acts as a factory for the standard <code>Operation</code> implementations
 provided by <code>ropt</code>.</p>
-<p><strong>Supported Steps:</strong></p>
+<p><strong>Supported Operations:</strong></p>
 <ul>
 <li><code>ensemble_evaluator</code>: Creates a
     <a class="autorefs autorefs-internal" title="            ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorOperation" href="#ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorOperation"><code>DefaultEnsembleEvaluatorOperation</code></a>
@@ -2048,9 +2048,9 @@ provided by <code>ropt</code>.</p>
 
 
 
-        <p>The default ensemble evaluator step for optimization plans.</p>
-<p>This step performs one or more ensemble evaluations based on the provided
-<code>variables</code>. It yields a tuple of
+        <p>The default ensemble evaluator operation for optimization workflows.</p>
+<p>This operation performs one or more ensemble evaluations based on the
+provided <code>variables</code>. It yields a tuple of
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
@@ -2058,15 +2058,15 @@ provided by <code>ropt</code>.</p>
       dataclass
   " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> objects, one for each
 input variable vector evaluated.</p>
-<p>The step emits the following events:</p>
+<p>The operation emits the following events:</p>
 <ul>
-<li><a class="autorefs autorefs-internal" title="            START_ENSEMBLE_EVALUATOR_STEP
+<li><a class="autorefs autorefs-internal" title="            START_ENSEMBLE_EVALUATOR
 
 
   
       class-attribute
       instance-attribute
-  " href="../enums/#ropt.enums.EventType.START_ENSEMBLE_EVALUATOR_STEP"><code>START_ENSEMBLE_EVALUATOR_STEP</code></a>:
+  " href="../enums/#ropt.enums.EventType.START_ENSEMBLE_EVALUATOR"><code>START_ENSEMBLE_EVALUATOR</code></a>:
   Emitted before the evaluation process begins.</li>
 <li><a class="autorefs autorefs-internal" title="            START_EVALUATION
 
@@ -2086,14 +2086,14 @@ input variable vector evaluated.</p>
   after the evaluation completes, carrying the generated <code>FunctionResults</code>
   in its <code>data</code> dictionary under the key <code>"results"</code>. Event handlers
   typically listen for this event.</li>
-<li><a class="autorefs autorefs-internal" title="            FINISHED_ENSEMBLE_EVALUATOR_STEP
+<li><a class="autorefs autorefs-internal" title="            FINISHED_ENSEMBLE_EVALUATOR
 
 
   
       class-attribute
       instance-attribute
-  " href="../enums/#ropt.enums.EventType.FINISHED_ENSEMBLE_EVALUATOR_STEP"><code>FINISHED_ENSEMBLE_EVALUATOR_STEP</code></a>:
-  Emitted after the entire step, including result emission, is finished.</li>
+  " href="../enums/#ropt.enums.EventType.FINISHED_ENSEMBLE_EVALUATOR"><code>FINISHED_ENSEMBLE_EVALUATOR</code></a>:
+  Emitted after the entire operation, including result emission, is finished.</li>
 </ul>
 
 
@@ -2136,8 +2136,8 @@ input variable vector evaluated.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Run the ensemble evaluator step to perform ensemble evaluations.</p>
-<p>This method executes the core logic of the ensemble evaluator step. It
+        <p>Run the ensemble evaluator.</p>
+<p>This method executes the core logic of the ensemble evaluator. It
 requires an optimizer configuration
 (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>) and optionally accepts
 specific variable vectors to evaluate.</p>
@@ -2288,8 +2288,8 @@ specific variable vectors to evaluate.</p>
 
 
 
-        <p>The default optimizer step for optimization plans.</p>
-<p>This step executes an optimization algorithm based on a provided
+        <p>The default optimizer operation.</p>
+<p>This operation executes an optimization algorithm based on a provided
 configuration (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> or a compatible
 dictionary). It iteratively performs function and potentially gradient
 evaluations, yielding a sequence of
@@ -2307,15 +2307,15 @@ evaluations, yielding a sequence of
   " href="../results/#ropt.results.GradientResults"><code>GradientResults</code></a> objects.</p>
 <p>While initial variable values are typically specified in the configuration,
 they can be overridden by passing them directly to the <code>run</code> method.</p>
-<p>The step emits the following events during its execution:</p>
+<p>The following events are emitted during execution:</p>
 <ul>
-<li><a class="autorefs autorefs-internal" title="            START_OPTIMIZER_STEP
+<li><a class="autorefs autorefs-internal" title="            START_OPTIMIZER
 
 
   
       class-attribute
       instance-attribute
-  " href="../enums/#ropt.enums.EventType.START_OPTIMIZER_STEP"><code>START_OPTIMIZER_STEP</code></a>:
+  " href="../enums/#ropt.enums.EventType.START_OPTIMIZER"><code>START_OPTIMIZER</code></a>:
   Emitted just before the optimization process begins.</li>
 <li><a class="autorefs autorefs-internal" title="            START_EVALUATION
 
@@ -2342,28 +2342,27 @@ they can be overridden by passing them directly to the <code>run</code> method.<
   " href="../results/#ropt.results.Results"><code>Results</code></a> object(s) in its <code>data</code> dictionary
   under the key <code>"results"</code>. Event handlers typically listen for this event
   to process or track optimization progress.</li>
-<li><a class="autorefs autorefs-internal" title="            FINISHED_OPTIMIZER_STEP
+<li><a class="autorefs autorefs-internal" title="            FINISHED_OPTIMIZER
 
 
   
       class-attribute
       instance-attribute
-  " href="../enums/#ropt.enums.EventType.FINISHED_OPTIMIZER_STEP"><code>FINISHED_OPTIMIZER_STEP</code></a>:
+  " href="../enums/#ropt.enums.EventType.FINISHED_OPTIMIZER"><code>FINISHED_OPTIMIZER</code></a>:
   Emitted after the entire optimization process concludes (successfully,
   or due to termination conditions or errors).</li>
 </ul>
-<p>This step also supports <strong>nested optimization</strong>. If a <code>nested_optimization</code>
-function is provided to the <code>run</code> method, the optimizer will execute a
-nested optimization at as part of each function evaluation. Each nested
-optimization run is done by creating a new plan. The provided function is
-then executed, passing the new plan and the variables. The
-<code>nested_optimization</code> function is expected to return a single
-<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+<p>This operation also supports <strong>nested optimization</strong>. If a
+<code>nested_optimization</code> function is provided to the <code>run</code> method, the
+optimizer will execute a nested optimization at as part of each function
+evaluation. The <code>nested_optimization</code> function is expected to return a
+single <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
       dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object.</p>
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object and a flag
+that indicates whether the optimization was aborted by the user.</p>
 
 
 
@@ -2407,12 +2406,12 @@ then executed, passing the new plan and the variables. The
 
     <div class="doc doc-contents ">
 
-        <p>Run the optimizer step to perform an optimization.</p>
-<p>This method executes the core logic of the optimizer step. It requires
-an optimizer configuration
+        <p>Run the operation to perform an optimization.</p>
+<p>This method executes the core logic of the optimizer operation. It
+requires an optimizer configuration
 (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>) and optionally accepts
-specific initial variable vectors, and/or a nested optimization plan,
-and metadata.</p>
+specific initial variable vectors, and/or a nested optimization
+workflow, and metadata.</p>
 <p>If <code>variables</code> are not provided, the initial values specified in the
 <code>config</code> are used. If <code>variables</code> are provided, they override the
 config's initial values.</p>
@@ -2424,16 +2423,16 @@ config's initial values.</p>
       dataclass
   " href="../results/#ropt.results.Results"><code>Results</code></a> objects emitted via the
 <code>FINISHED_EVALUATION</code> event.</p>
-<p>If a <code>nested_optimization</code> callable is provided, a fresh plan will be
-constructed, and the callable will be called passing that plan and the
-initial variables to use. The callable should return a a single
-<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+<p>If a <code>nested_optimization</code> callable is provided, a callable will be
+called passing the initial variables to use. The callable should return
+a a single <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
 
 
   
       dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object that should
-contain the results of the nested optimization.</p>
+  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object that
+should contain the results of the nested optimization, and a flag
+indicating whether the optimization was aborted by the user.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2510,7 +2509,7 @@ contain the results of the nested optimization.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional callable to run a nested plan.</p>
+                <p>Optional callable to run a nested optimization.</p>
               </div>
             </td>
             <td>
@@ -2740,8 +2739,8 @@ this tuple.</p>
 
 
         <p>The default event handler for observing events.</p>
-<p>This event handler listens for events emitted by specified steps and
-forwards them to one or more callback functions.</p>
+<p>This event handler listens for events and forwards them to one or more
+callback functions.</p>
 
 
 

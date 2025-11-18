@@ -1960,15 +1960,15 @@
 
     <div class="doc doc-contents ">
 
-        <p>Create a Operationnstance.</p>
+        <p>Create a Operation instance.</p>
 <p>This abstract class method serves as a factory for creating concrete
 <a class="autorefs autorefs-internal" title="            ropt.plugins.operation.base.Operation" href="#ropt.plugins.operation.base.Operation"><code>Operation</code></a> objects. Plugin
 implementations must override this method to return an instance of
-their specific <code>Operationation</code> subclass.</p>
-<p>The <code>name</code> argument specifies the requested step, potentially in the
-format <code>"plugin-name/method-name"</code> or just <code>"method-name"</code>.
-Implementations can use this <code>name</code> to vary the created step if the
-plugin supports multiple step types.</p>
+their specific <code>Operation</code> subclass.</p>
+<p>The <code>name</code> argument specifies the requested operation, potentially in
+the format <code>"plugin-name/method-name"</code> or just <code>"method-name"</code>.
+Implementations can use this <code>name</code> to vary the created operation if the
+plugin supports multiple operation types.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1991,7 +1991,7 @@ plugin supports multiple step types.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The requested step name (potentially plugin-specific).</p>
+                <p>The requested operation name (potentially plugin-specific).</p>
               </div>
             </td>
             <td>
@@ -2556,9 +2556,9 @@ method to define specific behavior.</p>
 
         <p>Execute the logic defined by this operation.</p>
 <p>This abstract method must be implemented by concrete <code>Operation</code>
-subclasses to define the specific action the step performs within the
-optimization workflow.</p>
-<p>The return value and type can vary depending on the specific step
+subclasses to define the specific action the operation performs within
+the optimization workflow.</p>
+<p>The return value and type can vary depending on the specific
 implementation.</p>
 
 

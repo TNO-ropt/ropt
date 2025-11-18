@@ -1728,7 +1728,7 @@ corresponding plugin type:</p>
 <ul>
 <li><strong>Workflow:</strong> The built-in
   <a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.default.DefaultEventHandlerPlugin" href="../default_workflow_plugins/#ropt.plugins.event_handler.default.DefaultEventHandlerPlugin"><code>default</code></a> event handler
-  and <a class="autorefs autorefs-internal" title="            ropt.plugins.operation.default.DefaultOperationPlugin" href="../default_workflow_plugins/#ropt.plugins.operation.default.DefaultOperationPlugin"><code>default</code></a> step plugins,
+  and <a class="autorefs autorefs-internal" title="            ropt.plugins.operation.default.DefaultOperationPlugin" href="../default_workflow_plugins/#ropt.plugins.operation.default.DefaultOperationPlugin"><code>default</code></a> plugins,
   providing components for executing complex optimization workflows.</li>
 <li><strong>Optimizer:</strong> The <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.scipy.SciPyOptimizer" href="../scipy_optimizer_plugin/#ropt.plugins.optimizer.scipy.SciPyOptimizer"><code>scipy</code></a>
   plugin, leveraging algorithms from <code>scipy.optimize</code>, and the
@@ -2405,8 +2405,7 @@ role in the optimization process:</p>
         <p>Abstract base class for all <code>ropt</code> plugins.</p>
 <p>This class serves as the fundamental building block for all plugins within
 the <code>ropt</code> framework. Any class intended to function as a plugin (e.g., an
-optimizer, sampler, step, or event handler) must inherit from this base
-class.</p>
+optimizer, sampler, or event handler) must inherit from this base class.</p>
 <p>It defines the core interface that all plugins must adhere to, ensuring
 consistency and enabling the <a class="autorefs autorefs-internal" title="            PluginManager" href="#ropt.plugins.PluginManager"><code>PluginManager</code></a>
 to discover and manage them effectively.</p>

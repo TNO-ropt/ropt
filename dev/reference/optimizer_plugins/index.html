@@ -1911,7 +1911,7 @@ third-party packages.</p>
   <code>start</code> method.</li>
 <li><strong>Discovery:</strong> The <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> discovers
   available <code>OptimizerPlugin</code> implementations (typically via entry points) and
-  uses them to create <code>Optimizer</code> instances as needed during plan execution.</li>
+  uses them to create <code>Optimizer</code> instances as needed during workflow execution.</li>
 </ul>
 <p><strong>Utilities:</strong></p>
 <p>The <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.utils" href="#ropt.plugins.optimizer.utils"><code>ropt.plugins.optimizer.utils</code></a> module offers
@@ -1976,10 +1976,6 @@ constraint support and handling normalized constraints.</p>
 <p>This class defines the interface for plugins responsible for creating
 <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.Optimizer" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> instances. These plugins
 act as factories for specific optimization algorithms or backends.</p>
-<p>During plan execution, the <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>
-identifies the appropriate optimizer plugin based on the configuration and
-uses its <code>create</code> class method to instantiate the actual <code>Optimizer</code> object
-that will perform the optimization.</p>
 
 
 
@@ -2029,7 +2025,7 @@ that will perform the optimization.</p>
 implementations must override this method to return an instance of their
 specific <code>Optimizer</code> subclass.</p>
 <p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> calls this method when
-an optimization step requires an optimizer provided by this plugin.</p>
+an optimization workflow requires an optimizer provided by this plugin.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3336,7 +3332,7 @@ or increments a numerical suffix (e.g., "-001", "-002") to ensure uniqueness.</p
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional identifier (e.g., step name) to include in the path.</p>
+                <p>Optional identifier to include in the path.</p>
               </div>
             </td>
             <td>
