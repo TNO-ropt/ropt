@@ -93,31 +93,39 @@ nav:
   - "About": index.md
   - "Introduction": usage/robust_optimization.md
   - "Reference":
-      - "Configuration": reference/enopt_config.md
-      - "Domain transforms": reference/domain_transforms.md
-      - "Optimization":
+      - "Workflows":
           - "Optimization Workflows": reference/workflows.md
           - "Basic Optimizer": reference/basic_optimizer.md
-          - "Optimization": reference/optimization.md
-          - "Function Evaluations": reference/evaluator.md
-          - "Optimization Results": reference/results.md
+      - "Optimization":
+        - "Configuration": reference/enopt_config.md
+        - "Domain Transforms": reference/domain_transforms.md
+        - "Ensemble Optimization": reference/optimization.md
+        - "Function Evaluations": reference/evaluator.md
+        - "Optimization Results": reference/results.md
       - "Plugins":
-          - "Plugins": reference/plugin_manager.md
-          - "Workflow Plugins": reference/workflow_plugins.md
-          - "Optimizer Plugins": reference/optimizer_plugins.md
-          - "Sampler Plugins": reference/sampler_plugins.md
-          - "Realization Filter Plugins": reference/realization_filter_plugins.md
-          - "Function estimator Plugins": reference/function_estimator_plugins.md
-      - "Default Plugins":
-          - "Default Workflow Plugins": reference/default_workflow_plugins.md
-          - "SciPy Optimizer Plugin": reference/scipy_optimizer_plugin.md
-          - "SciPy Sampler Plugin": reference/scipy_sampler_plugin.md
-          - "Default Realization Filter Plugin": reference/default_realization_filter_plugin.md
-          - "Default Function Estimator Plugin": reference/default_function_estimator_plugin.md
-          - "External Optimizer Plugin": reference/external_optimizer_plugin.md
-      - "Enumerations": reference/enums.md
-      - "Exceptions": reference/exceptions.md
-      - "Utilities": reference/utilities.md
+        - "Plugin Manager": reference/plugin_manager.md
+        - "Workflow Plugins":        
+          - "Operations": reference/operation_plugins.md
+          - "Event Handlers": reference/event_handler_plugins.md
+          - "Evaluators": reference/evaluator_plugins.md
+        - "Optimizer Plugins":
+          - "Optimizers": reference/optimizer_plugins.md
+          - "Samplers": reference/sampler_plugins.md
+          - "Realization Filters": reference/realization_filter_plugins.md
+          - "Function estimators": reference/function_estimator_plugins.md
+        - "Default Plugins":
+          - "Operations": reference/default_operation_plugins.md
+          - "Event Handlers": reference/default_event_handler_plugins.md
+          - "Evaluators": reference/default_evaluator_plugins.md
+          - "SciPy Optimizers": reference/scipy_optimizer_plugin.md
+          - "SciPy Samplers": reference/scipy_sampler_plugin.md
+          - "Default Realization Filters": reference/default_realization_filter_plugin.md
+          - "Default Function Estimators": reference/default_function_estimator_plugin.md
+          - "External Optimizers": reference/external_optimizer_plugin.md
+      - "Miscellaneous":
+        - "Enumerations": reference/enums.md
+        - "Exceptions": reference/exceptions.md
+        - "Utilities": reference/utilities.md
 
 exclude_docs: |
   /snippets/
