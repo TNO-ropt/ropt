@@ -1559,7 +1559,7 @@ custom strategies for aggregating ensemble results.</p>
 <li><strong>Discovery:</strong> The <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> discovers
   available <code>FunctionEstimatorPlugin</code> implementations (typically via entry
   points) and uses them to create <code>FunctionEstimator</code> instances as needed
-  during plan execution.</li>
+  during workflow execution.</li>
 </ul>
 <p><strong>Built-in Function Estimator Plugins:</strong></p>
 <p>The default
@@ -1617,11 +1617,11 @@ deviation (<code>stddev</code>) of the realization results.</p>
 <a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.base.FunctionEstimator" href="#ropt.plugins.function_estimator.base.FunctionEstimator"><code>FunctionEstimator</code></a>
 instances. These plugins act as factories for specific function estimation
 strategies.</p>
-<p>During plan execution, the <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>
-identifies the appropriate function estimator plugin based on the
-configuration and uses its <code>create</code> class method to instantiate the actual
-<code>FunctionEstimator</code> object that will perform the aggregation of ensemble
-results (function values and gradients).</p>
+<p>During optimization execution, the
+<a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> identifies the appropriate
+function estimator plugin based on the configuration and uses its <code>create</code>
+class method to instantiate the actual <code>FunctionEstimator</code> object that will
+perform the aggregation of ensemble results (function values and gradients).</p>
 
 
 

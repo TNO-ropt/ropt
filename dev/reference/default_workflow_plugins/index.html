@@ -1119,19 +1119,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorStep" class="md-nav__link">
+  <a href="#ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorOperation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        DefaultEnsembleEvaluatorStep
+        DefaultEnsembleEvaluatorOperation
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="DefaultEnsembleEvaluatorStep">
+    <nav class="md-nav" aria-label="DefaultEnsembleEvaluatorOperation">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorStep.run" class="md-nav__link">
+  <a href="#ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorOperation.run" class="md-nav__link">
     <span class="md-ellipsis">
       
         run
@@ -1147,19 +1147,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.operation.optimizer.DefaultOptimizerStep" class="md-nav__link">
+  <a href="#ropt.plugins.operation.optimizer.DefaultOptimizerOperation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        DefaultOptimizerStep
+        DefaultOptimizerOperation
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="DefaultOptimizerStep">
+    <nav class="md-nav" aria-label="DefaultOptimizerOperation">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.operation.optimizer.DefaultOptimizerStep.run" class="md-nav__link">
+  <a href="#ropt.plugins.operation.optimizer.DefaultOptimizerOperation.run" class="md-nav__link">
     <span class="md-ellipsis">
       
         run
@@ -1568,19 +1568,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorStep" class="md-nav__link">
+  <a href="#ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorOperation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        DefaultEnsembleEvaluatorStep
+        DefaultEnsembleEvaluatorOperation
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="DefaultEnsembleEvaluatorStep">
+    <nav class="md-nav" aria-label="DefaultEnsembleEvaluatorOperation">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorStep.run" class="md-nav__link">
+  <a href="#ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorOperation.run" class="md-nav__link">
     <span class="md-ellipsis">
       
         run
@@ -1596,19 +1596,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.operation.optimizer.DefaultOptimizerStep" class="md-nav__link">
+  <a href="#ropt.plugins.operation.optimizer.DefaultOptimizerOperation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        DefaultOptimizerStep
+        DefaultOptimizerOperation
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="DefaultOptimizerStep">
+    <nav class="md-nav" aria-label="DefaultOptimizerOperation">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.operation.optimizer.DefaultOptimizerStep.run" class="md-nav__link">
+  <a href="#ropt.plugins.operation.optimizer.DefaultOptimizerOperation.run" class="md-nav__link">
     <span class="md-ellipsis">
       
         run
@@ -1715,10 +1715,10 @@
         <p>This module provides the default plugin implementations for actions.</p>
 <p><strong>Supported Components:</strong>
     - <code>ensemble_evaluator</code>: Performs ensemble evaluations
-        (<a class="autorefs autorefs-internal" title="            ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorStep" href="#ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorStep"><code>DefaultEnsembleEvaluatorStep</code></a>).
+        (<a class="autorefs autorefs-internal" title="            ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorOperation" href="#ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorOperation"><code>DefaultEnsembleEvaluatorOperation</code></a>).
     - <code>optimizer</code>: Runs an optimization algorithm using a configured optimizer
         plugin
-        (<a class="autorefs autorefs-internal" title="            ropt.plugins.operation.optimizer.DefaultOptimizerStep" href="#ropt.plugins.operation.optimizer.DefaultOptimizerStep"><code>DefaultOptimizerStep</code></a>).</p>
+        (<a class="autorefs autorefs-internal" title="            ropt.plugins.operation.optimizer.DefaultOptimizerOperation" href="#ropt.plugins.operation.optimizer.DefaultOptimizerOperation"><code>DefaultOptimizerOperation</code></a>).</p>
 
 
 
@@ -1761,18 +1761,15 @@
     <div class="doc doc-contents first">
 
         <p>This module provides the default plugin implementations for event handlers.</p>
-<p>It defines <code>DefaultOperationPlugin</code> and <code>DefaultEventHandlerPlugin</code>, which serve
-as factories for the built-in plan components, enabling the creation of
-standard optimization plans out-of-the-box.</p>
-<p><strong>Supported Components:</strong>
-    - <code>tracker</code>: Tracks the 'best' or 'last' valid result based on objective
-        value and constraints
-        (<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler._tracker.DefaultTrackerHandler" href="#ropt.plugins.event_handler._tracker.DefaultTrackerHandler"><code>DefaultTrackerHandler</code></a>).
-    - <code>store</code>: Accumulates all results from specified sources
-        (<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler._store.DefaultStoreHandler" href="#ropt.plugins.event_handler._store.DefaultStoreHandler"><code>DefaultStoreHandler</code></a>).
-    - <code>observer</code>: Listens for events from specified sources, and calls a
+<p><strong>Supported handlers:</strong>
+  - <code>tracker</code>: Tracks the 'best' or 'last' valid result based on objective
+      value and constraints
+      (<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler._tracker.DefaultTrackerHandler" href="#ropt.plugins.event_handler._tracker.DefaultTrackerHandler"><code>DefaultTrackerHandler</code></a>).
+  - <code>store</code>: Accumulates all results from specified sources
+      (<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler._store.DefaultStoreHandler" href="#ropt.plugins.event_handler._store.DefaultStoreHandler"><code>DefaultStoreHandler</code></a>).
+  - <code>observer</code>: Listens for events from specified sources, and calls a
       callback for each event
-        (<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler._observer.DefaultObserverHandler" href="#ropt.plugins.event_handler._observer.DefaultObserverHandler"><code>DefaultObserverHandler</code></a>).</p>
+      (<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler._observer.DefaultObserverHandler" href="#ropt.plugins.event_handler._observer.DefaultObserverHandler"><code>DefaultObserverHandler</code></a>).</p>
 
 
 
@@ -1815,18 +1812,15 @@ standard optimization plans out-of-the-box.</p>
     <div class="doc doc-contents first">
 
         <p>This module provides the default plugin implementations for event handlers.</p>
-<p>It defines <code>DefaultOperationPlugin</code> and <code>DefaultEventHandlerPlugin</code>, which serve
-as factories for the built-in plan components, enabling the creation of
-standard optimization plans out-of-the-box.</p>
-<p><strong>Supported Components:</strong>
-    - <code>tracker</code>: Tracks the 'best' or 'last' valid result based on objective
-        value and constraints
-        (<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler._tracker.DefaultTrackerHandler" href="#ropt.plugins.event_handler._tracker.DefaultTrackerHandler"><code>DefaultTrackerHandler</code></a>).
-    - <code>store</code>: Accumulates all results from specified sources
-        (<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler._store.DefaultStoreHandler" href="#ropt.plugins.event_handler._store.DefaultStoreHandler"><code>DefaultStoreHandler</code></a>).
-    - <code>observer</code>: Listens for events from specified sources, and calls a
+<p><strong>Supported handlers:</strong>
+  - <code>tracker</code>: Tracks the 'best' or 'last' valid result based on objective
+      value and constraints
+      (<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler._tracker.DefaultTrackerHandler" href="#ropt.plugins.event_handler._tracker.DefaultTrackerHandler"><code>DefaultTrackerHandler</code></a>).
+  - <code>store</code>: Accumulates all results from specified sources
+      (<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler._store.DefaultStoreHandler" href="#ropt.plugins.event_handler._store.DefaultStoreHandler"><code>DefaultStoreHandler</code></a>).
+  - <code>observer</code>: Listens for events from specified sources, and calls a
       callback for each event
-        (<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler._observer.DefaultObserverHandler" href="#ropt.plugins.event_handler._observer.DefaultObserverHandler"><code>DefaultObserverHandler</code></a>).</p>
+      (<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler._observer.DefaultObserverHandler" href="#ropt.plugins.event_handler._observer.DefaultObserverHandler"><code>DefaultObserverHandler</code></a>).</p>
 
 
 
@@ -1879,10 +1873,10 @@ provided by <code>ropt</code>.</p>
 <p><strong>Supported Steps:</strong></p>
 <ul>
 <li><code>ensemble_evaluator</code>: Creates a
-    <a class="autorefs autorefs-internal" title="            ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorStep" href="#ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorStep"><code>DefaultEnsembleEvaluatorStep</code></a>
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorOperation" href="#ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorOperation"><code>DefaultEnsembleEvaluatorOperation</code></a>
     instance, which performs ensemble evaluations.</li>
 <li><code>optimizer</code>: Creates a
-    <a class="autorefs autorefs-internal" title="            ropt.plugins.operation.optimizer.DefaultOptimizerStep" href="#ropt.plugins.operation.optimizer.DefaultOptimizerStep"><code>DefaultOptimizerStep</code></a>
+    <a class="autorefs autorefs-internal" title="            ropt.plugins.operation.optimizer.DefaultOptimizerOperation" href="#ropt.plugins.operation.optimizer.DefaultOptimizerOperation"><code>DefaultOptimizerOperation</code></a>
     instance, which runs an optimization algorithm using a configured
     optimizer plugin.</li>
 </ul>
@@ -2041,8 +2035,8 @@ provided by <code>ropt</code>.</p>
 
 
 
-<h2 id="ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorStep" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorStep</span>
+<h2 id="ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorOperation" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorOperation</span>
 
 
 </h2>
@@ -2126,7 +2120,7 @@ input variable vector evaluated.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorStep.run" class="doc doc-heading">
+<h3 id="ropt.plugins.operation.ensemble_evaluator.DefaultEnsembleEvaluatorOperation.run" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
 
 
@@ -2281,8 +2275,8 @@ specific variable vectors to evaluate.</p>
 
 
 
-<h2 id="ropt.plugins.operation.optimizer.DefaultOptimizerStep" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.operation.optimizer.DefaultOptimizerStep</span>
+<h2 id="ropt.plugins.operation.optimizer.DefaultOptimizerOperation" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.operation.optimizer.DefaultOptimizerOperation</span>
 
 
 </h2>
@@ -2395,7 +2389,7 @@ then executed, passing the new plan and the variables. The
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plugins.operation.optimizer.DefaultOptimizerStep.run" class="doc doc-heading">
+<h3 id="ropt.plugins.operation.optimizer.DefaultOptimizerOperation.run" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
 
 
@@ -2604,7 +2598,7 @@ contain the results of the nested optimization.</p>
       class-attribute
       instance-attribute
   " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events
-emitted by specified steps. It processes the
+emitted from within an optimization workflow. It processes the
 <a class="autorefs autorefs-internal" title="            ropt.results.Results
 
 
@@ -2686,14 +2680,14 @@ selected result, potentially transformed to the user domain.</p>
       class-attribute
       instance-attribute
   " href="../enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events
-emitted by specified steps. It collects all
-<a class="autorefs autorefs-internal" title="            ropt.results.Results
+emitted by specified operations from within an optimization workflow. It
+collects all <a class="autorefs autorefs-internal" title="            ropt.results.Results
 
 
   
       dataclass
-  " href="../results/#ropt.results.Results"><code>Results</code></a> objects contained within these events and
-stores them sequentially in memory.</p>
+  " href="../results/#ropt.results.Results"><code>Results</code></a> objects contained within
+these events and stores them sequentially in memory.</p>
 <p>The accumulated results are stored as a tuple and can be accessed via
 dictionary access using the key <code>"results"</code> (e.g., <code>handler["results"]</code>).
 Each time new results are received from a valid source, they are appended to

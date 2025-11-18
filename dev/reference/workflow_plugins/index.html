@@ -1870,7 +1870,7 @@
 
     <div class="doc doc-contents first">
 
-        <p>Framework and Implementations for Optimization Plan Plugins.</p>
+        <p>Implementation of operations and operation plugins for optimization workflows.</p>
 
 
 
@@ -2070,14 +2070,14 @@ plugin supports multiple step types.</p>
 
 
 
-        <p>Abstract Base Class for event handler plugins.</p>
+        <p>Abstract base class for event handler plugins.</p>
 <p>This class defines the interface for plugins responsible for creating
-<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.base.EventHandler" href="#ropt.plugins.event_handler.base.EventHandler"><code>EventHandler</code></a> instances within an
-optimization workflow.</p>
-<p>During plan setup, the <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>
-identifies the appropriate event handler plugin based on a requested name
-and uses its <code>create</code> class method to instantiate the actual <code>EventHandler</code>
-object that will process events during plan execution.</p>
+<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.base.EventHandler" href="#ropt.plugins.event_handler.base.EventHandler"><code>EventHandler</code></a> instances within
+an optimization workflow.</p>
+<p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> identifies the appropriate
+event handler plugin based on a requested name and uses its <code>create</code> class
+method to instantiate the actual <code>EventHandler</code> object that will process
+events.</p>
 
 
 
@@ -2384,24 +2384,19 @@ the plugin supports multiple evaluator types.</p>
 
 
 
-        <p>Abstract base class for optimization plan steps.</p>
-<p>This class defines the fundamental interface for all executable steps within
-an optimization workflow. Concrete step implementations, which perform
+        <p>Abstract base class for optimization operations.</p>
+<p>This class defines the fundamental interface for all executable operations
+within an optimization workflow. Concrete implementations, which perform
 specific actions like running an optimizer or evaluating functions, must
 inherit from this base class.</p>
-<p><code>Operation</code> objects are typically created by corresponding
-<a class="autorefs autorefs-internal" title="            ropt.plugins.operation.base.OperationPlugin" href="#ropt.plugins.operation.base.OperationPlugin"><code>OperationPlugin</code></a> factories, which
-are managed by the <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>. Once
-instantiated and added to a <code>Plan</code>, they may be executed using their <code>run</code>
-method.</p>
-<p>Subclasses must implement the abstract
-<a class="autorefs autorefs-internal" title="            run
+<p><code>Operation</code> objects are typically created by corresponding Subclasses must
+implement the abstract <a class="autorefs autorefs-internal" title="            run
 
 
   
       abstractmethod
-  " href="#ropt.plugins.operation.base.Operation.run"><code>run</code></a> method to define the step's
-specific behavior.</p>
+  " href="#ropt.plugins.operation.base.Operation.run"><code>run</code></a>
+method to define specific behavior.</p>
 
 
 
@@ -2439,7 +2434,7 @@ specific behavior.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Get the event handlers available to this plan.</p>
+        <p>Get the event handlers attached to this operation.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2559,20 +2554,13 @@ specific behavior.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Execute the logic defined by this plan step.</p>
+        <p>Execute the logic defined by this operation.</p>
 <p>This abstract method must be implemented by concrete <code>Operation</code>
 subclasses to define the specific action the step performs within the
 optimization workflow.</p>
 <p>The return value and type can vary depending on the specific step
 implementation.</p>
 
-
-<details class="warning" open>
-  <summary>Calling the plan's <code>pre_run</code> method.</summary>
-  <p>At the beginning of this function it essential to call the plan's
-<code>pre_run</code> method. This will assure that the plan performs some checks,
-such as checking if the plan was aborted by an earlier step</p>
-</details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>
@@ -2636,7 +2624,7 @@ such as checking if the plan was aborted by an earlier step</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The result of the step's execution, if any.</p>
+                <p>The result of the execution, if any.</p>
               </div>
             </td>
           </tr>
@@ -2673,30 +2661,13 @@ such as checking if the plan was aborted by an earlier step</p>
 
 
 
-        <p>Abstract Base Class for Optimization Plan Result Handlers.</p>
+        <p>Abstract base class for event handlers.</p>
 <p>This class defines the fundamental interface for all event handlers within
-an optimization workflow. Concrete handler implementations, which process
-events emitted during plan execution (e.g., tracking results, storing data,
-logging), must inherit from this base class.</p>
-<p><code>EventHandler</code> objects are typically created by corresponding
-<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.base.EventHandlerPlugin" href="#ropt.plugins.event_handler.base.EventHandlerPlugin"><code>EventHandlerPlugin</code></a> factories,
-managed by the <a class="autorefs autorefs-internal" title="            PluginManager" href="../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a>. Once
-instantiated and added to a <code>Plan</code>, their
-<a class="autorefs autorefs-internal" title="            handle_event
-
-
-  
-      abstractmethod
-  " href="#ropt.plugins.event_handler.base.EventHandler.handle_event"><code>handle_event</code></a> method is
-called by the plan whenever an <a class="autorefs autorefs-internal" title="            ropt.optimization.Event
-
-
-  
-      dataclass
-  " href="../workflows/#ropt.optimization.Event"><code>Event</code></a> is emitted.</p>
-<p>Handlers can also store state using dictionary-like access (<code>[]</code>), allowing
-them to accumulate information or make data available to subsequent steps
-or event handlers within the plan.</p>
+an optimization workflow. Concrete handler implementations, (e.g., tracking
+results, storing data, logging), must inherit from this base class.</p>
+<p>Handlers may store state using dictionary-like access (<code>[]</code>), allowing
+them to accumulate information or make data available to other components in
+an optimization workflow.</p>
 <p>Subclasses must implement the abstract
 <a class="autorefs autorefs-internal" title="            handle_event
 
@@ -2789,8 +2760,6 @@ define their specific event processing logic.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize the EventHandler.</p>
-<p>Assigns a unique ID and initializes an internal dictionary for storing
-state.</p>
 
 
     </div>
@@ -2814,7 +2783,7 @@ state.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Process an event emitted by the optimization plan.</p>
+        <p>Process an event.</p>
 <p>This abstract method must be implemented by concrete <code>EventHandler</code>
 subclasses. It defines the event handler's core logic for reacting to
 <a class="autorefs autorefs-internal" title="            ropt.optimization.Event
@@ -2822,7 +2791,7 @@ subclasses. It defines the event handler's core logic for reacting to
 
   
       dataclass
-  " href="../workflows/#ropt.optimization.Event"><code>Event</code></a> objects emitted by steps in the optimization
+  " href="../workflows/#ropt.optimization.Event"><code>Event</code></a> objects emitted in the optimization
 workflow.</p>
 <p>Implementations should inspect the <code>event</code> object (its <code>event_type</code> and
 <code>data</code>) and perform computations accordingly, such as storing results,
@@ -2854,7 +2823,7 @@ logging information, or updating internal state.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The event object containing details about what occurred in the plan.</p>
+                <p>The event object.</p>
               </div>
             </td>
             <td>
@@ -2885,7 +2854,7 @@ logging information, or updating internal state.</p>
         <p>Retrieve a value from the event handler's internal state.</p>
 <p>This method enables dictionary-like access (<code>handler[key]</code>) to the
 values stored within the event handler's internal state dictionary. This
-allows handlers to store and retrieve data accumulated during plan
+allows handlers to store and retrieve data accumulated during workflow
 execution.</p>
 
 
@@ -2988,7 +2957,7 @@ execution.</p>
 <p>This method enables dictionary-like assignment (<code>handler[key] = value</code>)
 to store arbitrary data within the event handler's internal state
 dictionary. This allows event handlers to accumulate information or make
-data available to other components of plan.</p>
+data available to other components of the workflow.</p>
 <p>The key must be a valid Python identifier.</p>
 
 
