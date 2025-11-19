@@ -1,11 +1,12 @@
 """This module provides the default plugin implementations evaluators.
 
 **Supported Components:**
-    - `function_evaluator`: Evaluator that forwards calculations to a given evaluation function.
-      ([`DefaultFunctionEvaluator`][ropt.plugins.evaluator._function_evaluator.DefaultFunctionEvaluator])
-    - `caching_evaluator`: Evaluator that uses caching to find results that were
-      already evaluated before forwarding to another evaluator.
-      ([`DefaultCachedEvaluator`][ropt.plugins.evaluator.cached_evaluator.DefaultCachedEvaluator])
+
+  - `function_evaluator`: Evaluator that forwards calculations to a given evaluation function.
+    ([`DefaultFunctionEvaluator`][ropt.plugins.evaluator._function_evaluator.DefaultFunctionEvaluator])
+  - `caching_evaluator`: Evaluator that uses caching to find results that were
+    already evaluated before forwarding to another evaluator.
+    ([`DefaultCachedEvaluator`][ropt.plugins.evaluator.cached_evaluator.DefaultCachedEvaluator])
 """
 
 from __future__ import annotations

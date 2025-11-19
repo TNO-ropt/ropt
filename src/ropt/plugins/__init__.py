@@ -1,4 +1,4 @@
-"""Extending `ropt` with Plugins.
+"""Extending `ropt` with plugins.
 
 The `ropt.plugins` module provides the framework for extending `ropt`'s
 capabilities through a plugin system. Plugins allow for the integration of
@@ -9,15 +9,15 @@ the optimization workflow:
 
 **Workflow related plugins:**
 
-Workflow related plugins may directly be used by the user to create components when building
-optimization workflows, generally via these convenience methods:
+Workflow related plugins may directly be used by the user to create components
+when building optimization workflows, generally via these convenience methods:
 
   - [create_compute_step][ropt.plugins.PluginManager.create_compute_step]: Create
-    compute steps, such as optimizations to run during workflow execution.
+    compute steps, such as optimizations, to run during workflow execution.
   - [create_event_handler][ropt.plugins.PluginManager.create_event_handler]:
-    Create handlers to process events generated duing optimization.
+    Create handlers to process events generated during optimization.
   - [create_evaluator][ropt.plugins.PluginManager.create_event_handler]: Create
-    evaluators to for use by compute steps
+    evaluators to for use by compute steps.
 
 **Optimizer related plugins:**
 
@@ -69,8 +69,8 @@ Plugins can implement multiple named methods. To request a specific method
 `"plugin-name/method-name"`. If only a method name is provided, the plugin
 manager searches through all registered plugins (that allow discovery) for one
 that supports the method. Using `"plugin-name/default"` typically selects the
-primary or default method offered by that plugin, although specifying "default"
-without a plugin name is not permitted.
+primary or default method offered by that plugin, although specifying
+`"default"` without a plugin name is not permitted.
 
 Plugins retrieved by the
 [`PluginManager.get_plugin`][ropt.plugins.PluginManager.get_plugin] method
@@ -92,7 +92,7 @@ from the base class for the corresponding plugin type:
 The [create_evaluator][ropt.plugins.PluginManager.create_event_handler],
 [create_event_handler][ropt.plugins.PluginManager.create_event_handler] and
 [create_compute_step][ropt.plugins.PluginManager.create_compute_step] methods are
-convenience functions that combing plugin discovery and object creation into a
+convenience functions that combine plugin discovery and object creation into a
 single call.
 
 **Pre-installed Plugins Included with `ropt`**

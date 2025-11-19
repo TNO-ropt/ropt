@@ -52,9 +52,9 @@ class ComputeStep(ABC):
     specific actions like running an optimizer or evaluating functions, must
     inherit from this base class.
 
-    `ComputeStep` objects are typically created by corresponding Subclasses must
-    implement the abstract [`run`][ropt.plugins.compute_step.base.ComputeStep.run]
-    method to define specific behavior.
+    `ComputeStep` instances are typically created using the
+    [`create_compute_step`][ropt.plugins.PluginManager.create_compute_step] method
+    of a plugin manager.
     """
 
     def __init__(self) -> None:
@@ -62,7 +62,13 @@ class ComputeStep(ABC):
         self._event_handlers: list[EventHandler] = []
 
     def add_event_handler(self, handler: EventHandler) -> Self:
-        """Add a handler.
+        """Add an event handler.
+
+        Compute steps emit [`events`][ropt.workflow.Event] to report on the
+        calculations they perform. These events are processed by independently
+        created [`event
+        handlers`][ropt.plugins.event_handler.base.EventHandler]. Use the
+        `add_event_handler` method to attach these handlers to the compute step.
 
         Args:
             handler: The handler to add.

@@ -1,6 +1,7 @@
 """This module provides the default plugin implementations for event handlers.
 
 **Supported handlers:**
+
   - `tracker`: Tracks the 'best' or 'last' valid result based on objective
       value and constraints
       ([`DefaultTrackerHandler`][ropt.plugins.event_handler._tracker.DefaultTrackerHandler]).

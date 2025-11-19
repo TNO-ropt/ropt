@@ -58,8 +58,9 @@ class BasicOptimizer:
     - **Accessing Results:** After the optimization is complete, the optimal
       results, corresponding variables, and the optimization's exit code are
       readily accessible.
-    - **Customizable ComputeSteps and Handlers:** While designed for single runs, it
-      allows for the addition of custom compute steps and event handlers for more
+    - **Customizable ComputeSteps, Handlers, and Evaluators:** While designed
+      for single runs, it allows for the addition of custom compute steps and
+      event handlers for more
       complex scenarios.
 
     By encapsulating the core elements of an optimization run, the
@@ -160,16 +161,17 @@ class BasicOptimizer:
         """Initialize a `BasicOptimizer` object.
 
         This constructor sets up the necessary components for a single
-        optimization run. It requires an optimization configuration, optional
-        domain transforms, and an evaluator, which together define the
-        optimization problem and how to evaluate potential solutions. If a
-        constraint value is within the `constraint_tolerance` of zero, it is
-        considered satisfied.
+        optimization run. It requires an optimization configuration, an
+        evaluator, and optional domain transform, which together define the
+        optimization problem.
+
+        The `constraint_tolerance` is used to check any constraints, if a
+        constraint value is within this tolerance, it is considered satisfied.
 
         Args:
             enopt_config:         The configuration for the optimization.
             evaluator:            The evaluator object.
-            transforms:           The transforms to apply to the model.
+            transforms:           Optional transforms to apply to the model.
             constraint_tolerance: The constraint violation tolerance.
         """
         self._config = EnOptConfig.model_validate(enopt_config, context=transforms)

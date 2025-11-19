@@ -61,6 +61,10 @@ class Evaluator(ABC):
     for performing the actual evaluation of variables using an
     [`EvaluatorContext`][ropt.evaluator.EvaluatorContext] and returning an
     [`EvaluatorResult`][ropt.evaluator.EvaluatorResult].
+
+    `Evaluator` instances are typically created using the
+    [`create_evaluator`][ropt.plugins.PluginManager.create_evaluator] method
+    of a plugin manager.
     """
 
     @abstractmethod

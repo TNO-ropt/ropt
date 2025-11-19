@@ -1,11 +1,12 @@
 """This module provides the default plugin implementations for compute steps.
 
 **Supported Components:**
+
   - `ensemble_evaluator`: Performs ensemble evaluations
-      ([`DefaultEnsembleEvaluatorComputeStep`][ropt.plugins.compute_step.ensemble_evaluator.DefaultEnsembleEvaluatorComputeStep]).
+    ([`DefaultEnsembleEvaluatorComputeStep`][ropt.plugins.compute_step.ensemble_evaluator.DefaultEnsembleEvaluatorComputeStep]).
   - `optimizer`: Runs an optimization algorithm using a configured optimizer
-      plugin
-      ([`DefaultOptimizerComputeStep`][ropt.plugins.compute_step.optimizer.DefaultOptimizerComputeStep]).
+    plugin
+    ([`DefaultOptimizerComputeStep`][ropt.plugins.compute_step.optimizer.DefaultOptimizerComputeStep]).
 """
 
 from __future__ import annotations
