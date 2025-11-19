@@ -7,17 +7,33 @@ custom or third-party components, installed as separate packages.
 `ropt` supports several types of plugins, each addressing a specific aspect of
 the optimization workflow:
 
-* Define components for constructing and executing optimization workflows
-  ([`EventHandlerPlugin`][ropt.plugins.event_handler.base.EventHandlerPlugin],
-  [`OperationPlugin`][ropt.plugins.operation.base.OperationPlugin] and
-  [`EvaluatorPlugin`][ropt.plugins.evaluator.base.EvaluatorPlugin]).
-* [`optimizer`][ropt.plugins.optimizer]: Implements optimization algorithms.
-* [`sampler`][ropt.plugins.sampler]: Generates parameter perturbations, which
+**Workflow related plugins:**
+
+Workflow related plugins may directly be used by the user to create components when building
+optimization workflows, generally via these convenience methods:
+
+  - [create_operation][ropt.plugins.PluginManager.create_operation]: Create
+    operations, such as optimizations to run during workflow execution.
+  - [create_event_handler][ropt.plugins.PluginManager.create_event_handler]:
+    Create handlers to process events generated duing optimization.
+  - [create_evaluator][ropt.plugins.PluginManager.create_event_handler]: Create
+    evaluators to for use by workflow operations
+
+**Optimizer related plugins:**
+
+These plugins are used to implement specific features of the ensemble optimizer:
+
+- [`optimizer`][ropt.plugins.optimizer]: Implements optimization algorithms.
+- [`sampler`][ropt.plugins.sampler]: Generates parameter perturbations, which
   are used for gradient estimation.
-* [`realization_filter`][ropt.plugins.realization_filter]: Selects subsets of
+- [`realization_filter`][ropt.plugins.realization_filter]: Selects subsets of
   ensemble realizations for calculating objectives or constraints.
-* [`function_estimator`][ropt.plugins.function_estimator]: Computes final
+- [`function_estimator`][ropt.plugins.function_estimator]: Computes final
   objective function values and gradients from individual realization results.
+
+These plugins are generally not directly created by the user. Instead, the
+optimization algorithm will find and create the required plugins based on
+information passed via the optimization configuration.
 
 **Plugin Management and Discovery**
 
@@ -28,15 +44,16 @@ discovered automatically using Python's standard entry points mechanism.
 Each plugin type has a corresponding abstract base class that custom plugins
 must inherit from:
 
-* **Workflow:** [`EventHandlerPlugin`][ropt.plugins.event_handler.base.EventHandlerPlugin],
-  [`OperationPlugin`][ropt.plugins.operation.base.OperationPlugin], and
+- **Workflow plugins:**
+  [`OperationPlugin`][ropt.plugins.operation.base.OperationPlugin],
+  [`EventHandlerPlugin`][ropt.plugins.event_handler.base.EventHandlerPlugin],
   [`EvaluatorPlugin`][ropt.plugins.evaluator.base.EvaluatorPlugin]
-* **Optimizer:**
+- **Optimizer:**
   [`OptimizerPlugin`][ropt.plugins.optimizer.base.OptimizerPlugin]
-* **Sampler:** [`SamplerPlugin`][ropt.plugins.sampler.base.SamplerPlugin]
-* **Realization Filter:**
+- **Sampler:** [`SamplerPlugin`][ropt.plugins.sampler.base.SamplerPlugin]
+- **Realization Filter:**
   [`RealizationFilterPlugin`][ropt.plugins.realization_filter.base.RealizationFilterPlugin]
-* **Function Estimator:**
+- **Function Estimator:**
   [`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.base.FunctionEstimatorPlugin]
 
 **Using Plugins**
@@ -55,39 +72,48 @@ that supports the method. Using `"plugin-name/default"` typically selects the
 primary or default method offered by that plugin, although specifying "default"
 without a plugin name is not permitted.
 
-Plugins retrieved by the [`PluginManager.get_plugin`][ropt.plugins.PluginManager.get_plugin]
-method generally implement a `create` factory method that will be used to instantiate the objects
-that implement the desired functionality. These objects must inherit from the base class for the
-corresponding plugin type:
+Plugins retrieved by the
+[`PluginManager.get_plugin`][ropt.plugins.PluginManager.get_plugin] method
+generally implement a `create` factory method that will be used to instantiate
+the objects that implement the desired functionality. These objects must inherit
+from the base class for the corresponding plugin type:
 
-* **Workflow:** [`EventHandler`][ropt.plugins.event_handler.base.EventHandler] and
-  [`Operation`][ropt.plugins.operation.base.Operation]
-* **Optimizer:**
-  [`Optimizer`][ropt.plugins.optimizer.base.Optimizer]
-* **Sampler:** [`Sampler`][ropt.plugins.sampler.base.Sampler]
-* **Realization Filter:**
+- Workflow related plugins:
+  [`Operation`][ropt.plugins.operation.base.Operation],
+  [`EventHandler`][ropt.plugins.event_handler.base.EventHandler],
+  [`Evaluator`][ropt.plugins.evaluator.base.Evaluator]
+- Optimizer: [`Optimizer`][ropt.plugins.optimizer.base.Optimizer]
+- Sampler: [`Sampler`][ropt.plugins.sampler.base.Sampler]
+- Realization Filter:
   [`RealizationFilter`][ropt.plugins.realization_filter.base.RealizationFilter]
-* **Function Estimator:**
+- Function Estimator:
   [`FunctionEstimator`][ropt.plugins.function_estimator.base.FunctionEstimator]
+
+The [create_evaluator][ropt.plugins.PluginManager.create_event_handler],
+[create_event_handler][ropt.plugins.PluginManager.create_event_handler] and
+[create_operation][ropt.plugins.PluginManager.create_operation] methods are
+convenience functions that combing plugin discovery and object creation into a
+single call.
 
 **Pre-installed Plugins Included with `ropt`**
 
 `ropt` comes bundled with a set of pre-installed plugins:
 
-* **Workflow:** The built-in
-  [`default`][ropt.plugins.event_handler.default.DefaultEventHandlerPlugin] event handler
-  and [`default`][ropt.plugins.operation.default.DefaultOperationPlugin] plugins,
+- **Workflow:** The built-in
+  [`default operation`][ropt.plugins.operation.default.DefaultOperationPlugin],
+  [`default event handler`][ropt.plugins.event_handler.default.DefaultEventHandlerPlugin]
+  and [`default evaluator`][ropt.plugins.evaluator.default.DefaultEvaluatorPlugin] plugins,
   providing components for executing complex optimization workflows.
-* **Optimizer:** The [`scipy`][ropt.plugins.optimizer.scipy.SciPyOptimizer]
+- **Optimizer:** The [`scipy`][ropt.plugins.optimizer.scipy.SciPyOptimizer]
   plugin, leveraging algorithms from `scipy.optimize`, and the
-  [`ExternalOptimizer`][ropt.plugins.optimizer.external.ExternalOptimizer],
+  [`ExternalOptimizer`][ropt.plugins.optimizer.external.ExternalOptimizer] plugin,
   which is used to launch optimizers in separate processes.
-* **Sampler:** The [`scipy`][ropt.plugins.sampler.scipy.SciPySampler] plugin,
+- **Sampler:** The [`scipy`][ropt.plugins.sampler.scipy.SciPySampler] plugin,
   using distributions from `scipy.stats`.
-* **Realization Filter:** The
+- **Realization Filter:** The
   [`default`][ropt.plugins.realization_filter.default.DefaultRealizationFilter]
   plugin, offering filters based on ranking and for CVaR optimization.
-* **Function Estimator:** The
+- **Function Estimator:** The
   [`default`][ropt.plugins.function_estimator.default.DefaultFunctionEstimator]
   plugin, supporting objectives based on mean or standard deviation.
 """

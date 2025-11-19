@@ -18,11 +18,6 @@ class EventHandlerPlugin(Plugin):
     This class defines the interface for plugins responsible for creating
     [`EventHandler`][ropt.plugins.operation.base.EventHandler] instances within
     an optimization workflow.
-
-    The [`PluginManager`][ropt.plugins.PluginManager] identifies the appropriate
-    event handler plugin based on a requested name and uses its `create` class
-    method to instantiate the actual `EventHandler` object that will process
-    events.
     """
 
     @classmethod

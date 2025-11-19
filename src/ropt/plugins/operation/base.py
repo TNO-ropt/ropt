@@ -13,7 +13,7 @@ class OperationPlugin(Plugin):
     """Abstract base class for plugins that create Operation instances.
 
     This class defines the interface for plugins that act as factories for
-    [`Operation[ropt.plugins.operation.base.Operationobjects.
+    [`Operation`][ropt.plugins.operation.base.Operation] objects.
     """
 
     @classmethod
