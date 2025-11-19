@@ -2033,22 +2033,22 @@
 
     <div class="doc doc-contents first">
 
-        <p>Extending <code>ropt</code> with Plugins.</p>
+        <p>Extending <code>ropt</code> with plugins.</p>
 <p>The <code>ropt.plugins</code> module provides the framework for extending <code>ropt</code>'s
 capabilities through a plugin system. Plugins allow for the integration of
 custom or third-party components, installed as separate packages.</p>
 <p><code>ropt</code> supports several types of plugins, each addressing a specific aspect of
 the optimization workflow:</p>
 <p><strong>Workflow related plugins:</strong></p>
-<p>Workflow related plugins may directly be used by the user to create components when building
-optimization workflows, generally via these convenience methods:</p>
+<p>Workflow related plugins may directly be used by the user to create components
+when building optimization workflows, generally via these convenience methods:</p>
 <ul>
 <li><a class="autorefs autorefs-internal" title="            create_compute_step" href="#ropt.plugins.PluginManager.create_compute_step">create_compute_step</a>: Create
-    compute steps, such as optimizations to run during workflow execution.</li>
+    compute steps, such as optimizations, to run during workflow execution.</li>
 <li><a class="autorefs autorefs-internal" title="            create_event_handler" href="#ropt.plugins.PluginManager.create_event_handler">create_event_handler</a>:
-    Create handlers to process events generated duing optimization.</li>
+    Create handlers to process events generated during optimization.</li>
 <li><a class="autorefs autorefs-internal" title="            create_event_handler" href="#ropt.plugins.PluginManager.create_event_handler">create_evaluator</a>: Create
-    evaluators to for use by compute steps</li>
+    evaluators to for use by compute steps.</li>
 </ul>
 <p><strong>Optimizer related plugins:</strong></p>
 <p>These plugins are used to implement specific features of the ensemble optimizer:</p>
@@ -2094,8 +2094,8 @@ method can be used to find the name of a plugin that supports a given method.</p
 <code>"plugin-name/method-name"</code>. If only a method name is provided, the plugin
 manager searches through all registered plugins (that allow discovery) for one
 that supports the method. Using <code>"plugin-name/default"</code> typically selects the
-primary or default method offered by that plugin, although specifying "default"
-without a plugin name is not permitted.</p>
+primary or default method offered by that plugin, although specifying
+<code>"default"</code> without a plugin name is not permitted.</p>
 <p>Plugins retrieved by the
 <a class="autorefs autorefs-internal" title="            get_plugin" href="#ropt.plugins.PluginManager.get_plugin"><code>PluginManager.get_plugin</code></a> method
 generally implement a <code>create</code> factory method that will be used to instantiate
@@ -2116,7 +2116,7 @@ from the base class for the corresponding plugin type:</p>
 <p>The <a class="autorefs autorefs-internal" title="            create_event_handler" href="#ropt.plugins.PluginManager.create_event_handler">create_evaluator</a>,
 <a class="autorefs autorefs-internal" title="            create_event_handler" href="#ropt.plugins.PluginManager.create_event_handler">create_event_handler</a> and
 <a class="autorefs autorefs-internal" title="            create_compute_step" href="#ropt.plugins.PluginManager.create_compute_step">create_compute_step</a> methods are
-convenience functions that combing plugin discovery and object creation into a
+convenience functions that combine plugin discovery and object creation into a
 single call.</p>
 <p><strong>Pre-installed Plugins Included with <code>ropt</code></strong></p>
 <p><code>ropt</code> comes bundled with a set of pre-installed plugins:</p>

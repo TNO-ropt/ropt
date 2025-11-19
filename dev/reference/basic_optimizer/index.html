@@ -1943,8 +1943,9 @@ operations, including:</p>
 <li><strong>Accessing Results:</strong> After the optimization is complete, the optimal
   results, corresponding variables, and the optimization's exit code are
   readily accessible.</li>
-<li><strong>Customizable ComputeSteps and Handlers:</strong> While designed for single runs, it
-  allows for the addition of custom compute steps and event handlers for more
+<li><strong>Customizable ComputeSteps, Handlers, and Evaluators:</strong> While designed
+  for single runs, it allows for the addition of custom compute steps and
+  event handlers for more
   complex scenarios.</li>
 </ul>
 <p>By encapsulating the core elements of an optimization run, the
@@ -2253,11 +2254,11 @@ aborted, or encountered an error.</p>
 
         <p>Initialize a <code>BasicOptimizer</code> object.</p>
 <p>This constructor sets up the necessary components for a single
-optimization run. It requires an optimization configuration, optional
-domain transforms, and an evaluator, which together define the
-optimization problem and how to evaluate potential solutions. If a
-constraint value is within the <code>constraint_tolerance</code> of zero, it is
-considered satisfied.</p>
+optimization run. It requires an optimization configuration, an
+evaluator, and optional domain transform, which together define the
+optimization problem.</p>
+<p>The <code>constraint_tolerance</code> is used to check any constraints, if a
+constraint value is within this tolerance, it is considered satisfied.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2317,7 +2318,7 @@ considered satisfied.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The transforms to apply to the model.</p>
+                <p>Optional transforms to apply to the model.</p>
               </div>
             </td>
             <td>
