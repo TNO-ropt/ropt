@@ -46,8 +46,8 @@ default = "ropt.plugins.function_estimator.default:DefaultFunctionEstimatorPlugi
 [project.entry-points."ropt.plugins.event_handler"]
 default = "ropt.plugins.event_handler.default:DefaultEventHandlerPlugin"
 
-[project.entry-points."ropt.plugins.operation"]
-default = "ropt.plugins.operation.default:DefaultOperationPlugin"
+[project.entry-points."ropt.plugins.compute_step"]
+default = "ropt.plugins.compute_step.default:DefaultComputeStepPlugin"
 
 [project.entry-points."ropt.plugins.evaluator"]
 default = "ropt.plugins.evaluator.default:DefaultEvaluatorPlugin"

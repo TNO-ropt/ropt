@@ -17,7 +17,7 @@ class DefaultStoreHandler(EventHandler):
 
     This event handler listens for
     [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events
-    emitted by specified operations from within an optimization workflow. It
+    emitted by specified compute steps from within an optimization workflow. It
     collects all [`Results`][ropt.results.Results] objects contained within
     these events and stores them sequentially in memory.
 

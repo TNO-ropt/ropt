@@ -1,4 +1,4 @@
-"""Base classes for operations and operation plugins."""
+"""Base classes for compute steps and compute step plugins."""
 
 from __future__ import annotations
 
@@ -9,11 +9,11 @@ from ropt.plugins.base import Plugin
 from ropt.plugins.event_handler import EventHandler
 
 
-class OperationPlugin(Plugin):
-    """Abstract base class for plugins that create Operation instances.
+class ComputeStepPlugin(Plugin):
+    """Abstract base class for plugins that create ComputeStep instances.
 
     This class defines the interface for plugins that act as factories for
-    [`Operation`][ropt.plugins.operation.base.Operation] objects.
+    [`ComputeStep`][ropt.plugins.compute_step.base.ComputeStep] objects.
     """
 
     @classmethod
@@ -22,43 +22,43 @@ class OperationPlugin(Plugin):
         cls,
         name: str,
         **kwargs: Any,  # noqa: ANN401
-    ) -> Operation:
-        """Create a Operation instance.
+    ) -> ComputeStep:
+        """Create a ComputeStep instance.
 
         This abstract class method serves as a factory for creating concrete
-        [`Operation`][ropt.plugins.operation.base.Operation] objects. Plugin
+        [`ComputeStep`][ropt.plugins.compute_step.base.ComputeStep] objects. Plugin
         implementations must override this method to return an instance of
-        their specific `Operation` subclass.
+        their specific `ComputeStep` subclass.
 
-        The `name` argument specifies the requested operation, potentially in
+        The `name` argument specifies the requested compute step, potentially in
         the format `"plugin-name/method-name"` or just `"method-name"`.
-        Implementations can use this `name` to vary the created operation if the
-        plugin supports multiple operation types.
+        Implementations can use this `name` to vary the created compute step if the
+        plugin supports multiple compute step types.
 
         Args:
-            name:   The requested operation name (potentially plugin-specific).
+            name:   The requested compute step name (potentially plugin-specific).
             kwargs: Additional arguments for custom configuration.
 
         Returns:
-            An initialized instance of a `Operation` subclass.
+            An initialized instance of a `ComputeStep` subclass.
         """
 
 
-class Operation(ABC):
-    """Abstract base class for optimization operations.
+class ComputeStep(ABC):
+    """Abstract base class for optimization compute steps.
 
-    This class defines the fundamental interface for all executable operations
+    This class defines the fundamental interface for all executable compute steps
     within an optimization workflow. Concrete implementations, which perform
     specific actions like running an optimizer or evaluating functions, must
     inherit from this base class.
 
-    `Operation` objects are typically created by corresponding Subclasses must
-    implement the abstract [`run`][ropt.plugins.operation.base.Operation.run]
+    `ComputeStep` objects are typically created by corresponding Subclasses must
+    implement the abstract [`run`][ropt.plugins.compute_step.base.ComputeStep.run]
     method to define specific behavior.
     """
 
     def __init__(self) -> None:
-        """Initialize the Operation."""
+        """Initialize the ComputeStep."""
         self._event_handlers: list[EventHandler] = []
 
     def add_event_handler(self, handler: EventHandler) -> Self:
@@ -73,7 +73,7 @@ class Operation(ABC):
 
     @property
     def event_handlers(self) -> list[EventHandler]:
-        """Get the event handlers attached to this operation.
+        """Get the event handlers attached to this compute step.
 
         Returns:
             A list of handlers.
@@ -82,10 +82,10 @@ class Operation(ABC):
 
     @abstractmethod
     def run(self, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
-        """Execute the logic defined by this operation.
+        """Execute the logic defined by this compute step.
 
-        This abstract method must be implemented by concrete `Operation`
-        subclasses to define the specific action the operation performs within
+        This abstract method must be implemented by concrete `ComputeStep`
+        subclasses to define the specific action the compute step performs within
         the optimization workflow.
 
         The return value and type can vary depending on the specific

@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Protocol
 import numpy as np
 
 from ropt.enums import ExitCode
-from ropt.exceptions import OperationAborted
+from ropt.exceptions import ComputeStepAborted
 from ropt.optimization import OptimizerCallbackResult
 from ropt.results import FunctionResults, GradientResults
 
@@ -205,7 +205,7 @@ class EnsembleOptimizer:
         try:
             with self._redirector.start():
                 self._optimizer.start(variables)
-        except OperationAborted as exc:
+        except ComputeStepAborted as exc:
             exit_code = exc.exit_code
         return exit_code
 
@@ -233,9 +233,9 @@ class EnsembleOptimizer:
                 variables = variables[0, ...]
             nested_results, aborted = self._nested_optimizer(variables)
             if aborted:
-                raise OperationAborted(exit_code=ExitCode.USER_ABORT)
+                raise ComputeStepAborted(exit_code=ExitCode.USER_ABORT)
             if nested_results is None:
-                raise OperationAborted(exit_code=ExitCode.NESTED_OPTIMIZER_FAILED)
+                raise ComputeStepAborted(exit_code=ExitCode.NESTED_OPTIMIZER_FAILED)
             variables = nested_results.evaluations.variables
             self._fixed_variables = variables.copy()
 
@@ -298,10 +298,10 @@ class EnsembleOptimizer:
     def _check_stopping_criteria(self) -> None:
         max_functions = self._enopt_config.optimizer.max_functions
         if max_functions is not None and self._completed_functions >= max_functions:
-            raise OperationAborted(exit_code=ExitCode.MAX_FUNCTIONS_REACHED)
+            raise ComputeStepAborted(exit_code=ExitCode.MAX_FUNCTIONS_REACHED)
         max_batches = self._enopt_config.optimizer.max_batches
         if max_batches is not None and self._completed_batches >= max_batches:
-            raise OperationAborted(exit_code=ExitCode.MAX_BATCHES_REACHED)
+            raise ComputeStepAborted(exit_code=ExitCode.MAX_BATCHES_REACHED)
 
     def _run_evaluations(
         self,
@@ -349,7 +349,7 @@ class EnsembleOptimizer:
                 self._signal_evaluation(results)
 
             if exit_code is not None:
-                raise OperationAborted(exit_code=exit_code)
+                raise ComputeStepAborted(exit_code=exit_code)
 
         return results
 

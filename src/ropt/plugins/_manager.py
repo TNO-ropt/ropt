@@ -6,10 +6,10 @@ from functools import cache
 from importlib.metadata import entry_points
 from typing import TYPE_CHECKING, Any, Final, Literal
 
+from .compute_step.base import ComputeStep, ComputeStepPlugin
 from .evaluator.base import Evaluator, EvaluatorPlugin
 from .event_handler.base import EventHandler, EventHandlerPlugin
 from .function_estimator.base import FunctionEstimatorPlugin
-from .operation.base import Operation, OperationPlugin
 from .optimizer.base import OptimizerPlugin
 from .realization_filter.base import RealizationFilterPlugin
 from .sampler.base import SamplerPlugin
@@ -24,7 +24,7 @@ _PLUGIN_TYPES: Final = {
     "sampler": SamplerPlugin,
     "realization_filter": RealizationFilterPlugin,
     "event_handler": EventHandlerPlugin,
-    "operation": OperationPlugin,
+    "compute_step": ComputeStepPlugin,
     "evaluator": EvaluatorPlugin,
 }
 
@@ -34,7 +34,7 @@ PluginType = Literal[
     "realization_filter",
     "function_estimator",
     "event_handler",
-    "operation",
+    "compute_step",
     "evaluator",
 ]
 """Represents the valid types of plugins supported by `ropt`.
@@ -53,8 +53,8 @@ role in the optimization process:
   ([`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.base.FunctionEstimatorPlugin]).
 * `"event_handler"`: Plugins that create event handlers for processing optimization
   results ([`EventHandlerPlugin`][ropt.plugins.event_handler.base.EventHandlerPlugin]).
-* `"operation"`: Plugins that define executable steps within an optimization workflow
-  ([`OperationPlugin`][ropt.plugins.operation.base.OperationPlugin]).
+* `"compute_step"`: Plugins that define executable steps within an optimization workflow
+  ([`ComputeStepPlugin`][ropt.plugins.compute_step.base.ComputeStepPlugin]).
 * `"evaluator"`: Plugins that define evaluators within an optimization workflow
   ([`EvaluatorPlugin`][ropt.plugins.evaluator.base.EvaluatorPlugin]).
 """
@@ -105,7 +105,7 @@ class PluginManager:
             "realization_filter": {},
             "function_estimator": {},
             "event_handler": {},
-            "operation": {},
+            "compute_step": {},
             "evaluator": {},
         }
 
@@ -238,16 +238,18 @@ class PluginManager:
         assert isinstance(handler, EventHandler)
         return handler
 
-    def create_operation(self, method: str, **kwargs: Any) -> Operation:  # noqa: ANN401
-        """Create a new operation.
+    def create_compute_step(self, method: str, **kwargs: Any) -> ComputeStep:  # noqa: ANN401
+        """Create a new compute step.
 
         Args:
-            method: The method string to find the operation.
-            kwargs: Optional keyword arguments passed to the operation init.
+            method: The method string to find the compute step.
+            kwargs: Optional keyword arguments passed to the compute step init.
         """
-        operation = self.get_plugin("operation", method=method).create(method, **kwargs)
-        assert isinstance(operation, Operation)
-        return operation
+        compute_step = self.get_plugin("compute_step", method=method).create(
+            method, **kwargs
+        )
+        assert isinstance(compute_step, ComputeStep)
+        return compute_step
 
 
 @cache  # Without the cache, repeated calls are very slow

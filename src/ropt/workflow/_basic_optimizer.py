@@ -15,7 +15,7 @@ import numpy as np
 
 from ropt.config import EnOptConfig
 from ropt.enums import EventType, ExitCode
-from ropt.exceptions import OperationAborted
+from ropt.exceptions import ComputeStepAborted
 from ropt.plugins import PluginManager
 
 if TYPE_CHECKING:
@@ -58,8 +58,8 @@ class BasicOptimizer:
     - **Accessing Results:** After the optimization is complete, the optimal
       results, corresponding variables, and the optimization's exit code are
       readily accessible.
-    - **Customizable Operations and Handlers:** While designed for single runs, it
-      allows for the addition of custom operations and event handlers for more
+    - **Customizable ComputeSteps and Handlers:** While designed for single runs, it
+      allows for the addition of custom compute steps and event handlers for more
       complex scenarios.
 
     By encapsulating the core elements of an optimization run, the
@@ -116,14 +116,14 @@ class BasicOptimizer:
         2.  **Custom Workflow Execution**
 
             If the `ROPT_SCRIPT` environment variable contains an option in the
-            format `operation=script.py` (where `script.py` may be any file),
-            the named operation will be executed *instead* of the standard
+            format `step-name=script.py` (where `script.py` may be any file),
+            the named custom compute step will be executed *instead* of the standard
             optimization workflow, passing it the name of the script that
             defines the new optimization workflow.
 
-            The custom operation (`operation-name`) must adhere to the following:
+            The custom compute step (`step-name`) must adhere to the following:
 
-            *   It must be a registered `Operation`.
+            *   It must be a registered `ComputeStep`.
             *   Its `run` method  must accept
                 1.   An `evaluator` keyword argument, which will receive the
                      evaluator function passed to `BasicOptimizer`.
@@ -137,7 +137,7 @@ class BasicOptimizer:
 
             As a short-cut is possible to also define `ROPT_SCRIPT` with only
             the name of the script (i.e. `ROPT_SCRIPT=script.py`). In this case
-            an operation with the name `run_script` is assumed to exists and
+            a compute step with the name `run_script` is assumed to exists and
             will be used.
 
             [^1]:
@@ -235,8 +235,8 @@ class BasicOptimizer:
         Returns:
             The `BasicOptimizer` instance, allowing for method chaining.
         """
-        # Optionally run a custom operation defined via the environment:
-        custom_function = self._get_custom_operation()
+        # Optionally run a custom compute step defined via the environment:
+        custom_function = self._get_custom_compute_step()
 
         if custom_function is None:
             evaluator = self._plugin_manager.create_evaluator(
@@ -246,7 +246,7 @@ class BasicOptimizer:
                 "tracker",
                 constraint_tolerance=self._constraint_tolerance,
             )
-            optimizer = self._plugin_manager.create_operation(
+            optimizer = self._plugin_manager.create_compute_step(
                 "optimizer", evaluator=evaluator, plugin_manager=self._plugin_manager
             ).add_event_handler(tracker)
             for event_type, function in self._observers:
@@ -300,7 +300,7 @@ class BasicOptimizer:
 
         def _check_abort_callback(event: Event) -> None:  # noqa: ARG001
             if callback():
-                raise OperationAborted(exit_code=ExitCode.USER_ABORT)
+                raise ComputeStepAborted(exit_code=ExitCode.USER_ABORT)
 
         self._observers.append((EventType.START_EVALUATION, _check_abort_callback))
         return self
@@ -339,21 +339,21 @@ class BasicOptimizer:
         self._observers.append((EventType.FINISHED_EVALUATION, _results_callback))
         return self
 
-    def _get_custom_operation(self) -> Callable[[], ExitCode] | None:
+    def _get_custom_compute_step(self) -> Callable[[], ExitCode] | None:
         if "ROPT_SCRIPT" in os.environ:
-            operation_name, sep, script = os.environ["ROPT_SCRIPT"].partition("=")
+            compute_step_name, sep, script = os.environ["ROPT_SCRIPT"].partition("=")
             if not sep:
-                operation_name, script = "run_script", operation_name
+                compute_step_name, script = "run_script", compute_step_name
             if (
-                self._plugin_manager.get_plugin_name("operation", operation_name)
+                self._plugin_manager.get_plugin_name("compute_step", compute_step_name)
                 is not None
             ):
-                operation: Callable[[], ExitCode] = (
-                    self._plugin_manager.create_operation(operation_name).run(
+                compute_step: Callable[[], ExitCode] = (
+                    self._plugin_manager.create_compute_step(compute_step_name).run(
                         evaluator=self._evaluator, script=script
                     )
                 )
-                return operation
+                return compute_step
         return None
 
     def _custom_event_handlers(self) -> Iterator[str]:

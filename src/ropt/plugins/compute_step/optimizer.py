@@ -1,4 +1,4 @@
-"""This module implements the default optimizer operation."""
+"""This module implements the default optimizer compute step."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from numpy.typing import NDArray  # noqa: TC002
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, ExitCode
 from ropt.optimization import EnsembleOptimizer
-from ropt.plugins.operation.base import Operation
+from ropt.plugins.compute_step.base import ComputeStep
 from ropt.results import FunctionResults
 from ropt.workflow import Event
 
@@ -38,7 +38,7 @@ class NestedOptimizationCallable(Protocol):
 
         This functions defines the signature of the callable that defines a
         nested optimization in a
-        [`DefaultOptimizerOperation`][ropt.plugins.operation.optimizer.DefaultOptimizerOperation].
+        [`DefaultOptimizerComputeStep`][ropt.plugins.compute_step.optimizer.DefaultOptimizerComputeStep].
 
         It accepts the variables to evaluate and returns a tuple. The first
         element is a `FunctionResults` object containing the results of the
@@ -55,10 +55,10 @@ class NestedOptimizationCallable(Protocol):
         """
 
 
-class DefaultOptimizerOperation(Operation):
-    """The default optimizer operation.
+class DefaultOptimizerComputeStep(ComputeStep):
+    """The default optimizer compute step.
 
-    This operation executes an optimization algorithm based on a provided
+    This compute step executes an optimization algorithm based on a provided
     configuration ([`EnOptConfig`][ropt.config.EnOptConfig] or a compatible
     dictionary). It iteratively performs function and potentially gradient
     evaluations, yielding a sequence of
@@ -84,7 +84,7 @@ class DefaultOptimizerOperation(Operation):
       Emitted after the entire optimization process concludes (successfully,
       or due to termination conditions or errors).
 
-    This operation also supports **nested optimization**. If a
+    This compute step also supports **nested optimization**. If a
     `nested_optimization` function is provided to the `run` method, the
     optimizer will execute a nested optimization at as part of each function
     evaluation. The `nested_optimization` function is expected to return a
@@ -112,9 +112,9 @@ class DefaultOptimizerOperation(Operation):
         nested_optimization: NestedOptimizationCallable | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> ExitCode:
-        """Run the operation to perform an optimization.
+        """Run the compute step to perform an optimization.
 
-        This method executes the core logic of the optimizer operation. It
+        This method executes the core logic of the optimizer compute step. It
         requires an optimizer configuration
         ([`EnOptConfig`][ropt.config.EnOptConfig]) and optionally accepts
         specific initial variable vectors, and/or a nested optimization

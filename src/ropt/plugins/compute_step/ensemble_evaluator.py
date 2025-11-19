@@ -9,8 +9,8 @@ import numpy as np
 
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, ExitCode
-from ropt.exceptions import OperationAborted
-from ropt.plugins.operation.base import Operation
+from ropt.exceptions import ComputeStepAborted
+from ropt.plugins.compute_step.base import ComputeStep
 from ropt.results import FunctionResults
 from ropt.workflow import Event
 
@@ -23,15 +23,15 @@ if TYPE_CHECKING:
     from ropt.transforms import OptModelTransforms
 
 
-class DefaultEnsembleEvaluatorOperation(Operation):
-    """The default ensemble evaluator operation for optimization workflows.
+class DefaultEnsembleEvaluatorComputeStep(ComputeStep):
+    """The default ensemble evaluator compute step for optimization workflows.
 
-    This operation performs one or more ensemble evaluations based on the
+    This compute step performs one or more ensemble evaluations based on the
     provided `variables`. It yields a tuple of
     [`FunctionResults`][ropt.results.FunctionResults] objects, one for each
     input variable vector evaluated.
 
-    The operation emits the following events:
+    The compute step emits the following events:
 
     - [`START_ENSEMBLE_EVALUATOR`][ropt.enums.EventType.START_ENSEMBLE_EVALUATOR]:
       Emitted before the evaluation process begins.
@@ -42,7 +42,7 @@ class DefaultEnsembleEvaluatorOperation(Operation):
       in its `data` dictionary under the key `"results"`. Event handlers
       typically listen for this event.
     - [`FINISHED_ENSEMBLE_EVALUATOR`][ropt.enums.EventType.FINISHED_ENSEMBLE_EVALUATOR]:
-      Emitted after the entire operation, including result emission, is finished.
+      Emitted after the entire compute step, including result emission, is finished.
     """
 
     def __init__(self, *, evaluator: Evaluator, plugin_manager: PluginManager) -> None:
@@ -109,7 +109,7 @@ class DefaultEnsembleEvaluatorOperation(Operation):
             results = ensemble_evaluator.calculate(
                 variables, compute_functions=True, compute_gradients=False
             )
-        except OperationAborted as exc:
+        except ComputeStepAborted as exc:
             exit_code = exc.exit_code
 
         assert results

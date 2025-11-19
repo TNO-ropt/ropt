@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt
 
 from ropt.config import EnOptConfig
 from ropt.enums import ExitCode
-from ropt.exceptions import OperationAborted
+from ropt.exceptions import ComputeStepAborted
 
 from .base import RealizationFilter, RealizationFilterPlugin
 
@@ -267,7 +267,7 @@ class DefaultRealizationFilter(RealizationFilter):
                 raise ValueError(msg)
 
         if not np.any(weights > 0):
-            raise OperationAborted(exit_code=ExitCode.TOO_FEW_REALIZATIONS)
+            raise ComputeStepAborted(exit_code=ExitCode.TOO_FEW_REALIZATIONS)
 
         return weights
 

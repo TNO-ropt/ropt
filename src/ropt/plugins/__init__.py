@@ -12,12 +12,12 @@ the optimization workflow:
 Workflow related plugins may directly be used by the user to create components when building
 optimization workflows, generally via these convenience methods:
 
-  - [create_operation][ropt.plugins.PluginManager.create_operation]: Create
-    operations, such as optimizations to run during workflow execution.
+  - [create_compute_step][ropt.plugins.PluginManager.create_compute_step]: Create
+    compute steps, such as optimizations to run during workflow execution.
   - [create_event_handler][ropt.plugins.PluginManager.create_event_handler]:
     Create handlers to process events generated duing optimization.
   - [create_evaluator][ropt.plugins.PluginManager.create_event_handler]: Create
-    evaluators to for use by workflow operations
+    evaluators to for use by compute steps
 
 **Optimizer related plugins:**
 
@@ -45,7 +45,7 @@ Each plugin type has a corresponding abstract base class that custom plugins
 must inherit from:
 
 - **Workflow plugins:**
-  [`OperationPlugin`][ropt.plugins.operation.base.OperationPlugin],
+  [`ComputeStepPlugin`][ropt.plugins.compute_step.base.ComputeStepPlugin],
   [`EventHandlerPlugin`][ropt.plugins.event_handler.base.EventHandlerPlugin],
   [`EvaluatorPlugin`][ropt.plugins.evaluator.base.EvaluatorPlugin]
 - **Optimizer:**
@@ -79,7 +79,7 @@ the objects that implement the desired functionality. These objects must inherit
 from the base class for the corresponding plugin type:
 
 - Workflow related plugins:
-  [`Operation`][ropt.plugins.operation.base.Operation],
+  [`ComputeStep`][ropt.plugins.compute_step.base.ComputeStep],
   [`EventHandler`][ropt.plugins.event_handler.base.EventHandler],
   [`Evaluator`][ropt.plugins.evaluator.base.Evaluator]
 - Optimizer: [`Optimizer`][ropt.plugins.optimizer.base.Optimizer]
@@ -91,7 +91,7 @@ from the base class for the corresponding plugin type:
 
 The [create_evaluator][ropt.plugins.PluginManager.create_event_handler],
 [create_event_handler][ropt.plugins.PluginManager.create_event_handler] and
-[create_operation][ropt.plugins.PluginManager.create_operation] methods are
+[create_compute_step][ropt.plugins.PluginManager.create_compute_step] methods are
 convenience functions that combing plugin discovery and object creation into a
 single call.
 
@@ -100,7 +100,7 @@ single call.
 `ropt` comes bundled with a set of pre-installed plugins:
 
 - **Workflow:** The built-in
-  [`default operation`][ropt.plugins.operation.default.DefaultOperationPlugin],
+  [`default compute step`][ropt.plugins.compute_step.default.DefaultComputeStepPlugin],
   [`default event handler`][ropt.plugins.event_handler.default.DefaultEventHandlerPlugin]
   and [`default evaluator`][ropt.plugins.evaluator.default.DefaultEvaluatorPlugin] plugins,
   providing components for executing complex optimization workflows.

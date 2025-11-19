@@ -43,8 +43,8 @@ for:
     in the configuration object.
 2.  **Optimization Workflow:** The same transformation objects are passed to the
     relevant optimization steps via the configuration object. (See, for example,
-    the default implementation of an optimizer operation in
-    [`DefaultOptimizerOperation.run`][ropt.plugins.operation.optimizer.DefaultOptimizerOperation.run]).
+    the default implementation of an optimizer compute step in
+    [`DefaultOptimizerComputeStep.run`][ropt.plugins.compute_step.optimizer.DefaultOptimizerComputeStep.run]).
 3.  **Evaluation:** When the optimizer requests an evaluation of a variable
     vector, the following occurs:
       -  **Transformation to the User Domain:** The variable vector is
@@ -64,7 +64,7 @@ for:
     [`transform_from_optimizer`][ropt.results.Results.transform_from_optimizer]
     method is used to create new `Results` objects with the transformed values.
     For example,
-    [`DefaultOptimizerOperation.run`][ropt.plugins.operation.optimizer.DefaultOptimizerOperation.run]
+    [`DefaultOptimizerComputeStep.run`][ropt.plugins.compute_step.optimizer.DefaultOptimizerComputeStep.run]
     emits events that include a dictionary with a `"results"` key That contains
     `Results` objects in the  optimizer domain. To obtain results in the user
     domain they must be converted using the

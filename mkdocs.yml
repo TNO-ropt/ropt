@@ -105,7 +105,7 @@ nav:
       - "Plugins":
         - "Plugin Manager": reference/plugin_manager.md
         - "Workflow Plugins":        
-          - "Operations": reference/operation_plugins.md
+          - "Compute Steps": reference/compute_steps_plugins.md
           - "Event Handlers": reference/event_handler_plugins.md
           - "Evaluators": reference/evaluator_plugins.md
         - "Optimizer Plugins":
@@ -114,7 +114,7 @@ nav:
           - "Realization Filters": reference/realization_filter_plugins.md
           - "Function estimators": reference/function_estimator_plugins.md
         - "Default Plugins":
-          - "Operations": reference/default_operation_plugins.md
+          - "Compute Steps": reference/default_compute_steps_plugins.md
           - "Event Handlers": reference/default_event_handler_plugins.md
           - "Evaluators": reference/default_evaluator_plugins.md
           - "SciPy Optimizers": reference/scipy_optimizer_plugin.md
