@@ -4,7 +4,6 @@ import numpy as np
 import pytest
 from pydantic import ValidationError
 
-from ropt.optimization import BasicOptimizer
 from ropt.plugins import PluginManager
 from ropt.plugins.optimizer.scipy import (
     _CONSTRAINT_REQUIRES_BOUNDS,
@@ -16,6 +15,7 @@ from ropt.plugins.optimizer.scipy import (
     _SUPPORTED_METHODS,
 )
 from ropt.results import Results
+from ropt.workflow import BasicOptimizer
 
 _REQUIRES_BOUNDS = _CONSTRAINT_REQUIRES_BOUNDS - {"differential_evolution"}
 _SUPPORTS_BOUNDS = _CONSTRAINT_SUPPORT_BOUNDS - {"differential_evolution"}

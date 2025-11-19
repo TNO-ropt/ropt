@@ -83,7 +83,7 @@ class EventType(IntEnum):
     registered to listen for specific event types.
 
     When an event occurs, registered callbacks receive an
-    [`Event`][ropt.optimization.Event] object containing:
+    [`Event`][ropt.workflow.Event] object containing:
 
     - `event_type`: The type of the event (a value from this enumeration).
     - `data`: A dictionary containing event-specific data, such as

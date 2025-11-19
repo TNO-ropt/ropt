@@ -94,7 +94,7 @@ nav:
   - "Introduction": usage/robust_optimization.md
   - "Reference":
       - "Workflows":
-          - "Optimization Workflows": reference/workflows.md
+          - "Optimization Workflows": reference/workflow.md
           - "Basic Optimizer": reference/basic_optimizer.md
       - "Optimization":
         - "Configuration": reference/enopt_config.md

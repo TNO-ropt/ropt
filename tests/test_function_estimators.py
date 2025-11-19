@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from ropt.optimization import BasicOptimizer
+from ropt.workflow import BasicOptimizer
 
 initial_values = 3 * [0]
 

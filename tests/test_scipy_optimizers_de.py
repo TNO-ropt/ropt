@@ -3,8 +3,8 @@ from typing import Any
 import numpy as np
 import pytest
 
-from ropt.optimization import BasicOptimizer
 from ropt.plugins import PluginManager
+from ropt.workflow import BasicOptimizer
 
 pytestmark = [pytest.mark.slow]
 

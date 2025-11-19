@@ -81,7 +81,7 @@ class EnsembleOptimizer:
     The [`EnsembleOptimizer`][ropt.optimization.EnsembleOptimizer] class
     provides the core functionality for running ensemble-based optimizations.
     Direct use of this class is generally discouraged. Instead, use the
-    [`BasicOptimizer`][ropt.optimization.BasicOptimizer] class or build a
+    [`BasicOptimizer`][ropt.workflow.BasicOptimizer] class or build a
     workflow containing the optimization steps.
     """
 

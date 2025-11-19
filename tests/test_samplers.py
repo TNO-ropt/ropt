@@ -9,8 +9,8 @@ from numpy.random import Generator, default_rng
 
 from ropt.config import EnOptConfig
 from ropt.ensemble_evaluator._gradient import _perturb_variables
-from ropt.optimization import BasicOptimizer
 from ropt.plugins.sampler.base import Sampler, SamplerPlugin
+from ropt.workflow import BasicOptimizer
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray

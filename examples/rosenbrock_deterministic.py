@@ -11,8 +11,8 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.optimization import BasicOptimizer
 from ropt.results import FunctionResults, Results
+from ropt.workflow import BasicOptimizer
 
 DIM = 5
 

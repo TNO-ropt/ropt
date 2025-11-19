@@ -10,15 +10,16 @@ import pytest
 from ropt.config import EnOptConfig
 from ropt.enums import EventType, ExitCode
 from ropt.exceptions import OperationAborted
-from ropt.optimization import BasicOptimizer, Event
 from ropt.plugins import PluginManager
 from ropt.plugins.evaluator.cached_evaluator import DefaultCachedEvaluator
 from ropt.results import FunctionResults
+from ropt.workflow import BasicOptimizer
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.evaluator import EvaluatorContext, EvaluatorResult
+    from ropt.workflow import Event
 
 
 initial_values = np.array([0.0, 0.0, 0.1])

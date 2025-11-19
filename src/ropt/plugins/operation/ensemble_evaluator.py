@@ -10,9 +10,9 @@ import numpy as np
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, ExitCode
 from ropt.exceptions import OperationAborted
-from ropt.optimization import Event
 from ropt.plugins.operation.base import Operation
 from ropt.results import FunctionResults
+from ropt.workflow import Event
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike

@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt.optimization import BasicOptimizer
 from ropt.plugins.sampler.scipy import _SUPPORTED_METHODS
 from ropt.results import GradientResults, Results
+from ropt.workflow import BasicOptimizer
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray

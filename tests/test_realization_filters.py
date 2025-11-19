@@ -5,12 +5,12 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from ropt.optimization import BasicOptimizer
 from ropt.plugins.realization_filter.default import (
     _get_cvar_weights_from_percentile,
     _sort_and_select,
 )
 from ropt.results import FunctionResults, GradientResults, Results
+from ropt.workflow import BasicOptimizer
 
 initial_values = 3 * [0]
 

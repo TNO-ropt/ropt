@@ -24,9 +24,9 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
 
     from ropt.evaluator import EvaluatorCallback
-    from ropt.optimization import Event
     from ropt.results import FunctionResults
     from ropt.transforms import OptModelTransforms
+    from ropt.workflow import Event
 
 
 @dataclass(slots=True)

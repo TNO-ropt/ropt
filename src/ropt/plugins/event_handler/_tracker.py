@@ -10,8 +10,8 @@ from ._utils import _get_last_result, _update_optimal_result
 from .base import EventHandler
 
 if TYPE_CHECKING:
-    from ropt.optimization import Event
     from ropt.results import FunctionResults
+    from ropt.workflow import Event
 
 
 class DefaultTrackerHandler(EventHandler):

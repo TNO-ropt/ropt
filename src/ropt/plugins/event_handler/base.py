@@ -9,7 +9,7 @@ from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
     from ropt.enums import EventType
-    from ropt.optimization import Event
+    from ropt.workflow import Event
 
 
 class EventHandlerPlugin(Plugin):
@@ -88,7 +88,7 @@ class EventHandler(ABC):
 
         This abstract method must be implemented by concrete `EventHandler`
         subclasses. It defines the event handler's core logic for reacting to
-        [`Event`][ropt.optimization.Event] objects emitted in the optimization
+        [`Event`][ropt.workflow.Event] objects emitted in the optimization
         workflow.
 
         Implementations should inspect the `event` object (its `event_type` and

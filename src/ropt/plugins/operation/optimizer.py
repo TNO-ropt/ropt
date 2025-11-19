@@ -10,9 +10,10 @@ from numpy.typing import NDArray  # noqa: TC002
 
 from ropt.ensemble_evaluator import EnsembleEvaluator
 from ropt.enums import EventType, ExitCode
-from ropt.optimization import EnsembleOptimizer, Event
+from ropt.optimization import EnsembleOptimizer
 from ropt.plugins.operation.base import Operation
 from ropt.results import FunctionResults
+from ropt.workflow import Event
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
