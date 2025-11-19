@@ -1304,14 +1304,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../operation_plugins/" class="md-nav__link">
+      <a href="../compute_steps_plugins/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Operations
+    Compute Steps
   
 
     
@@ -1624,14 +1624,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../default_operation_plugins/" class="md-nav__link">
+      <a href="../default_compute_steps_plugins/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Operations
+    Compute Steps
   
 
     
@@ -2465,8 +2465,8 @@ for:</p>
     in the configuration object.</li>
 <li><strong>Optimization Workflow:</strong> The same transformation objects are passed to the
     relevant optimization steps via the configuration object. (See, for example,
-    the default implementation of an optimizer operation in
-    <a class="autorefs autorefs-internal" title="            run" href="../default_operation_plugins/#ropt.plugins.operation.optimizer.DefaultOptimizerOperation.run"><code>DefaultOptimizerOperation.run</code></a>).</li>
+    the default implementation of an optimizer compute step in
+    <a class="autorefs autorefs-internal" title="            run" href="../default_compute_steps_plugins/#ropt.plugins.compute_step.optimizer.DefaultOptimizerComputeStep.run"><code>DefaultOptimizerComputeStep.run</code></a>).</li>
 <li><strong>Evaluation:</strong> When the optimizer requests an evaluation of a variable
     vector, the following occurs:<ul>
 <li><strong>Transformation to the User Domain:</strong> The variable vector is
@@ -2498,7 +2498,7 @@ for:</p>
   " href="../results/#ropt.results.Results.transform_from_optimizer"><code>transform_from_optimizer</code></a>
     method is used to create new <code>Results</code> objects with the transformed values.
     For example,
-    <a class="autorefs autorefs-internal" title="            run" href="../default_operation_plugins/#ropt.plugins.operation.optimizer.DefaultOptimizerOperation.run"><code>DefaultOptimizerOperation.run</code></a>
+    <a class="autorefs autorefs-internal" title="            run" href="../default_compute_steps_plugins/#ropt.plugins.compute_step.optimizer.DefaultOptimizerComputeStep.run"><code>DefaultOptimizerComputeStep.run</code></a>
     emits events that include a dictionary with a <code>"results"</code> key That contains
     <code>Results</code> objects in the  optimizer domain. To obtain results in the user
     domain they must be converted using the

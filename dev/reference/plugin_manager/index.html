@@ -12,7 +12,7 @@
         <link rel="prev" href="../results/">
       
       
-        <link rel="next" href="../operation_plugins/">
+        <link rel="next" href="../compute_steps_plugins/">
       
       
         
@@ -976,10 +976,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.PluginManager.create_operation" class="md-nav__link">
+  <a href="#ropt.plugins.PluginManager.create_compute_step" class="md-nav__link">
     <span class="md-ellipsis">
       
-        create_operation
+        create_compute_step
       
     </span>
   </a>
@@ -1116,14 +1116,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../operation_plugins/" class="md-nav__link">
+      <a href="../compute_steps_plugins/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Operations
+    Compute Steps
   
 
     
@@ -1436,14 +1436,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../default_operation_plugins/" class="md-nav__link">
+      <a href="../default_compute_steps_plugins/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Operations
+    Compute Steps
   
 
     
@@ -1929,10 +1929,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.PluginManager.create_operation" class="md-nav__link">
+  <a href="#ropt.plugins.PluginManager.create_compute_step" class="md-nav__link">
     <span class="md-ellipsis">
       
-        create_operation
+        create_compute_step
       
     </span>
   </a>
@@ -2043,12 +2043,12 @@ the optimization workflow:</p>
 <p>Workflow related plugins may directly be used by the user to create components when building
 optimization workflows, generally via these convenience methods:</p>
 <ul>
-<li><a class="autorefs autorefs-internal" title="            create_operation" href="#ropt.plugins.PluginManager.create_operation">create_operation</a>: Create
-    operations, such as optimizations to run during workflow execution.</li>
+<li><a class="autorefs autorefs-internal" title="            create_compute_step" href="#ropt.plugins.PluginManager.create_compute_step">create_compute_step</a>: Create
+    compute steps, such as optimizations to run during workflow execution.</li>
 <li><a class="autorefs autorefs-internal" title="            create_event_handler" href="#ropt.plugins.PluginManager.create_event_handler">create_event_handler</a>:
     Create handlers to process events generated duing optimization.</li>
 <li><a class="autorefs autorefs-internal" title="            create_event_handler" href="#ropt.plugins.PluginManager.create_event_handler">create_evaluator</a>: Create
-    evaluators to for use by workflow operations</li>
+    evaluators to for use by compute steps</li>
 </ul>
 <p><strong>Optimizer related plugins:</strong></p>
 <p>These plugins are used to implement specific features of the ensemble optimizer:</p>
@@ -2072,7 +2072,7 @@ discovered automatically using Python's standard entry points mechanism.</p>
 must inherit from:</p>
 <ul>
 <li><strong>Workflow plugins:</strong>
-  <a class="autorefs autorefs-internal" title="            ropt.plugins.operation.base.OperationPlugin" href="../operation_plugins/#ropt.plugins.operation.base.OperationPlugin"><code>OperationPlugin</code></a>,
+  <a class="autorefs autorefs-internal" title="            ropt.plugins.compute_step.base.ComputeStepPlugin" href="../compute_steps_plugins/#ropt.plugins.compute_step.base.ComputeStepPlugin"><code>ComputeStepPlugin</code></a>,
   <a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.base.EventHandlerPlugin" href="../event_handler_plugins/#ropt.plugins.event_handler.base.EventHandlerPlugin"><code>EventHandlerPlugin</code></a>,
   <a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.EvaluatorPlugin" href="../evaluator_plugins/#ropt.plugins.evaluator.base.EvaluatorPlugin"><code>EvaluatorPlugin</code></a></li>
 <li><strong>Optimizer:</strong>
@@ -2103,7 +2103,7 @@ the objects that implement the desired functionality. These objects must inherit
 from the base class for the corresponding plugin type:</p>
 <ul>
 <li>Workflow related plugins:
-  <a class="autorefs autorefs-internal" title="            ropt.plugins.operation.base.Operation" href="../operation_plugins/#ropt.plugins.operation.base.Operation"><code>Operation</code></a>,
+  <a class="autorefs autorefs-internal" title="            ropt.plugins.compute_step.base.ComputeStep" href="../compute_steps_plugins/#ropt.plugins.compute_step.base.ComputeStep"><code>ComputeStep</code></a>,
   <a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.base.EventHandler" href="../event_handler_plugins/#ropt.plugins.event_handler.base.EventHandler"><code>EventHandler</code></a>,
   <a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.Evaluator" href="../evaluator_plugins/#ropt.plugins.evaluator.base.Evaluator"><code>Evaluator</code></a></li>
 <li>Optimizer: <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.Optimizer" href="../optimizer_plugins/#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a></li>
@@ -2115,14 +2115,14 @@ from the base class for the corresponding plugin type:</p>
 </ul>
 <p>The <a class="autorefs autorefs-internal" title="            create_event_handler" href="#ropt.plugins.PluginManager.create_event_handler">create_evaluator</a>,
 <a class="autorefs autorefs-internal" title="            create_event_handler" href="#ropt.plugins.PluginManager.create_event_handler">create_event_handler</a> and
-<a class="autorefs autorefs-internal" title="            create_operation" href="#ropt.plugins.PluginManager.create_operation">create_operation</a> methods are
+<a class="autorefs autorefs-internal" title="            create_compute_step" href="#ropt.plugins.PluginManager.create_compute_step">create_compute_step</a> methods are
 convenience functions that combing plugin discovery and object creation into a
 single call.</p>
 <p><strong>Pre-installed Plugins Included with <code>ropt</code></strong></p>
 <p><code>ropt</code> comes bundled with a set of pre-installed plugins:</p>
 <ul>
 <li><strong>Workflow:</strong> The built-in
-  <a class="autorefs autorefs-internal" title="            ropt.plugins.operation.default.DefaultOperationPlugin" href="../default_operation_plugins/#ropt.plugins.operation.default.DefaultOperationPlugin"><code>default operation</code></a>,
+  <a class="autorefs autorefs-internal" title="            ropt.plugins.compute_step.default.DefaultComputeStepPlugin" href="../default_compute_steps_plugins/#ropt.plugins.compute_step.default.DefaultComputeStepPlugin"><code>default compute step</code></a>,
   <a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.default.DefaultEventHandlerPlugin" href="../default_event_handler_plugins/#ropt.plugins.event_handler.default.DefaultEventHandlerPlugin"><code>default event handler</code></a>
   and <a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.default.DefaultEvaluatorPlugin" href="../default_evaluator_plugins/#ropt.plugins.evaluator.default.DefaultEvaluatorPlugin"><code>default evaluator</code></a> plugins,
   providing components for executing complex optimization workflows.</li>
@@ -2647,17 +2647,19 @@ to retrieve a plugin with <a class="autorefs autorefs-internal" title="         
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.plugins.PluginManager.create_operation" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">create_operation</span>
+<h4 id="ropt.plugins.PluginManager.create_compute_step" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">create_compute_step</span>
 
 
 </h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create_operation</span><span class="p">(</span><span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Operation</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create_compute_step</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputeStep</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Create a new operation.</p>
+        <p>Create a new compute step.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2680,7 +2682,7 @@ to retrieve a plugin with <a class="autorefs autorefs-internal" title="         
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The method string to find the operation.</p>
+                <p>The method string to find the compute step.</p>
               </div>
             </td>
             <td>
@@ -2696,7 +2698,7 @@ to retrieve a plugin with <a class="autorefs autorefs-internal" title="         
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optional keyword arguments passed to the operation init.</p>
+                <p>Optional keyword arguments passed to the compute step init.</p>
               </div>
             </td>
             <td>
@@ -2744,7 +2746,7 @@ to retrieve a plugin with <a class="autorefs autorefs-internal" title="         
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="s2">&quot;realization_filter&quot;</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="s2">&quot;function_estimator&quot;</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="s2">&quot;event_handler&quot;</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="s2">&quot;operation&quot;</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="s2">&quot;compute_step&quot;</span><span class="p">,</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s2">&quot;evaluator&quot;</span><span class="p">,</span>
 </span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">]</span>
 </span></code></pre></div>
@@ -2766,8 +2768,8 @@ role in the optimization process:</p>
   (<a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.base.FunctionEstimatorPlugin" href="../function_estimator_plugins/#ropt.plugins.function_estimator.base.FunctionEstimatorPlugin"><code>FunctionEstimatorPlugin</code></a>).</li>
 <li><code>"event_handler"</code>: Plugins that create event handlers for processing optimization
   results (<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.base.EventHandlerPlugin" href="../event_handler_plugins/#ropt.plugins.event_handler.base.EventHandlerPlugin"><code>EventHandlerPlugin</code></a>).</li>
-<li><code>"operation"</code>: Plugins that define executable steps within an optimization workflow
-  (<a class="autorefs autorefs-internal" title="            ropt.plugins.operation.base.OperationPlugin" href="../operation_plugins/#ropt.plugins.operation.base.OperationPlugin"><code>OperationPlugin</code></a>).</li>
+<li><code>"compute_step"</code>: Plugins that define executable steps within an optimization workflow
+  (<a class="autorefs autorefs-internal" title="            ropt.plugins.compute_step.base.ComputeStepPlugin" href="../compute_steps_plugins/#ropt.plugins.compute_step.base.ComputeStepPlugin"><code>ComputeStepPlugin</code></a>).</li>
 <li><code>"evaluator"</code>: Plugins that define evaluators within an optimization workflow
   (<a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.EvaluatorPlugin" href="../evaluator_plugins/#ropt.plugins.evaluator.base.EvaluatorPlugin"><code>EvaluatorPlugin</code></a>).</li>
 </ul>
@@ -3045,13 +3047,13 @@ requested, so it overrides this method to return <code>False</code>.</p>
         
         
           
-          <a href="../operation_plugins/" class="md-footer__link md-footer__link--next" aria-label="Next: Operations">
+          <a href="../compute_steps_plugins/" class="md-footer__link md-footer__link--next" aria-label="Next: Compute Steps">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Operations
+                Compute Steps
               </div>
             </div>
             <div class="md-footer__button md-icon">
