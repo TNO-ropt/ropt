@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.workflow.BasicOptimizer" class="md-skip">
+        <a href="#ropt.workflow._basic_optimizer" class="md-skip">
           Skip to content
         </a>
       
@@ -597,6 +597,17 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.workflow._basic_optimizer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        _basic_optimizer
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#ropt.workflow.BasicOptimizer" class="md-nav__link">
@@ -1794,6 +1805,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#ropt.workflow._basic_optimizer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        _basic_optimizer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.workflow.BasicOptimizer" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1909,6 +1931,48 @@
 
   <h1>Basic Optimizer</h1>
 
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="ropt.workflow._basic_optimizer" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.workflow._basic_optimizer</span>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>This module defines a basic optimization object.</p>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
 <div class="doc doc-object doc-class">
 
 
@@ -1952,7 +2016,44 @@ operations, including:</p>
 <code>BasicOptimizer</code> reduces the boilerplate code required for simple
 optimization tasks, allowing users to focus on defining the optimization
 problem and analyzing the results.</p>
+<p>The following example demonstrates how to find the optimum of the Rosenbrock
+function using a <code>BasicOptimizer</code> object, combining it with a <code>tracker</code> to
+store the best result.</p>
 
+
+<details class="example" open>
+  <summary>Example</summary>
+  <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.evaluator</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluatorContext</span><span class="p">,</span> <span class="n">EvaluatorResult</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasicOptimizer</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">DIM</span> <span class="o">=</span> <span class="mi">5</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        <span class="s2">&quot;variable_count&quot;</span><span class="p">:</span> <span class="n">DIM</span><span class="p">,</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        <span class="s2">&quot;perturbation_magnitudes&quot;</span><span class="p">:</span> <span class="mf">1e-6</span><span class="p">,</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="p">},</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="p">}</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="n">initial_values</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">DIM</span><span class="p">)</span> <span class="o">/</span> <span class="n">DIM</span> <span class="o">+</span> <span class="mf">0.5</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="k">def</span><span class="w"> </span><span class="nf">rosenbrock</span><span class="p">(</span><span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">],</span> <span class="n">_</span><span class="p">:</span> <span class="n">EvaluatorContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluatorResult</span><span class="p">:</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>    <span class="n">objectives</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">variables</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="k">for</span> <span class="n">v_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">variables</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>        <span class="k">for</span> <span class="n">d_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">DIM</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">variables</span><span class="p">[</span><span class="n">v_idx</span><span class="p">,</span> <span class="n">d_idx</span> <span class="p">:</span> <span class="n">d_idx</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>            <span class="n">objectives</span><span class="p">[</span><span class="n">v_idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>    <span class="k">return</span> <span class="n">EvaluatorResult</span><span class="p">(</span><span class="n">objectives</span><span class="o">=</span><span class="n">objectives</span><span class="p">)</span>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="n">optimal_result</span> <span class="o">=</span> <span class="n">BasicOptimizer</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">initial_values</span><span class="p">)</span><span class="o">.</span><span class="n">results</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  variables: </span><span class="si">{</span><span class="n">optimal_result</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  objective: </span><span class="si">{</span><span class="n">optimal_result</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">weighted_objective</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+</span></code></pre></div>
+</details>
 
 <details class="note" open>
   <summary>Customization</summary>
