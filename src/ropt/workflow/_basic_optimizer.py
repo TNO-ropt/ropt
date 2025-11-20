@@ -37,7 +37,7 @@ class _Results:
 
 
 class BasicOptimizer:
-    """A class for executing single optimization runs.
+    r"""A class for executing single optimization runs.
 
     The `BasicOptimizer` is designed to simplify the process of setting up and
     executing optimization workflows that consist primarily of a single
@@ -67,6 +67,43 @@ class BasicOptimizer:
     `BasicOptimizer` reduces the boilerplate code required for simple
     optimization tasks, allowing users to focus on defining the optimization
     problem and analyzing the results.
+
+    The following example demonstrates how to find the optimum of the Rosenbrock
+    function using a `BasicOptimizer` object, combining it with a `tracker` to
+    store the best result.
+
+    Example:
+        ````python
+        import numpy as np
+        from numpy.typing import NDArray
+
+        from ropt.evaluator import EvaluatorContext, EvaluatorResult
+        from ropt.workflow import BasicOptimizer
+
+        DIM = 5
+        CONFIG = {
+            "variables": {
+                "variable_count": DIM,
+                "perturbation_magnitudes": 1e-6,
+            },
+        }
+        initial_values = 2 * np.arange(DIM) / DIM + 0.5
+
+
+        def rosenbrock(variables: NDArray[np.float64], _: EvaluatorContext) -> EvaluatorResult:
+            objectives = np.zeros((variables.shape[0], 1), dtype=np.float64)
+            for v_idx in range(variables.shape[0]):
+                for d_idx in range(DIM - 1):
+                    x, y = variables[v_idx, d_idx : d_idx + 2]
+                    objectives[v_idx, 0] += (1.0 - x) ** 2 + 100 * (y - x * x) ** 2
+            return EvaluatorResult(objectives=objectives)
+
+
+        optimal_result = BasicOptimizer(CONFIG, rosenbrock).run(initial_values).results
+
+        print(f"  variables: {optimal_result.evaluations.variables}")
+        print(f"  objective: {optimal_result.functions.weighted_objective}\n")
+        ````
 
     Note: Customization
         The optimization workflow executed by `BasicOptimizer` can be tailored

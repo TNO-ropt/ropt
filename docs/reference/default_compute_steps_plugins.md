@@ -6,8 +6,4 @@
         members: False
 
 ::: ropt.plugins.compute_step.ensemble_evaluator.DefaultEnsembleEvaluatorComputeStep
-    options:
-        members: [run]
 ::: ropt.plugins.compute_step.optimizer.DefaultOptimizerComputeStep
-    options:
-        members: [run]

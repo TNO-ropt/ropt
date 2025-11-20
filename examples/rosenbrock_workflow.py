@@ -1,0 +1,112 @@
+"""Example of optimization of a multi-dimensional Rosenbrock test function.
+
+This example demonstrates optimization of the unmodified (deterministic)
+multi-dimensional Rosenbrock function. It shows how to write a minimal
+configuration and how to run and monitor the optimization using basic workflow
+components.
+"""
+
+from typing import Any
+
+import numpy as np
+from numpy.typing import NDArray
+
+from ropt.config import EnOptConfig
+from ropt.enums import EventType
+from ropt.evaluator import EvaluatorContext, EvaluatorResult
+from ropt.plugins import PluginManager
+from ropt.results import FunctionResults
+from ropt.workflow import Event
+
+DIM = 5
+
+initial_values = 2 * np.arange(DIM) / DIM + 0.5
+CONFIG: dict[str, Any] = {
+    "variables": {
+        "variable_count": len(initial_values),
+        "perturbation_magnitudes": 1e-6,
+    },
+}
+
+
+def rosenbrock(variables: NDArray[np.float64], _: EvaluatorContext) -> EvaluatorResult:
+    """Function evaluator for the 4D rosenbrock function.
+
+    This function returns a tuple containing the calculated objectives and
+    `None`, the latter because no constraints are calculated.
+
+    Args:
+        variables: The variables to evaluate.
+        dimension: The number of variables.
+
+    Returns:
+        The calculated objective, and `None`
+    """
+    objectives = np.zeros((variables.shape[0], 1), dtype=np.float64)
+    for v_idx in range(variables.shape[0]):
+        for d_idx in range(DIM - 1):
+            x, y = variables[v_idx, d_idx : d_idx + 2]
+            objectives[v_idx, 0] += (1.0 - x) ** 2 + 100 * (y - x * x) ** 2
+    return EvaluatorResult(objectives=objectives)
+
+
+def report(event: Event) -> None:
+    """Report results of an evaluation.
+
+    Args:
+        event: The event to process.
+    """
+    for item in event.data["results"]:
+        if isinstance(item, FunctionResults) and item.functions is not None:
+            print(f"  variables: {item.evaluations.variables}")
+            print(f"  objective: {item.functions.weighted_objective}\n")
+
+
+def run_optimization(config: dict[str, Any]) -> FunctionResults:
+    """Run the optimization.
+
+    Args:
+        config: The configuration of the optimizer.
+
+    Returns:
+        The optimal results.
+    """
+    plugin_manager = PluginManager()
+    evaluator = plugin_manager.create_evaluator(
+        "function_evaluator", callback=rosenbrock
+    )
+    step = plugin_manager.create_compute_step(
+        "optimizer", evaluator=evaluator, plugin_manager=plugin_manager
+    )
+
+    tracker = plugin_manager.create_event_handler("tracker")
+    step.add_event_handler(tracker)
+
+    reporter = plugin_manager.create_event_handler(
+        "observer", callback=report, event_types={EventType.FINISHED_EVALUATION}
+    )
+    step.add_event_handler(reporter)
+
+    step.run(variables=initial_values, config=EnOptConfig.model_validate(config))
+
+    optimal_result = tracker["results"]
+    assert optimal_result is not None
+    assert optimal_result.functions is not None
+
+    print(f"  Optimal variables: {optimal_result.evaluations.variables}")
+    print(f"  Optimal objective: {optimal_result.functions.weighted_objective}\n")
+
+    return optimal_result
+
+
+def main() -> None:
+    """Run the example and check the result."""
+    optimal_result = run_optimization(CONFIG)
+    assert optimal_result is not None
+    assert optimal_result.functions is not None
+    assert np.allclose(optimal_result.functions.weighted_objective, 0, atol=1e-4)
+    assert np.allclose(optimal_result.evaluations.variables, 1, atol=1e-2)
+
+
+if __name__ == "__main__":
+    main()

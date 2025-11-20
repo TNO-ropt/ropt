@@ -28,6 +28,12 @@ def test_rosenbrock_ensemble(tmp_path: Path, monkeypatch: Any) -> None:
     module.main()
 
 
+def test_rosenbrock_workflow(tmp_path: Path, monkeypatch: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+    module = _load_from_file("rosenbrock_workflow")
+    module.main()
+
+
 def test_rosenbrock_ensemble_merged(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.chdir(tmp_path)
     module = _load_from_file("rosenbrock_ensemble")
