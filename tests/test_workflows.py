@@ -49,7 +49,7 @@ def test_run_basic(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step = plugin_manager.create_compute_step(
         "optimizer",
         evaluator=plugin_manager.create_evaluator(
-            "function_evaluator", evaluator=evaluator()
+            "function_evaluator", callback=evaluator()
         ),
         plugin_manager=plugin_manager,
     ).add_event_handler(tracker)
@@ -74,7 +74,7 @@ def test_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step = plugin_manager.create_compute_step(
         "optimizer",
         evaluator=plugin_manager.create_evaluator(
-            "function_evaluator", evaluator=evaluator()
+            "function_evaluator", callback=evaluator()
         ),
         plugin_manager=plugin_manager,
     ).add_event_handler(tracker)
@@ -102,7 +102,7 @@ def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> Non
     step = plugin_manager.create_compute_step(
         "optimizer",
         evaluator=plugin_manager.create_evaluator(
-            "function_evaluator", evaluator=evaluator()
+            "function_evaluator", callback=evaluator()
         ),
         plugin_manager=plugin_manager,
     ).add_event_handler(tracker)
@@ -134,7 +134,7 @@ def test_reset_results(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step = plugin_manager.create_compute_step(
         "optimizer",
         evaluator=plugin_manager.create_evaluator(
-            "function_evaluator", evaluator=evaluator()
+            "function_evaluator", callback=evaluator()
         ),
         plugin_manager=plugin_manager,
     ).add_event_handler(tracker)
@@ -175,7 +175,7 @@ def test_two_optimizers_alternating(
         plugin_manager.create_compute_step(
             "optimizer",
             evaluator=plugin_manager.create_evaluator(
-                "function_evaluator", evaluator=evaluator()
+                "function_evaluator", callback=evaluator()
             ),
             plugin_manager=plugin_manager,
         )
@@ -245,7 +245,7 @@ def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -
         plugin_manager.create_compute_step(
             "optimizer",
             evaluator=plugin_manager.create_evaluator(
-                "function_evaluator", evaluator=evaluator()
+                "function_evaluator", callback=evaluator()
             ),
             plugin_manager=plugin_manager,
         )
@@ -287,7 +287,7 @@ def test_restart_initial(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step = plugin_manager.create_compute_step(
         "optimizer",
         evaluator=plugin_manager.create_evaluator(
-            "function_evaluator", evaluator=evaluator()
+            "function_evaluator", callback=evaluator()
         ),
         plugin_manager=plugin_manager,
     )
@@ -325,7 +325,7 @@ def test_restart_last(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step = plugin_manager.create_compute_step(
         "optimizer",
         evaluator=plugin_manager.create_evaluator(
-            "function_evaluator", evaluator=evaluator()
+            "function_evaluator", callback=evaluator()
         ),
         plugin_manager=plugin_manager,
     )
@@ -371,7 +371,7 @@ def test_restart_optimum(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step = plugin_manager.create_compute_step(
         "optimizer",
         evaluator=plugin_manager.create_evaluator(
-            "function_evaluator", evaluator=evaluator()
+            "function_evaluator", callback=evaluator()
         ),
         plugin_manager=plugin_manager,
     )
@@ -438,7 +438,7 @@ def test_restart_optimum_with_reset(
     step = plugin_manager.create_compute_step(
         "optimizer",
         evaluator=plugin_manager.create_evaluator(
-            "function_evaluator", evaluator=evaluator(new_functions)
+            "function_evaluator", callback=evaluator(new_functions)
         ),
         plugin_manager=plugin_manager,
     )
@@ -497,7 +497,7 @@ def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step = plugin_manager.create_compute_step(
         "optimizer",
         evaluator=plugin_manager.create_evaluator(
-            "function_evaluator", evaluator=evaluator()
+            "function_evaluator", callback=evaluator()
         ),
         plugin_manager=plugin_manager,
     )
@@ -526,7 +526,7 @@ def test_evaluator(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step = plugin_manager.create_compute_step(
         "ensemble_evaluator",
         evaluator=plugin_manager.create_evaluator(
-            "function_evaluator", evaluator=evaluator()
+            "function_evaluator", callback=evaluator()
         ),
         plugin_manager=plugin_manager,
     ).add_event_handler(tracker)
@@ -554,7 +554,7 @@ def test_evaluator_multi(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step = plugin_manager.create_compute_step(
         "ensemble_evaluator",
         evaluator=plugin_manager.create_evaluator(
-            "function_evaluator", evaluator=evaluator()
+            "function_evaluator", callback=evaluator()
         ),
         plugin_manager=plugin_manager,
     ).add_event_handler(store)
@@ -590,7 +590,7 @@ def test_exit_code(
     step = plugin_manager.create_compute_step(
         "optimizer",
         evaluator=plugin_manager.create_evaluator(
-            "function_evaluator", evaluator=evaluator()
+            "function_evaluator", callback=evaluator()
         ),
         plugin_manager=plugin_manager,
     )
@@ -621,7 +621,7 @@ def test_nested_optimization(enopt_config: dict[str, Any], evaluator: Any) -> No
     plugin_manager = PluginManager()
 
     function_evaluator = plugin_manager.create_evaluator(
-        "function_evaluator", evaluator=evaluator()
+        "function_evaluator", callback=evaluator()
     )
     outer_step = plugin_manager.create_compute_step(
         "optimizer", evaluator=function_evaluator, plugin_manager=plugin_manager
@@ -689,7 +689,7 @@ def test_nested_optimization_metadata(
     plugin_manager = PluginManager()
 
     function_evaluator = plugin_manager.create_evaluator(
-        "function_evaluator", evaluator=evaluator()
+        "function_evaluator", callback=evaluator()
     )
     outer_step = plugin_manager.create_compute_step(
         "optimizer", evaluator=function_evaluator, plugin_manager=plugin_manager
@@ -754,7 +754,7 @@ def test_optimization_abort(enopt_config: Any, evaluator: Any) -> None:
         plugin_manager.create_compute_step(
             "optimizer",
             evaluator=plugin_manager.create_evaluator(
-                "function_evaluator", evaluator=evaluator()
+                "function_evaluator", callback=evaluator()
             ),
             plugin_manager=plugin_manager,
         )
@@ -845,7 +845,7 @@ def test_evaluator_cache(
     tracker = plugin_manager.create_event_handler("tracker", what="last")
 
     function_evaluator = plugin_manager.create_evaluator(
-        "function_evaluator", evaluator=evaluator((_test_function1, test_functions[1]))
+        "function_evaluator", callback=evaluator((_test_function1, test_functions[1]))
     )
     cached_evaluator = plugin_manager.create_evaluator(
         "cached_evaluator", evaluator=function_evaluator, sources={tracker}
@@ -905,7 +905,7 @@ def test_evaluator_cache_with_store(
 
     store = plugin_manager.create_event_handler("store")
     function_evaluator = plugin_manager.create_evaluator(
-        "function_evaluator", evaluator=evaluator((_test_function1, test_functions[1]))
+        "function_evaluator", callback=evaluator((_test_function1, test_functions[1]))
     )
     cached_evaluator = plugin_manager.create_evaluator(
         "cached_evaluator", evaluator=function_evaluator, sources={store}

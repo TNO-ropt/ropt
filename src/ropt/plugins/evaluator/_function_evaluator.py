@@ -26,14 +26,14 @@ class DefaultFunctionEvaluator(Evaluator):
     arguments, to the wrapped `evaluator` function.
     """
 
-    def __init__(self, *, evaluator: EvaluatorCallback) -> None:
+    def __init__(self, *, callback: EvaluatorCallback) -> None:
         """Initialize the DefaultFunctionEvaluator.
 
         Args:
-            evaluator: The callable that will perform the actual evaluation.
+            callback: The callable that will perform the actual evaluation.
         """
         super().__init__()
-        self._evaluator_callback = evaluator
+        self._evaluator_callback = callback
 
     def eval(
         self, variables: NDArray[np.float64], context: EvaluatorContext

@@ -242,7 +242,7 @@ class BasicOptimizer:
 
         if custom_function is None:
             evaluator = self._plugin_manager.create_evaluator(
-                "function_evaluator", evaluator=self._evaluator
+                "function_evaluator", callback=self._evaluator
             )
             tracker = self._plugin_manager.create_event_handler(
                 "tracker",
