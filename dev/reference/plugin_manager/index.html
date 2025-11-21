@@ -953,39 +953,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.PluginManager.create_evaluator" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        create_evaluator
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.PluginManager.create_event_handler" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        create_event_handler
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.PluginManager.create_compute_step" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        create_compute_step
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -1906,39 +1873,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.PluginManager.create_evaluator" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        create_evaluator
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.PluginManager.create_event_handler" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        create_event_handler
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.PluginManager.create_compute_step" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        create_compute_step
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -2041,13 +1975,13 @@ custom or third-party components, installed as separate packages.</p>
 the optimization workflow:</p>
 <p><strong>Workflow related plugins:</strong></p>
 <p>Workflow related plugins may directly be used by the user to create components
-when building optimization workflows, generally via these convenience methods:</p>
+when building optimization workflows, generally via these convenience functions:</p>
 <ul>
-<li><a class="autorefs autorefs-internal" title="            create_compute_step" href="#ropt.plugins.PluginManager.create_compute_step">create_compute_step</a>: Create
+<li><a class="autorefs autorefs-internal" title="            ropt.workflow.create_compute_step" href="../workflow/#ropt.workflow.create_compute_step">create_compute_step</a>: Create
     compute steps, such as optimizations, to run during workflow execution.</li>
-<li><a class="autorefs autorefs-internal" title="            create_event_handler" href="#ropt.plugins.PluginManager.create_event_handler">create_event_handler</a>:
+<li><a class="autorefs autorefs-internal" title="            ropt.workflow.create_event_handler" href="../workflow/#ropt.workflow.create_event_handler">create_event_handler</a>:
     Create handlers to process events generated during optimization.</li>
-<li><a class="autorefs autorefs-internal" title="            create_event_handler" href="#ropt.plugins.PluginManager.create_event_handler">create_evaluator</a>: Create
+<li><a class="autorefs autorefs-internal" title="            ropt.workflow.create_event_handler" href="../workflow/#ropt.workflow.create_event_handler">create_evaluator</a>: Create
     evaluators to for use by compute steps.</li>
 </ul>
 <p><strong>Optimizer related plugins:</strong></p>
@@ -2113,10 +2047,10 @@ from the base class for the corresponding plugin type:</p>
 <li>Function Estimator:
   <a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.base.FunctionEstimator" href="../function_estimator_plugins/#ropt.plugins.function_estimator.base.FunctionEstimator"><code>FunctionEstimator</code></a></li>
 </ul>
-<p>The <a class="autorefs autorefs-internal" title="            create_event_handler" href="#ropt.plugins.PluginManager.create_event_handler">create_evaluator</a>,
-<a class="autorefs autorefs-internal" title="            create_event_handler" href="#ropt.plugins.PluginManager.create_event_handler">create_event_handler</a> and
-<a class="autorefs autorefs-internal" title="            create_compute_step" href="#ropt.plugins.PluginManager.create_compute_step">create_compute_step</a> methods are
-convenience functions that combine plugin discovery and object creation into a
+<p>The <a class="autorefs autorefs-internal" title="            ropt.workflow.create_event_handler" href="../workflow/#ropt.workflow.create_event_handler">create_evaluator</a>,
+<a class="autorefs autorefs-internal" title="            ropt.workflow.create_event_handler" href="../workflow/#ropt.workflow.create_event_handler">create_event_handler</a> and
+<a class="autorefs autorefs-internal" title="            ropt.workflow.create_compute_step" href="../workflow/#ropt.workflow.create_compute_step">create_compute_step</a>
+convenience functions combine plugin discovery and object creation into a
 single call.</p>
 <p><strong>Pre-installed Plugins Included with <code>ropt</code></strong></p>
 <p><code>ropt</code> comes bundled with a set of pre-installed plugins:</p>
@@ -2483,226 +2417,6 @@ to retrieve a plugin with <a class="autorefs autorefs-internal" title="         
               <div class="doc-md-description">
                 <p>The name of a matching plugin supporting the specified method, or <code>None</code>.</p>
               </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plugins.PluginManager.create_evaluator" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">create_evaluator</span>
-
-
-</h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create_evaluator</span><span class="p">(</span><span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Evaluator</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Create a new evaluator.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>method</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The method string to find the evaluator.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>kwargs</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional keyword arguments passed to the evaluator init.</p>
-              </div>
-            </td>
-            <td>
-                  <code>{}</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plugins.PluginManager.create_event_handler" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">create_event_handler</span>
-
-
-</h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create_event_handler</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EventHandler</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Create a new event handler.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>method</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The method string to find the handler.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>kwargs</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional keyword arguments passed to the handler init.</p>
-              </div>
-            </td>
-            <td>
-                  <code>{}</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="ropt.plugins.PluginManager.create_compute_step" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">create_compute_step</span>
-
-
-</h4>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create_compute_step</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ComputeStep</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Create a new compute step.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>method</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The method string to find the compute step.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>kwargs</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional keyword arguments passed to the compute step init.</p>
-              </div>
-            </td>
-            <td>
-                  <code>{}</code>
             </td>
           </tr>
       </tbody>
