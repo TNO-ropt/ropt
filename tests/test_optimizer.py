@@ -9,11 +9,10 @@ from pydantic import ValidationError
 from ropt.config import EnOptConfig
 from ropt.config.constants import DEFAULT_SEED
 from ropt.enums import EventType, ExitCode
-from ropt.plugins import plugin_manager
 from ropt.results import FunctionResults, GradientResults, Results
 from ropt.transforms import OptModelTransforms, VariableScaler
 from ropt.transforms.base import NonLinearConstraintTransform, ObjectiveTransform
-from ropt.workflow import BasicOptimizer
+from ropt.workflow import BasicOptimizer, validate_optimizer_options
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
@@ -63,11 +62,10 @@ def test_invalid_options(enopt_config: Any, external: str) -> None:
     enopt_config["optimizer"]["method"] = f"{external}{_SLSQP}"
 
     method = enopt_config["optimizer"]["method"]
-    plugin = plugin_manager.get_plugin("optimizer", method)
     with pytest.raises(
         ValidationError, match=r"Unknown or unsupported option\(s\): `foo`"
     ):
-        plugin.validate_options(method, enopt_config["optimizer"]["options"])
+        validate_optimizer_options(method, enopt_config["optimizer"]["options"])
 
 
 def test_max_functions_exceeded(

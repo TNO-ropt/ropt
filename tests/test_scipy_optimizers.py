@@ -4,7 +4,6 @@ import numpy as np
 import pytest
 from pydantic import ValidationError
 
-from ropt.plugins import plugin_manager
 from ropt.plugins.optimizer.scipy import (
     _CONSTRAINT_REQUIRES_BOUNDS,
     _CONSTRAINT_SUPPORT_BOUNDS,
@@ -15,7 +14,7 @@ from ropt.plugins.optimizer.scipy import (
     _SUPPORTED_METHODS,
 )
 from ropt.results import Results
-from ropt.workflow import BasicOptimizer
+from ropt.workflow import BasicOptimizer, validate_optimizer_options
 
 _REQUIRES_BOUNDS = _CONSTRAINT_REQUIRES_BOUNDS - {"differential_evolution"}
 _SUPPORTS_BOUNDS = _CONSTRAINT_SUPPORT_BOUNDS - {"differential_evolution"}
@@ -54,9 +53,7 @@ def test_scipy_invalid_options(enopt_config: Any) -> None:
     with pytest.raises(
         ValidationError, match=r"Unknown or unsupported option\(s\): `foo`"
     ):
-        plugin_manager.get_plugin("optimizer", "slsqp").validate_options(
-            "slsqp", enopt_config["optimizer"]["options"]
-        )
+        validate_optimizer_options("slsqp", enopt_config["optimizer"]["options"])
 
 
 def test_scipy_invalid_options_type(enopt_config: Any) -> None:
@@ -66,9 +63,7 @@ def test_scipy_invalid_options_type(enopt_config: Any) -> None:
     with pytest.raises(
         ValueError, match="SciPy optimizer options must be a dictionary"
     ):
-        plugin_manager.get_plugin("optimizer", "slsqp").validate_options(
-            "slsqp", enopt_config["optimizer"]["options"]
-        )
+        validate_optimizer_options("slsqp", enopt_config["optimizer"]["options"])
 
 
 @pytest.mark.parametrize("method", sorted(_SUPPORTED - _REQUIRES_BOUNDS))
