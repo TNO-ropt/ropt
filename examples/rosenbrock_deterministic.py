@@ -15,14 +15,13 @@ from ropt.results import FunctionResults, Results
 from ropt.workflow import BasicOptimizer
 
 DIM = 5
-
-initial_values = 2 * np.arange(DIM) / DIM + 0.5
 CONFIG: dict[str, Any] = {
     "variables": {
-        "variable_count": len(initial_values),
+        "variable_count": DIM,
         "perturbation_magnitudes": 1e-6,
     },
 }
+initial_values = 2 * np.arange(DIM) / DIM + 0.5
 
 
 def rosenbrock(variables: NDArray[np.float64], _: EvaluatorContext) -> EvaluatorResult:

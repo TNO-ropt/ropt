@@ -16,7 +16,9 @@ import numpy as np
 from ropt.config import EnOptConfig
 from ropt.enums import EventType, ExitCode
 from ropt.exceptions import ComputeStepAborted
-from ropt.plugins import PluginManager
+from ropt.plugins import plugin_manager
+
+from ._factory import create_compute_step, create_evaluator, create_event_handler
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -101,8 +103,8 @@ class BasicOptimizer:
 
         optimal_result = BasicOptimizer(CONFIG, rosenbrock).run(initial_values).results
 
-        print(f"  variables: {optimal_result.evaluations.variables}")
-        print(f"  objective: {optimal_result.functions.weighted_objective}\n")
+        print(f"variables: {optimal_result.evaluations.variables}")
+        print(f"objective: {optimal_result.functions.weighted_objective}")
         ````
 
     Note: Customization
@@ -215,7 +217,6 @@ class BasicOptimizer:
         self._transforms = transforms
         self._constraint_tolerance = constraint_tolerance
         self._evaluator = evaluator
-        self._plugin_manager = PluginManager()
         self._observers: list[tuple[EventType, Callable[[Event], None]]] = []
         self._results: _Results
 
@@ -278,28 +279,24 @@ class BasicOptimizer:
         custom_function = self._get_custom_compute_step()
 
         if custom_function is None:
-            evaluator = self._plugin_manager.create_evaluator(
-                "function_evaluator", callback=self._evaluator
-            )
-            tracker = self._plugin_manager.create_event_handler(
+            evaluator = create_evaluator("function_evaluator", callback=self._evaluator)
+            tracker = create_event_handler(
                 "tracker",
                 constraint_tolerance=self._constraint_tolerance,
             )
-            optimizer = self._plugin_manager.create_compute_step(
-                "optimizer", evaluator=evaluator, plugin_manager=self._plugin_manager
+            optimizer = create_compute_step(
+                "optimizer", evaluator=evaluator
             ).add_event_handler(tracker)
             for event_type, function in self._observers:
                 optimizer.add_event_handler(
-                    self._plugin_manager.create_event_handler(
+                    create_event_handler(
                         "observer",
                         event_types={event_type},
                         callback=function,
                     )
                 )
             for handler in self._custom_event_handlers():
-                optimizer.add_event_handler(
-                    self._plugin_manager.create_event_handler(handler)
-                )
+                optimizer.add_event_handler(create_event_handler(handler))
 
             exit_code = optimizer.run(
                 variables=np.asarray(initial_values, dtype=np.float64),
@@ -384,14 +381,12 @@ class BasicOptimizer:
             if not sep:
                 compute_step_name, script = "run_script", compute_step_name
             if (
-                self._plugin_manager.get_plugin_name("compute_step", compute_step_name)
+                plugin_manager.get_plugin_name("compute_step", compute_step_name)
                 is not None
             ):
-                compute_step: Callable[[], ExitCode] = (
-                    self._plugin_manager.create_compute_step(compute_step_name).run(
-                        evaluator=self._evaluator, script=script
-                    )
-                )
+                compute_step: Callable[[], ExitCode] = create_compute_step(
+                    compute_step_name
+                ).run(evaluator=self._evaluator, script=script)
                 return compute_step
         return None
 
@@ -399,10 +394,7 @@ class BasicOptimizer:
         handlers = os.environ.get("ROPT_HANDLERS", "").split(",")
         handlers += _get_option("event_handlers")
         for handler in dict.fromkeys(handlers):
-            if (
-                self._plugin_manager.get_plugin_name("event_handler", handler)
-                is not None
-            ):
+            if plugin_manager.get_plugin_name("event_handler", handler) is not None:
                 yield handler
 
 

@@ -18,7 +18,6 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ropt.config import EnOptConfig
-    from ropt.plugins import PluginManager
     from ropt.plugins.evaluator.base import Evaluator
     from ropt.transforms import OptModelTransforms
 
@@ -45,16 +44,14 @@ class DefaultEnsembleEvaluatorComputeStep(ComputeStep):
       Emitted after the entire compute step, including result emission, is finished.
     """
 
-    def __init__(self, *, evaluator: Evaluator, plugin_manager: PluginManager) -> None:
+    def __init__(self, *, evaluator: Evaluator) -> None:
         """Initialize a default evaluator.
 
         Args:
-            evaluator:      The evaluator object to run function evaluations.
-            plugin_manager: The plugin manager used to retrieve optimizer components
+            evaluator: The evaluator object to run function evaluations.
         """
         super().__init__()
         self._evaluator = evaluator
-        self._plugin_manager = plugin_manager
 
     def run(
         self,
@@ -98,9 +95,7 @@ class DefaultEnsembleEvaluatorComputeStep(ComputeStep):
         if transforms is not None and transforms.variables is not None:
             variables = transforms.variables.to_optimizer(variables)
 
-        ensemble_evaluator = EnsembleEvaluator(
-            config, transforms, self._evaluator.eval, self._plugin_manager
-        )
+        ensemble_evaluator = EnsembleEvaluator(config, transforms, self._evaluator.eval)
 
         exit_code = ExitCode.ENSEMBLE_EVALUATOR_FINISHED
 

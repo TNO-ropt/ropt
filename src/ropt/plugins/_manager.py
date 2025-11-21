@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from functools import cache
 from importlib.metadata import entry_points
-from typing import TYPE_CHECKING, Any, Final, Literal
+from typing import TYPE_CHECKING, Any, Final, Literal, cast
 
-from .compute_step.base import ComputeStep, ComputeStepPlugin
-from .evaluator.base import Evaluator, EvaluatorPlugin
-from .event_handler.base import EventHandler, EventHandlerPlugin
+from .compute_step.base import ComputeStepPlugin
+from .evaluator.base import EvaluatorPlugin
+from .event_handler.base import EventHandlerPlugin
 from .function_estimator.base import FunctionEstimatorPlugin
 from .optimizer.base import OptimizerPlugin
 from .realization_filter.base import RealizationFilterPlugin
@@ -17,16 +17,6 @@ from .sampler.base import SamplerPlugin
 if TYPE_CHECKING:
     from ropt.plugins.base import Plugin
 
-
-_PLUGIN_TYPES: Final = {
-    "function_estimator": FunctionEstimatorPlugin,
-    "optimizer": OptimizerPlugin,
-    "sampler": SamplerPlugin,
-    "realization_filter": RealizationFilterPlugin,
-    "event_handler": EventHandlerPlugin,
-    "compute_step": ComputeStepPlugin,
-    "evaluator": EvaluatorPlugin,
-}
 
 PluginType = Literal[
     "optimizer",
@@ -58,6 +48,17 @@ role in the optimization process:
 * `"evaluator"`: Plugins that define evaluators within an optimization workflow
   ([`EvaluatorPlugin`][ropt.plugins.evaluator.base.EvaluatorPlugin]).
 """
+
+
+_PLUGIN_TYPES: Final = {
+    "function_estimator": FunctionEstimatorPlugin,
+    "optimizer": OptimizerPlugin,
+    "sampler": SamplerPlugin,
+    "realization_filter": RealizationFilterPlugin,
+    "event_handler": EventHandlerPlugin,
+    "compute_step": ComputeStepPlugin,
+    "evaluator": EvaluatorPlugin,
+}
 
 
 class PluginManager:
@@ -98,20 +99,15 @@ class PluginManager:
 
     def __init__(self) -> None:
         """Initialize the plugin manager."""
-        # Built-in plugins, listed for all possible plugin types:
-        self._plugins: dict[PluginType, dict[str, type[Plugin]]] = {
-            "optimizer": {},
-            "sampler": {},
-            "realization_filter": {},
-            "function_estimator": {},
-            "event_handler": {},
-            "compute_step": {},
-            "evaluator": {},
-        }
+        self._plugins: dict[PluginType, dict[str, type[Plugin]]] = {}
 
-        for plugin_type in self._plugins:
+    def _init(self) -> None:
+        if self._plugins:
+            return
+        for plugin_type in _PLUGIN_TYPES:
             for name, plugin in _from_entry_points(plugin_type).items():
-                self._add_plugin(plugin_type, name, plugin)
+                assert plugin_type in _PLUGIN_TYPES
+                self._add_plugin(cast("PluginType", plugin_type), name, plugin)
 
     def _add_plugin(
         self,
@@ -121,6 +117,8 @@ class PluginManager:
         *,
         prioritize: bool = False,
     ) -> None:
+        if plugin_type not in self._plugins:
+            self._plugins[plugin_type] = {}
         name_lower = name.lower()
         if name_lower in self._plugins[plugin_type]:
             msg = f"Duplicate plugin name: {name_lower}"
@@ -135,6 +133,7 @@ class PluginManager:
     def _get_plugin(
         self, plugin_type: PluginType, method: str
     ) -> tuple[str, Any] | None:
+        self._init()
         split_method = method.split("/", maxsplit=1)
         if len(split_method) > 1:
             plugin_name, method = split_method
@@ -213,43 +212,6 @@ class PluginManager:
         if plugin is None:
             return None
         return plugin[0]
-
-    def create_evaluator(self, method: str, **kwargs: Any) -> Evaluator:  # noqa: ANN401
-        """Create a new evaluator.
-
-        Args:
-            method: The method string to find the evaluator.
-            kwargs: Optional keyword arguments passed to the evaluator init.
-        """
-        evaluator = self.get_plugin("evaluator", method=method).create(method, **kwargs)
-        assert isinstance(evaluator, Evaluator)
-        return evaluator
-
-    def create_event_handler(self, method: str, **kwargs: Any) -> EventHandler:  # noqa: ANN401
-        """Create a new event handler.
-
-        Args:
-            method: The method string to find the handler.
-            kwargs: Optional keyword arguments passed to the handler init.
-        """
-        handler = self.get_plugin("event_handler", method=method).create(
-            method, **kwargs
-        )
-        assert isinstance(handler, EventHandler)
-        return handler
-
-    def create_compute_step(self, method: str, **kwargs: Any) -> ComputeStep:  # noqa: ANN401
-        """Create a new compute step.
-
-        Args:
-            method: The method string to find the compute step.
-            kwargs: Optional keyword arguments passed to the compute step init.
-        """
-        compute_step = self.get_plugin("compute_step", method=method).create(
-            method, **kwargs
-        )
-        assert isinstance(compute_step, ComputeStep)
-        return compute_step
 
 
 @cache  # Without the cache, repeated calls are very slow

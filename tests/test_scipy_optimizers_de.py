@@ -3,7 +3,7 @@ from typing import Any
 import numpy as np
 import pytest
 
-from ropt.plugins import PluginManager
+from ropt.plugins import plugin_manager
 from ropt.workflow import BasicOptimizer
 
 pytestmark = [pytest.mark.slow]
@@ -40,7 +40,6 @@ def test_scipy_bound_constraints_de(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["variables"]["lower_bounds"] = [0.15, 0.0, 0.0]
     enopt_config["variables"]["upper_bounds"] = [0.5, 0.5, 0.2]
 
-    plugin_manager = PluginManager()
     plugin = plugin_manager.get_plugin("optimizer", "differential_evolution")
     plugin.validate_options(
         "differential_evolution", enopt_config["optimizer"]["options"]

@@ -19,7 +19,6 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ropt.config import EnOptConfig
-    from ropt.plugins import PluginManager
     from ropt.plugins.evaluator.base import Evaluator
     from ropt.results import Results
     from ropt.transforms import OptModelTransforms
@@ -92,16 +91,14 @@ class DefaultOptimizerComputeStep(ComputeStep):
     that indicates whether the optimization was aborted by the user.
     """
 
-    def __init__(self, *, evaluator: Evaluator, plugin_manager: PluginManager) -> None:
+    def __init__(self, *, evaluator: Evaluator) -> None:
         """Initialize a default optimizer.
 
         Args:
-            evaluator:      The evaluator object to run function evaluations.
-            plugin_manager: The plugin manager used to retrieve optimizer components
+            evaluator: The evaluator object to run function evaluations.
         """
         super().__init__()
         self._evaluator = evaluator
-        self._plugin_manager = plugin_manager
 
     def run(
         self,
@@ -165,14 +162,12 @@ class DefaultOptimizerComputeStep(ComputeStep):
             self._config,
             self._transforms,
             self._evaluator.eval,
-            self._plugin_manager,
         )
 
         ensemble_optimizer = EnsembleOptimizer(
             enopt_config=self._config,
             transforms=self._transforms,
             ensemble_evaluator=ensemble_evaluator,
-            plugin_manager=self._plugin_manager,
             nested_optimizer=(
                 self._run_nested_optimization
                 if self._nested_optimization is not None

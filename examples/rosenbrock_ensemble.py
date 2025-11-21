@@ -19,15 +19,13 @@ from ropt.workflow import BasicOptimizer
 
 DIM = 5
 UNCERTAINTY = 0.1
-
-
-initial_values = 2 * np.arange(DIM) / DIM + 0.5
 CONFIG: dict[str, Any] = {
     "variables": {
-        "variable_count": len(initial_values),
+        "variable_count": DIM,
         "perturbation_magnitudes": 1e-6,
     },
 }
+initial_values = 2 * np.arange(DIM) / DIM + 0.5
 
 
 def rosenbrock(

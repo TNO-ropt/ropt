@@ -10,13 +10,13 @@ the optimization workflow:
 **Workflow related plugins:**
 
 Workflow related plugins may directly be used by the user to create components
-when building optimization workflows, generally via these convenience methods:
+when building optimization workflows, generally via these convenience functions:
 
-  - [create_compute_step][ropt.plugins.PluginManager.create_compute_step]: Create
+  - [create_compute_step][ropt.workflow.create_compute_step]: Create
     compute steps, such as optimizations, to run during workflow execution.
-  - [create_event_handler][ropt.plugins.PluginManager.create_event_handler]:
+  - [create_event_handler][ropt.workflow.create_event_handler]:
     Create handlers to process events generated during optimization.
-  - [create_evaluator][ropt.plugins.PluginManager.create_event_handler]: Create
+  - [create_evaluator][ropt.workflow.create_event_handler]: Create
     evaluators to for use by compute steps.
 
 **Optimizer related plugins:**
@@ -89,10 +89,10 @@ from the base class for the corresponding plugin type:
 - Function Estimator:
   [`FunctionEstimator`][ropt.plugins.function_estimator.base.FunctionEstimator]
 
-The [create_evaluator][ropt.plugins.PluginManager.create_event_handler],
-[create_event_handler][ropt.plugins.PluginManager.create_event_handler] and
-[create_compute_step][ropt.plugins.PluginManager.create_compute_step] methods are
-convenience functions that combine plugin discovery and object creation into a
+The [create_evaluator][ropt.workflow.create_event_handler],
+[create_event_handler][ropt.workflow.create_event_handler] and
+[create_compute_step][ropt.workflow.create_compute_step]
+convenience functions combine plugin discovery and object creation into a
 single call.
 
 **Pre-installed Plugins Included with `ropt`**
@@ -126,3 +126,5 @@ __all__ = [
     "PluginManager",
     "PluginType",
 ]
+
+plugin_manager = PluginManager()

@@ -9,7 +9,7 @@ from pydantic import ValidationError
 from ropt.config import EnOptConfig
 from ropt.config.constants import DEFAULT_SEED
 from ropt.enums import EventType, ExitCode
-from ropt.plugins._manager import PluginManager
+from ropt.plugins import plugin_manager
 from ropt.results import FunctionResults, GradientResults, Results
 from ropt.transforms import OptModelTransforms, VariableScaler
 from ropt.transforms.base import NonLinearConstraintTransform, ObjectiveTransform
@@ -63,7 +63,7 @@ def test_invalid_options(enopt_config: Any, external: str) -> None:
     enopt_config["optimizer"]["method"] = f"{external}{_SLSQP}"
 
     method = enopt_config["optimizer"]["method"]
-    plugin = PluginManager().get_plugin("optimizer", method)
+    plugin = plugin_manager.get_plugin("optimizer", method)
     with pytest.raises(
         ValidationError, match=r"Unknown or unsupported option\(s\): `foo`"
     ):

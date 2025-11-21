@@ -63,8 +63,7 @@ class Evaluator(ABC):
     [`EvaluatorResult`][ropt.evaluator.EvaluatorResult].
 
     `Evaluator` instances are typically created using the
-    [`create_evaluator`][ropt.plugins.PluginManager.create_evaluator] method
-    of a plugin manager.
+    [`create_evaluator`][ropt.workflow.create_evaluator] function.
     """
 
     @abstractmethod

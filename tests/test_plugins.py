@@ -7,7 +7,7 @@ import pytest
 from pydantic import ValidationError
 
 from ropt.config.options import OptionsSchemaModel
-from ropt.plugins import PluginManager
+from ropt.plugins import PluginManager, plugin_manager
 from ropt.plugins.optimizer.base import OptimizerPlugin
 from ropt.plugins.optimizer.scipy import SciPyOptimizerPlugin
 
@@ -16,17 +16,27 @@ if TYPE_CHECKING:
     from ropt.optimization import OptimizerCallback
 
 
-class MockedPlugin(OptimizerPlugin):
+class MockedPlugin1(OptimizerPlugin):
     @classmethod
     def create(cls, _0: EnOptConfig, _1: OptimizerCallback) -> None:  # type: ignore[override]
         pass
 
     @classmethod
     def is_supported(cls, method: str) -> bool:
-        return method.lower() in {"slsqp", "test"}
+        return method.lower() in {"test"}
 
 
-class MockedPluginWithValidation(MockedPlugin):
+class MockedPlugin2(OptimizerPlugin):
+    @classmethod
+    def create(cls, _0: EnOptConfig, _1: OptimizerCallback) -> None:  # type: ignore[override]
+        pass
+
+    @classmethod
+    def is_supported(cls, method: str) -> bool:
+        return method.lower() in {"test"}
+
+
+class MockedPluginWithValidation(MockedPlugin1):
     @classmethod
     def validate_options(
         cls, method: str, options: dict[str, Any] | list[str] | None
@@ -47,51 +57,33 @@ class MockedPluginWithValidation(MockedPlugin):
 
 
 def test_default_plugins() -> None:
-    plugin_manager = PluginManager()
-
     plugin = plugin_manager.get_plugin("optimizer", "slsqp")
     assert issubclass(plugin, SciPyOptimizerPlugin)
 
 
 def test_default_plugins_full_spec() -> None:
-    plugin_manager = PluginManager()
-
     plugin = plugin_manager.get_plugin("optimizer", "scipy/slsqp")
     assert issubclass(plugin, SciPyOptimizerPlugin)
 
 
-def test_added_plugin() -> None:
-    plugin_manager = PluginManager()
-    plugin_manager._add_plugin("optimizer", "test", MockedPlugin)
+def test_added_plugin_prioritize(monkeypatch: Any) -> None:
+    manager = PluginManager()
+    monkeypatch.setattr(manager, "_init", lambda: None)
+    manager._add_plugin("optimizer", "test1", MockedPlugin1)
+    manager._add_plugin("optimizer", "test2", MockedPlugin2)
 
-    plugin = plugin_manager.get_plugin("optimizer", "test")
-    assert issubclass(plugin, MockedPlugin)
+    plugin = manager.get_plugin("optimizer", "test")
+    assert issubclass(plugin, MockedPlugin1)
 
-    plugin = plugin_manager.get_plugin("optimizer", "slsqp")
-    assert issubclass(plugin, SciPyOptimizerPlugin)
-
-    plugin = plugin_manager.get_plugin("optimizer", "test/slsqp")
-    assert issubclass(plugin, MockedPlugin)
-
-
-def test_added_plugin_prioritize() -> None:
-    plugin_manager = PluginManager()
-    plugin_manager._add_plugin("optimizer", "test", MockedPlugin, prioritize=True)
-
-    plugin = plugin_manager.get_plugin("optimizer", "test")
-    assert issubclass(plugin, MockedPlugin)
-
-    plugin = plugin_manager.get_plugin("optimizer", "slsqp")
-    assert issubclass(plugin, MockedPlugin)
-
-    plugin = plugin_manager.get_plugin("optimizer", "scipy/slsqp")
-    assert issubclass(plugin, SciPyOptimizerPlugin)
+    plugin = manager.get_plugin("optimizer", "test2/test")
+    assert issubclass(plugin, MockedPlugin2)
 
 
-def test_validate_options() -> None:
-    plugin_manager = PluginManager()
-    plugin_manager._add_plugin("optimizer", "test", MockedPluginWithValidation)
-    plugin = plugin_manager.get_plugin("optimizer", "test")
+def test_validate_options(monkeypatch: Any) -> None:
+    manager = PluginManager()
+    monkeypatch.setattr(manager, "_init", lambda: None)
+    manager._add_plugin("optimizer", "test", MockedPluginWithValidation)
+    plugin = manager.get_plugin("optimizer", "test")
     assert issubclass(plugin, MockedPluginWithValidation)
     plugin.validate_options("test", {"a": 1.0})
     plugin.validate_options("test", {"a": "foo"})

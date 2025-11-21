@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 from numpy.random import default_rng
 
+from ropt.plugins import plugin_manager
 from ropt.results import (
     ConstraintInfo,
     FunctionEvaluations,
@@ -34,7 +35,6 @@ if TYPE_CHECKING:
 
     from ropt.config import EnOptConfig
     from ropt.evaluator import EvaluatorCallback
-    from ropt.plugins import PluginManager
     from ropt.plugins.function_estimator.base import FunctionEstimator
     from ropt.plugins.realization_filter.base import RealizationFilter
     from ropt.plugins.sampler.base import Sampler
@@ -61,7 +61,6 @@ class EnsembleEvaluator:
         config: EnOptConfig,
         transforms: OptModelTransforms | None,
         evaluator: EvaluatorCallback,
-        plugin_manager: PluginManager,
     ) -> None:
         """Initialize the EnsembleEvaluator.
 
@@ -81,15 +80,14 @@ class EnsembleEvaluator:
             config:         The configuration object.
             transforms:     The domain transforms to apply.
             evaluator:      The callable for evaluating individual functions.
-            plugin_manager: A plugin manager to load required plugins.
         """
         self._config = config
         self._transforms = transforms
         self._evaluator = evaluator
-        self._realization_filters = self._init_realization_filters(plugin_manager)
-        self._function_estimators = self._init_function_estimators(plugin_manager)
+        self._realization_filters = self._init_realization_filters()
+        self._function_estimators = self._init_function_estimators()
         rng = default_rng(config.variables.seed)
-        self._samplers = self._init_samplers(rng, plugin_manager)
+        self._samplers = self._init_samplers(rng)
         self._cache_for_gradient: FunctionResults | None = None
 
     def calculate(
@@ -631,9 +629,7 @@ class EnsembleEvaluator:
                 constraint_weights[apply_to_constraints, :] = weights
         return objective_weights, constraint_weights
 
-    def _init_realization_filters(
-        self, plugin_manager: PluginManager
-    ) -> list[RealizationFilter]:
+    def _init_realization_filters(self) -> list[RealizationFilter]:
         return [
             plugin_manager.get_plugin(
                 "realization_filter", method=filter_config.method
@@ -641,9 +637,7 @@ class EnsembleEvaluator:
             for idx, filter_config in enumerate(self._config.realization_filters)
         ]
 
-    def _init_function_estimators(
-        self, plugin_manager: PluginManager
-    ) -> list[FunctionEstimator]:
+    def _init_function_estimators(self) -> list[FunctionEstimator]:
         return [
             plugin_manager.get_plugin(
                 "function_estimator", method=estimator_config.method
@@ -651,9 +645,7 @@ class EnsembleEvaluator:
             for idx, estimator_config in enumerate(self._config.function_estimators)
         ]
 
-    def _init_samplers(
-        self, rng: Generator, plugin_manager: PluginManager
-    ) -> list[Sampler]:
+    def _init_samplers(self, rng: Generator) -> list[Sampler]:
         samplers: list[Sampler] = []
         for idx, sampler_config in enumerate(self._config.samplers):
             variable_indices = np.asarray(

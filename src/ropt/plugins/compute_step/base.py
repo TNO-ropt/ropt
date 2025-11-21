@@ -53,8 +53,7 @@ class ComputeStep(ABC):
     inherit from this base class.
 
     `ComputeStep` instances are typically created using the
-    [`create_compute_step`][ropt.plugins.PluginManager.create_compute_step] method
-    of a plugin manager.
+    [`create_compute_step`][ropt.workflow.create_compute_step] function.
     """
 
     def __init__(self) -> None:

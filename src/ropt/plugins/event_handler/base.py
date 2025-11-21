@@ -68,8 +68,7 @@ class EventHandler(ABC):
     define their specific event processing logic.
 
     `EventHandler` instances are typically created using the
-    [`create_event_handler`][ropt.plugins.PluginManager.create_event_handler] method
-    of a plugin manager.
+    [`create_event_handler`][ropt.workflow.create_event_handler] function.
 
     Event handlers are attached to a
     [`ComputeStep`][ropt.plugins.compute_step.base.ComputeStep] using its

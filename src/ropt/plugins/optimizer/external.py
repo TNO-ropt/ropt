@@ -20,7 +20,7 @@ import numpy as np
 from ropt.config import EnOptConfig
 from ropt.exceptions import ComputeStepAborted
 from ropt.optimization import OptimizerCallback, OptimizerCallbackResult
-from ropt.plugins import PluginManager
+from ropt.plugins import plugin_manager
 
 from .base import Optimizer, OptimizerPlugin
 
@@ -67,11 +67,9 @@ class ExternalOptimizer(Optimizer):
         self._optimizer_callback = optimizer_callback
         self._process_pid: int | None = None
 
-        optimizer: Optimizer = (
-            PluginManager()
-            .get_plugin("optimizer", config.optimizer.method.split("/", maxsplit=1)[1])
-            .create(config, lambda *_: None)
-        )
+        optimizer: Optimizer = plugin_manager.get_plugin(
+            "optimizer", config.optimizer.method.split("/", maxsplit=1)[1]
+        ).create(config, lambda *_: None)
         self._allow_nan = optimizer.allow_nan
         self._is_parallel = optimizer.is_parallel
         del optimizer
@@ -221,7 +219,7 @@ class ExternalOptimizerPlugin(OptimizerPlugin):
 
         # noqa
         """
-        return PluginManager().get_plugin_name("optimizer", method) is not None
+        return plugin_manager.get_plugin_name("optimizer", method) is not None
 
     @classmethod
     def allows_discovery(cls) -> bool:
@@ -244,9 +242,7 @@ class ExternalOptimizerPlugin(OptimizerPlugin):
         # noqa
         """
         method = method.split("/", maxsplit=1)[1]
-        PluginManager().get_plugin("optimizer", method).validate_options(
-            method, options
-        )
+        plugin_manager.get_plugin("optimizer", method).validate_options(method, options)
 
 
 class _PluginOptimizer:
@@ -315,13 +311,9 @@ class _PluginOptimizer:
         with _JSONPipeCommunicator(fifo1, fifo2) as self._comm:
             config = EnOptConfig.model_validate(self._request("config"))
 
-            optimizer = (
-                PluginManager()
-                .get_plugin(
-                    "optimizer", config.optimizer.method.split("/", maxsplit=1)[1]
-                )
-                .create(config, self._callback)
-            )
+            optimizer = plugin_manager.get_plugin(
+                "optimizer", config.optimizer.method.split("/", maxsplit=1)[1]
+            ).create(config, self._callback)
             try:
                 optimizer.start(
                     np.array(self._request("initial_values"), dtype=np.float64)

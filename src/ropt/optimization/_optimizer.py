@@ -12,6 +12,7 @@ import numpy as np
 from ropt.enums import ExitCode
 from ropt.exceptions import ComputeStepAborted
 from ropt.optimization import OptimizerCallbackResult
+from ropt.plugins import plugin_manager
 from ropt.results import FunctionResults, GradientResults
 
 if TYPE_CHECKING:
@@ -21,7 +22,6 @@ if TYPE_CHECKING:
 
     from ropt.config import EnOptConfig
     from ropt.ensemble_evaluator import EnsembleEvaluator
-    from ropt.plugins import PluginManager
     from ropt.plugins.optimizer.base import Optimizer
     from ropt.results import Functions, Gradients, Results
     from ropt.transforms._transforms import OptModelTransforms
@@ -85,12 +85,11 @@ class EnsembleOptimizer:
     workflow containing the optimization steps.
     """
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         enopt_config: EnOptConfig,
         transforms: OptModelTransforms | None,
         ensemble_evaluator: EnsembleEvaluator,
-        plugin_manager: PluginManager,
         signal_evaluation: SignalEvaluationCallback | None = None,
         nested_optimizer: NestedOptimizerCallback | None = None,
     ) -> None:
@@ -133,14 +132,12 @@ class EnsembleOptimizer:
             enopt_config:       The ensemble optimization configuration.
             transforms:         The transforms to apply to the model.
             ensemble_evaluator: The evaluator for function evaluations.
-            plugin_manager:     The plugin manager.
             signal_evaluation:  Optional callback to signal evaluations.
             nested_optimizer:   Optional callback for nested optimizations.
         """
         self._enopt_config = enopt_config
         self._transforms = transforms
         self._function_evaluator = ensemble_evaluator
-        self._plugin_manager = plugin_manager
         self._signal_evaluation = signal_evaluation
         self._nested_optimizer = nested_optimizer
 
@@ -154,7 +151,7 @@ class EnsembleOptimizer:
         # Whether NaN values are allowed:
         self._allow_nan = False
 
-        plugin = self._plugin_manager.get_plugin(
+        plugin = plugin_manager.get_plugin(
             "optimizer", method=self._enopt_config.optimizer.method
         )
 

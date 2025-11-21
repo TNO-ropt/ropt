@@ -16,13 +16,13 @@ framework is built upon three key components:
 
 Compute steps, event handlers, and evaluators are implemented using the
 [`plugin`][ropt.plugins] system. These objects are typically created via
-`PluginManager` methods:
+helper fuctions:
 
-- [create_compute_step][ropt.plugins.PluginManager.create_compute_step]: Create
+- [create_compute_step][ropt.workflow.create_compute_step]: Create
   compute steps.
-- [create_event_handler][ropt.plugins.PluginManager.create_event_handler]:
+- [create_event_handler][ropt.workflow.create_event_handler]:
   Create event handlers.
-- [create_evaluator][ropt.plugins.PluginManager.create_event_handler]: Create
+- [create_evaluator][ropt.workflow.create_event_handler]: Create
   evaluators.
 
 After creation, compute steps are executed by calling their
@@ -46,7 +46,11 @@ Example:
 
     from ropt.config import EnOptConfig
     from ropt.evaluator import EvaluatorContext, EvaluatorResult
-    from ropt.plugins import PluginManager
+    from ropt.workflow import (
+        create_compute_step,
+        create_evaluator,
+        create_event_handler,
+    )
 
     DIM = 5
     CONFIG = {
@@ -67,17 +71,14 @@ Example:
         return EvaluatorResult(objectives=objectives)
 
 
-    plugin_manager = PluginManager()
-    evaluator = plugin_manager.create_evaluator("function_evaluator", callback=rosenbrock)
-    step = plugin_manager.create_compute_step(
-        "optimizer", evaluator=evaluator, plugin_manager=plugin_manager
-    )
-    tracker = plugin_manager.create_event_handler("tracker")
+    evaluator = create_evaluator("function_evaluator", callback=rosenbrock)
+    step = create_compute_step("optimizer", evaluator=evaluator)
+    tracker = create_event_handler("tracker")
     step.add_event_handler(tracker)
     step.run(variables=initial_values, config=EnOptConfig.model_validate(CONFIG))
 
-    print(f"  Optimal variables: {tracker['results'].evaluations.variables}")
-    print(f"  Optimal objective: {tracker['results'].functions.weighted_objective}\n")
+    print(f"Optimal variables: {tracker['results'].evaluations.variables}")
+    print(f"Optimal objective: {tracker['results'].functions.weighted_objective}")
     ````
 
 Note:
@@ -89,8 +90,12 @@ Note:
 
 from ._basic_optimizer import BasicOptimizer
 from ._events import Event
+from ._factory import create_compute_step, create_evaluator, create_event_handler
 
 __all__ = [
     "BasicOptimizer",
     "Event",
+    "create_compute_step",
+    "create_evaluator",
+    "create_event_handler",
 ]

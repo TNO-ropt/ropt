@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from pydantic import ValidationError
 
-from ropt.plugins import PluginManager
+from ropt.plugins import plugin_manager
 from ropt.plugins.optimizer.scipy import (
     _CONSTRAINT_REQUIRES_BOUNDS,
     _CONSTRAINT_SUPPORT_BOUNDS,
@@ -54,7 +54,7 @@ def test_scipy_invalid_options(enopt_config: Any) -> None:
     with pytest.raises(
         ValidationError, match=r"Unknown or unsupported option\(s\): `foo`"
     ):
-        PluginManager().get_plugin("optimizer", "slsqp").validate_options(
+        plugin_manager.get_plugin("optimizer", "slsqp").validate_options(
             "slsqp", enopt_config["optimizer"]["options"]
         )
 
@@ -66,7 +66,7 @@ def test_scipy_invalid_options_type(enopt_config: Any) -> None:
     with pytest.raises(
         ValueError, match="SciPy optimizer options must be a dictionary"
     ):
-        PluginManager().get_plugin("optimizer", "slsqp").validate_options(
+        plugin_manager.get_plugin("optimizer", "slsqp").validate_options(
             "slsqp", enopt_config["optimizer"]["options"]
         )
 

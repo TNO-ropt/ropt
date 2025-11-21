@@ -14,19 +14,22 @@ from numpy.typing import NDArray
 from ropt.config import EnOptConfig
 from ropt.enums import EventType
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.plugins import PluginManager
 from ropt.results import FunctionResults
-from ropt.workflow import Event
+from ropt.workflow import (
+    Event,
+    create_compute_step,
+    create_evaluator,
+    create_event_handler,
+)
 
 DIM = 5
-
-initial_values = 2 * np.arange(DIM) / DIM + 0.5
 CONFIG: dict[str, Any] = {
     "variables": {
-        "variable_count": len(initial_values),
+        "variable_count": DIM,
         "perturbation_magnitudes": 1e-6,
     },
 }
+initial_values = 2 * np.arange(DIM) / DIM + 0.5
 
 
 def rosenbrock(variables: NDArray[np.float64], _: EvaluatorContext) -> EvaluatorResult:
@@ -71,18 +74,13 @@ def run_optimization(config: dict[str, Any]) -> FunctionResults:
     Returns:
         The optimal results.
     """
-    plugin_manager = PluginManager()
-    evaluator = plugin_manager.create_evaluator(
-        "function_evaluator", callback=rosenbrock
-    )
-    step = plugin_manager.create_compute_step(
-        "optimizer", evaluator=evaluator, plugin_manager=plugin_manager
-    )
+    evaluator = create_evaluator("function_evaluator", callback=rosenbrock)
+    step = create_compute_step("optimizer", evaluator=evaluator)
 
-    tracker = plugin_manager.create_event_handler("tracker")
+    tracker = create_event_handler("tracker")
     step.add_event_handler(tracker)
 
-    reporter = plugin_manager.create_event_handler(
+    reporter = create_event_handler(
         "observer", callback=report, event_types={EventType.FINISHED_EVALUATION}
     )
     step.add_event_handler(reporter)
