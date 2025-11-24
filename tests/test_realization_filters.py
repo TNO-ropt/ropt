@@ -125,8 +125,10 @@ def test_sort_filter_on_objectives(
 
     optimizer = BasicOptimizer(enopt_config, evaluator(functions))
     optimizer.run(initial_values)
-    assert optimizer.variables is not None
-    assert not np.allclose(optimizer.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert optimizer.results is not None
+    assert not np.allclose(
+        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+    )
 
     enopt_config["realization_filters"] = [
         {
@@ -398,8 +400,10 @@ def test_cvar_filter_on_objectives(
 
     optimizer = BasicOptimizer(enopt_config, evaluator(functions))
     optimizer.run(initial_values)
-    assert optimizer.variables is not None
-    assert not np.allclose(optimizer.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert optimizer.results is not None
+    assert not np.allclose(
+        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+    )
 
     enopt_config["realization_filters"] = [
         {

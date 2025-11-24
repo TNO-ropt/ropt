@@ -54,8 +54,8 @@ def test_basic_run(enopt_config: Any, evaluator: Any, external: str) -> None:
     enopt_config["optimizer"]["method"] = f"{external}{_SLSQP}"
     optimizer = BasicOptimizer(enopt_config, evaluator())
     optimizer.run(initial_values)
-    assert optimizer.variables is not None
-    assert np.allclose(optimizer.variables, [0, 0, 0.5], atol=0.02)
+    assert optimizer.results is not None
+    assert np.allclose(optimizer.results.evaluations.variables, [0, 0, 0.5], atol=0.02)
 
 
 def test_invalid_options(enopt_config: Any, external: str) -> None:
@@ -83,9 +83,9 @@ def test_max_functions_exceeded(
     enopt_config["optimizer"]["method"] = f"{external}{_SLSQP}"
     optimizer = BasicOptimizer(enopt_config, evaluator())
     optimizer.set_results_callback(track_results)
-    optimizer.run(initial_values)
+    exit_code = optimizer.run(initial_values)
     assert last_evaluation == max_functions + 1
-    assert optimizer.exit_code == ExitCode.MAX_FUNCTIONS_REACHED
+    assert exit_code == ExitCode.MAX_FUNCTIONS_REACHED
 
 
 def test_max_batches_exceeded(enopt_config: Any, evaluator: Any, external: str) -> None:
@@ -100,9 +100,9 @@ def test_max_batches_exceeded(enopt_config: Any, evaluator: Any, external: str) 
     enopt_config["optimizer"]["method"] = f"{external}{_SLSQP}"
     optimizer = BasicOptimizer(enopt_config, evaluator())
     optimizer.set_results_callback(track_results)
-    optimizer.run(initial_values)
+    exit_code = optimizer.run(initial_values)
     assert last_evaluation == max_batches
-    assert optimizer.exit_code == ExitCode.MAX_BATCHES_REACHED
+    assert exit_code == ExitCode.MAX_BATCHES_REACHED
 
 
 def test_max_functions_not_exceeded(
@@ -120,9 +120,9 @@ def test_max_functions_not_exceeded(
     enopt_config["optimizer"]["method"] = f"{external}{_SLSQP}"
     optimizer = BasicOptimizer(enopt_config, evaluator())
     optimizer.set_results_callback(track_results)
-    optimizer.run(initial_values)
+    exit_code = optimizer.run(initial_values)
     assert last_evaluation + 1 < 2 * max_functions
-    assert optimizer.exit_code == ExitCode.OPTIMIZER_FINISHED
+    assert exit_code == ExitCode.OPTIMIZER_FINISHED
 
 
 def test_failed_realizations(enopt_config: Any, evaluator: Any, external: str) -> None:
@@ -135,8 +135,8 @@ def test_failed_realizations(enopt_config: Any, evaluator: Any, external: str) -
     functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
     optimizer = BasicOptimizer(enopt_config, evaluator(functions))
     optimizer.set_results_callback(_observer)
-    optimizer.run(initial_values)
-    assert optimizer.exit_code == ExitCode.TOO_FEW_REALIZATIONS
+    exit_code = optimizer.run(initial_values)
+    assert exit_code == ExitCode.TOO_FEW_REALIZATIONS
 
 
 def test_failed_realizations_constraints(
@@ -156,8 +156,8 @@ def test_failed_realizations_constraints(
 
     optimizer = BasicOptimizer(enopt_config, evaluator(functions))
     optimizer.set_results_callback(_observer)
-    optimizer.run(initial_values)
-    assert optimizer.exit_code == ExitCode.TOO_FEW_REALIZATIONS
+    exit_code = optimizer.run(initial_values)
+    assert exit_code == ExitCode.TOO_FEW_REALIZATIONS
 
 
 def test_all_failed_realizations_not_supported(
@@ -169,8 +169,8 @@ def test_all_failed_realizations_not_supported(
 
     functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
     optimizer = BasicOptimizer(enopt_config, evaluator(functions))
-    optimizer.run(initial_values)
-    assert optimizer.exit_code == ExitCode.TOO_FEW_REALIZATIONS
+    exit_code = optimizer.run(initial_values)
+    assert exit_code == ExitCode.TOO_FEW_REALIZATIONS
 
 
 def test_user_abort(enopt_config: Any, evaluator: Any, external: str) -> None:
@@ -188,10 +188,10 @@ def test_user_abort(enopt_config: Any, evaluator: Any, external: str) -> None:
 
     optimizer = BasicOptimizer(enopt_config, evaluator())
     optimizer.set_abort_callback(_abort)
-    optimizer.run(initial_values)
+    exit_code = optimizer.run(initial_values)
     assert optimizer.results is not None
     assert last_evaluation == 1
-    assert optimizer.exit_code == ExitCode.USER_ABORT
+    assert exit_code == ExitCode.USER_ABORT
 
 
 def test_single_perturbation(enopt_config: Any, evaluator: Any, external: str) -> None:
@@ -205,8 +205,10 @@ def test_single_perturbation(enopt_config: Any, evaluator: Any, external: str) -
 
     optimizer = BasicOptimizer(enopt_config, evaluator())
     optimizer.run(initial_values)
-    assert optimizer.variables is not None
-    assert np.allclose(optimizer.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert optimizer.results is not None
+    assert np.allclose(
+        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+    )
 
 
 def test_external_error(enopt_config: Any, evaluator: Any, external: str) -> None:
@@ -613,7 +615,6 @@ def test_variables_scale_linear_constraints_with_scaler(
     optimizer = BasicOptimizer(enopt_config, evaluator(), transforms=transforms)
     optimizer.run(initial_values)
     assert optimizer.results is not None
-    assert optimizer.results.evaluations.variables is not None
     assert np.allclose(
         optimizer.results.evaluations.variables, [0.25, 0.0, 0.75], atol=0.02
     )
@@ -707,8 +708,10 @@ def test_optimizer_variables_subset(
     optimizer = BasicOptimizer(enopt_config, evaluator())
     optimizer.set_results_callback(assert_gradient)
     optimizer.run([0.0, 1.0, 0.1])
-    assert optimizer.variables is not None
-    assert np.allclose(optimizer.variables, [0.0, 1.0, 0.5], atol=0.02)
+    assert optimizer.results is not None
+    assert np.allclose(
+        optimizer.results.evaluations.variables, [0.0, 1.0, 0.5], atol=0.02
+    )
 
 
 def test_optimizer_variables_subset_linear_constraints(
@@ -728,8 +731,10 @@ def test_optimizer_variables_subset_linear_constraints(
 
     optimizer = BasicOptimizer(enopt_config, evaluator())
     optimizer.run([0.0, 1.0, 0.1])
-    assert optimizer.variables is not None
-    assert np.allclose(optimizer.variables, [0.25, 1.0, 0.75], atol=0.02)
+    assert optimizer.results is not None
+    assert np.allclose(
+        optimizer.results.evaluations.variables, [0.25, 1.0, 0.75], atol=0.02
+    )
 
 
 def test_parallelize(enopt_config: Any, evaluator: Any, external: str) -> None:
@@ -744,35 +749,51 @@ def test_parallelize(enopt_config: Any, evaluator: Any, external: str) -> None:
     enopt_config["optimizer"]["parallel"] = False
     optimizer = BasicOptimizer(enopt_config, evaluator())
     optimizer.run([0.2, *initial_values[1:]])
-    assert optimizer.variables is not None
-    assert np.allclose(optimizer.variables, [0.15, 0.0, 0.2], atol=3e-2)
+    assert optimizer.results is not None
+    assert np.allclose(
+        optimizer.results.evaluations.variables, [0.15, 0.0, 0.2], atol=3e-2
+    )
 
     enopt_config["optimizer"]["parallel"] = True
     optimizer = BasicOptimizer(enopt_config, evaluator())
     optimizer.run([0.2, *initial_values[1:]])
-    assert optimizer.variables is not None
-    assert np.allclose(optimizer.variables, [0.15, 0.0, 0.2], atol=3e-2)
+    assert optimizer.results is not None
+    assert np.allclose(
+        optimizer.results.evaluations.variables, [0.15, 0.0, 0.2], atol=3e-2
+    )
 
 
 def test_rng(enopt_config: Any, evaluator: Any, external: str) -> None:
     enopt_config["optimizer"]["method"] = f"{external}{_SLSQP}"
     optimizer1 = BasicOptimizer(enopt_config, evaluator())
     optimizer1.run(initial_values)
-    assert optimizer1.variables is not None
-    assert np.allclose(optimizer1.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert optimizer1.results is not None
+    assert np.allclose(
+        optimizer1.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+    )
 
     optimizer2 = BasicOptimizer(enopt_config, evaluator())
     optimizer2.run(initial_values)
-    assert optimizer2.variables is not None
-    assert np.allclose(optimizer2.variables, [0.0, 0.0, 0.5], atol=0.02)
-    assert np.all(optimizer2.variables == optimizer2.variables)
+    assert optimizer2.results is not None
+    assert np.allclose(
+        optimizer2.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+    )
+    assert np.all(
+        optimizer2.results.evaluations.variables
+        == optimizer2.results.evaluations.variables
+    )
 
     enopt_config["variables"]["seed"] = (1, DEFAULT_SEED)
     optimizer3 = BasicOptimizer(enopt_config, evaluator())
     optimizer3.run(initial_values)
-    assert optimizer3.variables is not None
-    assert np.allclose(optimizer3.variables, [0.0, 0.0, 0.5], atol=0.02)
-    assert not np.all(optimizer3.variables == optimizer1.variables)
+    assert optimizer3.results is not None
+    assert np.allclose(
+        optimizer3.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+    )
+    assert not np.all(
+        optimizer3.results.evaluations.variables
+        == optimizer1.results.evaluations.variables
+    )
 
 
 def test_arbitrary_objective_weights(
@@ -787,20 +808,22 @@ def test_arbitrary_objective_weights(
     enopt_config["objectives"]["weights"] = [0.75, 0.25, -0.25]
     optimizer = BasicOptimizer(enopt_config, evaluator(new_functions))
     optimizer.run(initial_values)
-    assert optimizer.variables is not None
-    assert not np.allclose(optimizer.variables, [0, 0, 0.5], atol=0.02)
+    assert optimizer.results is not None
+    assert not np.allclose(
+        optimizer.results.evaluations.variables, [0, 0, 0.5], atol=0.02
+    )
 
     enopt_config["objectives"]["weights"] = [0.75, 0.25, 0.0]
     optimizer = BasicOptimizer(enopt_config, evaluator(new_functions))
     optimizer.run(initial_values)
-    assert optimizer.variables is not None
-    assert np.allclose(optimizer.variables, [0, 0, 0.5], atol=0.02)
+    assert optimizer.results is not None
+    assert np.allclose(optimizer.results.evaluations.variables, [0, 0, 0.5], atol=0.02)
 
     enopt_config["objectives"]["weights"] = [0.75, 0.5, -0.25]
     optimizer = BasicOptimizer(enopt_config, evaluator(new_functions))
     optimizer.run(initial_values)
-    assert optimizer.variables is not None
-    assert np.allclose(optimizer.variables, [0, 0, 0.5], atol=0.02)
+    assert optimizer.results is not None
+    assert np.allclose(optimizer.results.evaluations.variables, [0, 0, 0.5], atol=0.02)
 
     enopt_config["objectives"]["weights"] = [-0.75, -0.25]
     with pytest.raises(ValidationError, match="The sum of weights is not positive"):

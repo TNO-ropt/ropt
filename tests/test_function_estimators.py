@@ -62,8 +62,10 @@ def test_mean_stddev_function_estimator(
     enopt_config["function_estimators"] = [{"method": "mean"}, {"method": "stddev"}]
     optimizer = BasicOptimizer(enopt_config, evaluator(test_functions))
     optimizer.run(initial_values)
-    assert optimizer.variables is not None
-    assert np.allclose(optimizer.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert optimizer.results is not None
+    assert np.allclose(
+        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+    )
 
 
 def _compute_distance_squared_stddev(
@@ -101,5 +103,7 @@ def test_stddev_function_estimator(
     enopt_config["function_estimators"] = [{"method": "stddev"}]
     optimizer = BasicOptimizer(enopt_config, evaluator(functions))
     optimizer.run(initial_values)
-    assert optimizer.variables is not None
-    assert np.allclose(optimizer.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert optimizer.results is not None
+    assert np.allclose(
+        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+    )

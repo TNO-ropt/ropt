@@ -6,7 +6,6 @@ import json
 import os
 import sysconfig
 from contextlib import suppress
-from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -23,19 +22,12 @@ from ._factory import create_compute_step, create_evaluator, create_event_handle
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
-    from numpy.typing import ArrayLike, NDArray
+    from numpy.typing import ArrayLike
 
     from ropt.evaluator import EvaluatorCallback
     from ropt.results import FunctionResults
     from ropt.transforms import OptModelTransforms
     from ropt.workflow import Event
-
-
-@dataclass(slots=True)
-class _Results:
-    results: FunctionResults | None
-    variables: NDArray[np.float64] | None
-    exit_code: ExitCode = ExitCode.UNKNOWN
 
 
 class BasicOptimizer:
@@ -101,10 +93,11 @@ class BasicOptimizer:
             return EvaluatorResult(objectives=objectives)
 
 
-        optimizer = BasicOptimizer(CONFIG, rosenbrock).run(initial_values)
+        optimizer = BasicOptimizer(CONFIG, rosenbrock)
+        optimizer.run(initial_values)
 
-        print(f"variables: {optimizer.results.evaluations.variables}")
-        print(f"objective: {optimizer.results.functions.weighted_objective}")
+        print(f"Optimal variables: {optimizer.results.evaluations.variables}")
+        print(f"Optimal objective: {optimizer.results.functions.weighted_objective}")
         ````
 
     Note: Customization
@@ -218,7 +211,7 @@ class BasicOptimizer:
         self._constraint_tolerance = constraint_tolerance
         self._evaluator = evaluator
         self._observers: list[tuple[EventType, Callable[[Event], None]]] = []
-        self._results: _Results
+        self._results: FunctionResults | None
 
     @property
     def results(self) -> FunctionResults | None:
@@ -233,37 +226,9 @@ class BasicOptimizer:
         Returns:
             The optimal result.
         """
-        return self._results.results
+        return self._results
 
-    @property
-    def variables(self) -> NDArray[np.float64] | None:
-        """Return the optimal variables found during the optimization.
-
-        This property provides access to the variable values that correspond to
-        the optimal [`FunctionResults`][ropt.results.FunctionResults] object.
-        These variables represent the solution that yielded the best objective
-        function value found during the optimization process.
-
-        Returns:
-            The variables corresponding to the optimal result.
-        """
-        return self._results.variables
-
-    @property
-    def exit_code(self) -> ExitCode:
-        """Return the exit code of the optimization run.
-
-        This property provides access to the [`ExitCode`][ropt.enums.ExitCode]
-        that indicates the outcome of the optimization process. It can be used
-        to determine whether the optimization completed successfully, was
-        aborted, or encountered an error.
-
-        Returns:
-            The exit code of the optimization run.
-        """
-        return self._results.exit_code
-
-    def run(self, initial_values: ArrayLike) -> None:
+    def run(self, initial_values: ArrayLike) -> ExitCode:
         """Run the optimization process.
 
         This method initiates and executes the optimization workflow defined by
@@ -271,6 +236,9 @@ class BasicOptimizer:
         handling, and event processing. After the optimization is complete, the
         optimal results, variables, and exit code can be accessed via the
         corresponding properties.
+
+        Returns:
+            The exit code returned by the optimization workflow.
         """
         # Optionally run a custom compute step defined via the environment:
         custom_function = self._get_custom_compute_step()
@@ -299,16 +267,12 @@ class BasicOptimizer:
                 config=self._config,
                 transforms=self._transforms,
             )
-            results = tracker["results"]
-            variables = None if results is None else results.evaluations.variables
+            self._results = tracker["results"]
         else:
             exit_code = custom_function()
-            results = None
-            variables = None
+            self._results = None
 
-        self._results = _Results(
-            results=results, variables=variables, exit_code=exit_code
-        )
+        return exit_code if isinstance(exit_code, ExitCode) else ExitCode.UNKNOWN
 
     def set_abort_callback(self, callback: Callable[[], bool]) -> None:
         """Set a callback to check for abort conditions.
