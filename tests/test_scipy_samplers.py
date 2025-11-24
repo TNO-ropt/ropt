@@ -36,9 +36,10 @@ def test_scipy_samplers_unconstrained(
     enopt_config: Any, method: str, evaluator: Any
 ) -> None:
     enopt_config["samplers"] = [{"method": method}]
-    variables = BasicOptimizer(enopt_config, evaluator()).run(initial_values).variables
-    assert variables is not None
-    assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
+    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer.run(initial_values)
+    assert optimizer.variables is not None
+    assert np.allclose(optimizer.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 def test_scipy_indexed_sampler(enopt_config: Any, evaluator: Any) -> None:
@@ -49,11 +50,12 @@ def test_scipy_indexed_sampler(enopt_config: Any, evaluator: Any) -> None:
     initial = initial_values.copy()
     initial[1] = 0.1
 
-    variables = BasicOptimizer(enopt_config, evaluator()).run(initial).variables
-    assert variables is not None
-    assert pytest.approx(variables[0]) != 0.0
-    assert pytest.approx(variables[1]) == 0.1
-    assert pytest.approx(variables[2]) != 0.5
+    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer.run(initial)
+    assert optimizer.variables is not None
+    assert pytest.approx(optimizer.variables[0]) != 0.0
+    assert pytest.approx(optimizer.variables[1]) == 0.1
+    assert pytest.approx(optimizer.variables[2]) != 0.5
 
 
 @pytest.mark.parametrize("method", sorted(_SUPPORTED_METHODS))
@@ -69,22 +71,16 @@ def test_scipy_samplers_shared(enopt_config: Any, method: str, evaluator: Any) -
                 perturbations[tag] = item.evaluations.perturbed_variables
 
     enopt_config["samplers"][0]["shared"] = False
-    variables1 = (
-        BasicOptimizer(enopt_config, evaluator())
-        .set_results_callback(partial(_observer, tag="result1"))
-        .run(initial_values)
-        .variables
-    )
-    assert variables1 is not None
+    optimizer1 = BasicOptimizer(enopt_config, evaluator())
+    optimizer1.set_results_callback(partial(_observer, tag="result1"))
+    optimizer1.run(initial_values)
+    assert optimizer1.variables is not None
 
     enopt_config["samplers"][0]["shared"] = True
-    variables2 = (
-        BasicOptimizer(enopt_config, evaluator())
-        .set_results_callback(partial(_observer, tag="result2"))
-        .run(initial_values)
-        .variables
-    )
-    assert variables2 is not None
+    optimizer2 = BasicOptimizer(enopt_config, evaluator())
+    optimizer2.set_results_callback(partial(_observer, tag="result2"))
+    optimizer2.run(initial_values)
+    assert optimizer2.variables is not None
 
     # The perturbations of the two realizations must differ, if not shared:
     assert not np.allclose(
@@ -97,6 +93,6 @@ def test_scipy_samplers_shared(enopt_config: Any, method: str, evaluator: Any) -
     )
 
     # The results should be correct, but slightly different:
-    assert np.allclose(variables1, [0.0, 0.0, 0.5], atol=0.02)
-    assert np.allclose(variables2, [0.0, 0.0, 0.5], atol=0.02)
-    assert not np.allclose(variables1, variables2, atol=1e-3)
+    assert np.allclose(optimizer1.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert np.allclose(optimizer2.variables, [0.0, 0.0, 0.5], atol=0.02)
+    assert not np.allclose(optimizer1.variables, optimizer2.variables, atol=1e-3)

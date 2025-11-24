@@ -66,17 +66,14 @@ def report(results: tuple[Results, ...]) -> None:
 
 def run_optimization() -> None:
     """Run the optimization."""
-    optimal_result = (
-        BasicOptimizer(CONFIG, function)
-        .set_results_callback(report)
-        .run(initial_values)
-        .results
-    )
-    assert optimal_result is not None
-    assert optimal_result.functions is not None
-    assert np.all(optimal_result.evaluations.variables == [3, 7])
-    print(f"  variables: {optimal_result.evaluations.variables}")
-    print(f"  objective: {optimal_result.functions.weighted_objective}\n")
+    optimizer = BasicOptimizer(CONFIG, function)
+    optimizer.set_results_callback(report)
+    optimizer.run(initial_values)
+    assert optimizer.results is not None
+    assert optimizer.results.functions is not None
+    assert np.all(optimizer.results.evaluations.variables == [3, 7])
+    print(f"  variables: {optimizer.results.evaluations.variables}")
+    print(f"  objective: {optimizer.results.functions.weighted_objective}\n")
 
 
 def main() -> None:

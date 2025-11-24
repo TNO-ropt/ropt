@@ -57,16 +57,19 @@ def _handle_results(
 
 def test_dataframe_results_no_results(enopt_config: Any, evaluator: Any) -> None:
     frames: list[pd.DataFrame] = []
-    BasicOptimizer(enopt_config, evaluator()).set_results_callback(
-        partial(_handle_results, frames=frames, fields=set(), result_type="functions"),
-    ).run(initial_values)
+    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer.set_results_callback(
+        partial(_handle_results, frames=frames, fields=set(), result_type="functions")
+    )
+    optimizer.run(initial_values)
     assert not frames
 
 
 def test_dataframe_results_function_results(enopt_config: Any, evaluator: Any) -> None:
     del enopt_config["names"]
     frames: list[pd.DataFrame] = []
-    BasicOptimizer(enopt_config, evaluator()).set_results_callback(
+    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer.set_results_callback(
         partial(
             _handle_results,
             frames=frames,
@@ -74,8 +77,9 @@ def test_dataframe_results_function_results(enopt_config: Any, evaluator: Any) -
                 "evaluations.variables",
             },
             result_type="functions",
-        ),
-    ).run(initial_values)
+        )
+    )
+    optimizer.run(initial_values)
     frame = pd.concat(frames)
     assert len(frame) == 3
     assert list(frame.columns.get_level_values(level=0)) == [
@@ -87,7 +91,8 @@ def test_dataframe_results_function_results_formatted_names(
     enopt_config: Any, evaluator: Any
 ) -> None:
     frames: list[pd.DataFrame] = []
-    BasicOptimizer(enopt_config, evaluator()).set_results_callback(
+    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer.set_results_callback(
         partial(
             _handle_results,
             frames=frames,
@@ -96,7 +101,8 @@ def test_dataframe_results_function_results_formatted_names(
             },
             result_type="functions",
         ),
-    ).run(initial_values)
+    )
+    optimizer.run(initial_values)
     frame = pd.concat(frames)
     assert len(frame) == 3
     assert list(frame.columns.get_level_values(level=0)) == [
@@ -106,7 +112,8 @@ def test_dataframe_results_function_results_formatted_names(
 
 def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -> None:
     frames: list[pd.DataFrame] = []
-    BasicOptimizer(enopt_config, evaluator()).set_results_callback(
+    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer.set_results_callback(
         partial(
             _handle_results,
             frames=frames,
@@ -115,7 +122,8 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
             },
             result_type="gradients",
         ),
-    ).run(initial_values)
+    )
+    optimizer.run(initial_values)
     frame = pd.concat(frames)
     assert len(frame) == 3
     assert list(frame.columns.get_level_values(level=0)) == [
@@ -126,7 +134,8 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
 def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
     del enopt_config["names"]
     frames: list[pd.DataFrame] = []
-    BasicOptimizer(enopt_config, evaluator()).set_results_callback(
+    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer.set_results_callback(
         partial(
             _handle_results,
             frames=frames,
@@ -138,7 +147,8 @@ def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
             result_type="functions",
             metadata={"foo": {"bar": 1}},
         ),
-    ).run(initial_values)
+    )
+    optimizer.run(initial_values)
     frame = pd.concat(frames)
     assert len(frame) == 3
     assert list(frame.columns.get_level_values(level=0)) == [

@@ -66,19 +66,16 @@ def run_optimization(config: dict[str, Any]) -> FunctionResults:
     Returns:
         The optimal results.
     """
-    optimal_result = (
-        BasicOptimizer(config, rosenbrock)
-        .set_results_callback(report)
-        .run(initial_values)
-        .results
-    )
-    assert optimal_result is not None
-    assert optimal_result.functions is not None
+    optimizer = BasicOptimizer(config, rosenbrock)
+    optimizer.set_results_callback(report)
+    optimizer.run(initial_values)
+    assert optimizer.results is not None
+    assert optimizer.results.functions is not None
 
-    print(f"  variables: {optimal_result.evaluations.variables}")
-    print(f"  objective: {optimal_result.functions.weighted_objective}\n")
+    print(f"  variables: {optimizer.results.evaluations.variables}")
+    print(f"  objective: {optimizer.results.functions.weighted_objective}\n")
 
-    return optimal_result
+    return optimizer.results
 
 
 def main() -> None:

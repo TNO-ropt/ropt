@@ -83,19 +83,16 @@ def run_optimization(config: dict[str, Any]) -> FunctionResults:
     a = rng.normal(loc=1.0, scale=UNCERTAINTY, size=realizations)
     b = rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=realizations)
 
-    optimal_result = (
-        BasicOptimizer(CONFIG, partial(rosenbrock, a=a, b=b))
-        .set_results_callback(report)
-        .run(initial_values)
-        .results
-    )
-    assert optimal_result is not None
-    assert optimal_result.functions is not None
+    optimizer = BasicOptimizer(CONFIG, partial(rosenbrock, a=a, b=b))
+    optimizer.set_results_callback(report)
+    optimizer.run(initial_values)
+    assert optimizer.results is not None
+    assert optimizer.results.functions is not None
 
-    print(f"  variables: {optimal_result.evaluations.variables}")
-    print(f"  objective: {optimal_result.functions.weighted_objective}\n")
+    print(f"  variables: {optimizer.results.evaluations.variables}")
+    print(f"  objective: {optimizer.results.functions.weighted_objective}\n")
 
-    return optimal_result
+    return optimizer.results
 
 
 def main(argv: list[str] | None = None) -> None:

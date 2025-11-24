@@ -59,9 +59,10 @@ def test_run_basic(enopt_config: dict[str, Any], evaluator: Any) -> None:
         tracker["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
 
-    variables = BasicOptimizer(enopt_config, evaluator()).run(initial_values).variables
-    assert variables is not None
-    assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
+    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer.run(initial_values)
+    assert optimizer.variables is not None
+    assert np.allclose(optimizer.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 def test_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:

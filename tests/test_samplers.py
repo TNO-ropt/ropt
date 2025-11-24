@@ -157,9 +157,10 @@ def test_sampler_order(enopt_config: Any, evaluator: Any) -> None:
         {"method": "norm"},
         {"method": "uniform"},
     ]
-    variables1 = BasicOptimizer(enopt_config, evaluator()).run(initial_values).variables
-    assert variables1 is not None
-    assert np.allclose(variables1, [0, 0, 0.5], atol=0.025)
+    optimizer1 = BasicOptimizer(enopt_config, evaluator())
+    optimizer1.run(initial_values)
+    assert optimizer1.variables is not None
+    assert np.allclose(optimizer1.variables, [0, 0, 0.5], atol=0.025)
 
     # Switch the samplers:
     enopt_config["samplers"] = [
@@ -167,8 +168,9 @@ def test_sampler_order(enopt_config: Any, evaluator: Any) -> None:
         {"method": "norm"},
     ]
     enopt_config["variables"]["samplers"] = [1, 1, 0]
-    variables2 = BasicOptimizer(enopt_config, evaluator()).run(initial_values).variables
-    assert variables2 is not None
-    assert np.allclose(variables2, [0, 0, 0.5], atol=0.025)
+    optimizer2 = BasicOptimizer(enopt_config, evaluator())
+    optimizer2.run(initial_values)
+    assert optimizer2.variables is not None
+    assert np.allclose(optimizer2.variables, [0, 0, 0.5], atol=0.025)
 
-    assert np.allclose(variables1, variables2)
+    assert np.allclose(optimizer1.variables, optimizer2.variables)

@@ -41,13 +41,14 @@ def test_stddev_function_estimator_merge_error(
     enopt_config["objectives"]["weights"].extend([0.75, 0.25])
     enopt_config["objectives"]["function_estimators"] = [0, 0, 1, 1]
     enopt_config["function_estimators"] = [{"method": "mean"}, {"method": "stddev"}]
+    optimizer = BasicOptimizer(enopt_config, evaluator(test_functions))
     with pytest.raises(
         ValueError,
         match=(
             "The stddev estimator does not support merging realizations in the gradient"
         ),
     ):
-        BasicOptimizer(enopt_config, evaluator(test_functions)).run(initial_values)
+        optimizer.run(initial_values)
 
 
 def test_mean_stddev_function_estimator(
@@ -59,13 +60,10 @@ def test_mean_stddev_function_estimator(
     enopt_config["objectives"]["weights"].extend([0.75, 0.25])
     enopt_config["objectives"]["function_estimators"] = [0, 0, 1, 1]
     enopt_config["function_estimators"] = [{"method": "mean"}, {"method": "stddev"}]
-    variables = (
-        BasicOptimizer(enopt_config, evaluator(test_functions))
-        .run(initial_values)
-        .variables
-    )
-    assert variables is not None
-    assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
+    optimizer = BasicOptimizer(enopt_config, evaluator(test_functions))
+    optimizer.run(initial_values)
+    assert optimizer.variables is not None
+    assert np.allclose(optimizer.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
 def _compute_distance_squared_stddev(
@@ -101,8 +99,7 @@ def test_stddev_function_estimator(
 
     enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
     enopt_config["function_estimators"] = [{"method": "stddev"}]
-    variables = (
-        BasicOptimizer(enopt_config, evaluator(functions)).run(initial_values).variables
-    )
-    assert variables is not None
-    assert np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
+    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer.run(initial_values)
+    assert optimizer.variables is not None
+    assert np.allclose(optimizer.variables, [0.0, 0.0, 0.5], atol=0.02)

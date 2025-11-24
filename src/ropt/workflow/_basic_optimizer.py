@@ -9,7 +9,7 @@ from contextlib import suppress
 from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Self
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -101,10 +101,10 @@ class BasicOptimizer:
             return EvaluatorResult(objectives=objectives)
 
 
-        optimal_result = BasicOptimizer(CONFIG, rosenbrock).run(initial_values).results
+        optimizer = BasicOptimizer(CONFIG, rosenbrock).run(initial_values)
 
-        print(f"variables: {optimal_result.evaluations.variables}")
-        print(f"objective: {optimal_result.functions.weighted_objective}")
+        print(f"variables: {optimizer.results.evaluations.variables}")
+        print(f"objective: {optimizer.results.functions.weighted_objective}")
         ````
 
     Note: Customization
@@ -263,7 +263,7 @@ class BasicOptimizer:
         """
         return self._results.exit_code
 
-    def run(self, initial_values: ArrayLike) -> Self:
+    def run(self, initial_values: ArrayLike) -> None:
         """Run the optimization process.
 
         This method initiates and executes the optimization workflow defined by
@@ -271,9 +271,6 @@ class BasicOptimizer:
         handling, and event processing. After the optimization is complete, the
         optimal results, variables, and exit code can be accessed via the
         corresponding properties.
-
-        Returns:
-            The `BasicOptimizer` instance, allowing for method chaining.
         """
         # Optionally run a custom compute step defined via the environment:
         custom_function = self._get_custom_compute_step()
@@ -313,9 +310,7 @@ class BasicOptimizer:
             results=results, variables=variables, exit_code=exit_code
         )
 
-        return self
-
-    def set_abort_callback(self, callback: Callable[[], bool]) -> Self:
+    def set_abort_callback(self, callback: Callable[[], bool]) -> None:
         """Set a callback to check for abort conditions.
 
         The provided callback function will be invoked repeatedly during the
@@ -328,9 +323,6 @@ class BasicOptimizer:
 
         Args:
             callback: The callable to check for abort conditions.
-
-        Returns:
-            The `BasicOptimizer` instance, allowing for method chaining.
         """
 
         def _check_abort_callback(event: Event) -> None:  # noqa: ARG001
@@ -338,9 +330,8 @@ class BasicOptimizer:
                 raise ComputeStepAborted(exit_code=ExitCode.USER_ABORT)
 
         self._observers.append((EventType.START_EVALUATION, _check_abort_callback))
-        return self
 
-    def set_results_callback(self, callback: Callable[..., None]) -> Self:
+    def set_results_callback(self, callback: Callable[..., None]) -> None:
         """Set a callback to report new results.
 
         The provided callback function will be invoked whenever new results
@@ -356,9 +347,6 @@ class BasicOptimizer:
 
         Args:
             callback: The callable that will be invoked to report new results.
-
-        Returns:
-            The `BasicOptimizer` instance, allowing for method chaining.
         """
 
         def _results_callback(event: Event) -> None:
@@ -372,7 +360,6 @@ class BasicOptimizer:
             callback(results)
 
         self._observers.append((EventType.FINISHED_EVALUATION, _results_callback))
-        return self
 
     def _get_custom_compute_step(self) -> Callable[[], ExitCode] | None:
         if "ROPT_SCRIPT" in os.environ:

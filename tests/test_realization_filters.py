@@ -123,11 +123,10 @@ def test_sort_filter_on_objectives(
 
     enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
 
-    variables = (
-        BasicOptimizer(enopt_config, evaluator(functions)).run(initial_values).variables
-    )
-    assert variables is not None
-    assert not np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
+    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer.run(initial_values)
+    assert optimizer.variables is not None
+    assert not np.allclose(optimizer.variables, [0.0, 0.0, 0.5], atol=0.02)
 
     enopt_config["realization_filters"] = [
         {
@@ -142,14 +141,13 @@ def test_sort_filter_on_objectives(
     enopt_config["objectives"]["realization_filters"] = [0, 0]
 
     result_list: list[Results] = []
-    results = (
-        BasicOptimizer(enopt_config, evaluator(functions))
-        .set_results_callback(partial(_track_results, result_list=result_list))
-        .run(initial_values)
-        .results
+    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer.set_results_callback(partial(_track_results, result_list=result_list))
+    optimizer.run(initial_values)
+    assert optimizer.results is not None
+    assert np.allclose(
+        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
-    assert results is not None
-    assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -198,14 +196,13 @@ def test_sort_filter_on_objectives_with_constraints(
     enopt_config["objectives"]["realization_filters"] = [0, 0]
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
-    results = (
-        BasicOptimizer(enopt_config, evaluator(functions))
-        .set_results_callback(partial(_track_results, result_list=result_list))
-        .run(initial_values)
-        .results
+    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer.set_results_callback(partial(_track_results, result_list=result_list))
+    optimizer.run(initial_values)
+    assert optimizer.results is not None
+    assert np.allclose(
+        optimizer.results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.02
     )
-    assert results is not None
-    assert np.allclose(results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -260,16 +257,13 @@ def test_sort_filter_on_constraints(
     enopt_config["objectives"]["realization_filters"] = [0, 0]
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
-    results = (
-        BasicOptimizer(enopt_config, evaluator(functions))
-        .set_results_callback(
-            partial(_track_results, result_list=result_list),
-        )
-        .run(initial_values)
-        .results
+    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer.set_results_callback(partial(_track_results, result_list=result_list))
+    optimizer.run(initial_values)
+    assert optimizer.results is not None
+    assert np.allclose(
+        optimizer.results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.02
     )
-    assert results is not None
-    assert np.allclose(results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -334,14 +328,13 @@ def test_sort_filter_mixed(  # noqa: C901
     enopt_config["objectives"]["realization_filters"] = [0, 0, 0, 0]
 
     result_list: list[Results] = []
-    results = (
-        BasicOptimizer(enopt_config, evaluator(functions))
-        .set_results_callback(_add_objective)
-        .run(initial_values)
-        .results
+    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer.set_results_callback(_add_objective)
+    optimizer.run(initial_values)
+    assert optimizer.results is not None
+    assert np.allclose(
+        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
-    assert results is not None
-    assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -372,14 +365,13 @@ def test_sort_filter_mixed(  # noqa: C901
     enopt_config["objectives"]["realization_filters"] = [0, 0, -1, -1]
 
     result_list = []
-    results = (
-        BasicOptimizer(enopt_config, evaluator(functions))
-        .set_results_callback(_add_objective)
-        .run(initial_values)
-        .results
+    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer.set_results_callback(_add_objective)
+    optimizer.run(initial_values)
+    assert optimizer.results is not None
+    assert not np.allclose(
+        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
-    assert results is not None
-    assert not np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -404,11 +396,10 @@ def test_cvar_filter_on_objectives(
 
     enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
 
-    variables = (
-        BasicOptimizer(enopt_config, evaluator(functions)).run(initial_values).variables
-    )
-    assert variables is not None
-    assert not np.allclose(variables, [0.0, 0.0, 0.5], atol=0.02)
+    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer.run(initial_values)
+    assert optimizer.variables is not None
+    assert not np.allclose(optimizer.variables, [0.0, 0.0, 0.5], atol=0.02)
 
     enopt_config["realization_filters"] = [
         {
@@ -421,16 +412,14 @@ def test_cvar_filter_on_objectives(
     ]
     enopt_config["objectives"]["realization_filters"] = [0, 0]
     result_list: list[Results] = []
-    results = (
-        BasicOptimizer(enopt_config, evaluator(functions))
-        .set_results_callback(
-            partial(_track_results, result_list=result_list),
-        )
-        .run(initial_values)
-        .results
+
+    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer.set_results_callback(partial(_track_results, result_list=result_list))
+    optimizer.run(initial_values)
+    assert optimizer.results is not None
+    assert np.allclose(
+        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
-    assert results is not None
-    assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -478,16 +467,13 @@ def test_cvar_filter_on_objectives_with_constraints(
     enopt_config["objectives"]["realization_filters"] = [0, 0]
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
-    results = (
-        BasicOptimizer(enopt_config, evaluator(functions))
-        .set_results_callback(
-            partial(_track_results, result_list=result_list),
-        )
-        .run(initial_values)
-        .results
+    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer.set_results_callback(partial(_track_results, result_list=result_list))
+    optimizer.run(initial_values)
+    assert optimizer.results is not None
+    assert np.allclose(
+        optimizer.results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.02
     )
-    assert results is not None
-    assert np.allclose(results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -542,16 +528,13 @@ def test_cvar_filter_on_constraints(
     enopt_config["objectives"]["realization_filters"] = [0, 0]
     enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
-    results = (
-        BasicOptimizer(enopt_config, evaluator(functions))
-        .set_results_callback(
-            partial(_track_results, result_list=result_list),
-        )
-        .run(initial_values)
-        .results
+    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer.set_results_callback(partial(_track_results, result_list=result_list))
+    optimizer.run(initial_values)
+    assert optimizer.results is not None
+    assert np.allclose(
+        optimizer.results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.02
     )
-    assert results is not None
-    assert np.allclose(results.evaluations.variables, [-0.05, 0.0, 0.45], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -614,14 +597,13 @@ def test_cvar_filter_mixed(
     enopt_config["objectives"]["realization_filters"] = [0, 0, 0, 0]
 
     result_list: list[Results] = []
-    results = (
-        BasicOptimizer(enopt_config, evaluator(functions))
-        .set_results_callback(_add_objective)
-        .run(initial_values)
-        .results
+    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer.set_results_callback(_add_objective)
+    optimizer.run(initial_values)
+    assert optimizer.results is not None
+    assert np.allclose(
+        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
-    assert results is not None
-    assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
@@ -651,14 +633,13 @@ def test_cvar_filter_mixed(
     enopt_config["objectives"]["realization_filters"] = [0, 0, -1, -1]
 
     result_list = []
-    results = (
-        BasicOptimizer(enopt_config, evaluator(functions))
-        .set_results_callback(_add_objective)
-        .run(initial_values)
-        .results
+    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer.set_results_callback(_add_objective)
+    optimizer.run(initial_values)
+    assert optimizer.results is not None
+    assert not np.allclose(
+        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
-    assert results is not None
-    assert not np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
     for result in result_list:
         assert result is not None
         if isinstance(result, FunctionResults):
