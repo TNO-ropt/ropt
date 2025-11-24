@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Self
+from typing import Any
 
 from ropt.plugins.base import Plugin
 from ropt.plugins.event_handler import EventHandler
@@ -60,7 +60,7 @@ class ComputeStep(ABC):
         """Initialize the ComputeStep."""
         self._event_handlers: list[EventHandler] = []
 
-    def add_event_handler(self, handler: EventHandler) -> Self:
+    def add_event_handler(self, handler: EventHandler) -> None:
         """Add an event handler.
 
         Compute steps emit [`events`][ropt.workflow.Event] to report on the
@@ -74,7 +74,6 @@ class ComputeStep(ABC):
         """
         if isinstance(handler, EventHandler):
             self._event_handlers.append(handler)
-        return self
 
     @property
     def event_handlers(self) -> list[EventHandler]:

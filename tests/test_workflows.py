@@ -51,7 +51,8 @@ def test_run_basic(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step = create_compute_step(
         "optimizer",
         evaluator=create_evaluator("function_evaluator", callback=evaluator()),
-    ).add_event_handler(tracker)
+    )
+    step.add_event_handler(tracker)
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
     assert tracker["results"] is not None
     assert np.allclose(
@@ -72,7 +73,8 @@ def test_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step = create_compute_step(
         "optimizer",
         evaluator=create_evaluator("function_evaluator", callback=evaluator()),
-    ).add_event_handler(tracker)
+    )
+    step.add_event_handler(tracker)
 
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
     assert tracker["results"] is not None
@@ -95,7 +97,8 @@ def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> Non
     step = create_compute_step(
         "optimizer",
         evaluator=create_evaluator("function_evaluator", callback=evaluator()),
-    ).add_event_handler(tracker)
+    )
+    step.add_event_handler(tracker)
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
     assert tracker["results"] is not None
     variables1 = tracker["results"].evaluations.variables
@@ -122,7 +125,8 @@ def test_reset_results(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step = create_compute_step(
         "optimizer",
         evaluator=create_evaluator("function_evaluator", callback=evaluator()),
-    ).add_event_handler(tracker)
+    )
+    step.add_event_handler(tracker)
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
     saved_results = deepcopy(tracker["results"])
     tracker["results"] = None
@@ -155,19 +159,17 @@ def test_two_optimizers_alternating(
     tracker1 = create_event_handler("tracker")
     tracker2 = create_event_handler("tracker", what="last")
 
-    step = (
-        create_compute_step(
-            "optimizer",
-            evaluator=create_evaluator("function_evaluator", callback=evaluator()),
-        )
-        .add_event_handler(tracker1)
-        .add_event_handler(tracker2)
-        .add_event_handler(
-            create_event_handler(
-                "observer",
-                event_types={EventType.FINISHED_EVALUATION},
-                callback=_track_evaluations,
-            )
+    step = create_compute_step(
+        "optimizer",
+        evaluator=create_evaluator("function_evaluator", callback=evaluator()),
+    )
+    step.add_event_handler(tracker1)
+    step.add_event_handler(tracker2)
+    step.add_event_handler(
+        create_event_handler(
+            "observer",
+            event_types={EventType.FINISHED_EVALUATION},
+            callback=_track_evaluations,
         )
     )
     step.run(
@@ -220,14 +222,12 @@ def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -
         event_types={EventType.FINISHED_EVALUATION},
         callback=_track_evaluations,
     )
-    step = (
-        create_compute_step(
-            "optimizer",
-            evaluator=create_evaluator("function_evaluator", callback=evaluator()),
-        )
-        .add_event_handler(tracker)
-        .add_event_handler(observer)
+    step = create_compute_step(
+        "optimizer",
+        evaluator=create_evaluator("function_evaluator", callback=evaluator()),
     )
+    step.add_event_handler(tracker)
+    step.add_event_handler(observer)
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
     assert tracker["results"] is not None
     step.run(
@@ -301,7 +301,8 @@ def test_restart_last(enopt_config: dict[str, Any], evaluator: Any) -> None:
         callback=_track_evaluations,
     )
     tracker = create_event_handler("tracker", what="last")
-    step.add_event_handler(observer).add_event_handler(tracker)
+    step.add_event_handler(observer)
+    step.add_event_handler(tracker)
     for _ in range(2):
         variables = (
             initial_values
@@ -477,7 +478,8 @@ def test_evaluator(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step = create_compute_step(
         "ensemble_evaluator",
         evaluator=create_evaluator("function_evaluator", callback=evaluator()),
-    ).add_event_handler(tracker)
+    )
+    step.add_event_handler(tracker)
     step.run(config=EnOptConfig.model_validate(enopt_config), variables=[0.0, 0.0, 0.1])
     assert tracker["results"].functions is not None
     assert np.allclose(tracker["results"].functions.weighted_objective, 1.66)
@@ -500,7 +502,8 @@ def test_evaluator_multi(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step = create_compute_step(
         "ensemble_evaluator",
         evaluator=create_evaluator("function_evaluator", callback=evaluator()),
-    ).add_event_handler(store)
+    )
+    step.add_event_handler(store)
     step.run(
         config=EnOptConfig.model_validate(enopt_config),
         transforms=None,
@@ -564,17 +567,16 @@ def test_nested_optimization(enopt_config: dict[str, Any], evaluator: Any) -> No
         event_types={EventType.FINISHED_EVALUATION},
         callback=_track_evaluations,
     )
-    outer_step.add_event_handler(observer).add_event_handler(outer_tracker)
+    outer_step.add_event_handler(observer)
+    outer_step.add_event_handler(outer_tracker)
 
     def _inner_optimization(
         variables: NDArray[np.float64],
     ) -> tuple[FunctionResults | None, bool]:
         inner_tracker = create_event_handler("tracker")
-        inner_step = (
-            create_compute_step("optimizer", evaluator=function_evaluator)
-            .add_event_handler(observer)
-            .add_event_handler(inner_tracker)
-        )
+        inner_step = create_compute_step("optimizer", evaluator=function_evaluator)
+        inner_step.add_event_handler(observer)
+        inner_step.add_event_handler(inner_tracker)
         exit_code = inner_step.run(
             config=EnOptConfig.model_validate(nested_config),
             variables=variables,
@@ -624,17 +626,16 @@ def test_nested_optimization_metadata(
         event_types={EventType.FINISHED_EVALUATION},
         callback=_track_evaluations,
     )
-    outer_step.add_event_handler(observer).add_event_handler(outer_tracker)
+    outer_step.add_event_handler(observer)
+    outer_step.add_event_handler(outer_tracker)
 
     def _inner_optimization(
         variables: NDArray[np.float64],
     ) -> tuple[FunctionResults | None, bool]:
         inner_tracker = create_event_handler("tracker")
-        inner_step = (
-            create_compute_step("optimizer", evaluator=function_evaluator)
-            .add_event_handler(observer)
-            .add_event_handler(inner_tracker)
-        )
+        inner_step = create_compute_step("optimizer", evaluator=function_evaluator)
+        inner_step.add_event_handler(observer)
+        inner_step.add_event_handler(inner_tracker)
         exit_code = inner_step.run(
             config=EnOptConfig.model_validate(nested_config),
             metadata={"inner": "inner_meta_data"},
@@ -670,18 +671,16 @@ def test_optimization_abort(enopt_config: Any, evaluator: Any) -> None:
             raise ComputeStepAborted(exit_code=ExitCode.USER_ABORT)
 
     tracker = create_event_handler("tracker")
-    step = (
-        create_compute_step(
-            "optimizer",
-            evaluator=create_evaluator("function_evaluator", callback=evaluator()),
-        )
-        .add_event_handler(tracker)
-        .add_event_handler(
-            create_event_handler(
-                "observer",
-                event_types={EventType.FINISHED_EVALUATION},
-                callback=_observer,
-            )
+    step = create_compute_step(
+        "optimizer",
+        evaluator=create_evaluator("function_evaluator", callback=evaluator()),
+    )
+    step.add_event_handler(tracker)
+    step.add_event_handler(
+        create_event_handler(
+            "observer",
+            event_types={EventType.FINISHED_EVALUATION},
+            callback=_observer,
         )
     )
     exit_code = step.run(
@@ -770,17 +769,15 @@ def test_evaluator_cache(
         cached_evaluator, "eval", partial(_cached_eval, cached_evaluator)
     )
 
-    step = (
-        create_compute_step("optimizer", evaluator=cached_evaluator)
-        .add_event_handler(
-            create_event_handler(
-                "observer",
-                event_types={EventType.FINISHED_EVALUATION},
-                callback=_track_evaluations,
-            )
+    step = create_compute_step("optimizer", evaluator=cached_evaluator)
+    step.add_event_handler(
+        create_event_handler(
+            "observer",
+            event_types={EventType.FINISHED_EVALUATION},
+            callback=_track_evaluations,
         )
-        .add_event_handler(tracker)
     )
+    step.add_event_handler(tracker)
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
     assert completed_test_functions == 8
 
@@ -821,9 +818,8 @@ def test_evaluator_cache_with_store(
     cached_evaluator = create_evaluator(
         "cached_evaluator", evaluator=function_evaluator, sources={store}
     )
-    step = create_compute_step(
-        "optimizer", evaluator=cached_evaluator
-    ).add_event_handler(store)
+    step = create_compute_step("optimizer", evaluator=cached_evaluator)
+    step.add_event_handler(store)
 
     assert isinstance(cached_evaluator, DefaultCachedEvaluator)
     monkeypatch.setattr(

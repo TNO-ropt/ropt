@@ -284,9 +284,8 @@ class BasicOptimizer:
                 "tracker",
                 constraint_tolerance=self._constraint_tolerance,
             )
-            optimizer = create_compute_step(
-                "optimizer", evaluator=evaluator
-            ).add_event_handler(tracker)
+            optimizer = create_compute_step("optimizer", evaluator=evaluator)
+            optimizer.add_event_handler(tracker)
             for event_type, function in self._observers:
                 optimizer.add_event_handler(
                     create_event_handler(
