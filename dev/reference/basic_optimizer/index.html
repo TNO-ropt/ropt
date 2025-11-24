@@ -2048,10 +2048,10 @@ store the best result.</p>
 </span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>    <span class="k">return</span> <span class="n">EvaluatorResult</span><span class="p">(</span><span class="n">objectives</span><span class="o">=</span><span class="n">objectives</span><span class="p">)</span>
 </span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>
 </span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>
-</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="n">optimal_result</span> <span class="o">=</span> <span class="n">BasicOptimizer</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">initial_values</span><span class="p">)</span><span class="o">.</span><span class="n">results</span>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="n">optimizer</span> <span class="o">=</span> <span class="n">BasicOptimizer</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">,</span> <span class="n">rosenbrock</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">initial_values</span><span class="p">)</span>
 </span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>
-</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;variables: </span><span class="si">{</span><span class="n">optimal_result</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;objective: </span><span class="si">{</span><span class="n">optimal_result</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">weighted_objective</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;variables: </span><span class="si">{</span><span class="n">optimizer</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">evaluations</span><span class="o">.</span><span class="n">variables</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;objective: </span><span class="si">{</span><span class="n">optimizer</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">weighted_objective</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span></code></pre></div>
 </details>
 
@@ -2458,7 +2458,7 @@ constraint value is within this tolerance, it is considered satisfied.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span><span class="n">initial_values</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span><span class="n">initial_values</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2469,29 +2469,6 @@ the <code>BasicOptimizer</code> object. It manages the optimization, result
 handling, and event processing. After the optimization is complete, the
 optimal results, variables, and exit code can be accessed via the
 corresponding properties.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Self" href="https://docs.python.org/3/library/typing.html#typing.Self">Self</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The <code>BasicOptimizer</code> instance, allowing for method chaining.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
 
 
     </div>
@@ -2506,7 +2483,7 @@ corresponding properties.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_abort_callback</span><span class="p">(</span><span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_abort_callback</span><span class="p">(</span><span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="nb">bool</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2551,29 +2528,6 @@ value.</p>
     </table>
 
 
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Self" href="https://docs.python.org/3/library/typing.html#typing.Self">Self</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The <code>BasicOptimizer</code> instance, allowing for method chaining.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
     </div>
 
 </div>
@@ -2586,7 +2540,7 @@ value.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_results_callback</span><span class="p">(</span><span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">set_results_callback</span><span class="p">(</span><span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2626,29 +2580,6 @@ real-time monitoring and analysis of the optimization's progress.</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Self" href="https://docs.python.org/3/library/typing.html#typing.Self">Self</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The <code>BasicOptimizer</code> instance, allowing for method chaining.</p>
-              </div>
             </td>
           </tr>
       </tbody>
