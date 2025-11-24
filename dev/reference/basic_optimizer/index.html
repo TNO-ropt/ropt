@@ -633,28 +633,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.BasicOptimizer.variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        variables
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.BasicOptimizer.exit_code" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        exit_code
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.workflow.BasicOptimizer.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1839,28 +1817,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.workflow.BasicOptimizer.variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        variables
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.workflow.BasicOptimizer.exit_code" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        exit_code
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.workflow.BasicOptimizer.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2224,113 +2180,6 @@ optimal solution.</p>
 
 </div>
 
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.workflow.BasicOptimizer.variables" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">variables</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Return the optimal variables found during the optimization.</p>
-<p>This property provides access to the variable values that correspond to
-the optimal <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object.
-These variables represent the solution that yielded the best objective
-function value found during the optimization process.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>] | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The variables corresponding to the optimal result.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.workflow.BasicOptimizer.exit_code" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">exit_code</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">exit_code</span><span class="p">:</span> <span class="n">ExitCode</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Return the exit code of the optimization run.</p>
-<p>This property provides access to the <a class="autorefs autorefs-internal" title="            ExitCode" href="../enums/#ropt.enums.ExitCode"><code>ExitCode</code></a>
-that indicates the outcome of the optimization process. It can be used
-to determine whether the optimization completed successfully, was
-aborted, or encountered an error.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The exit code of the optimization run.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-    </div>
-
-</div>
-
 
 
 
@@ -2458,7 +2307,7 @@ constraint value is within this tolerance, it is considered satisfied.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span><span class="n">initial_values</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span><span class="n">initial_values</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExitCode</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2469,6 +2318,29 @@ the <code>BasicOptimizer</code> object. It manages the optimization, result
 handling, and event processing. After the optimization is complete, the
 optimal results, variables, and exit code can be accessed via the
 corresponding properties.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ExitCode (ropt.enums.ExitCode)" href="../enums/#ropt.enums.ExitCode">ExitCode</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The exit code returned by the optimization workflow.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     </div>
