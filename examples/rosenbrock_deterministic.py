@@ -25,7 +25,7 @@ initial_values = 2 * np.arange(DIM) / DIM + 0.5
 
 
 def rosenbrock(variables: NDArray[np.float64], _: EvaluatorContext) -> EvaluatorResult:
-    """Function evaluator for the 4D rosenbrock function.
+    """Function evaluator for the multi-dimensional rosenbrock function.
 
     This function returns a tuple containing the calculated objectives and
     `None`, the latter because no constraints are calculated.
@@ -72,8 +72,8 @@ def run_optimization(config: dict[str, Any]) -> FunctionResults:
     assert optimizer.results is not None
     assert optimizer.results.functions is not None
 
-    print(f"  variables: {optimizer.results.evaluations.variables}")
-    print(f"  objective: {optimizer.results.functions.weighted_objective}\n")
+    print(f"Optimal variables: {optimizer.results.evaluations.variables}")
+    print(f"Optimal objective: {optimizer.results.functions.weighted_objective}\n")
 
     return optimizer.results
 

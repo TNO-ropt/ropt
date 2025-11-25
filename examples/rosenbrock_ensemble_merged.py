@@ -24,10 +24,11 @@ CONFIG: dict[str, Any] = {
         "perturbation_magnitudes": 1e-6,
     },
     "realizations": {
-        "weights": [1.0] * 10,
+        "weights": [1.0] * 50,
     },
     "gradient": {
-        "number_of_perturbations": 5,
+        "number_of_perturbations": 1,
+        "merge_realizations": True,
     },
 }
 initial_values = 2 * np.arange(DIM) / DIM + 0.5

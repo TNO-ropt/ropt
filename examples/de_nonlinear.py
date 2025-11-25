@@ -69,8 +69,8 @@ def run_optimization() -> None:
     assert optimizer.results is not None
     assert optimizer.results.functions is not None
     assert np.all(optimizer.results.evaluations.variables == [3, 7])
-    print(f"  variables: {optimizer.results.evaluations.variables}")
-    print(f"  objective: {optimizer.results.functions.weighted_objective}\n")
+    print(f"Optimal variables: {optimizer.results.evaluations.variables}")
+    print(f"Optimal objective: {optimizer.results.functions.weighted_objective}\n")
 
 
 def main() -> None:
