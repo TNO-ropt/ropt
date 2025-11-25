@@ -1,4 +1,4 @@
-# Introduction: Ensemble-based robust optimization
+# Ensemble-based robust optimization
 Constraint optimization is the process of optimizing an objective function
 $f(\mathbf{x})$ with respect to a vector of variables $\mathbf{x}$ in the
 presence of one or more inequality constraints $g_j(\mathbf{x})$ and/or equality

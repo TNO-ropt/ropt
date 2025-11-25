@@ -91,7 +91,9 @@ repo_name: TNO-ropt/ropt
 
 nav:
   - "About": index.md
-  - "Introduction": usage/robust_optimization.md
+  - "Usage": 
+      - "Background": usage/background.md
+      - "Basic Optimization": usage/basic.md
   - "Reference":
       - "Workflows":
           - "Optimization Workflows": reference/workflow.md
