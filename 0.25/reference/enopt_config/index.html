@@ -1,0 +1,4765 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../basic_optimizer/">
+      
+      
+        <link rel="next" href="../domain_transforms/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>Configuration - ropt Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ropt.config" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="ropt Documentation" class="md-header__button md-logo" aria-label="ropt Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ropt Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Configuration
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="lime"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/TNO-ropt/ropt" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    TNO-ropt/ropt
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  About
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../usage/robust_optimization/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Introduction
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../workflow/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="ropt Documentation" class="md-nav__button md-logo" aria-label="ropt Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    ropt Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/TNO-ropt/ropt" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    TNO-ropt/ropt
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../usage/robust_optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflows
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflows
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../basic_optimizer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basic Optimizer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Optimization
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        config
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="config">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.EnOptConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EnOptConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.VariablesConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VariablesConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.ObjectiveFunctionsConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ObjectiveFunctionsConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.LinearConstraintsConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LinearConstraintsConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.NonlinearConstraintsConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NonlinearConstraintsConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.RealizationsConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RealizationsConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.OptimizerConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptimizerConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.GradientConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GradientConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.FunctionEstimatorConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FunctionEstimatorConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.RealizationFilterConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RealizationFilterConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.SamplerConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SamplerConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.config.constants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        constants
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="constants">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.constants.DEFAULT_SEED" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DEFAULT_SEED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.constants.DEFAULT_NUMBER_OF_PERTURBATIONS" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DEFAULT_NUMBER_OF_PERTURBATIONS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.constants.DEFAULT_PERTURBATION_MAGNITUDE" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DEFAULT_PERTURBATION_MAGNITUDE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DEFAULT_PERTURBATION_BOUNDARY_TYPE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.constants.DEFAULT_PERTURBATION_TYPE" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DEFAULT_PERTURBATION_TYPE
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.config.options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.options.OptionsSchemaModel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptionsSchemaModel
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OptionsSchemaModel">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.options.OptionsSchemaModel.get_options_model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_options_model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.options.MethodSchemaModel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MethodSchemaModel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.options.gen_options_table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gen_options_table
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../domain_transforms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Domain Transforms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ensemble Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../evaluator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Function Evaluations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugins
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Plugins
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plugin_manager/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plugin Manager
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3_2" id="__nav_3_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workflow Plugins
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workflow Plugins
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../compute_steps_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Compute Steps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../event_handler_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Event Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../evaluator_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3_3" id="__nav_3_3_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimizer Plugins
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Optimizer Plugins
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../optimizer_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimizers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sampler_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Samplers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../realization_filter_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Realization Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../function_estimator_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Function estimators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3_4" id="__nav_3_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Default Plugins
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Default Plugins
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_compute_steps_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Compute Steps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_event_handler_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Event Handlers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_evaluator_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scipy_optimizer_plugin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SciPy Optimizers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scipy_sampler_plugin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SciPy Samplers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_realization_filter_plugin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Default Realization Filters
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_function_estimator_plugin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Default Function Estimators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../external_optimizer_plugin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    External Optimizers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Miscellaneous
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Miscellaneous
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../enums/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Enumerations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../exceptions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exceptions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        config
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="config">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.EnOptConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EnOptConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.VariablesConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VariablesConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.ObjectiveFunctionsConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ObjectiveFunctionsConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.LinearConstraintsConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LinearConstraintsConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.NonlinearConstraintsConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NonlinearConstraintsConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.RealizationsConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RealizationsConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.OptimizerConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptimizerConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.GradientConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GradientConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.FunctionEstimatorConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FunctionEstimatorConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.RealizationFilterConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RealizationFilterConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.SamplerConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SamplerConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.config.constants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        constants
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="constants">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.constants.DEFAULT_SEED" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DEFAULT_SEED
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.constants.DEFAULT_NUMBER_OF_PERTURBATIONS" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DEFAULT_NUMBER_OF_PERTURBATIONS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.constants.DEFAULT_PERTURBATION_MAGNITUDE" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DEFAULT_PERTURBATION_MAGNITUDE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DEFAULT_PERTURBATION_BOUNDARY_TYPE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.constants.DEFAULT_PERTURBATION_TYPE" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DEFAULT_PERTURBATION_TYPE
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.config.options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        options
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="options">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.options.OptionsSchemaModel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptionsSchemaModel
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OptionsSchemaModel">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.options.OptionsSchemaModel.get_options_model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_options_model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.options.MethodSchemaModel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MethodSchemaModel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.options.gen_options_table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gen_options_table
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>Configuration</h1>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="ropt.config" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.config</span>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>The <code>ropt.config</code> module provides configuration classes for optimization workflows.</p>
+<p>This module defines a set of classes that are used to configure various aspects
+of an optimization process, including variables, objectives, constraints,
+realizations, samplers, and more.</p>
+<p>The central configuration class for optimization is
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>, which encapsulates the complete
+configuration for a single optimization run. It is designed to be flexible and
+extensible, allowing users to customize the optimization process to their
+specific needs.</p>
+<p>These configuration classes are built using
+<a href="https://docs.pydantic.dev/"><code>pydantic</code></a>, which provides robust data validation
+and parsing capabilities. This ensures that the configuration data is consistent
+and adheres to the expected structure.</p>
+<p>Configuration objects are typically created from dictionaries of configuration
+values using the <code>model_validate</code> method provided by <code>pydantic</code>.</p>
+<p><strong>Key Features</strong>:</p>
+<ul>
+<li><strong>Modular Design:</strong> The configuration is broken down into smaller, manageable
+  components, each represented by a dedicated class.</li>
+<li><strong>Validation:</strong> <code>pydantic</code> ensures that the configuration data is valid and
+  consistent.</li>
+<li><strong>Extensibility:</strong> The modular design allows for easy extension and
+  customization of the optimization process.</li>
+<li><strong>Centralized Configuration:</strong> The
+  <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> class provides a single point
+  of entry for configuring an optimization run.</li>
+</ul>
+<p><strong>Parsing and Validation</strong></p>
+<p>The configuration classes are built using
+<a href="https://docs.pydantic.dev/"><code>pydantic</code></a>, which provides robust data validation.
+The primary configuration class is <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>, and
+it contains nested configuration classes for various aspects of the
+optimization. To parse a configuration from a dictionary, use the
+<a class="autorefs autorefs-external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel.model_validate"><code>model_validate</code></a> class method.
+```</p>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.EnOptConfig" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">EnOptConfig</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>The primary configuration class for an optimization run.</p>
+<p><code>EnOptConfig</code> orchestrates the configuration of an entire optimization
+workflow. It contains nested configuration classes that define specific
+aspects of the optimization, such as variables, objectives, constraints,
+realizations, and the optimizer itself.</p>
+<p><code>realization_filters</code>, <code>function_estimators</code>, and <code>samplers</code> are configured
+as tuples. Other configuration fields reference these objects by their index
+within the tuples. This makes it possible to share these objects between
+entities. For example, <a class="autorefs autorefs-internal" title="            VariablesConfig" href="#ropt.config.VariablesConfig"><code>VariablesConfig</code></a> has
+a <code>samplers</code> field, which is an array of indices specifying the sampler to
+use for each variable. If only a single sampler is needed, the <code>samplers</code>
+field in <code>EnOptConfig</code> should contain a single sampler configuration, and
+the <code>samplers</code> field in the <code>VariablesConfig</code> configuration contains only
+zeros to specify that each variable should use this entry. In case of
+multiple samplers, multiple sampler configurations are defined, and each
+entry in <code>samplers</code> array in <code>VariablesConfig</code> points to desired sampler.</p>
+<p>The optional <code>names</code> attribute is a dictionary that stores the names of the
+various entities, such as variables, objectives, and constraints. The
+supported name types are defined in the <a class="autorefs autorefs-internal" title="            AxisName" href="../enums/#ropt.enums.AxisName"><code>AxisName</code></a>
+enumeration. This information is optional, as it is not strictly necessary
+for the optimization, but it can be useful for labeling and interpreting
+results. For instance, when present, it is used to create a multi-index
+results that are exported as data frames.</p>
+
+
+<details class="info" open>
+  <summary>Info</summary>
+  <p>Many nested configuration classes use <code>numpy</code> arrays. These arrays
+typically have a size determined by a configured property (e.g., the
+number of variables) or a size of one. In the latter case, the single
+value is broadcasted to all relevant elements. For example,
+<a class="autorefs autorefs-internal" title="            VariablesConfig" href="#ropt.config.VariablesConfig"><code>VariablesConfig</code></a> defines properties like
+initial values and bounds as <code>numpy</code> arrays, which must either match the
+number of variables or have a size of one.</p>
+</details>
+
+<details class="warning" open>
+  <summary>Warning</summary>
+  <p><code>EnOptConfig</code> objects are immutable and hold the in-memory configuration
+for an optimization run. For persistence, do not serialize the object
+itself. Instead, store the original dictionary used for its creation.</p>
+<p>Round-trip serialization (e.g., to/from JSON) is not a supported use
+case and may lead to data loss due to the complex types it contains,
+such as <code>numpy</code> arrays, or to unexpected behavior because of the
+transformations that are applied to the input upon creation.</p>
+</details>
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.EnOptConfig.variables">variables</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            VariablesConfig (ropt.config._variables_config.VariablesConfig)" href="#ropt.config.VariablesConfig">VariablesConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration for the optimization variables.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.EnOptConfig.objectives">objectives</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ObjectiveFunctionsConfig (ropt.config._objective_functions_config.ObjectiveFunctionsConfig)" href="#ropt.config.ObjectiveFunctionsConfig">ObjectiveFunctionsConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration for the objective functions.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.EnOptConfig.linear_constraints">linear_constraints</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            LinearConstraintsConfig (ropt.config._linear_constraints_config.LinearConstraintsConfig)" href="#ropt.config.LinearConstraintsConfig">LinearConstraintsConfig</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration for linear constraints.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.EnOptConfig.nonlinear_constraints">nonlinear_constraints</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            NonlinearConstraintsConfig (ropt.config._nonlinear_constraints_config.NonlinearConstraintsConfig)" href="#ropt.config.NonlinearConstraintsConfig">NonlinearConstraintsConfig</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration for non-linear constraints.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.EnOptConfig.realizations">realizations</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            RealizationsConfig (ropt.config._realizations_config.RealizationsConfig)" href="#ropt.config.RealizationsConfig">RealizationsConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration for the realizations.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.EnOptConfig.optimizer">optimizer</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            OptimizerConfig (ropt.config._optimizer_config.OptimizerConfig)" href="#ropt.config.OptimizerConfig">OptimizerConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration for the optimization algorithm.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.EnOptConfig.gradient">gradient</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            GradientConfig (ropt.config._gradient_config.GradientConfig)" href="#ropt.config.GradientConfig">GradientConfig</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration for gradient calculations.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.EnOptConfig.realization_filters">realization_filters</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            RealizationFilterConfig (ropt.config._realization_filter_config.RealizationFilterConfig)" href="#ropt.config.RealizationFilterConfig">RealizationFilterConfig</a>, ...]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration for realization filters.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.EnOptConfig.function_estimators">function_estimators</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig (ropt.config._function_estimator_config.FunctionEstimatorConfig)" href="#ropt.config.FunctionEstimatorConfig">FunctionEstimatorConfig</a>, ...]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration for function estimators.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.EnOptConfig.samplers">samplers</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            SamplerConfig (ropt.config._sampler_config.SamplerConfig)" href="#ropt.config.SamplerConfig">SamplerConfig</a>, ...]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration for samplers.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.EnOptConfig.names">names</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>, ...]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional mapping of axis types to names.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.VariablesConfig" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">VariablesConfig</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Configuration class for optimization variables.</p>
+<p>This class, <code>VariablesConfig</code>, defines the configuration for optimization
+variables. It is used in an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object
+to specify the initial values, bounds, types, and an optional mask for the
+variables.</p>
+<p>The <code>variables</code> field is required and determines the number of variables,
+including both free and fixed variables.</p>
+<p>The <code>lower_bounds</code> and <code>upper_bounds</code> fields define the bounds for each
+variable. These are also <code>numpy</code> arrays and are broadcasted to match the
+number of variables. By default, they are set to negative and positive
+infinity, respectively. <code>numpy.nan</code> values in these arrays indicate
+unbounded variables and are converted to <code>numpy.inf</code> with the appropriate
+sign.</p>
+<p>The optional <code>types</code> field allows assigning a
+<a class="autorefs autorefs-internal" title="            VariableType" href="../enums/#ropt.enums.VariableType"><code>VariableType</code></a> to each variable. If not provided,
+all variables are assumed to be continuous real-valued
+(<a class="autorefs autorefs-internal" title="            REAL
+
+
+  
+      class-attribute
+      instance-attribute
+  " href="../enums/#ropt.enums.VariableType.REAL"><code>VariableType.REAL</code></a>).</p>
+<p>The optional <code>mask</code> field is a boolean <code>numpy</code> array that indicates which
+variables are free to change during optimization. <code>True</code> values in the mask
+indicate that the corresponding variable is free, while <code>False</code> indicates a
+fixed variable.</p>
+<p><strong>Variable perturbations</strong></p>
+<p>The <code>VariablesConfig</code> class also stores information that is needed to
+generate perturbed variables, for instance to calculate stochastic
+gradients.</p>
+<p>Perturbations are generated by sampler objects that are configured
+separately as a tuple of <a class="autorefs autorefs-internal" title="            SamplerConfig" href="#ropt.config.SamplerConfig"><code>SamplerConfig</code></a>
+objects in the configuration object used by an optimization step.
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object defines the available
+samplers in its <code>samplers</code> field. The <code>samplers</code> field of the
+<code>VariablesConfig</code> object specifies, for each variable, the the sampler to
+use by its index into the <code>samplers</code> tuple. A random number generator is
+created to support samplers that require random numbers.</p>
+<p>The generated perturbation values are scaled by the values of the
+<code>perturbation_magnitudes</code> field and can be modified based on the
+<code>perturbation_types</code>. See <a class="autorefs autorefs-internal" title="            PerturbationType" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>
+for details on available perturbation types.</p>
+<p>Perturbed variables may violate the defined variable bounds. The
+<code>boundary_types</code> field specifies how to handle such violations. See
+<a class="autorefs autorefs-internal" title="            BoundaryType" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a> for details on available boundary
+handling methods.</p>
+<p>The <code>perturbation_types</code> and <code>boundary_types</code> fields use values from the
+<a class="autorefs autorefs-internal" title="            PerturbationType" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a> and
+<a class="autorefs autorefs-internal" title="            BoundaryType" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a> enumerations, respectively.</p>
+
+
+<details class="note" open>
+  <summary>Seed for Samplers</summary>
+  <p>The <code>seed</code> value ensures consistent results across repeated runs with
+the same configuration. To obtain unique results for each optimization
+run, modify the seed. A common approach is to use a tuple with a unique
+ID as the first element, ensuring reproducibility across nested and
+parallel evaluations.</p>
+</details>
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.VariablesConfig.types">types</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ArrayEnum
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.ArrayEnum)" href="../utilities/#ropt.config.validated_types.ArrayEnum">ArrayEnum</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional variable types.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.VariablesConfig.variable_count">variable_count</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of variables.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.VariablesConfig.lower_bounds">lower_bounds</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Array1D
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.Array1D)" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Lower bounds for the variables (default: <span class="arithmatex">\(-\infty\)</span>).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.VariablesConfig.upper_bounds">upper_bounds</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Array1D
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.Array1D)" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Upper bounds for the variables (default: <span class="arithmatex">\(+\infty\)</span>).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.VariablesConfig.mask">mask</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Array1DBool
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.Array1DBool)" href="../utilities/#ropt.config.validated_types.Array1DBool">Array1DBool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional boolean mask indicating free variables.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.VariablesConfig.perturbation_magnitudes">perturbation_magnitudes</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Array1D
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.Array1D)" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Magnitudes of the perturbations for each variable
+(default:
+<a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_MAGNITUDE
+
+
+  
+      module-attribute
+  " href="#ropt.config.constants.DEFAULT_PERTURBATION_MAGNITUDE"><code>DEFAULT_PERTURBATION_MAGNITUDE</code></a>).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.VariablesConfig.perturbation_types">perturbation_types</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ArrayEnum
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.ArrayEnum)" href="../utilities/#ropt.config.validated_types.ArrayEnum">ArrayEnum</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Type of perturbation for each variable (see
+<a class="autorefs autorefs-internal" title="            PerturbationType" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>, default:
+<a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_TYPE
+
+
+  
+      module-attribute
+  " href="#ropt.config.constants.DEFAULT_PERTURBATION_TYPE"><code>DEFAULT_PERTURBATION_TYPE</code></a>).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.VariablesConfig.boundary_types">boundary_types</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ArrayEnum
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.ArrayEnum)" href="../utilities/#ropt.config.validated_types.ArrayEnum">ArrayEnum</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>How to handle perturbations that violate boundary
+conditions (see <a class="autorefs autorefs-internal" title="            BoundaryType" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>, default:
+<a class="autorefs autorefs-internal" title="            DEFAULT_PERTURBATION_BOUNDARY_TYPE
+
+
+  
+      module-attribute
+  " href="#ropt.config.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE"><code>DEFAULT_PERTURBATION_BOUNDARY_TYPE</code></a>).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.VariablesConfig.samplers">samplers</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Array1DInt
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.Array1DInt)" href="../utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Indices of the samplers to use for each variable.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.VariablesConfig.seed">seed</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ItemOrTuple
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.ItemOrTuple)" href="../utilities/#ropt.config.validated_types.ItemOrTuple">ItemOrTuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Seed for the random number generator used by the samplers.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.ObjectiveFunctionsConfig" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ObjectiveFunctionsConfig</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Configuration class for objective functions.</p>
+<p>This class, <code>ObjectiveFunctionsConfig</code>, defines the configuration for
+objective functions. for instance, as part of an
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+<p><code>ropt</code> supports multi-objective optimization. Multiple objectives are
+combined into a single value by summing them after weighting. The <code>weights</code>
+field, a <code>numpy</code> array, determines the weight of each objective function.
+The length of this array defines the number of objective functions. The
+weights are automatically normalized to sum to 1 (e.g., <code>[1, 1]</code> becomes
+<code>[0.5, 0.5]</code>).</p>
+<p>Objective functions can optionally be processed using <a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="#ropt.config.RealizationFilterConfig"><code>realization
+filters</code></a> and <a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="#ropt.config.FunctionEstimatorConfig"><code>function
+estimators</code></a>.The <code>realization_filters</code>
+and <code>function_estimators</code> attributes, if provided, must be arrays of integer
+indices. Each index in the <code>realization_filters</code> array corresponds to a
+objective (by position) and specifies which filter to use. The available
+filters must be defined elsewhere as a tuple of realization filter
+configurations. For instance, for optimization these are defined in the
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig.realization_filters</code></a> configuration
+class. The same logic applies to the <code>function_estimators</code> array . If an
+index is invalid (e.g., out of bounds for the corresponding object tuple),
+no filter or estimator is applied to that specific objective. If these
+attributes are not provided (<code>None</code>), no filters or estimators are applied
+at all.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.ObjectiveFunctionsConfig.weights">weights</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Array1D
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.Array1D)" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Weights for the objective functions (default: 1.0).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.ObjectiveFunctionsConfig.realization_filters">realization_filters</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Array1DInt
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.Array1DInt)" href="../utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional indices of realization filters.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.ObjectiveFunctionsConfig.function_estimators">function_estimators</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Array1DInt
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.Array1DInt)" href="../utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional indices of function estimators.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.LinearConstraintsConfig" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">LinearConstraintsConfig</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Configuration class for linear constraints.</p>
+<p>This class, <code>LinearConstraintsConfig</code>, defines linear constraints used in an
+optimization, for instance as part of an
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+<p>Linear constraints are defined by a set of linear equations involving the
+optimization variables. These equations can represent equality or inequality
+constraints. The <code>coefficients</code> field is a 2D <code>numpy</code> array where each row
+represents a constraint, and each column corresponds to a variable.</p>
+<p>The <code>lower_bounds</code> and <code>upper_bounds</code> fields specify the bounds on the
+right-hand side of each constraint equation. These fields are converted and
+broadcasted to <code>numpy</code> arrays with a length equal to the number of
+constraint equations.</p>
+<p>Less-than and greater-than inequality constraints can be specified by
+setting the lower bounds to <span class="arithmatex">\(-\infty\)</span>, or the upper bounds to <span class="arithmatex">\(+\infty\)</span>,
+respectively. Equality constraints are specified by setting the lower bounds
+equal to the upper bounds.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.LinearConstraintsConfig.coefficients">coefficients</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Array2D
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.Array2D)" href="../utilities/#ropt.config.validated_types.Array2D">Array2D</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Matrix of coefficients for the linear constraints.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.LinearConstraintsConfig.lower_bounds">lower_bounds</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Array1D
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.Array1D)" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Lower bounds for the right-hand side of the constraint equations.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.LinearConstraintsConfig.upper_bounds">upper_bounds</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Array1D
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.Array1D)" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Upper bounds for the right-hand side of the constraint equations.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="note" open>
+  <summary>Linear transformation of variables.</summary>
+  <p>The set of linear constraints can be represented by a matrix equation:
+<span class="arithmatex">\(\mathbf{A} \mathbf{x} = \mathbf{b}\)</span>.</p>
+<p>When linearly transforming variables to the optimizer domain, the
+coefficients (<span class="arithmatex">\(\mathbf{A}\)</span>) and right-hand-side values (<span class="arithmatex">\(\mathbf{b}\)</span>)
+must be converted to remain valid. If the linear transformation of the
+variables to the optimizer domain is given by:</p>
+<div class="arithmatex">\[ \hat{\mathbf{x}} = \mathbf{S} \mathbf{x} + \mathbf{o}\]</div>
+<p>then the coefficients and right-hand-side values must be transformed as
+follows:</p>
+<div class="arithmatex">\[ \begin{align}
+    \hat{\mathbf{A}} &amp;= \mathbf{A} \mathbf{S}^{-1} \\ \hat{\mathbf{b}}
+    &amp;= \mathbf{b} + \mathbf{A}\mathbf{S}^{-1}\mathbf{o}
+\end{align}\]</div>
+</details>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.NonlinearConstraintsConfig" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">NonlinearConstraintsConfig</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Configuration class for non-linear constraints.</p>
+<p>This class, <code>NonlinearConstraintsConfig</code>, defines non-linear constraints ,
+for instance as part of an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+<p>Non-linear constraints are defined by comparing a constraint function to a
+right-hand-side value, allowing for equality or inequality constraints. The
+<code>lower_bounds</code> and <code>upper_bounds</code> fields, which are <code>numpy</code> arrays, specify the
+bounds on these right-hand-side values. The length of these arrays determines
+the number of constraint functions.</p>
+<p>Less-than and greater-than inequality constraints can be specified by
+setting the lower bounds to <span class="arithmatex">\(-\infty\)</span>, or the upper bounds to <span class="arithmatex">\(+\infty\)</span>,
+respectively. Equality constraints are specified by setting the lower bounds
+equal to the upper bounds.</p>
+<p>Non-linear constraints can optionally be processed using <a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="#ropt.config.RealizationFilterConfig"><code>realization
+filters</code></a> and <a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="#ropt.config.FunctionEstimatorConfig"><code>function
+estimators</code></a>.The <code>realization_filters</code>
+and <code>function_estimators</code> attributes, if provided, must be arrays of integer
+indices. Each index in the <code>realization_filters</code> array corresponds to a
+constraint function (by position) and specifies which filter to use. The
+available filters must be defined elsewhere as a tuple of realization filter
+configurations. For instance, for optimization these are defined in the
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig.realization_filters</code></a> configuration
+class. The same logic applies to the <code>function_estimators</code> array . If an
+index is invalid (e.g., out of bounds for the corresponding object tuple),
+no filter or estimator is applied to that specific constraint function. If
+these attributes are not provided (<code>None</code>), no filters or estimators are
+applied at all.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.NonlinearConstraintsConfig.lower_bounds">lower_bounds</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Array1D
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.Array1D)" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Lower bounds for the right-hand-side values.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.NonlinearConstraintsConfig.upper_bounds">upper_bounds</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Array1D
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.Array1D)" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Upper bounds for the right-hand-side values.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.NonlinearConstraintsConfig.realization_filters">realization_filters</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Array1DInt
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.Array1DInt)" href="../utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional indices of realization filters.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.NonlinearConstraintsConfig.function_estimators">function_estimators</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Array1DInt
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.Array1DInt)" href="../utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional indices of function estimators.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.RealizationsConfig" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">RealizationsConfig</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Configuration class for realizations.</p>
+<p>This class, <code>RealizationsConfig</code>, defines the configuration for realizations
+used when calculating objectives and constraints.</p>
+<p>To optimize an ensemble of functions, a set of realizations is defined. When
+the optimizer requests a function value or a gradient, these are calculated for
+each realization and then combined into a single value. Typically, this
+combination is a weighted sum, but other methods are possible.</p>
+<p>The <code>weights</code> field, a <code>numpy</code> array, determines the weight of each
+realization. The length of this array defines the number of realizations. The
+weights are automatically normalized to sum to 1 (e.g., <code>[1, 1]</code> becomes
+<code>[0.5, 0.5]</code>).</p>
+<p>If function value calculations for some realizations fail (e.g., due to a
+simulation error), the total function and gradient values can still be
+calculated by excluding the missing values. However, a minimum number of
+successful realizations may be required. The <code>realization_min_success</code> field
+specifies this minimum. By default, it is set equal to the number of
+realizations, meaning no missing values are allowed.</p>
+
+
+<details class="note" open>
+  <summary>Note</summary>
+  <p>Setting <code>realization_min_success</code> to zero allows the optimization to
+proceed even if all realizations fail. While some optimizers can handle
+this, most will treat it as if the value were one, requiring at least
+one successful realization.</p>
+</details>
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.RealizationsConfig.weights">weights</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Array1D
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.Array1D)" href="../utilities/#ropt.config.validated_types.Array1D">Array1D</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Weights for the realizations (default: 1.0).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.RealizationsConfig.realization_min_success">realization_min_success</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pydantic.NonNegativeInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.NonNegativeInt">NonNegativeInt</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Minimum number of successful realizations (default:
+                    equal to the number of realizations).</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.OptimizerConfig" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">OptimizerConfig</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Configuration class for the optimization algorithm.</p>
+<p>This class, <code>OptimizerConfig</code>, defines the configuration for the optimization
+algorithm used in an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+<p>While optimization methods can have diverse parameters, this class provides a
+standardized set of settings that are commonly used and forwarded to the
+optimizer:</p>
+<ul>
+<li><strong><code>max_iterations</code></strong>: The maximum number of iterations allowed. The
+  optimizer may choose to ignore this.</li>
+<li><strong><code>max_functions</code></strong>: The maximum number of function evaluations allowed.</li>
+<li><strong><code>max_batches</code></strong>: The maximum number of evaluations batches allowed. The
+  optimizer callback may ask to evaluate a batch of multiple functions and
+  gradients at once. This setting will limit the number of those calls.</li>
+<li><strong><code>tolerance</code></strong>: The convergence tolerance used as a stopping criterion.
+  The exact definition depends on the optimizer, and it may be ignored.</li>
+<li><strong><code>parallel</code></strong>: If <code>True</code>, allows the optimizer to use parallelized
+  function evaluations. This typically applies to gradient-free methods and
+  may be ignored.</li>
+<li><strong><code>output_dir</code></strong>: An optional output directory where the optimizer can
+  store files.</li>
+<li><strong><code>options</code></strong>: A dictionary or list of strings for generic optimizer
+  options. The required format and interpretation depend on the specific
+  optimization method.</li>
+<li><strong><code>stdout</code></strong>: Redirect optimizer standard output to the given file.</li>
+<li><strong><code>stderr</code></strong>: Redirect optimizer standard error to the given file.</li>
+</ul>
+
+
+<details class="note" open>
+  <summary>Differences between <code>max_iterations</code>, <code>max_functions</code>, and <code>max_batches</code></summary>
+  <p>These three parameters provide different ways to limit the duration or
+computational cost of the optimization process:</p>
+<ul>
+<li>
+<p><strong><code>max_iterations</code></strong>: This limit is passed directly to the backend
+  optimization algorithm. Many optimizers define an "iteration" as a
+  distinct step in their process, which might involve one or more
+  function or gradient evaluations. The interpretation of <code>max_iterations</code>
+  depends on the specific backend optimizer; it typically caps the number
+  of these internal iterations. Some backends might ignore this setting if
+  they don't have a clear concept of iterations.</p>
+</li>
+<li>
+<p><strong><code>max_batches</code></strong>: This limit restricts the total number of <em>calls</em> made
+  to the evaluation function provided to <code>ropt</code>. An optimizer might request
+  a batch containing multiple function and/or gradient evaluations within
+  a single call. <code>max_batches</code> limits how many such batch requests are
+  processed sequentially. This is particularly useful for managing resource
+  usage when batches are evaluated in parallel (e.g., on an HPC cluster),
+  as it controls the number of sequential submission steps. The number of
+  batches does not necessarily correspond directly to the number of
+  optimizer iterations, especially if function and gradient evaluations
+  occur in separate batches.</p>
+</li>
+<li>
+<p><strong><code>max_functions</code></strong>: This imposes a hard limit on the total <em>number</em> of
+  individual objective function evaluations performed across all batches.
+  Since a single batch evaluation (limited by <code>max_batches</code>) can involve
+  multiple function evaluations, setting <code>max_functions</code> provides more
+  granular control over the total computational effort spent on function
+  calls. It can serve as an alternative stopping criterion if the backend
+  optimizer doesn't support <code>max_iterations</code> or if you need to strictly
+  limit the function evaluation count. Note that exceeding this limit might
+  cause the optimization to terminate mid-batch, potentially earlier than
+  a corresponding <code>max_batches</code> limit would.</p>
+</li>
+</ul>
+</details>
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.OptimizerConfig.method">method</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Name of the optimization method.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.OptimizerConfig.max_iterations">max_iterations</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pydantic.PositiveInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.PositiveInt">PositiveInt</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum number of iterations (optional).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.OptimizerConfig.max_functions">max_functions</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pydantic.PositiveInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.PositiveInt">PositiveInt</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum number of function evaluations (optional).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.OptimizerConfig.max_batches">max_batches</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pydantic.PositiveInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.PositiveInt">PositiveInt</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum number of batch evaluations (optional).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.OptimizerConfig.tolerance">tolerance</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pydantic.NonNegativeFloat" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.NonNegativeFloat">NonNegativeFloat</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Convergence tolerance (optional).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.OptimizerConfig.parallel">parallel</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Allow parallelized function evaluations (default: <code>False</code>).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.OptimizerConfig.output_dir">output_dir</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Output directory for the optimizer (optional).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.OptimizerConfig.options">options</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>] | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Generic options for the optimizer (optional).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.OptimizerConfig.stdout">stdout</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File to redirect optimizer standard output (optional).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.OptimizerConfig.stderr">stderr</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File to redirect optimizer standard error (optional).</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.GradientConfig" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">GradientConfig</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Configuration class for gradient calculations.</p>
+<p>This class, <code>GradientConfig</code>, defines the configuration of gradient
+calculations. It is used in an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>
+object as the <code>gradient</code> field to specify how gradients are calculated in
+gradient-based optimizers.</p>
+<p>Gradients are estimated using function values calculated from perturbed
+variables and the unperturbed variables. The <code>number_of_perturbations</code> field
+determines the number of perturbed variables used, which must be at least
+one.</p>
+<p>If function evaluations for some perturbed variables fail, the gradient may
+still be estimated as long as a minimum number of evaluations succeed. The
+<code>perturbation_min_success</code> field specifies this minimum. By default, it
+equals <code>number_of_perturbations</code>.</p>
+<p>Gradients are calculated for each realization individually and then combined
+into a total gradient. If <code>number_of_perturbations</code> is low, or even just
+one, individual gradient calculations may be unreliable. In this case,
+setting <code>merge_realizations</code> to <code>True</code> directs the optimizer to combine the
+results of all realizations directly into a single gradient estimate.</p>
+<p>The <code>evaluation_policy</code> option controls how and when objective functions and
+gradients are calculated. It accepts one of three string values:</p>
+<ul>
+<li><code>"speculative"</code>: Evaluate the gradient whenever the objective function
+    is requested, even if the optimizer hasn't explicitly asked for the
+    gradient at that point. This approach can potentially improve load
+    balancing on HPC clusters by initiating gradient work earlier, though
+    its effectiveness depends on whether the optimizer can utilize these
+    speculatively computed gradients.</li>
+<li><code>"separate"</code>: Always launch function and gradient evaluations as
+    distinct operations, even if the optimizer requests both simultaneously.
+    This is particularly useful when employing realization filters (see
+    <a class="autorefs autorefs-internal" title="            RealizationFilterConfig" href="#ropt.config.RealizationFilterConfig"><code>RealizationFilterConfig</code></a>) that
+    might disable certain realizations, as it can potentially reduce the
+    number of gradient evaluations needed.</li>
+<li><code>"auto"</code>: Evaluate functions and/or gradients strictly according to the
+    optimizer's requests. Calculations are performed only when the
+    optimization algorithm explicitly requires them.</li>
+</ul>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.GradientConfig.number_of_perturbations">number_of_perturbations</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pydantic.PositiveInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.PositiveInt">PositiveInt</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of perturbations (default:
+<a class="autorefs autorefs-internal" title="            DEFAULT_NUMBER_OF_PERTURBATIONS
+
+
+  
+      module-attribute
+  " href="#ropt.config.constants.DEFAULT_NUMBER_OF_PERTURBATIONS"><code>DEFAULT_NUMBER_OF_PERTURBATIONS</code></a>).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.GradientConfig.perturbation_min_success">perturbation_min_success</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pydantic.PositiveInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.PositiveInt">PositiveInt</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Minimum number of successful function evaluations
+for perturbed variables (default: equal to <code>number_of_perturbations</code>).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.GradientConfig.merge_realizations">merge_realizations</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Merge all realizations for the final gradient
+calculation (default: <code>False</code>).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.GradientConfig.evaluation_policy">evaluation_policy</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Literal" href="https://docs.python.org/3/library/typing.html#typing.Literal">Literal</a>[&#39;speculative&#39;, &#39;separate&#39;, &#39;auto&#39;]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>How to evaluate functions and gradients.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.FunctionEstimatorConfig" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">FunctionEstimatorConfig</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Configuration class for function estimators.</p>
+<p>This class, <code>FunctionEstimatorConfig</code>, defines the configuration for
+function estimators. Function estimators are generally configured as a tuple
+of <code>FunctionEstimatorConfig</code> objects in a configuration class of an
+optimization step. For instance, <code>function_estimators</code> field of the
+<code>EnOptConfig</code> defines the available estimators for the optimization.</p>
+<p>By default, objective and constraint functions, as well as their gradients,
+are calculated from individual realizations using a weighted sum. Function
+estimators provide a way to modify this default calculation.</p>
+<p>The <code>method</code> field specifies the function estimator method to use for
+combining the individual realizations. The <code>options</code> field allows passing a
+dictionary of key-value pairs to further configure the chosen method. The
+interpretation of these options depends on the selected method.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.FunctionEstimatorConfig.method">method</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Name of the function estimator method.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.FunctionEstimatorConfig.options">options</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Dictionary of options for the function estimator.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.RealizationFilterConfig" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">RealizationFilterConfig</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Configuration class for realization filters.</p>
+<p>This class, <code>RealizationFilterConfig</code>, defines the configuration for
+realization filters. Realization filters are generally configured as a tuple
+in another configuration object. For instance, the <code>realization_filters</code>
+field of the <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> defines the available
+filters for the optimization.</p>
+<p>By default, objective and constraint functions, as well as their gradients,
+are calculated as a weighted function of all realizations. Realization
+filters provide a way to modify the weights of individual realizations. For
+example, they can be used to select a subset of realizations for calculating
+the final objective and constraint functions and their gradients by setting
+the weights of the other realizations to zero.</p>
+<p>The <code>method</code> field specifies the realization filter method to use for
+adjusting the weights. The <code>options</code> field allows passing a dictionary of
+key-value pairs to further configure the chosen method. The interpretation
+of these options depends on the selected method.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.RealizationFilterConfig.method">method</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Name of the realization filter method.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.RealizationFilterConfig.options">options</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Dictionary of options for the realization filter.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.SamplerConfig" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">SamplerConfig</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Configuration class for samplers.</p>
+<p>This class, <code>SamplerConfig</code>, defines the configuration for samplers used in
+an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object. Samplers are configured
+as a tuple in the <code>samplers</code> field of the <code>EnOptConfig</code>, defining the
+available samplers for the optimization. The <code>samplers</code> field in the
+<a class="autorefs autorefs-internal" title="            GradientConfig" href="#ropt.config.GradientConfig"><code>GradientConfig</code></a> specifies the index of the
+sampler to use for each variable.</p>
+<p>Samplers generate perturbations added to variables for gradient
+calculations. These perturbations can be deterministic or stochastic.</p>
+<p>The <code>method</code> field specifies the sampler method to use for generating
+perturbations. The <code>options</code> field allows passing a dictionary of key-value
+pairs to further configure the chosen method. The interpretation of these
+options depends on the selected method.</p>
+<p>By default, each realization uses a different set of perturbed variables.
+Setting the <code>shared</code> flag to <code>True</code> directs the sampler to use the same set
+of perturbed values for all realizations.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.SamplerConfig.method">method</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Name of the sampler method.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.SamplerConfig.options">options</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Dictionary of options for the sampler.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.SamplerConfig.shared">shared</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to share perturbation values between realizations (default: <code>False</code>).</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="ropt.config.constants" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.config.constants</span>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Default values used by the configuration classes.</p>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.config.constants.DEFAULT_SEED" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">DEFAULT_SEED</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">DEFAULT_SEED</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="mi">1</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Default seed for random number generators.</p>
+<p>The seed is used as the base value for random number generators within various
+components of the optimization process, such as samplers. Using a consistent
+seed ensures reproducibility across multiple runs with the same configuration.
+To obtain unique results for each optimization run, modify this seed.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.config.constants.DEFAULT_NUMBER_OF_PERTURBATIONS" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">DEFAULT_NUMBER_OF_PERTURBATIONS</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">DEFAULT_NUMBER_OF_PERTURBATIONS</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="mi">5</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Default number of perturbations for gradient estimation.</p>
+<p>This value defines the default number of perturbed variables used to estimate
+gradients. A higher number of perturbations can lead to more accurate gradient
+estimates but also increases the number of function evaluations required.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.config.constants.DEFAULT_PERTURBATION_MAGNITUDE" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">DEFAULT_PERTURBATION_MAGNITUDE</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">DEFAULT_PERTURBATION_MAGNITUDE</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="mf">0.005</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Default magnitude for variable perturbations.</p>
+<p>This value specifies the default value of the scaling factor applied to the
+perturbation values generated by samplers. The magnitude can be interpreted as
+an absolute value or as a relative value, depending on the selected perturbation
+type.</p>
+<p>See also: <a class="autorefs autorefs-internal" title="            PerturbationType" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.config.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">DEFAULT_PERTURBATION_BOUNDARY_TYPE</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">DEFAULT_PERTURBATION_BOUNDARY_TYPE</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="n">MIRROR_BOTH</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Default perturbation boundary handling type.</p>
+<p>This value determines how perturbations that violate the defined variable bounds
+are handled. The default, <code>BoundaryType.MIRROR_BOTH</code>, mirrors perturbations back
+into the valid range if they exceed either the lower or upper bound.</p>
+<p>See also: <a class="autorefs autorefs-internal" title="            BoundaryType" href="../enums/#ropt.enums.BoundaryType"><code>BoundaryType</code></a>.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.config.constants.DEFAULT_PERTURBATION_TYPE" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">DEFAULT_PERTURBATION_TYPE</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">DEFAULT_PERTURBATION_TYPE</span><span class="p">:</span> <span class="n">Final</span> <span class="o">=</span> <span class="n">ABSOLUTE</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Default perturbation type.</p>
+<p>This value determines how the perturbation magnitude is interpreted. The
+default, <code>PerturbationType.ABSOLUTE</code>, means that the perturbation magnitude is
+added directly to the variable value. Other options, such as
+<code>PerturbationType.RELATIVE</code>, scale the perturbation magnitude based on the
+variable's bounds.</p>
+<p>See also: <a class="autorefs autorefs-internal" title="            PerturbationType" href="../enums/#ropt.enums.PerturbationType"><code>PerturbationType</code></a>.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="ropt.config.options" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.config.options</span>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>This module defines utilities for validating plugin options.</p>
+<p>This module provides classes and functions to define and validate options for
+plugins. It uses Pydantic to create models that represent the schema of
+plugin options, allowing for structured and type-safe configuration.</p>
+
+
+<p><span class="doc-section-title">Classes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="            OptionsSchemaModel (ropt.config.options.OptionsSchemaModel)" href="#ropt.config.options.OptionsSchemaModel">OptionsSchemaModel</a></code></td>
+            <td>
+              <div class="doc-md-description">
+                <p>Represents the overall schema for plugin options.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><a class="autorefs autorefs-internal" title="            MethodSchemaModel (ropt.config.options.MethodSchemaModel)" href="#ropt.config.options.MethodSchemaModel">MethodSchemaModel</a></code></td>
+            <td>
+              <div class="doc-md-description">
+                <p>Represents the schema for a specific method within a
+plugin, including its name and options.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.options.OptionsSchemaModel" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">OptionsSchemaModel</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" title="pydantic.BaseModel" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel">BaseModel</a></code></p>
+
+
+
+        <p>Represents the overall schema for plugin options.</p>
+<p>This class defines the structure for describing the methods and options
+available for a plugin. The methods are described in a list of
+[<code>MethodSchemaModel][ropt.config.options.MethodSchemaModel</code>] objects, each
+describing a method supported by the plugin.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.options.OptionsSchemaModel.methods">methods</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-internal" title="            MethodSchemaModel (ropt.config.options.MethodSchemaModel)" href="#ropt.config.options.MethodSchemaModel">MethodSchemaModel</a>[<a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A list of method schemas.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+        <p><strong>Example</strong>:
+<div class="language-py highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.config.options</span><span class="w"> </span><span class="kn">import</span> <span class="n">OptionsSchemaModel</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">schema</span> <span class="o">=</span> <span class="n">OptionsSchemaModel</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="p">{</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="s2">&quot;methods&quot;</span><span class="p">:</span> <span class="p">[</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>            <span class="p">{</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">}</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>            <span class="p">},</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>            <span class="p">{</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>                <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span><span class="p">},</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>            <span class="p">},</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="p">]</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="p">}</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p">)</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="n">options</span> <span class="o">=</span> <span class="n">schema</span><span class="o">.</span><span class="n">get_options_model</span><span class="p">(</span><span class="s2">&quot;method&quot;</span><span class="p">)</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="nb">print</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">model_validate</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}))</span>  <span class="c1"># a=1.0 b=1</span>
+</span></code></pre></div></p>
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="ropt.config.options.OptionsSchemaModel.get_options_model" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">get_options_model</span>
+
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">get_options_model</span><span class="p">(</span><span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">BaseModel</span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Creates a Pydantic model for validating options of a specific method.</p>
+<p>This method dynamically generates a Pydantic model tailored to validate
+the options associated with a given method. It iterates through the
+defined methods, collecting option schemas from those matching the
+specified <code>method</code> name. The resulting model can then be used to
+validate dictionaries of options against the defined schema.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>method</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the method for which to create the options model.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#type">type</a>[<a class="autorefs autorefs-external" title="pydantic.BaseModel" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel">BaseModel</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A Pydantic model class capable of validating options for the specified method.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.options.MethodSchemaModel" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">MethodSchemaModel</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" title="pydantic.BaseModel" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel">BaseModel</a></code>, <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="ropt.config.options.T">T</span>]</code></p>
+
+
+
+        <p>Represents the schema for a specific method within a plugin.</p>
+<p>This class defines the structure for describing one or more methods
+supported by a plugin. It contains a dictionary describing an option for
+this method.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.options.MethodSchemaModel.options">options</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <span title="ropt.config.options.T">T</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A list of option dictionaries.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.options.MethodSchemaModel.url">url</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pydantic.HttpUrl" href="https://docs.pydantic.dev/latest/api/networks/#pydantic.networks.HttpUrl">HttpUrl</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An optional URL for the plugin.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.config.options.gen_options_table" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-function"></code>            <span class="doc doc-object-name doc-function-name">gen_options_table</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">gen_options_table</span><span class="p">(</span><span class="n">schema</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Generates a Markdown table documenting plugin options.</p>
+<p>This function takes a schema dictionary, validates it against the
+<a class="autorefs autorefs-internal" title="            OptionsSchemaModel" href="#ropt.config.options.OptionsSchemaModel"><code>OptionsSchemaModel</code></a>, and then
+generates a Markdown table that summarizes the available methods and their
+options. Each row in the table represents a method, and the columns list the
+method's name and its configurable options. If a URL is provided for a
+method, the method name will be hyperlinked to that URL in the table.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>schema</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary representing the schema of plugin options.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A string containing a Markdown table that documents the plugin options.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../basic_optimizer/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Basic Optimizer">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Basic Optimizer
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../domain_transforms/" class="md-footer__link md-footer__link--next" aria-label="Next: Domain Transforms">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Domain Transforms
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.expand", "navigation.footer", "navigation.sections", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
