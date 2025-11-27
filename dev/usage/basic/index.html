@@ -1898,7 +1898,8 @@ solve a simple optimization problem. We minimize the multi-dimensional
 Rosenbrock function, where we introduce some uncertainty in its parameters
 across an ensemble of realizations.</p>
 <h2 id="the-complete-example">The complete example</h2>
-<p>Below is the full Python script for this example. We will go through each part of the script in the following sections.</p>
+<p>Below is the full Python script for this example. We will go through each part
+of the script in the following sections.</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="sd">&quot;&quot;&quot;Example of optimization of a multi-dimensional Rosenbrock test function.</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="sd">This example demonstrates optimization of the a modified multi-dimensional</span>
@@ -2031,9 +2032,9 @@ override only the most essential ones:</p>
   the gradient at each iteration.</li>
 </ul>
 <h2 id="the-objective-function">The objective function</h2>
-<p>You must provide a Python function (<code>rosenbrock</code>) that <code>ropt</code> can call to
-evaluate your objective function for a given set of variables. The evaluator
-function receives the <code>variables</code> to be evaluated and an
+<p>You must provide a Python function (<code>rosenbrock()</code> in our example) that <code>ropt</code>
+can call to evaluate your objective function for a given set of variables. The
+evaluator function receives the <code>variables</code> to be evaluated and an
 <a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
 
 
@@ -2053,11 +2054,11 @@ calculated objective values.</p>
 the optimizer:</p>
 <ol>
 <li>
-<p><strong>Initialize uncertain parameters</strong>: Before instantiating the optimizer, the
-    <code>run_optimization</code> function initializes a random number generator (<code>rng =
-    default_rng(seed=123)</code>). This generator is then used to create the uncertain
-    parameters <code>a</code> and <code>b</code> for the Rosenbrock function, simulating variability
-    across realizations.</p>
+<p><strong>Initialize uncertain parameters</strong>:
+    Before instantiating the optimizer, the <code>run_optimization</code> function
+    initializes a random number generator (<code>rng = default_rng(seed=123)</code>). This
+    generator is then used to create the uncertain parameters <code>a</code> and <code>b</code> for
+    the Rosenbrock function, simulating variability across realizations.</p>
 </li>
 <li>
 <p><strong>Instantiate <code>BasicOptimizer</code></strong>:
