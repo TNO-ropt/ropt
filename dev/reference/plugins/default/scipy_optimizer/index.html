@@ -9,26 +9,28 @@
       
       
       
+        <link rel="prev" href="../evaluator/">
       
-        <link rel="next" href="usage/background/">
+      
+        <link rel="next" href="../scipy_sampler/">
       
       
         
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
     
     
       
-        <title>ropt Documentation</title>
+        <title>SciPy Optimizers - ropt Documentation</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.618322db.min.css">
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.618322db.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -47,11 +49,11 @@
       
     
     
-      <link rel="stylesheet" href="assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../../../assets/_mkdocstrings.css">
     
-      <link rel="stylesheet" href="stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -76,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt-a-python-module-for-robust-optimization" class="md-skip">
+        <a href="#ropt.plugins.optimizer.scipy.SciPyOptimizer" class="md-skip">
           Skip to content
         </a>
       
@@ -96,7 +98,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="ropt Documentation" class="md-header__button md-logo" aria-label="ropt Documentation" data-md-component="logo">
+    <a href="../../../.." title="ropt Documentation" class="md-header__button md-logo" aria-label="ropt Documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -116,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              About
+              SciPy Optimizers
             
           </span>
         </div>
@@ -219,11 +221,9 @@
   
   
   
-    
   
-  
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="." class="md-tabs__link">
+    <li class="md-tabs__item">
+      <a href="../../../.." class="md-tabs__link">
         
   
   
@@ -244,7 +244,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="usage/background/" class="md-tabs__link">
+        <a href="../../../../usage/background/" class="md-tabs__link">
           
   
   
@@ -260,6 +260,8 @@
   
   
   
+    
+  
   
     
     
@@ -267,11 +269,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="reference/workflows/workflow/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../../workflows/workflow/" class="md-tabs__link">
           
   
   
@@ -314,7 +318,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="ropt Documentation" class="md-nav__button md-logo" aria-label="ropt Documentation" data-md-component="logo">
+    <a href="../../../.." title="ropt Documentation" class="md-nav__button md-logo" aria-label="ropt Documentation" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -341,37 +345,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    About
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="." class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
         
   
   
@@ -387,76 +364,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Overview
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related-packages" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Related packages
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Related packages">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#plugins" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Plugins
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#applications" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Applications
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -522,7 +429,7 @@
   
   
     <li class="md-nav__item">
-      <a href="usage/background/" class="md-nav__link">
+      <a href="../../../../usage/background/" class="md-nav__link">
         
   
   
@@ -550,7 +457,7 @@
   
   
     <li class="md-nav__item">
-      <a href="usage/basic/" class="md-nav__link">
+      <a href="../../../../usage/basic/" class="md-nav__link">
         
   
   
@@ -578,7 +485,7 @@
   
   
     <li class="md-nav__item">
-      <a href="usage/workflows/" class="md-nav__link">
+      <a href="../../../../usage/workflows/" class="md-nav__link">
         
   
   
@@ -610,28 +517,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -649,7 +559,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -673,10 +583,13 @@
       
       
         
+          
+          
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
@@ -685,7 +598,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
         
           
-          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="">
             
   
   
@@ -721,7 +634,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/workflows/workflow/" class="md-nav__link">
+      <a href="../../../workflows/workflow/" class="md-nav__link">
         
   
   
@@ -749,7 +662,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/workflows/basic_optimizer/" class="md-nav__link">
+      <a href="../../../workflows/basic_optimizer/" class="md-nav__link">
         
   
   
@@ -791,10 +704,13 @@
       
       
         
+          
+          
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
@@ -803,7 +719,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
         
           
-          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="">
             
   
   
@@ -839,7 +755,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/optimization/enopt_config/" class="md-nav__link">
+      <a href="../../../optimization/enopt_config/" class="md-nav__link">
         
   
   
@@ -867,7 +783,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/optimization/domain_transforms/" class="md-nav__link">
+      <a href="../../../optimization/domain_transforms/" class="md-nav__link">
         
   
   
@@ -895,7 +811,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/optimization/optimization/" class="md-nav__link">
+      <a href="../../../optimization/optimization/" class="md-nav__link">
         
   
   
@@ -923,7 +839,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/optimization/evaluator/" class="md-nav__link">
+      <a href="../../../optimization/evaluator/" class="md-nav__link">
         
   
   
@@ -951,7 +867,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/optimization/results/" class="md-nav__link">
+      <a href="../../../optimization/results/" class="md-nav__link">
         
   
   
@@ -984,28 +900,31 @@
                 
   
   
+    
   
   
+  
     
     
     
     
       
       
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
         
           
+          
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3" checked>
         
           
-          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
             
   
   
@@ -1023,7 +942,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1041,7 +960,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/plugins/plugin_manager/" class="md-nav__link">
+      <a href="../../plugin_manager/" class="md-nav__link">
         
   
   
@@ -1123,7 +1042,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/plugins/workflow/compute_steps/" class="md-nav__link">
+      <a href="../../workflow/compute_steps/" class="md-nav__link">
         
   
   
@@ -1151,7 +1070,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/plugins/workflow/event_handler/" class="md-nav__link">
+      <a href="../../workflow/event_handler/" class="md-nav__link">
         
   
   
@@ -1179,7 +1098,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/plugins/workflow/evaluator/" class="md-nav__link">
+      <a href="../../workflow/evaluator/" class="md-nav__link">
         
   
   
@@ -1269,7 +1188,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/plugins/optimizer/optimizer/" class="md-nav__link">
+      <a href="../../optimizer/optimizer/" class="md-nav__link">
         
   
   
@@ -1297,7 +1216,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/plugins/optimizer/sampler/" class="md-nav__link">
+      <a href="../../optimizer/sampler/" class="md-nav__link">
         
   
   
@@ -1325,7 +1244,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/plugins/optimizer/realization_filter/" class="md-nav__link">
+      <a href="../../optimizer/realization_filter/" class="md-nav__link">
         
   
   
@@ -1353,7 +1272,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/plugins/optimizer/function_estimator/" class="md-nav__link">
+      <a href="../../optimizer/function_estimator/" class="md-nav__link">
         
   
   
@@ -1386,8 +1305,10 @@
                 
   
   
+    
   
   
+  
     
     
     
@@ -1398,13 +1319,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_3_4" checked>
         
           
           <label class="md-nav__link" for="__nav_3_3_4" id="__nav_3_3_4_label" tabindex="0">
@@ -1425,7 +1344,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_3_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_3_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_3_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1443,7 +1362,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/plugins/default/compute_steps/" class="md-nav__link">
+      <a href="../compute_steps/" class="md-nav__link">
         
   
   
@@ -1471,7 +1390,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/plugins/default/event_handler/" class="md-nav__link">
+      <a href="../event_handler/" class="md-nav__link">
         
   
   
@@ -1499,7 +1418,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/plugins/default/evaluator/" class="md-nav__link">
+      <a href="../evaluator/" class="md-nav__link">
         
   
   
@@ -1524,10 +1443,35 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="reference/plugins/default/scipy_optimizer/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SciPy Optimizers
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1543,6 +1487,35 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.optimizer.scipy.SciPyOptimizer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SciPyOptimizer
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1555,7 +1528,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/plugins/default/scipy_sampler/" class="md-nav__link">
+      <a href="../scipy_sampler/" class="md-nav__link">
         
   
   
@@ -1583,7 +1556,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/plugins/default/realization_filter/" class="md-nav__link">
+      <a href="../realization_filter/" class="md-nav__link">
         
   
   
@@ -1611,7 +1584,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/plugins/default/function_estimator/" class="md-nav__link">
+      <a href="../function_estimator/" class="md-nav__link">
         
   
   
@@ -1639,7 +1612,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/plugins/default/external_optimizer/" class="md-nav__link">
+      <a href="../external_optimizer/" class="md-nav__link">
         
   
   
@@ -1689,10 +1662,13 @@
       
       
         
+          
+          
+        
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
@@ -1701,7 +1677,7 @@
         <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
         
           
-          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
             
   
   
@@ -1737,7 +1713,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/miscellaneous/enums/" class="md-nav__link">
+      <a href="../../../miscellaneous/enums/" class="md-nav__link">
         
   
   
@@ -1765,7 +1741,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/miscellaneous/exceptions/" class="md-nav__link">
+      <a href="../../../miscellaneous/exceptions/" class="md-nav__link">
         
   
   
@@ -1793,7 +1769,7 @@
   
   
     <li class="md-nav__item">
-      <a href="reference/miscellaneous/utilities/" class="md-nav__link">
+      <a href="../../../miscellaneous/utilities/" class="md-nav__link">
         
   
   
@@ -1846,8 +1822,6 @@
   
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -1856,52 +1830,13 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
+  <a href="#ropt.plugins.optimizer.scipy.SciPyOptimizer" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Overview
+        SciPyOptimizer
       
     </span>
   </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related-packages" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Related packages
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Related packages">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#plugins" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Plugins
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#applications" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Applications
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1925,72 +1860,121 @@
   
 
 
-<h1 id="ropt-a-python-module-for-robust-optimization"><code>ropt</code>: A Python module for robust optimization</h1>
-<h2 id="overview">Overview</h2>
-<p><code>ropt</code> is a module designed for implementing and executing robust optimization
-workflows. In classical optimization problems, a deterministic function is
-optimized. However, in robust optimization, the function is expected to exhibit
-a stochastic nature and is represented by an ensemble of functions
-(realizations) for different values of some (possibly unknown) random
-parameters. The optimal solution is then determined by optimizing the value of a
-statistic, such as the mean, over the ensemble.</p>
-<p><code>ropt</code> can be employed to construct optimization workflows directly in Python or
-as a building block in optimization applications. At a minimum, the user needs
-to provide additional code to calculate the values for each function realization
-in the ensemble. This can range from simply calling a Python function that
-returns the objective values to initiating a long-running simulation on an HPC
-cluster and reading the results. Furthermore, <code>ropt</code> exposes all intermediate
-results of the optimization, such as objective and gradient values, but
-functionality to report or store any of these values must be added by the user.
-Optional functionality to assist with this is included with <code>ropt</code>.</p>
-<p><code>ropt</code> provides several features for efficiently solving complex robust
-optimization problems:</p>
-<ul>
-<li>Robust optimization over an ensemble of models, i.e., optimizing the average
-  of a set of objective functions. Alternative objectives can be implemented
-  using plugins, for instance, to implement risk-aware optimization, such as
-  Conditional Value at Risk (CVaR) or standard-deviation-based functions.</li>
-<li>Support for black-box optimization of arbitrary functions.</li>
-<li>Support for running complex optimization workflows, such as multiple runs with
-  different optimization settings or even different optimization methods.</li>
-<li>Support for nested optimization, allowing sub-sets of the variables to be
-  optimized by optimization workflows that run as part of the black-box function
-  to be optimized.</li>
-<li>An interface for running various continuous and discrete optimization methods.
-  By default, optimizers from the
-  <a href="https://docs.scipy.org/doc/scipy/tutorial/optimize.html"><code>scipy.optimize</code></a>
-  package are included, but additional optimizers can be added via a plugin
-  mechanism. The most common options of these optimizers can be configured in a
-  uniform manner, although algorithm- or package-specific options can still be
-  passed.</li>
-<li>Efficient estimation of gradients using a Stochastic Simplex Approximate
-  Gradient (StoSAG) approach. Additional samplers for generating perturbed
-  values for gradient estimation can be added via a plugin mechanism.</li>
-<li>Support for linear and non-linear constraints, if supported by the chosen
-  optimizer.</li>
-<li>Flexible configuration of the optimization process using
-  <a href="https://pydantic-docs.helpmanual.io/"><code>pydantic</code></a>.</li>
-<li>Support for tracking and processing optimization results generated during the
-  optimization process.</li>
-<li>Optional support for exporting results as
-  <a href="https://pandas.pydata.org/"><code>pandas</code></a> data frames.</li>
-</ul>
-<h2 id="related-packages">Related packages</h2>
-<h3 id="plugins">Plugins</h3>
-<p>Additional backend optimizers can be installed separately and used via the plugin system:</p>
-<ul>
-<li>The <a href="https://tno-ropt.github.io/ropt-dakota/"><code>ropt-dakota</code></a> plugin provides
-  access to algorithms from the <a href="https://dakota.sandia.gov/">Dakota</a> package.</li>
-<li>The <a href="https://tno-ropt.github.io/ropt-nomad/"><code>ropt-nomad</code></a> plugin implements
-  the MADS algorithm based on the
-  <a href="https://www.gerad.ca/en/software/nomad/">NOMAD</a> package.</li>
-<li>The <a href="https://tno-ropt.github.io/ropt-pymoo/"><code>ropt-pymoo</code></a> makes the
-  algorithms from the <a href="https://pymoo.org/"><code>pymoo</code></a> package available to <code>ropt</code>.</li>
-</ul>
-<h3 id="applications">Applications</h3>
-<p>The <code>ropt</code> package is used  by the
-<a href="https://everest.readthedocs.io/en/latest/">Everest</a> decision-making tool as its
-core optimization engine.</p>
+  <h1>SciPy Optimizers</h1>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.optimizer.scipy.SciPyOptimizer" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.optimizer.scipy.SciPyOptimizer</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.Optimizer" href="../../optimizer/optimizer/#ropt.plugins.optimizer.base.Optimizer">Optimizer</a></code></p>
+
+
+
+        <p>SciPy optimization backend for ropt.</p>
+<p>This class provides an interface to several optimization algorithms from
+SciPy's
+<a href="https://docs.scipy.org/doc/scipy/reference/optimize.html"><code>scipy.optimize</code></a>
+module, enabling their use within <code>ropt</code>.</p>
+<p>To select an optimizer, set the <code>method</code> field within the
+<a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../../../optimization/enopt_config/#ropt.config.OptimizerConfig"><code>optimizer</code></a> section of the
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../../../optimization/enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> configuration object to the desired
+algorithm's name. Most methods support the general options defined in the
+<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../../../optimization/enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object. For algorithm-specific
+options, use the <code>options</code> dictionary within the
+<a class="autorefs autorefs-internal" title="            OptimizerConfig" href="../../../optimization/enopt_config/#ropt.config.OptimizerConfig"><code>optimizer</code></a> section.</p>
+<p>The table below lists the included methods together with the method-specific
+options that are supported. Click on the method name to consult the
+corresponding
+<a href="https://docs.scipy.org/doc/scipy/reference/optimize.html"><code>scipy.optimize</code></a>
+documentation:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Method Options</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-neldermead.html">Nelder-Mead</a></td>
+<td>disp, maxiter, maxfev, xatol, fatol, adaptive</td>
+</tr>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-powell.html">Powell</a></td>
+<td>disp, maxiter, maxfev, xtol, ftol</td>
+</tr>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-cg.html">CG</a></td>
+<td>disp, maxiter, gtol, norm, eps, finite_diff_rel_step, c1, c2</td>
+</tr>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-bfgs.html">BFGS</a></td>
+<td>disp, maxiter, gtol, norm, eps, finite_diff_rel_step, xrtol, c1, c2</td>
+</tr>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-newtoncg.html">Newton-CG</a></td>
+<td>disp, maxiter, xtol, eps, c1, c2</td>
+</tr>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-lbfgsb.html">L-BFGS-B</a></td>
+<td>disp, maxiter, maxcor, ftol, gtol, eps, maxfun, iprint, maxls, finite_diff_rel_step</td>
+</tr>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-tnc.html">TNC</a></td>
+<td>disp, maxfun, eps, scale, offset, maxCGit, eta, stepmx, accuracy, minfev, ftol, xtol, gtol, rescale, finite_diff_rel_step</td>
+</tr>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-cobyla.html">COBYLA</a></td>
+<td>disp, maxiter, rhobeg, tol, catol</td>
+</tr>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/optimize.minimize-slsqp.html">SLSQP</a></td>
+<td>disp, maxiter, ftol, eps, finite_diff_rel_step</td>
+</tr>
+<tr>
+<td><a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.differential_evolution.html">differential_evolution</a></td>
+<td>disp, maxiter, strategy, popsize, tol, mutation, recombination, rng, polish, init, atol, updating</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 
 
@@ -2025,15 +2009,31 @@ core optimization engine.</p>
       
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
+          
+          <a href="../evaluator/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Evaluators">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Evaluators
+              </div>
+            </div>
+          </a>
+        
         
           
-          <a href="usage/background/" class="md-footer__link md-footer__link--next" aria-label="Next: Background">
+          <a href="../scipy_sampler/" class="md-footer__link md-footer__link--next" aria-label="Next: SciPy Samplers">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Background
+                SciPy Samplers
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -2070,12 +2070,12 @@ core optimization engine.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.expand", "navigation.footer", "navigation.sections", "content.code.copy", "content.code.annotate"], "search": "assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.expand", "navigation.footer", "navigation.sections", "content.code.copy", "content.code.annotate"], "search": "../../../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="assets/javascripts/bundle.e71a0d61.min.js"></script>
+      <script src="../../../../assets/javascripts/bundle.e71a0d61.min.js"></script>
       
-        <script src="javascripts/mathjax.js"></script>
+        <script src="../../../../javascripts/mathjax.js"></script>
       
         <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
       
