@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy-to-pypi:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     environment:
         name: deploy-to-pypi
         url: https://pypi.org/project/ropt/
@@ -20,7 +20,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v6
       with:
-        python-version: "3.11"
+        python-version: "3.12"
     - name: Install uv
       uses: astral-sh/setup-uv@v7
       with:
@@ -32,7 +32,7 @@ jobs:
       uses: pypa/gh-action-pypi-publish@release/v1
 
   deploy-docs:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
       with:
@@ -40,7 +40,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v6
       with:
-        python-version: "3.11"
+        python-version: "3.12"
     - name: Install uv
       uses: astral-sh/setup-uv@v7
       with:
