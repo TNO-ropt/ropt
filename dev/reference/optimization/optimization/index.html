@@ -2954,10 +2954,9 @@ structure.</p>
 
         <p>Holds the results from an optimizer callback evaluation.</p>
 <p>This dataclass is used to structure the output of the
-<a class="autorefs autorefs-internal" title="            ropt.optimization.OptimizerCallback" href="#ropt.optimization.OptimizerCallback"><code>OptimizerCallback</code></a>.
-It bundles the objective function values, gradient values, and any
-updated non-linear constraint bounds that result from an evaluation
-request.</p>
+<a class="autorefs autorefs-internal" title="            ropt.optimization.OptimizerCallback" href="#ropt.optimization.OptimizerCallback"><code>OptimizerCallback</code></a>. It bundles the
+objective function values, gradient values, and any updated non-linear
+constraint bounds that result from an evaluation request.</p>
 <p>The <code>functions</code> attribute will contain a NumPy array of the objective
 function value(s) if they were requested and successfully computed,
 otherwise it will be <code>None</code>. Similarly, the <code>gradients</code> attribute will

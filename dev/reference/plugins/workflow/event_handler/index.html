@@ -2107,9 +2107,9 @@ method of connected handlers is called with the event.</p>
 
         <p>Create a EventHandler instance.</p>
 <p>This abstract class method serves as a factory for creating concrete
-<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.base.EventHandler" href="#ropt.plugins.event_handler.base.EventHandler"><code>EventHandler</code></a> objects. Plugin
-implementations must override this method to return an instance of their
-specific <code>EventHandler</code> subclass.</p>
+<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.base.EventHandler" href="#ropt.plugins.event_handler.base.EventHandler"><code>EventHandler</code></a> objects.
+Plugin implementations must override this method to return an instance
+of their specific <code>EventHandler</code> subclass.</p>
 <p>The <code>name</code> argument specifies the requested event handler, potentially
 in the format <code>"plugin-name/method-name"</code> or just <code>"method-name"</code>.
 Implementations can use this <code>name</code> to vary the created event handler if
@@ -2228,8 +2228,8 @@ an optimization workflow.</p>
 
   
       abstractmethod
-  " href="#ropt.plugins.event_handler.base.EventHandler.handle_event"><code>handle_event</code></a> method to
-define their specific event processing logic.</p>
+  " href="#ropt.plugins.event_handler.base.EventHandler.handle_event"><code>handle_event</code></a>
+method to define their specific event processing logic.</p>
 <p><code>EventHandler</code> instances are typically created using the
 <a class="autorefs autorefs-internal" title="            ropt.workflow.create_event_handler" href="../../../workflows/workflow/#ropt.workflow.create_event_handler"><code>create_event_handler</code></a> function.</p>
 <p>Event handlers are attached to a
