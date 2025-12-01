@@ -15,10 +15,9 @@ class OptimizerCallbackResult:
     """Holds the results from an optimizer callback evaluation.
 
     This dataclass is used to structure the output of the
-    [`OptimizerCallback`][ropt.plugins.optimizer.base.OptimizerCallback].
-    It bundles the objective function values, gradient values, and any
-    updated non-linear constraint bounds that result from an evaluation
-    request.
+    [`OptimizerCallback`][ropt.optimization.OptimizerCallback]. It bundles the
+    objective function values, gradient values, and any updated non-linear
+    constraint bounds that result from an evaluation request.
 
     The `functions` attribute will contain a NumPy array of the objective
     function value(s) if they were requested and successfully computed,

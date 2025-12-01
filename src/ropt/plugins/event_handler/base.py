@@ -16,7 +16,7 @@ class EventHandlerPlugin(Plugin):
     """Abstract base class for event handler plugins.
 
     This class defines the interface for plugins responsible for creating
-    [`EventHandler`][ropt.plugins.compute_step.base.EventHandler] instances
+    [`EventHandler`][ropt.plugins.event_handler.base.EventHandler] instances
     within an optimization workflow. Event handlers respond to events after
     being connected to a compute step by the
     [`add_event_handler`][ropt.plugins.compute_step.base.ComputeStep.add_event_handler]
@@ -34,9 +34,9 @@ class EventHandlerPlugin(Plugin):
         """Create a EventHandler instance.
 
         This abstract class method serves as a factory for creating concrete
-        [`EventHandler`][ropt.plugins.compute_step.base.EventHandler] objects. Plugin
-        implementations must override this method to return an instance of their
-        specific `EventHandler` subclass.
+        [`EventHandler`][ropt.plugins.event_handler.base.EventHandler] objects.
+        Plugin implementations must override this method to return an instance
+        of their specific `EventHandler` subclass.
 
         The `name` argument specifies the requested event handler, potentially
         in the format `"plugin-name/method-name"` or just `"method-name"`.
@@ -64,8 +64,8 @@ class EventHandler(ABC):
     an optimization workflow.
 
     Subclasses must implement the abstract
-    [`handle_event`][ropt.plugins.compute_step.base.EventHandler.handle_event] method to
-    define their specific event processing logic.
+    [`handle_event`][ropt.plugins.event_handler.base.EventHandler.handle_event]
+    method to define their specific event processing logic.
 
     `EventHandler` instances are typically created using the
     [`create_event_handler`][ropt.workflow.create_event_handler] function.

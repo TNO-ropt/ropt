@@ -71,9 +71,9 @@ class Optimizer(ABC):
         of variable values as input.
 
         During execution, the implementation should use the
-        [`OptimizerCallback`][ropt.plugins.optimizer.base.OptimizerCallback]
-        (provided during initialization) to request necessary function and
-        gradient evaluations from the `ropt` core.
+        [`OptimizerCallback`][ropt.optimization.OptimizerCallback] (provided
+        during initialization) to request necessary function and gradient
+        evaluations from the `ropt` core.
 
         Args:
             initial_values: A 1D NumPy array representing the starting variable
