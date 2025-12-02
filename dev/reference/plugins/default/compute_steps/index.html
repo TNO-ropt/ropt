@@ -2454,7 +2454,7 @@ specific variable vectors to evaluate.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.compute_step.base.ComputeStep" href="../../workflow/compute_steps/#ropt.plugins.compute_step.base.ComputeStep">ComputeStep</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.compute_step.base.OptimizerComputeStep" href="../../workflow/compute_steps/#ropt.plugins.compute_step.base.OptimizerComputeStep">OptimizerComputeStep</a></code></p>
 
 
 
@@ -2629,13 +2629,9 @@ that indicates whether the optimization was aborted by the user.</p>
 
         <p>Run the compute step to perform an optimization.</p>
 <p>This method executes the core logic of the optimizer compute step. It
-requires an optimizer configuration
-(<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../../../optimization/enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>) and optionally accepts
-specific initial variable vectors, and/or a nested optimization
-workflow, and metadata.</p>
-<p>If <code>variables</code> are not provided, the initial values specified in the
-<code>config</code> are used. If <code>variables</code> are provided, they override the
-config's initial values.</p>
+requires an optimizer configuration and initial values,
+(<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../../../optimization/enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>) and optionally accepts a
+nested optimization workflow, and metadata.</p>
 <p>If <code>metadata</code> is provided, it is attached to the
 <a class="autorefs autorefs-internal" title="            ropt.results.Results
 
@@ -2685,6 +2681,22 @@ indicating whether the optimization was aborted by the user.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
+                <code>variables</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.ArrayLike">ArrayLike</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Initial variable vector(s) to start from.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
                 <code>transforms</code>
             </td>
             <td>
@@ -2703,22 +2715,6 @@ indicating whether the optimization was aborted by the user.</p>
             </td>
             <td>
                   <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>variables</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.ArrayLike">ArrayLike</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional initial variable vector(s) to start from.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
           <tr class="doc-section-item">
