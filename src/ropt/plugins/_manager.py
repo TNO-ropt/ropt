@@ -60,6 +60,16 @@ _PLUGIN_TYPES: Final = {
     "evaluator": EvaluatorPlugin,
 }
 
+_DEFAULT_PLUGINS: Final = {
+    "function_estimator": "default",
+    "optimizer": "scipy",
+    "sampler": "scipy",
+    "realization_filter": "default",
+    "event_handler": "default",
+    "compute_step": "default",
+    "evaluator": "default",
+}
+
 
 class PluginManager:
     """Manages the discovery and retrieval of `ropt` plugins.
@@ -114,8 +124,6 @@ class PluginManager:
         plugin_type: PluginType,
         name: str,
         plugin: type[Plugin],
-        *,
-        prioritize: bool = False,
     ) -> None:
         if plugin_type not in self._plugins:
             self._plugins[plugin_type] = {}
@@ -123,12 +131,7 @@ class PluginManager:
         if name_lower in self._plugins[plugin_type]:
             msg = f"Duplicate plugin name: {name_lower}"
             raise ValueError(msg)
-        if prioritize:
-            plugins = self._plugins[plugin_type]
-            self._plugins[plugin_type] = {name_lower: plugin}
-            self._plugins[plugin_type].update(dict(plugins))
-        else:
-            self._plugins[plugin_type][name_lower] = plugin
+        self._plugins[plugin_type][name_lower] = plugin
 
     def _get_plugin(
         self, plugin_type: PluginType, method: str
@@ -145,9 +148,19 @@ class PluginManager:
             if method == "default":
                 msg = "Cannot specify 'default' method without a plugin name"
                 raise ValueError(msg)
-            for plugin_name, plugin in self._plugins[plugin_type].items():
-                if plugin.allows_discovery() and plugin.is_supported(method):
-                    return plugin_name, plugin
+            plugins = {
+                plugin_name: plugin
+                for plugin_name, plugin in self._plugins[plugin_type].items()
+                if plugin.allows_discovery() and plugin.is_supported(method)
+            }
+            default_plugin = _DEFAULT_PLUGINS[plugin_type]
+            if default_plugin in plugins:
+                return default_plugin, plugins[default_plugin]
+            if len(plugins) > 1:
+                msg = f"Ambiguous method: '{method}' is available in multiple plugins: {set(plugins.keys())}"
+                raise ValueError(msg)
+            if plugins:
+                return plugins.popitem()
         return None
 
     def get_plugin(self, plugin_type: PluginType, method: str) -> Any:  # noqa: ANN401
@@ -165,7 +178,9 @@ class PluginManager:
             will search through all registered plugins of the specified
             `plugin_type` that allow discovery (see
             [`Plugin.allows_discovery`][ropt.plugins.base.Plugin.allows_discovery]).
-            It returns the first plugin found that supports the `method-name`.
+            If the method is found in the default plugin of `ropt`, that plugin
+            is used. Otherwise it returns the first plugin found that supports
+            the `method-name`.
 
         Args:
             plugin_type: The category of the plugin (e.g., "optimizer", "sampler").
@@ -199,6 +214,9 @@ class PluginManager:
             plugin named `plugin-name` supports `method-name`.
         2.  **Implicit Plugin:** `"method-name"` searches through all discoverable
             plugins of the given `plugin_type` to see if any support `method-name`.
+            If the method is found in the default plugin of `ropt`, that plugin
+            is used. Otherwise it returns the first plugin found that supports
+            the `method-name`.
 
         Args:
             plugin_type: The category of the plugin (e.g., "optimizer", "sampler").

@@ -66,17 +66,16 @@ def test_default_plugins_full_spec() -> None:
     assert issubclass(plugin, SciPyOptimizerPlugin)
 
 
-def test_added_plugin_prioritize(monkeypatch: Any) -> None:
+def test_added_ambiguous_method(monkeypatch: Any) -> None:
     manager = PluginManager()
     monkeypatch.setattr(manager, "_init", lambda: None)
     manager._add_plugin("optimizer", "test1", MockedPlugin1)
     manager._add_plugin("optimizer", "test2", MockedPlugin2)
 
-    plugin = manager.get_plugin("optimizer", "test")
-    assert issubclass(plugin, MockedPlugin1)
-
-    plugin = manager.get_plugin("optimizer", "test2/test")
-    assert issubclass(plugin, MockedPlugin2)
+    with pytest.raises(
+        ValueError, match="Ambiguous method: 'test' is available in multiple plugins"
+    ):
+        manager.get_plugin("optimizer", "test")
 
 
 def test_validate_options(monkeypatch: Any) -> None:
