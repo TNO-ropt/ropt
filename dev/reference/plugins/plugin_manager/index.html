@@ -2324,7 +2324,9 @@ specified <code>plugin_type</code> and supports the given <code>method</code>.</
   
       classmethod
   " href="#ropt.plugins.Plugin.allows_discovery"><code>Plugin.allows_discovery</code></a>).
-    It returns the first plugin found that supports the <code>method-name</code>.</li>
+    If the method is found in the default plugin of <code>ropt</code>, that plugin
+    is used. Otherwise it returns the first plugin found that supports
+    the <code>method-name</code>.</li>
 </ol>
 
 
@@ -2462,7 +2464,10 @@ to retrieve a plugin with <a class="autorefs autorefs-internal" title="         
 <li><strong>Explicit Plugin:</strong> <code>"plugin-name/method-name"</code> checks if the specific
     plugin named <code>plugin-name</code> supports <code>method-name</code>.</li>
 <li><strong>Implicit Plugin:</strong> <code>"method-name"</code> searches through all discoverable
-    plugins of the given <code>plugin_type</code> to see if any support <code>method-name</code>.</li>
+    plugins of the given <code>plugin_type</code> to see if any support <code>method-name</code>.
+    If the method is found in the default plugin of <code>ropt</code>, that plugin
+    is used. Otherwise it returns the first plugin found that supports
+    the <code>method-name</code>.</li>
 </ol>
 
 
