@@ -120,4 +120,5 @@ dev = [
     "pandas-stubs",
     "pytest",
     "ruff",
+    "scipy-stubs",
 ]

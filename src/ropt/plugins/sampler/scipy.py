@@ -162,6 +162,7 @@ class SciPySampler(Sampler):
     def _generate_stats_samples(
         self, realization_count: int, perturbation_count: int, sample_dim: int
     ) -> NDArray[np.float64]:
+        assert isinstance(self._sampler, rv_continuous)
         return np.array(
             self._sampler.rvs(
                 size=(realization_count, perturbation_count, sample_dim),
@@ -174,6 +175,7 @@ class SciPySampler(Sampler):
         self, realization_count: int, perturbation_count: int, sample_dim: int
     ) -> NDArray[np.float64]:
         def _run_qmc_engine() -> NDArray[np.float64]:
+            assert isinstance(self._sampler, QMCEngine)
             return np.array(
                 scale(
                     self._sampler.random(realization_count * perturbation_count),

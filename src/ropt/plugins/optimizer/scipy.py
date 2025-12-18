@@ -172,17 +172,18 @@ class SciPyOptimizer(Optimizer):
             if self._parallel:
                 self._options["updating"] = "deferred"
                 self._options["workers"] = 1
+            assert self._bounds is not None
             differential_evolution(
-                func=self._function,
+                func=self._function,  # type: ignore[arg-type]
                 x0=initial_values[self._config.variables.mask],
                 bounds=self._bounds,
-                constraints=self._constraints,
+                constraints=self._constraints,  # type: ignore[arg-type]
                 polish=False,
                 vectorized=self._parallel,
                 **self._options,
             )
         else:
-            minimize(
+            minimize(  # type: ignore[call-overload,misc]
                 fun=self._function,
                 x0=initial_values[self._config.variables.mask],
                 tol=self._config.optimizer.tolerance,
@@ -246,7 +247,9 @@ class SciPyOptimizer(Optimizer):
 
     def _initialize_constraints(
         self, initial_values: NDArray[np.float64]
-    ) -> list[dict[str, _ConstraintType] | NonlinearConstraint | LinearConstraint]:
+    ) -> (
+        list[dict[str, _ConstraintType]] | list[NonlinearConstraint | LinearConstraint]
+    ):
         self._normalized_constraints = None
 
         lin_coef, lin_lower, lin_upper = None, None, None
@@ -358,8 +361,11 @@ class SciPyOptimizer(Optimizer):
         lin_lower: NDArray[np.float64] | None,
         lin_upper: NDArray[np.float64] | None,
     ) -> list[LinearConstraint | NonlinearConstraint]:
-        constraints = []
+        constraints: list[LinearConstraint | NonlinearConstraint] = []
         if self._config.linear_constraints is not None:
+            assert lin_coef is not None
+            assert lin_lower is not None
+            assert lin_upper is not None
             constraints.append(LinearConstraint(lin_coef, lin_lower, lin_upper))
         if self._normalized_constraints is not None:
             ub = [
@@ -372,7 +378,7 @@ class SciPyOptimizer(Optimizer):
             )
         return constraints
 
-    def _function(self, variables: NDArray[np.float64]) -> NDArray[np.float64]:
+    def _function(self, variables: NDArray[np.float64], /) -> NDArray[np.float64]:
         if variables.ndim > 1 and variables.size == 0:
             return np.array([])
         functions, _ = self._get_function_or_gradient(
@@ -383,7 +389,7 @@ class SciPyOptimizer(Optimizer):
             return functions[:, 0]
         return np.array(functions[0])
 
-    def _gradient(self, variables: NDArray[np.float64]) -> NDArray[np.float64]:
+    def _gradient(self, variables: NDArray[np.float64], /) -> NDArray[np.float64]:
         _, gradients = self._get_function_or_gradient(
             variables, get_function=False, get_gradient=True
         )
