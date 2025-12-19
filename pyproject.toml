@@ -81,9 +81,16 @@ exclude = ["src/ropt/version.py", "build"]
 select = ["ALL"]
 ignore = [
     "COM812", # missing-trailing-comma
+    "CPY",
+    "DOC",
     "E501",   # line-too-long
+    "FURB",
+    "PLC",
+    "PLR",
+    "RUF",
     "S101",   # assert
 ]
+preview = true
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = [
