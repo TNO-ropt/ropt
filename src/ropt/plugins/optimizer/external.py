@@ -8,7 +8,7 @@ import json
 import os
 import selectors
 import signal
-import subprocess
+import subprocess  # noqa: S404
 import sys
 import time
 from pathlib import Path
