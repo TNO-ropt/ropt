@@ -101,7 +101,7 @@ class MockedSamplerPlugin(SamplerPlugin):
 
     @classmethod
     def is_supported(cls, method: str) -> bool:
-        return method.lower() in {"test"}
+        return method.lower() == "test"
 
 
 def test_sampler_simple(enopt_config: Any) -> None:

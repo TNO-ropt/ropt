@@ -23,7 +23,7 @@ class MockedPlugin1(OptimizerPlugin):
 
     @classmethod
     def is_supported(cls, method: str) -> bool:
-        return method.lower() in {"test"}
+        return method.lower() == "test"
 
 
 class MockedPlugin2(OptimizerPlugin):
@@ -33,7 +33,7 @@ class MockedPlugin2(OptimizerPlugin):
 
     @classmethod
     def is_supported(cls, method: str) -> bool:
-        return method.lower() in {"test"}
+        return method.lower() == "test"
 
 
 class MockedPluginWithValidation(MockedPlugin1):
