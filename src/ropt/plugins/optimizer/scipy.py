@@ -191,7 +191,7 @@ class SciPyOptimizer(Optimizer):
                 bounds=self._bounds,
                 jac=(False if self._method in _NO_GRADIENT else self._gradient),
                 constraints=self._constraints,
-                options=self._options if self._options else None,
+                options=self._options or None,
             )
 
     @property

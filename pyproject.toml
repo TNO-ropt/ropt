@@ -84,7 +84,6 @@ ignore = [
     "CPY",
     "DOC",
     "E501",   # line-too-long
-    "FURB",
     "PLC",
     "PLR",
     "RUF",
