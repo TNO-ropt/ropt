@@ -166,7 +166,9 @@ def _get_gradient_results(
 ) -> _GradientEvaluatorResults:
     realization_num = config.realizations.weights.size
     perturbation_num = config.gradient.number_of_perturbations
-    realizations = np.repeat(np.arange(realization_num), perturbation_num)
+    realizations = np.repeat(
+        np.arange(realization_num, dtype=np.intc), perturbation_num
+    )
     context = EvaluatorContext(
         config=config,
         realizations=realizations,
@@ -213,7 +215,7 @@ def _get_function_and_gradient_results(  # noqa: PLR0913
 ) -> tuple[_FunctionEvaluatorResults, _GradientEvaluatorResults]:
     realization_num = config.realizations.weights.size
     perturbation_num = config.gradient.number_of_perturbations
-    realizations = np.arange(realization_num)
+    realizations = np.arange(realization_num, dtype=np.intc)
     realizations = np.hstack(
         (
             realizations,
