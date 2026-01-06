@@ -35,7 +35,7 @@ def test_stddev_function_estimator_merge_error(
     enopt_config: Any, evaluator: Any, test_functions: Any
 ) -> None:
     # Add dummy functions, these will be estimated using stddev.
-    test_functions = test_functions + test_functions
+    test_functions += test_functions
 
     enopt_config["gradient"]["merge_realizations"] = True
     enopt_config["objectives"]["weights"].extend([0.75, 0.25])
@@ -55,7 +55,7 @@ def test_mean_stddev_function_estimator(
     enopt_config: Any, evaluator: Any, test_functions: Any
 ) -> None:
     # Add dummy functions, these will be estimated using stddev.
-    test_functions = test_functions + test_functions
+    test_functions += test_functions
 
     enopt_config["objectives"]["weights"].extend([0.75, 0.25])
     enopt_config["objectives"]["function_estimators"] = [0, 0, 1, 1]
@@ -81,7 +81,7 @@ def _compute_distance_squared_stddev(
     # is equal to the squared distance. Hence, using the standard deviation
     # objective function will optimize the squared distance.
     result: float = ((variables - target) ** 2).sum()
-    if realization in [0, 1]:
+    if realization in {0, 1}:
         result = -result
     elif realization == 2:
         result = 0.0

@@ -556,7 +556,7 @@ class SciPyOptimizerPlugin(OptimizerPlugin):
         See the [ropt.plugins.optimizer.base.OptimizerPlugin][] abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC201
         return SciPyOptimizer(config, optimizer_callback)
 
     @classmethod
@@ -566,7 +566,7 @@ class SciPyOptimizerPlugin(OptimizerPlugin):
         See the [ropt.plugins.optimizer.base.OptimizerPlugin][] abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC201
         return method.lower() in (_SUPPORTED_METHODS | {"default"})
 
     @classmethod
@@ -578,7 +578,7 @@ class SciPyOptimizerPlugin(OptimizerPlugin):
         See the [ropt.plugins.optimizer.base.OptimizerPlugin][] abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC501
         if options is not None:
             if not isinstance(options, dict):
                 msg = "SciPy optimizer options must be a dictionary"

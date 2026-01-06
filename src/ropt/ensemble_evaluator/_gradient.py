@@ -118,7 +118,7 @@ def _estimate_merged_gradient(
     delta_functions: NDArray[np.float64],
     weights: NDArray[np.float64],
 ) -> NDArray[np.float64]:
-    delta_functions = delta_functions * np.expand_dims(weights, axis=-1)
+    delta_functions = delta_functions.copy() * np.expand_dims(weights, axis=-1)
     active_realizations = np.abs(weights) > 0
     active_perturbations = np.repeat(active_realizations, delta_variables.shape[1])
     delta_variables = delta_variables.reshape(-1, delta_variables.shape[-1])
@@ -129,7 +129,7 @@ def _estimate_merged_gradient(
     )
 
 
-def _calculate_gradient(  # noqa: PLR0913
+def _calculate_gradient(  # noqa: PLR0913, PLR0917
     functions: NDArray[np.float64],
     delta_variables: NDArray[np.float64],
     delta_functions: NDArray[np.float64],
@@ -148,7 +148,7 @@ def _calculate_gradient(  # noqa: PLR0913
     return estimator.calculate_gradient(functions, gradients, weights)
 
 
-def _calculate_estimated_gradients(  # noqa: PLR0913
+def _calculate_estimated_gradients(  # noqa: PLR0913, PLR0917
     function_estimators: list[FunctionEstimator],
     estimator_indices: NDArray[np.intc] | None,
     variables: NDArray[np.float64],

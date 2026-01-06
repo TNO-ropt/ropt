@@ -50,7 +50,7 @@ class DefaultEvaluatorPlugin(EvaluatorPlugin):
         """Create an evaluator.
 
         # noqa
-        """
+        """  # noqa: DOC201, DOC501
         _, _, name = name.lower().rpartition("/")
         evaluator_obj = _EVALUATOR_OBJECTS.get(name)
         if evaluator_obj is not None:
@@ -66,5 +66,5 @@ class DefaultEvaluatorPlugin(EvaluatorPlugin):
         See the [ropt.plugins.base.Plugin][] abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC201
         return method.lower() in _EVALUATOR_OBJECTS

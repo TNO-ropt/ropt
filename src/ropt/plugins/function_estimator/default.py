@@ -49,7 +49,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
         abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC501
         self._enopt_config = enopt_config
         self._estimator_config = enopt_config.function_estimators[estimator_index]
         _, _, self._method = self._estimator_config.method.lower().rpartition("/")
@@ -72,12 +72,12 @@ class DefaultFunctionEstimator(FunctionEstimator):
         abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC201, DOC501
         estimator_method = self._method
         if estimator_method == "mean":
             return self._calculate_function_mean(functions, weights)
         if estimator_method == "stddev":
-            return self._calculate_function_stddev(functions, weights)
+            return _calculate_function_stddev(functions, weights)
         msg = f"Function estimator method not supported: {estimator_method}"
         raise ValueError(msg)
 
@@ -94,12 +94,12 @@ class DefaultFunctionEstimator(FunctionEstimator):
         abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC201, DOC501
         estimator_method = self._method
         if estimator_method == "mean":
             return self._calculate_gradient_mean(functions, gradient, weights)
         if estimator_method == "stddev":
-            return self._calculate_gradient_stddev(functions, gradient, weights)
+            return _calculate_gradient_stddev(functions, gradient, weights)
         msg = f"Function estimator method not supported: {estimator_method}"
         raise ValueError(msg)
 
@@ -120,47 +120,46 @@ class DefaultFunctionEstimator(FunctionEstimator):
             return gradient
         return np.dot(gradient, weights)  # type: ignore[no-any-return]
 
-    def _calculate_function_stddev(
-        self, functions: NDArray[np.float64], weights: NDArray[np.float64]
-    ) -> NDArray[np.float64]:
-        if np.count_nonzero(weights) < _MIN_STDDEV_REALIZATIONS:
-            raise ComputeStepAborted(exit_code=ExitCode.TOO_FEW_REALIZATIONS)
-        functions = np.nan_to_num(functions)
-        *_, stddev = self._mean_stddev(functions, weights)
-        return stddev
 
-    def _calculate_gradient_stddev(
-        self,
-        functions: NDArray[np.float64],
-        gradient: NDArray[np.float64],
-        weights: NDArray[np.float64],
-    ) -> NDArray[np.float64]:
-        if np.count_nonzero(weights) < _MIN_STDDEV_REALIZATIONS:
-            raise ComputeStepAborted(exit_code=ExitCode.TOO_FEW_REALIZATIONS)
-        functions = np.nan_to_num(functions)
-        norm, mean, stddev = self._mean_stddev(functions, weights)
-        mean_gradient = np.dot(gradient, weights)
-        return (
-            np.zeros(mean_gradient.shape, dtype=np.float64)
-            if np.allclose(np.abs(stddev), 0.0)
-            else (
-                (norm / stddev)
-                * (np.dot(gradient, functions * weights) - mean * mean_gradient)
-            )
-        )
+def _calculate_function_stddev(
+    functions: NDArray[np.float64], weights: NDArray[np.float64]
+) -> NDArray[np.float64]:
+    if np.count_nonzero(weights) < _MIN_STDDEV_REALIZATIONS:
+        raise ComputeStepAborted(exit_code=ExitCode.TOO_FEW_REALIZATIONS)
+    functions = np.nan_to_num(functions)
+    *_, stddev = _mean_stddev(functions, weights)
+    return stddev
 
-    def _mean_stddev(
-        self,
-        functions: NDArray[np.float64],
-        weights: NDArray[np.float64],
-    ) -> tuple[float, NDArray[np.float64], NDArray[np.float64]]:
-        norm = float(np.count_nonzero(weights > 0))
-        norm = norm / (norm - 1)
-        mean = np.dot(functions, weights)
-        stddev = np.sqrt(
-            norm * np.dot((functions - mean[..., np.newaxis]) ** 2, weights)
+
+def _calculate_gradient_stddev(
+    functions: NDArray[np.float64],
+    gradient: NDArray[np.float64],
+    weights: NDArray[np.float64],
+) -> NDArray[np.float64]:
+    if np.count_nonzero(weights) < _MIN_STDDEV_REALIZATIONS:
+        raise ComputeStepAborted(exit_code=ExitCode.TOO_FEW_REALIZATIONS)
+    functions = np.nan_to_num(functions)
+    norm, mean, stddev = _mean_stddev(functions, weights)
+    mean_gradient = np.dot(gradient, weights)
+    return (
+        np.zeros(mean_gradient.shape, dtype=np.float64)
+        if np.allclose(np.abs(stddev), 0.0)
+        else (
+            (norm / stddev)
+            * (np.dot(gradient, functions * weights) - mean * mean_gradient)
         )
-        return norm, mean, stddev
+    )
+
+
+def _mean_stddev(
+    functions: NDArray[np.float64],
+    weights: NDArray[np.float64],
+) -> tuple[float, NDArray[np.float64], NDArray[np.float64]]:
+    norm = float(np.count_nonzero(weights > 0))
+    norm /= norm - 1
+    mean = np.dot(functions, weights)
+    stddev = np.sqrt(norm * np.dot((functions - mean[..., np.newaxis]) ** 2, weights))
+    return norm, mean, stddev
 
 
 class DefaultFunctionEstimatorPlugin(FunctionEstimatorPlugin):
@@ -176,7 +175,7 @@ class DefaultFunctionEstimatorPlugin(FunctionEstimatorPlugin):
         abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC201
         return DefaultFunctionEstimator(enopt_config, estimator_index)
 
     @classmethod
@@ -186,5 +185,5 @@ class DefaultFunctionEstimatorPlugin(FunctionEstimatorPlugin):
         See the [ropt.plugins.base.Plugin][] abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC201
         return method.lower() in {"default", "mean", "stddev"}

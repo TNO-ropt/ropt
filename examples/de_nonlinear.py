@@ -37,7 +37,6 @@ def function(variables: NDArray[np.float64], _: EvaluatorContext) -> EvaluatorRe
 
     Args:
         variables: The variables to evaluate.
-        context:   Evaluator context.
 
     Returns:
         Calculated objectives and constraints.

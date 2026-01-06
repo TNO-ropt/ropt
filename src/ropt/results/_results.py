@@ -109,7 +109,7 @@ class Results(ABC):
 
         Raises:
             NotImplementedError: If the `pandas` module is not installed.
-            ValueError:          If the field name is incorrect.
+            AttributeError:      If the field name is invalid.
 
         Returns:
             A `pandas` DataFrame containing the results.

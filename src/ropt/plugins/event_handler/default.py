@@ -58,7 +58,7 @@ class DefaultEventHandlerPlugin(EventHandlerPlugin):
         """Create an event handler.
 
         # noqa
-        """
+        """  # noqa: DOC201, DOC501
         _, _, name = name.lower().rpartition("/")
         obj = _EVENT_HANDLER_OBJECTS.get(name)
         if obj is not None:
@@ -74,5 +74,5 @@ class DefaultEventHandlerPlugin(EventHandlerPlugin):
         See the [ropt.plugins.base.Plugin][] abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC201
         return method.lower() in _EVENT_HANDLER_OBJECTS

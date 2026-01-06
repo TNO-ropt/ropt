@@ -32,7 +32,6 @@ def rosenbrock(variables: NDArray[np.float64], _: EvaluatorContext) -> Evaluator
 
     Args:
         variables: The variables to evaluate.
-        dimension: The number of variables.
 
     Returns:
         The calculated objective, and `None`

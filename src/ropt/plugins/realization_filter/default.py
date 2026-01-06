@@ -212,7 +212,7 @@ class DefaultRealizationFilter(RealizationFilter):
         base class.
 
         # noqa
-        """
+        """  # noqa: DOC501
         self._filter_config = enopt_config.realization_filters[filter_index]
         self._enopt_config = enopt_config
         self._filter_options: (
@@ -251,7 +251,7 @@ class DefaultRealizationFilter(RealizationFilter):
         abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC501
         weights = self._enopt_config.realizations.weights
         match self._method:
             case "sort-objective":
@@ -398,7 +398,7 @@ class DefaultRealizationFilterPlugin(RealizationFilterPlugin):
         abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC201
         return DefaultRealizationFilter(enopt_config, filter_index)
 
     @classmethod
@@ -408,7 +408,7 @@ class DefaultRealizationFilterPlugin(RealizationFilterPlugin):
         See the [ropt.plugins.base.Plugin][] abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC201
         return method.lower() in {
             "sort-objective",
             "sort-constraint",

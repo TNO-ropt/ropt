@@ -329,16 +329,16 @@ class EnsembleOptimizer:
             exit_code: ExitCode | None = None
             for result in results:
                 assert isinstance(result, FunctionResults | GradientResults)
-                if (
-                    (isinstance(result, FunctionResults) and result.functions is None)
-                    or (
-                        isinstance(result, GradientResults) and result.gradients is None
-                    )
-                    or (
-                        check_failures
-                        and np.all(result.realizations.failed_realizations)
-                    )
-                ):
+                no_functions = (
+                    isinstance(result, FunctionResults) and result.functions is None
+                )
+                no_gradient = (
+                    isinstance(result, GradientResults) and result.gradients is None
+                )
+                all_failures = check_failures and np.all(
+                    result.realizations.failed_realizations
+                )
+                if no_functions or no_gradient or all_failures:
                     exit_code = ExitCode.TOO_FEW_REALIZATIONS
                     break
 

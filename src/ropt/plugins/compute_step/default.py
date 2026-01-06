@@ -52,7 +52,7 @@ class DefaultComputeStepPlugin(ComputeStepPlugin):
         """Create a compute step.
 
         # noqa
-        """
+        """  # noqa: DOC201, DOC501
         _, _, name = name.lower().rpartition("/")
         op_obj = _ACTION_OBJECTS.get(name)
         if op_obj is not None:
@@ -68,5 +68,5 @@ class DefaultComputeStepPlugin(ComputeStepPlugin):
         See the [ropt.plugins.base.Plugin][] abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC201
         return method.lower() in _ACTION_OBJECTS

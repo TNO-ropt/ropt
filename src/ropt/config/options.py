@@ -69,6 +69,9 @@ class OptionsSchemaModel(BaseModel):
         specified `method` name. The resulting model can then be used to
         validate dictionaries of options against the defined schema.
 
+        Raises:
+            ValueError: If the specified method is not found in the schema.
+
         Args:
             method: The name of the method for which to create the options model.
 

@@ -101,7 +101,7 @@ class SciPySampler(Sampler):
         See the [ropt.plugins.sampler.base.Sampler][] abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC201
         variable_count = self._enopt_config.variables.variable_count
         realization_count = self._enopt_config.realizations.weights.size
         perturbation_count = self._enopt_config.gradient.number_of_perturbations
@@ -208,7 +208,7 @@ class SciPySamplerPlugin(SamplerPlugin):
         See the [ropt.plugins.sampler.base.SamplerPlugin][] abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC201
         return SciPySampler(enopt_config, sampler_index, mask, rng)
 
     @classmethod
@@ -218,5 +218,5 @@ class SciPySamplerPlugin(SamplerPlugin):
         See the [ropt.plugins.base.Plugin][] abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC201
         return method.lower() in (_SUPPORTED_METHODS | {"default"})

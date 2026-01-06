@@ -43,7 +43,6 @@ def rosenbrock(
 
     Args:
         variables: The variables to evaluate.
-        dimension: The number of variables.
 
     Returns:
         The calculated objective, and `None`

@@ -83,20 +83,15 @@ select = ["ALL"]
 ignore = [
     "COM812", # missing-trailing-comma
     "CPY",    # flake8-copyright
-    "DOC",    # pydoclint
     "E501",   # line-too-long
-    "PLC",    # pylint, convention
-    "PLR",    # pylint, refactor
-    "RUF",    # ruff-specific rules
     "S101",   # assert
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = [
-    "E402",    # module-import-not-at-top-of-file
     "D",       # pydocstyle
     "ANN401",  # anytype
-    "FBT",     # flake8-boolean-trap
+    "PLC2701", # import-private-name
     "PLR2004", # magic-value-comparison
     "PLR0913", # too-many-arguments
 ]
