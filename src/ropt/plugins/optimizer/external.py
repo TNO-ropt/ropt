@@ -84,47 +84,51 @@ class ExternalOptimizer(Optimizer):
         atexit.register(self._atexit)
 
         with TemporaryDirectory() as fifo_dir:
-            fifo1 = Path(fifo_dir) / "fifo1"
-            fifo2 = Path(fifo_dir) / "fifo2"
+            self._start(
+                initial_values, Path(fifo_dir) / "fifo1", Path(fifo_dir) / "fifo2"
+            )
 
-            with _JSONPipeCommunicator(fifo1, fifo2) as comm:
-                try:
-                    process = subprocess.Popen(  # noqa: S603
-                        [_PLUGIN_BINARY, str(fifo2), str(fifo1), str(os.getpid())]
-                    )
-                    self._process_pid = process.pid
-                except FileNotFoundError as exc:
-                    msg = "The plugin runner binary was not found"
-                    raise ValueError(msg) from exc
+    def _start(
+        self, initial_values: NDArray[np.float64], fifo1: Path, fifo2: Path
+    ) -> None:
+        with _JSONPipeCommunicator(fifo1, fifo2) as comm:
+            try:
+                process = subprocess.Popen(  # noqa: S603
+                    [_PLUGIN_BINARY, str(fifo2), str(fifo1), str(os.getpid())]
+                )
+                self._process_pid = process.pid
+            except FileNotFoundError as exc:
+                msg = "The plugin runner binary was not found"
+                raise ValueError(msg) from exc
 
-                answer: str | list[Any] | dict[str, Any] | None = None
-                exception: BaseException | None = None
+            answer: str | list[Any] | dict[str, Any] | None = None
+            exception: BaseException | None = None
 
-                while process.poll() is None:
-                    if answer is None:
-                        try:
-                            answer = self._handle_request(comm, initial_values)
-                        except Exception as exc:  # noqa: BLE001
-                            # Store the exception, we first need to send the 'abort' signal:
-                            exception = exc
-                            answer = "abort"
+            while process.poll() is None:
+                if answer is None:
+                    try:
+                        answer = self._handle_request(comm, initial_values)
+                    except Exception as exc:  # noqa: BLE001
+                        # Store the exception, we first need to send the 'abort' signal:
+                        exception = exc
+                        answer = "abort"
 
-                    if answer is not None and comm.write(answer):
-                        answer = None
-                        # If the message has been sent, then reraise any exceptions:
-                        if exception is not None:
-                            # The process should have aborted:
-                            with contextlib.suppress(ProcessLookupError):
-                                os.kill(self._process_pid, signal.SIGTERM)
-                            with contextlib.suppress(subprocess.TimeoutExpired):
-                                process.wait(_PROCESS_TIMEOUT)
-                            raise exception
-                    time.sleep(0.1)
+                if answer is not None and comm.write(answer):
+                    answer = None
+                    # If the message has been sent, then reraise any exceptions:
+                    if exception is not None:
+                        # The process should have aborted:
+                        with contextlib.suppress(ProcessLookupError):
+                            os.kill(self._process_pid, signal.SIGTERM)
+                        with contextlib.suppress(subprocess.TimeoutExpired):
+                            process.wait(_PROCESS_TIMEOUT)
+                        raise exception
+                time.sleep(0.1)
 
-                with contextlib.suppress(ProcessLookupError):
-                    os.kill(self._process_pid, signal.SIGTERM)
-                with contextlib.suppress(subprocess.TimeoutExpired):
-                    process.wait(_PROCESS_TIMEOUT)
+            with contextlib.suppress(ProcessLookupError):
+                os.kill(self._process_pid, signal.SIGTERM)
+            with contextlib.suppress(subprocess.TimeoutExpired):
+                process.wait(_PROCESS_TIMEOUT)
 
     @property
     def allow_nan(self) -> bool:
@@ -208,7 +212,7 @@ class ExternalOptimizerPlugin(OptimizerPlugin):
         See the [ropt.plugins.optimizer.base.OptimizerPlugin][] abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC201
         return ExternalOptimizer(config, optimizer_callback)
 
     @classmethod
@@ -218,7 +222,7 @@ class ExternalOptimizerPlugin(OptimizerPlugin):
         See the [ropt.plugins.base.Plugin][] abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC201
         return plugin_manager.get_plugin_name("optimizer", method) is not None
 
     @classmethod
@@ -228,7 +232,7 @@ class ExternalOptimizerPlugin(OptimizerPlugin):
         See the [ropt.plugins.optimizer.base.OptimizerPlugin][] abstract base class.
 
         # noqa
-        """
+        """  # noqa: DOC201
         return False
 
     @classmethod
@@ -237,7 +241,8 @@ class ExternalOptimizerPlugin(OptimizerPlugin):
     ) -> None:
         """Validate the options of a given method.
 
-        See the [ropt.plugins.optimizer.base.OptimizerPlugin][] abstract base class.
+        See the [ropt.plugins.
+        optimizer.base.OptimizerPlugin][] abstract base class.
 
         # noqa
         """

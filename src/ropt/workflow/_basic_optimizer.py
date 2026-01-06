@@ -259,7 +259,7 @@ class BasicOptimizer:
                         callback=function,
                     )
                 )
-            for handler in self._custom_event_handlers():
+            for handler in _custom_event_handlers():
                 optimizer.add_event_handler(create_event_handler(handler))
 
             exit_code = optimizer.run(
@@ -340,12 +340,13 @@ class BasicOptimizer:
                 return compute_step
         return None
 
-    def _custom_event_handlers(self) -> Iterator[str]:
-        handlers = os.environ.get("ROPT_HANDLERS", "").split(",")
-        handlers += _get_option("event_handlers")
-        for handler in dict.fromkeys(handlers):
-            if plugin_manager.get_plugin_name("event_handler", handler) is not None:
-                yield handler
+
+def _custom_event_handlers() -> Iterator[str]:
+    handlers = os.environ.get("ROPT_HANDLERS", "").split(",")
+    handlers += _get_option("event_handlers")
+    for handler in dict.fromkeys(handlers):
+        if plugin_manager.get_plugin_name("event_handler", handler) is not None:
+            yield handler
 
 
 @cache

@@ -15,8 +15,8 @@ from ropt.results import (
 )
 
 pandas = pytest.importorskip("pandas")
-from ropt.config import EnOptConfig
-from ropt.results._pandas import _to_series
+from ropt.config import EnOptConfig  # noqa: E402
+from ropt.results._pandas import _to_series  # noqa: E402
 
 initial_values = [0.0, 0.0]
 
@@ -110,7 +110,7 @@ def test__to_series(gradient_result: GradientResults) -> None:
         for r_idx, real in enumerate(gradient_result.names[AxisName.REALIZATION]):
             for pert in range(gradient_result.evaluations.perturbed_variables.shape[1]):
                 assert (
-                    series.loc[(real, pert, var)]
+                    series.loc[real, pert, var]
                     == gradient_result.evaluations.perturbed_variables[
                         r_idx, pert, v_idx
                     ]
@@ -133,7 +133,7 @@ def test__to_series_evaluation_info(gradient_result: GradientResults) -> None:
     ]
     for r_idx, real in enumerate(gradient_result.names[AxisName.REALIZATION]):
         for pert in range(gradient_result.evaluations.perturbed_variables.shape[1]):
-            assert series.loc[(real, pert)] == info[r_idx, pert]
+            assert series.loc[real, pert] == info[r_idx, pert]
 
 
 def test_to_dataframe_function(function_result: FunctionResults) -> None:

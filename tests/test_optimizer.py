@@ -562,13 +562,13 @@ def test_variables_scale_with_scaler(
     optimizer.run(initial_values)
     assert optimizer.results is not None
 
-    if offsets is not None:
-        lower_bounds = lower_bounds - offsets
-        upper_bounds = upper_bounds - offsets
-    if scales is not None:
-        lower_bounds = lower_bounds / scales
-        upper_bounds = upper_bounds / scales
     config = EnOptConfig.model_validate(enopt_config, context=transforms)
+    if offsets is not None:
+        lower_bounds -= offsets
+        upper_bounds -= offsets
+    if scales is not None:
+        lower_bounds /= scales
+        upper_bounds /= scales
     assert np.allclose(config.variables.lower_bounds, lower_bounds)
     assert np.allclose(config.variables.upper_bounds, upper_bounds)
     result = optimizer.results.evaluations.variables

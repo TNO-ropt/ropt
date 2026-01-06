@@ -194,10 +194,13 @@ def results_to_dataframe(
         result_type: The type of results to include ("functions" or
                      "gradients").
 
+    Raises:
+        TypeError: If `result_type` is not "functions" or "gradients".
+
     Returns:
         A `pandas` DataFrame containing the combined results.
     """
-    if result_type not in ("functions", "gradients"):
+    if result_type not in {"functions", "gradients"}:
         msg = f"Invalid frame output type: {result_type}"
         raise TypeError(msg)
 

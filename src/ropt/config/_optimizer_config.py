@@ -112,7 +112,7 @@ class OptimizerConfig(BaseModel):
     @model_validator(mode="after")
     def _method(self) -> Self:
         plugin, sep, method = self.method.rpartition("/")
-        if (sep == "/") and (plugin == "" or method) == "":
+        if (sep == "/") and not (not plugin or method):
             msg = f"malformed method specification: `{self.method}`"
             raise ValueError(msg)
         return self

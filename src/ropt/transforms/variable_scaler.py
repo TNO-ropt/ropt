@@ -69,9 +69,9 @@ class VariableScaler(VariableTransform):
             The transformed variable values in the optimizer domain.
         """
         if self._offsets is not None:
-            values = values - self._offsets
+            values = values.copy() - self._offsets
         if self._scales is not None:
-            values = values / self._scales
+            values = values.copy() / self._scales
         return values
 
     def from_optimizer(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -96,9 +96,9 @@ class VariableScaler(VariableTransform):
             The transformed variable values in the user domain.
         """
         if self._scales is not None:
-            values = values * self._scales
+            values = values.copy() * self._scales
         if self._offsets is not None:
-            values = values + self._offsets
+            values = values.copy() + self._offsets
         return values
 
     def magnitudes_to_optimizer(
@@ -174,10 +174,10 @@ class VariableScaler(VariableTransform):
         """
         if self._offsets is not None:
             offsets = np.matmul(coefficients, self._offsets)
-            lower_bounds = lower_bounds - offsets
-            upper_bounds = upper_bounds - offsets
+            lower_bounds = lower_bounds.copy() - offsets
+            upper_bounds = upper_bounds.copy() - offsets
         if self._scales is not None:
-            coefficients = coefficients * self._scales
+            coefficients = coefficients.copy() * self._scales
         self._equation_scaling = np.max(np.abs(coefficients), axis=-1)
         assert self._equation_scaling is not None
         return (
@@ -213,8 +213,8 @@ class VariableScaler(VariableTransform):
             A tuple containing the transformed lower and upper differences.
         """
         if self._scales is not None:
-            lower_diffs = lower_diffs * self._scales
-            upper_diffs = upper_diffs * self._scales
+            lower_diffs = lower_diffs.copy() * self._scales
+            upper_diffs = upper_diffs.copy() * self._scales
         return lower_diffs, upper_diffs
 
     def linear_constraints_diffs_from_optimizer(
@@ -242,6 +242,6 @@ class VariableScaler(VariableTransform):
             A tuple containing the transformed lower and upper differences.
         """
         if self._equation_scaling is not None:
-            lower_diffs = lower_diffs * self._equation_scaling
-            upper_diffs = upper_diffs * self._equation_scaling
+            lower_diffs = lower_diffs.copy() * self._equation_scaling
+            upper_diffs = upper_diffs.copy() * self._equation_scaling
         return lower_diffs, upper_diffs

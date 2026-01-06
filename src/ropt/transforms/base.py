@@ -171,7 +171,7 @@ class VariableTransform(ABC):
 
         Returns:
             A tuple containing the transformed coefficient matrix and bounds.
-        """
+        """  # noqa: DOC202
         msg = "This transformer does not support linear constraints."
         raise NotImplementedError(msg)
 
@@ -198,7 +198,7 @@ class VariableTransform(ABC):
 
         Returns:
             A tuple containing the transformed lower and upper differences.
-        """
+        """  # noqa: DOC202
         msg = "This transformer does not support linear constraints."
         raise NotImplementedError(msg)
 

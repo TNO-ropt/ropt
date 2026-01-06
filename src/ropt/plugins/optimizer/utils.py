@@ -55,10 +55,6 @@ def validate_supported_constraints(
                                that support them.
         required_constraints:  Dict mapping constraint types to sets of methods
                                that require them.
-
-    Raises:
-        NotImplementedError: If a configured constraint is not supported by the
-                             method, or if a required constraint is missing.
     """
     _validate_bounds(config, method, supported_constraints, required_constraints)
     _validate_linear_constraints(
@@ -307,6 +303,9 @@ class NormalizedConstraints:
         upper_bounds: NDArray[np.float64],
     ) -> None:
         """Set the bounds of the normalization class.
+
+        Raises:
+            ValueError: If the bounds have changed.
 
         Args:
             lower_bounds: The lower bounds on the right hand sides.

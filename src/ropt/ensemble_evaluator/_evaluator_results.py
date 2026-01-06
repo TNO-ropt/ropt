@@ -205,7 +205,7 @@ def _get_gradient_results(
     )
 
 
-def _get_function_and_gradient_results(  # noqa: PLR0913
+def _get_function_and_gradient_results(  # noqa: PLR0913, PLR0917
     config: EnOptConfig,
     transforms: OptModelTransforms | None,
     evaluator: EvaluatorCallback,

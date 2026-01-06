@@ -60,8 +60,5 @@ def validate_optimizer_options(
     Args:
         method:  The specific optimization method name.
         options: The dictionary or a list of strings of options.
-
-    Raises:
-        ValueError: If the provided options are invalid.
     """
     plugin_manager.get_plugin("optimizer", method).validate_options(method, options)
