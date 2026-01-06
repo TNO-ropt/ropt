@@ -2795,11 +2795,11 @@ constructed from axis indices or labels. In addition, the <code>batch_id</code>
           </tr>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#AttributeError">AttributeError</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If the field name is incorrect.</p>
+                <p>If the field name is invalid.</p>
               </div>
             </td>
           </tr>
@@ -4885,6 +4885,29 @@ results (<code>functions</code>) or gradient results (<code>gradients</code>).</
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#TypeError">TypeError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>result_type</code> is not "functions" or "gradients".</p>
+              </div>
             </td>
           </tr>
       </tbody>

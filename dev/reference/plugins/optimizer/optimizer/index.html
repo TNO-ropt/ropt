@@ -3392,6 +3392,29 @@ Returns <code>None</code> if <code>set_gradients</code> has not been called sinc
         <p>Set the bounds of the normalization class.</p>
 
 
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#ValueError">ValueError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the bounds have changed.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>
       <thead>
@@ -3716,30 +3739,6 @@ A similar structure is used for <code>required_constraints</code>.</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError">NotImplementedError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If a configured constraint is not supported by the
-                 method, or if a required constraint is missing.</p>
-              </div>
             </td>
           </tr>
       </tbody>
