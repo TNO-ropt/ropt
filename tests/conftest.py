@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from ropt.evaluator import EvaluatorContext, EvaluatorResult
+from ropt.workflow import create_evaluator
 
 _Function = Callable[[NDArray[np.float64], int], float]
 
@@ -37,46 +37,6 @@ def pytest_collection_modifyitems(config: Any, items: Sequence[Any]) -> None:
                 item.add_marker(skip_external)
 
 
-def _function_runner(
-    variables: NDArray[np.float64],
-    evaluator_context: EvaluatorContext,
-    functions: list[_Function],
-) -> EvaluatorResult:
-    objective_count = evaluator_context.config.objectives.weights.size
-    constraint_count = (
-        0
-        if evaluator_context.config.nonlinear_constraints is None
-        else evaluator_context.config.nonlinear_constraints.lower_bounds.size
-    )
-    objective_results = np.zeros(
-        (variables.shape[0], objective_count),
-        dtype=np.float64,
-    )
-    constraint_results = (
-        np.zeros((variables.shape[0], constraint_count), dtype=np.float64)
-        if constraint_count > 0
-        else None
-    )
-    for eval_idx, realization in enumerate(evaluator_context.realizations):
-        if evaluator_context.active is None or evaluator_context.active[eval_idx]:
-            for idx in range(objective_count):
-                function = functions[idx]
-                objective_results[eval_idx, idx] = function(
-                    variables[eval_idx, :], int(realization)
-                )
-            for idx in range(constraint_count):
-                function = functions[idx + objective_count]
-                assert constraint_results is not None
-                constraint_results[eval_idx, idx] = function(
-                    variables[eval_idx, :], int(realization)
-                )
-
-    return EvaluatorResult(
-        objectives=objective_results,
-        constraints=constraint_results,
-    )
-
-
 def _compute_distance_squared(
     variables: NDArray[np.float64], _: int, target: NDArray[np.float64]
 ) -> float:
@@ -94,7 +54,7 @@ def fixture_test_functions() -> tuple[_Function, _Function]:
 @pytest.fixture(scope="session")
 def evaluator(test_functions: Any) -> Any:
     def _evaluator(test_functions: list[_Function] = test_functions) -> Any:
-        return partial(_function_runner, functions=test_functions)
+        return create_evaluator("function_evaluator", functions=test_functions)
 
     return _evaluator
 
