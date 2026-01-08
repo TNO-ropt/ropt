@@ -16,15 +16,16 @@ from ropt.config import EnOptConfig
 from ropt.enums import EventType, ExitCode
 from ropt.exceptions import ComputeStepAborted
 from ropt.plugins import plugin_manager
+from ropt.plugins.evaluator.base import Evaluator
 
-from ._factory import create_compute_step, create_evaluator, create_event_handler
+from ._factory import create_compute_step, create_event_handler
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
-    from numpy.typing import ArrayLike
+    from numpy.typing import ArrayLike, NDArray
 
-    from ropt.evaluator import EvaluatorCallback
+    from ropt.evaluator import EvaluatorCallback, EvaluatorContext, EvaluatorResult
     from ropt.results import FunctionResults
     from ropt.transforms import OptModelTransforms
     from ropt.workflow import Event
@@ -185,7 +186,7 @@ class BasicOptimizer:
     def __init__(
         self,
         enopt_config: dict[str, Any],
-        evaluator: EvaluatorCallback,
+        evaluator: EvaluatorCallback | Evaluator,
         *,
         transforms: OptModelTransforms | None = None,
         constraint_tolerance: float = 1e-10,
@@ -244,7 +245,11 @@ class BasicOptimizer:
         custom_function = self._get_custom_compute_step()
 
         if custom_function is None:
-            evaluator = create_evaluator("function_evaluator", callback=self._evaluator)
+            evaluator = (
+                self._evaluator
+                if isinstance(self._evaluator, Evaluator)
+                else _Evaluator(callback=self._evaluator)
+            )
             tracker = create_event_handler(
                 "tracker",
                 constraint_tolerance=self._constraint_tolerance,
@@ -339,6 +344,17 @@ class BasicOptimizer:
                 ).run(evaluator=self._evaluator, script=script)
                 return compute_step
         return None
+
+
+class _Evaluator(Evaluator):
+    def __init__(self, *, callback: EvaluatorCallback) -> None:
+        super().__init__()
+        self._evaluator_callback = callback
+
+    def eval(
+        self, variables: NDArray[np.float64], context: EvaluatorContext
+    ) -> EvaluatorResult:
+        return self._evaluator_callback(variables, context)
 
 
 def _custom_event_handlers() -> Iterator[str]:

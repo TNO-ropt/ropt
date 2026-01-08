@@ -13,7 +13,6 @@ from numpy.typing import NDArray
 
 from ropt.config import EnOptConfig
 from ropt.enums import EventType
-from ropt.evaluator import EvaluatorContext, EvaluatorResult
 from ropt.results import FunctionResults
 from ropt.workflow import (
     Event,
@@ -32,27 +31,20 @@ CONFIG: dict[str, Any] = {
 initial_values = 2 * np.arange(DIM) / DIM + 0.5
 
 
-def rosenbrock(
-    variables: NDArray[np.float64],
-    _: EvaluatorContext,
-) -> EvaluatorResult:
+def rosenbrock(variables: NDArray[np.float64], _: int) -> float:
     """Function evaluator for the multi-dimensional rosenbrock function.
-
-    This function returns a tuple containing the calculated objectives and
-    `None`, the latter because no constraints are calculated.
 
     Args:
         variables: The variables to evaluate.
 
     Returns:
-        The calculated objective, and `None`
+        The calculated objective
     """
-    objectives = np.zeros((variables.shape[0], 1), dtype=np.float64)
-    for v_idx in range(variables.shape[0]):
-        for d_idx in range(DIM - 1):
-            x, y = variables[v_idx, d_idx : d_idx + 2]
-            objectives[v_idx, 0] += (1.0 - x) ** 2 + 100 * (y - x * x) ** 2
-    return EvaluatorResult(objectives=objectives)
+    objective: float = 0
+    for d_idx in range(DIM - 1):
+        x, y = variables[d_idx : d_idx + 2]
+        objective += (1.0 - x) ** 2 + 100 * (y - x * x) ** 2
+    return objective
 
 
 def report(event: Event) -> None:
@@ -76,7 +68,7 @@ def run_optimization(config: dict[str, Any]) -> FunctionResults:
     Returns:
         The optimal results.
     """
-    evaluator = create_evaluator("function_evaluator", callback=rosenbrock)
+    evaluator = create_evaluator("function_evaluator", functions=[rosenbrock])
     step = create_compute_step("optimizer", evaluator=evaluator)
 
     tracker = create_event_handler("tracker")
