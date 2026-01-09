@@ -127,4 +127,4 @@ __all__ = [
     "PluginType",
 ]
 
-plugin_manager = PluginManager()
+plugin_manager = PluginManager()  # noqa: RUF067
