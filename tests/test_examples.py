@@ -2,6 +2,8 @@ from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
 from typing import Any
 
+import pytest
+
 
 def _load_from_file(name: str, sub_path: str | None = None) -> Any:
     path = Path(__file__).parent.parent / "examples"
@@ -38,6 +40,22 @@ def test_rosenbrock_workflow(tmp_path: Path, monkeypatch: Any) -> None:
     monkeypatch.chdir(tmp_path)
     module = _load_from_file("rosenbrock_workflow")
     module.main()
+
+
+@pytest.mark.asyncio
+async def test_rosenbrock_async(tmp_path: Path, monkeypatch: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+    module = _load_from_file("rosenbrock_async")
+    await module.main()
+
+
+@pytest.mark.asyncio
+async def test_rosenbrock_multiprocessing(tmp_path: Path, monkeypatch: Any) -> None:
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.syspath_prepend(Path(__file__).parent.parent / "examples")
+    import rosenbrock_async  # type: ignore[import-not-found] # noqa: PLC0415
+
+    await rosenbrock_async.main(multiprocessing=True)
 
 
 def test_differential_evolution_linear(tmp_path: Path, monkeypatch: Any) -> None:

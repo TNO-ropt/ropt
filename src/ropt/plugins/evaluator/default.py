@@ -4,6 +4,8 @@
 
   - `function_evaluator`: Evaluator that forwards calculations to a given evaluation function.
     ([`DefaultFunctionEvaluator`][ropt.plugins.evaluator._function_evaluator.DefaultFunctionEvaluator])
+  - `async_evaluator`: Evaluator that forwards calculations to a given awaitable function.
+    ([`DefaultAsyncEvaluator`][ropt.plugins.evaluator._async_evaluator.DefaultAsyncEvaluator])
   - `caching_evaluator`: Evaluator that uses caching to find results that were
     already evaluated before forwarding to another evaluator.
     ([`DefaultCachedEvaluator`][ropt.plugins.evaluator.cached_evaluator.DefaultCachedEvaluator])
@@ -13,6 +15,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Final
 
+from ._async_evaluator import DefaultAsyncEvaluator
 from ._function_evaluator import DefaultFunctionEvaluator
 from .base import EvaluatorPlugin
 from .cached_evaluator import DefaultCachedEvaluator
@@ -23,6 +26,7 @@ if TYPE_CHECKING:
 
 _EVALUATOR_OBJECTS: Final[dict[str, type[Evaluator]]] = {
     "function_evaluator": DefaultFunctionEvaluator,
+    "async_evaluator": DefaultAsyncEvaluator,
     "cached_evaluator": DefaultCachedEvaluator,
 }
 
@@ -35,9 +39,10 @@ class DefaultEvaluatorPlugin(EvaluatorPlugin):
 
     **Supported Evaluators:**
 
-    - `function_evaluator`: Evaluator that forwards calculations to a given
-       evaluation function.
+    - `function_evaluator`: Evaluator that forwards calculations to a given evaluation function.
        ([`DefaultFunctionEvaluator`][ropt.plugins.evaluator._function_evaluator.DefaultFunctionEvaluator])
+    - `async_evaluator`: Evaluator that forwards calculations to a given awaitable function.
+      ([`DefaultAsyncEvaluator`][ropt.plugins.evaluator._async_evaluator.DefaultAsyncEvaluator])
     - `caching_evaluator`: Evaluator that uses caching to find results that were
        already evaluated before forwarding to another evaluator.
        ([`DefaultCachedEvaluator`][ropt.plugins.evaluator.cached_evaluator.DefaultCachedEvaluator])

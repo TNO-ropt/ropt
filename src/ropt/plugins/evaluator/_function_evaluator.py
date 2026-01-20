@@ -26,7 +26,7 @@ class DefaultFunctionEvaluator(Evaluator):
     def __init__(
         self,
         *,
-        function: Callable[[NDArray[np.float64], int], NDArray[np.float64]],
+        function: Callable[[NDArray[np.float64], int], float],
     ) -> None:
         """Initialize the DefaultFunctionEvaluator.
 

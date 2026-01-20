@@ -1,4 +1,4 @@
-"""Defines base classes for optimization workflow plugins and components."""
+"""Defines base classes for evaluators."""
 
 from __future__ import annotations
 

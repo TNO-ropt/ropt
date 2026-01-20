@@ -52,6 +52,9 @@ default = "ropt.plugins.compute_step.default:DefaultComputeStepPlugin"
 [project.entry-points."ropt.plugins.evaluator"]
 default = "ropt.plugins.evaluator.default:DefaultEvaluatorPlugin"
 
+[project.entry-points."ropt.plugins.server"]
+default = "ropt.plugins.server.default:DefaultServerPlugin"
+
 [project.scripts]
 ropt_plugin_optimizer = "ropt.plugins.optimizer.external:ropt_plugin_optimizer"
 
@@ -120,6 +123,8 @@ dev = [
     "mypy",
     "pandas-stubs",
     "pytest",
+    "pytest-asyncio",
+    "pytest-timeout",
     "ruff",
     "scipy-stubs",
 ]

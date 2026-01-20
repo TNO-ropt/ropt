@@ -111,6 +111,7 @@ nav:
           - "Compute Steps": reference/plugins/workflow/compute_steps.md
           - "Event Handlers": reference/plugins/workflow/event_handler.md
           - "Evaluators": reference/plugins/workflow/evaluator.md
+          - "Servers": reference/plugins/workflow/server.md
         - "Optimizer Plugins":
           - "Optimizers": reference/plugins/optimizer/optimizer.md
           - "Samplers": reference/plugins/optimizer/sampler.md
@@ -120,6 +121,7 @@ nav:
           - "Compute Steps": reference/plugins/default/compute_steps.md
           - "Event Handlers": reference/plugins/default/event_handler.md
           - "Evaluators": reference/plugins/default/evaluator.md
+          - "Servers": reference/plugins/default/server.md
           - "SciPy Optimizers": reference/plugins/default/scipy_optimizer.md
           - "SciPy Samplers": reference/plugins/default/scipy_sampler.md
           - "Default Realization Filters": reference/plugins/default/realization_filter.md
