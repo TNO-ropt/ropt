@@ -17,29 +17,29 @@ if TYPE_CHECKING:
 
 
 class DefaultFunctionEvaluator(Evaluator):
-    """An evaluator that calls a function for each objective and constraint.
+    """An evaluator that calls a function.
 
-    This Evaluator stores a function for each objective and constraint and
-    calls these sequentially.
+    This Evaluator stores a single function that returns a value for each
+    objective and constraint.
     """
 
     def __init__(
         self,
         *,
-        functions: list[Callable[[NDArray[np.float64], int], float]],
+        function: Callable[[NDArray[np.float64], int], NDArray[np.float64]],
     ) -> None:
         """Initialize the DefaultFunctionEvaluator.
 
         Args:
-            functions: The functions used for objectives and constraints.
+            function: The function used for objectives and constraints.
         """
         super().__init__()
-        self._functions = functions
+        self._function = function
 
     def eval(
         self, variables: NDArray[np.float64], context: EvaluatorContext
     ) -> EvaluatorResult:
-        """Evaluate all objective and constraint functions.
+        """Evaluate all objective and constraints.
 
         Args:
             variables: The matrix of variables to evaluate.
@@ -57,10 +57,9 @@ class DefaultFunctionEvaluator(Evaluator):
         results = np.zeros((variables.shape[0], no + nc), dtype=np.float64)
         for eval_idx, realization in enumerate(context.realizations):
             if context.active is None or context.active[eval_idx]:
-                for idx in range(no + nc):
-                    results[eval_idx, idx] = self._functions[idx](
-                        variables[eval_idx, :], int(realization)
-                    )
+                results[eval_idx] = self._function(
+                    variables[eval_idx, :], int(realization)
+                )
         return EvaluatorResult(
             objectives=results[:, :no],
             constraints=results[:, no:] if nc > 0 else None,

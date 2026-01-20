@@ -35,10 +35,12 @@ class DefaultEvaluatorPlugin(EvaluatorPlugin):
 
     **Supported Evaluators:**
 
-    - `function_evaluator`: Creates a
-        [`DefaultFunctionEvaluator`][ropt.plugins.evaluator._function_evaluator.DefaultFunctionEvaluator]
-        instance, which uses function calls to calculated individual objectives
-        and constraints.
+    - `function_evaluator`: Evaluator that forwards calculations to a given
+       evaluation function.
+       ([`DefaultFunctionEvaluator`][ropt.plugins.evaluator._function_evaluator.DefaultFunctionEvaluator])
+    - `caching_evaluator`: Evaluator that uses caching to find results that were
+       already evaluated before forwarding to another evaluator.
+       ([`DefaultCachedEvaluator`][ropt.plugins.evaluator.cached_evaluator.DefaultCachedEvaluator])
     """
 
     @classmethod

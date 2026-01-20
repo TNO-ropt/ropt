@@ -45,7 +45,7 @@ def rosenbrock(
     realization: int,
     a: NDArray[np.float64],
     b: NDArray[np.float64],
-) -> float:
+) -> NDArray[np.float64]:
     """Function evaluator for the multi-dimensional rosenbrock function.
 
     Args:
@@ -61,7 +61,7 @@ def rosenbrock(
     for d_idx in range(DIM - 1):
         x, y = variables[d_idx : d_idx + 2]
         objective += (a[realization] - x) ** 2 + b[realization] * (y - x * x) ** 2
-    return objective
+    return np.asarray([objective])
 
 
 def report(event: Event) -> None:
@@ -80,7 +80,7 @@ def run_optimization(config: dict[str, Any]) -> FunctionResults:
     """Run the optimization.
 
     Args:
-        config: The configuration of the optimizer.
+        config:    The configuration of the optimizer.
 
     Returns:
         The optimal results.
@@ -92,7 +92,7 @@ def run_optimization(config: dict[str, Any]) -> FunctionResults:
     b = rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=realizations)
 
     evaluator = create_evaluator(
-        "function_evaluator", functions=[partial(rosenbrock, a=a, b=b)]
+        "function_evaluator", function=partial(rosenbrock, a=a, b=b)
     )
     step = create_compute_step("optimizer", evaluator=evaluator)
 

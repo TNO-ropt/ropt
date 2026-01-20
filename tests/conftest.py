@@ -51,10 +51,21 @@ def fixture_test_functions() -> tuple[_Function, _Function]:
     )
 
 
+def _function(
+    variables: NDArray[np.float64], realization: int, test_functions: list[_Function]
+) -> NDArray[np.float64]:
+    return np.fromiter(
+        (func(variables, realization) for func in test_functions), dtype=np.float64
+    )
+
+
 @pytest.fixture(scope="session")
 def evaluator(test_functions: Any) -> Any:
     def _evaluator(test_functions: list[_Function] = test_functions) -> Any:
-        return create_evaluator("function_evaluator", functions=test_functions)
+        return create_evaluator(
+            "function_evaluator",
+            function=partial(_function, test_functions=test_functions),
+        )
 
     return _evaluator
 
