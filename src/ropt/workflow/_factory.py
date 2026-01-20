@@ -8,6 +8,7 @@ from ropt.plugins import plugin_manager
 from ropt.plugins.compute_step.base import ComputeStep
 from ropt.plugins.evaluator.base import Evaluator
 from ropt.plugins.event_handler.base import EventHandler
+from ropt.plugins.server.base import Server
 
 
 def create_evaluator(method: str, **kwargs: Any) -> Evaluator:  # noqa: ANN401
@@ -25,6 +26,21 @@ def create_evaluator(method: str, **kwargs: Any) -> Evaluator:  # noqa: ANN401
     )
     assert isinstance(evaluator, Evaluator)
     return evaluator
+
+
+def create_server(method: str, **kwargs: Any) -> Server:  # noqa: ANN401
+    """Create a new server.
+
+    Args:
+        method: The method string to find the server.
+        kwargs: Optional keyword arguments passed to the server init.
+
+    Returns:
+        The new server.
+    """
+    server = plugin_manager.get_plugin("server", method=method).create(method, **kwargs)
+    assert isinstance(server, Server)
+    return server
 
 
 def create_event_handler(method: str, **kwargs: Any) -> EventHandler:  # noqa: ANN401
