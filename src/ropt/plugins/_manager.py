@@ -13,6 +13,7 @@ from .function_estimator.base import FunctionEstimatorPlugin
 from .optimizer.base import OptimizerPlugin
 from .realization_filter.base import RealizationFilterPlugin
 from .sampler.base import SamplerPlugin
+from .server.base import ServerPlugin
 
 if TYPE_CHECKING:
     from ropt.plugins.base import Plugin
@@ -26,6 +27,7 @@ PluginType = Literal[
     "event_handler",
     "compute_step",
     "evaluator",
+    "server",
 ]
 """Represents the valid types of plugins supported by `ropt`.
 
@@ -47,6 +49,8 @@ role in the optimization process:
   ([`ComputeStepPlugin`][ropt.plugins.compute_step.base.ComputeStepPlugin]).
 * `"evaluator"`: Plugins that define evaluators within an optimization workflow
   ([`EvaluatorPlugin`][ropt.plugins.evaluator.base.EvaluatorPlugin]).
+* `"server"`: Plugins that define servers within an optimization workflow
+  ([`ServerPlugin`][ropt.plugins.server.base.ServerPlugin]).
 """
 
 
@@ -58,6 +62,7 @@ _PLUGIN_TYPES: Final = {
     "event_handler": EventHandlerPlugin,
     "compute_step": ComputeStepPlugin,
     "evaluator": EvaluatorPlugin,
+    "server": ServerPlugin,
 }
 
 _DEFAULT_PLUGINS: Final = {
@@ -68,6 +73,7 @@ _DEFAULT_PLUGINS: Final = {
     "event_handler": "default",
     "compute_step": "default",
     "evaluator": "default",
+    "server": "default",
 }
 
 
