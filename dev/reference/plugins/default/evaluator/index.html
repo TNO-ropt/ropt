@@ -12,7 +12,7 @@
         <link rel="prev" href="../event_handler/">
       
       
-        <link rel="next" href="../scipy_optimizer/">
+        <link rel="next" href="../server/">
       
       
         
@@ -1119,6 +1119,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workflow/server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Servers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1524,6 +1552,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ropt.plugins.evaluator._async_evaluator.DefaultAsyncEvaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultAsyncEvaluator
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DefaultAsyncEvaluator">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.evaluator._async_evaluator.DefaultAsyncEvaluator.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.evaluator._async_evaluator.DefaultAsyncEvaluator.eval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        eval
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.evaluator.cached_evaluator.DefaultCachedEvaluator" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1599,6 +1666,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Servers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1991,6 +2086,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ropt.plugins.evaluator._async_evaluator.DefaultAsyncEvaluator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultAsyncEvaluator
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DefaultAsyncEvaluator">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.evaluator._async_evaluator.DefaultAsyncEvaluator.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.evaluator._async_evaluator.DefaultAsyncEvaluator.eval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        eval
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#ropt.plugins.evaluator.cached_evaluator.DefaultCachedEvaluator" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2106,9 +2240,10 @@
 provided by <code>ropt</code>.</p>
 <p><strong>Supported Evaluators:</strong></p>
 <ul>
-<li><code>function_evaluator</code>: Evaluator that forwards calculations to a given
-   evaluation function.
+<li><code>function_evaluator</code>: Evaluator that forwards calculations to a given evaluation function.
    (<a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator._function_evaluator.DefaultFunctionEvaluator" href="#ropt.plugins.evaluator._function_evaluator.DefaultFunctionEvaluator"><code>DefaultFunctionEvaluator</code></a>)</li>
+<li><code>async_evaluator</code>: Evaluator that forwards calculations to a given awaitable function.
+  (<a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator._async_evaluator.DefaultAsyncEvaluator" href="#ropt.plugins.evaluator._async_evaluator.DefaultAsyncEvaluator"><code>DefaultAsyncEvaluator</code></a>)</li>
 <li><code>caching_evaluator</code>: Evaluator that uses caching to find results that were
    already evaluated before forwarding to another evaluator.
    (<a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.cached_evaluator.DefaultCachedEvaluator" href="#ropt.plugins.evaluator.cached_evaluator.DefaultCachedEvaluator"><code>DefaultCachedEvaluator</code></a>)</li>
@@ -2194,11 +2329,8 @@ objective and constraint.</p>
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="nb">int</span><span class="p">],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">]</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="p">],</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span> <span class="n">function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2222,7 +2354,7 @@ objective and constraint.</p>
                 <code>function</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>], <span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]]</code>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>], <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2245,6 +2377,231 @@ objective and constraint.</p>
 
 
 <h3 id="ropt.plugins.evaluator._function_evaluator.DefaultFunctionEvaluator.eval" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">eval</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">eval</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">EvaluatorContext</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluatorResult</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Evaluate all objective and constraints.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>variables</code>
+            </td>
+            <td>
+                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The matrix of variables to evaluate.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>context</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
+
+
+  
+      dataclass
+  " href="../../../optimization/evaluator/#ropt.evaluator.EvaluatorContext">EvaluatorContext</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The evaluation context.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
+
+
+  
+      dataclass
+  " href="../../../optimization/evaluator/#ropt.evaluator.EvaluatorResult">EvaluatorResult</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The result of calling the wrapped evaluator function.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.evaluator._async_evaluator.DefaultAsyncEvaluator" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.evaluator._async_evaluator.DefaultAsyncEvaluator</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.Evaluator" href="../../workflow/evaluator/#ropt.plugins.evaluator.base.Evaluator">Evaluator</a></code></p>
+
+
+
+        <p>An evaluator that calls a function in a asyncio loop.</p>
+<p>This Evaluator stores a single awaitable function that returns a value for
+each objective and constraint.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.evaluator._async_evaluator.DefaultAsyncEvaluator.__init__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="p">[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Awaitable</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="p">],</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">server</span><span class="p">:</span> <span class="n">EvaluatorServer</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize the DefaultFunctionEvaluator.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>function</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>], <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>], <a class="autorefs autorefs-external" title="collections.abc.Awaitable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Awaitable">Awaitable</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The function used for objectives and constraints.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>server</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.EvaluatorServer" href="../../workflow/server/#ropt.plugins.server.base.EvaluatorServer">EvaluatorServer</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional evaluator server to use.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.evaluator._async_evaluator.DefaultAsyncEvaluator.eval" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">eval</span>
 
 
@@ -2901,13 +3258,13 @@ from the evaluator.</p>
         
         
           
-          <a href="../scipy_optimizer/" class="md-footer__link md-footer__link--next" aria-label="Next: SciPy Optimizers">
+          <a href="../server/" class="md-footer__link md-footer__link--next" aria-label="Next: Servers">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                SciPy Optimizers
+                Servers
               </div>
             </div>
             <div class="md-footer__button md-icon">

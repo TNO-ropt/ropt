@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../event_handler/">
+        <link rel="prev" href="../evaluator/">
       
       
-        <link rel="next" href="../server/">
+        <link rel="next" href="../../optimizer/optimizer/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Evaluators - ropt Documentation</title>
+        <title>Servers - ropt Documentation</title>
       
     
     
@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.plugins.evaluator.base.EvaluatorPlugin" class="md-skip">
+        <a href="#ropt.plugins.server.base.ServerPlugin" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Evaluators
+              Servers
             
           </span>
         </div>
@@ -1095,6 +1095,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../evaluator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1112,7 +1140,7 @@
   <span class="md-ellipsis">
     
   
-    Evaluators
+    Servers
   
 
     
@@ -1130,7 +1158,7 @@
   <span class="md-ellipsis">
     
   
-    Evaluators
+    Servers
   
 
     
@@ -1154,19 +1182,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.evaluator.base.EvaluatorPlugin" class="md-nav__link">
+  <a href="#ropt.plugins.server.base.ServerPlugin" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EvaluatorPlugin
+        ServerPlugin
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="EvaluatorPlugin">
+    <nav class="md-nav" aria-label="ServerPlugin">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.evaluator.base.EvaluatorPlugin.create" class="md-nav__link">
+  <a href="#ropt.plugins.server.base.ServerPlugin.create" class="md-nav__link">
     <span class="md-ellipsis">
       
         create
@@ -1182,22 +1210,172 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.evaluator.base.Evaluator" class="md-nav__link">
+  <a href="#ropt.plugins.server.base.Server" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Evaluator
+        Server
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Evaluator">
+    <nav class="md-nav" aria-label="Server">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.evaluator.base.Evaluator.eval" class="md-nav__link">
+  <a href="#ropt.plugins.server.base.Server.task_queue" class="md-nav__link">
     <span class="md-ellipsis">
       
-        eval
+        task_queue
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.Server.loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        loop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.Server.start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.Server.stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        stop
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.TaskResult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TaskResult
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.Task" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Task">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.Task.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.EvaluatorServer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluatorServer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EvaluatorServer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.EvaluatorServer.task_queue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        task_queue
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.EvaluatorServer.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.EvaluatorTaskResult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluatorTaskResult
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.EvaluatorTask" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluatorTask
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EvaluatorTask">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.EvaluatorTask.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run
       
     </span>
   </a>
@@ -1213,34 +1391,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../server/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Servers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -1931,19 +2081,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.evaluator.base.EvaluatorPlugin" class="md-nav__link">
+  <a href="#ropt.plugins.server.base.ServerPlugin" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EvaluatorPlugin
+        ServerPlugin
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="EvaluatorPlugin">
+    <nav class="md-nav" aria-label="ServerPlugin">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.evaluator.base.EvaluatorPlugin.create" class="md-nav__link">
+  <a href="#ropt.plugins.server.base.ServerPlugin.create" class="md-nav__link">
     <span class="md-ellipsis">
       
         create
@@ -1959,22 +2109,172 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.evaluator.base.Evaluator" class="md-nav__link">
+  <a href="#ropt.plugins.server.base.Server" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Evaluator
+        Server
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Evaluator">
+    <nav class="md-nav" aria-label="Server">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.evaluator.base.Evaluator.eval" class="md-nav__link">
+  <a href="#ropt.plugins.server.base.Server.task_queue" class="md-nav__link">
     <span class="md-ellipsis">
       
-        eval
+        task_queue
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.Server.loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        loop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.Server.start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.Server.stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        stop
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.TaskResult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TaskResult
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.Task" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Task">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.Task.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.EvaluatorServer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluatorServer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EvaluatorServer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.EvaluatorServer.task_queue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        task_queue
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.EvaluatorServer.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.EvaluatorTaskResult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluatorTaskResult
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.EvaluatorTask" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EvaluatorTask
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EvaluatorTask">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.EvaluatorTask.run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        run
       
     </span>
   </a>
@@ -2006,14 +2306,14 @@
   
 
 
-  <h1>Evaluators</h1>
+  <h1>Servers</h1>
 
 <div class="doc doc-object doc-class">
 
 
 
-<h2 id="ropt.plugins.evaluator.base.EvaluatorPlugin" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.evaluator.base.EvaluatorPlugin</span>
+<h2 id="ropt.plugins.server.base.ServerPlugin" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.server.base.ServerPlugin</span>
 
 
 </h2>
@@ -2025,9 +2325,9 @@
 
 
 
-        <p>Abstract base class for evaluator plugins.</p>
+        <p>Abstract base class for asynchronous server plugins.</p>
 <p>This class defines the interface for plugins responsible for creating
-<a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.Evaluator" href="#ropt.plugins.evaluator.base.Evaluator"><code>Evaluator</code></a> instances within
+<a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.Server" href="#ropt.plugins.server.base.Server"><code>Evaluator</code></a> instances within
 an optimization workflow.</p>
 
 
@@ -2054,7 +2354,7 @@ an optimization workflow.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plugins.evaluator.base.EvaluatorPlugin.create" class="doc doc-heading">
+<h3 id="ropt.plugins.server.base.ServerPlugin.create" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">create</span>
 
 
@@ -2064,16 +2364,16 @@ an optimization workflow.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Evaluator</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Server</span><span class="p">[</span><span class="n">TaskType</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Create an Evaluator instance.</p>
+        <p>Create a Server instance.</p>
 <p>This abstract class method serves as a factory for creating concrete
-<a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.Evaluator" href="#ropt.plugins.evaluator.base.Evaluator"><code>Evaluator</code></a> objects. Plugin
+<a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.Server" href="#ropt.plugins.server.base.Server"><code>Server</code></a> objects. Plugin
 implementations must override this method to return an instance of their
-specific <code>Evaluator</code> subclass.</p>
+specific <code>Server</code> subclass.</p>
 <p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="../../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> calls this method when
 an evaluator provided by this plugin is requested.</p>
 <p>The <code>name</code> argument specifies the requested evaluator, potentially
@@ -2102,7 +2402,7 @@ the plugin supports multiple evaluator types.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The requested evaluator name (potentially plugin-specific).</p>
+                <p>The requested server name (potentially plugin-specific).</p>
               </div>
             </td>
             <td>
@@ -2140,11 +2440,11 @@ the plugin supports multiple evaluator types.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.Evaluator" href="#ropt.plugins.evaluator.base.Evaluator">Evaluator</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.Server" href="#ropt.plugins.server.base.Server">Server</a>[<span title="ropt.plugins.server.base.TaskType">TaskType</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An initialized instance of an <code>Evaluator</code> subclass.</p>
+                <p>An initialized instance of an <code>Server</code> subclass.</p>
               </div>
             </td>
           </tr>
@@ -2168,8 +2468,8 @@ the plugin supports multiple evaluator types.</p>
 
 
 
-<h2 id="ropt.plugins.evaluator.base.Evaluator" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.evaluator.base.Evaluator</span>
+<h2 id="ropt.plugins.server.base.Server" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.server.base.Server</span>
 
 
 </h2>
@@ -2177,33 +2477,361 @@ the plugin supports multiple evaluator types.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
+              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code>, <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="ropt.plugins.server.base.TaskType">TaskType</span>]</code></p>
 
 
 
-        <p>Abstract base class for evaluator components within an optimization workflow.</p>
-<p>Subclasses must implement the abstract
-<a class="autorefs autorefs-internal" title="            eval
+        <p>Abstract base class for server components within an optimization workflow.</p>
+<p>Subclasses must implement the following abstract methods and properties:</p>
+<ul>
+<li><a class="autorefs autorefs-internal" title="            start
 
 
   
       abstractmethod
-  " href="#ropt.plugins.evaluator.base.Evaluator.eval"><code>eval</code></a> method, which is responsible
-for performing the actual evaluation of variables using an
-<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
+  " href="#ropt.plugins.server.base.Server.start"><code>start</code></a>: Starts the server.</li>
+<li><a class="autorefs autorefs-internal" title="            stop
 
 
   
-      dataclass
-  " href="../../../optimization/evaluator/#ropt.evaluator.EvaluatorContext"><code>EvaluatorContext</code></a> and returning an
-<a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
+      abstractmethod
+  " href="#ropt.plugins.server.base.Server.stop"><code>stop</code></a>: Stops the server.</li>
+<li><a class="autorefs autorefs-internal" title="            task_queue
 
 
   
-      dataclass
-  " href="../../../optimization/evaluator/#ropt.evaluator.EvaluatorResult"><code>EvaluatorResult</code></a>.</p>
-<p><code>Evaluator</code> instances are typically created using the
-<a class="autorefs autorefs-internal" title="            ropt.workflow.create_evaluator" href="../../../workflows/workflow/#ropt.workflow.create_evaluator"><code>create_evaluator</code></a> function.</p>
+      abstractmethod
+      property
+  " href="#ropt.plugins.server.base.Server.task_queue"><code>task_queue</code></a>: Retrieves the
+  servers task queue.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.plugins.server.base.Server.task_queue" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">task_queue</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">task_queue</span><span class="p">:</span> <span class="n">Queue</span><span class="p">[</span><span class="n">TaskType</span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the task queue.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.plugins.server.base.Server.loop" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">loop</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">loop</span><span class="p">:</span> <span class="n">AbstractEventLoop</span> <span class="o">|</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the asyncio loop used by this server.</p>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.server.base.Server.start" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">start</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">start</span><span class="p">(</span><span class="n">task_group</span><span class="p">:</span> <span class="n">TaskGroup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Start the evaluation server.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>task_group</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="asyncio.TaskGroup" href="https://docs.python.org/3/library/asyncio-task.html#asyncio.TaskGroup">TaskGroup</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The task group to use.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the evaluator is already running or using an
+          external queue.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.server.base.Server.stop" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">stop</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">stop</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Stop the evaluation server.</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.server.base.TaskResult" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.server.base.TaskResult</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>A result from an asynchronous task.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.server.base.TaskResult.task_id">task_id</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The unique identifier of the task.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.server.base.TaskResult.result">result</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The result of the task.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.server.base.Task" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.server.base.Task</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code>, <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="ropt.plugins.server.base.EvaluationResultType">EvaluationResultType</span>, <span title="ropt.plugins.server.base.ResultType">ResultType</span>]</code></p>
+
+
+
+        <p>An asynchronous task to be executed by a worker.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.server.base.Task.result_queue">result_queue</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="queue.Queue" href="https://docs.python.org/3/library/queue.html#queue.Queue">Queue</a>[<span title="ropt.plugins.server.base.ResultType">ResultType</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The queue to put the result in.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.server.base.Task.task_id">task_id</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The unique identifier of the task.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 
@@ -2229,80 +2857,22 @@ for performing the actual evaluation of variables using an
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plugins.evaluator.base.Evaluator.eval" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">eval</span>
+<h3 id="ropt.plugins.server.base.Task.run" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
 
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">eval</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">EvaluatorContext</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluatorResult</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">EvaluationResultType</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Evaluate objective and constraint functions for given variables.</p>
-<p>This method defines function evaluator callback, which calculates
-objective and constraint functions for a set of variable vectors,
-potentially for a subset of realizations and perturbations.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>variables</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The matrix of variables to evaluate. Each row represents
-       a variable vector.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>context</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
-
-
-  
-      dataclass
-  " href="../../../optimization/evaluator/#ropt.evaluator.EvaluatorContext">EvaluatorContext</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The evaluation context, providing additional information
-       about the evaluation.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Run the task.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2316,16 +2886,11 @@ potentially for a subset of realizations and perturbations.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorResult
-
-
-  
-      dataclass
-  " href="../../../optimization/evaluator/#ropt.evaluator.EvaluatorResult">EvaluatorResult</a></code>
+                  <code><span title="ropt.plugins.server.base.EvaluationResultType">EvaluationResultType</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>An evaluation results object containing the calculated values.</p>
+                <p>The result of the task.</p>
               </div>
             </td>
           </tr>
@@ -2333,20 +2898,294 @@ potentially for a subset of realizations and perturbations.</p>
     </table>
 
 
-<details class="tip" open>
-  <summary>Reusing Objectives and Constraints</summary>
-  <p>When defining multiple objectives, there may be a need to reuse the
-same objective or constraint value multiple times. For instance, a
-total objective could consist of the mean of the objectives for each
-realization, plus the standard deviation of the same values. This
-can be implemented by defining two objectives: the first calculated
-as the mean of the realizations, and the second using a function
-estimator to compute the standard deviations. The optimizer is
-unaware that both objectives use the same set of realizations. To
-prevent redundant calculations, the evaluator should compute the
-results of the realizations once and return them for both
-objectives.</p>
-</details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.server.base.EvaluatorServer" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.server.base.EvaluatorServer</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.Server" href="#ropt.plugins.server.base.Server">Server</a>[<a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.EvaluatorTask
+
+
+  
+      dataclass
+  " href="#ropt.plugins.server.base.EvaluatorTask">EvaluatorTask</a>]</code></p>
+
+
+
+        <p>An server that performs evaluations.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.plugins.server.base.EvaluatorServer.task_queue" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">task_queue</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">task_queue</span><span class="p">:</span> <span class="n">Queue</span><span class="p">[</span><span class="n">EvaluatorTask</span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the task queue.</p>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.server.base.EvaluatorServer.__init__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize the DefaultAsyncEvaluator.</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.server.base.EvaluatorTaskResult" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.server.base.EvaluatorTaskResult</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.TaskResult
+
+
+  
+      dataclass
+  " href="#ropt.plugins.server.base.TaskResult">TaskResult</a></code></p>
+
+
+
+        <p>A result from an asynchronous task.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.server.base.EvaluatorTaskResult.value">value</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The result of the task.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.server.base.EvaluatorTask" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.server.base.EvaluatorTask</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.Task
+
+
+  
+      dataclass
+  " href="#ropt.plugins.server.base.Task">Task</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a>, <a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.EvaluatorTaskResult
+
+
+  
+      dataclass
+  " href="#ropt.plugins.server.base.EvaluatorTaskResult">EvaluatorTaskResult</a>]</code></p>
+
+
+
+        <p>An asynchronous task to be executed by a worker.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.server.base.EvaluatorTask.run" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">float</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Run the task.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The result of the evaluation.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
 
     </div>
 
@@ -2394,7 +3233,7 @@ objectives.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../event_handler/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Event Handlers">
+          <a href="../evaluator/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Evaluators">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -2404,20 +3243,20 @@ objectives.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Event Handlers
+                Evaluators
               </div>
             </div>
           </a>
         
         
           
-          <a href="../server/" class="md-footer__link md-footer__link--next" aria-label="Next: Servers">
+          <a href="../../optimizer/optimizer/" class="md-footer__link md-footer__link--next" aria-label="Next: Optimizers">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Servers
+                Optimizers
               </div>
             </div>
             <div class="md-footer__button md-icon">
