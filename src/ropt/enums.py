@@ -136,6 +136,9 @@ class ExitCode(IntEnum):
     ENSEMBLE_EVALUATOR_FINISHED = 7
     """Returned when an evaluation step terminates normally."""
 
+    ABORT_FROM_ERROR = 8
+    """Returned when the step is aborted due to an error in another thread."""
+
 
 class AxisName(StrEnum):
     """Enumerates the semantic meaning of axes in data arrays.

@@ -28,7 +28,7 @@ def create_evaluator(method: str, **kwargs: Any) -> Evaluator:  # noqa: ANN401
     return evaluator
 
 
-def create_server(method: str, **kwargs: Any) -> Server[Any]:  # noqa: ANN401
+def create_server(method: str, **kwargs: Any) -> Server:  # noqa: ANN401
     """Create a new server.
 
     Args:

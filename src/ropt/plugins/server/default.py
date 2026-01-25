@@ -2,23 +2,23 @@
 
 **Supported Components:**
 
-  - `function_server`: Server that forwards calculations to an evaluation function.
-    ([`DefaultFunctionEvaluatorServer`][ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer])
+  - `async_server`: Server that forwards calculations to an evaluation function.
+    ([`DefaultAsyncServer`][ropt.plugins.server._async_server.DefaultAsyncServer])
 """
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Final
 
-from ._function_server import DefaultFunctionEvaluatorServer
+from ._async_server import DefaultAsyncServer
 from .base import ServerPlugin
 
 if TYPE_CHECKING:
     from .base import Server
 
 
-_SERVER_OBJECTS: Final[dict[str, type[Server[Any]]]] = {
-    "function_server": DefaultFunctionEvaluatorServer,
+_SERVER_OBJECTS: Final[dict[str, type[Server]]] = {
+    "async_server": DefaultAsyncServer,
 }
 
 
@@ -30,8 +30,8 @@ class DefaultServerPlugin(ServerPlugin):
 
     **Supported Servers:**
 
-    - `function_server`: Server that forwards calculations to an evaluation function.
-        ([`DefaultFunctionEvaluatorServer`][ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer])
+    - `async_server`: Server that forwards calculations to an evaluation function.
+        ([`DefaultAsyncServer`][ropt.plugins.server._async_server.DefaultAsyncServer])
     """
 
     @classmethod
@@ -39,7 +39,7 @@ class DefaultServerPlugin(ServerPlugin):
         cls,
         name: str,
         **kwargs: Any,  # noqa: ANN401
-    ) -> Server[Any]:
+    ) -> Server:
         """Create a server.
 
         # noqa

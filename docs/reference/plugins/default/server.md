@@ -2,4 +2,4 @@
     options:
         members: False
 
-::: ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer
+::: ropt.plugins.server._async_server.DefaultAsyncServer
