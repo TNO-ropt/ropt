@@ -1244,6 +1244,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.Server.task_group" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        task_group
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.plugins.server.base.Server.start" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2143,6 +2154,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.Server.task_group" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        task_group
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.plugins.server.base.Server.start" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2574,6 +2596,31 @@ the plugin supports multiple evaluator types.</p>
 
 </div>
 
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="ropt.plugins.server.base.Server.task_group" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">task_group</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">task_group</span><span class="p">:</span> <span class="n">TaskGroup</span> <span class="o">|</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the task group used by this server.</p>
+
+    </div>
+
+</div>
+
 
 
 
@@ -2710,42 +2757,6 @@ the plugin supports multiple evaluator types.</p>
         <p>A result from an asynchronous task.</p>
 
 
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.server.base.TaskResult.task_id">task_id</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The unique identifier of the task.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.server.base.TaskResult.result">result</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The result of the task.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
 
 
 
@@ -2816,17 +2827,6 @@ the plugin supports multiple evaluator types.</p>
             <td>
               <div class="doc-md-description">
                 <p>The queue to put the result in.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.server.base.Task.task_id">task_id</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="uuid.UUID" href="https://docs.python.org/3/library/uuid.html#uuid.UUID">UUID</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The unique identifier of the task.</p>
               </div>
             </td>
           </tr>
@@ -2987,12 +2987,43 @@ the plugin supports multiple evaluator types.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="n">maxsize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Initialize the DefaultAsyncEvaluator.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>maxsize</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum size of the task queue.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     </div>
@@ -3054,6 +3085,17 @@ the plugin supports multiple evaluator types.</p>
             <td>
               <div class="doc-md-description">
                 <p>The result of the task.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.server.base.EvaluatorTaskResult.eval_idx">eval_idx</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The index of the evaluation.</p>
               </div>
             </td>
           </tr>
@@ -3121,6 +3163,31 @@ the plugin supports multiple evaluator types.</p>
 
 
         <p>An asynchronous task to be executed by a worker.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.server.base.EvaluatorTask.eval_idx">eval_idx</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The index of the evaluation.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
 
