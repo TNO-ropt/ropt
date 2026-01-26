@@ -1553,28 +1553,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer.loop" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        loop
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer.task_group" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        task_group
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1981,28 +1959,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer.loop" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        loop
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer.task_group" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        task_group
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2154,54 +2110,6 @@ provided by <code>ropt</code>.</p>
 
 
 
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer.loop" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">loop</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">loop</span><span class="p">:</span> <span class="n">AbstractEventLoop</span> <span class="o">|</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Get the asyncio loop used by this server.</p>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer.task_group" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">task_group</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-property"><code>property</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">task_group</span><span class="p">:</span> <span class="n">TaskGroup</span> <span class="o">|</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Get the task group used by this server.</p>
-
-    </div>
-
-</div>
-
 
 
 
@@ -2226,7 +2134,7 @@ provided by <code>ropt</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Initialize the DefaultAsyncEvaluator.</p>
+        <p>Initialize the server.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2337,30 +2245,6 @@ provided by <code>ropt</code>.</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the evaluator is already running or using an
-          external queue.</p>
-              </div>
             </td>
           </tr>
       </tbody>
