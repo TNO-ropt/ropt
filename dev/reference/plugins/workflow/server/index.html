@@ -2418,7 +2418,7 @@ an optimization workflow.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Server</span><span class="p">[</span><span class="n">TaskType</span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Server</span><span class="p">[</span><span class="n">T</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2494,7 +2494,7 @@ the plugin supports multiple evaluator types.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.Server" href="#ropt.plugins.server.base.Server">Server</a>[<span title="ropt.plugins.server.base.TaskType">TaskType</span>]</code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.Server" href="#ropt.plugins.server.base.Server">Server</a>[<span title="ropt.plugins.server.base.T">T</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2531,7 +2531,7 @@ the plugin supports multiple evaluator types.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code>, <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="ropt.plugins.server.base.TaskType">TaskType</span>]</code></p>
+              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code>, <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="ropt.plugins.server.base.T">T</span>]</code></p>
 
 
 
@@ -2592,7 +2592,7 @@ the plugin supports multiple evaluator types.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">task_queue</span><span class="p">:</span> <span class="n">Queue</span><span class="p">[</span><span class="n">TaskType</span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">task_queue</span><span class="p">:</span> <span class="n">Queue</span><span class="p">[</span><span class="n">T</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2834,7 +2834,7 @@ the plugin supports multiple evaluator types.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code>, <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="ropt.plugins.server.base.ResultType">ResultType</span>]</code></p>
+              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code>, <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="ropt.plugins.server.base.R">R</span>]</code></p>
 
 
 
@@ -2854,7 +2854,7 @@ the plugin supports multiple evaluator types.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.server.base.Task.result_queue">result_queue</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" title="queue.Queue" href="https://docs.python.org/3/library/queue.html#queue.Queue">Queue</a>[<span title="ropt.plugins.server.base.ResultType">ResultType</span>]</code>
+                  <code><a class="autorefs autorefs-external" title="queue.Queue" href="https://docs.python.org/3/library/queue.html#queue.Queue">Queue</a>[<span title="ropt.plugins.server.base.R">R</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
