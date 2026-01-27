@@ -1541,19 +1541,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer" class="md-nav__link">
+  <a href="#ropt.plugins.server._async_server.DefaultAsyncServer" class="md-nav__link">
     <span class="md-ellipsis">
       
-        DefaultFunctionEvaluatorServer
+        DefaultAsyncServer
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="DefaultFunctionEvaluatorServer">
+    <nav class="md-nav" aria-label="DefaultAsyncServer">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer.__init__" class="md-nav__link">
+  <a href="#ropt.plugins.server._async_server.DefaultAsyncServer.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -1564,7 +1564,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer.start" class="md-nav__link">
+  <a href="#ropt.plugins.server._async_server.DefaultAsyncServer.start" class="md-nav__link">
     <span class="md-ellipsis">
       
         start
@@ -1575,7 +1575,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer.stop" class="md-nav__link">
+  <a href="#ropt.plugins.server._async_server.DefaultAsyncServer.stop" class="md-nav__link">
     <span class="md-ellipsis">
       
         stop
@@ -1947,19 +1947,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer" class="md-nav__link">
+  <a href="#ropt.plugins.server._async_server.DefaultAsyncServer" class="md-nav__link">
     <span class="md-ellipsis">
       
-        DefaultFunctionEvaluatorServer
+        DefaultAsyncServer
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="DefaultFunctionEvaluatorServer">
+    <nav class="md-nav" aria-label="DefaultAsyncServer">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer.__init__" class="md-nav__link">
+  <a href="#ropt.plugins.server._async_server.DefaultAsyncServer.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -1970,7 +1970,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer.start" class="md-nav__link">
+  <a href="#ropt.plugins.server._async_server.DefaultAsyncServer.start" class="md-nav__link">
     <span class="md-ellipsis">
       
         start
@@ -1981,7 +1981,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer.stop" class="md-nav__link">
+  <a href="#ropt.plugins.server._async_server.DefaultAsyncServer.stop" class="md-nav__link">
     <span class="md-ellipsis">
       
         stop
@@ -2040,8 +2040,8 @@
 provided by <code>ropt</code>.</p>
 <p><strong>Supported Servers:</strong></p>
 <ul>
-<li><code>function_server</code>: Server that forwards calculations to an evaluation function.
-    (<a class="autorefs autorefs-internal" title="            ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer" href="#ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer"><code>DefaultFunctionEvaluatorServer</code></a>)</li>
+<li><code>async_server</code>: Server that forwards calculations to an evaluation function.
+    (<a class="autorefs autorefs-internal" title="            ropt.plugins.server._async_server.DefaultAsyncServer" href="#ropt.plugins.server._async_server.DefaultAsyncServer"><code>DefaultAsyncServer</code></a>)</li>
 </ul>
 
 
@@ -2077,8 +2077,8 @@ provided by <code>ropt</code>.</p>
 
 
 
-<h2 id="ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer</span>
+<h2 id="ropt.plugins.server._async_server.DefaultAsyncServer" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.server._async_server.DefaultAsyncServer</span>
 
 
 </h2>
@@ -2086,11 +2086,11 @@ provided by <code>ropt</code>.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.EvaluatorServer" href="../../workflow/server/#ropt.plugins.server.base.EvaluatorServer">EvaluatorServer</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.ServerBase" href="../../workflow/server/#ropt.plugins.server.base.ServerBase">ServerBase</a></code></p>
 
 
 
-        <p>An evaluator server that calls an awaitable function.</p>
+        <p>An evaluator server that employs asynchronous workers.</p>
 
 
 
@@ -2116,7 +2116,7 @@ provided by <code>ropt</code>.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer.__init__" class="doc doc-heading">
+<h3 id="ropt.plugins.server._async_server.DefaultAsyncServer.__init__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
 
@@ -2183,7 +2183,7 @@ provided by <code>ropt</code>.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer.start" class="doc doc-heading">
+<h3 id="ropt.plugins.server._async_server.DefaultAsyncServer.start" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">start</span>
 
 
@@ -2193,7 +2193,7 @@ provided by <code>ropt</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Start the evaluation server.</p>
+        <p>Start the server.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2234,7 +2234,7 @@ provided by <code>ropt</code>.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plugins.server._function_server.DefaultFunctionEvaluatorServer.stop" class="doc doc-heading">
+<h3 id="ropt.plugins.server._async_server.DefaultAsyncServer.stop" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">stop</span>
 
 
