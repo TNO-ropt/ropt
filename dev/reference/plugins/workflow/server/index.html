@@ -1276,6 +1276,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.Server.is_running" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        is_running
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1392,6 +1403,28 @@
     <span class="md-ellipsis">
       
         start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.ServerBase.cancel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cancel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.ServerBase.is_running" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        is_running
       
     </span>
   </a>
@@ -2191,6 +2224,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.Server.is_running" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        is_running
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2307,6 +2351,28 @@
     <span class="md-ellipsis">
       
         start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.ServerBase.cancel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cancel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.ServerBase.is_running" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        is_running
       
     </span>
   </a>
@@ -2552,6 +2618,13 @@ the plugin supports multiple evaluator types.</p>
       property
   " href="#ropt.plugins.server.base.Server.task_group"><code>task_group</code></a>: The asyncio.Taskgroup
   used by this server.</li>
+<li><a class="autorefs autorefs-internal" title="            is_running
+
+
+  
+      abstractmethod
+  " href="#ropt.plugins.server.base.Server.is_running"><code>is_running</code></a>: Checks if the
+  server is running.</li>
 </ul>
 
 
@@ -2747,6 +2820,53 @@ the plugin supports multiple evaluator types.</p>
     <div class="doc doc-contents ">
 
         <p>Stop the evaluation server.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.server.base.Server.is_running" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">is_running</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">is_running</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Check if the server is not running.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True if the server is not running.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     </div>
@@ -3178,6 +3298,69 @@ overloaded function.</p>
               <div class="doc-md-description">
                 <p>If the evaluator is already running or using an
           external queue.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.server.base.ServerBase.cancel" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">cancel</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">cancel</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Stop the evaluation server.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.server.base.ServerBase.is_running" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">is_running</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">is_running</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Check if the server is not running.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>True if the server is not running.</p>
               </div>
             </td>
           </tr>
