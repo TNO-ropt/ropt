@@ -1266,10 +1266,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server.base.Server.stop" class="md-nav__link">
+  <a href="#ropt.plugins.server.base.Server.cancel" class="md-nav__link">
     <span class="md-ellipsis">
       
-        stop
+        cancel
       
     </span>
   </a>
@@ -2192,10 +2192,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server.base.Server.stop" class="md-nav__link">
+  <a href="#ropt.plugins.server.base.Server.cancel" class="md-nav__link">
     <span class="md-ellipsis">
       
-        stop
+        cancel
       
     </span>
   </a>
@@ -2544,12 +2544,12 @@ the plugin supports multiple evaluator types.</p>
   
       abstractmethod
   " href="#ropt.plugins.server.base.Server.start"><code>start</code></a>: Starts the server.</li>
-<li><a class="autorefs autorefs-internal" title="            stop
+<li><a class="autorefs autorefs-internal" title="            cancel
 
 
   
       abstractmethod
-  " href="#ropt.plugins.server.base.Server.stop"><code>stop</code></a>: Stops the server.</li>
+  " href="#ropt.plugins.server.base.Server.cancel"><code>cancel</code></a>: Stops the server.</li>
 <li><a class="autorefs autorefs-internal" title="            task_queue
 
 
@@ -2558,6 +2558,22 @@ the plugin supports multiple evaluator types.</p>
       property
   " href="#ropt.plugins.server.base.Server.task_queue"><code>task_queue</code></a>: Retrieves the
   servers task queue.</li>
+<li><a class="autorefs autorefs-internal" title="            loop
+
+
+  
+      abstractmethod
+      property
+  " href="#ropt.plugins.server.base.Server.loop"><code>loop</code></a>: Retrieves the
+  currently running asyncio loop.</li>
+<li><a class="autorefs autorefs-internal" title="            task_group
+
+
+  
+      abstractmethod
+      property
+  " href="#ropt.plugins.server.base.Server.task_group"><code>task_group</code></a>: The asyncio.Taskgroup
+  used by this server.</li>
 </ul>
 
 
@@ -2738,8 +2754,8 @@ the plugin supports multiple evaluator types.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plugins.server.base.Server.stop" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">stop</span>
+<h3 id="ropt.plugins.server.base.Server.cancel" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">cancel</span>
 
 
   <span class="doc doc-labels">
@@ -2747,7 +2763,7 @@ the plugin supports multiple evaluator types.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">stop</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">cancel</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
