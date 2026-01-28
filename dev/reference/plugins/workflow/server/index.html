@@ -1305,10 +1305,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server.base.Task.run" class="md-nav__link">
+  <a href="#ropt.plugins.server.base.Task.put_result" class="md-nav__link">
     <span class="md-ellipsis">
       
-        run
+        put_result
       
     </span>
   </a>
@@ -1389,28 +1389,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.server.base.TaskResultBase" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        TaskResultBase
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.server.base.TaskBase" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        TaskBase
-      
-    </span>
-  </a>
   
 </li>
       
@@ -2231,10 +2209,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server.base.Task.run" class="md-nav__link">
+  <a href="#ropt.plugins.server.base.Task.put_result" class="md-nav__link">
     <span class="md-ellipsis">
       
-        run
+        put_result
       
     </span>
   </a>
@@ -2318,28 +2296,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.server.base.TaskResultBase" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        TaskResultBase
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.server.base.TaskBase" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        TaskBase
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -2418,7 +2374,7 @@ an optimization workflow.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Server</span><span class="p">[</span><span class="n">T</span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Server</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2494,7 +2450,7 @@ the plugin supports multiple evaluator types.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.Server" href="#ropt.plugins.server.base.Server">Server</a>[<span title="ropt.plugins.server.base.T">T</span>]</code>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.Server" href="#ropt.plugins.server.base.Server">Server</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2531,7 +2487,7 @@ the plugin supports multiple evaluator types.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code>, <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="ropt.plugins.server.base.T">T</span>]</code></p>
+              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
 
 
 
@@ -2608,7 +2564,7 @@ the plugin supports multiple evaluator types.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">task_queue</span><span class="p">:</span> <span class="n">Queue</span><span class="p">[</span><span class="n">T</span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">task_queue</span><span class="p">:</span> <span class="n">Queue</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2802,7 +2758,7 @@ the plugin supports multiple evaluator types.</p>
 
 
 
-        <p>A result from an asynchronous task.</p>
+        <p>A result from a task.</p>
 
 
 
@@ -2850,11 +2806,11 @@ the plugin supports multiple evaluator types.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code>, <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="ropt.plugins.server.base.R">R</span>]</code></p>
+              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code>, <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="ropt.plugins.server.base.R">R</span>, <span title="ropt.plugins.server.base.TR">TR</span>]</code></p>
 
 
 
-        <p>An asynchronous task to be executed by a worker.</p>
+        <p>A task to be executed by a worker.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -2868,9 +2824,20 @@ the plugin supports multiple evaluator types.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.server.base.Task.function">function</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[], <span title="ropt.plugins.server.base.R">R</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The function to execute.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.server.base.Task.result_queue">result_queue</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" title="queue.Queue" href="https://docs.python.org/3/library/queue.html#queue.Queue">Queue</a>[<span title="ropt.plugins.server.base.R">R</span>]</code>
+                  <code><a class="autorefs autorefs-external" title="queue.Queue" href="https://docs.python.org/3/library/queue.html#queue.Queue">Queue</a>[<span title="ropt.plugins.server.base.TR">TR</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2905,8 +2872,8 @@ the plugin supports multiple evaluator types.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plugins.server.base.Task.run" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">run</span>
+<h3 id="ropt.plugins.server.base.Task.put_result" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">put_result</span>
 
 
   <span class="doc doc-labels">
@@ -2914,35 +2881,12 @@ the plugin supports multiple evaluator types.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">put_result</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">R</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Run the task.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code>None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The result of the task.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+        <p>Put the result in the result queue.</p>
 
 
     </div>
@@ -2970,12 +2914,7 @@ the plugin supports multiple evaluator types.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.Server" href="#ropt.plugins.server.base.Server">Server</a>[<a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.TaskBase
-
-
-  
-      module-attribute
-  " href="#ropt.plugins.server.base.TaskBase">TaskBase</a>]</code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.Server" href="#ropt.plugins.server.base.Server">Server</a></code>, <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="ropt.plugins.server.base.T">T</span>]</code></p>
 
 
 
@@ -3060,7 +2999,7 @@ the plugin supports multiple evaluator types.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">task_queue</span><span class="p">:</span> <span class="n">Queue</span><span class="p">[</span><span class="n">TaskBase</span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">task_queue</span><span class="p">:</span> <span class="n">Queue</span><span class="p">[</span><span class="n">T</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3207,50 +3146,6 @@ overloaded function.</p>
 
 
   </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h2 id="ropt.plugins.server.base.TaskResultBase" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ropt.plugins.server.base.TaskResultBase</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
-  </span>
-
-</h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">TaskResultBase</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">TaskResult</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents first">
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h2 id="ropt.plugins.server.base.TaskBase" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">ropt.plugins.server.base.TaskBase</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
-  </span>
-
-</h2>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">TaskBase</span><span class="p">:</span> <span class="n">TypeAlias</span> <span class="o">=</span> <span class="n">Task</span><span class="p">[</span><span class="n">TaskResult</span><span class="p">]</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents first">
 
     </div>
 
