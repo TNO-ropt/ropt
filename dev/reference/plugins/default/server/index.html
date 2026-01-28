@@ -1590,6 +1590,56 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultMultiprocessingServer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DefaultMultiprocessingServer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer.start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer.cancel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cancel
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1996,6 +2046,56 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DefaultMultiprocessingServer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DefaultMultiprocessingServer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer.start" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        start
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer.cancel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cancel
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2042,6 +2142,8 @@ provided by <code>ropt</code>.</p>
 <ul>
 <li><code>async_server</code>: Server that forwards calculations to an evaluation function.
     (<a class="autorefs autorefs-internal" title="            ropt.plugins.server._async_server.DefaultAsyncServer" href="#ropt.plugins.server._async_server.DefaultAsyncServer"><code>DefaultAsyncServer</code></a>)</li>
+<li><code>multiprocessing_server</code>: Server that forwards calculations to a a pool of multiprocessing workers.
+   (<a class="autorefs autorefs-internal" title="            ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer" href="#ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer"><code>DefaultMultiprocessingEvaluatorServer</code></a>)</li>
 </ul>
 
 
@@ -2240,6 +2342,197 @@ provided by <code>ropt</code>.</p>
 
 
 <h3 id="ropt.plugins.server._async_server.DefaultAsyncServer.cancel" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">cancel</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">cancel</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Stop the server.</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer</span>
+
+
+</h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.ServerBase" href="../../workflow/server/#ropt.plugins.server.base.ServerBase">ServerBase</a>[<a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.Task
+
+
+  
+      dataclass
+  " href="../../workflow/server/#ropt.plugins.server.base.Task">Task</a>[<span title="ropt.plugins.server._multiprocessing_server.R">R</span>, <span title="ropt.plugins.server._multiprocessing_server.TR">TR</span>]]</code></p>
+
+
+
+        <p>An evaluator server that employs a pool of multiprocessing workers.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer.__init__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">maxsize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Initialize the server.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>workers</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The number of workers to use.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>maxsize</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum size of the tasks queue.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer.start" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">start</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">start</span><span class="p">(</span><span class="n">task_group</span><span class="p">:</span> <span class="n">TaskGroup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Start the server.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>task_group</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="asyncio.TaskGroup" href="https://docs.python.org/3/library/asyncio-task.html#asyncio.TaskGroup">TaskGroup</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The task group to use.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer.cancel" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">cancel</span>
 
 
