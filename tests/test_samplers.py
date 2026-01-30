@@ -9,7 +9,7 @@ from numpy.random import Generator, default_rng
 
 from ropt.config import EnOptConfig
 from ropt.ensemble_evaluator._gradient import _perturb_variables
-from ropt.plugins.sampler.base import Sampler, SamplerPlugin
+from ropt.plugins.sampler.base import Sampler
 from ropt.workflow import BasicOptimizer
 
 if TYPE_CHECKING:
@@ -86,22 +86,6 @@ class MockedSampler(Sampler):
             diag = np.diag(samples[idx, ...])
             samples[idx, ...] = np.diag(diag)
         return samples
-
-
-class MockedSamplerPlugin(SamplerPlugin):
-    @classmethod
-    def create(
-        cls,
-        enopt_config: EnOptConfig,
-        sampler_index: int,
-        mask: NDArray[np.bool_] | None,
-        rng: Generator,
-    ) -> MockedSampler:
-        return MockedSampler(enopt_config, sampler_index, mask, rng)
-
-    @classmethod
-    def is_supported(cls, method: str) -> bool:
-        return method.lower() == "test"
 
 
 def test_sampler_simple(enopt_config: Any) -> None:
