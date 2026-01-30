@@ -1399,10 +1399,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server.base.ServerBase.start" class="md-nav__link">
+  <a href="#ropt.plugins.server.base.ServerBase.cancel" class="md-nav__link">
     <span class="md-ellipsis">
       
-        start
+        cancel
       
     </span>
   </a>
@@ -1410,10 +1410,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server.base.ServerBase.cancel" class="md-nav__link">
+  <a href="#ropt.plugins.server.base.ServerBase.cleanup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        cancel
+        cleanup
       
     </span>
   </a>
@@ -2347,10 +2347,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server.base.ServerBase.start" class="md-nav__link">
+  <a href="#ropt.plugins.server.base.ServerBase.cancel" class="md-nav__link">
     <span class="md-ellipsis">
       
-        start
+        cancel
       
     </span>
   </a>
@@ -2358,10 +2358,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server.base.ServerBase.cancel" class="md-nav__link">
+  <a href="#ropt.plugins.server.base.ServerBase.cleanup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        cancel
+        cleanup
       
     </span>
   </a>
@@ -2587,6 +2587,7 @@ the plugin supports multiple evaluator types.</p>
 
   
       abstractmethod
+      async
   " href="#ropt.plugins.server.base.Server.start"><code>start</code></a>: Starts the server.</li>
 <li><a class="autorefs autorefs-internal" title="            cancel
 
@@ -2732,6 +2733,7 @@ the plugin supports multiple evaluator types.</p>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
   </span>
 
 </h3>
@@ -3233,85 +3235,6 @@ the plugin supports multiple evaluator types.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plugins.server.base.ServerBase.start" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">start</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">start</span><span class="p">(</span><span class="n">task_group</span><span class="p">:</span> <span class="n">TaskGroup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Start the evaluation server.</p>
-<p>This method should be overload to implement starting the server. To
-populate the loop and task_group properties, and to implement a check
-that the server is not already running, this method can be called in the
-overloaded function.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>task_group</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="asyncio.TaskGroup" href="https://docs.python.org/3/library/asyncio-task.html#asyncio.TaskGroup">TaskGroup</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The task group to use.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>If the evaluator is already running or using an
-          external queue.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
 <h3 id="ropt.plugins.server.base.ServerBase.cancel" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">cancel</span>
 
@@ -3323,6 +3246,30 @@ overloaded function.</p>
     <div class="doc doc-contents ">
 
         <p>Stop the evaluation server.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.server.base.ServerBase.cleanup" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">cleanup</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">cleanup</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Cleanup the server.</p>
 
 
     </div>
