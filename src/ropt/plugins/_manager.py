@@ -118,12 +118,39 @@ class PluginManager:
         self._plugins: dict[PluginType, dict[str, type[Plugin]]] = {}
 
     def _init(self) -> None:
+        # ruff: disable[I001,PLC0415]
         if self._plugins:
             return
+
+        from .optimizer.scipy import SciPyOptimizerPlugin
+        from .optimizer.external import ExternalOptimizerPlugin
+        from .sampler.scipy import SciPySamplerPlugin
+        from .realization_filter.default import DefaultRealizationFilterPlugin
+        from .function_estimator.default import DefaultFunctionEstimatorPlugin
+        from .compute_step.default import DefaultComputeStepPlugin
+        from .event_handler.default import DefaultEventHandlerPlugin
+        from .evaluator.default import DefaultEvaluatorPlugin
+        from .server.default import DefaultServerPlugin
+
+        self._add_plugin("optimizer", "scipy", SciPyOptimizerPlugin)
+        self._add_plugin("optimizer", "external", ExternalOptimizerPlugin)
+        self._add_plugin("sampler", "scipy", SciPySamplerPlugin)
+        self._add_plugin(
+            "realization_filter", "default", DefaultRealizationFilterPlugin
+        )
+        self._add_plugin(
+            "function_estimator", "default", DefaultFunctionEstimatorPlugin
+        )
+        self._add_plugin("compute_step", "default", DefaultComputeStepPlugin)
+        self._add_plugin("event_handler", "default", DefaultEventHandlerPlugin)
+        self._add_plugin("evaluator", "default", DefaultEvaluatorPlugin)
+        self._add_plugin("server", "default", DefaultServerPlugin)
+
         for plugin_type in _PLUGIN_TYPES:
             for name, plugin in _from_entry_points(plugin_type).items():
                 assert plugin_type in _PLUGIN_TYPES
                 self._add_plugin(cast("PluginType", plugin_type), name, plugin)
+        # ruff: enable[I001,PLC0415]
 
     def _add_plugin(
         self,
