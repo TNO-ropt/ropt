@@ -51,6 +51,7 @@ def enopt_config_fixture() -> dict[str, Any]:
 def _function(
     variables: NDArray[np.float64],
     realization: int,
+    perturbation: int,  # noqa: ARG001
     test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
     *,
     raise_error: bool = False,

@@ -31,7 +31,7 @@ class DefaultAsyncEvaluator(Evaluator):
     def __init__(
         self,
         *,
-        function: Callable[[NDArray[np.float64], int], float],
+        function: Callable[[NDArray[np.float64], int, int], float],
         server: ServerBase[Task[float, _TaskResult]],
         maxsize: int = 0,
     ) -> None:
@@ -110,11 +110,16 @@ class DefaultAsyncEvaluator(Evaluator):
             for eval_idx, realization in enumerate(context.realizations):
                 if not self._server.is_running():
                     break
+                perturbation = (
+                    -1
+                    if context.perturbations is None
+                    else int(context.perturbations[eval_idx])
+                )
                 if context.active is None or context.active[eval_idx]:
                     task = _Task(
                         result_queue=results_queue,
                         function=self._function,
-                        args=(variables[eval_idx, :], int(realization)),
+                        args=(variables[eval_idx, :], int(realization), perturbation),
                         eval_idx=eval_idx,
                     )
                     await self._server.task_queue.put(task)

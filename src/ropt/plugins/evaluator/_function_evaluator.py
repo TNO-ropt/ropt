@@ -26,7 +26,7 @@ class DefaultFunctionEvaluator(Evaluator):
     def __init__(
         self,
         *,
-        function: Callable[[NDArray[np.float64], int], float],
+        function: Callable[[NDArray[np.float64], int, int], float],
     ) -> None:
         """Initialize the DefaultFunctionEvaluator.
 
@@ -56,9 +56,14 @@ class DefaultFunctionEvaluator(Evaluator):
         )
         results = np.zeros((variables.shape[0], no + nc), dtype=np.float64)
         for eval_idx, realization in enumerate(context.realizations):
+            perturbation = (
+                -1
+                if context.perturbations is None
+                else int(context.perturbations[eval_idx])
+            )
             if context.active is None or context.active[eval_idx]:
                 results[eval_idx] = self._function(
-                    variables[eval_idx, :], int(realization)
+                    variables[eval_idx, :], int(realization), perturbation
                 )
         return EvaluatorResult(
             objectives=results[:, :no],
