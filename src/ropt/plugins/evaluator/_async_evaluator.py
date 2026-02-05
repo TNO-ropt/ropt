@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import queue
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 import numpy as np
+from numpy.typing import NDArray
 
 from ropt.enums import ExitCode
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
@@ -17,8 +18,6 @@ from .base import Evaluator
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-
-    from numpy.typing import NDArray
 
 
 class DefaultAsyncEvaluator(Evaluator):
@@ -31,8 +30,8 @@ class DefaultAsyncEvaluator(Evaluator):
     def __init__(
         self,
         *,
-        function: Callable[[NDArray[np.float64], int, int], float],
-        server: ServerBase[Task[float, _TaskResult]],
+        function: Callable[[NDArray[np.float64], int, int], NDArray[np.float64]],
+        server: ServerBase[Task[NDArray[np.float64], _TaskResult]],
         maxsize: int = 0,
     ) -> None:
         """Initialize the DefaultFunctionEvaluator.
@@ -124,7 +123,7 @@ class DefaultAsyncEvaluator(Evaluator):
                     )
                     await self._server.task_queue.put(task)
         except Exception as exc:  # noqa: BLE001
-            results_queue.put(_TaskResult(value=0.0, eval_idx=eval_idx, exception=exc))
+            results_queue.put(_TaskResult(eval_idx=eval_idx, exception=exc))
 
         if not self._server.is_running():
             raise ComputeStepAborted(ExitCode.ABORT_FROM_ERROR)
@@ -132,16 +131,16 @@ class DefaultAsyncEvaluator(Evaluator):
 
 @dataclass(frozen=True, kw_only=True)
 class _TaskResult(TaskResult):
-    value: float = 0.0
+    value: NDArray[np.float64] = field(default_factory=lambda: np.array(0.0))
     eval_idx: int
     exception: Exception | None = None
 
 
 @dataclass(frozen=True, kw_only=True)
-class _Task(Task[float, _TaskResult]):
+class _Task(Task[NDArray[np.float64], _TaskResult]):
     eval_idx: int
 
-    def put_result(self, result: float | Exception) -> None:
+    def put_result(self, result: NDArray[np.float64] | Exception) -> None:
         if isinstance(result, Exception):
             self.result_queue.put(_TaskResult(eval_idx=self.eval_idx, exception=result))
         else:
