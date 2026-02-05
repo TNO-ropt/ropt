@@ -48,14 +48,14 @@ class RemoteAdapter(Protocol, Generic[R, TR]):
     def poll(self) -> dict[UUID, RemoteTaskState]:
         """Poll the server for task state changes."""
 
-    def get_result(self, task_id: UUID) -> R:
+    def get_result(self, task_id: UUID) -> R | Exception:
         """Get the result of a task.
 
         Args:
             task_id: The id of the task to get the result of.
 
         Returns:
-            The result of the task.
+            The result of the task, or an except that may have been raised.
         """
 
 
@@ -98,9 +98,14 @@ class DefaultRemoteServer(ServerBase[Task[R, TR]]):
         while self._running.is_set():
             remove = []
             for task_id, (task, state) in self._tasks.items():
-                if state in {"done", "error"}:
-                    task.put_result(self._remote.get_result(task_id))
-                    remove.append(task_id)
+                result = self._remote.get_result(task_id)
+                if state == "done":
+                    assert not isinstance(result, Exception)
+                    task.put_result(result)
+                if state == "error":
+                    assert isinstance(result, Exception)
+                    task.put_exception(result)
+                remove.append(task_id)
             for task_id in remove:
                 self._tasks.pop(task_id)
             if len(self._tasks) < self._workers:

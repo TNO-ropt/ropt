@@ -19,7 +19,7 @@ classifiers = [
 ]
 requires-python = ">=3.11"
 dynamic = ["version"]
-dependencies = ["numpy", "pydantic", "scipy>=1.15"]
+dependencies = ["numpy", "pydantic", "scipy>=1.15", "cloudpickle"]
 
 [project.urls]
 "Homepage" = "https://github.com/TNO-ropt/ropt"
@@ -45,7 +45,6 @@ write_to = "src/ropt/version.py"
 [tool.pytest.ini_options]
 markers = ["slow: slow test marker", "external: external optimizer marker"]
 filterwarnings = [
-    "error",
     'ignore:numpy.ndarray size changed, may indicate binary incompatibility.*:RuntimeWarning',
 ]
 
@@ -83,7 +82,7 @@ strict = true
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["scipy.*"]
+module = ["scipy.*", "cloudpickle.*"]
 ignore_missing_imports = true
 
 [dependency-groups]

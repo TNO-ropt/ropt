@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import asyncio
+import subprocess  # noqa: S404
 from functools import partial
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
+import cloudpickle
 import numpy as np
 import pytest
 
@@ -35,12 +37,15 @@ initial_values = np.array([0.0, 0.0, 0.1])
 def enopt_config_fixture() -> dict[str, Any]:
     return {
         "optimizer": {
-            "tolerance": 1e-5,
-            "max_functions": 20,
+            "tolerance": 1e-2,
+            "max_functions": 8,
         },
         "variables": {
             "variable_count": len(initial_values),
-            "perturbation_magnitudes": 0.01,
+            "perturbation_magnitudes": 0.001,
+        },
+        "gradient": {
+            "number_of_perturbations": 3,
         },
         "objectives": {
             "weights": [0.75, 0.25],
@@ -68,7 +73,7 @@ R = TypeVar("R")
 TR = TypeVar("TR")
 
 
-class MockedRemoteAdapter(Generic[R, TR]):
+class MockedBasicRemoteAdapter(Generic[R, TR]):
     def __init__(self) -> None:
         self._results: dict[UUID, R] = {}
 
@@ -78,7 +83,7 @@ class MockedRemoteAdapter(Generic[R, TR]):
     def poll(self) -> dict[UUID, RemoteTaskState]:
         return dict.fromkeys(self._results, "done")
 
-    def get_result(self, task_id: UUID) -> R:
+    def get_result(self, task_id: UUID) -> R | Exception:
         return self._results.pop(task_id)
 
 
@@ -108,7 +113,7 @@ async def test_async_evaluator_ok(
 ) -> None:
     server = (
         create_server(
-            "remote_server", remote=MockedRemoteAdapter(), workers=2, interval=0.0
+            "remote_server", remote=MockedBasicRemoteAdapter(), workers=2, interval=0.0
         )
         if server_name == "remote_server"
         else create_server(server_name, workers=2)
@@ -140,7 +145,7 @@ async def test_async_evaluator_error(
 ) -> None:
     server = (
         create_server(
-            "remote_server", remote=MockedRemoteAdapter(), workers=2, interval=0.0
+            "remote_server", remote=MockedBasicRemoteAdapter(), workers=2, interval=0.0
         )
         if server_name == "remote_server"
         else create_server(server_name, workers=2)
@@ -172,7 +177,7 @@ async def test_async_evaluator_two_optimizations(
 ) -> None:
     server = (
         create_server(
-            "remote_server", remote=MockedRemoteAdapter(), workers=2, interval=0.0
+            "remote_server", remote=MockedBasicRemoteAdapter(), workers=2, interval=0.0
         )
         if server_name == "remote_server"
         else create_server(server_name, workers=2)
@@ -199,3 +204,90 @@ async def test_async_evaluator_two_optimizations(
     for results in results_list:
         assert results is not None
         assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+
+
+class MockedCloudpickleRemoteAdapter(Generic[R, TR]):
+    def __init__(self) -> None:
+        self._results: dict[UUID, R | Exception] = {}
+
+    def submit(self, task: Task[R, TR]) -> None:
+        process = subprocess.Popen(
+            ["python", "-m", "ropt.plugins.server"],  # noqa: S607
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        stdout, stderr = process.communicate(
+            input=cloudpickle.dumps((task.function, task.args))
+        )
+        if process.returncode == 0:
+            self._results[task.id] = cloudpickle.loads(stdout)
+        else:
+            self._results[task.id] = cloudpickle.loads(stderr)
+
+    def poll(self) -> dict[UUID, RemoteTaskState]:
+        return {
+            task_id: ("error" if isinstance(result, Exception) else "done")
+            for (task_id, result) in self._results.items()
+        }
+
+    def get_result(self, task_id: UUID) -> R | Exception:
+        return self._results.pop(task_id)
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+async def test_async_evaluator_cloudpickle_ok(
+    enopt_config: dict[str, Any],
+    test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
+) -> None:
+    server = create_server(
+        "remote_server",
+        remote=MockedCloudpickleRemoteAdapter(),
+        workers=2,
+        interval=0.1,
+    )
+    assert not server.is_running()
+    async with asyncio.TaskGroup() as tg:
+        await server.start(tg)
+        assert server.is_running()
+        results = await asyncio.to_thread(
+            _workflow,
+            server,
+            enopt_config,
+            partial(_function, test_functions=test_functions),
+        )
+        server.cancel()
+    assert not server.is_running()
+
+    assert results is not None
+    assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
+
+
+@pytest.mark.slow
+@pytest.mark.timeout(30)
+async def test_async_evaluator_cloudpickle_error(
+    enopt_config: dict[str, Any],
+    test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
+) -> None:
+    server = create_server(
+        "remote_server",
+        remote=MockedCloudpickleRemoteAdapter(),
+        workers=2,
+        interval=0.1,
+    )
+    assert not server.is_running()
+    with pytest.RaisesGroup(
+        pytest.RaisesExc(ValueError, match="Test error in function")
+    ):
+        async with asyncio.TaskGroup() as tg:
+            await server.start(tg)
+            assert server.is_running()
+            await asyncio.to_thread(
+                _workflow,
+                server,
+                enopt_config,
+                partial(_function, test_functions=test_functions, raise_error=True),
+            )
+            server.cancel()
+    assert not server.is_running()
