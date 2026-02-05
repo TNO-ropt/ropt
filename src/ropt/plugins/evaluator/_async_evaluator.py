@@ -141,8 +141,8 @@ class _TaskResult(TaskResult):
 class _Task(Task[float, _TaskResult]):
     eval_idx: int
 
-    def put_result(self, result: float) -> None:
-        self.result_queue.put(_TaskResult(value=result, eval_idx=self.eval_idx))
-
-    def put_exception(self, exc: Exception) -> None:
-        self.result_queue.put(_TaskResult(eval_idx=self.eval_idx, exception=exc))
+    def put_result(self, result: float | Exception) -> None:
+        if isinstance(result, Exception):
+            self.result_queue.put(_TaskResult(eval_idx=self.eval_idx, exception=result))
+        else:
+            self.result_queue.put(_TaskResult(value=result, eval_idx=self.eval_idx))

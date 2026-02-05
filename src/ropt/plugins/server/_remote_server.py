@@ -104,7 +104,7 @@ class DefaultRemoteServer(ServerBase[Task[R, TR]]):
                     task.put_result(result)
                 if state == "error":
                     assert isinstance(result, Exception)
-                    task.put_exception(result)
+                    task.put_result(result)
                 remove.append(task_id)
             for task_id in remove:
                 self._tasks.pop(task_id)
@@ -131,5 +131,5 @@ class DefaultRemoteServer(ServerBase[Task[R, TR]]):
         for task, _ in self._tasks.values():
             if task.result_queue not in queues:
                 queues.add(task.result_queue)
-                task.put_exception(ComputeStepAborted(ExitCode.ABORT_FROM_ERROR))
+                task.put_result(ComputeStepAborted(ExitCode.ABORT_FROM_ERROR))
         self._drain_and_kill(ComputeStepAborted(ExitCode.ABORT_FROM_ERROR))

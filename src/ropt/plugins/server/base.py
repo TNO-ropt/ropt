@@ -197,7 +197,7 @@ class ServerBase(Server, Generic[T]):
                 task = self._task_queue.get_nowait()
                 if task.result_queue not in queues:
                     queues.add(task.result_queue)
-                    task.put_exception(exc)
+                    task.put_result(exc)
                 self._task_queue.task_done()
             except asyncio.QueueEmpty:
                 break
@@ -225,12 +225,8 @@ class Task(ABC, Generic[R, TR]):
     result_queue: queue.Queue[TR]
 
     @abstractmethod
-    def put_result(self, result: R) -> None:
+    def put_result(self, result: R | Exception) -> None:
         """Put the result in the result queue."""
-
-    @abstractmethod
-    def put_exception(self, exc: Exception) -> None:
-        """Put an exception in the result queue."""
 
 
 RemoteTaskState: TypeAlias = Literal["pending", "running", "done", "error"]

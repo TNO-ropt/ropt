@@ -82,7 +82,7 @@ class _Worker:
                 )
                 task.put_result(result)
             except Exception:
-                task.put_exception(ComputeStepAborted(ExitCode.ABORT_FROM_ERROR))
+                task.put_result(ComputeStepAborted(ExitCode.ABORT_FROM_ERROR))
                 self._server.cancel()
                 raise
             finally:
