@@ -5,7 +5,6 @@ import subprocess  # noqa: S404
 from functools import partial
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-import cloudpickle
 import numpy as np
 import pytest
 
@@ -26,6 +25,12 @@ if TYPE_CHECKING:
     from ropt.plugins.server.base import RemoteTaskState, Server, Task
     from ropt.results import FunctionResults
 
+try:
+    import cloudpickle
+
+    HAS_CLOUDPICKLE = True
+except ImportError:
+    HAS_CLOUDPICKLE = False
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.timeout(1)]
 
@@ -206,46 +211,49 @@ async def test_async_evaluator_two_optimizations(
         assert np.allclose(results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
-class MockedCloudpickleRemoteAdapter(Generic[R, TR]):
-    def __init__(self) -> None:
-        self._results: dict[UUID, R | Exception] = {}
-        self._processes: dict[UUID, subprocess.Popen[bytes]] = {}
+if HAS_CLOUDPICKLE:
 
-    def submit(self, task: Task[R, TR]) -> None:
-        process = subprocess.Popen(
-            ["python", "-m", "ropt.plugins.server"],  # noqa: S607
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        self._processes[task.id] = process
-        assert process.stdin is not None
-        process.stdin.write(cloudpickle.dumps((task.function, task.args)))
-        process.stdin.close()
+    class MockedCloudpickleRemoteAdapter(Generic[R, TR]):
+        def __init__(self) -> None:
+            self._results: dict[UUID, R | Exception] = {}
+            self._processes: dict[UUID, subprocess.Popen[bytes]] = {}
 
-    def poll(self) -> dict[UUID, RemoteTaskState]:
-        remove = []
-        for task_id, process in self._processes.items():
-            if process.poll() is not None:
-                stdout = process.stdout
-                assert stdout is not None
-                self._results[task_id] = cloudpickle.loads(stdout.read())
-                remove.append(task_id)
-        for task_id in remove:
-            self._processes.pop(task_id)
-        states: dict[UUID, RemoteTaskState] = {
-            task_id: ("error" if isinstance(result, Exception) else "done")
-            for (task_id, result) in self._results.items()
-        }
-        states.update(dict.fromkeys(self._processes, "running"))
-        return states
+        def submit(self, task: Task[R, TR]) -> None:
+            process = subprocess.Popen(
+                ["python", "-m", "ropt.plugins.server"],  # noqa: S607
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            self._processes[task.id] = process
+            assert process.stdin is not None
+            process.stdin.write(cloudpickle.dumps((task.function, task.args)))
+            process.stdin.close()
 
-    def get_result(self, task_id: UUID) -> R | Exception:
-        return self._results.pop(task_id)
+        def poll(self) -> dict[UUID, RemoteTaskState]:
+            remove = []
+            for task_id, process in self._processes.items():
+                if process.poll() is not None:
+                    stdout = process.stdout
+                    assert stdout is not None
+                    self._results[task_id] = cloudpickle.loads(stdout.read())
+                    remove.append(task_id)
+            for task_id in remove:
+                self._processes.pop(task_id)
+            states: dict[UUID, RemoteTaskState] = {
+                task_id: ("error" if isinstance(result, Exception) else "done")
+                for (task_id, result) in self._results.items()
+            }
+            states.update(dict.fromkeys(self._processes, "running"))
+            return states
+
+        def get_result(self, task_id: UUID) -> R | Exception:
+            return self._results.pop(task_id)
 
 
 @pytest.mark.slow
 @pytest.mark.timeout(30)
+@pytest.mark.skipif(not HAS_CLOUDPICKLE, reason="cloudpickle is not installed")
 async def test_async_evaluator_cloudpickle_ok(
     enopt_config: dict[str, Any],
     test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
@@ -275,6 +283,7 @@ async def test_async_evaluator_cloudpickle_ok(
 
 @pytest.mark.slow
 @pytest.mark.timeout(30)
+@pytest.mark.skipif(not HAS_CLOUDPICKLE, reason="cloudpickle is not installed")
 async def test_async_evaluator_cloudpickle_error(
     enopt_config: dict[str, Any],
     test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],

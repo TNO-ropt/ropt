@@ -19,7 +19,7 @@ classifiers = [
 ]
 requires-python = ">=3.11"
 dynamic = ["version"]
-dependencies = ["numpy", "pydantic", "scipy>=1.15", "cloudpickle"]
+dependencies = ["numpy", "pydantic", "scipy>=1.15"]
 
 [project.urls]
 "Homepage" = "https://github.com/TNO-ropt/ropt"
@@ -29,6 +29,7 @@ dependencies = ["numpy", "pydantic", "scipy>=1.15", "cloudpickle"]
 
 [project.optional-dependencies]
 pandas = ["pandas"]
+remote = ["cloudpickle"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
