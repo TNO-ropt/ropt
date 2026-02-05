@@ -98,14 +98,9 @@ class DefaultRemoteServer(ServerBase[Task[R, TR]]):
         while self._running.is_set():
             remove = []
             for task_id, (task, state) in self._tasks.items():
-                result = self._remote.get_result(task_id)
-                if state == "done":
-                    assert not isinstance(result, Exception)
-                    task.put_result(result)
-                if state == "error":
-                    assert isinstance(result, Exception)
-                    task.put_result(result)
-                remove.append(task_id)
+                if state in {"done", "error"}:
+                    task.put_result(self._remote.get_result(task_id))
+                    remove.append(task_id)
             for task_id in remove:
                 self._tasks.pop(task_id)
             if len(self._tasks) < self._workers:

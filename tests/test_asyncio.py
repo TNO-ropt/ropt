@@ -209,6 +209,7 @@ async def test_async_evaluator_two_optimizations(
 class MockedCloudpickleRemoteAdapter(Generic[R, TR]):
     def __init__(self) -> None:
         self._results: dict[UUID, R | Exception] = {}
+        self._processes: dict[UUID, subprocess.Popen[bytes]] = {}
 
     def submit(self, task: Task[R, TR]) -> None:
         process = subprocess.Popen(
@@ -217,19 +218,27 @@ class MockedCloudpickleRemoteAdapter(Generic[R, TR]):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        stdout, stderr = process.communicate(
-            input=cloudpickle.dumps((task.function, task.args))
-        )
-        if process.returncode == 0:
-            self._results[task.id] = cloudpickle.loads(stdout)
-        else:
-            self._results[task.id] = cloudpickle.loads(stderr)
+        self._processes[task.id] = process
+        assert process.stdin is not None
+        process.stdin.write(cloudpickle.dumps((task.function, task.args)))
+        process.stdin.close()
 
     def poll(self) -> dict[UUID, RemoteTaskState]:
-        return {
+        remove = []
+        for task_id, process in self._processes.items():
+            if process.poll() is not None:
+                stdout = process.stdout
+                assert stdout is not None
+                self._results[task_id] = cloudpickle.loads(stdout.read())
+                remove.append(task_id)
+        for task_id in remove:
+            self._processes.pop(task_id)
+        states: dict[UUID, RemoteTaskState] = {
             task_id: ("error" if isinstance(result, Exception) else "done")
             for (task_id, result) in self._results.items()
         }
+        states.update(dict.fromkeys(self._processes, "running"))
+        return states
 
     def get_result(self, task_id: UUID) -> R | Exception:
         return self._results.pop(task_id)
