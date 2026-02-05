@@ -28,7 +28,6 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 
-_PLUGIN_BINARY: Final = "ropt_plugin_optimizer"
 _PROCESS_TIMEOUT: Final = 10
 
 
@@ -94,7 +93,14 @@ class ExternalOptimizer(Optimizer):
         with _JSONPipeCommunicator(fifo1, fifo2) as comm:
             try:
                 process = subprocess.Popen(  # noqa: S603
-                    [_PLUGIN_BINARY, str(fifo2), str(fifo1), str(os.getpid())]
+                    [
+                        sys.executable,
+                        "-m",
+                        "ropt.plugins.optimizer",
+                        str(fifo2),
+                        str(fifo1),
+                        str(os.getpid()),
+                    ]
                 )
                 self._process_pid = process.pid
             except FileNotFoundError as exc:
@@ -329,22 +335,6 @@ class _PluginOptimizer:
                 assert self._request({"error": str(exc)}) == "abort"  # noqa: PT017
                 return 1
         return 0
-
-
-def ropt_plugin_optimizer() -> int:
-    """Entry point for the plugin runner script.
-
-    Returns:
-        The exit code of the script.
-    """
-    fifo1 = Path(sys.argv[1])
-    fifo2 = Path(sys.argv[2])
-    parent_pid = int(sys.argv[3])
-
-    assert fifo1.exists()
-    assert fifo2.exists()
-
-    return _PluginOptimizer(parent_pid).run(fifo1, fifo2)
 
 
 class _JSONPipeCommunicator:
