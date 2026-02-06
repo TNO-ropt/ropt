@@ -18,6 +18,7 @@ from ropt.workflow import (
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
+    from pathlib import Path
     from uuid import UUID
 
     from numpy.typing import NDArray
@@ -214,29 +215,40 @@ async def test_async_evaluator_two_optimizations(
 if HAS_CLOUDPICKLE:
 
     class MockedCloudpickleRemoteAdapter(Generic[R, TR]):
-        def __init__(self) -> None:
+        def __init__(self, workdir: Path) -> None:
+            self._workdir = workdir
             self._results: dict[UUID, R | Exception] = {}
             self._processes: dict[UUID, subprocess.Popen[bytes]] = {}
 
         def submit(self, task: Task[R, TR]) -> None:
-            process = subprocess.Popen(
-                ["python", "-m", "ropt.plugins.server"],  # noqa: S607
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+            input_file = self._workdir / f"{task.id}.in"
+            output_file = self._workdir / f"{task.id}.out"
+            with input_file.open("wb") as fp:
+                cloudpickle.dump((task.function, task.args), fp)
+            process = subprocess.Popen(  # noqa: S603
+                [  # noqa: S607
+                    "python",
+                    "-m",
+                    "ropt.plugins.server",
+                    str(input_file),
+                    str(output_file),
+                ],
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
             )
             self._processes[task.id] = process
-            assert process.stdin is not None
-            process.stdin.write(cloudpickle.dumps((task.function, task.args)))
-            process.stdin.close()
 
         def poll(self) -> dict[UUID, RemoteTaskState]:
             remove = []
             for task_id, process in self._processes.items():
                 if process.poll() is not None:
-                    stdout = process.stdout
-                    assert stdout is not None
-                    self._results[task_id] = cloudpickle.loads(stdout.read())
+                    input_file = self._workdir / f"{task_id}.in"
+                    output_file = self._workdir / f"{task_id}.out"
+                    with output_file.open("rb") as fp:
+                        self._results[task_id] = cloudpickle.load(fp)
+                    input_file.unlink()
+                    output_file.unlink()
                     remove.append(task_id)
             for task_id in remove:
                 self._processes.pop(task_id)
@@ -257,10 +269,11 @@ if HAS_CLOUDPICKLE:
 async def test_async_evaluator_cloudpickle_ok(
     enopt_config: dict[str, Any],
     test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
+    tmp_path: Path,
 ) -> None:
     server = create_server(
         "remote_server",
-        remote=MockedCloudpickleRemoteAdapter(),
+        remote=MockedCloudpickleRemoteAdapter(tmp_path),
         workers=2,
         interval=0.1,
     )
@@ -287,10 +300,11 @@ async def test_async_evaluator_cloudpickle_ok(
 async def test_async_evaluator_cloudpickle_error(
     enopt_config: dict[str, Any],
     test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
+    tmp_path: Path,
 ) -> None:
     server = create_server(
         "remote_server",
-        remote=MockedCloudpickleRemoteAdapter(),
+        remote=MockedCloudpickleRemoteAdapter(tmp_path),
         workers=2,
         interval=0.1,
     )
