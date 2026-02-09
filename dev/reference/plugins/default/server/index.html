@@ -1641,19 +1641,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.server._remote_server.DefaultRemoteServer" class="md-nav__link">
+  <a href="#ropt.plugins.server._hpc_server.DefaultHPCServer" class="md-nav__link">
     <span class="md-ellipsis">
       
-        DefaultRemoteServer
+        DefaultHPCServer
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="DefaultRemoteServer">
+    <nav class="md-nav" aria-label="DefaultHPCServer">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server._remote_server.DefaultRemoteServer.__init__" class="md-nav__link">
+  <a href="#ropt.plugins.server._hpc_server.DefaultHPCServer.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -1664,7 +1664,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server._remote_server.DefaultRemoteServer.start" class="md-nav__link">
+  <a href="#ropt.plugins.server._hpc_server.DefaultHPCServer.start" class="md-nav__link">
     <span class="md-ellipsis">
       
         start
@@ -1675,7 +1675,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server._remote_server.DefaultRemoteServer.cleanup" class="md-nav__link">
+  <a href="#ropt.plugins.server._hpc_server.DefaultHPCServer.cleanup" class="md-nav__link">
     <span class="md-ellipsis">
       
         cleanup
@@ -2147,19 +2147,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.server._remote_server.DefaultRemoteServer" class="md-nav__link">
+  <a href="#ropt.plugins.server._hpc_server.DefaultHPCServer" class="md-nav__link">
     <span class="md-ellipsis">
       
-        DefaultRemoteServer
+        DefaultHPCServer
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="DefaultRemoteServer">
+    <nav class="md-nav" aria-label="DefaultHPCServer">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server._remote_server.DefaultRemoteServer.__init__" class="md-nav__link">
+  <a href="#ropt.plugins.server._hpc_server.DefaultHPCServer.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -2170,7 +2170,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server._remote_server.DefaultRemoteServer.start" class="md-nav__link">
+  <a href="#ropt.plugins.server._hpc_server.DefaultHPCServer.start" class="md-nav__link">
     <span class="md-ellipsis">
       
         start
@@ -2181,7 +2181,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.server._remote_server.DefaultRemoteServer.cleanup" class="md-nav__link">
+  <a href="#ropt.plugins.server._hpc_server.DefaultHPCServer.cleanup" class="md-nav__link">
     <span class="md-ellipsis">
       
         cleanup
@@ -2244,8 +2244,8 @@ provided by <code>ropt</code>.</p>
     (<a class="autorefs autorefs-internal" title="            ropt.plugins.server._async_server.DefaultAsyncServer" href="#ropt.plugins.server._async_server.DefaultAsyncServer"><code>DefaultAsyncServer</code></a>)</li>
 <li><code>multiprocessing_server</code>: Server that forwards calculations to a a pool of multiprocessing workers.
    (<a class="autorefs autorefs-internal" title="            ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer" href="#ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer"><code>DefaultMultiprocessingEvaluatorServer</code></a>)</li>
-<li><code>remote_server</code>: Server that forwards calculations to a remote server.
-   (<a class="autorefs autorefs-internal" title="            ropt.plugins.server._remote_server.DefaultRemoteServer" href="#ropt.plugins.server._remote_server.DefaultRemoteServer"><code>DefaultRemoteServer</code></a>)</li>
+<li><code>hpc_server</code>: Server that forwards calculations to a HPC cluster.
+    (<a class="autorefs autorefs-internal" title="            ropt.plugins.server._hpc_server.DefaultHPCServer" href="#ropt.plugins.server._hpc_server.DefaultHPCServer"><code>DefaultHPCServer</code></a>)</li>
 </ul>
 
 
@@ -2671,8 +2671,8 @@ provided by <code>ropt</code>.</p>
 
 
 
-<h2 id="ropt.plugins.server._remote_server.DefaultRemoteServer" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.server._remote_server.DefaultRemoteServer</span>
+<h2 id="ropt.plugins.server._hpc_server.DefaultHPCServer" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.server._hpc_server.DefaultHPCServer</span>
 
 
 </h2>
@@ -2685,7 +2685,7 @@ provided by <code>ropt</code>.</p>
 
   
       dataclass
-  " href="../../workflow/server/#ropt.plugins.server.base.Task">Task</a>[<span title="ropt.plugins.server._remote_server.R">R</span>, <span title="ropt.plugins.server._remote_server.TR">TR</span>]]</code></p>
+  " href="../../workflow/server/#ropt.plugins.server.base.Task">Task</a>[<span title="ropt.plugins.server._hpc_server.R">R</span>, <span title="ropt.plugins.server._hpc_server.TR">TR</span>]]</code></p>
 
 
 
@@ -2715,18 +2715,19 @@ provided by <code>ropt</code>.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plugins.server._remote_server.DefaultRemoteServer.__init__" class="doc doc-heading">
+<h3 id="ropt.plugins.server._hpc_server.DefaultHPCServer.__init__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">remote</span><span class="p">:</span> <span class="n">RemoteAdapter</span><span class="p">[</span><span class="n">R</span><span class="p">,</span> <span class="n">TR</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">workdir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">maxsize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">template</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2747,14 +2748,14 @@ provided by <code>ropt</code>.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>remote</code>
+                <code>workdir</code>
             </td>
             <td>
-                  <code><span title="ropt.plugins.server._remote_server.RemoteAdapter">RemoteAdapter</span>[<span title="ropt.plugins.server._remote_server.R">R</span>, <span title="ropt.plugins.server._remote_server.TR">TR</span>]</code>
+                  <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The adapter class for the remote server.</p>
+                <p>Working directory for the server.</p>
               </div>
             </td>
             <td>
@@ -2809,6 +2810,22 @@ provided by <code>ropt</code>.</p>
                   <code>1</code>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>template</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional template for the submission script.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -2820,7 +2837,7 @@ provided by <code>ropt</code>.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plugins.server._remote_server.DefaultRemoteServer.start" class="doc doc-heading">
+<h3 id="ropt.plugins.server._hpc_server.DefaultHPCServer.start" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">start</span>
 
 
@@ -2875,7 +2892,7 @@ provided by <code>ropt</code>.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plugins.server._remote_server.DefaultRemoteServer.cleanup" class="doc doc-heading">
+<h3 id="ropt.plugins.server._hpc_server.DefaultHPCServer.cleanup" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">cleanup</span>
 
 
