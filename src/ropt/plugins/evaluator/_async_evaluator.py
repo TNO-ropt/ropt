@@ -45,6 +45,7 @@ class DefaultAsyncEvaluator(Evaluator):
         self._function = function
         self._server = server
         self._maxsize = maxsize
+        self._batch_id = -1
 
     def eval(
         self, variables: NDArray[np.float64], context: EvaluatorContext
@@ -63,6 +64,8 @@ class DefaultAsyncEvaluator(Evaluator):
         """
         if not self._server.is_running():
             raise ComputeStepAborted(ExitCode.ABORT_FROM_ERROR)
+
+        self._batch_id += 1
 
         no = context.config.objectives.weights.size
         nc = (
@@ -95,6 +98,7 @@ class DefaultAsyncEvaluator(Evaluator):
                 raise ComputeStepAborted(ExitCode.ABORT_FROM_ERROR)
 
         return EvaluatorResult(
+            batch_id=self._batch_id,
             objectives=results[:, :no],
             constraints=results[:, no:] if nc > 0 else None,
         )
@@ -118,7 +122,12 @@ class DefaultAsyncEvaluator(Evaluator):
                     task = _Task(
                         result_queue=results_queue,
                         function=self._function,
-                        args=(variables[eval_idx, :], int(realization), perturbation),
+                        args=(
+                            variables[eval_idx, :],
+                            int(realization),
+                            perturbation,
+                            self._batch_id,
+                        ),
                         eval_idx=eval_idx,
                     )
                     await self._server.task_queue.put(task)

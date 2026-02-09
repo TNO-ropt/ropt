@@ -54,7 +54,8 @@ def fixture_test_functions() -> tuple[_Function, _Function]:
 def _function(
     variables: NDArray[np.float64],
     realization: int,
-    _: int,
+    _0: int,
+    _1: int,
     /,
     *,
     test_functions: list[_Function],

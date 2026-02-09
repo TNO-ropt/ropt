@@ -40,10 +40,11 @@ CONFIG: dict[str, Any] = {
 initial_values = 2 * np.arange(DIM) / DIM + 0.5
 
 
-def rosenbrock(
+def rosenbrock(  # noqa: PLR0913, PLR0917
     variables: NDArray[np.float64],
     realization: int,
     perturbation: int,  # noqa: ARG001
+    batch_id: int,  # noqa: ARG001
     a: NDArray[np.float64],
     b: NDArray[np.float64],
 ) -> NDArray[np.float64]:
@@ -53,6 +54,7 @@ def rosenbrock(
         variables:    The variables to evaluate.
         realization:  Realization number.
         perturbation: Perturbation number.
+        batch_id:     Batch ID.
         a:            The 'a' parameters.
         b:            The 'b' parameters.
 
