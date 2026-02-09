@@ -1,4 +1,4 @@
-"""Script for running external optimizers."""
+"""Script for running functions with pickled arguments and return values."""
 
 import sys
 from pathlib import Path

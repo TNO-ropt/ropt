@@ -4,4 +4,4 @@
 
 ::: ropt.plugins.server._async_server.DefaultAsyncServer
 ::: ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer
-::: ropt.plugins.server._remote_server.DefaultRemoteServer
+::: ropt.plugins.server._hpc_server.DefaultHPCServer

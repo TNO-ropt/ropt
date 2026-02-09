@@ -6,8 +6,8 @@
     ([`DefaultAsyncServer`][ropt.plugins.server._async_server.DefaultAsyncServer])
   - `multiprocessing_server`: Server that forwards calculations to a a pool of multiprocessing workers.
     ([`DefaultMultiprocessingEvaluatorServer`][ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer])
-  - `remote_server`: Server that forwards calculations to a remote server.
-    ([`DefaultRemoteServer`][ropt.plugins.server._remote_server.DefaultRemoteServer])
+  - `hpc_server`: Server that forwards calculations to a HPC cluster.
+    ([`DefaultHPCServer`][ropt.plugins.server._hpc_server.DefaultHPCServer])
 """
 
 from __future__ import annotations
@@ -15,8 +15,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Final
 
 from ._async_server import DefaultAsyncServer
+from ._hpc_server import DefaultHPCServer
 from ._multiprocessing_server import DefaultMultiprocessingServer
-from ._remote_server import DefaultRemoteServer
 from .base import ServerPlugin
 
 if TYPE_CHECKING:
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 _SERVER_OBJECTS: Final[dict[str, type[Server]]] = {
     "async_server": DefaultAsyncServer,
     "multiprocessing_server": DefaultMultiprocessingServer,
-    "remote_server": DefaultRemoteServer,
+    "hpc_server": DefaultHPCServer,
 }
 
 
@@ -42,8 +42,8 @@ class DefaultServerPlugin(ServerPlugin):
         ([`DefaultAsyncServer`][ropt.plugins.server._async_server.DefaultAsyncServer])
     - `multiprocessing_server`: Server that forwards calculations to a a pool of multiprocessing workers.
        ([`DefaultMultiprocessingEvaluatorServer`][ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer])
-    - `remote_server`: Server that forwards calculations to a remote server.
-       ([`DefaultRemoteServer`][ropt.plugins.server._remote_server.DefaultRemoteServer])
+    - `hpc_server`: Server that forwards calculations to a HPC cluster.
+        ([`DefaultHPCServer`][ropt.plugins.server._hpc_server.DefaultHPCServer])
     """
 
     @classmethod

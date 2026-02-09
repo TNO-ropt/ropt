@@ -29,7 +29,7 @@ dependencies = ["numpy", "pydantic", "scipy>=1.15"]
 
 [project.optional-dependencies]
 pandas = ["pandas"]
-remote = ["cloudpickle"]
+hpc = ["cloudpickle", "pysqa"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -83,7 +83,7 @@ strict = true
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["scipy.*", "cloudpickle.*"]
+module = ["scipy.*", "cloudpickle.*", "pysqa.*"]
 ignore_missing_imports = true
 
 [dependency-groups]
