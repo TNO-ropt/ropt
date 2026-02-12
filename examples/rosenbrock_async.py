@@ -68,6 +68,7 @@ def rosenbrock(  # noqa: PLR0913
     realization: int,
     perturbation: int,  # noqa: ARG001
     batch_id: int,  # noqa: ARG001
+    eval_idx: int,  # noqa: ARG001
     *,
     a: NDArray[np.float64],
     b: NDArray[np.float64],
@@ -80,6 +81,7 @@ def rosenbrock(  # noqa: PLR0913
         realization:  Realization number.
         perturbation: Perturbation number.
         batch_id:     Batch ID.
+        eval_idx:     The evaluation index.
         a:            The 'a' parameters.
         b:            The 'b' parameters.
         delay:        The delay before starting the evaluation.

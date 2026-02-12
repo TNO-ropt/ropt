@@ -45,6 +45,7 @@ def rosenbrock(  # noqa: PLR0913, PLR0917
     realization: int,
     perturbation: int,  # noqa: ARG001
     batch_id: int,  # noqa: ARG001
+    eval_idx: int,  # noqa: ARG001
     a: NDArray[np.float64],
     b: NDArray[np.float64],
 ) -> NDArray[np.float64]:
@@ -55,6 +56,7 @@ def rosenbrock(  # noqa: PLR0913, PLR0917
         realization:  Realization number.
         perturbation: Perturbation number.
         batch_id:     Batch ID.
+        eval_idx:     Evaluation index.
         a:            The 'a' parameters.
         b:            The 'b' parameters.
 

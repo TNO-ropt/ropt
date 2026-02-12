@@ -56,6 +56,7 @@ def _function(
     realization: int,
     _0: int,
     _1: int,
+    _2: int,
     /,
     *,
     test_functions: list[_Function],

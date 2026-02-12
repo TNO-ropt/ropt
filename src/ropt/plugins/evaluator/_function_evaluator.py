@@ -26,7 +26,7 @@ class DefaultFunctionEvaluator(Evaluator):
     def __init__(
         self,
         *,
-        function: Callable[[NDArray[np.float64], int, int, int], float],
+        function: Callable[[NDArray[np.float64], int, int, int, int], float],
     ) -> None:
         """Initialize the DefaultFunctionEvaluator.
 
@@ -69,6 +69,7 @@ class DefaultFunctionEvaluator(Evaluator):
                     int(realization),
                     perturbation,
                     self._batch_id,
+                    eval_idx,
                 )
         return EvaluatorResult(
             objectives=results[:, :no],

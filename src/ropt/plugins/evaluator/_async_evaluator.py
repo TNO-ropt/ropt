@@ -127,6 +127,7 @@ class DefaultAsyncEvaluator(Evaluator):
                             int(realization),
                             perturbation,
                             self._batch_id,
+                            eval_idx,
                         ),
                         eval_idx=eval_idx,
                     )
