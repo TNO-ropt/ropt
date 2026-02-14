@@ -145,7 +145,14 @@ class DefaultHPCServer(ServerBase[Task[R, TR]]):
 
     async def _worker(self) -> None:
         while self._running.is_set():
-            await asyncio.to_thread(self._run_worker_tasks)
+            tasks: list[Task[R, TR]] = []
+            try:
+                for _ in range(max(self._workers - len(self._tasks), 0)):
+                    tasks.append(self._task_queue.get_nowait())
+                    self._task_queue.task_done()
+            except asyncio.QueueEmpty:
+                pass
+            await asyncio.to_thread(self._run_worker_tasks, tasks)
             await asyncio.sleep(self._interval)
 
     def cleanup(self) -> None:
@@ -165,30 +172,25 @@ class DefaultHPCServer(ServerBase[Task[R, TR]]):
                 task.put_result(ComputeStepAborted(ExitCode.ABORT_FROM_ERROR))
         self._drain_and_kill(ComputeStepAborted(ExitCode.ABORT_FROM_ERROR))
 
-    def _run_worker_tasks(self) -> None:
-        self._submit()
+    def _run_worker_tasks(self, tasks: list[Task[R, TR]]) -> None:
+        for task in tasks:
+            self._submit(task)
         self._poll()
         self._get_results()
 
-    def _submit(self) -> None:
-        try:
-            while len(self._tasks) < self._workers:
-                task = self._task_queue.get_nowait()
-                self._tasks[task.id] = task
-                input_file = self._workdir / f"{task.id}.in"
-                output_file = self._workdir / f"{task.id}.out"
-                with input_file.open("wb") as fp:
-                    cloudpickle.dump((task.function, task.args), fp)
-                self._jobs[task.id] = self._queue_adapter.submit_job(
-                    job_name=task.id,
-                    output=f"{task.id}.txt",
-                    working_directory=str(self._workdir),
-                    command=f"python -m ropt.plugins.server {input_file} {output_file}",
-                    submission_template=self._template,
-                )
-                self._task_queue.task_done()
-        except asyncio.QueueEmpty:
-            pass
+    def _submit(self, task: Task[R, TR]) -> None:
+        self._tasks[task.id] = task
+        input_file = self._workdir / f"{task.id}.in"
+        output_file = self._workdir / f"{task.id}.out"
+        with input_file.open("wb") as fp:
+            cloudpickle.dump((task.function, task.args), fp)
+        self._jobs[task.id] = self._queue_adapter.submit_job(
+            job_name=task.id,
+            output=f"{task.id}.txt",
+            working_directory=str(self._workdir),
+            command=f"python -m ropt.plugins.server {input_file} {output_file}",
+            submission_template=self._template,
+        )
 
     def _poll(self, retries: int = 2) -> None:
         jobs = self._queue_adapter.get_status_of_my_jobs()["jobid"].values
