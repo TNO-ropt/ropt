@@ -1,3 +1,5 @@
+# ruff: noqa: RUF069
+
 from functools import partial
 from typing import Any, Literal
 

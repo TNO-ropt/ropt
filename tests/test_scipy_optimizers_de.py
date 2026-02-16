@@ -1,3 +1,5 @@
+# ruff: noqa: RUF069
+
 from typing import Any
 
 import numpy as np
