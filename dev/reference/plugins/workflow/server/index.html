@@ -2957,6 +2957,17 @@ the plugin supports multiple evaluator types.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.server.base.Task.function">function</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[..., <span title="ropt.plugins.server.base.R">R</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The function to execute.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.server.base.Task.args">args</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>, ...]</code>
@@ -2968,13 +2979,13 @@ the plugin supports multiple evaluator types.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.server.base.Task.function">function</span></code></td>
+            <td><code><span title="ropt.plugins.server.base.Task.kwargs">kwargs</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[..., <span title="ropt.plugins.server.base.R">R</span>]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The function to execute.</p>
+                <p>The keyword arguments to pass to the function.</p>
               </div>
             </td>
           </tr>
