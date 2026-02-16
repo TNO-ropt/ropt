@@ -6,7 +6,7 @@ import asyncio
 import threading
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Generic, Literal, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 from uuid import UUID, uuid4
 
 from ropt.plugins.base import Plugin
@@ -228,6 +228,3 @@ class Task(ABC, Generic[R, TR]):
     @abstractmethod
     def put_result(self, result: R | Exception) -> None:
         """Put the result in the result queue."""
-
-
-RemoteTaskState: TypeAlias = Literal["pending", "running", "done", "error"]
