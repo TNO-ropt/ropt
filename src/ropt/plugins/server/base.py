@@ -189,15 +189,15 @@ class ServerBase(Server, Generic[T]):
         """
         return self._running.is_set()
 
-    def _drain_and_kill(self, exc: Exception) -> None:
+    def _drain_and_kill(self) -> None:
         """Drain the task queue and kill clients."""
-        queues: set[queue.Queue[T]] = set()
+        queues: set[queue.Queue[T | None]] = set()
         while not self._task_queue.empty():
             try:
                 task = self._task_queue.get_nowait()
                 if task.result_queue not in queues:
                     queues.add(task.result_queue)
-                    task.put_result(exc)
+                    task.put_result(None)
                 self._task_queue.task_done()
             except asyncio.QueueEmpty:
                 break
@@ -214,17 +214,18 @@ class Task(ABC, Generic[R, TR]):
 
     Attributes:
         id:           A unique identifier for the task (set on construction).
-        args:         The arguments to pass to the function.
         function:     The function to execute.
+        args:         The arguments to pass to the function.
+        kwargs:       The keyword arguments to pass to the function.
         result_queue: The queue to put the result in.
     """
 
     id: UUID = field(default_factory=uuid4)
     function: Callable[..., R]
-    args: tuple[Any, ...]
-    kwargs: dict[str, Any]
-    result_queue: queue.Queue[TR]
+    args: tuple[Any, ...] = field(default_factory=tuple)
+    kwargs: dict[str, Any] = field(default_factory=dict)
+    result_queue: queue.Queue[TR | None]
 
     @abstractmethod
-    def put_result(self, result: R | Exception) -> None:
+    def put_result(self, result: R | None) -> None:
         """Put the result in the result queue."""

@@ -74,7 +74,7 @@ class DefaultAsyncEvaluator(Evaluator):
             else context.config.nonlinear_constraints.lower_bounds.size
         )
 
-        results_queue: queue.Queue[_TaskResult] = queue.Queue(self._maxsize)
+        results_queue: queue.Queue[_TaskResult | None] = queue.Queue(self._maxsize)
         if self._server.loop is not None and self._server.task_group is not None:
             self._server.loop.call_soon_threadsafe(
                 self._server.task_group.create_task,
@@ -87,9 +87,9 @@ class DefaultAsyncEvaluator(Evaluator):
                 while self._server.is_running():
                     try:
                         result = results_queue.get(timeout=1)
+                        if result is None:
+                            raise ComputeStepAborted(ExitCode.ABORT_FROM_ERROR)
                         assert isinstance(result, _TaskResult)
-                        if result.exception is not None:
-                            raise result.exception
                         results[result.eval_idx] = result.value
                         break
                     except queue.Empty:
@@ -107,7 +107,7 @@ class DefaultAsyncEvaluator(Evaluator):
         self,
         variables: NDArray[np.float64],
         context: EvaluatorContext,
-        results_queue: queue.Queue[_TaskResult],
+        results_queue: queue.Queue[_TaskResult | None],
     ) -> None:
         try:
             for eval_idx, realization in enumerate(context.realizations):
@@ -132,8 +132,9 @@ class DefaultAsyncEvaluator(Evaluator):
                         eval_idx=eval_idx,
                     )
                     await self._server.task_queue.put(task)
-        except Exception as exc:  # noqa: BLE001
-            results_queue.put(_TaskResult(eval_idx=eval_idx, exception=exc))
+        except Exception:
+            results_queue.put(None)
+            raise
 
         if not self._server.is_running():
             raise ComputeStepAborted(ExitCode.ABORT_FROM_ERROR)
@@ -143,15 +144,14 @@ class DefaultAsyncEvaluator(Evaluator):
 class _TaskResult(TaskResult):
     value: NDArray[np.float64] = field(default_factory=lambda: np.array(0.0))
     eval_idx: int
-    exception: Exception | None = None
 
 
 @dataclass(frozen=True, kw_only=True)
 class _Task(Task[NDArray[np.float64], _TaskResult]):
     eval_idx: int
 
-    def put_result(self, result: NDArray[np.float64] | Exception) -> None:
-        if isinstance(result, Exception):
-            self.result_queue.put(_TaskResult(eval_idx=self.eval_idx, exception=result))
+    def put_result(self, result: NDArray[np.float64] | None) -> None:
+        if result is None:
+            self.result_queue.put(None)
         else:
             self.result_queue.put(_TaskResult(value=result, eval_idx=self.eval_idx))

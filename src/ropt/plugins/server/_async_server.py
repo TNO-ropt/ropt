@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, TypeVar
 
-from ropt.enums import ExitCode
-from ropt.exceptions import ComputeStepAborted
 from ropt.plugins.server.base import Server, ServerBase, Task
 
 if TYPE_CHECKING:
@@ -47,7 +45,7 @@ class DefaultAsyncServer(ServerBase[Task[R, TR]]):
             if not worker_task.done():
                 worker_task.cancel()
         self._worker_tasks = []
-        self._drain_and_kill(ComputeStepAborted(ExitCode.ABORT_FROM_ERROR))
+        self._drain_and_kill()
 
 
 class _Worker:
@@ -62,7 +60,7 @@ class _Worker:
                 result = task.function(*task.args, **task.kwargs)
                 task.put_result(result)
             except Exception:
-                task.put_result(ComputeStepAborted(ExitCode.ABORT_FROM_ERROR))
+                task.put_result(None)
                 self._server.cancel()
                 raise
             finally:

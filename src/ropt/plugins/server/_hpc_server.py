@@ -8,9 +8,6 @@ from pathlib import Path
 from pickle import UnpicklingError  # noqa: S403
 from typing import TYPE_CHECKING, Final, TypeVar
 
-from ropt.enums import ExitCode
-from ropt.exceptions import ComputeStepAborted
-
 from .base import Task
 
 if TYPE_CHECKING:
@@ -130,7 +127,7 @@ class DefaultHPCServer(ServerBase[Task[R, TR]]):
             self._queue_adapter.switch_cluster(cluster)
 
         self._tasks: dict[UUID, Task[R, TR]] = {}
-        self._results: dict[UUID, R | Exception] = {}
+        self._results: dict[UUID, R | None] = {}
         self._jobs: dict[UUID, int] = {}
         self._retries: dict[UUID, int] = {}
 
@@ -165,12 +162,12 @@ class DefaultHPCServer(ServerBase[Task[R, TR]]):
         if self._worker_task is not None and not self._worker_task.done():
             self._worker_task.cancel()
         self._worker_task = None
-        queues: set[queue.Queue[TR]] = set()
+        queues: set[queue.Queue[TR | None]] = set()
         for task in self._tasks.values():
             if task.result_queue not in queues:
                 queues.add(task.result_queue)
-                task.put_result(ComputeStepAborted(ExitCode.ABORT_FROM_ERROR))
-        self._drain_and_kill(ComputeStepAborted(ExitCode.ABORT_FROM_ERROR))
+                task.put_result(None)
+        self._drain_and_kill()
 
     def _run_worker_tasks(self, tasks: list[Task[R, TR]]) -> None:
         for task in tasks:
@@ -205,20 +202,24 @@ class DefaultHPCServer(ServerBase[Task[R, TR]]):
                             self._results[task_id] = cloudpickle.load(fp)
                         self._retries.pop(task_id, None)
                         del self._jobs[task_id]
-                except (EOFError, UnpicklingError):
+                except (EOFError, UnpicklingError) as exc:
                     if self._retries.get(task_id, 0) >= retries:
-                        msg = f"No result found for task {task_id}"
-                        self._results[task_id] = RuntimeError(msg)
+                        self._results[task_id] = None
                         self._retries.pop(task_id, None)
                         del self._jobs[task_id]
-                    else:
-                        self._retries[task_id] = self._retries.get(task_id, 0) + 1
+                        msg = f"No result found for task {task_id}"
+                        raise RuntimeError(msg) from exc
+                    self._retries[task_id] = self._retries.get(task_id, 0) + 1
 
     def _get_results(self) -> None:
         remove = []
         for task_id, task in self._tasks.items():
             if task_id in self._results:
-                task.put_result(self._results.pop(task_id))
+                result = self._results.pop(task_id)
+                if isinstance(result, Exception):
+                    task.put_result(None)
+                    raise result
+                task.put_result(result)
                 remove.append(task_id)
         for task_id in remove:
             self._tasks.pop(task_id)
