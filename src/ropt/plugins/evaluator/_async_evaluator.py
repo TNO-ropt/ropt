@@ -30,7 +30,7 @@ class DefaultAsyncEvaluator(Evaluator):
     def __init__(
         self,
         *,
-        function: Callable[[NDArray[np.float64], int, int], NDArray[np.float64]],
+        function: Callable[..., NDArray[np.float64]],
         server: ServerBase[Task[NDArray[np.float64], _TaskResult]],
         maxsize: int = 0,
     ) -> None:
@@ -122,13 +122,13 @@ class DefaultAsyncEvaluator(Evaluator):
                     task = _Task(
                         result_queue=results_queue,
                         function=self._function,
-                        args=(
-                            variables[eval_idx, :],
-                            int(realization),
-                            perturbation,
-                            self._batch_id,
-                            eval_idx,
-                        ),
+                        args=(variables[eval_idx, :],),
+                        kwargs={
+                            "realization": int(realization),
+                            "perturbation": perturbation,
+                            "batch_id": self._batch_id,
+                            "eval_idx": eval_idx,
+                        },
                         eval_idx=eval_idx,
                     )
                     await self._server.task_queue.put(task)

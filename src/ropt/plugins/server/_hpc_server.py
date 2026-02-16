@@ -183,7 +183,7 @@ class DefaultHPCServer(ServerBase[Task[R, TR]]):
         input_file = self._workdir / f"{task.id}.in"
         output_file = self._workdir / f"{task.id}.out"
         with input_file.open("wb") as fp:
-            cloudpickle.dump((task.function, task.args), fp)
+            cloudpickle.dump((task.function, task.args, task.kwargs), fp)
         self._jobs[task.id] = self._queue_adapter.submit_job(
             job_name=task.id,
             output=f"{task.id}.txt",

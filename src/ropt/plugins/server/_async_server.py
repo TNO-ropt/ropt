@@ -59,7 +59,7 @@ class _Worker:
         while self._server.is_running():
             task = await self._task_queue.get()
             try:
-                result = task.function(*task.args)
+                result = task.function(*task.args, **task.kwargs)
                 task.put_result(result)
             except Exception:
                 task.put_result(ComputeStepAborted(ExitCode.ABORT_FROM_ERROR))

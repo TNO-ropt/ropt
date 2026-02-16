@@ -40,25 +40,21 @@ CONFIG: dict[str, Any] = {
 initial_values = 2 * np.arange(DIM) / DIM + 0.5
 
 
-def rosenbrock(  # noqa: PLR0913, PLR0917
+def rosenbrock(
     variables: NDArray[np.float64],
     realization: int,
-    perturbation: int,  # noqa: ARG001
-    batch_id: int,  # noqa: ARG001
-    eval_idx: int,  # noqa: ARG001
     a: NDArray[np.float64],
     b: NDArray[np.float64],
+    **kwargs: Any,  # noqa: ANN401, ARG001
 ) -> NDArray[np.float64]:
     """Function evaluator for the multi-dimensional rosenbrock function.
 
     Args:
         variables:    The variables to evaluate.
         realization:  Realization number.
-        perturbation: Perturbation number.
-        batch_id:     Batch ID.
-        eval_idx:     Evaluation index.
         a:            The 'a' parameters.
         b:            The 'b' parameters.
+        kwargs:       Unused keyword arguments.
 
     Returns:
         The calculated objective.

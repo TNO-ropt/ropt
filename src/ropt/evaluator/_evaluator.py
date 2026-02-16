@@ -31,12 +31,12 @@ class EvaluatorContext:
       less than 0 indicates that the vector is not a perturbation.
 
     Attributes:
-        config:             Configuration of the optimizer.
-        active:             Indicates which variable rows require evaluation.
-        realizations:       Realization numbers for each requested evaluation.
-        perturbations:      Perturbation numbers for each requested evaluation.
-                            A value less than 0 indicates that the vector is
-                            not a perturbation.
+        config:        Configuration of the optimizer.
+        active:        Indicates which variable rows require evaluation.
+        realizations:  Realization numbers for each requested evaluation.
+        perturbations: Perturbation numbers for each requested evaluation.
+                       A value less than 0 indicates that the vector is not a
+                       perturbation.
     """
 
     config: EnOptConfig

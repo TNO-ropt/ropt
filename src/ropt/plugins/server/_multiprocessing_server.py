@@ -5,11 +5,14 @@ from __future__ import annotations
 import asyncio
 import multiprocessing
 from concurrent.futures import ProcessPoolExecutor
-from typing import TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from ropt.enums import ExitCode
 from ropt.exceptions import ComputeStepAborted
 from ropt.plugins.server.base import Server, ServerBase, Task
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 R = TypeVar("R")
 TR = TypeVar("TR")
@@ -78,7 +81,7 @@ class _Worker:
             try:
                 loop = asyncio.get_running_loop()
                 result = await loop.run_in_executor(
-                    self._executor, task.function, *task.args
+                    self._executor, _run_function, task.function, task.args, task.kwargs
                 )
                 task.put_result(result)
             except Exception:
@@ -87,3 +90,9 @@ class _Worker:
                 raise
             finally:
                 self._task_queue.task_done()
+
+
+def _run_function(
+    function: Callable[..., R], args: tuple[Any, ...], kwargs: dict[str, Any]
+) -> R:
+    return function(*args, **kwargs)

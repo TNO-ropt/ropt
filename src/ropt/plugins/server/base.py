@@ -222,6 +222,7 @@ class Task(ABC, Generic[R, TR]):
     id: UUID = field(default_factory=uuid4)
     function: Callable[..., R]
     args: tuple[Any, ...]
+    kwargs: dict[str, Any]
     result_queue: queue.Queue[TR]
 
     @abstractmethod
