@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, TypeVar
+import asyncio
+from typing import TypeVar
 
 from ropt.plugins.server.base import Server, ServerBase, Task
-
-if TYPE_CHECKING:
-    import asyncio
 
 R = TypeVar("R")
 TR = TypeVar("TR")
@@ -57,7 +55,9 @@ class _Worker:
         while self._server.is_running():
             task = await self._task_queue.get()
             try:
-                result = task.function(*task.args, **task.kwargs)
+                result = await asyncio.to_thread(
+                    task.function, *task.args, **task.kwargs
+                )
                 task.put_result(result)
             except Exception:
                 task.put_result(None)

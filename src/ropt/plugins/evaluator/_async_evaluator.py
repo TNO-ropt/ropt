@@ -151,7 +151,8 @@ class _Task(Task[NDArray[np.float64], _TaskResult]):
     eval_idx: int
 
     def put_result(self, result: NDArray[np.float64] | None) -> None:
-        if result is None:
-            self.result_queue.put(None)
-        else:
-            self.result_queue.put(_TaskResult(value=result, eval_idx=self.eval_idx))
+        self.result_queue.put(
+            None
+            if result is None
+            else _TaskResult(value=result, eval_idx=self.eval_idx)
+        )
