@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import asyncio
+import queue
 import subprocess  # noqa: S404
+from dataclasses import dataclass
 from functools import partial
 from typing import TYPE_CHECKING, Any, TypeVar
 
@@ -10,6 +12,7 @@ import pytest
 
 from ropt.config import EnOptConfig
 from ropt.plugins.server._hpc_server import DefaultHPCServer
+from ropt.plugins.server.base import Task, TaskResult
 from ropt.workflow import (
     create_compute_step,
     create_evaluator,
@@ -39,6 +42,160 @@ except ImportError:
 pytestmark = [pytest.mark.asyncio, pytest.mark.timeout(1)]
 
 
+@dataclass(frozen=True, kw_only=True)
+class _TaskResult(TaskResult):
+    value: int
+
+
+@dataclass(frozen=True, kw_only=True)
+class _Task(Task[Any, _TaskResult]):
+    def put_result(self, result: Any | None) -> None:
+        self.result_queue.put(None if result is None else _TaskResult(value=result))
+
+
+class _ResultProcessor:
+    def __init__(self) -> None:
+        self.results: set[int] = set()
+
+    def process_results(
+        self,
+        result_queue: queue.Queue[_TaskResult | None],
+        count: int,
+        finished_event: asyncio.Event,
+    ) -> None:
+        for _ in range(count):
+            result = result_queue.get()
+            if result is None:
+                break
+            self.results.add(result.value)
+        finished_event.set()
+
+
+def _function(input_value: int, *, raise_error: bool = False) -> float:
+    if raise_error:
+        msg = f"Test error in function {input_value}"
+        raise ValueError(msg)
+    return input_value + 1
+
+
+@pytest.mark.parametrize(
+    "server_name",
+    [
+        "async_server",
+        "multiprocessing_server",
+        pytest.param(
+            "hpc_server",
+            marks=[
+                pytest.mark.slow,
+                pytest.mark.timeout(30),
+                pytest.mark.skipif(
+                    not _TEST_HPC, reason="hpc requirements are not installed"
+                ),
+            ],
+        ),
+    ],
+)
+async def test_server_ok(server_name: str, tmp_path: Path, monkeypatch: Any) -> None:
+    result_queue: queue.Queue[_TaskResult | None] = queue.Queue()
+    tasks = [
+        _Task(function=_function, args=(idx,), result_queue=result_queue)
+        for idx in range(2)
+    ]
+    if server_name == "hpc_server":
+        monkeypatch.setattr(
+            "ropt.plugins.server._hpc_server.pysqa.QueueAdapter",
+            lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
+        )
+        server: Server = DefaultHPCServer(
+            workdir=tmp_path, workers=2, interval=0, template=""
+        )
+    else:
+        server = create_server(server_name, workers=2)
+    assert not server.is_running()
+    all_processed = asyncio.Event()
+    result_processor = _ResultProcessor()
+    async with asyncio.TaskGroup() as tg:
+        await server.start(tg)
+        tg.create_task(
+            asyncio.to_thread(
+                result_processor.process_results,
+                result_queue,
+                len(tasks),
+                all_processed,
+            )
+        )
+        assert server.is_running()
+        for task in tasks:
+            await server.task_queue.put(task)
+        await all_processed.wait()
+        server.cancel()
+    assert result_processor.results == {1, 2}
+    assert not server.is_running()
+
+
+@pytest.mark.parametrize(
+    "server_name",
+    [
+        "async_server",
+        "multiprocessing_server",
+        pytest.param(
+            "hpc_server",
+            marks=[
+                pytest.mark.slow,
+                pytest.mark.timeout(30),
+                pytest.mark.skipif(
+                    not _TEST_HPC, reason="hpc requirements are not installed"
+                ),
+            ],
+        ),
+    ],
+)
+async def test_server_error(server_name: str, tmp_path: Path, monkeypatch: Any) -> None:
+    result_queue: queue.Queue[_TaskResult | None] = queue.Queue()
+    tasks = [
+        _Task(
+            function=_function,
+            args=(idx,),
+            kwargs={"raise_error": True},
+            result_queue=result_queue,
+        )
+        for idx in range(2)
+    ]
+    if server_name == "hpc_server":
+        monkeypatch.setattr(
+            "ropt.plugins.server._hpc_server.pysqa.QueueAdapter",
+            lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
+        )
+        server: Server = DefaultHPCServer(
+            workdir=tmp_path, workers=2, interval=0, template=""
+        )
+    else:
+        server = create_server(server_name, workers=2)
+    assert not server.is_running()
+    all_processed = asyncio.Event()
+    result_processor = _ResultProcessor()
+    with pytest.raises(ExceptionGroup) as excinfo:  # noqa: PT012
+        async with asyncio.TaskGroup() as tg:
+            await server.start(tg)
+            tg.create_task(
+                asyncio.to_thread(
+                    result_processor.process_results,
+                    result_queue,
+                    len(tasks),
+                    all_processed,
+                )
+            )
+            assert server.is_running()
+            for task in tasks:
+                await server.task_queue.put(task)
+            await all_processed.wait()
+            server.cancel()
+    for err in excinfo.value.exceptions:
+        assert isinstance(err, ValueError)
+        assert "Test error in function" in str(err)
+    assert not server.is_running()
+
+
 initial_values = np.array([0.0, 0.0, 0.1])
 
 
@@ -62,7 +219,7 @@ def enopt_config_fixture() -> dict[str, Any]:
     }
 
 
-def _function(  # noqa: PLR0917
+def _opt_function(  # noqa: PLR0917
     variables: NDArray[np.float64],
     realization: int,
     perturbation: int,  # noqa: ARG001
@@ -84,7 +241,7 @@ R = TypeVar("R")
 TR = TypeVar("TR")
 
 
-def _workflow(
+def _opt_workflow(
     server: Server,
     enopt_config: dict[str, Any],
     test_function: Callable[[NDArray[np.float64], int], NDArray[np.float64]],
@@ -141,7 +298,7 @@ if _TEST_HPC:
         ),
     ],
 )
-async def test_async_evaluator_ok(
+async def test_server_evaluator_ok(
     enopt_config: dict[str, Any],
     test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
     server_name: str,
@@ -163,10 +320,10 @@ async def test_async_evaluator_ok(
         await server.start(tg)
         assert server.is_running()
         results = await asyncio.to_thread(
-            _workflow,
+            _opt_workflow,
             server,
             enopt_config,
-            partial(_function, test_functions=test_functions),
+            partial(_opt_function, test_functions=test_functions),
         )
         server.cancel()
     assert not server.is_running()
@@ -192,7 +349,7 @@ async def test_async_evaluator_ok(
         ),
     ],
 )
-async def test_async_evaluator_error(
+async def test_server_evaluator_error(
     enopt_config: dict[str, Any],
     test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
     server_name: str,
@@ -210,19 +367,20 @@ async def test_async_evaluator_error(
     else:
         server = create_server(server_name, workers=2)
     assert not server.is_running()
-    with pytest.RaisesGroup(
-        pytest.RaisesExc(ValueError, match="Test error in function")
-    ):
+    with pytest.raises(ExceptionGroup) as excinfo:  # noqa: PT012
         async with asyncio.TaskGroup() as tg:
             await server.start(tg)
             assert server.is_running()
             await asyncio.to_thread(
-                _workflow,
+                _opt_workflow,
                 server,
                 enopt_config,
-                partial(_function, test_functions=test_functions, raise_error=True),
+                partial(_opt_function, test_functions=test_functions, raise_error=True),
             )
             server.cancel()
+    for err in excinfo.value.exceptions:
+        assert isinstance(err, ValueError)
+        assert "Test error in function" in str(err)
     assert not server.is_running()
 
 
@@ -243,7 +401,7 @@ async def test_async_evaluator_error(
         ),
     ],
 )
-async def test_async_evaluator_two_optimizations(
+async def test_server_evaluator_two_optimizations(
     enopt_config: dict[str, Any],
     test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
     server_name: str,
@@ -267,10 +425,10 @@ async def test_async_evaluator_two_optimizations(
         results_list = await asyncio.gather(
             *(
                 asyncio.to_thread(
-                    _workflow,
+                    _opt_workflow,
                     server,
                     enopt_config,
-                    partial(_function, test_functions=test_functions),
+                    partial(_opt_function, test_functions=test_functions),
                 )
                 for _ in range(2)
             )
