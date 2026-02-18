@@ -14,14 +14,14 @@ TR = TypeVar("TR")
 class DefaultAsyncServer(ServerBase[Task[R, TR]]):
     """An evaluator server that employs asynchronous workers."""
 
-    def __init__(self, *, workers: int = 1, maxsize: int = 0) -> None:
+    def __init__(self, *, workers: int = 1, queue_size: int = 0) -> None:
         """Initialize the server.
 
         Args:
-            workers:  The number of workers to use.
-            maxsize:  Maximum size of the tasks queue.
+            workers:    The number of workers to use.
+            queue_size: Maximum size of the tasks queue.
         """
-        super().__init__(maxsize=maxsize)
+        super().__init__(queue_size=queue_size)
         self._workers = workers
         self._worker_tasks: list[asyncio.Task[None]] = []
 

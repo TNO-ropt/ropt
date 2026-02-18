@@ -32,19 +32,19 @@ class DefaultAsyncEvaluator(Evaluator):
         *,
         function: Callable[..., NDArray[np.float64]],
         server: ServerBase[Task[NDArray[np.float64], _TaskResult]],
-        maxsize: int = 0,
+        queue_size: int = 0,
     ) -> None:
         """Initialize the DefaultFunctionEvaluator.
 
         Args:
-            function: The function used for objectives and constraints.
-            server:   Optional evaluator server to use.
-            maxsize:  Maximum size of the result queue.
+            function:   The function used for objectives and constraints.
+            server:     Optional evaluator server to use.
+            queue_size: Maximum size of the result queue.
         """
         super().__init__()
         self._function = function
         self._server = server
-        self._maxsize = maxsize
+        self._queue_size = queue_size
         self._batch_id = -1
 
     def eval(
@@ -74,7 +74,7 @@ class DefaultAsyncEvaluator(Evaluator):
             else context.config.nonlinear_constraints.lower_bounds.size
         )
 
-        results_queue: queue.Queue[_TaskResult | None] = queue.Queue(self._maxsize)
+        results_queue: queue.Queue[_TaskResult | None] = queue.Queue(self._queue_size)
         if self._server.loop is not None and self._server.task_group is not None:
             self._server.loop.call_soon_threadsafe(
                 self._server.task_group.create_task,
@@ -82,18 +82,18 @@ class DefaultAsyncEvaluator(Evaluator):
             )
 
         results = np.zeros((variables.shape[0], no + nc), dtype=np.float64)
-        for eval_idx in range(variables.shape[0]):
-            if context.active is None or context.active[eval_idx]:
-                while self._server.is_running():
-                    try:
-                        result = results_queue.get(timeout=1)
-                        if result is None:
-                            raise ComputeStepAborted(ExitCode.ABORT_FROM_ERROR)
-                        assert isinstance(result, _TaskResult)
-                        results[result.eval_idx] = result.value
-                        break
-                    except queue.Empty:
-                        continue
+        for _ in range(
+            variables.shape[0] if context.active is None else context.active.sum()
+        ):
+            while self._server.is_running():
+                try:
+                    if (result := results_queue.get(timeout=1)) is None:
+                        raise ComputeStepAborted(ExitCode.ABORT_FROM_ERROR)
+                    assert isinstance(result, _TaskResult)
+                    results[result.eval_idx] = result.value
+                    break
+                except queue.Empty:
+                    continue
             if not self._server.is_running():
                 raise ComputeStepAborted(ExitCode.ABORT_FROM_ERROR)
 

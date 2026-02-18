@@ -57,7 +57,7 @@ class DefaultHPCServer(ServerBase[Task[R, TR]]):
         *,
         workdir: Path | str,
         workers: int = 1,
-        maxsize: int = 0,
+        queue_size: int = 0,
         interval: float = 1,
         queue_type: str = "slurm",
         template: str | None = None,
@@ -83,7 +83,7 @@ class DefaultHPCServer(ServerBase[Task[R, TR]]):
                          input/output files.
             workers:     The maximum number of concurrent jobs to run on the HPC
                          cluster.
-            maxsize:     The maximum number of tasks to hold in the internal
+            queue_size:  The maximum number of tasks to hold in the internal
                          queue before submission. A value of 0 means an
                          unlimited size.
             interval:    The interval in seconds at which to poll the HPC queue
@@ -105,7 +105,7 @@ class DefaultHPCServer(ServerBase[Task[R, TR]]):
             RuntimeError: If neither a `template` is provided nor a valid
                           `config_path` can be found.
         """
-        super().__init__(maxsize=maxsize)
+        super().__init__(queue_size=queue_size)
         self._workdir = Path(workdir).resolve()
         self._workers = workers
         self._interval = interval

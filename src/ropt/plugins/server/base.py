@@ -52,8 +52,8 @@ class ServerPlugin(Plugin):
         the plugin supports multiple evaluator types.
 
         Args:
-            name:    The requested server name (potentially plugin-specific).
-            kwargs:  Additional arguments for custom configuration.
+            name:   The requested server name (potentially plugin-specific).
+            kwargs: Additional arguments for custom configuration.
 
         Returns:
             An initialized instance of an `Server` subclass.
@@ -120,14 +120,14 @@ class Server(ABC):
 class ServerBase(Server, Generic[T]):
     """An base class for asynchronous servers."""
 
-    def __init__(self, maxsize: int = 0) -> None:
+    def __init__(self, queue_size: int = 0) -> None:
         """Initialize the server.
 
         Arguments:
-            maxsize: Maximum size of the task queue.
+            queue_size: Maximum size of the task queue.
         """
         super().__init__()
-        self._task_queue: asyncio.Queue[T] = asyncio.Queue(maxsize)
+        self._task_queue: asyncio.Queue[T] = asyncio.Queue(queue_size)
         self._loop: asyncio.AbstractEventLoop | None = None
         self._task_group: asyncio.TaskGroup | None = None
         self._running = threading.Event()
