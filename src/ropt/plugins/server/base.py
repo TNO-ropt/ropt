@@ -8,7 +8,6 @@ import threading
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
-from uuid import UUID, uuid4
 
 from ropt.plugins.base import Plugin
 
@@ -200,7 +199,6 @@ class Task(ABC):
     """A task to be executed by a worker.
 
     Attributes:
-        id:            A unique identifier for the task (set on construction).
         function:      The function to execute.
         args:          The arguments to pass to the function.
         kwargs:        The keyword arguments to pass to the function.
@@ -208,7 +206,6 @@ class Task(ABC):
         result:        The result of the function, or None if no result is available.
     """
 
-    id: UUID = field(default_factory=uuid4)
     function: Callable[..., Any]
     args: tuple[Any, ...] = field(default_factory=tuple)
     kwargs: dict[str, Any] = field(default_factory=dict)

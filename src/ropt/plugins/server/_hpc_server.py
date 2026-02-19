@@ -8,12 +8,9 @@ from importlib.util import find_spec
 from pathlib import Path
 from pickle import UnpicklingError  # noqa: S403
 from typing import TYPE_CHECKING, Any, Final
+from uuid import uuid4
 
 from .base import ServerBase, Task
-
-if TYPE_CHECKING:
-    from uuid import UUID
-
 
 if TYPE_CHECKING:
     from uuid import UUID
@@ -165,14 +162,15 @@ class DefaultHPCServer(ServerBase):
         self._get_results()
 
     def _submit(self, task: Task) -> None:
-        self._tasks[task.id] = task
-        input_file = self._workdir / f"{task.id}.in"
-        output_file = self._workdir / f"{task.id}.out"
+        task_id = uuid4()
+        self._tasks[task_id] = task
+        input_file = self._workdir / f"{task_id}.in"
+        output_file = self._workdir / f"{task_id}.out"
         with input_file.open("wb") as fp:
             cloudpickle.dump((task.function, task.args, task.kwargs), fp)
-        self._jobs[task.id] = self._queue_adapter.submit_job(
-            job_name=task.id,
-            output=f"{task.id}.txt",
+        self._jobs[task_id] = self._queue_adapter.submit_job(
+            job_name=task_id,
+            output=f"{task_id}.txt",
             working_directory=str(self._workdir),
             command=f"python -m ropt.plugins.server {input_file} {output_file}",
             submission_template=self._template,
