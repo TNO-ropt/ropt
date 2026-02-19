@@ -3,15 +3,11 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TypeVar
 
 from ropt.plugins.server.base import Server, ServerBase, Task
 
-R = TypeVar("R")
-TR = TypeVar("TR")
 
-
-class DefaultAsyncServer(ServerBase[Task[R, TR]]):
+class DefaultAsyncServer(ServerBase):
     """An evaluator server that employs asynchronous workers."""
 
     def __init__(self, *, workers: int = 1, queue_size: int = 0) -> None:
@@ -47,7 +43,7 @@ class DefaultAsyncServer(ServerBase[Task[R, TR]]):
 
 
 class _Worker:
-    def __init__(self, task_queue: asyncio.Queue[Task[R, TR]], server: Server) -> None:
+    def __init__(self, task_queue: asyncio.Queue[Task], server: Server) -> None:
         self._task_queue = task_queue
         self._server = server
 
@@ -60,7 +56,7 @@ class _Worker:
                 )
                 task.put_result(result)
             except Exception:
-                task.put_result(None)
+                task.cancel_all()
                 self._server.cancel()
                 raise
             finally:

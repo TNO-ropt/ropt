@@ -3,22 +3,17 @@
 from __future__ import annotations
 
 import asyncio
+import queue
 import threading
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any
 from uuid import UUID, uuid4
 
 from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
-    import queue
     from collections.abc import Callable
-
-
-T = TypeVar("T", bound="Task[Any, Any]")
-R = TypeVar("R")
-TR = TypeVar("TR")
 
 
 class ServerPlugin(Plugin):
@@ -117,7 +112,7 @@ class Server(ABC):
         """
 
 
-class ServerBase(Server, Generic[T]):
+class ServerBase(Server):
     """An base class for asynchronous servers."""
 
     def __init__(self, queue_size: int = 0) -> None:
@@ -127,7 +122,7 @@ class ServerBase(Server, Generic[T]):
             queue_size: Maximum size of the task queue.
         """
         super().__init__()
-        self._task_queue: asyncio.Queue[T] = asyncio.Queue(queue_size)
+        self._task_queue: asyncio.Queue[Task] = asyncio.Queue(queue_size)
         self._loop: asyncio.AbstractEventLoop | None = None
         self._task_group: asyncio.TaskGroup | None = None
         self._running = threading.Event()
@@ -146,7 +141,7 @@ class ServerBase(Server, Generic[T]):
         return self._task_group
 
     @property
-    def task_queue(self) -> asyncio.Queue[T]:
+    def task_queue(self) -> asyncio.Queue[Task]:
         """Get the task queue."""
         return self._task_queue
 
@@ -191,41 +186,59 @@ class ServerBase(Server, Generic[T]):
 
     def _drain_and_kill(self) -> None:
         """Drain the task queue and kill clients."""
-        queues: set[queue.Queue[T | None]] = set()
         while not self._task_queue.empty():
             try:
                 task = self._task_queue.get_nowait()
-                if task.result_queue not in queues:
-                    queues.add(task.result_queue)
-                    task.put_result(None)
+                task.cancel_all()
                 self._task_queue.task_done()
             except asyncio.QueueEmpty:
                 break
 
 
-@dataclass(frozen=True, kw_only=True)
-class TaskResult:
-    """A result from a task."""
-
-
-@dataclass(frozen=True, kw_only=True)
-class Task(ABC, Generic[R, TR]):
+@dataclass(kw_only=True)
+class Task(ABC):
     """A task to be executed by a worker.
 
     Attributes:
-        id:           A unique identifier for the task (set on construction).
-        function:     The function to execute.
-        args:         The arguments to pass to the function.
-        kwargs:       The keyword arguments to pass to the function.
-        result_queue: The queue to put the result in.
+        id:            A unique identifier for the task (set on construction).
+        function:      The function to execute.
+        args:          The arguments to pass to the function.
+        kwargs:        The keyword arguments to pass to the function.
+        results_queue: The queue to put the result in.
+        result:        The result of the function, or None if no result is available.
     """
 
     id: UUID = field(default_factory=uuid4)
-    function: Callable[..., R]
+    function: Callable[..., Any]
     args: tuple[Any, ...] = field(default_factory=tuple)
     kwargs: dict[str, Any] = field(default_factory=dict)
-    result_queue: queue.Queue[TR | None]
+    results_queue: ResultsQueue
+    result: Any | None = None
 
-    @abstractmethod
-    def put_result(self, result: R | None) -> None:
+    def put_result(self, result: Any) -> None:  # noqa: ANN401
         """Put the result in the result queue."""
+        self.result = result
+        self.results_queue.put(self)
+
+    def cancel_all(self) -> None:
+        """Stop putting results in the result queue."""
+        self.results_queue.put(None)
+        self.results_queue.close()
+
+
+class ResultsQueue(queue.Queue[Task | None]):
+    """A queue that can be closed."""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
+        """Initialize the queue."""
+        super().__init__(*args, **kwargs)
+        self.closed = False
+
+    def close(self) -> None:
+        """Close the queue."""
+        self.closed = True
+
+    def put(self, item: Task | None, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
+        """Put an item in the queue."""
+        if not self.closed:
+            super().put(item, *args, **kwargs)

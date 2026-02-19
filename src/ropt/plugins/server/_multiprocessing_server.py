@@ -5,18 +5,15 @@ from __future__ import annotations
 import asyncio
 import multiprocessing
 from concurrent.futures import ProcessPoolExecutor
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any
 
 from ropt.plugins.server.base import Server, ServerBase, Task
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-R = TypeVar("R")
-TR = TypeVar("TR")
 
-
-class DefaultMultiprocessingServer(ServerBase[Task[R, TR]]):
+class DefaultMultiprocessingServer(ServerBase):
     """An evaluator server that employs a pool of multiprocessing workers."""
 
     def __init__(self, *, workers: int = 1, queue_size: int = 0) -> None:
@@ -65,7 +62,7 @@ class DefaultMultiprocessingServer(ServerBase[Task[R, TR]]):
 class _Worker:
     def __init__(
         self,
-        task_queue: asyncio.Queue[Task[R, TR]],
+        task_queue: asyncio.Queue[Task],
         server: Server,
         executor: ProcessPoolExecutor,
     ) -> None:
@@ -83,7 +80,7 @@ class _Worker:
                 )
                 task.put_result(result)
             except Exception:
-                task.put_result(None)
+                task.cancel_all()
                 self._server.cancel()
                 raise
             finally:
@@ -91,6 +88,6 @@ class _Worker:
 
 
 def _run_function(
-    function: Callable[..., R], args: tuple[Any, ...], kwargs: dict[str, Any]
-) -> R:
+    function: Callable[..., Any], args: tuple[Any, ...], kwargs: dict[str, Any]
+) -> Any:  # noqa: ANN401
     return function(*args, **kwargs)

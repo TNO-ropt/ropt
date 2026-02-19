@@ -2,30 +2,22 @@
 
 from __future__ import annotations
 
+import asyncio
 import sysconfig
 from importlib.util import find_spec
 from pathlib import Path
 from pickle import UnpicklingError  # noqa: S403
-from typing import TYPE_CHECKING, Final, TypeVar
-
-from .base import Task
-
-if TYPE_CHECKING:
-    from uuid import UUID
-
-    from .base import Task
-import asyncio
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Final
 
 from .base import ServerBase, Task
 
 if TYPE_CHECKING:
-    import queue
     from uuid import UUID
 
 
-R = TypeVar("R")
-TR = TypeVar("TR")
+if TYPE_CHECKING:
+    from uuid import UUID
+
 
 _HAVE_HPC: Final = (
     find_spec("cloudpickle") is not None and find_spec("pysqa") is not None
@@ -36,7 +28,7 @@ if _HAVE_HPC:
     import pysqa
 
 
-class DefaultHPCServer(ServerBase[Task[R, TR]]):
+class DefaultHPCServer(ServerBase):
     """A server for submitting tasks to a High-Performance Computing (HPC) cluster.
 
     This server interfaces with an HPC queueing system (like Slurm) via the `pysqa`
@@ -126,8 +118,8 @@ class DefaultHPCServer(ServerBase[Task[R, TR]]):
         if cluster is not None:
             self._queue_adapter.switch_cluster(cluster)
 
-        self._tasks: dict[UUID, Task[R, TR]] = {}
-        self._results: dict[UUID, R | None] = {}
+        self._tasks: dict[UUID, Task] = {}
+        self._results: dict[UUID, Any | None] = {}
         self._jobs: dict[UUID, int] = {}
         self._retries: dict[UUID, int] = {}
 
@@ -142,7 +134,7 @@ class DefaultHPCServer(ServerBase[Task[R, TR]]):
 
     async def _worker(self) -> None:
         while self._running.is_set():
-            tasks: list[Task[R, TR]] = []
+            tasks: list[Task] = []
             try:
                 for _ in range(max(self._workers - len(self._tasks), 0)):
                     tasks.append(self._task_queue.get_nowait())
@@ -162,20 +154,17 @@ class DefaultHPCServer(ServerBase[Task[R, TR]]):
         if self._worker_task is not None and not self._worker_task.done():
             self._worker_task.cancel()
         self._worker_task = None
-        queues: set[queue.Queue[TR | None]] = set()
         for task in self._tasks.values():
-            if task.result_queue not in queues:
-                queues.add(task.result_queue)
-                task.put_result(None)
+            task.cancel_all()
         self._drain_and_kill()
 
-    def _run_worker_tasks(self, tasks: list[Task[R, TR]]) -> None:
+    def _run_worker_tasks(self, tasks: list[Task]) -> None:
         for task in tasks:
             self._submit(task)
         self._poll()
         self._get_results()
 
-    def _submit(self, task: Task[R, TR]) -> None:
+    def _submit(self, task: Task) -> None:
         self._tasks[task.id] = task
         input_file = self._workdir / f"{task.id}.in"
         output_file = self._workdir / f"{task.id}.out"
@@ -217,8 +206,9 @@ class DefaultHPCServer(ServerBase[Task[R, TR]]):
             if task_id in self._results:
                 result = self._results.pop(task_id)
                 if isinstance(result, Exception):
-                    task.put_result(None)
+                    task.cancel_all()
                     raise result
+                assert result is not None
                 task.put_result(result)
                 remove.append(task_id)
         for task_id in remove:

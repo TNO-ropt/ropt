@@ -1,18 +1,16 @@
 from __future__ import annotations
 
 import asyncio
-import queue
 import subprocess  # noqa: S404
-from dataclasses import dataclass
 from functools import partial
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pytest
 
 from ropt.config import EnOptConfig
 from ropt.plugins.server._hpc_server import DefaultHPCServer
-from ropt.plugins.server.base import Task, TaskResult
+from ropt.plugins.server.base import ResultsQueue, Task
 from ropt.workflow import (
     create_compute_step,
     create_evaluator,
@@ -42,36 +40,26 @@ except ImportError:
 pytestmark = [pytest.mark.asyncio, pytest.mark.timeout(1)]
 
 
-@dataclass(frozen=True, kw_only=True)
-class _TaskResult(TaskResult):
-    value: int
-
-
-@dataclass(frozen=True, kw_only=True)
-class _Task(Task[Any, _TaskResult]):
-    def put_result(self, result: Any | None) -> None:
-        self.result_queue.put(None if result is None else _TaskResult(value=result))
-
-
 class _ResultProcessor:
     def __init__(self) -> None:
         self.results: set[int] = set()
 
     def process_results(
         self,
-        result_queue: queue.Queue[_TaskResult | None],
+        result_queue: ResultsQueue,
         count: int,
         finished_event: asyncio.Event,
     ) -> None:
         for _ in range(count):
-            result = result_queue.get()
-            if result is None:
+            task = result_queue.get()
+            if task is None:
                 break
-            self.results.add(result.value)
+            assert task.result is not None
+            self.results.add(task.result)
         finished_event.set()
 
 
-def _function(input_value: int, *, raise_error: bool = False) -> float:
+def _function(input_value: int, *, raise_error: bool = False) -> int:
     if raise_error:
         msg = f"Test error in function {input_value}"
         raise ValueError(msg)
@@ -96,9 +84,9 @@ def _function(input_value: int, *, raise_error: bool = False) -> float:
     ],
 )
 async def test_server_ok(server_name: str, tmp_path: Path, monkeypatch: Any) -> None:
-    result_queue: queue.Queue[_TaskResult | None] = queue.Queue()
+    result_queue: ResultsQueue = ResultsQueue()
     tasks = [
-        _Task(function=_function, args=(idx,), result_queue=result_queue)
+        Task(function=_function, args=(idx,), results_queue=result_queue)
         for idx in range(2)
     ]
     if server_name == "hpc_server":
@@ -151,13 +139,13 @@ async def test_server_ok(server_name: str, tmp_path: Path, monkeypatch: Any) -> 
     ],
 )
 async def test_server_error(server_name: str, tmp_path: Path, monkeypatch: Any) -> None:
-    result_queue: queue.Queue[_TaskResult | None] = queue.Queue()
+    result_queue: ResultsQueue = ResultsQueue()
     tasks = [
-        _Task(
+        Task(
             function=_function,
             args=(idx,),
             kwargs={"raise_error": True},
-            result_queue=result_queue,
+            results_queue=result_queue,
         )
         for idx in range(2)
     ]
@@ -219,15 +207,13 @@ def enopt_config_fixture() -> dict[str, Any]:
     }
 
 
-def _opt_function(  # noqa: PLR0917
+def _opt_function(
     variables: NDArray[np.float64],
     realization: int,
-    perturbation: int,  # noqa: ARG001
-    batch_id: int,  # noqa: ARG001
-    eval_idx: int,  # noqa: ARG001
     test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
     *,
     raise_error: bool = False,
+    **kwargs: Any,  # noqa: ARG001
 ) -> NDArray[np.float64]:
     if raise_error:
         msg = "Test error in function"
@@ -235,10 +221,6 @@ def _opt_function(  # noqa: PLR0917
     return np.fromiter(
         (func(variables, realization) for func in test_functions), dtype=np.float64
     )
-
-
-R = TypeVar("R")
-TR = TypeVar("TR")
 
 
 def _opt_workflow(
