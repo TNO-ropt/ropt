@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.2">
     
     
       
@@ -1293,17 +1293,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.server.base.TaskResult" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        TaskResult
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#ropt.plugins.server.base.Task" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1320,6 +1309,17 @@
     <span class="md-ellipsis">
       
         put_result
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.Task.cancel_all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cancel_all
       
     </span>
   </a>
@@ -2230,17 +2230,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.server.base.TaskResult" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        TaskResult
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#ropt.plugins.server.base.Task" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2257,6 +2246,17 @@
     <span class="md-ellipsis">
       
         put_result
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.server.base.Task.cancel_all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cancel_all
       
     </span>
   </a>
@@ -2865,56 +2865,6 @@ the plugin supports multiple evaluator types.</p>
 
 
 
-<h2 id="ropt.plugins.server.base.TaskResult" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.server.base.TaskResult</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
-  </span>
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-
-
-
-        <p>A result from a task.</p>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
 <h2 id="ropt.plugins.server.base.Task" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.server.base.Task</span>
 
@@ -2928,7 +2878,7 @@ the plugin supports multiple evaluator types.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code>, <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="ropt.plugins.server.base.R">R</span>, <span title="ropt.plugins.server.base.TR">TR</span>]</code></p>
+              Bases: <code><a class="autorefs autorefs-external" title="abc.ABC" href="https://docs.python.org/3/library/abc.html#abc.ABC">ABC</a></code></p>
 
 
 
@@ -2959,7 +2909,7 @@ the plugin supports multiple evaluator types.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.plugins.server.base.Task.function">function</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[..., <span title="ropt.plugins.server.base.R">R</span>]</code>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[..., <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2990,13 +2940,24 @@ the plugin supports multiple evaluator types.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.plugins.server.base.Task.result_queue">result_queue</span></code></td>
+            <td><code><span title="ropt.plugins.server.base.Task.results_queue">results_queue</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" title="queue.Queue" href="https://docs.python.org/3/library/queue.html#queue.Queue">Queue</a>[<span title="ropt.plugins.server.base.TR">TR</span> | None]</code>
+                  <code><span title="ropt.plugins.server.base.ResultsQueue">ResultsQueue</span></code>
             </td>
             <td>
               <div class="doc-md-description">
                 <p>The queue to put the result in.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.plugins.server.base.Task.result">result</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The result of the function, or None if no result is available.</p>
               </div>
             </td>
           </tr>
@@ -3031,17 +2992,33 @@ the plugin supports multiple evaluator types.</p>
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">put_result</span>
 
 
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
-
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">put_result</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">R</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">put_result</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Put the result in the result queue.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.server.base.Task.cancel_all" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">cancel_all</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">cancel_all</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Stop putting results in the result queue.</p>
 
 
     </div>
@@ -3069,7 +3046,7 @@ the plugin supports multiple evaluator types.</p>
 
     <div class="doc doc-contents first">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.Server" href="#ropt.plugins.server.base.Server">Server</a></code>, <code><a class="autorefs autorefs-external" title="typing.Generic" href="https://docs.python.org/3/library/typing.html#typing.Generic">Generic</a>[<span title="ropt.plugins.server.base.T">T</span>]</code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.Server" href="#ropt.plugins.server.base.Server">Server</a></code></p>
 
 
 
@@ -3154,7 +3131,7 @@ the plugin supports multiple evaluator types.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">task_queue</span><span class="p">:</span> <span class="n">Queue</span><span class="p">[</span><span class="n">T</span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">task_queue</span><span class="p">:</span> <span class="n">Queue</span><span class="p">[</span><span class="n">Task</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
