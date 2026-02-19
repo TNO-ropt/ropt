@@ -2747,12 +2747,6 @@ be marked as inactive. The results for these inactive vectors should be set
 to zero. All active variable vectors should be evaluated. If an evaluation
 fails for any reason, the corresponding values should be set to <code>numpy.nan</code>.</p>
 <p>A <code>batch_id</code> can be set to identify this specific set of evaluation results.</p>
-<p>The <code>evaluation_info</code> dictionary can store additional metadata for each
-evaluation. This information is not used internally by <code>ropt</code> and can have
-an arbitrary structure, to be interpreted by the application. This can be
-used, for example, to uniquely identify the results calculated for each
-variable vector, allowing them to be linked back to their corresponding
-input vectors.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2812,22 +2806,6 @@ input vectors.</p>
             </td>
             <td>
                   <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>evaluation_info</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <span title="numpy.typing.NDArray">NDArray</span>[<a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional info for each evaluation.</p>
-              </div>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>()</code>
             </td>
           </tr>
       </tbody>
