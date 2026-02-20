@@ -182,21 +182,20 @@ class DefaultHPCServer(ServerBase):
             if self._jobs[task_id] in jobs:
                 continue
             output_file = self._workdir / f"{task_id}.out"
-            if output_file.exists():
-                try:
-                    if output_file.stat().st_size > 0:
-                        with output_file.open("rb") as fp:
-                            self._results[task_id] = cloudpickle.load(fp)
-                        self._retries.pop(task_id, None)
-                        del self._jobs[task_id]
-                except (EOFError, UnpicklingError) as exc:
-                    if self._retries.get(task_id, 0) >= retries:
-                        self._results[task_id] = None
-                        self._retries.pop(task_id, None)
-                        del self._jobs[task_id]
-                        msg = f"No result found for task {task_id}"
-                        raise RuntimeError(msg) from exc
-                    self._retries[task_id] = self._retries.get(task_id, 0) + 1
+            try:
+                if output_file.stat().st_size > 0:
+                    with output_file.open("rb") as fp:
+                        self._results[task_id] = cloudpickle.load(fp)
+                    self._retries.pop(task_id, None)
+                    del self._jobs[task_id]
+            except (OSError, EOFError, UnpicklingError) as exc:
+                if self._retries.get(task_id, 0) >= retries:
+                    self._results[task_id] = None
+                    self._retries.pop(task_id, None)
+                    del self._jobs[task_id]
+                    msg = f"No result found for task {task_id}, it did not run"
+                    raise RuntimeError(msg) from exc
+                self._retries[task_id] = self._retries.get(task_id, 0) + 1
 
     def _get_results(self) -> None:
         remove = []
