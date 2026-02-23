@@ -96,6 +96,9 @@ class DefaultHPCServer(ServerBase):
         """
         super().__init__(queue_size=queue_size)
         self._workdir = Path(workdir).resolve()
+        if not self._workdir.exists():
+            msg = f"HPC work directory not found: {self._workdir}"
+            raise RuntimeError(msg)
         self._workers = workers
         self._interval = interval
         self._worker_task: asyncio.Task[None] | None = None
