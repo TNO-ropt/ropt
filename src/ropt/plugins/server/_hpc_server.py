@@ -172,7 +172,7 @@ class DefaultHPCServer(ServerBase):
             job_name=task_id,
             output=f"{task_id}.txt",
             working_directory=str(self._workdir),
-            command=f"python -m ropt.plugins.server {input_file} {output_file}",
+            command=f"python -m ropt.plugins.server {Path.cwd()} {input_file} {output_file}",
             submission_template=self._template,
         )
 
