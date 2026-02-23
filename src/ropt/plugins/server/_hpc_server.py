@@ -44,7 +44,7 @@ class DefaultHPCServer(ServerBase):
     def __init__(  # noqa: PLR0913
         self,
         *,
-        workdir: Path | str,
+        workdir: Path | str = "./",
         workers: int = 1,
         queue_size: int = 0,
         interval: float = 1,
@@ -116,7 +116,7 @@ class DefaultHPCServer(ServerBase):
             self._queue_adapter.switch_cluster(cluster)
 
         self._tasks: dict[UUID, Task] = {}
-        self._results: dict[UUID, Any | None] = {}
+        self._results: dict[UUID, Any] = {}
         self._jobs: dict[UUID, int] = {}
         self._retries: dict[UUID, int] = {}
 
@@ -190,7 +190,6 @@ class DefaultHPCServer(ServerBase):
                     del self._jobs[task_id]
             except (OSError, EOFError, UnpicklingError) as exc:
                 if self._retries.get(task_id, 0) >= retries:
-                    self._results[task_id] = None
                     self._retries.pop(task_id, None)
                     del self._jobs[task_id]
                     msg = f"No result found for task {task_id}, it did not run"
@@ -205,7 +204,6 @@ class DefaultHPCServer(ServerBase):
                 if isinstance(result, Exception):
                     task.cancel_all()
                     raise result
-                assert result is not None
                 task.put_result(result)
                 remove.append(task_id)
         for task_id in remove:
