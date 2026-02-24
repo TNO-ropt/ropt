@@ -174,16 +174,16 @@ class SciPyOptimizer(Optimizer):
                 self._options["workers"] = 1
             assert self._bounds is not None
             differential_evolution(
-                func=self._function,  # type: ignore[arg-type]
+                func=self._function,
                 x0=initial_values[self._config.variables.mask],
                 bounds=self._bounds,
-                constraints=self._constraints,  # type: ignore[arg-type]
+                constraints=self._constraints,
                 polish=False,
                 vectorized=self._parallel,
                 **self._options,
             )
         else:
-            minimize(  # type: ignore[call-overload,misc]
+            minimize(
                 fun=self._function,
                 x0=initial_values[self._config.variables.mask],
                 tol=self._config.optimizer.tolerance,

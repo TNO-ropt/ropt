@@ -20,6 +20,8 @@ from ropt.workflow import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from numpy.typing import NDArray
 
     from ropt.evaluator import EvaluatorContext, EvaluatorResult
@@ -62,6 +64,41 @@ def test_run_basic(enopt_config: dict[str, Any], evaluator: Any) -> None:
     assert np.allclose(
         optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
+
+
+def test_function_evaluator_with_info(
+    enopt_config: dict[str, Any], evaluator: Any, test_functions: Any
+) -> None:
+
+    def _function_dict(
+        variables: NDArray[np.float64],
+        *,
+        realization: int,
+        test_functions: list[Callable[[NDArray[np.float64], int], float]],
+        **kwargs: Any,  # noqa: ARG001
+    ) -> dict[str, Any]:
+        return {
+            "result": np.fromiter(
+                (func(variables, realization) for func in test_functions),
+                dtype=np.float64,
+            ),
+            "foo": "bar",
+        }
+
+    evaluator = create_evaluator(
+        "function_evaluator",
+        function=partial(_function_dict, test_functions=test_functions),
+        evaluation_info={"foo": object},
+    )
+    tracker = create_event_handler("tracker")
+    step = create_compute_step("optimizer", evaluator=evaluator)
+    step.add_event_handler(tracker)
+    step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
+    assert tracker["results"] is not None
+    assert np.allclose(
+        tracker["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+    )
+    assert tracker["results"].evaluations.evaluation_info["foo"] == "bar"
 
 
 def test_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:

@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import queue
-from typing import TYPE_CHECKING
+from collections.abc import Mapping
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -30,21 +31,24 @@ class DefaultAsyncEvaluator(Evaluator):
     def __init__(
         self,
         *,
-        function: Callable[..., NDArray[np.float64]],
+        function: Callable[..., NDArray[np.float64] | dict[str, Any]],
         server: ServerBase,
         queue_size: int = 0,
+        evaluation_info: dict[str, np.dtype] | None = None,
     ) -> None:
         """Initialize the DefaultFunctionEvaluator.
 
         Args:
-            function:   The function used for objectives and constraints.
-            server:     Optional evaluator server to use.
-            queue_size: Maximum size of the result queue.
+            function:        The function used for objectives and constraints.
+            server:          Optional evaluator server to use.
+            queue_size:      Maximum size of the result queue.
+            evaluation_info: Optional dictionary of evaluations info keys and data types.
         """
         super().__init__()
         self._function = function
         self._server = server
         self._queue_size = queue_size
+        self._evaluation_info = {} if evaluation_info is None else evaluation_info
         self._batch_id = -1
 
     def eval(
@@ -82,6 +86,11 @@ class DefaultAsyncEvaluator(Evaluator):
             )
 
         results = np.zeros((variables.shape[0], no + nc), dtype=np.float64)
+        evaluation_info: dict[str, NDArray[Any]] = {
+            key: np.zeros(variables.shape[0], dtype=dtype)
+            for key, dtype in self._evaluation_info.items()
+        }
+
         for _ in range(
             variables.shape[0] if context.active is None else context.active.sum()
         ):
@@ -89,8 +98,7 @@ class DefaultAsyncEvaluator(Evaluator):
                 try:
                     if (task := results_queue.get(timeout=1)) is None:
                         raise ComputeStepAborted(ExitCode.ABORT_FROM_ERROR)
-                    assert isinstance(task.result, np.ndarray)
-                    results[task.kwargs["eval_idx"], :] = task.result
+                    _handle_result(task, results, evaluation_info)
                     break
                 except queue.Empty:
                     continue
@@ -101,6 +109,7 @@ class DefaultAsyncEvaluator(Evaluator):
             batch_id=self._batch_id,
             objectives=results[:, :no],
             constraints=results[:, no:] if nc > 0 else None,
+            evaluation_info=evaluation_info,
         )
 
     async def _put_tasks(
@@ -138,3 +147,20 @@ class DefaultAsyncEvaluator(Evaluator):
 
         if not self._server.is_running():
             raise ComputeStepAborted(ExitCode.ABORT_FROM_ERROR)
+
+
+def _handle_result(
+    task: Task,
+    results: NDArray[np.float64],
+    evaluation_info: dict[str, NDArray[Any]],
+) -> None:
+    eval_idx = task.kwargs["eval_idx"]
+    if isinstance(task.result, np.ndarray):
+        results[eval_idx, :] = task.result
+    else:
+        assert isinstance(task.result, Mapping)
+        for key, value in task.result.items():
+            if key == "result":
+                results[eval_idx, :] = value
+            elif key in evaluation_info:
+                evaluation_info[key][eval_idx] = value
