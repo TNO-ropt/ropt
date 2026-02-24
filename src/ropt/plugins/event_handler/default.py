@@ -10,6 +10,8 @@
   - `observer`: Listens for events from specified sources, and calls a
       callback for each event
       ([`DefaultObserverHandler`][ropt.plugins.event_handler._observer.DefaultObserverHandler]).
+  - `table`: Collect results in a set of pandas data frames
+      ([`DefaultTableHandler`][ropt.plugins.event_handler._table.DefaultTableHandler]).
 """
 
 from __future__ import annotations
@@ -18,6 +20,7 @@ from typing import TYPE_CHECKING, Any, Final
 
 from ._observer import DefaultObserverHandler
 from ._store import DefaultStoreHandler
+from ._table import DefaultTableHandler
 from ._tracker import DefaultTrackerHandler
 from .base import EventHandlerPlugin
 
@@ -29,6 +32,7 @@ _EVENT_HANDLER_OBJECTS: Final[dict[str, type[EventHandler]]] = {
     "observer": DefaultObserverHandler,
     "tracker": DefaultTrackerHandler,
     "store": DefaultStoreHandler,
+    "table": DefaultTableHandler,
 }
 
 

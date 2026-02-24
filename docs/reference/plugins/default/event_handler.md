@@ -7,4 +7,5 @@
 
 ::: ropt.plugins.event_handler._tracker.DefaultTrackerHandler
 ::: ropt.plugins.event_handler._store.DefaultStoreHandler
+::: ropt.plugins.event_handler._table.DefaultTableHandler
 ::: ropt.plugins.event_handler._observer.DefaultObserverHandler
