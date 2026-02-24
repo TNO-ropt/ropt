@@ -95,7 +95,10 @@ class DefaultHPCServer(ServerBase):
                           `config_path` can be found.
         """
         super().__init__(queue_size=queue_size)
-        self._workdir = Path(workdir).resolve()
+        self._workdir = Path(workdir)
+        if not self._workdir.is_absolute():
+            msg = f"HPC working directory is not absolute: {self._workdir}"
+            raise RuntimeError(msg)
         if not self._workdir.exists():
             msg = f"HPC work directory not found: {self._workdir}"
             raise RuntimeError(msg)
@@ -175,7 +178,7 @@ class DefaultHPCServer(ServerBase):
             job_name=task_id,
             output=f"{task_id}.txt",
             working_directory=str(self._workdir),
-            command=f"python -m ropt.plugins.server {Path.cwd()} {input_file} {output_file}",
+            command=f"python -m ropt.plugins.server {input_file} {output_file}",
             submission_template=self._template,
         )
 
