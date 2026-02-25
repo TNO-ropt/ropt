@@ -1,5 +1,5 @@
 import asyncio
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Any, Literal
 
@@ -33,7 +33,7 @@ def _collect_results(
 
 
 async def dispatch_tasks(  # noqa: PLR0913
-    functions: list[tuple[Callable[..., None], tuple[Any, ...]]],
+    functions: Sequence[Callable[[], None]],
     server: Literal["async", "multiprocessing", "hpc"],
     *,
     report: Callable[[Any], None] | None = None,
@@ -73,13 +73,8 @@ async def dispatch_tasks(  # noqa: PLR0913
     results: dict[int, Any] = {}
     results_queue = ResultsQueue()
     tasks = [
-        _Task(
-            function=function,
-            args=args,
-            results_queue=results_queue,
-            id=idx,
-        )
-        for idx, (function, args) in enumerate(functions)
+        _Task(function=function, results_queue=results_queue, id=idx)
+        for idx, function in enumerate(functions)
     ]
     match server:
         case "hpc":

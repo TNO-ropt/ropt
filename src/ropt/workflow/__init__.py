@@ -1,7 +1,7 @@
 r"""Optimization workflow functionality."""
 
 from ._basic_optimizer import BasicOptimizer
-from ._dispatch_functions import dispatch_tasks
+from ._dispatch_tasks import dispatch_tasks
 from ._events import Event
 from ._factory import (
     create_compute_step,
