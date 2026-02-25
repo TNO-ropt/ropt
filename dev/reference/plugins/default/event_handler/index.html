@@ -1640,6 +1640,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.event_handler._table.DefaultTableHandler.__getitem__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __getitem__
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2257,6 +2268,17 @@
     <span class="md-ellipsis">
       
         handle_event
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.plugins.event_handler._table.DefaultTableHandler.__getitem__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __getitem__
       
     </span>
   </a>
@@ -3075,23 +3097,42 @@ appends them to the tuple stored in <code>self["results"]</code>.</p>
     <div class="doc doc-contents ">
 
         <p>Initialize a default table event handler.</p>
-<p>Tables are stored by their name in attributes, i.e. if the <code>functions</code>
+<p>Tables are accessed by their name in attributes, i.e. if the <code>functions</code>
 input has an entry <code>evaluations</code>, this table can be accessed via
-<code>handler["evaluations"]</code>.</p>
+<code>handler["evaluations"]</code>. Note that the tables are generated on the fly
+from internal data when accessing them in this way. When multiple access
+are needed, it is more efficient to first store them in a variable.</p>
+<p>The column names are formed from the field names of the results. Many
+fields may result in multiple columns in the DataFrame. For example,
+<code>evaluations.variables</code> will generate a separate column for each
+variable. If available, variable names will be used as column labels.
+Multi-dimensional fields, such as those with named realizations and
+objectives, will have column names that are tuples of the corresponding
+names.</p>
 <p>The stored tables contain human-readable column names in their <code>attrs</code>
-fields that are derived from the titles given in the input dictionaries.
-These can be used to rename the columns. For example:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">table</span> <span class="o">=</span> <span class="n">handler</span><span class="p">[</span><span class="s2">&quot;evaluations&quot;</span><span class="p">]</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">table</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">to_string</span><span class="p">())</span>
-</span></code></pre></div>
-<p>Note that these human-readable column names may contain new-lines. One
-way to handle these is to install and use the tabulate package:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tabulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">tabulate</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nb">print</span><span class="p">(</span><span class="n">tabulate</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="s2">&quot;keys&quot;</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s2">&quot;simple&quot;</span><span class="p">,</span> <span class="n">showindex</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
-</span></code></pre></div>
+fields that are derived from the titles given in the input dictionaries:</p>
+<ul>
+<li>"renamed_columns":   The column names are renamed according to the
+                       inputs dictionaries, and compound names are still
+                       tuples.</li>
+<li>"formatted_columns": The column names are renamed, and compound names
+                       are joined by newlines.</li>
+</ul>
+<p>These column names can be assigned to the column fields of the tables.</p>
 
+
+<details class="tip" open>
+  <summary>Multi-line column names.</summary>
+  <p>The column names obtained from the attributes via the "formatted_columns"
+key may contain new lines. These can be displayed well using the
+<code>tabulate</code> package:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tabulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">tabulate</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="s2">&quot;functions&quot;</span><span class="p">]</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">table</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;formatted_columns&quot;</span><span class="p">]</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">print</span><span class="p">(</span><span class="n">tabulate</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="s2">&quot;keys&quot;</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s2">&quot;simple&quot;</span><span class="p">,</span> <span class="n">showindex</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+</span></code></pre></div>
+</details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>
@@ -3190,6 +3231,103 @@ way to handle these is to install and use the tabulate package:</p>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="ropt.plugins.event_handler._table.DefaultTableHandler.__getitem__" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__getitem__</span>
+
+
+</h3>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__getitem__</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Retrieve a of a table from the event handler.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>key</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The string key identifying the table to retrieve.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The table associated with the specified key.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#AttributeError">AttributeError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the requested table does not exist.</p>
+              </div>
             </td>
           </tr>
       </tbody>
