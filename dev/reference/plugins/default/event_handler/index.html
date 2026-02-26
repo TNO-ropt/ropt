@@ -3009,7 +3009,105 @@ appends them to the tuple stored in <code>self["results"]</code>.</p>
 
 
 
-        <p>Default handler for generating result tables.</p>
+        <p>This event handler tracks results and stores them in pandas DataFrames.</p>
+<p><strong>Tables</strong></p>
+<p>The <code>functions</code> and <code>gradients</code> inputs are dictionaries where each item
+denotes a table to generate, for
+<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
+
+
+  
+      dataclass
+  " href="../../../optimization/results/#ropt.results.FunctionResults"><code>FunctionsResults</code></a> and
+<a class="autorefs autorefs-internal" title="            ropt.results.GradientResults
+
+
+  
+      dataclass
+  " href="../../../optimization/results/#ropt.results.GradientResults"><code>GradientsResults</code></a> respectively. Tables are
+accessed by their name in attributes, i.e. if the <code>functions</code> input has an
+entry <code>evaluations</code>, this table can be accessed via
+<code>handler["evaluations"]</code>. Note that the tables are generated on the fly from
+internal data when accessing them in this way. When multiple access are
+needed, it is more efficient to first store them in a variable.</p>
+<p>By default the <code>functions</code> and <code>gradients</code> are set to <code>None</code> directing the handler
+to generate a set of default tables:</p>
+<ul>
+<li>For the <code>functions</code> input:<ul>
+<li><code>"functions"</code>: contains a set of values of the calculated functions.</li>
+<li><code>"evaluations"</code>: contains a set of values for all evaluations.</li>
+<li><code>"constraints"</code>: contains a set of values for all constraints.</li>
+</ul>
+</li>
+<li>For the <code>gradients</code> input:<ul>
+<li><code>"gradients"</code>: contains a set of values of the calculated gradients.</li>
+<li><code>"perturbations"</code>: contains a set of values for all perturbations.</li>
+</ul>
+</li>
+</ul>
+<p>To change (or disable) the generation of these table, pass an appropriate
+(or empty) dictionary specifying the desired tables.</p>
+<p><strong>Table specification</strong></p>
+<p>Each value of each entry in the <code>functions</code> and <code>gradients</code> dictionaries is
+another dictionary that determines which fields in the results should be
+stored in the corresponding table. The keys denote the names of the fields,
+using attribute syntax. For instance a <code>result.function.objectives</code> key
+indicates the the result should contain a column with objective values that
+are found in the <code>objectives</code> field of the <code>function</code> field of the result.
+The values corresponding to the keys are used to provide the column names.</p>
+<p>For example, passing this dictionary via the <code>functions</code> input generates a
+table containing the batch id, the values of all calculated objectives and
+the vector of variables.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">&quot;functions&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        <span class="s2">&quot;batch_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Batch&quot;</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="s2">&quot;functions.objectives&quot;</span><span class="p">:</span> <span class="s2">&quot;Objective&quot;</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="s2">&quot;evaluations.variables&quot;</span><span class="p">:</span> <span class="s2">&quot;Variables&quot;</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="p">}</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Some fields may result in multiple columns in the DataFrame if their values
+are vectors or matrices. For example, <code>evaluations.variables</code> will generate
+a separate column for each variable. The table specification above may
+generate a pandas dataframe looking something like this:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>    Batch   Objective,0  Variables,v0  Variables,v1  Variables,v2
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>0       0  1.309826e+02      0.500000      0.900000      1.300000
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>1       0  4.362553e+12    120.900265     20.698539    -90.578972
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>...
+</span></code></pre></div>
+<p>Here, because the variables are vectors of length 2, there are two variable
+columns generated. The corresponding column names consist of the column
+title and the name of the variable vector, separated by a comma. Note that
+the <code>function.objectives</code> column also contains a comma followed by a 0
+value. This is because the <code>functions.objectives</code> is also a vector of
+values, there just happens to be only one objective. Its index is used
+instead of a name, because no name was provided in the configuration of the
+optimization. Fields may even have matrix values, in which case the column
+names may be contain two item names or indices separated by commas.</p>
+
+
+<details class="tip" open>
+  <summary>Changing the column name separator.</summary>
+  <p>By default a comma is used to separate fields in the column names if
+needed. The <code>sep</code> input can be used to provide an alternative separator.</p>
+<p>You can exploit this by specifying a newline as the separator and
+display a nicely formatted table using the <code>tabulate</code> package:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tabulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">tabulate</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nb">print</span><span class="p">(</span><span class="n">tabulate</span><span class="p">(</span><span class="n">table</span><span class="p">[</span><span class="s2">&quot;functions&quot;</span><span class="p">],</span> <span class="n">headers</span><span class="o">=</span><span class="s2">&quot;keys&quot;</span><span class="p">,</span> <span class="n">showindex</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+</span></code></pre></div>
+<p>which will show something like this using multi-line headers:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>  Batch         Objective    Variables    Variables     Variables
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>                        0           v0           v1            v2
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>-------  ----------------  -----------  -----------  ------------
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>      0           130.983          0.5          0.9           1.3
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>...
+</span></code></pre></div></p>
+</details>        <p><strong>Callback functionality</strong></p>
+<p>The tables are updated anytime a result is processed. To be able to do
+something with the tables each time they are updated a callback can be
+provided via the <code>callback</code> input. This callback will called anytime the
+tables are update, passing the handler as its only argument.</p>
 
 
 
@@ -3091,49 +3189,15 @@ appends them to the tuple stored in <code>self["results"]</code>.</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">functions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">gradients</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">EventHandler</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">EventHandler</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Initialize a default table event handler.</p>
-<p>Tables are accessed by their name in attributes, i.e. if the <code>functions</code>
-input has an entry <code>evaluations</code>, this table can be accessed via
-<code>handler["evaluations"]</code>. Note that the tables are generated on the fly
-from internal data when accessing them in this way. When multiple access
-are needed, it is more efficient to first store them in a variable.</p>
-<p>The column names are formed from the field names of the results. Many
-fields may result in multiple columns in the DataFrame. For example,
-<code>evaluations.variables</code> will generate a separate column for each
-variable. If available, variable names will be used as column labels.
-Multi-dimensional fields, such as those with named realizations and
-objectives, will have column names that are tuples of the corresponding
-names.</p>
-<p>The stored tables contain human-readable column names in their <code>attrs</code>
-fields that are derived from the titles given in the input dictionaries:</p>
-<ul>
-<li>"renamed_columns":   The column names are renamed according to the
-                       inputs dictionaries, and compound names are still
-                       tuples.</li>
-<li>"formatted_columns": The column names are renamed, and compound names
-                       are joined by newlines.</li>
-</ul>
-<p>These column names can be assigned to the column fields of the tables.</p>
 
-
-<details class="tip" open>
-  <summary>Multi-line column names.</summary>
-  <p>The column names obtained from the attributes via the "formatted_columns"
-key may contain new lines. These can be displayed well using the
-<code>tabulate</code> package:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tabulate</span><span class="w"> </span><span class="kn">import</span> <span class="n">tabulate</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="s2">&quot;functions&quot;</span><span class="p">]</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">table</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;formatted_columns&quot;</span><span class="p">]</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="nb">print</span><span class="p">(</span><span class="n">tabulate</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="s2">&quot;keys&quot;</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s2">&quot;simple&quot;</span><span class="p">,</span> <span class="n">showindex</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
-</span></code></pre></div>
-</details>
 
 <p><span class="doc-section-title">Parameters:</span></p>
     <table>
@@ -3176,6 +3240,22 @@ key may contain new lines. These can be displayed well using the
             </td>
             <td>
                   <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>sep</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Separator used in column names.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;,&#39;</code>
             </td>
           </tr>
           <tr class="doc-section-item">
