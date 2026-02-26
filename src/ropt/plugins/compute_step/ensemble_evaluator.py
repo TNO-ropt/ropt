@@ -72,10 +72,6 @@ class DefaultEnsembleEvaluatorComputeStep(ComputeStep):
         [`Results`][ropt.results.Results] objects emitted via the
         `FINISHED_EVALUATION` event.
 
-        Raises:
-            ValueError: If the input variables have the wrong shape.
-
-
         Args:
             config:     Optimizer configuration.
             variables:  Variable vector(s) to evaluate.
@@ -85,6 +81,9 @@ class DefaultEnsembleEvaluatorComputeStep(ComputeStep):
 
         Returns:
             An [`ExitCode`][ropt.enums.ExitCode] indicating the outcome.
+
+        Raises:
+            ValueError: If the input variables have the wrong shape.
         """
         event_data: dict[str, Any] = {"config": config, "transforms": transforms}
 

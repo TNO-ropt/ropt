@@ -304,12 +304,12 @@ class NormalizedConstraints:
     ) -> None:
         """Set the bounds of the normalization class.
 
-        Raises:
-            ValueError: If the bounds have changed.
-
         Args:
             lower_bounds: The lower bounds on the right hand sides.
             upper_bounds: The upper bounds on the right hand sides.
+
+        Raises:
+            ValueError: If the bounds have changed.
         """
         if (
             self._lower_bounds is None

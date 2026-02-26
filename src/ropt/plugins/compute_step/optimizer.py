@@ -131,10 +131,6 @@ class DefaultOptimizerComputeStep(ComputeStep):
         should contain the results of the nested optimization, and a flag
         indicating whether the optimization was aborted by the user.
 
-        Raises:
-            ValueError:   If the input variables have the wrong shape.
-            RuntimeError: Parallel optimization not supported for nested optimization.
-
         Args:
             config:              Optimizer configuration.
             transforms:          Optional transforms to apply to the variables,
@@ -145,6 +141,10 @@ class DefaultOptimizerComputeStep(ComputeStep):
 
         Returns:
             An exit code indicating the outcome of the optimization.
+
+        Raises:
+            ValueError:   If the input variables have the wrong shape.
+            RuntimeError: Parallel optimization not supported for nested optimization.
         """
         self._config = config
         self._transforms = transforms

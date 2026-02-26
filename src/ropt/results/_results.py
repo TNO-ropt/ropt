@@ -107,12 +107,12 @@ class Results(ABC):
             unstack:    Select axes to unstack. By default, no axes are
                         unstacked.
 
+        Returns:
+            A `pandas` DataFrame containing the results.
+
         Raises:
             NotImplementedError: If the `pandas` module is not installed.
             AttributeError:      If the field name is invalid.
-
-        Returns:
-            A `pandas` DataFrame containing the results.
 
         Warning:
             This function requires the `pandas` module to be installed.

@@ -43,11 +43,11 @@ class ResultField:
             name: The name of the field (sub-field) within the
                   `ResultField` instance or class.
 
-        Raises:
-            ValueError: If the provided field name is not recognized.
-
         Returns:
             A tuple of [`AxisName`][ropt.enums.AxisName] enums, representing the axes of the field.
+
+        Raises:
+            ValueError: If the provided field name is not recognized.
         """
         metadata = next(
             (item.metadata for item in fields(cls) if item.name == name), None

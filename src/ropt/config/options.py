@@ -69,14 +69,14 @@ class OptionsSchemaModel(BaseModel):
         specified `method` name. The resulting model can then be used to
         validate dictionaries of options against the defined schema.
 
-        Raises:
-            ValueError: If the specified method is not found in the schema.
-
         Args:
             method: The name of the method for which to create the options model.
 
         Returns:
             A Pydantic model class capable of validating options for the specified method.
+
+        Raises:
+            ValueError: If the specified method is not found in the schema.
         """
         options: dict[str, Any] | None = None
         for method_name, method_schema in self.methods.items():
