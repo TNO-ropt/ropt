@@ -9,7 +9,7 @@ from ropt.plugins.event_handler.base import EventHandler
 from ropt.results import Results, results_to_dataframe
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import Callable, Sequence
 
     from ropt.workflow import Event
 
@@ -68,6 +68,7 @@ class DefaultTableHandler(EventHandler):
         *,
         functions: dict[str, dict[str, str]] | None = None,
         gradients: dict[str, dict[str, str]] | None = None,
+        callback: Callable[[EventHandler], None] | None = None,
     ) -> None:
         """Initialize a default table event handler.
 
@@ -110,10 +111,12 @@ class DefaultTableHandler(EventHandler):
             ```
 
         Args:
-            functions:   Dictionary of tables with function results.
-            gradients:   Dictionary of tables with gradient results.
+            functions: Dictionary of tables with function results.
+            gradients: Dictionary of tables with gradient results.
+            callback:  An optional callback that is called when the tables are update.
         """
         super().__init__()
+        self._callback = callback
         if functions is None:
             functions = _FUNCTION_TABLES
         if gradients is None:
@@ -144,8 +147,11 @@ class DefaultTableHandler(EventHandler):
             else item.transform_from_optimizer(event.data["config"], transforms)
             for item in results
         )
-        for table in self._tables.values():
-            table.add_results(results)
+        if (
+            any(table.add_results(results) for table in self._tables.values())
+            and self._callback is not None
+        ):
+            self._callback(self)
 
     @property
     def event_types(self) -> set[EventType]:
@@ -185,12 +191,14 @@ class _ResultsTable:
         self._frames: list[pd.DataFrame] = []
         self._attrs: dict[str, Any] = {}
 
-    def add_results(self, results: Sequence[Results]) -> None:
+    def add_results(self, results: Sequence[Results]) -> bool:
         frame = results_to_dataframe(
             results, set(self._columns), result_type=self._results_type
         )
         if not frame.empty:
             self._frames.append(frame)
+            return True
+        return False
 
     def get_table(self) -> pd.DataFrame | None:
         data = pd.concat(self._frames)
