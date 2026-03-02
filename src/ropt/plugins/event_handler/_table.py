@@ -1,8 +1,7 @@
 from __future__ import annotations
 
+from importlib.util import find_spec
 from typing import TYPE_CHECKING, Any, Final, Literal
-
-import pandas as pd
 
 from ropt.enums import EventType
 from ropt.plugins.event_handler.base import EventHandler
@@ -12,6 +11,12 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
     from ropt.workflow import Event
+
+_HAVE_PANDAS: Final = find_spec("pandas") is not None
+
+if _HAVE_PANDAS:
+    import pandas as pd
+
 
 _FUNCTION_TABLES: Final[dict[str, dict[str, str]]] = {
     "functions": {
@@ -181,6 +186,10 @@ class DefaultTableHandler(EventHandler):
             sep:       Separator used in column names.
             callback:  An optional callback that is called when the tables are update.
         """
+        if not _HAVE_PANDAS:
+            msg = "The pandas module must be installed to use DefaultTableHandler"
+            raise NotImplementedError(msg)
+
         super().__init__()
         self._sep = sep
         self._callback = callback
