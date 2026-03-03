@@ -54,7 +54,7 @@ class _Worker:
                 result = await asyncio.to_thread(
                     task.function, *task.args, **task.kwargs
                 )
-                task.put_result(result)
+                await asyncio.to_thread(task.put_result, result)
             except Exception:
                 task.cancel_all()
                 self._server.cancel()

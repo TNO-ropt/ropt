@@ -80,9 +80,11 @@ class _Worker:
                 result = await loop.run_in_executor(
                     self._executor, _run_function, task.function, task.args, task.kwargs
                 )
-                task.put_result(result)
+                await asyncio.to_thread(task.put_result, result)
             except BrokenProcessPool:
-                task.put_result(ServerFailure("Background process was killed"))
+                await asyncio.to_thread(
+                    task.put_result, ServerFailure("Background process was killed")
+                )
             except Exception:
                 task.cancel_all()
                 self._server.cancel()
