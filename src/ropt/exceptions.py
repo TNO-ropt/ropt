@@ -25,3 +25,7 @@ class ComputeStepAborted(Exception):  # noqa: N818
         """
         self.exit_code = exit_code
         super().__init__()
+
+
+class ServerFailure(Exception):  # noqa: N818
+    """Raised when an evaluator server fails to execute a task."""

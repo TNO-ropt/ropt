@@ -5,8 +5,10 @@ from __future__ import annotations
 import asyncio
 import multiprocessing
 from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures.process import BrokenProcessPool
 from typing import TYPE_CHECKING, Any
 
+from ropt.exceptions import ServerFailure
 from ropt.plugins.server.base import Server, ServerBase, Task
 
 if TYPE_CHECKING:
@@ -79,6 +81,8 @@ class _Worker:
                     self._executor, _run_function, task.function, task.args, task.kwargs
                 )
                 task.put_result(result)
+            except BrokenProcessPool:
+                task.put_result(ServerFailure("Background process was killed"))
             except Exception:
                 task.cancel_all()
                 self._server.cancel()

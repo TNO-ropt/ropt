@@ -10,7 +10,7 @@ import numpy as np
 
 from ropt.enums import ExitCode
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
-from ropt.exceptions import ComputeStepAborted
+from ropt.exceptions import ComputeStepAborted, ServerFailure
 from ropt.plugins.server.base import ResultsQueue, ServerBase, Task
 
 from .base import Evaluator
@@ -155,12 +155,14 @@ def _handle_result(
     evaluation_info: dict[str, NDArray[Any]],
 ) -> None:
     eval_idx = task.kwargs["eval_idx"]
-    if isinstance(task.result, np.ndarray):
-        results[eval_idx, :] = task.result
-    else:
-        assert isinstance(task.result, Mapping)
-        for key, value in task.result.items():
-            if key == "result":
-                results[eval_idx, :] = value
-            elif key in evaluation_info:
-                evaluation_info[key][eval_idx] = value
+    match task.result:
+        case np.ndarray():
+            results[eval_idx, :] = task.result
+        case Mapping():
+            for key, value in task.result.items():
+                if key == "result":
+                    results[eval_idx, :] = value
+                elif key in evaluation_info:
+                    evaluation_info[key][eval_idx] = value
+        case ServerFailure():
+            results[eval_idx, :] = np.nan

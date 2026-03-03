@@ -10,6 +10,8 @@ from pickle import UnpicklingError  # noqa: S403
 from typing import TYPE_CHECKING, Any, Final
 from uuid import uuid4
 
+from ropt.exceptions import ServerFailure
+
 from .base import ServerBase, Task
 
 if TYPE_CHECKING:
@@ -198,12 +200,12 @@ class DefaultHPCServer(ServerBase):
                         self._results[task_id] = cloudpickle.load(fp)
                     self._retries.pop(task_id, None)
                     del self._jobs[task_id]
-            except (OSError, EOFError, UnpicklingError) as exc:
+            except (OSError, EOFError, UnpicklingError):
                 if self._retries.get(task_id, 0) >= retries:
                     self._retries.pop(task_id, None)
                     del self._jobs[task_id]
                     msg = f"No result found for task {task_id}, it did not run"
-                    raise RuntimeError(msg) from exc
+                    self._results[task_id] = ServerFailure(msg)
                 self._retries[task_id] = self._retries.get(task_id, 0) + 1
 
     def _get_results(self) -> None:
@@ -211,7 +213,9 @@ class DefaultHPCServer(ServerBase):
         for task_id, task in self._tasks.items():
             if task_id in self._results:
                 result = self._results.pop(task_id)
-                if isinstance(result, Exception):
+                if isinstance(result, Exception) and not isinstance(
+                    result, ServerFailure
+                ):
                     task.cancel_all()
                     raise result
                 task.put_result(result)
