@@ -52,6 +52,7 @@ class DefaultHPCServer(ServerBase):
         template: str | None = None,
         config_path: Path | str | None = None,
         cluster: str | None = None,
+        queue: str | None = None,
     ) -> None:
         """Initialize the HPC server.
 
@@ -89,6 +90,7 @@ class DefaultHPCServer(ServerBase):
             cluster:     Optional name of the cluster to use. If supported by the
                          installation, this makes it possible to switch between
                          clusters.
+            queue:       Optional queue to use on the cluster.
 
         Raises:
             RuntimeError: If neither a `template` is provided nor a valid
@@ -104,6 +106,7 @@ class DefaultHPCServer(ServerBase):
             raise RuntimeError(msg)
         self._workers = workers
         self._interval = interval
+        self._queue = queue
         self._worker_task: asyncio.Task[None] | None = None
 
         self._template = template
@@ -180,6 +183,7 @@ class DefaultHPCServer(ServerBase):
             working_directory=str(self._workdir),
             command=f"python -m ropt.plugins.server {input_file} {output_file}",
             submission_template=self._template,
+            queue=self._queue,
         )
 
     def _poll(self, retries: int = 2) -> None:
