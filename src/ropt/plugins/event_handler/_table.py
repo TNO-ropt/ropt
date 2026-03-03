@@ -223,10 +223,9 @@ class DefaultTableHandler(EventHandler):
             else item.transform_from_optimizer(event.data["config"], transforms)
             for item in results
         )
-        if (
-            any(table.add_results(results) for table in self._tables.values())
-            and self._callback is not None
-        ):
+
+        done = [table.add_results(results) for table in self._tables.values()]
+        if any(done) and self._callback is not None:
             self._callback(self)
 
     @property
