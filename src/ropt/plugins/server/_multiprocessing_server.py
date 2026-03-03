@@ -18,15 +18,19 @@ if TYPE_CHECKING:
 class DefaultMultiprocessingServer(ServerBase):
     """An evaluator server that employs a pool of multiprocessing workers."""
 
-    def __init__(self, *, workers: int = 1, queue_size: int = 0) -> None:
+    def __init__(
+        self, *, workers: int = 1, queue_size: int = 0, max_tasks_per_child: int = 100
+    ) -> None:
         """Initialize the server.
 
         Args:
-            workers:    The number of workers to use.
-            queue_size: Maximum size of the tasks queue.
+            workers:             The number of workers to use.
+            queue_size:          Maximum size of the tasks queue.
+            max_tasks_per_child: Number of tasks to execute before refreshing workers.
         """
         super().__init__(queue_size=queue_size)
         self._workers = workers
+        self._max_tasks_per_child = max_tasks_per_child
         self._worker_tasks: list[asyncio.Task[None]] = []
         self._executor: ProcessPoolExecutor | None = None
 
@@ -34,11 +38,12 @@ class DefaultMultiprocessingServer(ServerBase):
         """Start the server.
 
         Args:
-            task_group: The task group to use.
+            task_group:          The task group to use.
         """
-        context = multiprocessing.get_context("spawn")
         self._executor = ProcessPoolExecutor(
-            max_workers=self._workers, mp_context=context
+            max_workers=self._workers,
+            mp_context=multiprocessing.get_context("spawn"),
+            max_tasks_per_child=self._max_tasks_per_child,
         )
         workers = [
             _Worker(self._task_queue, self, self._executor)
