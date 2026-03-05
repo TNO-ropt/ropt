@@ -1,5 +1,5 @@
 import asyncio
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, Literal
 
@@ -33,7 +33,7 @@ def _collect_results(
 
 
 async def dispatch_tasks(  # noqa: PLR0913
-    functions: Sequence[Callable[[], None]],
+    functions: Sequence[Callable[[], None]] | Mapping[str, Callable[[], None]],
     server: Literal["async", "multiprocessing", "hpc"],
     *,
     report: Callable[[Any], None] | None = None,
@@ -74,10 +74,16 @@ async def dispatch_tasks(  # noqa: PLR0913
     """
     results: dict[int, Any] = {}
     results_queue = ResultsQueue()
-    tasks = [
-        _Task(function=function, results_queue=results_queue, id=idx)
-        for idx, function in enumerate(functions)
-    ]
+    if isinstance(functions, Mapping):
+        tasks = [
+            _Task(function=function, results_queue=results_queue, id=idx, name=name)
+            for idx, (name, function) in enumerate(functions.items())
+        ]
+    else:
+        tasks = [
+            _Task(function=function, results_queue=results_queue, id=idx)
+            for idx, function in enumerate(functions)
+        ]
     match server:
         case "hpc":
             eval_server = create_server(

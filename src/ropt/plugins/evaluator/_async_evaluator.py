@@ -35,6 +35,7 @@ class DefaultAsyncEvaluator(Evaluator):
         server: ServerBase,
         queue_size: int = 0,
         evaluation_info: dict[str, np.dtype] | None = None,
+        get_name: Callable[..., str] | None = None,
     ) -> None:
         """Initialize the DefaultFunctionEvaluator.
 
@@ -43,6 +44,7 @@ class DefaultAsyncEvaluator(Evaluator):
             server:          Optional evaluator server to use.
             queue_size:      Maximum size of the result queue.
             evaluation_info: Optional dictionary of evaluations info keys and data types.
+            get_name:        Optional callable to generate names for tasks.
         """
         super().__init__()
         self._function = function
@@ -50,6 +52,7 @@ class DefaultAsyncEvaluator(Evaluator):
         self._queue_size = queue_size
         self._evaluation_info = {} if evaluation_info is None else evaluation_info
         self._batch_id = -1
+        self._get_name = get_name
 
     def eval(
         self, variables: NDArray[np.float64], context: EvaluatorContext
@@ -122,12 +125,22 @@ class DefaultAsyncEvaluator(Evaluator):
             for eval_idx, realization in enumerate(context.realizations):
                 if not self._server.is_running():
                     break
-                perturbation = (
-                    -1
-                    if context.perturbations is None
-                    else int(context.perturbations[eval_idx])
-                )
                 if context.active is None or context.active[eval_idx]:
+                    perturbation = (
+                        -1
+                        if context.perturbations is None
+                        else int(context.perturbations[eval_idx])
+                    )
+                    task_name = (
+                        None
+                        if self._get_name is None
+                        else self._get_name(
+                            realization=int(realization),
+                            perturbation=perturbation,
+                            batch_id=self._batch_id,
+                            eval_idx=eval_idx,
+                        )
+                    )
                     task = Task(
                         results_queue=results_queue,
                         function=self._function,
@@ -138,6 +151,7 @@ class DefaultAsyncEvaluator(Evaluator):
                             "batch_id": self._batch_id,
                             "eval_idx": eval_idx,
                         },
+                        name=task_name,
                     )
                     await self._server.task_queue.put(task)
         except Exception:

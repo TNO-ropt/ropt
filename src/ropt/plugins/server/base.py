@@ -204,6 +204,7 @@ class Task(ABC):
         kwargs:        The keyword arguments to pass to the function.
         results_queue: The queue to put the result in.
         result:        The result of the function, or None if no result is available.
+        name:          Optional unique name of the task.
     """
 
     function: Callable[..., Any]
@@ -211,6 +212,7 @@ class Task(ABC):
     kwargs: dict[str, Any] = field(default_factory=dict)
     results_queue: ResultsQueue
     result: Any | None = None
+    name: str | None = None
 
     def put_result(self, result: Any) -> None:  # noqa: ANN401
         """Put the result in the result queue."""

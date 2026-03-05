@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import sysconfig
+from collections import ChainMap
 from importlib.util import find_spec
 from pathlib import Path
 from pickle import UnpicklingError  # noqa: S403
@@ -126,10 +127,10 @@ class DefaultHPCServer(ServerBase):
         if cluster is not None:
             self._queue_adapter.switch_cluster(cluster)
 
-        self._tasks: dict[UUID, Task] = {}
-        self._results: dict[UUID, Any] = {}
-        self._jobs: dict[UUID, int] = {}
-        self._retries: dict[UUID, int] = {}
+        self._tasks: dict[str | UUID, Task] = {}
+        self._results: dict[str | UUID, Any] = {}
+        self._jobs: dict[str | UUID, int] = {}
+        self._retries: dict[str | UUID, int] = {}
 
     async def start(self, task_group: asyncio.TaskGroup) -> None:
         """Start the server.
@@ -173,7 +174,10 @@ class DefaultHPCServer(ServerBase):
         self._get_results()
 
     def _submit(self, task: Task) -> None:
-        task_id = uuid4()
+        task_id = task.name or uuid4()
+        if task_id in ChainMap(self._tasks, self._results, self._jobs, self._retries):
+            msg = "Task ID already in use, unique names required"
+            raise RuntimeError(msg)
         self._tasks[task_id] = task
         input_file = self._workdir / f"{task_id}.in"
         output_file = self._workdir / f"{task_id}.out"
