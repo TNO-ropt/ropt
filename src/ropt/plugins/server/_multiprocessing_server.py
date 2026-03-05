@@ -19,9 +19,20 @@ class DefaultMultiprocessingServer(ServerBase):
     """An evaluator server that employs a pool of multiprocessing workers."""
 
     def __init__(
-        self, *, workers: int = 1, queue_size: int = 0, max_tasks_per_child: int = 100
+        self,
+        *,
+        workers: int = 1,
+        queue_size: int = 0,
+        max_tasks_per_child: int | None = None,
     ) -> None:
         """Initialize the server.
+
+        Note: `max_tasks_per_child`
+            The `max_tasks_per_child` is passed to the process executor pool. It
+            forces the pool tasks to be restarted after the set numbers of tasks
+            is executed. This adds to the overhead which can be significant. It
+            is therefore set to `None` be default. Adjust memory or resource
+            leaks are suspected.
 
         Args:
             workers:             The number of workers to use.
