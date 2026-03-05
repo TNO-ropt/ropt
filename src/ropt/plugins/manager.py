@@ -90,11 +90,12 @@ class PluginManager:
     this way are loaded and stored internally, categorized by their type.
 
     The primary way to interact with the manager is through the
-    [`get_plugin`][ropt.plugins.PluginManager.get_plugin] method, which
+    [`get_plugin`][ropt.plugins.manager.PluginManager.get_plugin] method, which
     retrieves a specific plugin class based on its type and a method name it
     supports. The
-    [`get_plugin_name`][ropt.plugins.PluginManager.get_plugin_name] method can
-    be used to find the name of a plugin that supports a given method.
+    [`get_plugin_name`][ropt.plugins.manager.PluginManager.get_plugin_name]
+    method can be used to find the name of a plugin that supports a given
+    method.
 
     **Example: Registering a Custom Optimizer Plugin**
 
@@ -116,6 +117,7 @@ class PluginManager:
     def __init__(self) -> None:
         """Initialize the plugin manager."""
         self._plugins: dict[PluginType, dict[str, type[Plugin]]] = {}
+        self._init()
 
     def _init(self) -> None:
         # ruff: disable[I001,PLC0415]
@@ -169,7 +171,6 @@ class PluginManager:
     def _get_plugin(
         self, plugin_type: PluginType, method: str
     ) -> tuple[str, Any] | None:
-        self._init()
         split_method = method.split("/", maxsplit=1)
         if len(split_method) > 1:
             plugin_name, method = split_method
@@ -238,8 +239,9 @@ class PluginManager:
         """Return the name of the plugin that supports a given method.
 
         Verifies whether a plugin of the specified `plugin_type` supports the
-        given `method`. This is useful for checking availability before attempting
-        to retrieve a plugin with [`get_plugin`][ropt.plugins.PluginManager.get_plugin].
+        given `method`. This is useful for checking availability before
+        attempting to retrieve a plugin with
+        [`get_plugin`][ropt.plugins.manager.PluginManager.get_plugin].
 
         The `method` argument can be specified in two ways:
 
@@ -278,3 +280,72 @@ def _from_entry_points(plugin_type: str) -> dict[str, type[Plugin]]:
             )
             raise TypeError(msg)
     return plugins
+
+
+_plugin_manager = None
+
+
+def get_plugin(plugin_type: PluginType, method: str) -> Any:  # noqa: ANN401
+    """Retrieve a plugin class by its type and a supported method name.
+
+    This method finds and returns the class of a plugin that matches the
+    specified `plugin_type` and supports the given `method`.
+
+    The `method` argument can be specified in two ways:
+
+    1.  **Explicit Plugin:** Use the format `"plugin-name/method-name"`.
+        This directly requests the `method-name` from the plugin named
+        `plugin-name`.
+    2.  **Implicit Plugin:** Provide only the `method-name`. The manager
+        will search through all registered plugins of the specified
+        `plugin_type` that allow discovery (see
+        [`Plugin.allows_discovery`][ropt.plugins.base.Plugin.allows_discovery]).
+        If the method is found in the default plugin of `ropt`, that plugin
+        is used. Otherwise it returns the first plugin found that supports
+        the `method-name`.
+
+    Args:
+        plugin_type: The category of the plugin (e.g., "optimizer", "sampler").
+        method:      The name of the method the plugin must support, potentially
+                        prefixed with the plugin name and a slash (`/`).
+
+    Returns:
+        The plugin class that matches the criteria.
+    """
+    global _plugin_manager  # noqa: PLW0603
+    if _plugin_manager is None:
+        _plugin_manager = PluginManager()
+    return _plugin_manager.get_plugin(plugin_type, method)
+
+
+def get_plugin_name(plugin_type: PluginType, method: str) -> str | None:
+    """Return the name of the plugin that supports a given method.
+
+    Verifies whether a plugin of the specified `plugin_type` supports the given
+    `method`. This is useful for checking availability before attempting to
+    retrieve a plugin with
+    [`get_plugin`][ropt.plugins.manager.PluginManager.get_plugin].
+
+    The `method` argument can be specified in two ways:
+
+    1.  **Explicit Plugin:** `"plugin-name/method-name"` checks if the specific
+        plugin named `plugin-name` supports `method-name`.
+    2.  **Implicit Plugin:** `"method-name"` searches through all discoverable
+        plugins of the given `plugin_type` to see if any support `method-name`.
+        If the method is found in the default plugin of `ropt`, that plugin
+        is used. Otherwise it returns the first plugin found that supports
+        the `method-name`.
+
+    Args:
+        plugin_type: The category of the plugin (e.g., "optimizer", "sampler").
+        method:      The name of the method to check, potentially prefixed
+                        with the plugin name and a slash (`/`).
+
+    Returns:
+        The name of a matching plugin supporting the specified method, or `None`.
+    """
+    global _plugin_manager  # noqa: PLW0603
+
+    if _plugin_manager is None:
+        _plugin_manager = PluginManager()
+    return _plugin_manager.get_plugin_name(plugin_type, method)

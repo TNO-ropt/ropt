@@ -20,9 +20,9 @@ custom strategies for aggregating ensemble results.
   functionality is provided by the `calculate_function` and `calculate_gradient`
   methods, which combine the function values and gradients from multiple
   realizations, respectively, using realization weights.
-* **Discovery:** The [`PluginManager`][ropt.plugins.PluginManager] discovers
-  available `FunctionEstimatorPlugin` implementations (typically via entry
-  points) and uses them to create `FunctionEstimator` instances as needed
+* **Discovery:** The [`PluginManager`][ropt.plugins.manager.PluginManager]
+  discovers available `FunctionEstimatorPlugin` implementations (typically via
+  entry points) and uses them to create `FunctionEstimator` instances as needed
   during workflow execution.
 
 **Built-in Function Estimator Plugins:**

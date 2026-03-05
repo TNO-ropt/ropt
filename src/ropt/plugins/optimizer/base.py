@@ -136,8 +136,9 @@ class OptimizerPlugin(Plugin):
         implementations must override this method to return an instance of their
         specific `Optimizer` subclass.
 
-        The [`PluginManager`][ropt.plugins.PluginManager] calls this method when
-        an optimization workflow requires an optimizer provided by this plugin.
+        The [`PluginManager`][ropt.plugins.manager.PluginManager] calls this
+        method when an optimization workflow requires an optimizer provided by
+        this plugin.
 
         Args:
             config:             The  configuration object containing the

@@ -19,9 +19,10 @@ third-party packages.
   used by the optimizer to request function and gradient evaluations from
   `ropt`. The optimization process is initiated by calling the optimizer's
   `start` method.
-* **Discovery:** The [`PluginManager`][ropt.plugins.PluginManager] discovers
-  available `OptimizerPlugin` implementations (typically via entry points) and
-  uses them to create `Optimizer` instances as needed during workflow execution.
+* **Discovery:** The [`PluginManager`][ropt.plugins.manager.PluginManager]
+  discovers available `OptimizerPlugin` implementations (typically via entry
+  points) and uses them to create `Optimizer` instances as needed during
+  workflow execution.
 
 **Utilities:**
 

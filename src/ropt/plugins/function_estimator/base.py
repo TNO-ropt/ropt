@@ -134,10 +134,11 @@ class FunctionEstimatorPlugin(Plugin):
     strategies.
 
     During optimization execution, the
-    [`PluginManager`][ropt.plugins.PluginManager] identifies the appropriate
-    function estimator plugin based on the configuration and uses its `create`
-    class method to instantiate the actual `FunctionEstimator` object that will
-    perform the aggregation of ensemble results (function values and gradients).
+    [`PluginManager`][ropt.plugins.manager.PluginManager] identifies the
+    appropriate function estimator plugin based on the configuration and uses
+    its `create` class method to instantiate the actual `FunctionEstimator`
+    object that will perform the aggregation of ensemble results (function
+    values and gradients).
     """
 
     @classmethod
@@ -152,8 +153,9 @@ class FunctionEstimatorPlugin(Plugin):
         objects. Plugin implementations must override this method to return an
         instance of their specific `FunctionEstimator` subclass.
 
-        The [`PluginManager`][ropt.plugins.PluginManager] calls this method when
-        the optimization requires a function estimator provided by this plugin.
+        The [`PluginManager`][ropt.plugins.manager.PluginManager] calls this
+        method when the optimization requires a function estimator provided by
+        this plugin.
 
         Args:
             enopt_config:    The main EnOpt configuration object.

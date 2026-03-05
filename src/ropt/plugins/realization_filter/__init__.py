@@ -20,9 +20,9 @@ of `ropt` with custom realization filtering strategies.
   is provided by the `get_realization_weights` method, which calculates and
   returns weights for each realization based on their objective and constraint
   values.
-* **Discovery:** The [`PluginManager`][ropt.plugins.PluginManager] discovers
-  available `RealizationFilterPlugin` implementations (typically via entry
-  points) and uses them to create `RealizationFilter` instances as needed.
+* **Discovery:** The [`PluginManager`][ropt.plugins.manager.PluginManager]
+  discovers available `RealizationFilterPlugin` implementations (typically via
+  entry points) and uses them to create `RealizationFilter` instances as needed.
 
 **Built-in Realization Filter Plugins:**
 

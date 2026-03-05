@@ -15,8 +15,8 @@ import numpy as np
 from ropt.config import EnOptConfig
 from ropt.enums import EventType, ExitCode
 from ropt.exceptions import ComputeStepAborted
-from ropt.plugins import plugin_manager
 from ropt.plugins.evaluator.base import Evaluator
+from ropt.plugins.manager import get_plugin_name
 
 from ._factory import create_compute_step, create_event_handler
 
@@ -335,10 +335,7 @@ class BasicOptimizer:
             compute_step_name, sep, script = os.environ["ROPT_SCRIPT"].partition("=")
             if not sep:
                 compute_step_name, script = "run_script", compute_step_name
-            if (
-                plugin_manager.get_plugin_name("compute_step", compute_step_name)
-                is not None
-            ):
+            if get_plugin_name("compute_step", compute_step_name) is not None:
                 compute_step: Callable[[], ExitCode] = create_compute_step(
                     compute_step_name
                 ).run(evaluator=self._evaluator, script=script)
@@ -361,7 +358,7 @@ def _custom_event_handlers() -> Iterator[str]:
     handlers = os.environ.get("ROPT_HANDLERS", "").split(",")
     handlers += _get_option("event_handlers")
     for handler in dict.fromkeys(handlers):
-        if plugin_manager.get_plugin_name("event_handler", handler) is not None:
+        if get_plugin_name("event_handler", handler) is not None:
             yield handler
 
 

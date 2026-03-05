@@ -12,7 +12,7 @@ import numpy as np
 from ropt.enums import ExitCode
 from ropt.exceptions import ComputeStepAborted
 from ropt.optimization import OptimizerCallbackResult
-from ropt.plugins import plugin_manager
+from ropt.plugins.manager import get_plugin
 from ropt.results import FunctionResults, GradientResults
 
 if TYPE_CHECKING:
@@ -109,8 +109,6 @@ class EnsembleOptimizer:
             constraints.
         3.  An [`EnsembleEvaluator`][ropt.ensemble_evaluator.EnsembleEvaluator]
             object: This object is responsible for evaluating functions.
-        4.  A [`PluginManager`][ropt.plugins.PluginManager] object: This object
-            provides access to optimizer plugins.
 
         Additionally, two optional callbacks can be provided to extend the
         functionality:
@@ -151,9 +149,7 @@ class EnsembleOptimizer:
         # Whether NaN values are allowed:
         self._allow_nan = False
 
-        plugin = plugin_manager.get_plugin(
-            "optimizer", method=self._enopt_config.optimizer.method
-        )
+        plugin = get_plugin("optimizer", method=self._enopt_config.optimizer.method)
 
         # Validate the optimizer options:
         plugin.validate_options(

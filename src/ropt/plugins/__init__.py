@@ -37,9 +37,10 @@ information passed via the optimization configuration.
 
 **Plugin Management and Discovery**
 
-The [`PluginManager`][ropt.plugins.PluginManager] class is central to the plugin
-system. It discovers and manages available plugins. Plugins are typically
-discovered automatically using Python's standard entry points mechanism.
+The [`PluginManager`][ropt.plugins.manager.PluginManager] class is central to
+the plugin system. It discovers and manages available plugins. Plugins are
+typically discovered automatically using Python's standard entry points
+mechanism.
 
 Each plugin type has a corresponding abstract base class that custom plugins
 must inherit from:
@@ -58,10 +59,10 @@ must inherit from:
 
 **Using Plugins**
 
-The [`PluginManager.get_plugin`][ropt.plugins.PluginManager.get_plugin] method
-is used internally by `ropt` to retrieve the appropriate plugin implementation
-based on a specified type and method name. The
-[`PluginManager.get_plugin_name`][ropt.plugins.PluginManager.get_plugin_name]
+The [`PluginManager.get_plugin`][ropt.plugins.manager.PluginManager.get_plugin]
+method is used internally by `ropt` to retrieve the appropriate plugin
+implementation based on a specified type and method name. The
+[`PluginManager.get_plugin_name`][ropt.plugins.manager.PluginManager.get_plugin_name]
 method can be used to find the name of a plugin that supports a given method.
 
 Plugins can implement multiple named methods. To request a specific method
@@ -73,9 +74,10 @@ primary or default method offered by that plugin, although specifying
 `"default"` without a plugin name is not permitted.
 
 Plugins retrieved by the
-[`PluginManager.get_plugin`][ropt.plugins.PluginManager.get_plugin] method
-generally implement a `create` factory method that will be used to instantiate
-the objects that implement the desired functionality. These objects must inherit
+[`PluginManager.get_plugin`][ropt.plugins.manager.PluginManager.get_plugin]
+method generally implement a `create` factory method that will be used to
+instantiate the objects that implement the desired functionality. These objects
+must inherit
 from the base class for the corresponding plugin type:
 
 - Workflow related plugins:
@@ -118,13 +120,8 @@ single call.
   plugin, supporting objectives based on mean or standard deviation.
 """
 
-from ._manager import PluginManager, PluginType
 from .base import Plugin
 
 __all__ = [
     "Plugin",
-    "PluginManager",
-    "PluginType",
 ]
-
-plugin_manager = PluginManager()  # noqa: RUF067

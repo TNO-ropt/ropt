@@ -74,8 +74,9 @@ class RealizationFilterPlugin(Plugin):
         objects. Plugin implementations must override this method to return an
         instance of their specific `RealizationFilter` subclass.
 
-        The [`PluginManager`][ropt.plugins.PluginManager] calls this method when
-        an optimization requires realization weights calculated by this plugin.
+        The [`PluginManager`][ropt.plugins.manager.PluginManager] calls this
+        method when an optimization requires realization weights calculated by
+        this plugin.
 
         Args:
             enopt_config: The main EnOpt configuration object.

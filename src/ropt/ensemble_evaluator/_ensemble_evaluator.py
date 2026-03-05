@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 from numpy.random import default_rng
 
-from ropt.plugins import plugin_manager
+from ropt.plugins.manager import get_plugin
 from ropt.results import (
     ConstraintInfo,
     FunctionEvaluations,
@@ -631,17 +631,17 @@ class EnsembleEvaluator:
 
     def _init_realization_filters(self) -> list[RealizationFilter]:
         return [
-            plugin_manager.get_plugin(
-                "realization_filter", method=filter_config.method
-            ).create(self._config, idx)
+            get_plugin("realization_filter", method=filter_config.method).create(
+                self._config, idx
+            )
             for idx, filter_config in enumerate(self._config.realization_filters)
         ]
 
     def _init_function_estimators(self) -> list[FunctionEstimator]:
         return [
-            plugin_manager.get_plugin(
-                "function_estimator", method=estimator_config.method
-            ).create(self._config, idx)
+            get_plugin("function_estimator", method=estimator_config.method).create(
+                self._config, idx
+            )
             for idx, estimator_config in enumerate(self._config.function_estimators)
         ]
 
@@ -652,8 +652,6 @@ class EnsembleEvaluator:
                 self._config.variables.mask & (self._config.variables.samplers == idx)
             )
             if variable_indices is None or variable_indices.size:
-                plugin = plugin_manager.get_plugin(
-                    "sampler", method=sampler_config.method
-                )
+                plugin = get_plugin("sampler", method=sampler_config.method)
                 samplers.append(plugin.create(self._config, idx, variable_indices, rng))
         return samplers

@@ -7,7 +7,7 @@ import pytest
 from pydantic import ValidationError
 
 from ropt.config.options import OptionsSchemaModel
-from ropt.plugins import PluginManager, plugin_manager
+from ropt.plugins.manager import PluginManager, get_plugin
 from ropt.plugins.optimizer.base import OptimizerPlugin
 from ropt.plugins.optimizer.scipy import SciPyOptimizerPlugin
 
@@ -57,12 +57,12 @@ class MockedPluginWithValidation(MockedPlugin1):
 
 
 def test_default_plugins() -> None:
-    plugin = plugin_manager.get_plugin("optimizer", "slsqp")
+    plugin = get_plugin("optimizer", "slsqp")
     assert issubclass(plugin, SciPyOptimizerPlugin)
 
 
 def test_default_plugins_full_spec() -> None:
-    plugin = plugin_manager.get_plugin("optimizer", "scipy/slsqp")
+    plugin = get_plugin("optimizer", "scipy/slsqp")
     assert issubclass(plugin, SciPyOptimizerPlugin)
 
 

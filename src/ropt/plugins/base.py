@@ -13,8 +13,9 @@ class Plugin(ABC):
     optimizer, sampler, or event handler) must inherit from this base class.
 
     It defines the core interface that all plugins must adhere to, ensuring
-    consistency and enabling the [`PluginManager`][ropt.plugins.PluginManager]
-    to discover and manage them effectively.
+    consistency and enabling the
+    [`PluginManager`][ropt.plugins.manager.PluginManager] to discover and manage
+    them effectively.
 
     Subclasses must implement the `is_supported` class method to indicate which
     named methods (functionalities) they provide. They can optionally override
@@ -29,10 +30,10 @@ class Plugin(ABC):
         """Verify if this plugin supports a specific named method.
 
         This class method is used by the
-        [`PluginManager`][ropt.plugins.PluginManager] (specifically its
-        [`get_plugin_name`][ropt.plugins.PluginManager.get_plugin_name] method)
-        to determine if this plugin class provides the functionality associated
-        with the given `method` name.
+        [`PluginManager`][ropt.plugins.manager.PluginManager] (specifically its
+        [`get_plugin_name`][ropt.plugins.manager.PluginManager.get_plugin_name]
+        method) to determine if this plugin class provides the functionality
+        associated with the given `method` name.
 
         Args:
             method: The string identifier of the method to check for support.
@@ -46,8 +47,9 @@ class Plugin(ABC):
         """Determine if the plugin allows implicit discovery by method name.
 
         By default (`True`), plugins can be found by the
-        [`PluginManager`][ropt.plugins.PluginManager] when a user provides only
-        a method name (without specifying the plugin, e.g., `"method-name"`).
+        [`PluginManager`][ropt.plugins.manager.PluginManager] when a user
+        provides only a method name (without specifying the plugin, e.g.,
+        `"method-name"`).
 
         If a plugin should *only* be used when explicitly named (e.g.,
         `"plugin-name/method-name"`), it must override this class method to

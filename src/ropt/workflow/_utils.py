@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from ropt.plugins import plugin_manager
+from ropt.plugins.manager import get_plugin, get_plugin_name
 
 
 def find_sampler_plugin(method: str) -> str | None:
@@ -23,7 +23,7 @@ def find_sampler_plugin(method: str) -> str | None:
     Returns:
         The name of the plugin that implements the sampler method or `None`.
     """
-    return plugin_manager.get_plugin_name("sampler", method)
+    return get_plugin_name("sampler", method)
 
 
 def find_optimizer_plugin(method: str) -> str | None:
@@ -42,7 +42,7 @@ def find_optimizer_plugin(method: str) -> str | None:
     Returns:
         The name of the plugin that implements the optimizer method or `None`.
     """
-    return plugin_manager.get_plugin_name("optimizer", method)
+    return get_plugin_name("optimizer", method)
 
 
 def validate_optimizer_options(
@@ -61,4 +61,4 @@ def validate_optimizer_options(
         method:  The specific optimization method name.
         options: The dictionary or a list of strings of options.
     """
-    plugin_manager.get_plugin("optimizer", method).validate_options(method, options)
+    get_plugin("optimizer", method).validate_options(method, options)

@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from ropt.plugins import plugin_manager
 from ropt.plugins.compute_step.base import ComputeStep
 from ropt.plugins.evaluator.base import Evaluator
 from ropt.plugins.event_handler.base import EventHandler
+from ropt.plugins.manager import get_plugin
 from ropt.plugins.server.base import Server
 
 
@@ -21,9 +21,7 @@ def create_evaluator(method: str, **kwargs: Any) -> Evaluator:  # noqa: ANN401
     Returns:
         The new evaluator.
     """
-    evaluator = plugin_manager.get_plugin("evaluator", method=method).create(
-        method, **kwargs
-    )
+    evaluator = get_plugin("evaluator", method=method).create(method, **kwargs)
     assert isinstance(evaluator, Evaluator)
     return evaluator
 
@@ -38,7 +36,7 @@ def create_server(method: str, **kwargs: Any) -> Server:  # noqa: ANN401
     Returns:
         The new server.
     """
-    server = plugin_manager.get_plugin("server", method=method).create(method, **kwargs)
+    server = get_plugin("server", method=method).create(method, **kwargs)
     assert isinstance(server, Server)
     return server
 
@@ -53,9 +51,7 @@ def create_event_handler(method: str, **kwargs: Any) -> EventHandler:  # noqa: A
     Returns:
         The new event handler.
     """
-    handler = plugin_manager.get_plugin("event_handler", method=method).create(
-        method, **kwargs
-    )
+    handler = get_plugin("event_handler", method=method).create(method, **kwargs)
     assert isinstance(handler, EventHandler)
     return handler
 
@@ -70,8 +66,6 @@ def create_compute_step(method: str, **kwargs: Any) -> ComputeStep:  # noqa: ANN
     Returns:
         The new compute step.
     """
-    compute_step = plugin_manager.get_plugin("compute_step", method=method).create(
-        method, **kwargs
-    )
+    compute_step = get_plugin("compute_step", method=method).create(method, **kwargs)
     assert isinstance(compute_step, ComputeStep)
     return compute_step

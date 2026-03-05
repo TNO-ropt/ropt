@@ -37,8 +37,8 @@ class ServerPlugin(Plugin):
         implementations must override this method to return an instance of their
         specific `Server` subclass.
 
-        The [`PluginManager`][ropt.plugins.PluginManager] calls this method when
-        an evaluator provided by this plugin is requested.
+        The [`PluginManager`][ropt.plugins.manager.PluginManager] calls this
+        method when an evaluator provided by this plugin is requested.
 
         The `name` argument specifies the requested evaluator, potentially
         in the format `"plugin-name/method-name"` or just `"method-name"`.
