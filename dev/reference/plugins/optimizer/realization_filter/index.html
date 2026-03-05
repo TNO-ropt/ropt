@@ -2084,9 +2084,9 @@ of <code>ropt</code> with custom realization filtering strategies.</p>
   is provided by the <code>get_realization_weights</code> method, which calculates and
   returns weights for each realization based on their objective and constraint
   values.</li>
-<li><strong>Discovery:</strong> The <a class="autorefs autorefs-internal" title="            PluginManager" href="../../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> discovers
-  available <code>RealizationFilterPlugin</code> implementations (typically via entry
-  points) and uses them to create <code>RealizationFilter</code> instances as needed.</li>
+<li><strong>Discovery:</strong> The <a class="autorefs autorefs-internal" title="            PluginManager" href="../../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a>
+  discovers available <code>RealizationFilterPlugin</code> implementations (typically via
+  entry points) and uses them to create <code>RealizationFilter</code> instances as needed.</li>
 </ul>
 <p><strong>Built-in Realization Filter Plugins:</strong></p>
 <p>The default
@@ -2192,8 +2192,9 @@ strategies.</p>
 <a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.base.RealizationFilter" href="#ropt.plugins.realization_filter.base.RealizationFilter"><code>RealizationFilter</code></a>
 objects. Plugin implementations must override this method to return an
 instance of their specific <code>RealizationFilter</code> subclass.</p>
-<p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="../../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> calls this method when
-an optimization requires realization weights calculated by this plugin.</p>
+<p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="../../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> calls this
+method when an optimization requires realization weights calculated by
+this plugin.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

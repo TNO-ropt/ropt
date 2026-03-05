@@ -2459,9 +2459,10 @@ third-party packages.</p>
   used by the optimizer to request function and gradient evaluations from
   <code>ropt</code>. The optimization process is initiated by calling the optimizer's
   <code>start</code> method.</li>
-<li><strong>Discovery:</strong> The <a class="autorefs autorefs-internal" title="            PluginManager" href="../../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> discovers
-  available <code>OptimizerPlugin</code> implementations (typically via entry points) and
-  uses them to create <code>Optimizer</code> instances as needed during workflow execution.</li>
+<li><strong>Discovery:</strong> The <a class="autorefs autorefs-internal" title="            PluginManager" href="../../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a>
+  discovers available <code>OptimizerPlugin</code> implementations (typically via entry
+  points) and uses them to create <code>Optimizer</code> instances as needed during
+  workflow execution.</li>
 </ul>
 <p><strong>Utilities:</strong></p>
 <p>The <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.utils" href="#ropt.plugins.optimizer.utils"><code>ropt.plugins.optimizer.utils</code></a> module offers
@@ -2574,8 +2575,9 @@ act as factories for specific optimization algorithms or backends.</p>
 <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.Optimizer" href="#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a> objects. Plugin
 implementations must override this method to return an instance of their
 specific <code>Optimizer</code> subclass.</p>
-<p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="../../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> calls this method when
-an optimization workflow requires an optimizer provided by this plugin.</p>
+<p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="../../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> calls this
+method when an optimization workflow requires an optimizer provided by
+this plugin.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

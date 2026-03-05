@@ -2074,8 +2074,8 @@ an optimization workflow.</p>
 <a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.Evaluator" href="#ropt.plugins.evaluator.base.Evaluator"><code>Evaluator</code></a> objects. Plugin
 implementations must override this method to return an instance of their
 specific <code>Evaluator</code> subclass.</p>
-<p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="../../plugin_manager/#ropt.plugins.PluginManager"><code>PluginManager</code></a> calls this method when
-an evaluator provided by this plugin is requested.</p>
+<p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="../../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> calls this
+method when an evaluator provided by this plugin is requested.</p>
 <p>The <code>name</code> argument specifies the requested evaluator, potentially
 in the format <code>"plugin-name/method-name"</code> or just <code>"method-name"</code>.
 Implementations can use this <code>name</code> to vary the created evaluator if
