@@ -4,8 +4,7 @@ from dataclasses import dataclass
 from typing import Any, Literal
 
 from ropt.plugins.server.base import ResultsQueue, Server, Task
-
-from ._factory import create_server
+from ropt.workflow.servers import AsyncServer, HPCServer, MultiprocessingServer
 
 
 @dataclass(kw_only=True)
@@ -84,19 +83,16 @@ async def dispatch_tasks(  # noqa: PLR0913
             _Task(function=function, results_queue=results_queue, id=idx)
             for idx, function in enumerate(functions)
         ]
+    eval_server: HPCServer | AsyncServer | MultiprocessingServer
     match server:
         case "hpc":
-            eval_server = create_server(
-                "hpc_server",
-                workdir=workdir,
-                workers=workers,
-                cluster=cluster,
-                queue=queue,
+            eval_server = HPCServer(
+                workdir=workdir, workers=workers, cluster=cluster, queue=queue
             )
         case "thread":
-            eval_server = create_server("async_server", workers=workers)
+            eval_server = AsyncServer(workers=workers)
         case "multiprocessing":
-            eval_server = create_server("async_server", workers=workers)
+            eval_server = MultiprocessingServer(workers=workers)
         case _:
             msg = f"Invalid server: {server}"
             raise ValueError(msg)

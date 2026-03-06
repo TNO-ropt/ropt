@@ -9,49 +9,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
-from ropt.plugins.base import Plugin
-
 if TYPE_CHECKING:
     from collections.abc import Callable
-
-
-class ServerPlugin(Plugin):
-    """Abstract base class for asynchronous server plugins.
-
-    This class defines the interface for plugins responsible for creating
-    [`Evaluator`][ropt.plugins.server.base.Server] instances within
-    an optimization workflow.
-    """
-
-    @classmethod
-    @abstractmethod
-    def create(
-        cls,
-        name: str,
-        **kwargs: Any,  # noqa: ANN401
-    ) -> Server:
-        """Create a Server instance.
-
-        This abstract class method serves as a factory for creating concrete
-        [`Server`][ropt.plugins.server.base.Server] objects. Plugin
-        implementations must override this method to return an instance of their
-        specific `Server` subclass.
-
-        The [`PluginManager`][ropt.plugins.manager.PluginManager] calls this
-        method when an evaluator provided by this plugin is requested.
-
-        The `name` argument specifies the requested evaluator, potentially
-        in the format `"plugin-name/method-name"` or just `"method-name"`.
-        Implementations can use this `name` to vary the created evaluator if
-        the plugin supports multiple evaluator types.
-
-        Args:
-            name:   The requested server name (potentially plugin-specific).
-            kwargs: Additional arguments for custom configuration.
-
-        Returns:
-            An initialized instance of an `Server` subclass.
-        """
 
 
 class Server(ABC):

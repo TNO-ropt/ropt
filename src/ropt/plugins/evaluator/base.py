@@ -3,54 +3,13 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
-
-from ropt.plugins.base import Plugin
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
     from ropt.evaluator import EvaluatorContext, EvaluatorResult
-
-
-class EvaluatorPlugin(Plugin):
-    """Abstract base class for evaluator plugins.
-
-    This class defines the interface for plugins responsible for creating
-    [`Evaluator`][ropt.plugins.evaluator.base.Evaluator] instances within
-    an optimization workflow.
-    """
-
-    @classmethod
-    @abstractmethod
-    def create(
-        cls,
-        name: str,
-        **kwargs: Any,  # noqa: ANN401
-    ) -> Evaluator:
-        """Create an Evaluator instance.
-
-        This abstract class method serves as a factory for creating concrete
-        [`Evaluator`][ropt.plugins.evaluator.base.Evaluator] objects. Plugin
-        implementations must override this method to return an instance of their
-        specific `Evaluator` subclass.
-
-        The [`PluginManager`][ropt.plugins.manager.PluginManager] calls this
-        method when an evaluator provided by this plugin is requested.
-
-        The `name` argument specifies the requested evaluator, potentially
-        in the format `"plugin-name/method-name"` or just `"method-name"`.
-        Implementations can use this `name` to vary the created evaluator if
-        the plugin supports multiple evaluator types.
-
-        Args:
-            name:    The requested evaluator name (potentially plugin-specific).
-            kwargs:  Additional arguments for custom configuration.
-
-        Returns:
-            An initialized instance of an `Evaluator` subclass.
-        """
 
 
 class Evaluator(ABC):
@@ -61,9 +20,6 @@ class Evaluator(ABC):
     for performing the actual evaluation of variables using an
     [`EvaluatorContext`][ropt.evaluator.EvaluatorContext] and returning an
     [`EvaluatorResult`][ropt.evaluator.EvaluatorResult].
-
-    `Evaluator` instances are typically created using the
-    [`create_evaluator`][ropt.workflow.create_evaluator] function.
     """
 
     @abstractmethod

@@ -5,43 +5,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
-from ropt.plugins.base import Plugin
 from ropt.plugins.event_handler import EventHandler
-
-
-class ComputeStepPlugin(Plugin):
-    """Abstract base class for plugins that create ComputeStep instances.
-
-    This class defines the interface for plugins that act as factories for
-    [`ComputeStep`][ropt.plugins.compute_step.base.ComputeStep] objects.
-    """
-
-    @classmethod
-    @abstractmethod
-    def create(
-        cls,
-        name: str,
-        **kwargs: Any,  # noqa: ANN401
-    ) -> ComputeStep:
-        """Create a ComputeStep instance.
-
-        This abstract class method serves as a factory for creating concrete
-        [`ComputeStep`][ropt.plugins.compute_step.base.ComputeStep] objects. Plugin
-        implementations must override this method to return an instance of
-        their specific `ComputeStep` subclass.
-
-        The `name` argument specifies the requested compute step, potentially in
-        the format `"plugin-name/method-name"` or just `"method-name"`.
-        Implementations can use this `name` to vary the created compute step if the
-        plugin supports multiple compute step types.
-
-        Args:
-            name:   The requested compute step name (potentially plugin-specific).
-            kwargs: Additional arguments for custom configuration.
-
-        Returns:
-            An initialized instance of a `ComputeStep` subclass.
-        """
 
 
 class ComputeStep(ABC):
@@ -51,9 +15,6 @@ class ComputeStep(ABC):
     within an optimization workflow. Concrete implementations, which perform
     specific actions like running an optimizer or evaluating functions, must
     inherit from this base class.
-
-    `ComputeStep` instances are typically created using the
-    [`create_compute_step`][ropt.workflow.create_compute_step] function.
     """
 
     def __init__(self) -> None:

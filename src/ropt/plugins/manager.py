@@ -6,14 +6,10 @@ from functools import cache
 from importlib.metadata import entry_points
 from typing import TYPE_CHECKING, Any, Final, Literal, cast
 
-from .compute_step.base import ComputeStepPlugin
-from .evaluator.base import EvaluatorPlugin
-from .event_handler.base import EventHandlerPlugin
 from .function_estimator.base import FunctionEstimatorPlugin
 from .optimizer.base import OptimizerPlugin
 from .realization_filter.base import RealizationFilterPlugin
 from .sampler.base import SamplerPlugin
-from .server.base import ServerPlugin
 
 if TYPE_CHECKING:
     from ropt.plugins.base import Plugin
@@ -24,10 +20,6 @@ PluginType = Literal[
     "sampler",
     "realization_filter",
     "function_estimator",
-    "event_handler",
-    "compute_step",
-    "evaluator",
-    "server",
 ]
 """Represents the valid types of plugins supported by `ropt`.
 
@@ -43,14 +35,6 @@ role in the optimization process:
   ([`RealizationFilterPlugin`][ropt.plugins.realization_filter.base.RealizationFilterPlugin]).
 * `"function_estimator"`: Plugins for estimating objective functions and gradients
   ([`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.base.FunctionEstimatorPlugin]).
-* `"event_handler"`: Plugins that create event handlers for processing optimization
-  results ([`EventHandlerPlugin`][ropt.plugins.event_handler.base.EventHandlerPlugin]).
-* `"compute_step"`: Plugins that define executable steps within an optimization workflow
-  ([`ComputeStepPlugin`][ropt.plugins.compute_step.base.ComputeStepPlugin]).
-* `"evaluator"`: Plugins that define evaluators within an optimization workflow
-  ([`EvaluatorPlugin`][ropt.plugins.evaluator.base.EvaluatorPlugin]).
-* `"server"`: Plugins that define servers within an optimization workflow
-  ([`ServerPlugin`][ropt.plugins.server.base.ServerPlugin]).
 """
 
 
@@ -59,10 +43,6 @@ _PLUGIN_TYPES: Final = {
     "optimizer": OptimizerPlugin,
     "sampler": SamplerPlugin,
     "realization_filter": RealizationFilterPlugin,
-    "event_handler": EventHandlerPlugin,
-    "compute_step": ComputeStepPlugin,
-    "evaluator": EvaluatorPlugin,
-    "server": ServerPlugin,
 }
 
 _DEFAULT_PLUGINS: Final = {
@@ -70,10 +50,6 @@ _DEFAULT_PLUGINS: Final = {
     "optimizer": "scipy",
     "sampler": "scipy",
     "realization_filter": "default",
-    "event_handler": "default",
-    "compute_step": "default",
-    "evaluator": "default",
-    "server": "default",
 }
 
 
@@ -129,10 +105,6 @@ class PluginManager:
         from .sampler.scipy import SciPySamplerPlugin
         from .realization_filter.default import DefaultRealizationFilterPlugin
         from .function_estimator.default import DefaultFunctionEstimatorPlugin
-        from .compute_step.default import DefaultComputeStepPlugin
-        from .event_handler.default import DefaultEventHandlerPlugin
-        from .evaluator.default import DefaultEvaluatorPlugin
-        from .server.default import DefaultServerPlugin
 
         self._add_plugin("optimizer", "scipy", SciPyOptimizerPlugin)
         self._add_plugin("optimizer", "external", ExternalOptimizerPlugin)
@@ -143,10 +115,6 @@ class PluginManager:
         self._add_plugin(
             "function_estimator", "default", DefaultFunctionEstimatorPlugin
         )
-        self._add_plugin("compute_step", "default", DefaultComputeStepPlugin)
-        self._add_plugin("event_handler", "default", DefaultEventHandlerPlugin)
-        self._add_plugin("evaluator", "default", DefaultEvaluatorPlugin)
-        self._add_plugin("server", "default", DefaultServerPlugin)
 
         for plugin_type in _PLUGIN_TYPES:
             for name, plugin in _from_entry_points(plugin_type).items():

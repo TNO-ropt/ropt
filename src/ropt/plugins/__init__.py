@@ -7,19 +7,7 @@ custom or third-party components, installed as separate packages.
 `ropt` supports several types of plugins, each addressing a specific aspect of
 the optimization workflow:
 
-**Workflow related plugins:**
-
-Workflow related plugins may directly be used by the user to create components
-when building optimization workflows, generally via these convenience functions:
-
-  - [create_compute_step][ropt.workflow.create_compute_step]: Create
-    compute steps, such as optimizations, to run during workflow execution.
-  - [create_event_handler][ropt.workflow.create_event_handler]:
-    Create handlers to process events generated during optimization.
-  - [create_evaluator][ropt.workflow.create_event_handler]: Create
-    evaluators to for use by compute steps.
-
-**Optimizer related plugins:**
+***Optimizer related plugins:**
 
 These plugins are used to implement specific features of the ensemble optimizer:
 
@@ -90,12 +78,6 @@ from the base class for the corresponding plugin type:
   [`RealizationFilter`][ropt.plugins.realization_filter.base.RealizationFilter]
 - Function Estimator:
   [`FunctionEstimator`][ropt.plugins.function_estimator.base.FunctionEstimator]
-
-The [create_evaluator][ropt.workflow.create_event_handler],
-[create_event_handler][ropt.workflow.create_event_handler] and
-[create_compute_step][ropt.workflow.create_compute_step]
-convenience functions combine plugin discovery and object creation into a
-single call.
 
 **Pre-installed Plugins Included with `ropt`**
 
