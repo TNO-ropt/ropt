@@ -2190,79 +2190,25 @@ store the best result.</p>
 <details class="note" open>
   <summary>Customization</summary>
   <p>The optimization workflow executed by <code>BasicOptimizer</code> can be tailored
-in two main ways: by adding event handlers to the default workflow or by
-running an entirely different workflow:</p>
-<ol>
-<li>
-<p><strong>Adding Custom Event Handlers</strong></p>
-<p>This method allows for custom processing of events emitted by the
-<em>default</em> optimization workflow, without replacing the workflow
-itself. This is useful for tasks like custom logging or data
+by adding event handlers. This allows for custom processing of events
+emitted by the <em>default</em> optimization workflow, without replacing the
+workflow itself. This is useful for tasks like custom logging or data
 processing.</p>
-<p>Event handlers can be specified in two ways, and handlers from both
-sources will be combined:</p>
-<ul>
-<li>
-<p><strong>Environment Variable</strong>: If the <code>ROPT_HANDLERS</code> environment
-    variable contains a comma-separated list of event handler names,
-    these handlers will be added to the default optimization
-    workflow. Each name must correspond to a registered
-    <code>EventHandler</code>.</p>
-</li>
-<li>
-<p><strong>JSON Configuration File</strong>: If a JSON configuration file is
-    found at <code>&lt;prefix&gt;/share/ropt/options.json</code> (where <code>&lt;prefix&gt;</code> is
-    the Python installation prefix or a system-wide data
-    prefix.<sup id="ropt.workflow.BasicOptimizer--fnref:1"><a class="footnote-ref" href="#ropt.workflow.BasicOptimizer--fn:1">1</a></sup>), <code>BasicOptimizer</code> will look for specific keys to
-    load additional event handlers. If this JSON file contains a
-    <code>basic_optimizer</code> key, and nested within it an <code>event_handlers</code>
-    key, the value of <code>event_handlers</code> should be a list of strings.
-    Each string in this list should be the name of a registered
-    <code>EventHandler</code>. These handlers will be added to
-    those found via <code>ROPT_HANDLERS</code>.</p>
+<p>Event handlers can be specified using a JSON configuration that file is
+found at <code>&lt;prefix&gt;/share/ropt/options.json</code> (where <code>&lt;prefix&gt;</code> is the
+Python installation prefix or a system-wide data prefix.<sup id="ropt.workflow.BasicOptimizer--fnref:1"><a class="footnote-ref" href="#ropt.workflow.BasicOptimizer--fn:1">1</a></sup>), If this
+JSON file contains a <code>basic_optimizer</code> key, and nested within it an
+<code>event_handlers</code> key, the value of <code>event_handlers</code> should be a list of
+strings of the form <code>"module_name.handler_name"</code>, where <code>module_name</code> is
+the name of module to load that should contain an event handler class
+with the name <code>module_name</code>.</p>
 <p>Example <code>shared/ropt/options.json</code>:</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="nt">&quot;basic_optimizer&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="nt">&quot;event_handlers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;custom_logger&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;extra/event_processor&quot;</span><span class="p">]</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">        </span><span class="nt">&quot;event_handlers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;mylogger.Logger&quot;</span><span class="p">]</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="p">}</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">}</span>
 </span></code></pre></div>
-</li>
-</ul>
-<p>Note that if a custom optimization workflow is installed using the
-<code>ROPT_SCRIPT</code> environment variable (see below), these custom
-handlers will not be installed.</p>
-</li>
-<li>
-<p><strong>Custom Workflow Execution</strong></p>
-<p>If the <code>ROPT_SCRIPT</code> environment variable contains an option in the
-format <code>step-name=script.py</code> (where <code>script.py</code> may be any file),
-the named custom compute step will be executed <em>instead</em> of the standard
-optimization workflow, passing it the name of the script that
-defines the new optimization workflow.</p>
-<p>The custom compute step (<code>step-name</code>) must adhere to the following:</p>
-<ul>
-<li>It must be a registered <code>ComputeStep</code>.</li>
-<li>Its <code>run</code> method  must accept<ol>
-<li>An <code>evaluator</code> keyword argument, which will receive the
-     evaluator function passed to <code>BasicOptimizer</code>.</li>
-<li>A <code>script</code> keyword argument, which will receive the name of
-     script passed via <code>ROPT_SCRIPT</code>.</li>
-</ol>
-</li>
-<li>
-<p>This method must return a <em>callable</em> that returns an
-    optimization <a class="autorefs autorefs-internal" title="            ExitCode" href="../../miscellaneous/enums/#ropt.enums.ExitCode"><code>ExitCode</code></a>.</p>
-<p>This callable will then be executed by <code>BasicOptimizer</code> in place
-of its default workflow.</p>
-</li>
-</ul>
-<p>As a short-cut is possible to also define <code>ROPT_SCRIPT</code> with only
-the name of the script (i.e. <code>ROPT_SCRIPT=script.py</code>). In this case
-a compute step with the name <code>run_script</code> is assumed to exists and
-will be used.</p>
-</li>
-</ol>
 <div class="footnote">
 <hr />
 <ol>
