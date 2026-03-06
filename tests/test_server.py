@@ -9,14 +9,11 @@ import numpy as np
 import pytest
 
 from ropt.config import EnOptConfig
-from ropt.plugins.server._hpc_server import DefaultHPCServer
 from ropt.plugins.server.base import ResultsQueue, Task
-from ropt.workflow import (
-    create_compute_step,
-    create_evaluator,
-    create_event_handler,
-    create_server,
-)
+from ropt.workflow.compute_steps import Optimizer
+from ropt.workflow.evaluators import AsyncEvaluator
+from ropt.workflow.event_handlers import Tracker
+from ropt.workflow.servers import AsyncServer, HPCServer, MultiprocessingServer
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -89,16 +86,19 @@ async def test_server_ok(server_name: str, tmp_path: Path, monkeypatch: Any) -> 
         Task(function=_function, args=(idx,), results_queue=result_queue)
         for idx in range(2)
     ]
-    if server_name == "hpc_server":
-        monkeypatch.setattr(
-            "ropt.plugins.server._hpc_server.pysqa.QueueAdapter",
-            lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
-        )
-        server: Server = DefaultHPCServer(
-            workdir=tmp_path, workers=2, interval=0, template=""
-        )
-    else:
-        server = create_server(server_name, workers=2)
+    match server_name:
+        case "hpc_server":
+            monkeypatch.setattr(
+                "ropt.plugins.server._hpc_server.pysqa.QueueAdapter",
+                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
+            )
+            server: Server = HPCServer(
+                workdir=tmp_path, workers=2, interval=0, template=""
+            )
+        case "async_server":
+            server = AsyncServer(workers=2)
+        case "multiprocessing_server":
+            server = MultiprocessingServer(workers=2)
     assert not server.is_running()
     all_processed = asyncio.Event()
     result_processor = _ResultProcessor()
@@ -149,16 +149,19 @@ async def test_server_error(server_name: str, tmp_path: Path, monkeypatch: Any) 
         )
         for idx in range(2)
     ]
-    if server_name == "hpc_server":
-        monkeypatch.setattr(
-            "ropt.plugins.server._hpc_server.pysqa.QueueAdapter",
-            lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
-        )
-        server: Server = DefaultHPCServer(
-            workdir=tmp_path, workers=2, interval=0, template=""
-        )
-    else:
-        server = create_server(server_name, workers=2)
+    match server_name:
+        case "hpc_server":
+            monkeypatch.setattr(
+                "ropt.plugins.server._hpc_server.pysqa.QueueAdapter",
+                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
+            )
+            server: Server = HPCServer(
+                workdir=tmp_path, workers=2, interval=0, template=""
+            )
+        case "async_server":
+            server = AsyncServer(workers=2)
+        case "multiprocessing_server":
+            server = MultiprocessingServer(workers=2)
     assert not server.is_running()
     all_processed = asyncio.Event()
     result_processor = _ResultProcessor()
@@ -228,11 +231,9 @@ def _opt_workflow(
     enopt_config: dict[str, Any],
     test_function: Callable[[NDArray[np.float64], int], NDArray[np.float64]],
 ) -> FunctionResults:
-    evaluator = create_evaluator(
-        "async_evaluator", function=test_function, server=server
-    )
-    step = create_compute_step("optimizer", evaluator=evaluator)
-    tracker = create_event_handler("tracker")
+    evaluator = AsyncEvaluator(function=test_function, server=server)
+    step = Optimizer(evaluator=evaluator)
+    tracker = Tracker()
     step.add_event_handler(tracker)
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
     results: FunctionResults = tracker["results"]
@@ -287,16 +288,19 @@ async def test_server_evaluator_ok(
     monkeypatch: Any,
     tmp_path: Path,
 ) -> None:
-    if server_name == "hpc_server":
-        monkeypatch.setattr(
-            "ropt.plugins.server._hpc_server.pysqa.QueueAdapter",
-            lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
-        )
-        server: Server = DefaultHPCServer(
-            workdir=tmp_path, workers=2, interval=0, template=""
-        )
-    else:
-        server = create_server(server_name, workers=2)
+    match server_name:
+        case "hpc_server":
+            monkeypatch.setattr(
+                "ropt.plugins.server._hpc_server.pysqa.QueueAdapter",
+                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
+            )
+            server: Server = HPCServer(
+                workdir=tmp_path, workers=2, interval=0, template=""
+            )
+        case "async_server":
+            server = AsyncServer(workers=2)
+        case "multiprocessing_server":
+            server = MultiprocessingServer(workers=2)
     assert not server.is_running()
     async with asyncio.TaskGroup() as tg:
         await server.start(tg)
@@ -338,16 +342,19 @@ async def test_server_evaluator_error(
     monkeypatch: Any,
     tmp_path: Path,
 ) -> None:
-    if server_name == "hpc_server":
-        monkeypatch.setattr(
-            "ropt.plugins.server._hpc_server.pysqa.QueueAdapter",
-            lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
-        )
-        server: Server = DefaultHPCServer(
-            workdir=tmp_path, workers=2, interval=0, template=""
-        )
-    else:
-        server = create_server(server_name, workers=2)
+    match server_name:
+        case "hpc_server":
+            monkeypatch.setattr(
+                "ropt.plugins.server._hpc_server.pysqa.QueueAdapter",
+                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
+            )
+            server: Server = HPCServer(
+                workdir=tmp_path, workers=2, interval=0, template=""
+            )
+        case "async_server":
+            server = AsyncServer(workers=2)
+        case "multiprocessing_server":
+            server = MultiprocessingServer(workers=2)
     assert not server.is_running()
     with pytest.raises(ExceptionGroup) as excinfo:  # noqa: PT012
         async with asyncio.TaskGroup() as tg:
@@ -390,16 +397,19 @@ async def test_server_evaluator_two_optimizations(
     monkeypatch: Any,
     tmp_path: Path,
 ) -> None:
-    if server_name == "hpc_server":
-        monkeypatch.setattr(
-            "ropt.plugins.server._hpc_server.pysqa.QueueAdapter",
-            lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
-        )
-        server: Server = DefaultHPCServer(
-            workdir=tmp_path, workers=2, interval=0, template=""
-        )
-    else:
-        server = create_server(server_name, workers=2)
+    match server_name:
+        case "hpc_server":
+            monkeypatch.setattr(
+                "ropt.plugins.server._hpc_server.pysqa.QueueAdapter",
+                lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
+            )
+            server: Server = HPCServer(
+                workdir=tmp_path, workers=2, interval=0, template=""
+            )
+        case "async_server":
+            server = AsyncServer(workers=2)
+        case "multiprocessing_server":
+            server = MultiprocessingServer(workers=2)
     assert not server.is_running()
     async with asyncio.TaskGroup() as tg:
         await server.start(tg)

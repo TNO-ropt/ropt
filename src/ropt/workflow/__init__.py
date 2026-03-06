@@ -2,7 +2,6 @@ r"""Optimization workflow functionality."""
 
 from ._basic_optimizer import BasicOptimizer
 from ._dispatch_tasks import dispatch_tasks
-from ._events import Event
 from ._factory import (
     create_compute_step,
     create_evaluator,
@@ -17,7 +16,6 @@ from ._utils import (
 
 __all__ = [
     "BasicOptimizer",
-    "Event",
     "create_compute_step",
     "create_evaluator",
     "create_event_handler",

@@ -3,3 +3,4 @@
 ::: ropt.optimization.NestedOptimizerCallback
 ::: ropt.optimization.OptimizerCallback
 ::: ropt.optimization.OptimizerCallbackResult
+::: ropt.optimization.Event

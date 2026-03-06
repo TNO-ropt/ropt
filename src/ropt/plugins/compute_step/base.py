@@ -63,7 +63,7 @@ class ComputeStep(ABC):
     def add_event_handler(self, handler: EventHandler) -> None:
         """Add an event handler.
 
-        Compute steps emit [`events`][ropt.workflow.Event] to report on the
+        Compute steps emit [`events`][ropt.optimization.Event] to report on the
         calculations they perform. These events are processed by independently
         created [`event
         handlers`][ropt.plugins.event_handler.base.EventHandler]. Use the

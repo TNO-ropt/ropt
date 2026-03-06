@@ -10,7 +10,7 @@ from ropt.results import Results, results_to_dataframe
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
-    from ropt.workflow import Event
+    from ropt.optimization import Event
 
 _HAVE_PANDAS: Final = find_spec("pandas") is not None
 

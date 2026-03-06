@@ -39,12 +39,10 @@ from numpy.typing import NDArray
 from ropt.config import EnOptConfig
 from ropt.plugins.server.base import Server
 from ropt.results import FunctionResults
-from ropt.workflow import (
-    create_compute_step,
-    create_evaluator,
-    create_event_handler,
-    create_server,
-)
+from ropt.workflow.compute_steps import Optimizer
+from ropt.workflow.evaluators import AsyncEvaluator
+from ropt.workflow.event_handlers import Tracker
+from ropt.workflow.servers import AsyncServer, MultiprocessingServer
 
 DIM = 5
 UNCERTAINTY = 0.1
@@ -103,9 +101,9 @@ def run_optimization(
     Returns:
         The optimal results.
     """
-    evaluator = create_evaluator("async_evaluator", function=function, server=server)
-    step = create_compute_step("optimizer", evaluator=evaluator)
-    tracker = create_event_handler("tracker")
+    evaluator = AsyncEvaluator(function=function, server=server)
+    step = Optimizer(evaluator=evaluator)
+    tracker = Tracker()
     step.add_event_handler(tracker)
     step.run(variables=initial_values, config=config)
     results: FunctionResults = tracker["results"]
@@ -134,9 +132,10 @@ async def async_run(  # noqa: PLR0913
     Returns:
         The optimal results.
     """
-    async_server = create_server(
-        "multiprocessing_server" if multiprocessing else "async_server",
-        workers=workers,
+    async_server = (
+        MultiprocessingServer(workers=workers)
+        if multiprocessing
+        else AsyncServer(workers=workers)
     )
     assert isinstance(async_server, Server)
     async with asyncio.TaskGroup() as tg:

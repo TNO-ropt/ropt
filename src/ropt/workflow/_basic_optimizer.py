@@ -19,6 +19,8 @@ from ropt.plugins.evaluator.base import Evaluator
 from ropt.plugins.manager import get_plugin_name
 
 from ._factory import create_compute_step, create_event_handler
+from .compute_steps import Optimizer
+from .event_handlers import Observer, Tracker
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -26,9 +28,9 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
 
     from ropt.evaluator import EvaluatorCallback, EvaluatorContext, EvaluatorResult
+    from ropt.optimization import Event
     from ropt.results import FunctionResults
     from ropt.transforms import OptModelTransforms
-    from ropt.workflow import Event
 
 
 class BasicOptimizer:
@@ -250,19 +252,12 @@ class BasicOptimizer:
                 if isinstance(self._evaluator, Evaluator)
                 else _Evaluator(callback=self._evaluator)
             )
-            tracker = create_event_handler(
-                "tracker",
-                constraint_tolerance=self._constraint_tolerance,
-            )
-            optimizer = create_compute_step("default/optimizer", evaluator=evaluator)
+            tracker = Tracker(constraint_tolerance=self._constraint_tolerance)
+            optimizer = Optimizer(evaluator=evaluator)
             optimizer.add_event_handler(tracker)
             for event_type, function in self._observers:
                 optimizer.add_event_handler(
-                    create_event_handler(
-                        "observer",
-                        event_types={event_type},
-                        callback=function,
-                    )
+                    Observer(event_types={event_type}, callback=function)
                 )
             for handler in _custom_event_handlers():
                 optimizer.add_event_handler(create_event_handler(handler))

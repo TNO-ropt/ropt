@@ -32,7 +32,7 @@ helper fuctions:
 
 After creation, compute steps are executed by calling their
 [`run`][ropt.plugins.compute_step.base.ComputeStep.run] method. During
-execution, compute steps may emit [`events`][ropt.workflow.Event] to
+execution, compute steps may emit [`events`][ropt.optimization.Event] to
 communicate intermediate results. Event handlers can be added to compute steps
 using the
 [`add_event_handler`][ropt.plugins.compute_step.base.ComputeStep.add_event_handler]
@@ -62,9 +62,9 @@ from numpy.typing import NDArray
 from ropt.config import EnOptConfig
 from ropt.enums import EventType
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
+from ropt.optimization import Event
 from ropt.results import FunctionResults
 from ropt.workflow import (
-    Event,
     create_compute_step,
     create_evaluator,
     create_event_handler,

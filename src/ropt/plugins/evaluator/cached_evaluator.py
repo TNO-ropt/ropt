@@ -46,7 +46,10 @@ class DefaultCachedEvaluator(Evaluator):
     """
 
     def __init__(
-        self, *, evaluator: Evaluator, sources: list[EventHandler] | None = None
+        self,
+        *,
+        evaluator: Evaluator,
+        sources: Sequence[EventHandler] | set[EventHandler] | None = None,
     ) -> None:
         """Initialize the DefaultCachedEvaluator.
 
@@ -60,7 +63,7 @@ class DefaultCachedEvaluator(Evaluator):
         """
         super().__init__()
         self._evaluator = evaluator
-        self._sources: list[EventHandler] = [] if sources is None else sources
+        self._sources: list[EventHandler] = [] if sources is None else list(sources)
 
     def eval_cached(
         self, variables: NDArray[np.float64], context: EvaluatorContext
@@ -192,7 +195,7 @@ _EPS: Final[float] = float(np.finfo(np.float64).eps)
 
 
 def _get_from_cache(
-    sources: list[EventHandler],
+    sources: Sequence[EventHandler],
     variables: NDArray[np.float64],
     realization_index: int,
     realization_name: str | None,

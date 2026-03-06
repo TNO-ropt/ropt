@@ -11,7 +11,7 @@ import numpy as np
 from ropt.enums import ExitCode
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
 from ropt.exceptions import ComputeStepAborted, ServerFailure
-from ropt.plugins.server.base import ResultsQueue, ServerBase, Task
+from ropt.plugins.server.base import ResultsQueue, Server, Task
 
 from .base import Evaluator
 
@@ -32,7 +32,7 @@ class DefaultAsyncEvaluator(Evaluator):
         self,
         *,
         function: Callable[..., NDArray[np.float64] | dict[str, Any]],
-        server: ServerBase,
+        server: Server,
         queue_size: int = 0,
         evaluation_info: dict[str, np.dtype] | None = None,
         get_name: Callable[..., str] | None = None,

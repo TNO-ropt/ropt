@@ -15,13 +15,11 @@ from numpy.typing import NDArray
 
 from ropt.config import EnOptConfig
 from ropt.enums import EventType
+from ropt.optimization import Event
 from ropt.results import FunctionResults
-from ropt.workflow import (
-    Event,
-    create_compute_step,
-    create_evaluator,
-    create_event_handler,
-)
+from ropt.workflow.compute_steps import Optimizer
+from ropt.workflow.evaluators import FunctionEvaluator
+from ropt.workflow.event_handlers import Observer, Tracker
 
 DIM = 5
 UNCERTAINTY = 0.1
@@ -93,17 +91,13 @@ def run_optimization(config: dict[str, Any]) -> FunctionResults:
     a = rng.normal(loc=1.0, scale=UNCERTAINTY, size=realizations)
     b = rng.normal(loc=100.0, scale=100 * UNCERTAINTY, size=realizations)
 
-    evaluator = create_evaluator(
-        "function_evaluator", function=partial(rosenbrock, a=a, b=b)
-    )
-    step = create_compute_step("optimizer", evaluator=evaluator)
+    evaluator = FunctionEvaluator(function=partial(rosenbrock, a=a, b=b))
+    step = Optimizer(evaluator=evaluator)
 
-    tracker = create_event_handler("tracker")
+    tracker = Tracker()
     step.add_event_handler(tracker)
 
-    reporter = create_event_handler(
-        "observer", callback=report, event_types={EventType.FINISHED_EVALUATION}
-    )
+    reporter = Observer(callback=report, event_types={EventType.FINISHED_EVALUATION})
     step.add_event_handler(reporter)
 
     step.run(variables=initial_values, config=EnOptConfig.model_validate(config))

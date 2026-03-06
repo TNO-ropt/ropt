@@ -28,7 +28,7 @@ class DefaultFunctionEvaluator(Evaluator):
         self,
         *,
         function: Callable[..., NDArray[np.float64] | dict[str, Any]],
-        evaluation_info: dict[str, np.dtype] | None = None,
+        evaluation_info: dict[str, Any] | None = None,
     ) -> None:
         """Initialize the DefaultFunctionEvaluator.
 
