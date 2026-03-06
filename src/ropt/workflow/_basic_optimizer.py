@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+import importlib
 import json
-import os
 import sysconfig
 from contextlib import suppress
 from functools import cache
@@ -16,9 +16,7 @@ from ropt.config import EnOptConfig
 from ropt.enums import EventType, ExitCode
 from ropt.exceptions import ComputeStepAborted
 from ropt.plugins.evaluator.base import Evaluator
-from ropt.plugins.manager import get_plugin_name
 
-from ._factory import create_compute_step, create_event_handler
 from .compute_steps import Optimizer
 from .event_handlers import Observer, Tracker
 
@@ -105,84 +103,37 @@ class BasicOptimizer:
 
     Note: Customization
         The optimization workflow executed by `BasicOptimizer` can be tailored
-        in two main ways: by adding event handlers to the default workflow or by
-        running an entirely different workflow:
+        by adding event handlers. This allows for custom processing of events
+        emitted by the *default* optimization workflow, without replacing the
+        workflow itself. This is useful for tasks like custom logging or data
+        processing.
 
-        1.  **Adding Custom Event Handlers**
+        Event handlers can be specified using a JSON configuration that file is
+        found at `<prefix>/share/ropt/options.json` (where `<prefix>` is the
+        Python installation prefix or a system-wide data prefix.[^1]), If this
+        JSON file contains a `basic_optimizer` key, and nested within it an
+        `event_handlers` key, the value of `event_handlers` should be a list of
+        strings of the form `"module_name.handler_name"`, where `module_name` is
+        the name of module to load that should contain an event handler class
+        with the name `module_name`.
 
-            This method allows for custom processing of events emitted by the
-            *default* optimization workflow, without replacing the workflow
-            itself. This is useful for tasks like custom logging or data
-            processing.
+        Example `shared/ropt/options.json`:
 
-            Event handlers can be specified in two ways, and handlers from both
-            sources will be combined:
+        ```json
+        {
+            "basic_optimizer": {
+                "event_handlers": ["mylogger.Logger"]
+            }
+        }
+        ```
 
-            *   **Environment Variable**: If the `ROPT_HANDLERS` environment
-                variable contains a comma-separated list of event handler names,
-                these handlers will be added to the default optimization
-                workflow. Each name must correspond to a registered
-                `EventHandler`.
-
-            *   **JSON Configuration File**: If a JSON configuration file is
-                found at `<prefix>/share/ropt/options.json` (where `<prefix>` is
-                the Python installation prefix or a system-wide data
-                prefix.[^1]), `BasicOptimizer` will look for specific keys to
-                load additional event handlers. If this JSON file contains a
-                `basic_optimizer` key, and nested within it an `event_handlers`
-                key, the value of `event_handlers` should be a list of strings.
-                Each string in this list should be the name of a registered
-                `EventHandler`. These handlers will be added to
-                those found via `ROPT_HANDLERS`.
-
-                Example `shared/ropt/options.json`:
-
-                ```json
-                {
-                    "basic_optimizer": {
-                        "event_handlers": ["custom_logger", "extra/event_processor"]
-                    }
-                }
-                ```
-
-            Note that if a custom optimization workflow is installed using the
-            `ROPT_SCRIPT` environment variable (see below), these custom
-            handlers will not be installed.
-
-        2.  **Custom Workflow Execution**
-
-            If the `ROPT_SCRIPT` environment variable contains an option in the
-            format `step-name=script.py` (where `script.py` may be any file),
-            the named custom compute step will be executed *instead* of the standard
-            optimization workflow, passing it the name of the script that
-            defines the new optimization workflow.
-
-            The custom compute step (`step-name`) must adhere to the following:
-
-            *   It must be a registered `ComputeStep`.
-            *   Its `run` method  must accept
-                1.   An `evaluator` keyword argument, which will receive the
-                     evaluator function passed to `BasicOptimizer`.
-                2.   A `script` keyword argument, which will receive the name of
-                     script passed via `ROPT_SCRIPT`.
-            *   This method must return a *callable* that returns an
-                optimization [`ExitCode`][ropt.enums.ExitCode].
-
-                This callable will then be executed by `BasicOptimizer` in place
-                of its default workflow.
-
-            As a short-cut is possible to also define `ROPT_SCRIPT` with only
-            the name of the script (i.e. `ROPT_SCRIPT=script.py`). In this case
-            a compute step with the name `run_script` is assumed to exists and
-            will be used.
-
-            [^1]:
-                The exact path to Python installation prefix, or the system's
-                data prefix can be found using the Python `sysconfig` module:
-                ```python
-                from sysconfig import get_paths
-                print(get_paths()["data"])
-                ```
+        [^1]:
+            The exact path to Python installation prefix, or the system's
+            data prefix can be found using the Python `sysconfig` module:
+            ```python
+            from sysconfig import get_paths
+            print(get_paths()["data"])
+            ```
     """
 
     def __init__(
@@ -243,34 +194,27 @@ class BasicOptimizer:
         Returns:
             The exit code returned by the optimization workflow.
         """
-        # Optionally run a custom compute step defined via the environment:
-        custom_function = self._get_custom_compute_step()
-
-        if custom_function is None:
-            evaluator = (
-                self._evaluator
-                if isinstance(self._evaluator, Evaluator)
-                else _Evaluator(callback=self._evaluator)
+        evaluator = (
+            self._evaluator
+            if isinstance(self._evaluator, Evaluator)
+            else _Evaluator(callback=self._evaluator)
+        )
+        tracker = Tracker(constraint_tolerance=self._constraint_tolerance)
+        optimizer = Optimizer(evaluator=evaluator)
+        optimizer.add_event_handler(tracker)
+        for event_type, function in self._observers:
+            optimizer.add_event_handler(
+                Observer(event_types={event_type}, callback=function)
             )
-            tracker = Tracker(constraint_tolerance=self._constraint_tolerance)
-            optimizer = Optimizer(evaluator=evaluator)
-            optimizer.add_event_handler(tracker)
-            for event_type, function in self._observers:
-                optimizer.add_event_handler(
-                    Observer(event_types={event_type}, callback=function)
-                )
-            for handler in _custom_event_handlers():
-                optimizer.add_event_handler(create_event_handler(handler))
+        for handler in _custom_event_handlers():
+            optimizer.add_event_handler(handler())
 
-            exit_code = optimizer.run(
-                variables=np.asarray(initial_values, dtype=np.float64),
-                config=self._config,
-                transforms=self._transforms,
-            )
-            self._results = tracker["results"]
-        else:
-            exit_code = custom_function()
-            self._results = None
+        exit_code = optimizer.run(
+            variables=np.asarray(initial_values, dtype=np.float64),
+            config=self._config,
+            transforms=self._transforms,
+        )
+        self._results = tracker["results"]
 
         return exit_code if isinstance(exit_code, ExitCode) else ExitCode.UNKNOWN
 
@@ -325,18 +269,6 @@ class BasicOptimizer:
 
         self._observers.append((EventType.FINISHED_EVALUATION, _results_callback))
 
-    def _get_custom_compute_step(self) -> Callable[[], ExitCode] | None:
-        if "ROPT_SCRIPT" in os.environ:
-            compute_step_name, sep, script = os.environ["ROPT_SCRIPT"].partition("=")
-            if not sep:
-                compute_step_name, script = "run_script", compute_step_name
-            if get_plugin_name("compute_step", compute_step_name) is not None:
-                compute_step: Callable[[], ExitCode] = create_compute_step(
-                    compute_step_name
-                ).run(evaluator=self._evaluator, script=script)
-                return compute_step
-        return None
-
 
 class _Evaluator(Evaluator):
     def __init__(self, *, callback: EvaluatorCallback) -> None:
@@ -349,12 +281,12 @@ class _Evaluator(Evaluator):
         return self._evaluator_callback(variables, context)
 
 
-def _custom_event_handlers() -> Iterator[str]:
-    handlers = os.environ.get("ROPT_HANDLERS", "").split(",")
-    handlers += _get_option("event_handlers")
-    for handler in dict.fromkeys(handlers):
-        if get_plugin_name("event_handler", handler) is not None:
-            yield handler
+def _custom_event_handlers() -> Iterator[Any]:
+    handlers = _get_option("event_handlers")
+    for handler in handlers:
+        module_path, class_name = handler.rsplit(".", 1)
+        module = importlib.import_module(module_path)
+        yield getattr(module, class_name)
 
 
 @cache
