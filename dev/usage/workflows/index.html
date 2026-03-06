@@ -1878,12 +1878,12 @@ helper fuctions:</p>
   
       abstractmethod
   " href="../../reference/plugins/workflow/compute_steps/#ropt.plugins.compute_step.base.ComputeStep.run"><code>run</code></a> method. During
-execution, compute steps may emit <a class="autorefs autorefs-internal" title="            ropt.workflow.Event
+execution, compute steps may emit <a class="autorefs autorefs-internal" title="            ropt.optimization.Event
 
 
   
       dataclass
-  " href="../../reference/workflows/workflow/#ropt.workflow.Event"><code>events</code></a> to
+  " href="../../reference/optimization/optimization/#ropt.optimization.Event"><code>events</code></a> to
 communicate intermediate results. Event handlers can be added to compute steps
 using the
 <a class="autorefs autorefs-internal" title="            add_event_handler" href="../../reference/plugins/workflow/compute_steps/#ropt.plugins.compute_step.base.ComputeStep.add_event_handler"><code>add_event_handler</code></a>
@@ -1909,9 +1909,9 @@ optimizer <code>ComputeStep</code> with a <code>tracker</code> to store the best
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnOptConfig</span>
 </span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventType</span>
 </span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.evaluator</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvaluatorContext</span><span class="p">,</span> <span class="n">EvaluatorResult</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.results</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionResults</span>
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>    <span class="n">Event</span><span class="p">,</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.optimization</span><span class="w"> </span><span class="kn">import</span> <span class="n">Event</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.results</span><span class="w"> </span><span class="kn">import</span> <span class="n">FunctionResults</span>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ropt.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
 </span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>    <span class="n">create_compute_step</span><span class="p">,</span>
 </span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>    <span class="n">create_evaluator</span><span class="p">,</span>
 </span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>    <span class="n">create_event_handler</span><span class="p">,</span>

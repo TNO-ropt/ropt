@@ -2403,12 +2403,12 @@ each attached handler is invoked, allowing it to process the event.</p>
         <p>Process an event.</p>
 <p>This abstract method must be implemented by concrete <code>EventHandler</code>
 subclasses. It defines the event handler's core logic for reacting to
-<a class="autorefs autorefs-internal" title="            ropt.workflow.Event
+<a class="autorefs autorefs-internal" title="            ropt.optimization.Event
 
 
   
       dataclass
-  " href="../../../workflows/workflow/#ropt.workflow.Event"><code>Event</code></a> objects emitted in the optimization
+  " href="../../../optimization/optimization/#ropt.optimization.Event"><code>Event</code></a> objects emitted in the optimization
 workflow.</p>
 <p>Implementations should inspect the <code>event</code> object (its <code>event_type</code> and
 <code>data</code>) and perform computations accordingly, such as storing results,
@@ -2431,12 +2431,12 @@ logging information, or updating internal state.</p>
                 <code>event</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.workflow.Event
+                  <code><a class="autorefs autorefs-internal" title="            ropt.optimization.Event
 
 
   
       dataclass
-  " href="../../../workflows/workflow/#ropt.workflow.Event">Event</a></code>
+  " href="../../../optimization/optimization/#ropt.optimization.Event">Event</a></code>
             </td>
             <td>
               <div class="doc-md-description">
