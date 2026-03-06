@@ -293,4 +293,4 @@ class _ResultsTable:
             sep.join(item) if isinstance(item, tuple) else item
             for item in renamed_columns
         ]
-        return data
+        return data.reset_index()
