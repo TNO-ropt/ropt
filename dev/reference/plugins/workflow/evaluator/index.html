@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.plugins.evaluator.base.EvaluatorPlugin" class="md-skip">
+        <a href="#ropt.workflow.evaluators.Evaluator" class="md-skip">
           Skip to content
         </a>
       
@@ -1154,35 +1154,7 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.evaluator.base.EvaluatorPlugin" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        EvaluatorPlugin
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="EvaluatorPlugin">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.evaluator.base.EvaluatorPlugin.create" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        create
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.evaluator.base.Evaluator" class="md-nav__link">
+  <a href="#ropt.workflow.evaluators.Evaluator" class="md-nav__link">
     <span class="md-ellipsis">
       
         Evaluator
@@ -1194,7 +1166,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.evaluator.base.Evaluator.eval" class="md-nav__link">
+  <a href="#ropt.workflow.evaluators.Evaluator.eval" class="md-nav__link">
     <span class="md-ellipsis">
       
         eval
@@ -1931,35 +1903,7 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.plugins.evaluator.base.EvaluatorPlugin" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        EvaluatorPlugin
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="EvaluatorPlugin">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.plugins.evaluator.base.EvaluatorPlugin.create" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        create
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.plugins.evaluator.base.Evaluator" class="md-nav__link">
+  <a href="#ropt.workflow.evaluators.Evaluator" class="md-nav__link">
     <span class="md-ellipsis">
       
         Evaluator
@@ -1971,7 +1915,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.plugins.evaluator.base.Evaluator.eval" class="md-nav__link">
+  <a href="#ropt.workflow.evaluators.Evaluator.eval" class="md-nav__link">
     <span class="md-ellipsis">
       
         eval
@@ -2012,164 +1956,8 @@
 
 
 
-<h2 id="ropt.plugins.evaluator.base.EvaluatorPlugin" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.evaluator.base.EvaluatorPlugin</span>
-
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="            Plugin (ropt.plugins.base.Plugin)" href="../../plugin_manager/#ropt.plugins.Plugin">Plugin</a></code></p>
-
-
-
-        <p>Abstract base class for evaluator plugins.</p>
-<p>This class defines the interface for plugins responsible for creating
-<a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.Evaluator" href="#ropt.plugins.evaluator.base.Evaluator"><code>Evaluator</code></a> instances within
-an optimization workflow.</p>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.plugins.evaluator.base.EvaluatorPlugin.create" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">create</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">create</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Evaluator</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Create an Evaluator instance.</p>
-<p>This abstract class method serves as a factory for creating concrete
-<a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.Evaluator" href="#ropt.plugins.evaluator.base.Evaluator"><code>Evaluator</code></a> objects. Plugin
-implementations must override this method to return an instance of their
-specific <code>Evaluator</code> subclass.</p>
-<p>The <a class="autorefs autorefs-internal" title="            PluginManager" href="../../plugin_manager/#ropt.plugins.manager.PluginManager"><code>PluginManager</code></a> calls this
-method when an evaluator provided by this plugin is requested.</p>
-<p>The <code>name</code> argument specifies the requested evaluator, potentially
-in the format <code>"plugin-name/method-name"</code> or just <code>"method-name"</code>.
-Implementations can use this <code>name</code> to vary the created evaluator if
-the plugin supports multiple evaluator types.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>name</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The requested evaluator name (potentially plugin-specific).</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>kwargs</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Additional arguments for custom configuration.</p>
-              </div>
-            </td>
-            <td>
-                  <code>{}</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.Evaluator" href="#ropt.plugins.evaluator.base.Evaluator">Evaluator</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>An initialized instance of an <code>Evaluator</code> subclass.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ropt.plugins.evaluator.base.Evaluator" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.plugins.evaluator.base.Evaluator</span>
+<h2 id="ropt.workflow.evaluators.Evaluator" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.workflow.evaluators.Evaluator</span>
 
 
 </h2>
@@ -2188,7 +1976,7 @@ the plugin supports multiple evaluator types.</p>
 
   
       abstractmethod
-  " href="#ropt.plugins.evaluator.base.Evaluator.eval"><code>eval</code></a> method, which is responsible
+  " href="#ropt.workflow.evaluators.Evaluator.eval"><code>eval</code></a> method, which is responsible
 for performing the actual evaluation of variables using an
 <a class="autorefs autorefs-internal" title="            ropt.evaluator.EvaluatorContext
 
@@ -2227,7 +2015,7 @@ for performing the actual evaluation of variables using an
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.plugins.evaluator.base.Evaluator.eval" class="doc doc-heading">
+<h3 id="ropt.workflow.evaluators.Evaluator.eval" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">eval</span>
 
 

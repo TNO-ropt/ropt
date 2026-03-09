@@ -2204,10 +2204,6 @@ mechanism.</p>
 <p>Each plugin type has a corresponding abstract base class that custom plugins
 must inherit from:</p>
 <ul>
-<li><strong>Workflow plugins:</strong>
-  <a class="autorefs autorefs-internal" title="            ropt.plugins.compute_step.base.ComputeStepPlugin" href="../workflow/compute_steps/#ropt.plugins.compute_step.base.ComputeStepPlugin"><code>ComputeStepPlugin</code></a>,
-  <a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.base.EventHandlerPlugin" href="../workflow/event_handler/#ropt.plugins.event_handler.base.EventHandlerPlugin"><code>EventHandlerPlugin</code></a>,
-  <a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.EvaluatorPlugin" href="../workflow/evaluator/#ropt.plugins.evaluator.base.EvaluatorPlugin"><code>EvaluatorPlugin</code></a></li>
 <li><strong>Optimizer:</strong>
   <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.OptimizerPlugin" href="../optimizer/optimizer/#ropt.plugins.optimizer.base.OptimizerPlugin"><code>OptimizerPlugin</code></a></li>
 <li><strong>Sampler:</strong> <a class="autorefs autorefs-internal" title="            ropt.plugins.sampler.base.SamplerPlugin" href="../optimizer/sampler/#ropt.plugins.sampler.base.SamplerPlugin"><code>SamplerPlugin</code></a></li>
@@ -2237,9 +2233,9 @@ must inherit
 from the base class for the corresponding plugin type:</p>
 <ul>
 <li>Workflow related plugins:
-  <a class="autorefs autorefs-internal" title="            ropt.plugins.compute_step.base.ComputeStep" href="../workflow/compute_steps/#ropt.plugins.compute_step.base.ComputeStep"><code>ComputeStep</code></a>,
-  <a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.base.EventHandler" href="../workflow/event_handler/#ropt.plugins.event_handler.base.EventHandler"><code>EventHandler</code></a>,
-  <a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.Evaluator" href="../workflow/evaluator/#ropt.plugins.evaluator.base.Evaluator"><code>Evaluator</code></a></li>
+  <a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.ComputeStep" href="../workflow/compute_steps/#ropt.workflow.compute_steps.ComputeStep"><code>ComputeStep</code></a>,
+  <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventHandler" href="../workflow/event_handler/#ropt.workflow.event_handlers.EventHandler"><code>EventHandler</code></a>,
+  <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../workflow/evaluator/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a></li>
 <li>Optimizer: <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.Optimizer" href="../optimizer/optimizer/#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a></li>
 <li>Sampler: <a class="autorefs autorefs-internal" title="            ropt.plugins.sampler.base.Sampler" href="../optimizer/sampler/#ropt.plugins.sampler.base.Sampler"><code>Sampler</code></a></li>
 <li>Realization Filter:
@@ -2250,11 +2246,6 @@ from the base class for the corresponding plugin type:</p>
 <p><strong>Pre-installed Plugins Included with <code>ropt</code></strong></p>
 <p><code>ropt</code> comes bundled with a set of pre-installed plugins:</p>
 <ul>
-<li><strong>Workflow:</strong> The built-in
-  <a class="autorefs autorefs-internal" title="            ropt.plugins.compute_step.default.DefaultComputeStepPlugin" href="../default/compute_steps/#ropt.plugins.compute_step.default.DefaultComputeStepPlugin"><code>default compute step</code></a>,
-  <a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.default.DefaultEventHandlerPlugin" href="../default/event_handler/#ropt.plugins.event_handler.default.DefaultEventHandlerPlugin"><code>default event handler</code></a>
-  and <a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.default.DefaultEvaluatorPlugin" href="../default/evaluator/#ropt.plugins.evaluator.default.DefaultEvaluatorPlugin"><code>default evaluator</code></a> plugins,
-  providing components for executing complex optimization workflows.</li>
 <li><strong>Optimizer:</strong> The <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.scipy.SciPyOptimizer" href="../default/scipy_optimizer/#ropt.plugins.optimizer.scipy.SciPyOptimizer"><code>scipy</code></a>
   plugin, leveraging algorithms from <code>scipy.optimize</code>, and the
   <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.external.ExternalOptimizer" href="../default/external_optimizer/#ropt.plugins.optimizer.external.ExternalOptimizer"><code>ExternalOptimizer</code></a> plugin,
@@ -2907,11 +2898,7 @@ attempting to retrieve a plugin with
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">&quot;sampler&quot;</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="s2">&quot;realization_filter&quot;</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="s2">&quot;function_estimator&quot;</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="s2">&quot;event_handler&quot;</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="s2">&quot;compute_step&quot;</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s2">&quot;evaluator&quot;</span><span class="p">,</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="s2">&quot;server&quot;</span><span class="p">,</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="p">]</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2929,14 +2916,6 @@ role in the optimization process:</p>
   (<a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.base.RealizationFilterPlugin" href="../optimizer/realization_filter/#ropt.plugins.realization_filter.base.RealizationFilterPlugin"><code>RealizationFilterPlugin</code></a>).</li>
 <li><code>"function_estimator"</code>: Plugins for estimating objective functions and gradients
   (<a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.base.FunctionEstimatorPlugin" href="../optimizer/function_estimator/#ropt.plugins.function_estimator.base.FunctionEstimatorPlugin"><code>FunctionEstimatorPlugin</code></a>).</li>
-<li><code>"event_handler"</code>: Plugins that create event handlers for processing optimization
-  results (<a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.base.EventHandlerPlugin" href="../workflow/event_handler/#ropt.plugins.event_handler.base.EventHandlerPlugin"><code>EventHandlerPlugin</code></a>).</li>
-<li><code>"compute_step"</code>: Plugins that define executable steps within an optimization workflow
-  (<a class="autorefs autorefs-internal" title="            ropt.plugins.compute_step.base.ComputeStepPlugin" href="../workflow/compute_steps/#ropt.plugins.compute_step.base.ComputeStepPlugin"><code>ComputeStepPlugin</code></a>).</li>
-<li><code>"evaluator"</code>: Plugins that define evaluators within an optimization workflow
-  (<a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.EvaluatorPlugin" href="../workflow/evaluator/#ropt.plugins.evaluator.base.EvaluatorPlugin"><code>EvaluatorPlugin</code></a>).</li>
-<li><code>"server"</code>: Plugins that define servers within an optimization workflow
-  (<a class="autorefs autorefs-internal" title="            ropt.plugins.server.base.ServerPlugin" href="../workflow/server/#ropt.plugins.server.base.ServerPlugin"><code>ServerPlugin</code></a>).</li>
 </ul>
 
     </div>

@@ -1851,12 +1851,12 @@ constructing and executing optimization workflows. It is designed to handle both
 simple, single-run optimizations and more complex, customized scenarios. The
 framework is built upon three key components:</p>
 <ul>
-<li><strong><a class="autorefs autorefs-internal" title="            ropt.plugins.compute_step.base.ComputeStep" href="../../reference/plugins/workflow/compute_steps/#ropt.plugins.compute_step.base.ComputeStep"><code>ComputeStep</code></a></strong>: Defines a
+<li><strong><a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.ComputeStep" href="../../reference/plugins/workflow/compute_steps/#ropt.workflow.compute_steps.ComputeStep"><code>ComputeStep</code></a></strong>: Defines a
   distinct action within the workflow, such as running an optimization algorithm.</li>
-<li><strong><a class="autorefs autorefs-internal" title="            ropt.plugins.event_handler.base.EventHandler" href="../../reference/plugins/workflow/event_handler/#ropt.plugins.event_handler.base.EventHandler"><code>EventHandler</code></a></strong>: Responds to
+<li><strong><a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventHandler" href="../../reference/plugins/workflow/event_handler/#ropt.workflow.event_handlers.EventHandler"><code>EventHandler</code></a></strong>: Responds to
   events emitted by <code>ComputeStep</code> instances. This allows for real-time
   monitoring, storing results, or triggering custom logic during the workflow.</li>
-<li><strong><a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.Evaluator" href="../../reference/plugins/workflow/evaluator/#ropt.plugins.evaluator.base.Evaluator"><code>Evaluator</code></a></strong>: Provides a mechanism
+<li><strong><a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../reference/plugins/workflow/evaluator/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a></strong>: Provides a mechanism
   for <code>ComputeStep</code> objects to perform function evaluations, such as running
   simulations on a high-performance computing (HPC) cluster.</li>
 </ul>
@@ -1866,7 +1866,7 @@ framework is built upon three key components:</p>
 
   
       abstractmethod
-  " href="../../reference/plugins/workflow/compute_steps/#ropt.plugins.compute_step.base.ComputeStep.run"><code>run</code></a> method. During
+  " href="../../reference/plugins/workflow/compute_steps/#ropt.workflow.compute_steps.ComputeStep.run"><code>run</code></a> method. During
 execution, compute steps may emit <a class="autorefs autorefs-internal" title="            ropt.optimization.Event
 
 
@@ -1875,7 +1875,7 @@ execution, compute steps may emit <a class="autorefs autorefs-internal" title=" 
   " href="../../reference/optimization/optimization/#ropt.optimization.Event"><code>events</code></a> to
 communicate intermediate results. Event handlers can be added to compute steps
 using the
-<a class="autorefs autorefs-internal" title="            add_event_handler" href="../../reference/plugins/workflow/compute_steps/#ropt.plugins.compute_step.base.ComputeStep.add_event_handler"><code>add_event_handler</code></a>
+<a class="autorefs autorefs-internal" title="            add_event_handler" href="../../reference/plugins/workflow/compute_steps/#ropt.workflow.compute_steps.ComputeStep.add_event_handler"><code>add_event_handler</code></a>
 method. Many compute steps, such as those performing optimizations, will require
 the repeated evaluation of a function, which is performed by evaluator objects
 passed to the step upon creation.</p>

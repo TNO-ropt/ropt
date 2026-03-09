@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.ensemble_evaluator.EnsembleEvaluator" class="md-skip">
+        <a href="#ropt.ensemble.EnsembleFunctionAndGradientEvaluator" class="md-skip">
           Skip to content
         </a>
       
@@ -895,19 +895,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.ensemble_evaluator.EnsembleEvaluator" class="md-nav__link">
+  <a href="#ropt.ensemble.EnsembleFunctionAndGradientEvaluator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EnsembleEvaluator
+        EnsembleFunctionAndGradientEvaluator
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="EnsembleEvaluator">
+    <nav class="md-nav" aria-label="EnsembleFunctionAndGradientEvaluator">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.ensemble_evaluator.EnsembleEvaluator.__init__" class="md-nav__link">
+  <a href="#ropt.ensemble.EnsembleFunctionAndGradientEvaluator.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -918,7 +918,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.ensemble_evaluator.EnsembleEvaluator.calculate" class="md-nav__link">
+  <a href="#ropt.ensemble.EnsembleFunctionAndGradientEvaluator.calculate" class="md-nav__link">
     <span class="md-ellipsis">
       
         calculate
@@ -1992,19 +1992,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.ensemble_evaluator.EnsembleEvaluator" class="md-nav__link">
+  <a href="#ropt.ensemble.EnsembleFunctionAndGradientEvaluator" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EnsembleEvaluator
+        EnsembleFunctionAndGradientEvaluator
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="EnsembleEvaluator">
+    <nav class="md-nav" aria-label="EnsembleFunctionAndGradientEvaluator">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.ensemble_evaluator.EnsembleEvaluator.__init__" class="md-nav__link">
+  <a href="#ropt.ensemble.EnsembleFunctionAndGradientEvaluator.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __init__
@@ -2015,7 +2015,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.ensemble_evaluator.EnsembleEvaluator.calculate" class="md-nav__link">
+  <a href="#ropt.ensemble.EnsembleFunctionAndGradientEvaluator.calculate" class="md-nav__link">
     <span class="md-ellipsis">
       
         calculate
@@ -2134,8 +2134,8 @@
 
 
 
-<h2 id="ropt.ensemble_evaluator.EnsembleEvaluator" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.ensemble_evaluator.EnsembleEvaluator</span>
+<h2 id="ropt.ensemble.EnsembleFunctionAndGradientEvaluator" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.ensemble.EnsembleFunctionAndGradientEvaluator</span>
 
 
 </h2>
@@ -2151,7 +2151,7 @@ gradients from an ensemble of functions. It leverages the settings defined
 in an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> configuration object to guide
 the calculations.</p>
 <p>The core functionality relies on an evaluator callable, (usually provided by
-an <a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.Evaluator" href="../../plugins/workflow/evaluator/#ropt.plugins.evaluator.base.Evaluator"><code>Evaluator</code></a> object), which is used to
+an <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../plugins/workflow/evaluator/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a> object), which is used to
 evaluate the individual functions within the ensemble. The evaluator
 provides the raw function values, which are then processed by the
 <code>EnsembleEvaluator</code> to produce the final function and gradient estimates.</p>
@@ -2180,7 +2180,7 @@ provides the raw function values, which are then processed by the
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.ensemble_evaluator.EnsembleEvaluator.__init__" class="doc doc-heading">
+<h3 id="ropt.ensemble.EnsembleFunctionAndGradientEvaluator.__init__" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__init__</span>
 
 
@@ -2202,7 +2202,7 @@ evaluation, such as the number of realizations, the function estimators,
 and the gradient settings. The <code>transforms</code> object defines the domain
 transforms that should be applied to variables, objectives and
 constraints. The <code>evaluator</code> callable is usually provide by a
-<a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.Evaluator" href="../../plugins/workflow/evaluator/#ropt.plugins.evaluator.base.Evaluator"><code>Evaluator</code></a> object. The
+<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../plugins/workflow/evaluator/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a> object. The
 <code>plugin_manager</code> is used to load the realization filters, function
 estimators, and samplers.</p>
 
@@ -2282,7 +2282,7 @@ estimators, and samplers.</p>
 <div class="doc doc-object doc-function">
 
 
-<h3 id="ropt.ensemble_evaluator.EnsembleEvaluator.calculate" class="doc doc-heading">
+<h3 id="ropt.ensemble.EnsembleFunctionAndGradientEvaluator.calculate" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">calculate</span>
 
 
@@ -2427,7 +2427,7 @@ row is a variable vector.</p>
 
 
         <p>Capture additional details for the function evaluator.</p>
-<p>Function evaluators (see <a class="autorefs autorefs-internal" title="            ropt.plugins.evaluator.base.Evaluator" href="../../plugins/workflow/evaluator/#ropt.plugins.evaluator.base.Evaluator"><code>Evaluator</code></a>)
+<p>Function evaluators (see <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../plugins/workflow/evaluator/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a>)
 primarily receive variable vectors to evaluate objective and constraint
 functions. However, they may also benefit from additional information to
 optimize their calculations. This <code>EvaluatorContext</code> object provides that
