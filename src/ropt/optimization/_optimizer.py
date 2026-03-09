@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config import EnOptConfig
-    from ropt.ensemble_evaluator import EnsembleEvaluator
+    from ropt.ensemble import EnsembleFunctionAndGradientEvaluator
     from ropt.plugins.optimizer.base import Optimizer
     from ropt.results import Functions, Gradients, Results
     from ropt.transforms._transforms import OptModelTransforms
@@ -89,7 +89,7 @@ class EnsembleOptimizer:
         self,
         enopt_config: EnOptConfig,
         transforms: OptModelTransforms | None,
-        ensemble_evaluator: EnsembleEvaluator,
+        ensemble_evaluator: EnsembleFunctionAndGradientEvaluator,
         signal_evaluation: SignalEvaluationCallback | None = None,
         nested_optimizer: NestedOptimizerCallback | None = None,
     ) -> None:
@@ -107,7 +107,7 @@ class EnsembleOptimizer:
         2.  A [`OptModelTransforms`][ropt.transforms.OptModelTransforms] object:
             This handles the transforms to apply to the variables, objectives and
             constraints.
-        3.  An [`EnsembleEvaluator`][ropt.ensemble_evaluator.EnsembleEvaluator]
+        3.  An [`EnsembleEvaluator`][ropt.ensemble.EnsembleFunctionAndGradientEvaluator]
             object: This object is responsible for evaluating functions.
 
         Additionally, two optional callbacks can be provided to extend the

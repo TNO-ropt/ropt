@@ -1,7 +1,3 @@
-::: ropt.plugins.server.default.DefaultServerPlugin
-    options:
-        members: False
-
-::: ropt.plugins.server._async_server.DefaultAsyncServer
-::: ropt.plugins.server._multiprocessing_server.DefaultMultiprocessingServer
-::: ropt.plugins.server._hpc_server.DefaultHPCServer
+::: ropt.workflow.servers.AsyncServer
+::: ropt.workflow.servers.MultiprocessingServer
+::: ropt.workflow.servers.HPCServer

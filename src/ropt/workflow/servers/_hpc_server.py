@@ -28,7 +28,7 @@ if _HAVE_HPC:
     import pysqa
 
 
-class DefaultHPCServer(ServerBase):
+class HPCServer(ServerBase):
     """A server for submitting tasks to a High-Performance Computing (HPC) cluster.
 
     This server interfaces with an HPC queueing system (like Slurm) via the `pysqa`
@@ -187,7 +187,7 @@ class DefaultHPCServer(ServerBase):
             job_name=task_id,
             output=f"{task_id}.txt",
             working_directory=str(self._workdir),
-            command=f"python -m ropt.plugins.server {input_file} {output_file}",
+            command=f"python -m ropt.workflow.servers {input_file} {output_file}",
             submission_template=self._template,
             queue=self._queue,
         )

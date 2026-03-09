@@ -37,12 +37,11 @@ from numpy.random import default_rng
 from numpy.typing import NDArray
 
 from ropt.config import EnOptConfig
-from ropt.plugins.server.base import Server
 from ropt.results import FunctionResults
 from ropt.workflow.compute_steps import Optimizer
 from ropt.workflow.evaluators import AsyncEvaluator
 from ropt.workflow.event_handlers import Tracker
-from ropt.workflow.servers import AsyncServer, MultiprocessingServer
+from ropt.workflow.servers import AsyncServer, MultiprocessingServer, Server
 
 DIM = 5
 UNCERTAINTY = 0.1

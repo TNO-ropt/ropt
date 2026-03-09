@@ -18,15 +18,15 @@ class Server(ABC):
 
     Subclasses must implement the following abstract methods and properties:
 
-    - [`start`][ropt.plugins.server.base.Server.start]: Starts the server.
-    - [`cancel`][ropt.plugins.server.base.Server.cancel]: Stops the server.
-    - [`task_queue`][ropt.plugins.server.base.Server.task_queue]: Retrieves the
+    - [`start`][ropt.workflow.servers.Server.start]: Starts the server.
+    - [`cancel`][ropt.workflow.servers.Server.cancel]: Stops the server.
+    - [`task_queue`][ropt.workflow.servers.Server.task_queue]: Retrieves the
       servers task queue.
-    - [`loop`][ropt.plugins.server.base.Server.loop]: Retrieves the
+    - [`loop`][ropt.workflow.servers.Server.loop]: Retrieves the
       currently running asyncio loop.
-    - [`task_group`][ropt.plugins.server.base.Server.task_group]: The asyncio.Taskgroup
+    - [`task_group`][ropt.workflow.servers.Server.task_group]: The asyncio.Taskgroup
       used by this server.
-    - [`is_running`][ropt.plugins.server.base.Server.is_running]: Checks if the
+    - [`is_running`][ropt.workflow.servers.Server.is_running]: Checks if the
       server is running.
     """
 

@@ -9,13 +9,14 @@ from concurrent.futures.process import BrokenProcessPool
 from typing import TYPE_CHECKING, Any
 
 from ropt.exceptions import ServerFailure
-from ropt.plugins.server.base import Server, ServerBase, Task
+
+from .base import Server, ServerBase, Task
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
 
-class DefaultMultiprocessingServer(ServerBase):
+class MultiprocessingServer(ServerBase):
     """An evaluator server that employs a pool of multiprocessing workers."""
 
     def __init__(

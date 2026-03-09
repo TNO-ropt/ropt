@@ -11,7 +11,7 @@ import numpy as np
 from ropt.enums import ExitCode
 from ropt.evaluator import EvaluatorContext, EvaluatorResult
 from ropt.exceptions import ComputeStepAborted, ServerFailure
-from ropt.plugins.server.base import ResultsQueue, Server, Task
+from ropt.workflow.servers import ResultsQueue, Server, Task
 
 from .base import Evaluator
 
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 
-class DefaultAsyncEvaluator(Evaluator):
+class AsyncEvaluator(Evaluator):
     """An evaluator that calls a function in a asyncio loop.
 
     This Evaluator stores a single awaitable function that returns a value for
@@ -37,7 +37,7 @@ class DefaultAsyncEvaluator(Evaluator):
         evaluation_info: dict[str, np.dtype] | None = None,
         get_name: Callable[..., str] | None = None,
     ) -> None:
-        """Initialize the DefaultFunctionEvaluator.
+        """Initialize the FunctionEvaluator.
 
         Args:
             function:        The function used for objectives and constraints.

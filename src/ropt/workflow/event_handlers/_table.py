@@ -4,8 +4,9 @@ from importlib.util import find_spec
 from typing import TYPE_CHECKING, Any, Final, Literal
 
 from ropt.enums import EventType
-from ropt.plugins.event_handler.base import EventHandler
 from ropt.results import Results, results_to_dataframe
+
+from .base import EventHandler
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -65,7 +66,7 @@ _GRADIENT_TABLES: Final[dict[str, dict[str, str]]] = {
 }
 
 
-class DefaultTableHandler(EventHandler):
+class Table(EventHandler):
     """This event handler tracks results and stores them in pandas DataFrames.
 
     **Tables**
@@ -187,7 +188,7 @@ class DefaultTableHandler(EventHandler):
             callback:  An optional callback that is called when the tables are update.
         """
         if not _HAVE_PANDAS:
-            msg = "The pandas module must be installed to use DefaultTableHandler"
+            msg = "The pandas module must be installed to use Table"
             raise NotImplementedError(msg)
 
         super().__init__()

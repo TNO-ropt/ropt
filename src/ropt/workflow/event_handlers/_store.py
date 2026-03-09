@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from ropt.optimization import Event
 
 
-class DefaultStoreHandler(EventHandler):
+class Store(EventHandler):
     """The default event handler for storing optimization results.
 
     This event handler listens for

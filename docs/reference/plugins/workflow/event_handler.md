@@ -1,2 +1,1 @@
-::: ropt.plugins.event_handler.base.EventHandlerPlugin
-::: ropt.plugins.event_handler.base.EventHandler
+::: ropt.workflow.event_handlers.EventHandler

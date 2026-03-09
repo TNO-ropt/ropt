@@ -8,7 +8,7 @@ import pytest
 from numpy.random import Generator, default_rng
 
 from ropt.config import EnOptConfig
-from ropt.ensemble_evaluator._gradient import _perturb_variables
+from ropt.ensemble._gradient import _perturb_variables
 from ropt.plugins.sampler.base import Sampler
 from ropt.workflow import BasicOptimizer
 

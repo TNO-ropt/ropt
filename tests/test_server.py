@@ -9,11 +9,16 @@ import numpy as np
 import pytest
 
 from ropt.config import EnOptConfig
-from ropt.plugins.server.base import ResultsQueue, Task
 from ropt.workflow.compute_steps import Optimizer
 from ropt.workflow.evaluators import AsyncEvaluator
 from ropt.workflow.event_handlers import Tracker
-from ropt.workflow.servers import AsyncServer, HPCServer, MultiprocessingServer
+from ropt.workflow.servers import (
+    AsyncServer,
+    HPCServer,
+    MultiprocessingServer,
+    ResultsQueue,
+    Task,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -21,8 +26,8 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from ropt.plugins.server.base import Server
     from ropt.results import FunctionResults
+    from ropt.workflow.servers import Server
 
 try:
     import cloudpickle  # noqa: F401
@@ -89,7 +94,7 @@ async def test_server_ok(server_name: str, tmp_path: Path, monkeypatch: Any) -> 
     match server_name:
         case "hpc_server":
             monkeypatch.setattr(
-                "ropt.plugins.server._hpc_server.pysqa.QueueAdapter",
+                "ropt.workflow.servers._hpc_server.pysqa.QueueAdapter",
                 lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
             )
             server: Server = HPCServer(
@@ -152,7 +157,7 @@ async def test_server_error(server_name: str, tmp_path: Path, monkeypatch: Any) 
     match server_name:
         case "hpc_server":
             monkeypatch.setattr(
-                "ropt.plugins.server._hpc_server.pysqa.QueueAdapter",
+                "ropt.workflow.servers._hpc_server.pysqa.QueueAdapter",
                 lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
             )
             server: Server = HPCServer(
@@ -291,7 +296,7 @@ async def test_server_evaluator_ok(
     match server_name:
         case "hpc_server":
             monkeypatch.setattr(
-                "ropt.plugins.server._hpc_server.pysqa.QueueAdapter",
+                "ropt.workflow.servers._hpc_server.pysqa.QueueAdapter",
                 lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
             )
             server: Server = HPCServer(
@@ -345,7 +350,7 @@ async def test_server_evaluator_error(
     match server_name:
         case "hpc_server":
             monkeypatch.setattr(
-                "ropt.plugins.server._hpc_server.pysqa.QueueAdapter",
+                "ropt.workflow.servers._hpc_server.pysqa.QueueAdapter",
                 lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
             )
             server: Server = HPCServer(
@@ -400,7 +405,7 @@ async def test_server_evaluator_two_optimizations(
     match server_name:
         case "hpc_server":
             monkeypatch.setattr(
-                "ropt.plugins.server._hpc_server.pysqa.QueueAdapter",
+                "ropt.workflow.servers._hpc_server.pysqa.QueueAdapter",
                 lambda *args, **kwargs: MockedHPCAdapter(tmp_path),  # noqa: ARG005
             )
             server: Server = HPCServer(

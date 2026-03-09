@@ -10,21 +10,21 @@ constructing and executing optimization workflows. It is designed to handle both
 simple, single-run optimizations and more complex, customized scenarios. The
 framework is built upon three key components:
 
-- **[`ComputeStep`][ropt.plugins.compute_step.base.ComputeStep]**: Defines a
+- **[`ComputeStep`][ropt.workflow.compute_steps.ComputeStep]**: Defines a
   distinct action within the workflow, such as running an optimization algorithm.
-- **[`EventHandler`][ropt.plugins.event_handler.base.EventHandler]**: Responds to
+- **[`EventHandler`][ropt.workflow.event_handlers.EventHandler]**: Responds to
   events emitted by `ComputeStep` instances. This allows for real-time
   monitoring, storing results, or triggering custom logic during the workflow.
-- **[`Evaluator`][ropt.plugins.evaluator.base.Evaluator]**: Provides a mechanism
+- **[`Evaluator`][ropt.workflow.evaluators.Evaluator]**: Provides a mechanism
   for `ComputeStep` objects to perform function evaluations, such as running
   simulations on a high-performance computing (HPC) cluster.
 
 Compute steps, event handlers are executed by calling their
-[`run`][ropt.plugins.compute_step.base.ComputeStep.run] method. During
+[`run`][ropt.workflow.compute_steps.ComputeStep.run] method. During
 execution, compute steps may emit [`events`][ropt.optimization.Event] to
 communicate intermediate results. Event handlers can be added to compute steps
 using the
-[`add_event_handler`][ropt.plugins.compute_step.base.ComputeStep.add_event_handler]
+[`add_event_handler`][ropt.workflow.compute_steps.ComputeStep.add_event_handler]
 method. Many compute steps, such as those performing optimizations, will require
 the repeated evaluation of a function, which is performed by evaluator objects
 passed to the step upon creation.

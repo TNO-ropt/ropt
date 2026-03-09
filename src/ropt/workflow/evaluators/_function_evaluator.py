@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 
-class DefaultFunctionEvaluator(Evaluator):
+class FunctionEvaluator(Evaluator):
     """An evaluator that calls a function.
 
     This Evaluator stores a single function that returns a value for each
@@ -30,7 +30,7 @@ class DefaultFunctionEvaluator(Evaluator):
         function: Callable[..., NDArray[np.float64] | dict[str, Any]],
         evaluation_info: dict[str, Any] | None = None,
     ) -> None:
-        """Initialize the DefaultFunctionEvaluator.
+        """Initialize the FunctionEvaluator.
 
         Args:
             function:        The function used for objectives and constraints.

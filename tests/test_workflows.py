@@ -10,7 +10,6 @@ import pytest
 from ropt.config import EnOptConfig
 from ropt.enums import EventType, ExitCode
 from ropt.exceptions import ComputeStepAborted
-from ropt.plugins.evaluator.cached_evaluator import DefaultCachedEvaluator
 from ropt.results import FunctionResults
 from ropt.workflow import BasicOptimizer
 from ropt.workflow.compute_steps import EnsembleEvaluator, Optimizer
@@ -658,7 +657,7 @@ def test_optimization_abort(enopt_config: Any, evaluator: Any) -> None:
 
 
 def _cached_eval(
-    obj: DefaultCachedEvaluator,
+    obj: CachedEvaluator,
     variables: NDArray[np.float64],
     context: EvaluatorContext,
 ) -> EvaluatorResult:
@@ -726,7 +725,7 @@ def test_evaluator_cache(
 
     function_evaluator = evaluator((_test_function1, test_functions[1]))
     cached_evaluator = CachedEvaluator(evaluator=function_evaluator, sources={tracker})
-    assert isinstance(cached_evaluator, DefaultCachedEvaluator)
+    assert isinstance(cached_evaluator, CachedEvaluator)
     monkeypatch.setattr(
         cached_evaluator, "eval", partial(_cached_eval, cached_evaluator)
     )
@@ -777,7 +776,7 @@ def test_evaluator_cache_with_store(
     step = Optimizer(evaluator=cached_evaluator)
     step.add_event_handler(store)
 
-    assert isinstance(cached_evaluator, DefaultCachedEvaluator)
+    assert isinstance(cached_evaluator, CachedEvaluator)
     monkeypatch.setattr(
         cached_evaluator, "eval", partial(_cached_eval, cached_evaluator)
     )

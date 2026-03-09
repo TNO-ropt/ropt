@@ -33,10 +33,6 @@ mechanism.
 Each plugin type has a corresponding abstract base class that custom plugins
 must inherit from:
 
-- **Workflow plugins:**
-  [`ComputeStepPlugin`][ropt.plugins.compute_step.base.ComputeStepPlugin],
-  [`EventHandlerPlugin`][ropt.plugins.event_handler.base.EventHandlerPlugin],
-  [`EvaluatorPlugin`][ropt.plugins.evaluator.base.EvaluatorPlugin]
 - **Optimizer:**
   [`OptimizerPlugin`][ropt.plugins.optimizer.base.OptimizerPlugin]
 - **Sampler:** [`SamplerPlugin`][ropt.plugins.sampler.base.SamplerPlugin]
@@ -69,9 +65,9 @@ must inherit
 from the base class for the corresponding plugin type:
 
 - Workflow related plugins:
-  [`ComputeStep`][ropt.plugins.compute_step.base.ComputeStep],
-  [`EventHandler`][ropt.plugins.event_handler.base.EventHandler],
-  [`Evaluator`][ropt.plugins.evaluator.base.Evaluator]
+  [`ComputeStep`][ropt.workflow.compute_steps.ComputeStep],
+  [`EventHandler`][ropt.workflow.event_handlers.EventHandler],
+  [`Evaluator`][ropt.workflow.evaluators.Evaluator]
 - Optimizer: [`Optimizer`][ropt.plugins.optimizer.base.Optimizer]
 - Sampler: [`Sampler`][ropt.plugins.sampler.base.Sampler]
 - Realization Filter:
@@ -83,11 +79,6 @@ from the base class for the corresponding plugin type:
 
 `ropt` comes bundled with a set of pre-installed plugins:
 
-- **Workflow:** The built-in
-  [`default compute step`][ropt.plugins.compute_step.default.DefaultComputeStepPlugin],
-  [`default event handler`][ropt.plugins.event_handler.default.DefaultEventHandlerPlugin]
-  and [`default evaluator`][ropt.plugins.evaluator.default.DefaultEvaluatorPlugin] plugins,
-  providing components for executing complex optimization workflows.
 - **Optimizer:** The [`scipy`][ropt.plugins.optimizer.scipy.SciPyOptimizer]
   plugin, leveraging algorithms from `scipy.optimize`, and the
   [`ExternalOptimizer`][ropt.plugins.optimizer.external.ExternalOptimizer] plugin,

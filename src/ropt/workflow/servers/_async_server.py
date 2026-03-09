@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import asyncio
 
-from ropt.plugins.server.base import Server, ServerBase, Task
+from .base import Server, ServerBase, Task
 
 
-class DefaultAsyncServer(ServerBase):
+class AsyncServer(ServerBase):
     """An evaluator server that employs asynchronous workers."""
 
     def __init__(self, *, workers: int = 1, queue_size: int = 0) -> None:

@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from ropt.results import FunctionResults
 
 
-class DefaultTrackerHandler(EventHandler):
+class Tracker(EventHandler):
     """The default event handler for tracking optimization results.
 
     This event handler listens for

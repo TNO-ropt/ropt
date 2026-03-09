@@ -7,22 +7,23 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt.ensemble_evaluator import EnsembleEvaluator
+from ropt.ensemble import EnsembleFunctionAndGradientEvaluator
 from ropt.enums import EventType, ExitCode
 from ropt.exceptions import ComputeStepAborted
 from ropt.optimization import Event
-from ropt.plugins.compute_step.base import ComputeStep
 from ropt.results import FunctionResults
+
+from .base import ComputeStep
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ropt.config import EnOptConfig
-    from ropt.plugins.evaluator.base import Evaluator
     from ropt.transforms import OptModelTransforms
+    from ropt.workflow.evaluators import Evaluator
 
 
-class DefaultEnsembleEvaluatorComputeStep(ComputeStep):
+class EnsembleEvaluator(ComputeStep):
     """The default ensemble evaluator compute step for optimization workflows.
 
     This compute step performs one or more ensemble evaluations based on the
@@ -98,7 +99,9 @@ class DefaultEnsembleEvaluatorComputeStep(ComputeStep):
         if transforms is not None and transforms.variables is not None:
             variables = transforms.variables.to_optimizer(variables)
 
-        ensemble_evaluator = EnsembleEvaluator(config, transforms, self._evaluator.eval)
+        ensemble_evaluator = EnsembleFunctionAndGradientEvaluator(
+            config, transforms, self._evaluator.eval
+        )
 
         exit_code = ExitCode.ENSEMBLE_EVALUATOR_FINISHED
 

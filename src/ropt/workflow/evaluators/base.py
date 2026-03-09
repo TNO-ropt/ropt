@@ -16,7 +16,7 @@ class Evaluator(ABC):
     """Abstract base class for evaluator components within an optimization workflow.
 
     Subclasses must implement the abstract
-    [`eval`][ropt.plugins.evaluator.base.Evaluator.eval] method, which is responsible
+    [`eval`][ropt.workflow.evaluators.Evaluator.eval] method, which is responsible
     for performing the actual evaluation of variables using an
     [`EvaluatorContext`][ropt.evaluator.EvaluatorContext] and returning an
     [`EvaluatorResult`][ropt.evaluator.EvaluatorResult].

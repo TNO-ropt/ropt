@@ -15,7 +15,7 @@ import numpy as np
 from ropt.config import EnOptConfig
 from ropt.enums import EventType, ExitCode
 from ropt.exceptions import ComputeStepAborted
-from ropt.plugins.evaluator.base import Evaluator
+from ropt.workflow.evaluators import Evaluator
 
 from .compute_steps import Optimizer
 from .event_handlers import Observer, Tracker

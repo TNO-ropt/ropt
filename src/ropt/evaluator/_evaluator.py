@@ -13,7 +13,7 @@ T = TypeVar("T", bound=np.generic)
 class EvaluatorContext:
     """Capture additional details for the function evaluator.
 
-    Function evaluators (see [`Evaluator`][ropt.plugins.evaluator.base.Evaluator])
+    Function evaluators (see [`Evaluator`][ropt.workflow.evaluators.Evaluator])
     primarily receive variable vectors to evaluate objective and constraint
     functions. However, they may also benefit from additional information to
     optimize their calculations. This `EvaluatorContext` object provides that

@@ -5,7 +5,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
-from ropt.plugins.event_handler import EventHandler
+from ropt.workflow.event_handlers import EventHandler
 
 
 class ComputeStep(ABC):
@@ -27,7 +27,7 @@ class ComputeStep(ABC):
         Compute steps emit [`events`][ropt.optimization.Event] to report on the
         calculations they perform. These events are processed by independently
         created [`event
-        handlers`][ropt.plugins.event_handler.base.EventHandler]. Use the
+        handlers`][ropt.workflow.event_handlers.EventHandler]. Use the
         `add_event_handler` method to attach these handlers to the compute step.
 
         Args:

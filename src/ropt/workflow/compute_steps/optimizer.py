@@ -8,19 +8,20 @@ from typing import TYPE_CHECKING, Any, Protocol
 import numpy as np
 from numpy.typing import NDArray  # noqa: TC002
 
-from ropt.ensemble_evaluator import EnsembleEvaluator
+from ropt.ensemble import EnsembleFunctionAndGradientEvaluator
 from ropt.enums import EventType, ExitCode
 from ropt.optimization import EnsembleOptimizer, Event
-from ropt.plugins.compute_step.base import ComputeStep
 from ropt.results import FunctionResults
+
+from .base import ComputeStep
 
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ropt.config import EnOptConfig
-    from ropt.plugins.evaluator.base import Evaluator
     from ropt.results import Results
     from ropt.transforms import OptModelTransforms
+    from ropt.workflow.evaluators import Evaluator
 
 
 MetaDataType = dict[str, int | float | bool | str]
@@ -36,7 +37,7 @@ class NestedOptimizationCallable(Protocol):
 
         This functions defines the signature of the callable that defines a
         nested optimization in a
-        [`DefaultOptimizerComputeStep`][ropt.plugins.compute_step.optimizer.DefaultOptimizerComputeStep].
+        [`Optimizer`][ropt.workflow.compute_steps.Optimizer].
 
         It accepts the variables to evaluate and returns a tuple. The first
         element is a `FunctionResults` object containing the results of the
@@ -53,7 +54,7 @@ class NestedOptimizationCallable(Protocol):
         """
 
 
-class DefaultOptimizerComputeStep(ComputeStep):
+class Optimizer(ComputeStep):
     """The default optimizer compute step.
 
     This compute step executes an optimization algorithm based on a provided
@@ -161,7 +162,7 @@ class DefaultOptimizerComputeStep(ComputeStep):
         if self._transforms is not None and self._transforms.variables is not None:
             variables = self._transforms.variables.to_optimizer(variables)
 
-        ensemble_evaluator = EnsembleEvaluator(
+        ensemble_evaluator = EnsembleFunctionAndGradientEvaluator(
             self._config,
             self._transforms,
             self._evaluator.eval,

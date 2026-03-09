@@ -22,12 +22,12 @@ class EventHandler(ABC):
     an optimization workflow.
 
     Subclasses must implement the abstract
-    [`handle_event`][ropt.plugins.event_handler.base.EventHandler.handle_event]
+    [`handle_event`][ropt.workflow.event_handlers.EventHandler.handle_event]
     method to define their specific event processing logic.
 
     Event handlers are attached to a
-    [`ComputeStep`][ropt.plugins.compute_step.base.ComputeStep] using its
-    [`add_event_handler`][ropt.plugins.compute_step.base.ComputeStep.add_event_handler]
+    [`ComputeStep`][ropt.workflow.compute_steps.ComputeStep] using its
+    [`add_event_handler`][ropt.workflow.compute_steps.ComputeStep.add_event_handler]
     method. When the compute step emits an event, the `handle_event` method of
     each attached handler is invoked, allowing it to process the event.
     """

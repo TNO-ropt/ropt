@@ -3,8 +3,14 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, Literal
 
-from ropt.plugins.server.base import ResultsQueue, Server, Task
-from ropt.workflow.servers import AsyncServer, HPCServer, MultiprocessingServer
+from ropt.workflow.servers import (
+    AsyncServer,
+    HPCServer,
+    MultiprocessingServer,
+    ResultsQueue,
+    Server,
+    Task,
+)
 
 
 @dataclass(kw_only=True)

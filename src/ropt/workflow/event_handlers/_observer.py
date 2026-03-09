@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from ropt.optimization import Event
 
 
-class DefaultObserverHandler(EventHandler):
+class Observer(EventHandler):
     """The default event handler for observing events.
 
     This event handler listens for events and forwards them to one or more
