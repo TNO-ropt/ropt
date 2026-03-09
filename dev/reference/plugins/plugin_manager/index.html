@@ -2182,18 +2182,7 @@ capabilities through a plugin system. Plugins allow for the integration of
 custom or third-party components, installed as separate packages.</p>
 <p><code>ropt</code> supports several types of plugins, each addressing a specific aspect of
 the optimization workflow:</p>
-<p><strong>Workflow related plugins:</strong></p>
-<p>Workflow related plugins may directly be used by the user to create components
-when building optimization workflows, generally via these convenience functions:</p>
-<ul>
-<li><a class="autorefs autorefs-internal" title="            ropt.workflow.create_compute_step" href="../../workflows/workflow/#ropt.workflow.create_compute_step">create_compute_step</a>: Create
-    compute steps, such as optimizations, to run during workflow execution.</li>
-<li><a class="autorefs autorefs-internal" title="            ropt.workflow.create_event_handler" href="../../workflows/workflow/#ropt.workflow.create_event_handler">create_event_handler</a>:
-    Create handlers to process events generated during optimization.</li>
-<li><a class="autorefs autorefs-internal" title="            ropt.workflow.create_event_handler" href="../../workflows/workflow/#ropt.workflow.create_event_handler">create_evaluator</a>: Create
-    evaluators to for use by compute steps.</li>
-</ul>
-<p><strong>Optimizer related plugins:</strong></p>
+<p><strong>*Optimizer related plugins:</strong></p>
 <p>These plugins are used to implement specific features of the ensemble optimizer:</p>
 <ul>
 <li><a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer" href="../optimizer/optimizer/#ropt.plugins.optimizer"><code>optimizer</code></a>: Implements optimization algorithms.</li>
@@ -2258,11 +2247,6 @@ from the base class for the corresponding plugin type:</p>
 <li>Function Estimator:
   <a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.base.FunctionEstimator" href="../optimizer/function_estimator/#ropt.plugins.function_estimator.base.FunctionEstimator"><code>FunctionEstimator</code></a></li>
 </ul>
-<p>The <a class="autorefs autorefs-internal" title="            ropt.workflow.create_event_handler" href="../../workflows/workflow/#ropt.workflow.create_event_handler">create_evaluator</a>,
-<a class="autorefs autorefs-internal" title="            ropt.workflow.create_event_handler" href="../../workflows/workflow/#ropt.workflow.create_event_handler">create_event_handler</a> and
-<a class="autorefs autorefs-internal" title="            ropt.workflow.create_compute_step" href="../../workflows/workflow/#ropt.workflow.create_compute_step">create_compute_step</a>
-convenience functions combine plugin discovery and object creation into a
-single call.</p>
 <p><strong>Pre-installed Plugins Included with <code>ropt</code></strong></p>
 <p><code>ropt</code> comes bundled with a set of pre-installed plugins:</p>
 <ul>
