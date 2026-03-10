@@ -46,6 +46,7 @@ async def dispatch_tasks(  # noqa: PLR0913
     workdir: str = "./",
     cluster: str | None = None,
     queue: str | None = None,
+    cores: int = 1,
 ) -> list[Any]:
     """Dispatch a list of functions to run in parallel.
 
@@ -59,7 +60,8 @@ async def dispatch_tasks(  # noqa: PLR0913
         workers:   The number of workers to run in parallel.
         workdir:   Working directory used by the HPC server.
         cluster:   The name of the HPC cluster to use.
-        queue:       Optional queue to use on the cluster.
+        queue:     Optional queue to use on the cluster.
+        cores:     Optional number of cores per task.
 
     Returns:
         A list of function results.
@@ -93,7 +95,11 @@ async def dispatch_tasks(  # noqa: PLR0913
     match server:
         case "hpc":
             eval_server = HPCServer(
-                workdir=workdir, workers=workers, cluster=cluster, queue=queue
+                workdir=workdir,
+                workers=workers,
+                cluster=cluster,
+                queue=queue,
+                cores=cores,
             )
         case "thread":
             eval_server = AsyncServer(workers=workers)

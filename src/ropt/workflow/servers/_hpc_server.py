@@ -56,6 +56,7 @@ class HPCServer(ServerBase):
         config_path: Path | str | None = None,
         cluster: str | None = None,
         queue: str | None = None,
+        cores: int = 1,
     ) -> None:
         """Initialize the HPC server.
 
@@ -94,6 +95,7 @@ class HPCServer(ServerBase):
                          installation, this makes it possible to switch between
                          clusters.
             queue:       Optional queue to use on the cluster.
+            cores:       The number of cpu's per task.
 
         Raises:
             RuntimeError: If neither a `template` is provided nor a valid
@@ -110,6 +112,7 @@ class HPCServer(ServerBase):
         self._workers = workers
         self._interval = interval
         self._queue = queue
+        self._cores = cores
         self._worker_task: asyncio.Task[None] | None = None
 
         self._template = template
@@ -190,6 +193,7 @@ class HPCServer(ServerBase):
             command=f"python -m ropt.workflow.servers {input_file} {output_file}",
             submission_template=self._template,
             queue=self._queue,
+            cores=self._cores,
         )
 
     def _poll(self, retries: int = 2) -> None:
