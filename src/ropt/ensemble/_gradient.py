@@ -7,6 +7,7 @@ from ropt.plugins.function_estimator.base import FunctionEstimator
 from ropt.plugins.sampler.base import Sampler
 
 _SVD_TOLERANCE = 0.999
+_EPSILON = 1e-15
 _MIRROR_REPEAT = 3
 
 
@@ -48,16 +49,13 @@ def _apply_bounds(
 def _invert_linear_equations(
     matrix: NDArray[np.float64], vector: NDArray[np.float64]
 ) -> NDArray[np.float64]:
-    u, sigma, v = np.linalg.svd(matrix)
-    u = u[:, : sigma.size]
-    v = v[: sigma.size, :]
+    u, sigma, v = np.linalg.svd(matrix, full_matrices=False)
     sigma2 = sigma**2
-    select = np.cumsum(sigma2) / np.sum(sigma2) < _SVD_TOLERANCE
-    select[np.argmin(select)] = True  # Add the element that passes the tolerance
-    sigma_inv = np.diag(
-        np.divide(1.0, sigma, out=np.zeros_like(sigma), where=(sigma > 0) & select)
-    )
-    result: NDArray[np.float64] = v.T.dot(sigma_inv).dot(u.T).dot(vector)
+    select = np.cumsum(sigma2, axis=-1) / np.sum(sigma2, axis=-1) < _SVD_TOLERANCE
+    select[np.argmin(select, axis=-1)] = True
+    with np.errstate(divide="ignore", invalid="ignore"):
+        sigma_inv = np.where(select & (sigma > _EPSILON), 1.0 / sigma, 0.0)
+    result: NDArray[np.float64] = np.matmul(v.T, sigma_inv * np.matmul(u.T, vector))
     return result
 
 
