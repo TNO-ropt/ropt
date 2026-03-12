@@ -38,7 +38,6 @@ The primary configuration class is [`EnOptConfig`][ropt.config.EnOptConfig], and
 it contains nested configuration classes for various aspects of the
 optimization. To parse a configuration from a dictionary, use the
 [`model_validate`][pydantic.BaseModel.model_validate] class method.
-```
 """
 
 from ._enopt_config import EnOptConfig

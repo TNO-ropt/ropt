@@ -96,42 +96,32 @@ nav:
       - "Basic Optimization": usage/basic.md
       - "Optimization workflows": usage/workflows.md
   - "Reference":
-      - "Workflows":
-          - "Optimization Workflows": reference/workflows/workflow.md
-          - "Basic Optimizer": reference/workflows/basic_optimizer.md
       - "Optimization":
         - "Configuration": reference/optimization/enopt_config.md
-        - "Domain Transforms": reference/optimization/domain_transforms.md
-        - "Ensemble Optimization": reference/optimization/optimization.md
         - "Function Evaluations": reference/optimization/evaluator.md
         - "Optimization Results": reference/optimization/results.md
+        - "Domain Transforms": reference/optimization/domain_transforms.md
+      - "Workflows":
+          - "Compute Steps": reference/workflow/compute_steps.md
+          - "Event Handlers": reference/workflow/event_handler.md
+          - "Evaluators": reference/workflow/evaluator.md
+          - "Servers": reference/workflow/server.md
+          - "Basic Optimizer": reference/workflow/basic_optimizer.md
       - "Plugins":
         - "Plugin Manager": reference/plugins/plugin_manager.md
-        - "Workflow Plugins":        
-          - "Compute Steps": reference/plugins/workflow/compute_steps.md
-          - "Event Handlers": reference/plugins/workflow/event_handler.md
-          - "Evaluators": reference/plugins/workflow/evaluator.md
-          - "Servers": reference/plugins/workflow/server.md
-        - "Optimizer Plugins":
-          - "Optimizers": reference/plugins/optimizer/optimizer.md
-          - "Samplers": reference/plugins/optimizer/sampler.md
-          - "Realization Filters": reference/plugins/optimizer/realization_filter.md
-          - "Function estimators": reference/plugins/optimizer/function_estimator.md
-        - "Default Plugins":
-          - "Compute Steps": reference/plugins/default/compute_steps.md
-          - "Event Handlers": reference/plugins/default/event_handler.md
-          - "Evaluators": reference/plugins/default/evaluator.md
-          - "Servers": reference/plugins/default/server.md
-          - "SciPy Optimizers": reference/plugins/default/scipy_optimizer.md
-          - "SciPy Samplers": reference/plugins/default/scipy_sampler.md
-          - "Default Realization Filters": reference/plugins/default/realization_filter.md
-          - "Default Function Estimators": reference/plugins/default/function_estimator.md
-          - "External Optimizers": reference/plugins/default/external_optimizer.md
+        - "Optimizer Plugins": reference/plugins/optimizer/optimizer.md
+        - "Sampler Plugins": reference/plugins/optimizer/sampler.md
+        - "Realization Filter Plugins": reference/plugins/optimizer/realization_filter.md
+        - "Function estimator Plugins": reference/plugins/optimizer/function_estimator.md
       - "Miscellaneous":
         - "Enumerations": reference/miscellaneous/enums.md
         - "Exceptions": reference/miscellaneous/exceptions.md
         - "Events": reference/miscellaneous/events.md
         - "Utilities": reference/miscellaneous/utilities.md
+      - "Core":
+        - "Ensemble Evaluator": reference/core/evaluator.md
+        - "Ensemble Optimizer": reference/core/optimizer.md
+
 
 exclude_docs: |
   /snippets/

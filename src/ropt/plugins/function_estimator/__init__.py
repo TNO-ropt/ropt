@@ -5,6 +5,13 @@ Function estimators are used by the optimization process to combine the results
 single representative value. This module allows for the extension of `ropt` with
 custom strategies for aggregating ensemble results.
 
+**Built-in Function Estimator Plugins:**
+
+The default
+[`DefaultFunctionEstimator`][ropt.plugins.function_estimator.default.DefaultFunctionEstimator]
+class provides methods for calculating the weighted mean (`mean`) and standard
+deviation (`stddev`) of the realization results.
+
 **Core Concepts:**
 
 * **Plugin Interface:** Function estimator plugins must inherit from the
@@ -24,11 +31,4 @@ custom strategies for aggregating ensemble results.
   discovers available `FunctionEstimatorPlugin` implementations (typically via
   entry points) and uses them to create `FunctionEstimator` instances as needed
   during workflow execution.
-
-**Built-in Function Estimator Plugins:**
-
-The default
-[`DefaultFunctionEstimator`][ropt.plugins.function_estimator.default.DefaultFunctionEstimator]
-class provides methods for calculating the weighted mean (`mean`) and standard
-deviation (`stddev`) of the realization results.
 """

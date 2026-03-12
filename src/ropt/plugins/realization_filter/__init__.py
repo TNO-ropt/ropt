@@ -5,6 +5,14 @@ results from a set of realizations should be weighted when evaluating the
 overall objective and constraint functions. This module allows for the extension
 of `ropt` with custom realization filtering strategies.
 
+**Built-in Realization Filter Plugins:**
+
+The default
+[`DefaultRealizationFilter`][ropt.plugins.realization_filter.default.DefaultRealizationFilter]
+class provides several filtering methods, including sorting by
+objective/constraint values and Conditional Value-at-Risk (CVaR) based
+weighting.
+
 **Core Concepts:**
 
 * **Plugin Interface:** Realization filter plugins must inherit from the
@@ -23,12 +31,4 @@ of `ropt` with custom realization filtering strategies.
 * **Discovery:** The [`PluginManager`][ropt.plugins.manager.PluginManager]
   discovers available `RealizationFilterPlugin` implementations (typically via
   entry points) and uses them to create `RealizationFilter` instances as needed.
-
-**Built-in Realization Filter Plugins:**
-
-The default
-[`DefaultRealizationFilter`][ropt.plugins.realization_filter.default.DefaultRealizationFilter]
-class provides several filtering methods, including sorting by
-objective/constraint values and Conditional Value-at-Risk (CVaR) based
-weighting.
 """

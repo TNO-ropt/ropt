@@ -53,10 +53,6 @@ class BasicOptimizer:
     - **Accessing Results:** After the optimization is complete, the optimal
       results, corresponding variables, and the optimization's exit code are
       readily accessible.
-    - **Customizable ComputeSteps, Handlers, and Evaluators:** While designed
-      for single runs, it allows for the addition of custom compute steps and
-      event handlers for more
-      complex scenarios.
 
     By encapsulating the core elements of an optimization run, the
     `BasicOptimizer` reduces the boilerplate code required for simple
@@ -103,19 +99,18 @@ class BasicOptimizer:
 
     Note: Customization
         The optimization workflow executed by `BasicOptimizer` can be tailored
-        by adding event handlers. This allows for custom processing of events
-        emitted by the *default* optimization workflow, without replacing the
-        workflow itself. This is useful for tasks like custom logging or data
-        processing.
+        by adding default event handlers. This allows for custom processing of
+        events emitted by the *default* optimization workflow, without replacing
+        the workflow itself. This is useful for tasks like custom logging or
+        data processing.
 
-        Event handlers can be specified using a JSON configuration that file is
-        found at `<prefix>/share/ropt/options.json` (where `<prefix>` is the
-        Python installation prefix or a system-wide data prefix.[^1]), If this
-        JSON file contains a `basic_optimizer` key, and nested within it an
-        `event_handlers` key, the value of `event_handlers` should be a list of
-        strings of the form `"module_name.handler_name"`, where `module_name` is
-        the name of module to load that should contain an event handler class
-        with the name `module_name`.
+        Default event handlers can be specified using a JSON configuration file
+        is found at `<prefix>/share/ropt/options.json`, where `<prefix>` is the
+        Python installation prefix or a system-wide data prefix.[^1]. This JSON
+        file should contain a `basic_optimizer` item, containing an
+        `event_handlers` item that provides a list of strings of the form
+        `"module_name.handler_name"`. The `module_name` denotes a module
+        containing an event handler class with the name `module_name`.
 
         Example `shared/ropt/options.json`:
 

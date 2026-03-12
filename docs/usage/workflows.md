@@ -5,10 +5,10 @@ single optimization using the [`BasicOptimizer`][ropt.workflow.BasicOptimizer]
 class. Although this is sufficient for simple optimization tasks, this class may be 
 limited for more complex workflows.
 
-The [`ropt.workflow`][] package provides a powerful and flexible framework for
-constructing and executing optimization workflows. It is designed to handle both
-simple, single-run optimizations and more complex, customized scenarios. The
-framework is built upon three key components:
+Workflows provide a powerful and flexible framework for constructing and
+executing optimization workflows. It is designed to handle both simple,
+single-run optimizations and more complex, customized scenarios. The framework
+is built upon three key components:
 
 - **[`ComputeStep`][ropt.workflow.compute_steps.ComputeStep]**: Defines a
   distinct action within the workflow, such as running an optimization algorithm.

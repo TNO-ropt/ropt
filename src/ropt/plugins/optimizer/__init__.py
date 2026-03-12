@@ -5,6 +5,16 @@ algorithms into `ropt` via its plugin system. Optimizer plugins allow `ropt` to
 utilize various optimization techniques, either built-in or provided by
 third-party packages.
 
+**Built-in Optimizers:**
+
+`ropt` includes the following optimizers by default:
+
+* [`SciPyOptimizer`][ropt.plugins.optimizer.scipy.SciPyOptimizer]: Provides
+  access to various algorithms from the `scipy.optimize` library.
+* [`ExternalOptimizer`][ropt.plugins.optimizer.external.ExternalOptimizer]:
+  Enables running other optimizer plugins in a separate external process, useful
+  for isolation or specific execution environments.
+
 **Core Concepts:**
 
 * **Plugin Interface:** Optimizer plugins must inherit from the
@@ -28,14 +38,4 @@ third-party packages.
 The [`ropt.plugins.optimizer.utils`][ropt.plugins.optimizer.utils] module offers
 helper functions for common tasks within optimizer plugins, such as validating
 constraint support and handling normalized constraints.
-
-**Built-in Optimizers:**
-
-`ropt` includes the following optimizers by default:
-
-* [`SciPyOptimizer`][ropt.plugins.optimizer.scipy.SciPyOptimizer]: Provides
-  access to various algorithms from the `scipy.optimize` library.
-* [`ExternalOptimizer`][ropt.plugins.optimizer.external.ExternalOptimizer]:
-  Enables running other optimizer plugins in a separate external process, useful
-  for isolation or specific execution environments.
 """

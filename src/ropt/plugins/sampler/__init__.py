@@ -3,6 +3,12 @@
 Samplers are used by the optimization process to generate perturbed variable
 vectors. This module allows for the extension of `ropt` with custom samplers.
 
+**Built-in Sampler Plugins:**
+
+By default, the [`SciPySampler`][ropt.plugins.sampler.scipy.SciPySampler] sampler
+is installed, which provides several sampling methods based on the `scipy.stats`
+and `scipy.stats.qmc` packages.
+
 **Core Concepts:**
 
 * **Plugin Interface:** Sampler plugins must inherit from the
@@ -19,10 +25,4 @@ vectors. This module allows for the extension of `ropt` with custom samplers.
 * **Discovery:** The [`PluginManager`][ropt.plugins.manager.PluginManager]
   discovers available `SamplerPlugin` implementations (typically via entry
   points) and uses them to create `Sampler` instances as needed.
-
-**Built-in Sampler Plugins:**
-
-By default, the [`SciPySampler`][ropt.plugins.sampler.scipy.SciPySampler] sampler
-is installed, which provides several sampling methods based on the `scipy.stats`
-and `scipy.stats.qmc` packages.
 """
