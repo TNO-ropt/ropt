@@ -9,7 +9,7 @@ import numpy as np
 import pytest
 
 from ropt.config import EnOptConfig
-from ropt.workflow.compute_steps import Optimizer
+from ropt.workflow.compute_steps import EnsembleOptimizer
 from ropt.workflow.evaluators import AsyncEvaluator
 from ropt.workflow.event_handlers import Tracker
 from ropt.workflow.servers import (
@@ -237,7 +237,7 @@ def _opt_workflow(
     test_function: Callable[[NDArray[np.float64], int], NDArray[np.float64]],
 ) -> FunctionResults:
     evaluator = AsyncEvaluator(function=test_function, server=server)
-    step = Optimizer(evaluator=evaluator)
+    step = EnsembleOptimizer(evaluator=evaluator)
     tracker = Tracker()
     step.add_event_handler(tracker)
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))

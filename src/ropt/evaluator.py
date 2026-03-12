@@ -1,3 +1,5 @@
+"""Function evaluation protocols and classes."""
+
 from dataclasses import dataclass, field
 from typing import Any, Protocol, TypeVar
 

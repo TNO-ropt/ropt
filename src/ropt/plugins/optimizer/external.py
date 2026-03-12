@@ -18,8 +18,8 @@ from typing import TYPE_CHECKING, Any, Final, Self
 import numpy as np
 
 from ropt.config import EnOptConfig
+from ropt.core import OptimizerCallback, OptimizerCallbackResult
 from ropt.exceptions import ComputeStepAborted
-from ropt.optimization import OptimizerCallback, OptimizerCallbackResult
 from ropt.plugins.manager import get_plugin, get_plugin_name
 
 from .base import Optimizer, OptimizerPlugin

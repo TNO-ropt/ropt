@@ -7,10 +7,10 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt.ensemble import EnsembleFunctionAndGradientEvaluator
+from ropt.core import EnsembleEvaluator as CoreEnsembleEvaluator
 from ropt.enums import EventType, ExitCode
+from ropt.events import Event
 from ropt.exceptions import ComputeStepAborted
-from ropt.optimization import Event
 from ropt.results import FunctionResults
 
 from .base import ComputeStep
@@ -99,7 +99,7 @@ class EnsembleEvaluator(ComputeStep):
         if transforms is not None and transforms.variables is not None:
             variables = transforms.variables.to_optimizer(variables)
 
-        ensemble_evaluator = EnsembleFunctionAndGradientEvaluator(
+        ensemble_evaluator = CoreEnsembleEvaluator(
             config, transforms, self._evaluator.eval
         )
 

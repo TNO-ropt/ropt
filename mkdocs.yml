@@ -130,6 +130,7 @@ nav:
       - "Miscellaneous":
         - "Enumerations": reference/miscellaneous/enums.md
         - "Exceptions": reference/miscellaneous/exceptions.md
+        - "Events": reference/miscellaneous/events.md
         - "Utilities": reference/miscellaneous/utilities.md
 
 exclude_docs: |

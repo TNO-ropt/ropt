@@ -19,7 +19,7 @@ from ropt.workflow import BasicOptimizer, validate_optimizer_options
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
 
-    from ropt.optimization import Event
+    from ropt.events import Event
 
 _SLSQP = "slsqp"
 _DIFFERENTIAL_EVOLUTION = "differential_evolution"

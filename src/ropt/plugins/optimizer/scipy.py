@@ -27,7 +27,7 @@ from .utils import NormalizedConstraints, get_masked_linear_constraints
 
 if TYPE_CHECKING:
     from ropt.config import EnOptConfig
-    from ropt.optimization import OptimizerCallback
+    from ropt.core import OptimizerCallback
 
 _SUPPORTED_METHODS: Final[set[str]] = {
     name.lower()

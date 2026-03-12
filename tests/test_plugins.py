@@ -13,7 +13,7 @@ from ropt.plugins.optimizer.scipy import SciPyOptimizerPlugin
 
 if TYPE_CHECKING:
     from ropt.config import EnOptConfig
-    from ropt.optimization import OptimizerCallback
+    from ropt.core import OptimizerCallback
 
 
 class MockedPlugin1(OptimizerPlugin):

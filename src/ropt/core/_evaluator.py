@@ -41,7 +41,7 @@ if TYPE_CHECKING:
     from ropt.transforms import OptModelTransforms
 
 
-class EnsembleFunctionAndGradientEvaluator:
+class EnsembleEvaluator:
     """Construct functions and gradients from an ensemble of functions.
 
     The `EnsembleEvaluator` class is responsible for calculating functions and

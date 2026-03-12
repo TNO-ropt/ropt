@@ -12,7 +12,7 @@ from ropt.enums import EventType, ExitCode
 from ropt.exceptions import ComputeStepAborted
 from ropt.results import FunctionResults
 from ropt.workflow import BasicOptimizer
-from ropt.workflow.compute_steps import EnsembleEvaluator, Optimizer
+from ropt.workflow.compute_steps import EnsembleEvaluator, EnsembleOptimizer
 from ropt.workflow.evaluators import CachedEvaluator, FunctionEvaluator
 from ropt.workflow.event_handlers import Observer, Store, Tracker
 
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.evaluator import EvaluatorContext, EvaluatorResult
-    from ropt.optimization import Event
+    from ropt.events import Event
 
 
 initial_values = np.array([0.0, 0.0, 0.1])
@@ -47,7 +47,7 @@ def enopt_config_fixture() -> dict[str, Any]:
 
 def test_run_basic(enopt_config: dict[str, Any], evaluator: Any) -> None:
     tracker = Tracker()
-    step = Optimizer(evaluator=evaluator())
+    step = EnsembleOptimizer(evaluator=evaluator())
     step.add_event_handler(tracker)
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
     assert tracker["results"] is not None
@@ -87,7 +87,7 @@ def test_function_evaluator_with_info(
         evaluation_info={"foo": object},
     )
     tracker = Tracker()
-    step = Optimizer(evaluator=evaluator)
+    step = EnsembleOptimizer(evaluator=evaluator)
     step.add_event_handler(tracker)
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
     assert tracker["results"] is not None
@@ -103,7 +103,7 @@ def test_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:
     config2["variables"]["seed"] = 2
 
     tracker = Tracker()
-    step = Optimizer(evaluator=evaluator())
+    step = EnsembleOptimizer(evaluator=evaluator())
     step.add_event_handler(tracker)
 
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
@@ -124,7 +124,7 @@ def test_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
 def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> None:
     tracker = Tracker()
-    step = Optimizer(evaluator=evaluator())
+    step = EnsembleOptimizer(evaluator=evaluator())
     step.add_event_handler(tracker)
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
     assert tracker["results"] is not None
@@ -149,7 +149,7 @@ def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> Non
 
 def test_reset_results(enopt_config: dict[str, Any], evaluator: Any) -> None:
     tracker = Tracker()
-    step = Optimizer(evaluator=evaluator())
+    step = EnsembleOptimizer(evaluator=evaluator())
     step.add_event_handler(tracker)
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
     saved_results = deepcopy(tracker["results"])
@@ -183,7 +183,7 @@ def test_two_optimizers_alternating(
     tracker1 = Tracker()
     tracker2 = Tracker(what="last")
 
-    step = Optimizer(evaluator=evaluator())
+    step = EnsembleOptimizer(evaluator=evaluator())
     step.add_event_handler(tracker1)
     step.add_event_handler(tracker2)
     step.add_event_handler(
@@ -239,7 +239,7 @@ def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -
     observer = Observer(
         event_types={EventType.FINISHED_EVALUATION}, callback=_track_evaluations
     )
-    step = Optimizer(evaluator=evaluator())
+    step = EnsembleOptimizer(evaluator=evaluator())
     step.add_event_handler(tracker)
     step.add_event_handler(observer)
     step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
@@ -272,7 +272,7 @@ def test_restart_initial(enopt_config: dict[str, Any], evaluator: Any) -> None:
     enopt_config["gradient"] = {"evaluation_policy": "speculative"}
     enopt_config["optimizer"]["max_functions"] = 3
 
-    step = Optimizer(evaluator=evaluator())
+    step = EnsembleOptimizer(evaluator=evaluator())
     observer = Observer(
         event_types={EventType.FINISHED_EVALUATION}, callback=_track_evaluations
     )
@@ -300,7 +300,7 @@ def test_restart_last(enopt_config: dict[str, Any], evaluator: Any) -> None:
     enopt_config["gradient"] = {"evaluation_policy": "speculative"}
     enopt_config["optimizer"]["max_functions"] = 3
 
-    step = Optimizer(evaluator=evaluator())
+    step = EnsembleOptimizer(evaluator=evaluator())
     observer = Observer(
         event_types={EventType.FINISHED_EVALUATION}, callback=_track_evaluations
     )
@@ -337,7 +337,7 @@ def test_restart_optimum(enopt_config: dict[str, Any], evaluator: Any) -> None:
     enopt_config["gradient"] = {"evaluation_policy": "speculative"}
     enopt_config["optimizer"]["max_functions"] = 4
 
-    step = Optimizer(evaluator=evaluator())
+    step = EnsembleOptimizer(evaluator=evaluator())
     step.add_event_handler(
         Observer(
             event_types={EventType.FINISHED_EVALUATION}, callback=_track_evaluations
@@ -394,7 +394,7 @@ def test_restart_optimum_with_reset(
     enopt_config["gradient"] = {"evaluation_policy": "speculative"}
     enopt_config["optimizer"]["max_functions"] = max_functions
 
-    step = Optimizer(evaluator=evaluator(new_functions))
+    step = EnsembleOptimizer(evaluator=evaluator(new_functions))
     step.add_event_handler(
         Observer(
             event_types={EventType.FINISHED_EVALUATION}, callback=_track_evaluations
@@ -443,7 +443,7 @@ def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
         "bar": "string",
     }
 
-    step = Optimizer(evaluator=evaluator())
+    step = EnsembleOptimizer(evaluator=evaluator())
     step.add_event_handler(
         Observer(event_types={EventType.FINISHED_EVALUATION}, callback=_track_results)
     )
@@ -510,7 +510,7 @@ def test_exit_code(
     enopt_config["gradient"] = {"evaluation_policy": "speculative"}
     enopt_config["optimizer"][max_criterion] = 4
 
-    step = Optimizer(evaluator=evaluator())
+    step = EnsembleOptimizer(evaluator=evaluator())
     exit_code = step.run(
         variables=initial_values, config=EnOptConfig.model_validate(enopt_config)
     )
@@ -536,7 +536,7 @@ def test_nested_optimization(enopt_config: dict[str, Any], evaluator: Any) -> No
     enopt_config["optimizer"]["max_functions"] = 5
 
     function_evaluator = evaluator()
-    outer_step = Optimizer(evaluator=function_evaluator)
+    outer_step = EnsembleOptimizer(evaluator=function_evaluator)
     outer_tracker = Tracker()
     observer = Observer(
         event_types={EventType.FINISHED_EVALUATION}, callback=_track_evaluations
@@ -548,7 +548,7 @@ def test_nested_optimization(enopt_config: dict[str, Any], evaluator: Any) -> No
         variables: NDArray[np.float64],
     ) -> tuple[FunctionResults | None, bool]:
         inner_tracker = Tracker()
-        inner_step = Optimizer(evaluator=function_evaluator)
+        inner_step = EnsembleOptimizer(evaluator=function_evaluator)
         inner_step.add_event_handler(observer)
         inner_step.add_event_handler(inner_tracker)
         exit_code = inner_step.run(
@@ -593,7 +593,7 @@ def test_nested_optimization_metadata(
     enopt_config["optimizer"]["max_functions"] = 5
 
     function_evaluator = evaluator()
-    outer_step = Optimizer(evaluator=function_evaluator)
+    outer_step = EnsembleOptimizer(evaluator=function_evaluator)
     outer_tracker = Tracker()
     observer = Observer(
         event_types={EventType.FINISHED_EVALUATION}, callback=_track_evaluations
@@ -605,7 +605,7 @@ def test_nested_optimization_metadata(
         variables: NDArray[np.float64],
     ) -> tuple[FunctionResults | None, bool]:
         inner_tracker = Tracker()
-        inner_step = Optimizer(evaluator=function_evaluator)
+        inner_step = EnsembleOptimizer(evaluator=function_evaluator)
         inner_step.add_event_handler(observer)
         inner_step.add_event_handler(inner_tracker)
         exit_code = inner_step.run(
@@ -643,7 +643,7 @@ def test_optimization_abort(enopt_config: Any, evaluator: Any) -> None:
             raise ComputeStepAborted(exit_code=ExitCode.USER_ABORT)
 
     tracker = Tracker()
-    step = Optimizer(evaluator=evaluator())
+    step = EnsembleOptimizer(evaluator=evaluator())
     step.add_event_handler(tracker)
     step.add_event_handler(
         Observer(event_types={EventType.FINISHED_EVALUATION}, callback=_observer)
@@ -730,7 +730,7 @@ def test_evaluator_cache(
         cached_evaluator, "eval", partial(_cached_eval, cached_evaluator)
     )
 
-    step = Optimizer(evaluator=cached_evaluator)
+    step = EnsembleOptimizer(evaluator=cached_evaluator)
     step.add_event_handler(
         Observer(
             event_types={EventType.FINISHED_EVALUATION}, callback=_track_evaluations
@@ -773,7 +773,7 @@ def test_evaluator_cache_with_store(
     store = Store()
     function_evaluator = evaluator((_test_function1, test_functions[1]))
     cached_evaluator = CachedEvaluator(evaluator=function_evaluator, sources={store})
-    step = Optimizer(evaluator=cached_evaluator)
+    step = EnsembleOptimizer(evaluator=cached_evaluator)
     step.add_event_handler(store)
 
     assert isinstance(cached_evaluator, CachedEvaluator)

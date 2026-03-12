@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config import EnOptConfig
-    from ropt.optimization import OptimizerCallback
+    from ropt.core import OptimizerCallback
 
 
 class Optimizer(ABC):
@@ -27,9 +27,9 @@ class Optimizer(ABC):
     [`OptimizerPlugin`][ropt.plugins.optimizer.base.OptimizerPlugin] factories.
     They are initialized with an [`EnOptConfig`][ropt.config.EnOptConfig] object
     detailing the optimization setup and an
-    [`OptimizerCallback`][ropt.optimization.OptimizerCallback] function. The
-    callback is crucial as it allows the optimizer to request function and
-    gradient evaluations from the `ropt` core during its execution.
+    [`OptimizerCallback`][ropt.core.OptimizerCallback] function. The callback is
+    crucial as it allows the optimizer to request function and gradient
+    evaluations from the `ropt` core during its execution.
 
     The optimization process itself is initiated by calling the `start` method,
     which must be implemented by subclasses.
@@ -71,9 +71,9 @@ class Optimizer(ABC):
         of variable values as input.
 
         During execution, the implementation should use the
-        [`OptimizerCallback`][ropt.optimization.OptimizerCallback] (provided
-        during initialization) to request necessary function and gradient
-        evaluations from the `ropt` core.
+        [`OptimizerCallback`][ropt.core.OptimizerCallback] (provided during
+        initialization) to request necessary function and gradient evaluations
+        from the `ropt` core.
 
         Args:
             initial_values: A 1D NumPy array representing the starting variable

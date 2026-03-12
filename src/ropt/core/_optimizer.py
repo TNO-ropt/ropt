@@ -11,9 +11,10 @@ import numpy as np
 
 from ropt.enums import ExitCode
 from ropt.exceptions import ComputeStepAborted
-from ropt.optimization import OptimizerCallbackResult
 from ropt.plugins.manager import get_plugin
 from ropt.results import FunctionResults, GradientResults
+
+from ._callback import OptimizerCallbackResult
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -21,10 +22,11 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config import EnOptConfig
-    from ropt.ensemble import EnsembleFunctionAndGradientEvaluator
     from ropt.plugins.optimizer.base import Optimizer
     from ropt.results import Functions, Gradients, Results
     from ropt.transforms._transforms import OptModelTransforms
+
+    from ._evaluator import EnsembleEvaluator
 
 
 class SignalEvaluationCallback(Protocol):
@@ -78,18 +80,18 @@ class NestedOptimizerCallback(Protocol):
 class EnsembleOptimizer:
     """Optimizer for ensemble-based optimizations.
 
-    The [`EnsembleOptimizer`][ropt.optimization.EnsembleOptimizer] class
-    provides the core functionality for running ensemble-based optimizations.
-    Direct use of this class is generally discouraged. Instead, use the
-    [`BasicOptimizer`][ropt.workflow.BasicOptimizer] class or build a
-    workflow containing the optimization steps.
+    The [`EnsembleOptimizer`][ropt.core.EnsembleOptimizer] class provides the
+    core functionality for running ensemble-based optimizations. Direct use of
+    this class is generally discouraged. Instead, use the
+    [`BasicOptimizer`][ropt.workflow.BasicOptimizer] class or build a workflow
+    containing the optimization steps.
     """
 
     def __init__(
         self,
         enopt_config: EnOptConfig,
         transforms: OptModelTransforms | None,
-        ensemble_evaluator: EnsembleFunctionAndGradientEvaluator,
+        ensemble_evaluator: EnsembleEvaluator,
         signal_evaluation: SignalEvaluationCallback | None = None,
         nested_optimizer: NestedOptimizerCallback | None = None,
     ) -> None:
@@ -107,24 +109,22 @@ class EnsembleOptimizer:
         2.  A [`OptModelTransforms`][ropt.transforms.OptModelTransforms] object:
             This handles the transforms to apply to the variables, objectives and
             constraints.
-        3.  An [`EnsembleEvaluator`][ropt.ensemble.EnsembleFunctionAndGradientEvaluator]
+        3.  An [`EnsembleEvaluator`][ropt.core.EnsembleEvaluator]
             object: This object is responsible for evaluating functions.
 
         Additionally, two optional callbacks can be provided to extend the
         functionality:
 
-        1.  A
-            [`SignalEvaluationCallback`][ropt.optimization.SignalEvaluationCallback]:
+        1.  A [`SignalEvaluationCallback`][ropt.core.SignalEvaluationCallback]:
             This callback is invoked before and after each function evaluation.
-        2.  A
-            [`NestedOptimizerCallback`][ropt.optimization.NestedOptimizerCallback]:
+        2.  A [`NestedOptimizerCallback`][ropt.core.NestedOptimizerCallback]:
             This callback is invoked at each function evaluation to run a nested
             optimization.
 
         The optimizer plugins are used by the ensemble optimizer to implement
         the actual optimization process. The `EnsembleOptimizer` class provides
         the callback function to these plugins needed (see
-        [OptimizerCallback][ropt.optimization.OptimizerCallback])
+        [OptimizerCallback][ropt.core.OptimizerCallback])
 
         Args:
             enopt_config:       The ensemble optimization configuration.

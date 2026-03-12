@@ -17,7 +17,7 @@ from ropt.enums import EventType, ExitCode
 from ropt.exceptions import ComputeStepAborted
 from ropt.workflow.evaluators import Evaluator
 
-from .compute_steps import Optimizer
+from .compute_steps import EnsembleOptimizer
 from .event_handlers import Observer, Tracker
 
 if TYPE_CHECKING:
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
 
     from ropt.evaluator import EvaluatorCallback, EvaluatorContext, EvaluatorResult
-    from ropt.optimization import Event
+    from ropt.events import Event
     from ropt.results import FunctionResults
     from ropt.transforms import OptModelTransforms
 
@@ -200,7 +200,7 @@ class BasicOptimizer:
             else _Evaluator(callback=self._evaluator)
         )
         tracker = Tracker(constraint_tolerance=self._constraint_tolerance)
-        optimizer = Optimizer(evaluator=evaluator)
+        optimizer = EnsembleOptimizer(evaluator=evaluator)
         optimizer.add_event_handler(tracker)
         for event_type, function in self._observers:
             optimizer.add_event_handler(

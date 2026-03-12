@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
     from ropt.enums import EventType
-    from ropt.optimization import Event
+    from ropt.events import Event
 
 
 class Observer(EventHandler):

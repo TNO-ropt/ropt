@@ -8,9 +8,10 @@ from typing import TYPE_CHECKING, Any, Protocol
 import numpy as np
 from numpy.typing import NDArray  # noqa: TC002
 
-from ropt.ensemble import EnsembleFunctionAndGradientEvaluator
+from ropt.core import EnsembleEvaluator as CoreEnsembleEvaluator
+from ropt.core import EnsembleOptimizer as CoreEnsembleOptimizer
 from ropt.enums import EventType, ExitCode
-from ropt.optimization import EnsembleOptimizer, Event
+from ropt.events import Event
 from ropt.results import FunctionResults
 
 from .base import ComputeStep
@@ -37,7 +38,7 @@ class NestedOptimizationCallable(Protocol):
 
         This functions defines the signature of the callable that defines a
         nested optimization in a
-        [`Optimizer`][ropt.workflow.compute_steps.Optimizer].
+        [`Optimizer`][ropt.workflow.compute_steps.EnsembleOptimizer].
 
         It accepts the variables to evaluate and returns a tuple. The first
         element is a `FunctionResults` object containing the results of the
@@ -54,7 +55,7 @@ class NestedOptimizationCallable(Protocol):
         """
 
 
-class Optimizer(ComputeStep):
+class EnsembleOptimizer(ComputeStep):
     """The default optimizer compute step.
 
     This compute step executes an optimization algorithm based on a provided
@@ -162,13 +163,13 @@ class Optimizer(ComputeStep):
         if self._transforms is not None and self._transforms.variables is not None:
             variables = self._transforms.variables.to_optimizer(variables)
 
-        ensemble_evaluator = EnsembleFunctionAndGradientEvaluator(
+        ensemble_evaluator = CoreEnsembleEvaluator(
             self._config,
             self._transforms,
             self._evaluator.eval,
         )
 
-        ensemble_optimizer = EnsembleOptimizer(
+        ensemble_optimizer = CoreEnsembleOptimizer(
             enopt_config=self._config,
             transforms=self._transforms,
             ensemble_evaluator=ensemble_evaluator,

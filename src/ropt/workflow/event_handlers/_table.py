@@ -11,7 +11,7 @@ from .base import EventHandler
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
-    from ropt.optimization import Event
+    from ropt.events import Event
 
 _HAVE_PANDAS: Final = find_spec("pandas") is not None
 

@@ -1,6 +1,6 @@
-::: ropt.optimization.EnsembleOptimizer
-::: ropt.optimization.SignalEvaluationCallback
-::: ropt.optimization.NestedOptimizerCallback
-::: ropt.optimization.OptimizerCallback
-::: ropt.optimization.OptimizerCallbackResult
-::: ropt.optimization.Event
+::: ropt.core.EnsembleOptimizer
+::: ropt.core.SignalEvaluationCallback
+::: ropt.core.NestedOptimizerCallback
+::: ropt.core.OptimizerCallback
+::: ropt.core.OptimizerCallbackResult
+::: ropt.core.EnsembleEvaluator

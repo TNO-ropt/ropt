@@ -9,7 +9,7 @@ from ropt.enums import EventType
 from .base import EventHandler
 
 if TYPE_CHECKING:
-    from ropt.optimization import Event
+    from ropt.events import Event
 
 
 class Store(EventHandler):

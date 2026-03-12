@@ -38,7 +38,7 @@ from numpy.typing import NDArray
 
 from ropt.config import EnOptConfig
 from ropt.results import FunctionResults
-from ropt.workflow.compute_steps import Optimizer
+from ropt.workflow.compute_steps import EnsembleOptimizer
 from ropt.workflow.evaluators import AsyncEvaluator
 from ropt.workflow.event_handlers import Tracker
 from ropt.workflow.servers import AsyncServer, MultiprocessingServer, Server
@@ -101,7 +101,7 @@ def run_optimization(
         The optimal results.
     """
     evaluator = AsyncEvaluator(function=function, server=server)
-    step = Optimizer(evaluator=evaluator)
+    step = EnsembleOptimizer(evaluator=evaluator)
     tracker = Tracker()
     step.add_event_handler(tracker)
     step.run(variables=initial_values, config=config)

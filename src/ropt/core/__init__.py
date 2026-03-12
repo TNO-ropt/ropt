@@ -1,7 +1,7 @@
-"""The main functionality for ensemble-based optimizations."""
+"""Functionality for the evaluation of ensembles."""
 
 from ._callback import OptimizerCallback, OptimizerCallbackResult
-from ._events import Event
+from ._evaluator import EnsembleEvaluator
 from ._optimizer import (
     EnsembleOptimizer,
     NestedOptimizerCallback,
@@ -9,8 +9,8 @@ from ._optimizer import (
 )
 
 __all__ = [
+    "EnsembleEvaluator",
     "EnsembleOptimizer",
-    "Event",
     "NestedOptimizerCallback",
     "OptimizerCallback",
     "OptimizerCallbackResult",
