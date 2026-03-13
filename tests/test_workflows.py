@@ -517,119 +517,51 @@ def test_exit_code(
     assert exit_code == max_enum
 
 
-def test_nested_optimization(enopt_config: dict[str, Any], evaluator: Any) -> None:
-    completed_functions = 0
-
-    def _track_evaluations(event: Event) -> None:
-        nonlocal completed_functions
-
-        for item in event.data["results"]:
-            if isinstance(item, FunctionResults):
-                completed_functions += 1
-
-    enopt_config["optimizer"]["tolerance"] = 1e-10
-    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
-    enopt_config["optimizer"]["max_functions"] = 4
-    enopt_config["variables"]["mask"] = [True, False, True]
-    nested_config = deepcopy(enopt_config)
-    nested_config["variables"]["mask"] = [False, True, False]
-    enopt_config["optimizer"]["max_functions"] = 5
-
-    function_evaluator = evaluator()
-    outer_step = EnsembleOptimizer(evaluator=function_evaluator)
-    outer_tracker = Tracker()
-    observer = Observer(
-        event_types={EventType.FINISHED_EVALUATION}, callback=_track_evaluations
-    )
-    outer_step.add_event_handler(observer)
-    outer_step.add_event_handler(outer_tracker)
-
-    def _inner_optimization(
-        variables: NDArray[np.float64],
-    ) -> tuple[FunctionResults | None, bool]:
-        inner_tracker = Tracker()
-        inner_step = EnsembleOptimizer(evaluator=function_evaluator)
-        inner_step.add_event_handler(observer)
-        inner_step.add_event_handler(inner_tracker)
-        exit_code = inner_step.run(
-            config=EnOptConfig.model_validate(nested_config),
-            variables=variables,
-        )
-        results = inner_tracker["results"]
-        assert isinstance(results, FunctionResults | None)
-        return results, exit_code == ExitCode.USER_ABORT
-
-    outer_step.run(
-        config=EnOptConfig.model_validate(enopt_config),
-        transforms=None,
-        nested_optimization=_inner_optimization,
-        variables=[0.0, 0.2, 0.1],
-    )
-    assert outer_tracker["results"] is not None
-    assert np.allclose(
-        outer_tracker["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
-    )
-    assert completed_functions == 25
-
-
-def test_nested_optimization_metadata(
-    enopt_config: dict[str, Any], evaluator: Any
+def test_nested_optimization(
+    enopt_config: dict[str, Any], evaluator: Any, test_functions: Any
 ) -> None:
-    def _track_evaluations(event: Event) -> None:
-        for item in event.data["results"]:
-            if isinstance(item, FunctionResults):
-                assert "inner" in item.metadata or "outer" in item.metadata
-                if "outer" in item.metadata:
-                    assert item.metadata.get("outer") == 1
-                if "inner" in item.metadata:
-                    assert item.metadata.get("inner") == "inner_meta_data"
 
-    enopt_config["optimizer"]["tolerance"] = 1e-10
-    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
     enopt_config["optimizer"]["max_functions"] = 4
     enopt_config["variables"]["mask"] = [True, False, True]
     nested_config = deepcopy(enopt_config)
     nested_config["variables"]["mask"] = [False, True, False]
-    enopt_config["optimizer"]["max_functions"] = 5
 
-    function_evaluator = evaluator()
-    outer_step = EnsembleOptimizer(evaluator=function_evaluator)
-    outer_tracker = Tracker()
-    observer = Observer(
-        event_types={EventType.FINISHED_EVALUATION}, callback=_track_evaluations
-    )
-    outer_step.add_event_handler(observer)
-    outer_step.add_event_handler(outer_tracker)
+    initial = np.array([0.0, 0.2, 0.1])
+    result_tracker = Tracker()
 
-    def _inner_optimization(
+    def _outer_function(
         variables: NDArray[np.float64],
-    ) -> tuple[FunctionResults | None, bool]:
-        inner_tracker = Tracker()
-        inner_step = EnsembleOptimizer(evaluator=function_evaluator)
-        inner_step.add_event_handler(observer)
-        inner_step.add_event_handler(inner_tracker)
-        exit_code = inner_step.run(
-            config=EnOptConfig.model_validate(nested_config),
-            metadata={"inner": "inner_meta_data"},
-            variables=variables,
+        perturbation: int,
+        **kwargs: Any,  # noqa: ARG001
+    ) -> Any:
+        new_variables = variables.copy()
+        if perturbation < 0:
+            new_variables[1] = (
+                initial[1]
+                if result_tracker["results"] is None
+                else result_tracker["results"].evaluations.variables[1]
+            )
+            tracker = Tracker()
+            step = EnsembleOptimizer(evaluator=evaluator())
+            step.add_event_handler(tracker)
+            step.add_event_handler(result_tracker)
+            step.run(
+                variables=new_variables,
+                config=EnOptConfig.model_validate(nested_config),
+            )
+            return tracker["results"].functions.objectives
+
+        new_variables[1] = result_tracker["results"].evaluations.variables[1]
+        return np.fromiter(
+            (func(new_variables, 0) for func in test_functions), dtype=np.float64
         )
-        results = inner_tracker["results"]
-        assert isinstance(results, FunctionResults)
-        assert results.metadata["inner"] == "inner_meta_data"
-        return results, exit_code == ExitCode.USER_ABORT
 
-    outer_step.run(
-        config=EnOptConfig.model_validate(enopt_config),
-        transforms=None,
-        nested_optimization=_inner_optimization,
-        metadata={"outer": 1},
-        variables=[0.0, 0.2, 0.1],
-    )
-
+    outer_evaluator = FunctionEvaluator(function=_outer_function)
+    step = EnsembleOptimizer(evaluator=outer_evaluator)
+    step.run(variables=initial, config=EnOptConfig.model_validate(enopt_config))
     assert np.allclose(
-        outer_tracker["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+        result_tracker["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
-    assert outer_tracker["results"].metadata["outer"] == 1
 
 
 def test_optimization_abort(enopt_config: Any, evaluator: Any) -> None:
