@@ -1558,34 +1558,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.core.NestedOptimizerCallback" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        NestedOptimizerCallback
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="NestedOptimizerCallback">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.core.NestedOptimizerCallback.__call__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __call__
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#ropt.core.OptimizerCallback" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1736,34 +1708,6 @@
         
           <li class="md-nav__item">
   <a href="#ropt.core.SignalEvaluationCallback.__call__" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        __call__
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ropt.core.NestedOptimizerCallback" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        NestedOptimizerCallback
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="NestedOptimizerCallback">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.core.NestedOptimizerCallback.__call__" class="md-nav__link">
     <span class="md-ellipsis">
       
         __call__
@@ -1957,8 +1901,7 @@ callback.</p>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">ensemble_evaluator</span><span class="p">:</span> <span class="n">EnsembleEvaluator</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">signal_evaluation</span><span class="p">:</span> <span class="n">SignalEvaluationCallback</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">nested_optimizer</span><span class="p">:</span> <span class="n">NestedOptimizerCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1983,15 +1926,9 @@ optimization run:</p>
 <li>An <a class="autorefs autorefs-internal" title="            ropt.core.EnsembleEvaluator" href="../evaluator/#ropt.core.EnsembleEvaluator"><code>EnsembleEvaluator</code></a>
     object: This object is responsible for evaluating functions.</li>
 </ol>
-<p>Additionally, two optional callbacks can be provided to extend the
-functionality:</p>
-<ol>
-<li>A <a class="autorefs autorefs-internal" title="            ropt.core.SignalEvaluationCallback" href="#ropt.core.SignalEvaluationCallback"><code>SignalEvaluationCallback</code></a>:
-    This callback is invoked before and after each function evaluation.</li>
-<li>A <a class="autorefs autorefs-internal" title="            ropt.core.NestedOptimizerCallback" href="#ropt.core.NestedOptimizerCallback"><code>NestedOptimizerCallback</code></a>:
-    This callback is invoked at each function evaluation to run a nested
-    optimization.</li>
-</ol>
+<p>Additionally, an optional callbacks can be provided that is invoked
+before and after each function evaluation.:
+<a class="autorefs autorefs-internal" title="            ropt.core.SignalEvaluationCallback" href="#ropt.core.SignalEvaluationCallback"><code>SignalEvaluationCallback</code></a>:</p>
 <p>The optimizer plugins are used by the ensemble optimizer to implement
 the actual optimization process. The <code>EnsembleOptimizer</code> class provides
 the callback function to these plugins needed (see
@@ -2072,22 +2009,6 @@ the callback function to these plugins needed (see
             <td>
               <div class="doc-md-description">
                 <p>Optional callback to signal evaluations.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>nested_optimizer</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.core.NestedOptimizerCallback (ropt.core._optimizer.NestedOptimizerCallback)" href="#ropt.core.NestedOptimizerCallback">NestedOptimizerCallback</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional callback for nested optimizations.</p>
               </div>
             </td>
             <td>
@@ -2293,149 +2214,6 @@ output of the evaluation.</p>
             </td>
             <td>
                   <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    </div>
-
-</div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ropt.core.NestedOptimizerCallback" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.core.NestedOptimizerCallback</span>
-
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-            <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-external" title="typing.Protocol" href="https://docs.python.org/3/library/typing.html#typing.Protocol">Protocol</a></code></p>
-
-
-
-        <p>Protocol for functions that start a nested optimization.</p>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="ropt.core.NestedOptimizerCallback.__call__" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">__call__</span>
-
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__call__</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">float64</span><span class="p">],</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">FunctionResults</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Callback protocol for executing a nested optimization.</p>
-<p>This function is invoked by the ensemble optimizer during each function
-evaluation to initiate a nested optimization process. It receives the
-current variables as input and is expected to perform a nested
-optimization using these variables as a starting point. The function
-should return a tuple containing the result of the nested optimization
-and a boolean indicating whether the nested optimization was aborted by
-the user. The result of the nested optimization should be a
-<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../../optimization/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object, or <code>None</code> if
-no result is available.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>variables</code>
-            </td>
-            <td>
-                  <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The variables to use as the starting point.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../../optimization/results/#ropt.results.FunctionResults">FunctionResults</a> | None, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The result and a boolean indicating if the user aborted.</p>
-              </div>
             </td>
           </tr>
       </tbody>

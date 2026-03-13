@@ -2503,17 +2503,6 @@ they can be overridden by passing them directly to the <code>run</code> method.<
   Emitted after the entire optimization process concludes (successfully,
   or due to termination conditions or errors).</li>
 </ul>
-<p>This compute step also supports <strong>nested optimization</strong>. If a
-<code>nested_optimization</code> function is provided to the <code>run</code> method, the
-optimizer will execute a nested optimization at as part of each function
-evaluation. The <code>nested_optimization</code> function is expected to return a
-single <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../../optimization/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object and a flag
-that indicates whether the optimization was aborted by the user.</p>
 
 
 
@@ -2600,10 +2589,8 @@ that indicates whether the optimization was aborted by the user.</p>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">transforms</span><span class="p">:</span> <span class="n">OptModelTransforms</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">nested_optimization</span><span class="p">:</span> <span class="n">NestedOptimizationCallable</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExitCode</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ExitCode</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2612,8 +2599,7 @@ that indicates whether the optimization was aborted by the user.</p>
 <p>This method executes the core logic of the optimizer compute step. It
 requires an optimizer configuration
 (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../../optimization/enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>) and optionally accepts
-specific initial variable vectors, and/or a nested optimization
-workflow, and metadata.</p>
+specific initial variable vectors and metadata.</p>
 <p>If <code>variables</code> are not provided, the initial values specified in the
 <code>config</code> are used. If <code>variables</code> are provided, they override the
 config's initial values.</p>
@@ -2625,16 +2611,6 @@ config's initial values.</p>
       dataclass
   " href="../../optimization/results/#ropt.results.Results"><code>Results</code></a> objects emitted via the
 <code>FINISHED_EVALUATION</code> event.</p>
-<p>If a <code>nested_optimization</code> callable is provided, a callable will be
-called passing the initial variables to use. The callable should return
-a a single <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
-
-
-  
-      dataclass
-  " href="../../optimization/results/#ropt.results.FunctionResults"><code>FunctionResults</code></a> object that
-should contain the results of the nested optimization, and a flag
-indicating whether the optimization was aborted by the user.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2679,7 +2655,7 @@ indicating whether the optimization was aborted by the user.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional transforms to apply to the variables,
-                 objectives, and constraints.</p>
+        objectives, and constraints.</p>
               </div>
             </td>
             <td>
@@ -2700,22 +2676,6 @@ indicating whether the optimization was aborted by the user.</p>
             </td>
             <td>
                 <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>nested_optimization</code>
-            </td>
-            <td>
-                  <code><span title="ropt.workflow.compute_steps._optimizer.NestedOptimizationCallable">NestedOptimizationCallable</span> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Optional callable to run a nested optimization.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -2777,16 +2737,6 @@ indicating whether the optimization was aborted by the user.</p>
             <td>
               <div class="doc-md-description">
                 <p>If the input variables have the wrong shape.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError">RuntimeError</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Parallel optimization not supported for nested optimization.</p>
               </div>
             </td>
           </tr>
