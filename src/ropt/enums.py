@@ -124,19 +124,16 @@ class ExitCode(IntEnum):
     MAX_BATCHES_REACHED = 3
     """Returned when the maximum number of evaluation batches is reached."""
 
-    NESTED_OPTIMIZER_FAILED = 4
-    """Returned when a nested optimization fails to find an optimal value."""
-
-    USER_ABORT = 5
+    USER_ABORT = 4
     """Returned when the optimization is aborted by the user."""
 
-    OPTIMIZER_FINISHED = 6
+    OPTIMIZER_FINISHED = 5
     """Returned when an optimization step terminates normally."""
 
-    ENSEMBLE_EVALUATOR_FINISHED = 7
+    ENSEMBLE_EVALUATOR_FINISHED = 6
     """Returned when an evaluation step terminates normally."""
 
-    ABORT_FROM_ERROR = 8
+    ABORT_FROM_ERROR = 7
     """Returned when the step is aborted due to an error in another thread."""
 
 

@@ -2,16 +2,11 @@
 
 from ._callback import OptimizerCallback, OptimizerCallbackResult
 from ._evaluator import EnsembleEvaluator
-from ._optimizer import (
-    EnsembleOptimizer,
-    NestedOptimizerCallback,
-    SignalEvaluationCallback,
-)
+from ._optimizer import EnsembleOptimizer, SignalEvaluationCallback
 
 __all__ = [
     "EnsembleEvaluator",
     "EnsembleOptimizer",
-    "NestedOptimizerCallback",
     "OptimizerCallback",
     "OptimizerCallbackResult",
     "SignalEvaluationCallback",

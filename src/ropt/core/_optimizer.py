@@ -51,32 +51,6 @@ class SignalEvaluationCallback(Protocol):
         """
 
 
-class NestedOptimizerCallback(Protocol):
-    """Protocol for functions that start a nested optimization."""
-
-    def __call__(
-        self, variables: NDArray[np.float64], /
-    ) -> tuple[FunctionResults | None, bool]:
-        """Callback protocol for executing a nested optimization.
-
-        This function is invoked by the ensemble optimizer during each function
-        evaluation to initiate a nested optimization process. It receives the
-        current variables as input and is expected to perform a nested
-        optimization using these variables as a starting point. The function
-        should return a tuple containing the result of the nested optimization
-        and a boolean indicating whether the nested optimization was aborted by
-        the user. The result of the nested optimization should be a
-        [`FunctionResults`][ropt.results.FunctionResults] object, or `None` if
-        no result is available.
-
-        Args:
-            variables: The variables to use as the starting point.
-
-        Returns:
-            The result and a boolean indicating if the user aborted.
-        """
-
-
 class EnsembleOptimizer:
     """Optimizer for ensemble-based optimizations.
 
@@ -93,7 +67,6 @@ class EnsembleOptimizer:
         transforms: OptModelTransforms | None,
         ensemble_evaluator: EnsembleEvaluator,
         signal_evaluation: SignalEvaluationCallback | None = None,
-        nested_optimizer: NestedOptimizerCallback | None = None,
     ) -> None:
         """Initialize the EnsembleOptimizer.
 
@@ -112,14 +85,9 @@ class EnsembleOptimizer:
         3.  An [`EnsembleEvaluator`][ropt.core.EnsembleEvaluator]
             object: This object is responsible for evaluating functions.
 
-        Additionally, two optional callbacks can be provided to extend the
-        functionality:
-
-        1.  A [`SignalEvaluationCallback`][ropt.core.SignalEvaluationCallback]:
-            This callback is invoked before and after each function evaluation.
-        2.  A [`NestedOptimizerCallback`][ropt.core.NestedOptimizerCallback]:
-            This callback is invoked at each function evaluation to run a nested
-            optimization.
+        Additionally, an optional callbacks can be provided that is invoked
+        before and after each function evaluation.:
+        [`SignalEvaluationCallback`][ropt.core.SignalEvaluationCallback]:
 
         The optimizer plugins are used by the ensemble optimizer to implement
         the actual optimization process. The `EnsembleOptimizer` class provides
@@ -131,16 +99,14 @@ class EnsembleOptimizer:
             transforms:         The transforms to apply to the model.
             ensemble_evaluator: The evaluator for function evaluations.
             signal_evaluation:  Optional callback to signal evaluations.
-            nested_optimizer:   Optional callback for nested optimizations.
         """
         self._enopt_config = enopt_config
         self._transforms = transforms
         self._function_evaluator = ensemble_evaluator
         self._signal_evaluation = signal_evaluation
-        self._nested_optimizer = nested_optimizer
 
         # This stores the values of the fixed variable
-        self._fixed_variables: NDArray[np.float64]
+        self._initial_variables: NDArray[np.float64]
 
         # For implementing max_functions:
         self._completed_functions = 0
@@ -193,7 +159,7 @@ class EnsembleOptimizer:
             An [`ExitCode`][ropt.enums.ExitCode] indicating the reason for
             termination.
         """
-        self._fixed_variables = variables.copy()
+        self._initial_variables = variables.copy()
         exit_code = ExitCode.OPTIMIZER_FINISHED
         try:
             with self._redirector.start():
@@ -214,23 +180,6 @@ class EnsembleOptimizer:
         self._check_stopping_criteria()
 
         variables = self._get_completed_variables(variables)
-
-        # Run any nested optimizations, when this improves the objective, this
-        # may change the fixed variables and the current optimal result:
-        if self._nested_optimizer is not None:
-            # Nested optimization does not support parallel evaluation:
-            if variables.ndim > 1:
-                if variables.shape[0] > 1:
-                    msg = "Nested optimization does not support parallel evaluation."
-                    raise RuntimeError(msg)
-                variables = variables[0, ...]
-            nested_results, aborted = self._nested_optimizer(variables)
-            if aborted:
-                raise ComputeStepAborted(exit_code=ExitCode.USER_ABORT)
-            if nested_results is None:
-                raise ComputeStepAborted(exit_code=ExitCode.NESTED_OPTIMIZER_FAILED)
-            variables = nested_results.evaluations.variables
-            self._fixed_variables = variables.copy()
 
         results = self._run_evaluations(
             variables,
@@ -280,11 +229,11 @@ class EnsembleOptimizer:
         mask = self._enopt_config.variables.mask
         if variables.ndim > 1:
             tmp_variables = np.repeat(
-                self._fixed_variables[np.newaxis, :], variables.shape[0], axis=0
+                self._initial_variables[np.newaxis, :], variables.shape[0], axis=0
             )
             tmp_variables[:, mask] = variables
         else:
-            tmp_variables = self._fixed_variables.copy()
+            tmp_variables = self._initial_variables.copy()
             tmp_variables[mask] = variables
         return tmp_variables
 
