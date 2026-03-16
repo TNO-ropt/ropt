@@ -134,7 +134,7 @@ class ExitCode(IntEnum):
     """Returned when an evaluation step terminates normally."""
 
     ABORT_FROM_ERROR = 7
-    """Returned when the step is aborted due to an error in another thread."""
+    """Returned when aborting due to an error raises and handled elsewhere."""
 
 
 class AxisName(StrEnum):

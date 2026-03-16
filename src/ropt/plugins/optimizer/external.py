@@ -2,23 +2,14 @@
 
 from __future__ import annotations
 
-import atexit
-import contextlib
-import json
-import os
-import selectors
-import signal
-import subprocess  # noqa: S404
-import sys
-import time
-from pathlib import Path
-from tempfile import TemporaryDirectory
-from typing import TYPE_CHECKING, Any, Final, Self
+import multiprocessing
+import traceback
+from typing import TYPE_CHECKING, Any, Final
 
 import numpy as np
 
-from ropt.config import EnOptConfig
 from ropt.core import OptimizerCallback, OptimizerCallbackResult
+from ropt.enums import ExitCode
 from ropt.exceptions import ComputeStepAborted
 from ropt.plugins.manager import get_plugin, get_plugin_name
 
@@ -26,6 +17,8 @@ from .base import Optimizer, OptimizerPlugin
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
+
+    from ropt.config import EnOptConfig
 
 
 _PROCESS_TIMEOUT: Final = 10
@@ -35,9 +28,8 @@ class ExternalOptimizer(Optimizer):
     """Plugin class for optimization using an external process.
 
     This class enables optimization via an external process, which performs the
-    optimization independently and communicates with this class over pipes to
-    request function evaluations, report optimizer states, and handle any
-    errors.
+    optimization independently and communicates with this class to request
+    function evaluations, report optimizer states, and handle any errors.
 
     Typically, the optimizer is specified within an
     [`OptimizerConfig`][ropt.config.OptimizerConfig] via the `method` field,
@@ -80,61 +72,53 @@ class ExternalOptimizer(Optimizer):
 
         # noqa
         """
-        atexit.register(self._atexit)
+        context = multiprocessing.get_context("spawn")
+        request_queue = context.Queue()
+        result_queue = context.Queue()
+        process = context.Process(
+            target=_run,
+            args=(self._config, initial_values, request_queue, result_queue),
+        )
 
-        with TemporaryDirectory() as fifo_dir:
-            self._start(
-                initial_values, Path(fifo_dir) / "fifo1", Path(fifo_dir) / "fifo2"
-            )
+        result: OptimizerCallbackResult | ExitCode
+        exception: Exception | None = None
 
-    def _start(
-        self, initial_values: NDArray[np.float64], fifo1: Path, fifo2: Path
-    ) -> None:
-        with _JSONPipeCommunicator(fifo1, fifo2) as comm:
-            try:
-                process = subprocess.Popen(  # noqa: S603
-                    [
-                        sys.executable,
-                        "-m",
-                        "ropt.plugins.optimizer",
-                        str(fifo2),
-                        str(fifo1),
-                        str(os.getpid()),
-                    ]
+        process.start()
+        while exception is None:
+            if (request := request_queue.get()) is None:
+                break
+            if "error" in request:
+                error_type = request["error"]
+                message = request["message"]
+                tb_str = request["traceback"]
+                exception = RuntimeError(
+                    f"External optimizer error: {error_type}\nmessage:{message}\nstacktrace: {tb_str}"
                 )
-                self._process_pid = process.pid
-            except FileNotFoundError as exc:
-                msg = "The plugin runner binary was not found"
-                raise ValueError(msg) from exc
+                break
+            try:
+                result = self._optimizer_callback(
+                    request["variables"],
+                    return_functions=request["return_functions"],
+                    return_gradients=request["return_gradients"],
+                )
+            except Exception as exc:  # noqa: BLE001
+                result = ExitCode.ABORT_FROM_ERROR
+                exception = exc
+            result_queue.put(result)
+        process.join(_PROCESS_TIMEOUT)
 
-            answer: str | list[Any] | dict[str, Any] | None = None
-            exception: BaseException | None = None
+        if process.is_alive():
+            process.terminate()
+            process.join(_PROCESS_TIMEOUT)
+            if process.is_alive():
+                try:
+                    process.kill()
+                    process.join(_PROCESS_TIMEOUT)
+                except AttributeError:
+                    pass
 
-            while process.poll() is None:
-                if answer is None:
-                    try:
-                        answer = self._handle_request(comm, initial_values)
-                    except Exception as exc:  # noqa: BLE001
-                        # Store the exception, we first need to send the 'abort' signal:
-                        exception = exc
-                        answer = "abort"
-
-                if answer is not None and comm.write(answer):
-                    answer = None
-                    # If the message has been sent, then reraise any exceptions:
-                    if exception is not None:
-                        # The process should have aborted:
-                        with contextlib.suppress(ProcessLookupError):
-                            os.kill(self._process_pid, signal.SIGTERM)
-                        with contextlib.suppress(subprocess.TimeoutExpired):
-                            process.wait(_PROCESS_TIMEOUT)
-                        raise exception
-                time.sleep(0.1)
-
-            with contextlib.suppress(ProcessLookupError):
-                os.kill(self._process_pid, signal.SIGTERM)
-            with contextlib.suppress(subprocess.TimeoutExpired):
-                process.wait(_PROCESS_TIMEOUT)
+        if exception is not None:
+            raise exception
 
     @property
     def allow_nan(self) -> bool:
@@ -156,54 +140,15 @@ class ExternalOptimizer(Optimizer):
         """
         return self._is_parallel
 
-    def _handle_request(
-        self, comm: _JSONPipeCommunicator, initial_values: NDArray[np.float64]
-    ) -> str | list[Any] | dict[str, Any] | None:
-        request = comm.read()
 
-        if request == "config":
-            return self._config.model_dump(round_trip=True)
-
-        if request == "initial_values":
-            return initial_values.tolist()  # type: ignore[no-any-return]
-
-        if isinstance(request, dict):
-            if (evaluation := request.get("evaluation")) is not None:
-                callback_results = self._optimizer_callback(
-                    np.array(evaluation["variables"], dtype=np.float64),
-                    return_functions=evaluation["return_functions"],
-                    return_gradients=evaluation["return_gradients"],
-                )
-                return {
-                    "functions": (
-                        None
-                        if callback_results.functions is None
-                        else callback_results.functions.tolist()
-                    ),
-                    "gradients": (
-                        None
-                        if callback_results.gradients is None
-                        else callback_results.gradients.tolist()
-                    ),
-                    "nonlinear_constraint_bounds": (
-                        None
-                        if callback_results.nonlinear_constraint_bounds is None
-                        else (
-                            callback_results.nonlinear_constraint_bounds[0].tolist(),
-                            callback_results.nonlinear_constraint_bounds[1].tolist(),
-                        )
-                    ),
-                }
-            if (error := request.get("error")) is not None:
-                msg = f"External optimizer error: {error}"
-                raise RuntimeError(msg)
-
-        return None
-
-    def _atexit(self) -> None:
-        if self._process_pid is not None:
-            with contextlib.suppress(ProcessLookupError):
-                os.kill(self._process_pid, signal.SIGTERM)
+def _run(
+    config: EnOptConfig,
+    initial_values: NDArray[np.float64],
+    request_queue: multiprocessing.Queue[dict[str, Any] | None],
+    result_queue: multiprocessing.Queue[OptimizerCallbackResult | ExitCode],
+) -> None:
+    optimizer = _PluginOptimizer(config, initial_values, request_queue, result_queue)
+    optimizer.run()
 
 
 class ExternalOptimizerPlugin(OptimizerPlugin):
@@ -257,26 +202,17 @@ class ExternalOptimizerPlugin(OptimizerPlugin):
 
 
 class _PluginOptimizer:
-    def __init__(self, parent_pid: int) -> None:
-        self._parent_pid = parent_pid
-        self._comm: _JSONPipeCommunicator
-
-    def _check_parent(self) -> None:
-        try:
-            os.kill(self._parent_pid, 0)
-        except OSError:
-            sys.exit(0)
-
-    def _request(self, request: Any) -> Any:  # noqa: ANN401
-        while True:
-            self._check_parent()
-            if self._comm.write(request):
-                break
-        while True:
-            self._check_parent()
-            answer = self._comm.read()
-            if answer is not None:
-                return answer
+    def __init__(
+        self,
+        config: EnOptConfig,
+        initial_values: NDArray[np.float64],
+        request_queue: multiprocessing.Queue[dict[str, Any] | None],
+        result_queue: multiprocessing.Queue[OptimizerCallbackResult | ExitCode],
+    ) -> None:
+        self._config = config
+        self._initial_values = np.asarray(initial_values, dtype=np.float64)
+        self._request_queue = request_queue
+        self._result_queue = result_queue
 
     def _callback(
         self,
@@ -285,119 +221,31 @@ class _PluginOptimizer:
         return_functions: bool,
         return_gradients: bool,
     ) -> OptimizerCallbackResult:
-        response = self._request(
+        self._request_queue.put(
             {
-                "evaluation": {
-                    "variables": variables.tolist(),
-                    "return_functions": return_functions,
-                    "return_gradients": return_gradients,
-                }
+                "variables": variables,
+                "return_functions": return_functions,
+                "return_gradients": return_gradients,
             },
         )
-        if response == "abort":
-            raise ComputeStepAborted(response)
-        functions = response["functions"]
-        gradients = response["gradients"]
-        nonlinear_constraint_bounds = response["nonlinear_constraint_bounds"]
-        return OptimizerCallbackResult(
-            functions=(
-                None if functions is None else np.array(functions, dtype=np.float64)
-            ),
-            gradients=(
-                None
-                if gradients is None
-                else np.array(response["gradients"], dtype=np.float64)
-            ),
-            nonlinear_constraint_bounds=(
-                None
-                if nonlinear_constraint_bounds is None
-                else (
-                    np.array(nonlinear_constraint_bounds[0], dtype=np.float64),
-                    np.array(nonlinear_constraint_bounds[1], dtype=np.float64),
-                )
-            ),
-        )
+        result = self._result_queue.get()
+        if isinstance(result, OptimizerCallbackResult):
+            return result
+        assert isinstance(result, ExitCode)
+        raise ComputeStepAborted(exit_code=result)
 
-    def run(self, fifo1: Path, fifo2: Path) -> int:
-        with _JSONPipeCommunicator(fifo1, fifo2) as self._comm:
-            config = EnOptConfig.model_validate(self._request("config"))
-
-            optimizer = get_plugin(
-                "optimizer", config.optimizer.method.split("/", maxsplit=1)[1]
-            ).create(config, self._callback)
-            try:
-                optimizer.start(
-                    np.array(self._request("initial_values"), dtype=np.float64)
-                )
-            except ComputeStepAborted:
-                return 0
-            except Exception as exc:  # noqa: BLE001
-                assert self._request({"error": str(exc)}) == "abort"  # noqa: PT017
-                return 1
-        return 0
-
-
-class _JSONPipeCommunicator:
-    DELIMITER = "--READY--"
-
-    def __init__(self, read_pipe: Path, write_pipe: Path, timeout: float = 1.0) -> None:
-        self._read_pipe = read_pipe
-        self._write_pipe = write_pipe
-        self._timeout = timeout
-
-        self._read_fd: int
-        self._write_fd: int | None
-        self._selector: selectors.BaseSelector
-
-        if not read_pipe.exists():
-            os.mkfifo(read_pipe)
-        if not write_pipe.exists():
-            os.mkfifo(write_pipe)
-
-    def __enter__(self) -> Self:
-        self._read_fd = os.open(self._read_pipe, os.O_RDONLY | os.O_NONBLOCK)
-        self._write_fd = None
-        self._selector = selectors.DefaultSelector()
-        self._selector.register(self._read_fd, selectors.EVENT_READ)
-        return self
-
-    def __exit__(self, *args: object) -> None:
-        self._selector.close()
-        os.close(self._read_fd)
-        if self._write_fd is not None:
-            os.close(self._write_fd)
-
-    def read(self) -> str | list[Any] | dict[str, Any] | None:
-        events = self._selector.select(timeout=self._timeout)
-        for _, mask in events:
-            if mask & selectors.EVENT_READ:
-                with os.fdopen(os.dup(self._read_fd), "r", encoding="utf-8") as fd:
-                    buffer = ""
-                    while line := fd.readline():
-                        if line.strip() == self.DELIMITER:
-                            buffer = buffer.strip()
-                            return json.loads(buffer) if buffer else buffer
-                        buffer += line
-        return None
-
-    def write(self, data: str | list[Any] | dict[str, Any]) -> bool:
-        class CustomEncoder(json.JSONEncoder):
-            def default(self, obj: Any) -> Any:  # noqa: ANN401
-                if isinstance(obj, np.ndarray):
-                    return obj.tolist()
-                if isinstance(obj, Path):
-                    return str(obj)
-                return super().default(obj)
-
-        if self._write_fd is None:
-            self._write_fd = os.open(self._write_pipe, os.O_WRONLY | os.O_NONBLOCK)
-            self._selector.register(self._write_fd, selectors.EVENT_WRITE)
-        events = self._selector.select(timeout=self._timeout)
-        for _, mask in events:
-            if mask & selectors.EVENT_WRITE:
-                os.write(
-                    self._write_fd,
-                    f"{json.dumps(data, cls=CustomEncoder)}\n{self.DELIMITER}\n".encode(),
-                )
-                return True
-        return False
+    def run(self) -> None:
+        optimizer = get_plugin(
+            "optimizer", self._config.optimizer.method.split("/", maxsplit=1)[1]
+        ).create(self._config, self._callback)
+        try:
+            optimizer.start(self._initial_values)
+        except ComputeStepAborted:
+            pass
+        except Exception as exc:  # noqa: BLE001
+            tb_str = traceback.format_exc()
+            self._request_queue.put(
+                {"error": type(exc).__name__, "message": str(exc), "traceback": tb_str}
+            )
+        finally:
+            self._request_queue.put(None)
