@@ -1954,12 +1954,12 @@ inherit from this base class.</p>
     <div class="doc doc-contents ">
 
         <p>Add an event handler.</p>
-<p>Compute steps emit <a class="autorefs autorefs-internal" title="            Event
+<p>Compute steps emit <a class="autorefs autorefs-internal" title="            EnOptEvent
 
 
   
       dataclass
-  " href="../../miscellaneous/events/#ropt.events.Event"><code>events</code></a> to report on the
+  " href="../../miscellaneous/events/#ropt.events.EnOptEvent"><code>events</code></a> to report on the
 calculations they perform. These events are processed by independently
 created <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventHandler" href="../event_handler/#ropt.workflow.event_handlers.EventHandler"><code>event handlers</code></a>.
 Use the <code>add_event_handler</code> method to attach these handlers to the
@@ -2143,7 +2143,7 @@ input variable vector evaluated.</p>
   
       class-attribute
       instance-attribute
-  " href="../../miscellaneous/enums/#ropt.enums.EventType.START_ENSEMBLE_EVALUATOR"><code>START_ENSEMBLE_EVALUATOR</code></a>:
+  " href="../../miscellaneous/enums/#ropt.enums.EnOptEventType.START_ENSEMBLE_EVALUATOR"><code>START_ENSEMBLE_EVALUATOR</code></a>:
   Emitted before the evaluation process begins.</li>
 <li><a class="autorefs autorefs-internal" title="            START_EVALUATION
 
@@ -2151,7 +2151,7 @@ input variable vector evaluated.</p>
   
       class-attribute
       instance-attribute
-  " href="../../miscellaneous/enums/#ropt.enums.EventType.START_EVALUATION"><code>START_EVALUATION</code></a>: Emitted
+  " href="../../miscellaneous/enums/#ropt.enums.EnOptEventType.START_EVALUATION"><code>START_EVALUATION</code></a>: Emitted
   just before the underlying ensemble evaluation is called.</li>
 <li><a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
 
@@ -2159,18 +2159,19 @@ input variable vector evaluated.</p>
   
       class-attribute
       instance-attribute
-  " href="../../miscellaneous/enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a>: Emitted
-  after the evaluation completes, carrying the generated <code>FunctionResults</code>
-  in its <code>data</code> dictionary under the key <code>"results"</code>. Event handlers
-  typically listen for this event.</li>
+  " href="../../miscellaneous/enums/#ropt.enums.EnOptEventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a>:
+  Emitted after the evaluation completes, carrying the generated
+  <code>FunctionResults</code> in its <code>data</code> dictionary under the key <code>"results"</code>.
+  Event handlers typically listen for this event.</li>
 <li><a class="autorefs autorefs-internal" title="            FINISHED_ENSEMBLE_EVALUATOR
 
 
   
       class-attribute
       instance-attribute
-  " href="../../miscellaneous/enums/#ropt.enums.EventType.FINISHED_ENSEMBLE_EVALUATOR"><code>FINISHED_ENSEMBLE_EVALUATOR</code></a>:
-  Emitted after the entire compute step, including result emission, is finished.</li>
+  " href="../../miscellaneous/enums/#ropt.enums.EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR"><code>FINISHED_ENSEMBLE_EVALUATOR</code></a>:
+  Emitted after the entire compute step, including result emission, is
+  finished.</li>
 </ul>
 
 
@@ -2443,7 +2444,7 @@ they can be overridden by passing them directly to the <code>run</code> method.<
   
       class-attribute
       instance-attribute
-  " href="../../miscellaneous/enums/#ropt.enums.EventType.START_OPTIMIZER"><code>START_OPTIMIZER</code></a>:
+  " href="../../miscellaneous/enums/#ropt.enums.EnOptEventType.START_OPTIMIZER"><code>START_OPTIMIZER</code></a>:
   Emitted just before the optimization process begins.</li>
 <li><a class="autorefs autorefs-internal" title="            START_EVALUATION
 
@@ -2451,7 +2452,7 @@ they can be overridden by passing them directly to the <code>run</code> method.<
   
       class-attribute
       instance-attribute
-  " href="../../miscellaneous/enums/#ropt.enums.EventType.START_EVALUATION"><code>START_EVALUATION</code></a>: Emitted
+  " href="../../miscellaneous/enums/#ropt.enums.EnOptEventType.START_EVALUATION"><code>START_EVALUATION</code></a>: Emitted
   immediately before an ensemble evaluation (for functions or gradients)
   is requested from the underlying optimizer.</li>
 <li><a class="autorefs autorefs-internal" title="            FINISHED_EVALUATION
@@ -2460,7 +2461,7 @@ they can be overridden by passing them directly to the <code>run</code> method.<
   
       class-attribute
       instance-attribute
-  " href="../../miscellaneous/enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a>: Emitted
+  " href="../../miscellaneous/enums/#ropt.enums.EnOptEventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a>: Emitted
   after an evaluation completes. This event carries the generated
   <a class="autorefs autorefs-internal" title="            ropt.results.Results
 
@@ -2476,7 +2477,7 @@ they can be overridden by passing them directly to the <code>run</code> method.<
   
       class-attribute
       instance-attribute
-  " href="../../miscellaneous/enums/#ropt.enums.EventType.FINISHED_OPTIMIZER"><code>FINISHED_OPTIMIZER</code></a>:
+  " href="../../miscellaneous/enums/#ropt.enums.EnOptEventType.FINISHED_OPTIMIZER"><code>FINISHED_OPTIMIZER</code></a>:
   Emitted after the entire optimization process concludes (successfully,
   or due to termination conditions or errors).</li>
 </ul>

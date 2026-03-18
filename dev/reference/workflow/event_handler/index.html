@@ -2187,7 +2187,7 @@ each attached handler is invoked, allowing it to process the event.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event_types</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">EventType</span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event_types</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">EnOptEventType</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2206,7 +2206,7 @@ each attached handler is invoked, allowing it to process the event.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            EventType (ropt.enums.EventType)" href="../../miscellaneous/enums/#ropt.enums.EventType">EventType</a>]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            EnOptEventType (ropt.enums.EnOptEventType)" href="../../miscellaneous/enums/#ropt.enums.EnOptEventType">EnOptEventType</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2256,7 +2256,7 @@ each attached handler is invoked, allowing it to process the event.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">EnOptEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2264,12 +2264,13 @@ each attached handler is invoked, allowing it to process the event.</p>
         <p>Process an event.</p>
 <p>This abstract method must be implemented by concrete <code>EventHandler</code>
 subclasses. It defines the event handler's core logic for reacting to
-<a class="autorefs autorefs-internal" title="            Event
+<a class="autorefs autorefs-internal" title="            EnOptEvent
 
 
   
       dataclass
-  " href="../../miscellaneous/events/#ropt.events.Event"><code>Event</code></a> objects emitted in the optimization workflow.</p>
+  " href="../../miscellaneous/events/#ropt.events.EnOptEvent"><code>EnOptEvent</code></a> objects emitted in the
+optimization workflow.</p>
 <p>Implementations should inspect the <code>event</code> object (its <code>event_type</code> and
 <code>data</code>) and perform computations accordingly, such as storing results,
 logging information, or updating internal state.</p>
@@ -2291,12 +2292,12 @@ logging information, or updating internal state.</p>
                 <code>event</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            Event
+                  <code><a class="autorefs autorefs-internal" title="            EnOptEvent
 
 
   
       dataclass
-   (ropt.events.Event)" href="../../miscellaneous/events/#ropt.events.Event">Event</a></code>
+   (ropt.events.EnOptEvent)" href="../../miscellaneous/events/#ropt.events.EnOptEvent">EnOptEvent</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2545,7 +2546,7 @@ data available to other components of the workflow.</p>
   
       class-attribute
       instance-attribute
-  " href="../../miscellaneous/enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events
+  " href="../../miscellaneous/enums/#ropt.enums.EnOptEventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events
 emitted from within an optimization workflow. It processes the
 <a class="autorefs autorefs-internal" title="            ropt.results.Results
 
@@ -2604,7 +2605,7 @@ selected result, potentially transformed to the user domain.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event_types</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">EventType</span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event_types</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">EnOptEventType</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2623,7 +2624,7 @@ selected result, potentially transformed to the user domain.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            EventType (ropt.enums.EventType)" href="../../miscellaneous/enums/#ropt.enums.EventType">EventType</a>]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            EnOptEventType (ropt.enums.EnOptEventType)" href="../../miscellaneous/enums/#ropt.enums.EnOptEventType">EnOptEventType</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2742,7 +2743,7 @@ transformed to the user's domain.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">EnOptEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2755,7 +2756,7 @@ transformed to the user's domain.</p>
   
       class-attribute
       instance-attribute
-  " href="../../miscellaneous/enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a>
+  " href="../../miscellaneous/enums/#ropt.enums.EnOptEventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a>
 events.</p>
 <p>If a relevant event containing results is received, this method updates
 the tracked result (<code>self["results"]</code>) based on the <code>what</code> criterion
@@ -2778,12 +2779,12 @@ the tracked result (<code>self["results"]</code>) based on the <code>what</code>
                 <code>event</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            Event
+                  <code><a class="autorefs autorefs-internal" title="            EnOptEvent
 
 
   
       dataclass
-   (ropt.events.Event)" href="../../miscellaneous/events/#ropt.events.Event">Event</a></code>
+   (ropt.events.EnOptEvent)" href="../../miscellaneous/events/#ropt.events.EnOptEvent">EnOptEvent</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2835,7 +2836,7 @@ the tracked result (<code>self["results"]</code>) based on the <code>what</code>
   
       class-attribute
       instance-attribute
-  " href="../../miscellaneous/enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events
+  " href="../../miscellaneous/enums/#ropt.enums.EnOptEventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events
 emitted by specified compute steps from within an optimization workflow. It
 collects all <a class="autorefs autorefs-internal" title="            ropt.results.Results
 
@@ -2880,7 +2881,7 @@ this tuple.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event_types</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">EventType</span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event_types</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">EnOptEventType</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2899,7 +2900,7 @@ this tuple.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            EventType (ropt.enums.EventType)" href="../../miscellaneous/enums/#ropt.enums.EventType">EventType</a>]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            EnOptEventType (ropt.enums.EnOptEventType)" href="../../miscellaneous/enums/#ropt.enums.EnOptEventType">EnOptEventType</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2944,7 +2945,7 @@ this tuple.</p>
   
       class-attribute
       instance-attribute
-  " href="../../miscellaneous/enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events
+  " href="../../miscellaneous/enums/#ropt.enums.EnOptEventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events
 and appends the results contained within them to an internal tuple.</p>
 <p>The results are converted from the optimizer domain to the user domain
 <em>before</em> being stored. The accumulated results are stored as a tuple and
@@ -2964,7 +2965,7 @@ can be accessed via dictionary access using the key <code>"results"</code> (e.g.
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">EnOptEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2977,7 +2978,7 @@ can be accessed via dictionary access using the key <code>"results"</code> (e.g.
   
       class-attribute
       instance-attribute
-  " href="../../miscellaneous/enums/#ropt.enums.EventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events.</p>
+  " href="../../miscellaneous/enums/#ropt.enums.EnOptEventType.FINISHED_EVALUATION"><code>FINISHED_EVALUATION</code></a> events.</p>
 <p>If a relevant event containing results is received, this method
 retrieves the results, optionally transforms them to the user domain and
 appends them to the tuple stored in <code>self["results"]</code>.</p>
@@ -2999,12 +3000,12 @@ appends them to the tuple stored in <code>self["results"]</code>.</p>
                 <code>event</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            Event
+                  <code><a class="autorefs autorefs-internal" title="            EnOptEvent
 
 
   
       dataclass
-   (ropt.events.Event)" href="../../miscellaneous/events/#ropt.events.Event">Event</a></code>
+   (ropt.events.EnOptEvent)" href="../../miscellaneous/events/#ropt.events.EnOptEvent">EnOptEvent</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3179,7 +3180,7 @@ tables are update, passing the handler as its only argument.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event_types</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">EventType</span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event_types</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">EnOptEventType</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3198,7 +3199,7 @@ tables are update, passing the handler as its only argument.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            EventType (ropt.enums.EventType)" href="../../miscellaneous/enums/#ropt.enums.EventType">EventType</a>]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            EnOptEventType (ropt.enums.EnOptEventType)" href="../../miscellaneous/enums/#ropt.enums.EnOptEventType">EnOptEventType</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3329,7 +3330,7 @@ tables are update, passing the handler as its only argument.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">EnOptEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3353,12 +3354,12 @@ tables are update, passing the handler as its only argument.</p>
                 <code>event</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            Event
+                  <code><a class="autorefs autorefs-internal" title="            EnOptEvent
 
 
   
       dataclass
-   (ropt.events.Event)" href="../../miscellaneous/events/#ropt.events.Event">Event</a></code>
+   (ropt.events.EnOptEvent)" href="../../miscellaneous/events/#ropt.events.EnOptEvent">EnOptEvent</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3534,7 +3535,7 @@ callback functions.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event_types</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">EventType</span><span class="p">]</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">event_types</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">EnOptEventType</span><span class="p">]</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3553,7 +3554,7 @@ callback functions.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            EventType (ropt.enums.EventType)" href="../../miscellaneous/enums/#ropt.enums.EventType">EventType</a>]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            EnOptEventType (ropt.enums.EnOptEventType)" href="../../miscellaneous/enums/#ropt.enums.EnOptEventType">EnOptEventType</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3581,8 +3582,8 @@ callback functions.</p>
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="o">*</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">event_types</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">EventType</span><span class="p">],</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Event</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">event_types</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">EnOptEventType</span><span class="p">],</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">EnOptEvent</span><span class="p">],</span> <span class="kc">None</span><span class="p">],</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
@@ -3609,7 +3610,7 @@ type matches <code>event_types</code>.</p>
                 <code>event_types</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            EventType (ropt.enums.EventType)" href="../../miscellaneous/enums/#ropt.enums.EventType">EventType</a>]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#set">set</a>[<a class="autorefs autorefs-internal" title="            EnOptEventType (ropt.enums.EnOptEventType)" href="../../miscellaneous/enums/#ropt.enums.EnOptEventType">EnOptEventType</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3625,12 +3626,12 @@ type matches <code>event_types</code>.</p>
                 <code>callback</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-internal" title="            Event
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Callable" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable">Callable</a>[[<a class="autorefs autorefs-internal" title="            EnOptEvent
 
 
   
       dataclass
-   (ropt.events.Event)" href="../../miscellaneous/events/#ropt.events.Event">Event</a>], None]</code>
+   (ropt.events.EnOptEvent)" href="../../miscellaneous/events/#ropt.events.EnOptEvent">EnOptEvent</a>], None]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3657,7 +3658,7 @@ type matches <code>event_types</code>.</p>
 
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">handle_event</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">EnOptEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -3684,12 +3685,12 @@ stored event type, the stored callback is called.</p>
                 <code>event</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            Event
+                  <code><a class="autorefs autorefs-internal" title="            EnOptEvent
 
 
   
       dataclass
-   (ropt.events.Event)" href="../../miscellaneous/events/#ropt.events.Event">Event</a></code>
+   (ropt.events.EnOptEvent)" href="../../miscellaneous/events/#ropt.events.EnOptEvent">EnOptEvent</a></code>
             </td>
             <td>
               <div class="doc-md-description">

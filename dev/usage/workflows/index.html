@@ -1519,13 +1519,13 @@ is built upon three key components:</p>
   
       abstractmethod
   " href="../../reference/workflow/compute_steps/#ropt.workflow.compute_steps.ComputeStep.run"><code>run</code></a> method. During execution,
-compute steps may emit <a class="autorefs autorefs-internal" title="            Event
+compute steps may emit <a class="autorefs autorefs-internal" title="            EnOptEvent
 
 
   
       dataclass
-  " href="../../reference/miscellaneous/events/#ropt.events.Event"><code>events</code></a> to communicate intermediate
-results. Event handlers can be added to compute steps using the
+  " href="../../reference/miscellaneous/events/#ropt.events.EnOptEvent"><code>events</code></a> to communicate
+intermediate results. Event handlers can be added to compute steps using the
 <a class="autorefs autorefs-internal" title="            add_event_handler" href="../../reference/workflow/compute_steps/#ropt.workflow.compute_steps.ComputeStep.add_event_handler"><code>add_event_handler</code></a>
 method. Many compute steps, such as those performing optimizations, will require
 the repeated evaluation of a function, which is performed by evaluator objects
