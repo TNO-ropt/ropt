@@ -7,7 +7,6 @@ from ._results import Results
 
 if TYPE_CHECKING:
     from ropt.config import EnOptConfig
-    from ropt.transforms import OptModelTransforms
 
     from ._gradient_evaluations import GradientEvaluations
     from ._gradients import Gradients
@@ -47,27 +46,25 @@ class GradientResults(Results):
     realizations: Realizations
     gradients: Gradients | None
 
-    def transform_from_optimizer(
-        self, config: EnOptConfig, transforms: OptModelTransforms
-    ) -> GradientResults:
+    def transform_from_optimizer(self, config: EnOptConfig) -> GradientResults:
         """Apply transformations from optimizer space.
 
         Args:
             config:     The configuration used by the source of the results.
-            transforms: The transforms to apply.
 
         Returns:
             The transformed results.
         """
+        assert config.transforms is not None
         return GradientResults(
             batch_id=self.batch_id,
             metadata=self.metadata,
             names=self.names,
-            evaluations=self.evaluations.transform_from_optimizer(transforms),
+            evaluations=self.evaluations.transform_from_optimizer(config.transforms),
             realizations=self.realizations,
             gradients=(
                 None
                 if self.gradients is None
-                else self.gradients.transform_from_optimizer(config, transforms)
+                else self.gradients.transform_from_optimizer(config)
             ),
         )

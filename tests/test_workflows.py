@@ -132,7 +132,6 @@ def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> Non
     tracker["variables"] = None
     step.run(
         config=EnOptConfig.model_validate(enopt_config),
-        transforms=None,
         variables=[0, 0, 0],
     )
     assert tracker["results"] is not None
@@ -197,19 +196,16 @@ def test_two_optimizers_alternating(
     assert tracker2["results"] is not None
     step.run(
         config=EnOptConfig.model_validate(enopt_config2),
-        transforms=None,
         variables=tracker2["results"].evaluations.variables,
     )
     assert tracker2["results"] is not None
     step.run(
         config=EnOptConfig.model_validate(enopt_config1),
-        transforms=None,
         variables=tracker2["results"].evaluations.variables,
     )
     assert tracker2["results"] is not None
     step.run(
         config=EnOptConfig.model_validate(enopt_config2),
-        transforms=None,
         variables=tracker2["results"].evaluations.variables,
     )
     assert completed_functions == 14
@@ -246,7 +242,6 @@ def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -
     assert tracker["results"] is not None
     step.run(
         config=EnOptConfig.model_validate(enopt_config2),
-        transforms=None,
         variables=tracker["results"].evaluations.variables,
     )
 
@@ -315,7 +310,6 @@ def test_restart_last(enopt_config: dict[str, Any], evaluator: Any) -> None:
         )
         step.run(
             config=EnOptConfig.model_validate(enopt_config),
-            transforms=None,
             variables=variables,
         )
 
@@ -353,7 +347,6 @@ def test_restart_optimum(enopt_config: dict[str, Any], evaluator: Any) -> None:
         )
         step.run(
             config=EnOptConfig.model_validate(enopt_config),
-            transforms=None,
             variables=variables,
         )
 
@@ -411,7 +404,6 @@ def test_restart_optimum_with_reset(
         tracker["results"] = None
         step.run(
             config=EnOptConfig.model_validate(enopt_config),
-            transforms=None,
             variables=variables,
         )
 
@@ -451,7 +443,6 @@ def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
         metadata["restart"] = idx
         step.run(
             config=EnOptConfig.model_validate(enopt_config),
-            transforms=None,
             metadata=metadata,
             variables=initial_values,
         )
@@ -469,7 +460,6 @@ def test_evaluator(enopt_config: dict[str, Any], evaluator: Any) -> None:
     tracker["results"] = None
     step.run(
         config=EnOptConfig.model_validate(enopt_config),
-        transforms=None,
         variables=[0, 0, 0],
     )
     assert tracker["results"].functions is not None
@@ -485,7 +475,6 @@ def test_evaluator_multi(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step.add_event_handler(store)
     step.run(
         config=EnOptConfig.model_validate(enopt_config),
-        transforms=None,
         variables=np.array([[0, 0, 0.1], [0, 0, 0]]),
     )
     values = [

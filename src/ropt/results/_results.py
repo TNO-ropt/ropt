@@ -10,7 +10,6 @@ if TYPE_CHECKING:
 
     from ropt.config import EnOptConfig
     from ropt.enums import AxisName
-    from ropt.transforms import OptModelTransforms
 
 
 _HAVE_PANDAS: Final = find_spec("pandas") is not None
@@ -135,9 +134,7 @@ class Results(ABC):
         )
 
     @abstractmethod
-    def transform_from_optimizer(
-        self, config: EnOptConfig, transforms: OptModelTransforms
-    ) -> Results:
+    def transform_from_optimizer(self, config: EnOptConfig) -> Results:
         """Transform results from the optimizer domain to the user domain.
 
         During optimization, variables, objectives, and constraints are often
@@ -155,14 +152,8 @@ class Results(ABC):
         restore the variables to their original scale and offset. Similarly,
         objectives and constraints are transformed back to the user domain.
 
-        These transformations are defined and managed by the
-        [`OptModelTransforms`][ropt.transforms.OptModelTransforms] object,
-        which encapsulates the specific transformations for variables,
-        objectives, and nonlinear constraints.
-
         Args:
             config:     The configuration used by the source of the results.
-            transforms: The transforms to apply.
 
         Returns:
             A new `FunctionResults` object with all relevant data transformed

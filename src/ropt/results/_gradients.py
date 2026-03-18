@@ -14,7 +14,6 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config import EnOptConfig
-    from ropt.transforms import OptModelTransforms
 
 
 @dataclass(slots=True)
@@ -125,23 +124,21 @@ class Gradients(ResultField):
             constraints=constraints,
         )
 
-    def transform_from_optimizer(
-        self, config: EnOptConfig, transforms: OptModelTransforms
-    ) -> Gradients:
+    def transform_from_optimizer(self, config: EnOptConfig) -> Gradients:
         """Apply transformations from optimizer space.
 
         Args:
             config:     The configuration used by the source of the results.
-            transforms: The transforms to apply.
 
         Returns:
             The transformed results.
         """
         objectives = self.objectives
         weighted_objective = self.weighted_objective
-        if transforms.objectives is not None:
+        assert config.transforms is not None
+        if config.transforms.objectives is not None:
             objectives = np.moveaxis(self.objectives, 0, -1)
-            objectives = transforms.objectives.from_optimizer(objectives)
+            objectives = config.transforms.objectives.from_optimizer(objectives)
             objectives = np.moveaxis(objectives, 0, -1)
             weighted_objective = (
                 config.objectives.weights[:, np.newaxis] * objectives
@@ -150,10 +147,12 @@ class Gradients(ResultField):
         constraints: NDArray[np.float64] | None = self.constraints
         if (
             self.constraints is not None
-            and transforms.nonlinear_constraints is not None
+            and config.transforms.nonlinear_constraints is not None
         ):
             constraints = np.moveaxis(self.constraints, 0, -1)
-            constraints = transforms.nonlinear_constraints.from_optimizer(constraints)
+            constraints = config.transforms.nonlinear_constraints.from_optimizer(
+                constraints
+            )
             constraints = np.moveaxis(constraints, 0, -1)
 
         return Gradients(

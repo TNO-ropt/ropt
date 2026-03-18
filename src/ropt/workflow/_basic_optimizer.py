@@ -207,7 +207,6 @@ class BasicOptimizer:
         exit_code = optimizer.run(
             variables=np.asarray(initial_values, dtype=np.float64),
             config=self._config,
-            transforms=self._transforms,
         )
         self._results = tracker["results"]
 
@@ -253,7 +252,7 @@ class BasicOptimizer:
         """
 
         def _results_callback(event: Event) -> None:
-            transforms = event.data["transforms"]
+            transforms = event.data["config"].transforms
             results = tuple(
                 item
                 if transforms is None

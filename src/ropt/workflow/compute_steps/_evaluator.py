@@ -19,7 +19,6 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
     from ropt.config import EnOptConfig
-    from ropt.transforms import OptModelTransforms
     from ropt.workflow.evaluators import Evaluator
 
 
@@ -59,7 +58,6 @@ class EnsembleEvaluator(ComputeStep):
         config: EnOptConfig,
         variables: ArrayLike,
         *,
-        transforms: OptModelTransforms | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> ExitCode:
         """Run the ensemble evaluator.
@@ -76,8 +74,6 @@ class EnsembleEvaluator(ComputeStep):
         Args:
             config:     Optimizer configuration.
             variables:  Variable vector(s) to evaluate.
-            transforms: Optional transforms to apply to the variables,
-                        objectives, and constraints.
             metadata:   Optional dictionary to attach to emitted `FunctionResults`.
 
         Returns:
@@ -86,7 +82,7 @@ class EnsembleEvaluator(ComputeStep):
         Raises:
             ValueError: If the input variables have the wrong shape.
         """
-        event_data: dict[str, Any] = {"config": config, "transforms": transforms}
+        event_data: dict[str, Any] = {"config": config}
 
         self._emit_event(
             Event(event_type=EventType.START_ENSEMBLE_EVALUATOR, data=event_data)
@@ -96,11 +92,11 @@ class EnsembleEvaluator(ComputeStep):
         if variables.shape[-1] != config.variables.variable_count:
             msg = "The input variables have the wrong shape"
             raise ValueError(msg)
-        if transforms is not None and transforms.variables is not None:
-            variables = transforms.variables.to_optimizer(variables)
+        if config.transforms is not None and config.transforms.variables is not None:
+            variables = config.transforms.variables.to_optimizer(variables)
 
         ensemble_evaluator = CoreEnsembleEvaluator(
-            config, transforms, self._evaluator.eval
+            config, config.transforms, self._evaluator.eval
         )
 
         exit_code = ExitCode.ENSEMBLE_EVALUATOR_FINISHED

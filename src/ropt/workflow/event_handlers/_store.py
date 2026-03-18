@@ -58,7 +58,7 @@ class Store(EventHandler):
         """
         if (results := event.data.get("results")) is None:
             return
-        transforms = event.data["transforms"]
+        transforms = event.data["config"].transforms
         results = (
             item
             if transforms is None

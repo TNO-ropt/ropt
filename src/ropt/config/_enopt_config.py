@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from typing import Any, Self
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, PrivateAttr, ValidationInfo, model_validator
+
+from ropt.transforms import OptModelTransforms  # noqa: TC001
 
 from ._function_estimator_config import FunctionEstimatorConfig
 from ._gradient_config import GradientConfig
@@ -91,6 +93,8 @@ class EnOptConfig(BaseModel):
     samplers: tuple[SamplerConfig, ...] = ()
     names: dict[str, tuple[str | int, ...]] = {}
 
+    _context: OptModelTransforms | None = PrivateAttr(default=None)
+
     model_config = ConfigDict(
         extra="forbid",
         validate_default=True,
@@ -126,3 +130,13 @@ class EnOptConfig(BaseModel):
         if isinstance(self, EnOptConfig):
             return self
         return handler(self)
+
+    @model_validator(mode="after")
+    def store_context(self, info: ValidationInfo) -> Self:
+        object.__setattr__(self, "_context", info.context)  # noqa: PLC2801
+        return self
+
+    @property
+    def transforms(self) -> OptModelTransforms | None:
+        """Return the transforms, if any."""
+        return self._context

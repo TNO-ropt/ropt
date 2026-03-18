@@ -108,10 +108,10 @@ class Tracker(EventHandler):
 
         if filtered_results is not None:
             self._tracked_results = filtered_results
-            transforms = event.data["transforms"]
+            transforms = event.data["config"].transforms
             if transforms is not None:
                 filtered_results = filtered_results.transform_from_optimizer(
-                    event.data["config"], transforms
+                    event.data["config"]
                 )
             self["results"] = filtered_results
 

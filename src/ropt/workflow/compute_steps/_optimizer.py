@@ -19,7 +19,6 @@ if TYPE_CHECKING:
 
     from ropt.config import EnOptConfig
     from ropt.results import Results
-    from ropt.transforms import OptModelTransforms
     from ropt.workflow.evaluators import Evaluator
 
 
@@ -70,7 +69,6 @@ class EnsembleOptimizer(ComputeStep):
         config: EnOptConfig,
         variables: ArrayLike,
         *,
-        transforms: OptModelTransforms | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> ExitCode:
         """Run the compute step to perform an optimization.
@@ -90,8 +88,6 @@ class EnsembleOptimizer(ComputeStep):
 
         Args:
             config:     Optimizer configuration.
-            transforms: Optional transforms to apply to the variables,
-                        objectives, and constraints.
             variables:  Optional initial variable vector(s) to start from.
             metadata:   Optional dictionary to attach to emitted `Results`.
 
@@ -102,28 +98,29 @@ class EnsembleOptimizer(ComputeStep):
             ValueError:   If the input variables have the wrong shape.
         """
         self._config = config
-        self._transforms = transforms
         self._metadata = metadata
 
-        event_data: dict[str, Any] = {"config": config, "transforms": transforms}
-
+        event_data: dict[str, Any] = {"config": config}
         self._emit_event(Event(event_type=EventType.START_OPTIMIZER, data=event_data))
 
         variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
         if variables.shape != (self._config.variables.variable_count,):
             msg = "The input variables have the wrong shape"
             raise ValueError(msg)
-        if self._transforms is not None and self._transforms.variables is not None:
-            variables = self._transforms.variables.to_optimizer(variables)
+        if (
+            self._config.transforms is not None
+            and self._config.transforms.variables is not None
+        ):
+            variables = self._config.transforms.variables.to_optimizer(variables)
 
         ensemble_evaluator = CoreEnsembleEvaluator(
             self._config,
-            self._transforms,
+            self._config.transforms,
             self._evaluator.eval,
         )
         ensemble_optimizer = CoreEnsembleOptimizer(
             enopt_config=self._config,
-            transforms=self._transforms,
+            transforms=self._config.transforms,
             ensemble_evaluator=ensemble_evaluator,
             signal_evaluation=self._signal_evaluation,
         )
@@ -141,10 +138,7 @@ class EnsembleOptimizer(ComputeStep):
                 handler.handle_event(event)
 
     def _signal_evaluation(self, results: tuple[Results, ...] | None = None) -> None:
-        event_data: dict[str, Any] = {
-            "config": self._config,
-            "transforms": self._transforms,
-        }
+        event_data: dict[str, Any] = {"config": self._config}
         if results is None:
             self._emit_event(
                 Event(event_type=EventType.START_EVALUATION, data=event_data)

@@ -217,7 +217,7 @@ class Table(EventHandler):
         """
         if (results := event.data.get("results")) is None:
             return
-        transforms = event.data["transforms"]
+        transforms = event.data["config"].transforms
         results = tuple(
             item
             if transforms is None

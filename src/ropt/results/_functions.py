@@ -13,7 +13,6 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config import EnOptConfig
-    from ropt.transforms import OptModelTransforms
 
 
 @dataclass(slots=True)
@@ -113,31 +112,37 @@ class Functions(ResultField):
             constraints=constraints,
         )
 
-    def transform_from_optimizer(
-        self, config: EnOptConfig, transforms: OptModelTransforms
-    ) -> Functions:
+    def transform_from_optimizer(self, config: EnOptConfig) -> Functions:
         """Apply transformations from optimizer space.
 
         Args:
             config:     The configuration used by the source of the results.
-            transforms: The transforms to apply.
 
         Returns:
             The transformed results.
         """
-        if transforms.objectives is None and transforms.nonlinear_constraints is None:
+        assert config.transforms is not None
+        if (
+            config.transforms.objectives is None
+            and config.transforms.nonlinear_constraints is None
+        ):
             return self
 
         objectives = self.objectives
+        assert config.transforms is not None
         weighted_objective = self.weighted_objective
-        if transforms.objectives is not None:
-            objectives = transforms.objectives.from_optimizer(self.objectives)
+        if config.transforms.objectives is not None:
+            objectives = config.transforms.objectives.from_optimizer(self.objectives)
             weighted_objective = (config.objectives.weights * objectives).sum()
 
+        assert config.transforms is not None
         constraints = (
             self.constraints
-            if self.constraints is None or transforms.nonlinear_constraints is None
-            else transforms.nonlinear_constraints.from_optimizer(self.constraints)
+            if self.constraints is None
+            or config.transforms.nonlinear_constraints is None
+            else config.transforms.nonlinear_constraints.from_optimizer(
+                self.constraints
+            )
         )
 
         return Functions(

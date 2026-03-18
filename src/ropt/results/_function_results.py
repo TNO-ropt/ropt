@@ -7,7 +7,6 @@ from ._results import Results
 
 if TYPE_CHECKING:
     from ropt.config import EnOptConfig
-    from ropt.transforms import OptModelTransforms
 
     from ._constraint_info import ConstraintInfo
     from ._function_evaluations import FunctionEvaluations
@@ -54,32 +53,30 @@ class FunctionResults(Results):
     functions: Functions | None
     constraint_info: ConstraintInfo | None = None
 
-    def transform_from_optimizer(
-        self, config: EnOptConfig, transforms: OptModelTransforms
-    ) -> FunctionResults:
+    def transform_from_optimizer(self, config: EnOptConfig) -> FunctionResults:
         """Apply transformations from optimizer space.
 
         Args:
-            config:     The configuration used by the source of the results.
-            transforms: The transforms to apply.
+            config: The configuration used by the source of the results.
 
         Returns:
             The transformed results.
         """
+        assert config.transforms is not None
         return FunctionResults(
             batch_id=self.batch_id,
             metadata=self.metadata,
             names=self.names,
-            evaluations=self.evaluations.transform_from_optimizer(transforms),
+            evaluations=self.evaluations.transform_from_optimizer(config.transforms),
             realizations=self.realizations,
             functions=(
                 None
                 if self.functions is None
-                else self.functions.transform_from_optimizer(config, transforms)
+                else self.functions.transform_from_optimizer(config)
             ),
             constraint_info=(
                 None
                 if self.constraint_info is None
-                else self.constraint_info.transform_from_optimizer(transforms)
+                else self.constraint_info.transform_from_optimizer(config.transforms)
             ),
         )
