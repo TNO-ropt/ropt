@@ -9,8 +9,8 @@ import numpy as np
 
 from ropt.core import EnsembleEvaluator as CoreEnsembleEvaluator
 from ropt.core import EnsembleOptimizer as CoreEnsembleOptimizer
-from ropt.enums import EventType, ExitCode
-from ropt.events import Event
+from ropt.enums import EnOptEventType, ExitCode
+from ropt.events import EnOptEvent
 
 from .base import ComputeStep
 
@@ -40,17 +40,17 @@ class EnsembleOptimizer(ComputeStep):
 
     The following events are emitted during execution:
 
-    - [`START_OPTIMIZER`][ropt.enums.EventType.START_OPTIMIZER]:
+    - [`START_OPTIMIZER`][ropt.enums.EnOptEventType.START_OPTIMIZER]:
       Emitted just before the optimization process begins.
-    - [`START_EVALUATION`][ropt.enums.EventType.START_EVALUATION]: Emitted
+    - [`START_EVALUATION`][ropt.enums.EnOptEventType.START_EVALUATION]: Emitted
       immediately before an ensemble evaluation (for functions or gradients)
       is requested from the underlying optimizer.
-    - [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION]: Emitted
+    - [`FINISHED_EVALUATION`][ropt.enums.EnOptEventType.FINISHED_EVALUATION]: Emitted
       after an evaluation completes. This event carries the generated
       [`Results`][ropt.results.Results] object(s) in its `data` dictionary
       under the key `"results"`. Event handlers typically listen for this event
       to process or track optimization progress.
-    - [`FINISHED_OPTIMIZER`][ropt.enums.EventType.FINISHED_OPTIMIZER]:
+    - [`FINISHED_OPTIMIZER`][ropt.enums.EnOptEventType.FINISHED_OPTIMIZER]:
       Emitted after the entire optimization process concludes (successfully,
       or due to termination conditions or errors).
     """
@@ -100,8 +100,9 @@ class EnsembleOptimizer(ComputeStep):
         self._config = config
         self._metadata = metadata
 
-        event_data: dict[str, Any] = {"config": config}
-        self._emit_event(Event(event_type=EventType.START_OPTIMIZER, data=event_data))
+        self._emit_event(
+            EnOptEvent(event_type=EnOptEventType.START_OPTIMIZER, config=config)
+        )
 
         variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
         if variables.shape != (self._config.variables.variable_count,):
@@ -127,28 +128,32 @@ class EnsembleOptimizer(ComputeStep):
         exit_code = ensemble_optimizer.start(variables)
 
         self._emit_event(
-            Event(event_type=EventType.FINISHED_OPTIMIZER, data=event_data)
+            EnOptEvent(event_type=EnOptEventType.FINISHED_OPTIMIZER, config=config)
         )
 
         return exit_code
 
-    def _emit_event(self, event: Event) -> None:
+    def _emit_event(self, event: EnOptEvent) -> None:
         for handler in self.event_handlers:
             if event.event_type in handler.event_types:
                 handler.handle_event(event)
 
     def _signal_evaluation(self, results: tuple[Results, ...] | None = None) -> None:
-        event_data: dict[str, Any] = {"config": self._config}
         if results is None:
             self._emit_event(
-                Event(event_type=EventType.START_EVALUATION, data=event_data)
+                EnOptEvent(
+                    event_type=EnOptEventType.START_EVALUATION, config=self._config
+                )
             )
         else:
             if self._metadata is not None:
                 for item in results:
                     item.metadata = deepcopy(self._metadata)
 
-            event_data["results"] = results
             self._emit_event(
-                Event(event_type=EventType.FINISHED_EVALUATION, data=event_data),
+                EnOptEvent(
+                    event_type=EnOptEventType.FINISHED_EVALUATION,
+                    config=self._config,
+                    results=results,
+                ),
             )

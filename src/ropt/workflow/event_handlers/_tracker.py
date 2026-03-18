@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal, assert_never
 
-from ropt.enums import EventType
+from ropt.enums import EnOptEventType
 
 from ._utils import _get_last_result, _update_optimal_result
 from .base import EventHandler
 
 if TYPE_CHECKING:
-    from ropt.events import Event
+    from ropt.events import EnOptEvent
     from ropt.results import FunctionResults
 
 
@@ -18,7 +18,7 @@ class Tracker(EventHandler):
     """The default event handler for tracking optimization results.
 
     This event handler listens for
-    [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events
+    [`FINISHED_EVALUATION`][ropt.enums.EnOptEventType.FINISHED_EVALUATION] events
     emitted from within an optimization workflow. It processes the
     [`Results`][ropt.results.Results] objects contained within these events and
     selects a single [`FunctionResults`][ropt.results.FunctionResults] object to
@@ -72,11 +72,11 @@ class Tracker(EventHandler):
         self._tracked_results: FunctionResults | None = None
         self["results"] = None
 
-    def handle_event(self, event: Event) -> None:
+    def handle_event(self, event: EnOptEvent) -> None:
         """Handle incoming events.
 
         This method processes incoming
-        [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION]
+        [`FINISHED_EVALUATION`][ropt.enums.EnOptEventType.FINISHED_EVALUATION]
         events.
 
         If a relevant event containing results is received, this method updates
@@ -86,7 +86,7 @@ class Tracker(EventHandler):
         Args:
             event: The event object.
         """
-        if (results := event.data.get("results")) is None:
+        if not (results := event.results):
             return
         if self["results"] is None:
             self._tracked_results = None
@@ -108,18 +108,17 @@ class Tracker(EventHandler):
 
         if filtered_results is not None:
             self._tracked_results = filtered_results
-            transforms = event.data["config"].transforms
-            if transforms is not None:
+            if event.config.transforms is not None:
                 filtered_results = filtered_results.transform_from_optimizer(
-                    event.data["config"]
+                    event.config
                 )
             self["results"] = filtered_results
 
     @property
-    def event_types(self) -> set[EventType]:
+    def event_types(self) -> set[EnOptEventType]:
         """Return the event types that are handled.
 
         Returns:
             A set of event types that are handled.
         """
-        return {EventType.FINISHED_EVALUATION}
+        return {EnOptEventType.FINISHED_EVALUATION}

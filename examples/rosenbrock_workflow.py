@@ -14,8 +14,8 @@ from numpy.random import default_rng
 from numpy.typing import NDArray
 
 from ropt.config import EnOptConfig
-from ropt.enums import EventType
-from ropt.events import Event
+from ropt.enums import EnOptEventType
+from ropt.events import EnOptEvent
 from ropt.results import FunctionResults
 from ropt.workflow.compute_steps import EnsembleOptimizer
 from ropt.workflow.evaluators import FunctionEvaluator
@@ -64,13 +64,13 @@ def rosenbrock(
     return np.asarray([objective])
 
 
-def report(event: Event) -> None:
+def report(event: EnOptEvent) -> None:
     """Report results of an evaluation.
 
     Args:
         event: The event to process.
     """
-    for item in event.data["results"]:
+    for item in event.results:
         if isinstance(item, FunctionResults) and item.functions is not None:
             print(f"  variables: {item.evaluations.variables}")
             print(f"  objective: {item.functions.weighted_objective}\n")
@@ -97,7 +97,9 @@ def run_optimization(config: dict[str, Any]) -> FunctionResults:
     tracker = Tracker()
     step.add_event_handler(tracker)
 
-    reporter = Observer(callback=report, event_types={EventType.FINISHED_EVALUATION})
+    reporter = Observer(
+        callback=report, event_types={EnOptEventType.FINISHED_EVALUATION}
+    )
     step.add_event_handler(reporter)
 
     step.run(variables=initial_values, config=EnOptConfig.model_validate(config))

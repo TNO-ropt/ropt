@@ -8,8 +8,8 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ropt.core import EnsembleEvaluator as CoreEnsembleEvaluator
-from ropt.enums import EventType, ExitCode
-from ropt.events import Event
+from ropt.enums import EnOptEventType, ExitCode
+from ropt.events import EnOptEvent
 from ropt.exceptions import ComputeStepAborted
 from ropt.results import FunctionResults
 
@@ -32,16 +32,17 @@ class EnsembleEvaluator(ComputeStep):
 
     The compute step emits the following events:
 
-    - [`START_ENSEMBLE_EVALUATOR`][ropt.enums.EventType.START_ENSEMBLE_EVALUATOR]:
+    - [`START_ENSEMBLE_EVALUATOR`][ropt.enums.EnOptEventType.START_ENSEMBLE_EVALUATOR]:
       Emitted before the evaluation process begins.
-    - [`START_EVALUATION`][ropt.enums.EventType.START_EVALUATION]: Emitted
+    - [`START_EVALUATION`][ropt.enums.EnOptEventType.START_EVALUATION]: Emitted
       just before the underlying ensemble evaluation is called.
-    - [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION]: Emitted
-      after the evaluation completes, carrying the generated `FunctionResults`
-      in its `data` dictionary under the key `"results"`. Event handlers
-      typically listen for this event.
-    - [`FINISHED_ENSEMBLE_EVALUATOR`][ropt.enums.EventType.FINISHED_ENSEMBLE_EVALUATOR]:
-      Emitted after the entire compute step, including result emission, is finished.
+    - [`FINISHED_EVALUATION`][ropt.enums.EnOptEventType.FINISHED_EVALUATION]:
+      Emitted after the evaluation completes, carrying the generated
+      `FunctionResults` in its `data` dictionary under the key `"results"`.
+      Event handlers typically listen for this event.
+    - [`FINISHED_ENSEMBLE_EVALUATOR`][ropt.enums.EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR]:
+      Emitted after the entire compute step, including result emission, is
+      finished.
     """
 
     def __init__(self, *, evaluator: Evaluator) -> None:
@@ -82,10 +83,10 @@ class EnsembleEvaluator(ComputeStep):
         Raises:
             ValueError: If the input variables have the wrong shape.
         """
-        event_data: dict[str, Any] = {"config": config}
-
         self._emit_event(
-            Event(event_type=EventType.START_ENSEMBLE_EVALUATOR, data=event_data)
+            EnOptEvent(
+                event_type=EnOptEventType.START_ENSEMBLE_EVALUATOR, config=config
+            )
         )
 
         variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=2)
@@ -101,7 +102,9 @@ class EnsembleEvaluator(ComputeStep):
 
         exit_code = ExitCode.ENSEMBLE_EVALUATOR_FINISHED
 
-        self._emit_event(Event(event_type=EventType.START_EVALUATION, data=event_data))
+        self._emit_event(
+            EnOptEvent(event_type=EnOptEventType.START_EVALUATION, config=config)
+        )
         try:
             results = ensemble_evaluator.calculate(
                 variables, compute_functions=True, compute_gradients=False
@@ -118,19 +121,25 @@ class EnsembleEvaluator(ComputeStep):
             for item in results:
                 item.metadata = deepcopy(metadata)
 
-        event_data["results"] = results
-
         self._emit_event(
-            Event(event_type=EventType.FINISHED_EVALUATION, data=event_data)
+            EnOptEvent(
+                event_type=EnOptEventType.FINISHED_EVALUATION,
+                config=config,
+                results=results,
+            )
         )
 
         self._emit_event(
-            Event(event_type=EventType.FINISHED_ENSEMBLE_EVALUATOR, data=event_data)
+            EnOptEvent(
+                event_type=EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR,
+                config=config,
+                results=results,
+            )
         )
 
         return exit_code
 
-    def _emit_event(self, event: Event) -> None:
+    def _emit_event(self, event: EnOptEvent) -> None:
         for handler in self.event_handlers:
             if event.event_type in handler.event_types:
                 handler.handle_event(event)
