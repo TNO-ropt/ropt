@@ -6,8 +6,8 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from ropt.enums import EventType
-    from ropt.events import Event
+    from ropt.enums import EnOptEventType
+    from ropt.events import EnOptEvent
 
 
 class EventHandler(ABC):
@@ -38,7 +38,7 @@ class EventHandler(ABC):
 
     @property
     @abstractmethod
-    def event_types(self) -> set[EventType]:
+    def event_types(self) -> set[EnOptEventType]:
         """Return the event types that are handled.
 
         Returns:
@@ -46,12 +46,13 @@ class EventHandler(ABC):
         """
 
     @abstractmethod
-    def handle_event(self, event: Event) -> None:
+    def handle_event(self, event: EnOptEvent) -> None:
         """Process an event.
 
         This abstract method must be implemented by concrete `EventHandler`
         subclasses. It defines the event handler's core logic for reacting to
-        [`Event`][ropt.events.Event] objects emitted in the optimization workflow.
+        [`EnOptEvent`][ropt.events.EnOptEvent] objects emitted in the
+        optimization workflow.
 
         Implementations should inspect the `event` object (its `event_type` and
         `data`) and perform computations accordingly, such as storing results,

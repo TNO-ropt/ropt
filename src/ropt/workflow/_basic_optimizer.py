@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from ropt.config import EnOptConfig
-from ropt.enums import EventType, ExitCode
+from ropt.enums import EnOptEventType, ExitCode
 from ropt.exceptions import ComputeStepAborted
 from ropt.workflow.evaluators import Evaluator
 
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from numpy.typing import ArrayLike, NDArray
 
     from ropt.evaluator import EvaluatorCallback, EvaluatorContext, EvaluatorResult
-    from ropt.events import Event
+    from ropt.events import EnOptEvent
     from ropt.results import FunctionResults
     from ropt.transforms import OptModelTransforms
 
@@ -159,7 +159,7 @@ class BasicOptimizer:
         self._transforms = transforms
         self._constraint_tolerance = constraint_tolerance
         self._evaluator = evaluator
-        self._observers: list[tuple[EventType, Callable[[Event], None]]] = []
+        self._observers: list[tuple[EnOptEventType, Callable[[EnOptEvent], None]]] = []
         self._results: FunctionResults | None
 
     @property
@@ -227,11 +227,11 @@ class BasicOptimizer:
             callback: The callable to check for abort conditions.
         """
 
-        def _check_abort_callback(event: Event) -> None:  # noqa: ARG001
+        def _check_abort_callback(event: EnOptEvent) -> None:  # noqa: ARG001
             if callback():
                 raise ComputeStepAborted(exit_code=ExitCode.USER_ABORT)
 
-        self._observers.append((EventType.START_EVALUATION, _check_abort_callback))
+        self._observers.append((EnOptEventType.START_EVALUATION, _check_abort_callback))
 
     def set_results_callback(self, callback: Callable[..., None]) -> None:
         """Set a callback to report new results.
@@ -251,17 +251,16 @@ class BasicOptimizer:
             callback: The callable that will be invoked to report new results.
         """
 
-        def _results_callback(event: Event) -> None:
-            transforms = event.data["config"].transforms
+        def _results_callback(event: EnOptEvent) -> None:
             results = tuple(
                 item
-                if transforms is None
-                else item.transform_from_optimizer(event.data["config"], transforms)
-                for item in event.data.get("results", ())
+                if event.config.transforms is None
+                else item.transform_from_optimizer(event.config)
+                for item in event.results
             )
             callback(results)
 
-        self._observers.append((EventType.FINISHED_EVALUATION, _results_callback))
+        self._observers.append((EnOptEventType.FINISHED_EVALUATION, _results_callback))
 
 
 class _Evaluator(Evaluator):

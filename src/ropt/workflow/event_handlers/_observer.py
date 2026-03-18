@@ -9,8 +9,8 @@ from .base import EventHandler
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from ropt.enums import EventType
-    from ropt.events import Event
+    from ropt.enums import EnOptEventType
+    from ropt.events import EnOptEvent
 
 
 class Observer(EventHandler):
@@ -21,7 +21,10 @@ class Observer(EventHandler):
     """
 
     def __init__(
-        self, *, event_types: set[EventType], callback: Callable[[Event], None]
+        self,
+        *,
+        event_types: set[EnOptEventType],
+        callback: Callable[[EnOptEvent], None],
     ) -> None:
         """Initialize a default event handler.
 
@@ -36,7 +39,7 @@ class Observer(EventHandler):
         self._event_types = event_types
         self._callback = callback
 
-    def handle_event(self, event: Event) -> None:
+    def handle_event(self, event: EnOptEvent) -> None:
         """Handle incoming events.
 
         This method processes events emitted from within the workflow.
@@ -51,7 +54,7 @@ class Observer(EventHandler):
             self._callback(event)
 
     @property
-    def event_types(self) -> set[EventType]:
+    def event_types(self) -> set[EnOptEventType]:
         """Return the event types that are handled.
 
         Returns:

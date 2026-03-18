@@ -21,8 +21,8 @@ is built upon three key components:
 
 Compute steps, event handlers are executed by calling their
 [`run`][ropt.workflow.compute_steps.ComputeStep.run] method. During execution,
-compute steps may emit [`events`][ropt.events.Event] to communicate intermediate
-results. Event handlers can be added to compute steps using the
+compute steps may emit [`events`][ropt.events.EnOptEvent] to communicate
+intermediate results. Event handlers can be added to compute steps using the
 [`add_event_handler`][ropt.workflow.compute_steps.ComputeStep.add_event_handler]
 method. Many compute steps, such as those performing optimizations, will require
 the repeated evaluation of a function, which is performed by evaluator objects

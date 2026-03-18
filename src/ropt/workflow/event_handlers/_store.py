@@ -4,19 +4,19 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ropt.enums import EventType
+from ropt.enums import EnOptEventType
 
 from .base import EventHandler
 
 if TYPE_CHECKING:
-    from ropt.events import Event
+    from ropt.events import EnOptEvent
 
 
 class Store(EventHandler):
     """The default event handler for storing optimization results.
 
     This event handler listens for
-    [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events
+    [`FINISHED_EVALUATION`][ropt.enums.EnOptEventType.FINISHED_EVALUATION] events
     emitted by specified compute steps from within an optimization workflow. It
     collects all [`Results`][ropt.results.Results] objects contained within
     these events and stores them sequentially in memory.
@@ -32,7 +32,7 @@ class Store(EventHandler):
 
         This event handler collects and stores all
         [`Results`][ropt.results.Results] objects it receives. It listens for
-        [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events
+        [`FINISHED_EVALUATION`][ropt.enums.EnOptEventType.FINISHED_EVALUATION] events
         and appends the results contained within them to an internal tuple.
 
         The results are converted from the optimizer domain to the user domain
@@ -43,11 +43,11 @@ class Store(EventHandler):
         super().__init__()
         self["results"] = None
 
-    def handle_event(self, event: Event) -> None:
+    def handle_event(self, event: EnOptEvent) -> None:
         """Handle incoming events.
 
         This method processes events it receives. It specifically listens for
-        [`FINISHED_EVALUATION`][ropt.enums.EventType.FINISHED_EVALUATION] events.
+        [`FINISHED_EVALUATION`][ropt.enums.EnOptEventType.FINISHED_EVALUATION] events.
 
         If a relevant event containing results is received, this method
         retrieves the results, optionally transforms them to the user domain and
@@ -56,24 +56,25 @@ class Store(EventHandler):
         Args:
             event: The event object.
         """
-        if (results := event.data.get("results")) is None:
+        if not (results := event.results):
             return
-        transforms = event.data["config"].transforms
-        results = (
+        transformed_results = (
             item
-            if transforms is None
-            else item.transform_from_optimizer(event.data["config"], transforms)
+            if event.config.transforms is None
+            else item.transform_from_optimizer(event.config)
             for item in results
         )
         self["results"] = tuple(
-            results if self["results"] is None else (*self["results"], *results)
+            results
+            if self["results"] is None
+            else (*self["results"], *transformed_results)
         )
 
     @property
-    def event_types(self) -> set[EventType]:
+    def event_types(self) -> set[EnOptEventType]:
         """Return the event types that are handled.
 
         Returns:
             A set of event types that are handled.
         """
-        return {EventType.FINISHED_EVALUATION}
+        return {EnOptEventType.FINISHED_EVALUATION}

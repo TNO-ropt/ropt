@@ -3,7 +3,7 @@ from __future__ import annotations
 from importlib.util import find_spec
 from typing import TYPE_CHECKING, Any, Final, Literal
 
-from ropt.enums import EventType
+from ropt.enums import EnOptEventType
 from ropt.results import Results, results_to_dataframe
 
 from .base import EventHandler
@@ -11,7 +11,7 @@ from .base import EventHandler
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
-    from ropt.events import Event
+    from ropt.events import EnOptEvent
 
 _HAVE_PANDAS: Final = find_spec("pandas") is not None
 
@@ -209,19 +209,18 @@ class Table(EventHandler):
             }
         )
 
-    def handle_event(self, event: Event) -> None:
+    def handle_event(self, event: EnOptEvent) -> None:
         """Handle incoming events.
 
         Args:
             event: The event object.
         """
-        if (results := event.data.get("results")) is None:
+        if not (results := event.results):
             return
-        transforms = event.data["config"].transforms
         results = tuple(
             item
-            if transforms is None
-            else item.transform_from_optimizer(event.data["config"], transforms)
+            if event.config.transforms is None
+            else item.transform_from_optimizer(event.config)
             for item in results
         )
 
@@ -230,13 +229,13 @@ class Table(EventHandler):
             self._callback(self)
 
     @property
-    def event_types(self) -> set[EventType]:
+    def event_types(self) -> set[EnOptEventType]:
         """Return the event types that are handled.
 
         Returns:
             A set of event types that are handled.
         """
-        return {EventType.FINISHED_EVALUATION}
+        return {EnOptEventType.FINISHED_EVALUATION}
 
     def __getitem__(self, key: str) -> Any:  # noqa: ANN401
         """Retrieve a of a table from the event handler.
