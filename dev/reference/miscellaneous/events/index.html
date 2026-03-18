@@ -1663,6 +1663,8 @@
 <p>During the execution of an optimization workflow, events are triggered to
 signal specific occurrences. Callbacks can be registered to react to these
 events and will receive an <code>Event</code> object containing relevant information.</p>
+<p>The specific data within the <code>Event</code> object varies depending on the event
+type. See the <a class="autorefs autorefs-internal" title="            EventType" href="../enums/#ropt.enums.EventType"><code>EventType</code></a> documentation for details.</p>
 
 
 <p><span class="doc-section-title">Attributes:</span></p>
@@ -1687,29 +1689,13 @@ events and will receive an <code>Event</code> object containing relevant informa
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.events.Event.config">config</span></code></td>
+            <td><code><span title="ropt.events.Event.data">data</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.EnOptConfig)" href="../../optimization/enopt_config/#ropt.config.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The optimizer configuration associated with the event.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.events.Event.results">results</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-internal" title="            ropt.results.Results
-
-
-  
-      dataclass
-  " href="../../optimization/results/#ropt.results.Results">Results</a>, ...]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>A tuple containing results.</p>
+                <p>A dictionary containing additional event-specific data.</p>
               </div>
             </td>
           </tr>

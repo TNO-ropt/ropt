@@ -2245,7 +2245,9 @@ the contents of a specific field, or a subset of its sub-fields, to a
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">transform_from_optimizer</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Results</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">transform_from_optimizer</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span> <span class="n">transforms</span><span class="p">:</span> <span class="n">OptModelTransforms</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Results</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2269,6 +2271,15 @@ more suitable for the optimizer. This method, using the provided
 <code>OptModelTransforms</code> object, applies the inverse scaling and shifting to
 restore the variables to their original scale and offset. Similarly,
 objectives and constraints are transformed back to the user domain.</p>
+<p>These transformations are defined and managed by the
+<a class="autorefs autorefs-internal" title="            ropt.transforms.OptModelTransforms
+
+
+  
+      dataclass
+  " href="../domain_transforms/#ropt.transforms.OptModelTransforms"><code>OptModelTransforms</code></a> object,
+which encapsulates the specific transformations for variables,
+objectives, and nonlinear constraints.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2292,6 +2303,27 @@ objectives and constraints are transformed back to the user domain.</p>
             <td>
               <div class="doc-md-description">
                 <p>The configuration used by the source of the results.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>transforms</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            ropt.transforms.OptModelTransforms
+
+
+  
+      dataclass
+  " href="../domain_transforms/#ropt.transforms.OptModelTransforms">OptModelTransforms</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The transforms to apply.</p>
               </div>
             </td>
             <td>
