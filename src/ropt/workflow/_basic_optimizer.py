@@ -280,7 +280,10 @@ def _custom_event_handlers() -> Iterator[Any]:
     handlers = _get_option("event_handlers")
     for handler in handlers:
         module_path, class_name = handler.rsplit(".", 1)
-        module = importlib.import_module(module_path)
+        try:
+            module = importlib.import_module(module_path)
+        except ModuleNotFoundError:
+            continue
         yield getattr(module, class_name)
 
 
