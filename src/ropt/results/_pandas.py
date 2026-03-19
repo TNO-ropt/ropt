@@ -81,7 +81,7 @@ def _to_series(
             data.flatten(), index=multi_index, name=f"{field}.{key}" if key else field
         )
     else:
-        series = pd.Series(data, name=f"{field}.{key}" if key else field)
+        series = pd.Series(data.flatten(), name=f"{field}.{key}" if key else field)
         series.index.name = "_dummy_"
 
     return series
