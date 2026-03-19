@@ -130,10 +130,8 @@ class Functions(ResultField):
 
         objectives = self.objectives
         assert config.transforms is not None
-        weighted_objective = self.weighted_objective
         if config.transforms.objectives is not None:
             objectives = config.transforms.objectives.from_optimizer(self.objectives)
-            weighted_objective = (config.objectives.weights * objectives).sum()
 
         assert config.transforms is not None
         constraints = (
@@ -146,7 +144,7 @@ class Functions(ResultField):
         )
 
         return Functions(
-            weighted_objective=weighted_objective,
+            weighted_objective=self.weighted_objective,
             objectives=objectives,
             constraints=constraints,
         )

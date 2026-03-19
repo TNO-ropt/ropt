@@ -134,15 +134,11 @@ class Gradients(ResultField):
             The transformed results.
         """
         objectives = self.objectives
-        weighted_objective = self.weighted_objective
         assert config.transforms is not None
         if config.transforms.objectives is not None:
             objectives = np.moveaxis(self.objectives, 0, -1)
             objectives = config.transforms.objectives.from_optimizer(objectives)
             objectives = np.moveaxis(objectives, 0, -1)
-            weighted_objective = (
-                config.objectives.weights[:, np.newaxis] * objectives
-            ).sum(axis=0)
 
         constraints: NDArray[np.float64] | None = self.constraints
         if (
@@ -156,7 +152,7 @@ class Gradients(ResultField):
             constraints = np.moveaxis(constraints, 0, -1)
 
         return Gradients(
-            weighted_objective=weighted_objective,
+            weighted_objective=self.weighted_objective,
             objectives=objectives,
             constraints=constraints,
         )
