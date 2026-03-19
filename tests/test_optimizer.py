@@ -696,7 +696,7 @@ def test_optimizer_variables_subset(
         for item in results:
             if isinstance(item, GradientResults):
                 assert item.gradients is not None
-                assert item.gradients.weighted_objective[1] == 0.0
+                assert item.gradients.target_objective[1] == 0.0
                 assert np.all(item.gradients.objectives[:, 1] == 0.0)
 
     optimizer = BasicOptimizer(enopt_config, evaluator())

@@ -24,15 +24,15 @@ class Gradients(ResultField):
     constraint functions. These gradients are typically derived from function
     evaluations across all realizations, often through a process like averaging.
     The optimizer may handle multiple objectives and constraints. Multiple
-    objective gradients are combined into a single weighted sum, which is stored
-    in the `weighted_objective` field. Multiple constraint gradients are handled
-    individually by the optimizer.
+    objective gradients are combined into a single vector, which is stored in
+    the `target_objective` field. This is the gradient used by the optimizer.
+    Multiple constraint gradients are handled individually by the optimizer.
 
     **Result descriptions**
 
     === "Weighted Objective Gradient"
 
-        `weighted_objective`: The gradient of the weighted objective with
+        `target_objective`: The gradient of the target objective with
         respect to each variable:
 
         - Shape: $(n_v,)$, where:
@@ -66,12 +66,12 @@ class Gradients(ResultField):
             - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE]
 
     Attributes:
-        weighted_objective: The weighted sum of the objective gradients.
-        objectives:         The gradient of each individual objective.
-        constraints:        The gradient of each individual constraint.
+        target_objective: The gradient of the target objective.
+        objectives:       The gradient of each individual objective.
+        constraints:      The gradient of each individual constraint.
     """
 
-    weighted_objective: NDArray[np.float64] = field(
+    target_objective: NDArray[np.float64] = field(
         metadata={"__axes__": (AxisName.VARIABLE,)},
     )
     objectives: NDArray[np.float64] = field(
@@ -97,29 +97,29 @@ class Gradients(ResultField):
 
         # noqa
         """
-        self.weighted_objective = _immutable_copy(self.weighted_objective)
+        self.target_objective = _immutable_copy(self.target_objective)
         self.objectives = _immutable_copy(self.objectives)
         self.constraints = _immutable_copy(self.constraints)
 
     @classmethod
     def create(
         cls,
-        weighted_objective: NDArray[np.float64],
+        target_objective: NDArray[np.float64],
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None = None,
     ) -> Gradients:
         """Create a Gradients object with the given information.
 
         Args:
-            weighted_objective: The weighted objective.
-            objectives:         The objective gradients for each realization.
-            constraints:        The constraint gradients for each realization.
+            target_objective: The gradient of the target objective.
+            objectives:       The objective gradients for each realization.
+            constraints:      The constraint gradients for each realization.
 
         Returns:
             A new Functions object.
         """
         return Gradients(
-            weighted_objective=weighted_objective,
+            target_objective=target_objective,
             objectives=objectives,
             constraints=constraints,
         )
@@ -152,7 +152,7 @@ class Gradients(ResultField):
             constraints = np.moveaxis(constraints, 0, -1)
 
         return Gradients(
-            weighted_objective=self.weighted_objective,
+            target_objective=self.target_objective,
             objectives=objectives,
             constraints=constraints,
         )

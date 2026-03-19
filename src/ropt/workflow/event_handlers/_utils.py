@@ -14,8 +14,8 @@ def _get_new_optimal_result(
         return results
     assert optimal_result.functions is not None
     assert results.functions is not None
-    optimal = optimal_result.functions.weighted_objective
-    objective = results.functions.weighted_objective
+    optimal = optimal_result.functions.target_objective
+    objective = results.functions.target_objective
     if objective < optimal:
         return results
     return None

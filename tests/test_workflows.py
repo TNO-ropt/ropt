@@ -460,7 +460,7 @@ def test_evaluator(enopt_config: dict[str, Any], evaluator: Any) -> None:
     step.add_event_handler(tracker)
     step.run(config=EnOptConfig.model_validate(enopt_config), variables=[0.0, 0.0, 0.1])
     assert tracker["results"].functions is not None
-    assert np.allclose(tracker["results"].functions.weighted_objective, 1.66)
+    assert np.allclose(tracker["results"].functions.target_objective, 1.66)
 
     tracker["results"] = None
     step.run(
@@ -468,7 +468,7 @@ def test_evaluator(enopt_config: dict[str, Any], evaluator: Any) -> None:
         variables=[0, 0, 0],
     )
     assert tracker["results"].functions is not None
-    assert np.allclose(tracker["results"].functions.weighted_objective, 1.75)
+    assert np.allclose(tracker["results"].functions.target_objective, 1.75)
 
 
 def test_evaluator_multi(enopt_config: dict[str, Any], evaluator: Any) -> None:
@@ -482,9 +482,7 @@ def test_evaluator_multi(enopt_config: dict[str, Any], evaluator: Any) -> None:
         config=EnOptConfig.model_validate(enopt_config),
         variables=np.array([[0, 0, 0.1], [0, 0, 0]]),
     )
-    values = [
-        results.functions.weighted_objective.item() for results in store["results"]
-    ]
+    values = [results.functions.target_objective.item() for results in store["results"]]
     assert np.allclose(values, [1.66, 1.75])
 
 

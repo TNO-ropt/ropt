@@ -315,7 +315,7 @@ def test_sort_filter_mixed(  # noqa: C901
             for item in results:
                 if isinstance(item, FunctionResults):
                     assert item.functions is not None
-                    objective_values.append(item.functions.weighted_objective)
+                    objective_values.append(item.functions.target_objective)
         _track_results(results, result_list=result_list)
 
     # Apply the filtering to all objectives, giving the expected result.
@@ -587,7 +587,7 @@ def test_cvar_filter_mixed(
         for item in results:
             if isinstance(item, FunctionResults):
                 assert item.functions is not None
-                objective_values.append(item.functions.weighted_objective)
+                objective_values.append(item.functions.target_objective)
         _track_results(results, result_list=result_list)
 
     # Apply the filtering to all objectives, giving the expected result.

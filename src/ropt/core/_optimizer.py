@@ -299,9 +299,9 @@ class EnsembleOptimizer:
     def _functions_from_results(functions: Functions | None) -> NDArray[np.float64]:
         assert functions is not None
         return (
-            np.array(functions.weighted_objective, ndmin=1)
+            np.array(functions.target_objective, ndmin=1)
             if functions.constraints is None
-            else np.append(functions.weighted_objective, functions.constraints)
+            else np.append(functions.target_objective, functions.constraints)
         )
 
     @staticmethod
@@ -309,10 +309,10 @@ class EnsembleOptimizer:
         gradients: Gradients | None, mask: NDArray[np.bool_] | None
     ) -> NDArray[np.float64]:
         assert gradients is not None
-        weighted_objective_gradient = (
-            gradients.weighted_objective.copy()
+        target_objective_gradient = (
+            gradients.target_objective.copy()
             if mask is None
-            else gradients.weighted_objective[mask]
+            else gradients.target_objective[mask]
         )
         constraint_gradients = (
             None
@@ -324,9 +324,9 @@ class EnsembleOptimizer:
             )
         )
         return (
-            np.expand_dims(weighted_objective_gradient, axis=0)
+            np.expand_dims(target_objective_gradient, axis=0)
             if constraint_gradients is None
-            else np.vstack((weighted_objective_gradient, constraint_gradients))
+            else np.vstack((target_objective_gradient, constraint_gradients))
         )
 
 

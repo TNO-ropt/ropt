@@ -23,8 +23,9 @@ class Functions(ResultField):
     constraint functions. These values are typically derived from the
     evaluations performed across all realizations, often through a process like
     averaging. The optimizer may handle multiple objectives and constraints.
-    Multiple objectives are combined into a single weighted sum, which is stored
-    in the `weighted_objective` field. Multiple constraints are handled
+    Multiple objectives are combined into a single objective, which is stored
+    in the `target_objective` field. This is the target value that is being
+    optimized. Multiple constraints are handled
     individually by the optimizer.
 
 
@@ -32,9 +33,10 @@ class Functions(ResultField):
 
     === "Weighted Objective"
 
-        `weighted_objective`: The overall objective calculated as a weighted sum
-        over the objectives. This is a single floating point values. It is
-        defined as a `numpy` array of dimensions 0, hence it has no axes:
+        `target_objective`: The overall objective calculated as a weighted sum
+        over the, possibly transformed, objectives. This is a single floating
+        point value. It is defined as a `numpy` array of dimensions 0, hence it
+        has no axes:
 
         - Shape: $()$
         - Axis type: `None`
@@ -60,12 +62,12 @@ class Functions(ResultField):
             - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
 
     Attributes:
-        weighted_objective: The weighted sum of the objective values.
-        objectives:         The value of each individual objective.
-        constraints:        The value of each individual constraint.
+        target_objective: The target objective value used by the optimizer.
+        objectives:       The value of each individual objective.
+        constraints:      The value of each individual constraint.
     """
 
-    weighted_objective: NDArray[np.float64] = field(
+    target_objective: NDArray[np.float64] = field(
         metadata={"__axes__": ()},
     )
     objectives: NDArray[np.float64] = field(
@@ -85,29 +87,29 @@ class Functions(ResultField):
 
         # noqa
         """
-        self.weighted_objective = _immutable_copy(self.weighted_objective)
+        self.target_objective = _immutable_copy(self.target_objective)
         self.objectives = _immutable_copy(self.objectives)
         self.constraints = _immutable_copy(self.constraints)
 
     @classmethod
     def create(
         cls,
-        weighted_objective: NDArray[np.float64],
+        target_objective: NDArray[np.float64],
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None = None,
     ) -> Functions:
         """Create a Functions object with the given information.
 
         Args:
-            weighted_objective: The weighted objective.
-            objectives:         The objective functions for each realization.
-            constraints:        The constraint functions for each realization.
+            target_objective: The target objective used by the optimizer.
+            objectives:       The objective functions for each realization.
+            constraints:      The constraint functions for each realization.
 
         Returns:
             A new Functions object.
         """
         return Functions(
-            weighted_objective=weighted_objective,
+            target_objective=target_objective,
             objectives=objectives,
             constraints=constraints,
         )
@@ -144,7 +146,7 @@ class Functions(ResultField):
         )
 
         return Functions(
-            weighted_objective=self.weighted_objective,
+            target_objective=self.target_objective,
             objectives=objectives,
             constraints=constraints,
         )

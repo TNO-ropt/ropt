@@ -56,7 +56,7 @@ def function_result_fixture(enopt_config: dict[str, Any]) -> FunctionResults:
         failed_realizations=np.zeros(3, dtype=np.bool_),
     )
     functions = Functions.create(
-        weighted_objective=np.array(1.0), objectives=np.array([1.0, 2.0])
+        target_objective=np.array(1.0), objectives=np.array([1.0, 2.0])
     )
     config = EnOptConfig.model_validate(enopt_config)
     return FunctionResults(
@@ -78,7 +78,7 @@ def gradient_result_fixture(enopt_config: dict[str, Any]) -> GradientResults:
         evaluation_info={"foo": np.arange(15, dtype=np.float64).reshape((3, 5))},
     )
     gradients = Gradients(
-        weighted_objective=np.array([1.0, 2.0]),
+        target_objective=np.array([1.0, 2.0]),
         objectives=np.arange(4, dtype=np.float64).reshape((2, 2)),
     )
     config = EnOptConfig.model_validate(enopt_config)
@@ -140,7 +140,7 @@ def test_to_dataframe_function(function_result: FunctionResults) -> None:
     frame = function_result.to_dataframe(
         "functions",
         [
-            "weighted_objective",
+            "target_objective",
             "objectives",
         ],
     )
@@ -198,7 +198,7 @@ def test_to_dataframe_unstack2(gradient_result: GradientResults) -> None:
     assert gradient_result.gradients is not None
     frame = gradient_result.to_dataframe(
         "gradients",
-        select=["objectives", "weighted_objective"],
+        select=["objectives", "target_objective"],
         unstack=[AxisName.OBJECTIVE, AxisName.VARIABLE],
     )
     assert list(frame.columns.values) == [
@@ -206,8 +206,8 @@ def test_to_dataframe_unstack2(gradient_result: GradientResults) -> None:
         ("objectives", "fa", "vb"),
         ("objectives", "fb", "va"),
         ("objectives", "fb", "vb"),
-        ("weighted_objective", "va"),
-        ("weighted_objective", "vb"),
+        ("target_objective", "va"),
+        ("target_objective", "vb"),
     ]
 
 
@@ -233,7 +233,7 @@ def test_to_dataframe_unstack_only_variable(gradient_result: GradientResults) ->
 def test_to_dataframe_join(function_result: FunctionResults) -> None:
     frame1 = function_result.to_dataframe("evaluations", ["variables", "objectives"])
     frame2 = function_result.to_dataframe(
-        "functions", ["weighted_objective", "objectives"]
+        "functions", ["target_objective", "objectives"]
     )
     frame1.columns = pandas.Index(
         "_".join(column) if isinstance(column, tuple) else column

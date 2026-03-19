@@ -22,7 +22,7 @@ if _HAVE_PANDAS:
 _FUNCTION_TABLES: Final[dict[str, dict[str, str]]] = {
     "functions": {
         "batch_id": "Batch",
-        "functions.weighted_objective": "Total-Objective",
+        "functions.target_objective": "Total-Objective",
         "functions.objectives": "Objective",
         "functions.constraints": "Constraint",
         "evaluations.variables": "Variable",
@@ -51,7 +51,7 @@ _FUNCTION_TABLES: Final[dict[str, dict[str, str]]] = {
 _GRADIENT_TABLES: Final[dict[str, dict[str, str]]] = {
     "gradients": {
         "batch_id": "Batch",
-        "gradients.weighted_objective": "Total-Gradient",
+        "gradients.target_objective": "Total-Gradient",
         "gradients.objectives": "Grad-objective",
         "gradients.constraints": "Grad-constraint",
     },
