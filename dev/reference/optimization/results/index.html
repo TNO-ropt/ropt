@@ -3087,16 +3087,18 @@ evaluations. This includes:</p>
 constraint functions. These values are typically derived from the
 evaluations performed across all realizations, often through a process like
 averaging. The optimizer may handle multiple objectives and constraints.
-Multiple objectives are combined into a single weighted sum, which is stored
-in the <code>weighted_objective</code> field. Multiple constraints are handled
+Multiple objectives are combined into a single objective, which is stored
+in the <code>target_objective</code> field. This is the target value that is being
+optimized. Multiple constraints are handled
 individually by the optimizer.</p>
 <p><strong>Result descriptions</strong></p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.Functions--__tabbed_1_1" name="ropt.results.Functions--__tabbed_1" type="radio" /><input id="ropt.results.Functions--__tabbed_1_2" name="ropt.results.Functions--__tabbed_1" type="radio" /><input id="ropt.results.Functions--__tabbed_1_3" name="ropt.results.Functions--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Functions--__tabbed_1_1">Weighted Objective</label><label for="ropt.results.Functions--__tabbed_1_2">Objectives</label><label for="ropt.results.Functions--__tabbed_1_3">Constraints</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<p><code>weighted_objective</code>: The overall objective calculated as a weighted sum
-over the objectives. This is a single floating point values. It is
-defined as a <code>numpy</code> array of dimensions 0, hence it has no axes:</p>
+<p><code>target_objective</code>: The overall objective calculated as a weighted sum
+over the, possibly transformed, objectives. This is a single floating
+point value. It is defined as a <code>numpy</code> array of dimensions 0, hence it
+has no axes:</p>
 <ul>
 <li>Shape: <span class="arithmatex">\(()\)</span></li>
 <li>Axis type: <code>None</code></li>
@@ -3157,13 +3159,13 @@ one-dimensional array of floating point values:</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.results.Functions.weighted_objective">weighted_objective</span></code></td>
+            <td><code><span title="ropt.results.Functions.target_objective">target_objective</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The weighted sum of the objective values.</p>
+                <p>The target objective value used by the optimizer.</p>
               </div>
             </td>
           </tr>
@@ -3252,14 +3254,14 @@ one-dimensional array of floating point values:</p>
 constraint functions. These gradients are typically derived from function
 evaluations across all realizations, often through a process like averaging.
 The optimizer may handle multiple objectives and constraints. Multiple
-objective gradients are combined into a single weighted sum, which is stored
-in the <code>weighted_objective</code> field. Multiple constraint gradients are handled
-individually by the optimizer.</p>
+objective gradients are combined into a single vector, which is stored in
+the <code>target_objective</code> field. This is the gradient used by the optimizer.
+Multiple constraint gradients are handled individually by the optimizer.</p>
 <p><strong>Result descriptions</strong></p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="ropt.results.Gradients--__tabbed_1_1" name="ropt.results.Gradients--__tabbed_1" type="radio" /><input id="ropt.results.Gradients--__tabbed_1_2" name="ropt.results.Gradients--__tabbed_1" type="radio" /><input id="ropt.results.Gradients--__tabbed_1_3" name="ropt.results.Gradients--__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="ropt.results.Gradients--__tabbed_1_1">Weighted Objective Gradient</label><label for="ropt.results.Gradients--__tabbed_1_2">Objective  Gradients</label><label for="ropt.results.Gradients--__tabbed_1_3">Constraint Gradients</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<p><code>weighted_objective</code>: The gradient of the weighted objective with
+<p><code>target_objective</code>: The gradient of the target objective with
 respect to each variable:</p>
 <ul>
 <li>Shape: <span class="arithmatex">\((n_v,)\)</span>, where:<ul>
@@ -3350,13 +3352,13 @@ floating point values:</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.results.Gradients.weighted_objective">weighted_objective</span></code></td>
+            <td><code><span title="ropt.results.Gradients.target_objective">target_objective</span></code></td>
             <td>
                   <code><span title="numpy.typing.NDArray">NDArray</span>[<span title="numpy.float64">float64</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The weighted sum of the objective gradients.</p>
+                <p>The gradient of the target objective.</p>
               </div>
             </td>
           </tr>
