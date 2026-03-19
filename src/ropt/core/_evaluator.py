@@ -439,7 +439,7 @@ class EnsembleEvaluator:
                     dtype=np.float64,
                 )
                 constraints.fill(np.nan)
-            weighted_objective = np.array(np.nan)
+            target_objective = np.array(np.nan)
         else:
             objectives = _calculate_estimated_functions(
                 self._function_estimators,
@@ -466,12 +466,12 @@ class EnsembleEvaluator:
                     failed_realizations,
                 )
 
-            weighted_objective = np.array(
+            target_objective = np.array(
                 (self._config.objectives.weights * objectives).sum()
             )
 
         return Functions.create(
-            weighted_objective=weighted_objective,
+            target_objective=target_objective,
             objectives=objectives,
             constraints=constraints,
         )
@@ -535,16 +535,14 @@ class EnsembleEvaluator:
         else:
             constraint_gradients = None
 
-        weighted_objective_gradient = np.array(
+        target_objective_gradient = np.array(
             (self._config.objectives.weights[:, np.newaxis] * objective_gradients).sum(
                 axis=0
             )
         )
 
         return Gradients.create(
-            weighted_objective=self._expand_gradients(
-                weighted_objective_gradient, mask
-            ),
+            target_objective=self._expand_gradients(target_objective_gradient, mask),
             objectives=self._expand_gradients(objective_gradients, mask),
             constraints=(
                 None

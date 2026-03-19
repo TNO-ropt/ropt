@@ -118,7 +118,7 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
             _handle_results,
             frames=frames,
             fields={
-                "gradients.weighted_objective",
+                "gradients.target_objective",
             },
             result_type="gradients",
         ),
@@ -127,7 +127,7 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
     frame = pd.concat(frames)
     assert len(frame) == 3
     assert list(frame.columns.get_level_values(level=0)) == [
-        ("gradients.weighted_objective", f"a:{idx}") for idx in range(1, 4)
+        ("gradients.target_objective", f"a:{idx}") for idx in range(1, 4)
     ]
 
 

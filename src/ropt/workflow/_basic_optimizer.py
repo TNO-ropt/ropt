@@ -94,7 +94,7 @@ class BasicOptimizer:
         optimizer.run(initial_values)
 
         print(f"Optimal variables: {optimizer.results.evaluations.variables}")
-        print(f"Optimal objective: {optimizer.results.functions.weighted_objective}")
+        print(f"Optimal objective: {optimizer.results.functions.target_objective}")
         ````
 
     Note: Customization

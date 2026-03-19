@@ -189,8 +189,8 @@ async def main(
         assert optimal_result is not None
         assert optimal_result.functions is not None
         print(f"Optimal variables: {optimal_result.evaluations.variables}")
-        print(f"Optimal objective: {optimal_result.functions.weighted_objective}\n")
-        assert np.allclose(optimal_result.functions.weighted_objective, 0, atol=2e-1)
+        print(f"Optimal objective: {optimal_result.functions.target_objective}\n")
+        assert np.allclose(optimal_result.functions.target_objective, 0, atol=2e-1)
         assert np.allclose(optimal_result.evaluations.variables, 1, atol=2e-1)
 
     print(f"Elapsed time: {end_time - start_time} seconds")
