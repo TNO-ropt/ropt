@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -1685,10 +1685,8 @@ provides the raw function values, which are then processed by the
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">transforms</span><span class="p">:</span> <span class="n">OptModelTransforms</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">evaluator</span><span class="p">:</span> <span class="n">EvaluatorCallback</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span> <span class="n">evaluator</span><span class="p">:</span> <span class="n">EvaluatorCallback</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1698,10 +1696,8 @@ provides the raw function values, which are then processed by the
 configuration, evaluator, and plugins.</p>
 <p>The <code>config</code> object contains all the settings required for the ensemble
 evaluation, such as the number of realizations, the function estimators,
-and the gradient settings. The <code>transforms</code> object defines the domain
-transforms that should be applied to variables, objectives and
-constraints. The <code>evaluator</code> callable is usually provide by a
-<a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../workflow/evaluator/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a> object. The
+and the gradient settings. The <code>evaluator</code> callable is usually provide
+by a <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../workflow/evaluator/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a> object. The
 <code>plugin_manager</code> is used to load the realization filters, function
 estimators, and samplers.</p>
 
@@ -1727,27 +1723,6 @@ estimators, and samplers.</p>
             <td>
               <div class="doc-md-description">
                 <p>The configuration object.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>transforms</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.transforms.OptModelTransforms
-
-
-  
-      dataclass
-  " href="../../optimization/domain_transforms/#ropt.transforms.OptModelTransforms">OptModelTransforms</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The domain transforms to apply.</p>
               </div>
             </td>
             <td>

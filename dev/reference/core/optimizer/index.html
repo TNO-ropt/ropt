@@ -17,7 +17,7 @@
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -1897,11 +1897,10 @@ callback.</p>
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">__init__</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">enopt_config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">transforms</span><span class="p">:</span> <span class="n">OptModelTransforms</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">ensemble_evaluator</span><span class="p">:</span> <span class="n">EnsembleEvaluator</span><span class="p">,</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">signal_evaluation</span><span class="p">:</span> <span class="n">SignalEvaluationCallback</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">ensemble_evaluator</span><span class="p">:</span> <span class="n">EnsembleEvaluator</span><span class="p">,</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">signal_evaluation</span><span class="p">:</span> <span class="n">SignalEvaluationCallback</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1915,14 +1914,6 @@ optimization run:</p>
 <ol>
 <li>An <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../../optimization/enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object: This contains
     all configuration settings for the optimization.</li>
-<li>A <a class="autorefs autorefs-internal" title="            ropt.transforms.OptModelTransforms
-
-
-  
-      dataclass
-  " href="../../optimization/domain_transforms/#ropt.transforms.OptModelTransforms"><code>OptModelTransforms</code></a> object:
-    This handles the transforms to apply to the variables, objectives and
-    constraints.</li>
 <li>An <a class="autorefs autorefs-internal" title="            ropt.core.EnsembleEvaluator" href="../evaluator/#ropt.core.EnsembleEvaluator"><code>EnsembleEvaluator</code></a>
     object: This object is responsible for evaluating functions.</li>
 </ol>
@@ -1956,27 +1947,6 @@ the callback function to these plugins needed (see
             <td>
               <div class="doc-md-description">
                 <p>The ensemble optimization configuration.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>transforms</code>
-            </td>
-            <td>
-                  <code><a class="autorefs autorefs-internal" title="            ropt.transforms.OptModelTransforms
-
-
-  
-      dataclass
-   (ropt.transforms._transforms.OptModelTransforms)" href="../../optimization/domain_transforms/#ropt.transforms.OptModelTransforms">OptModelTransforms</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The transforms to apply to the model.</p>
               </div>
             </td>
             <td>
