@@ -8,7 +8,6 @@ from numpy.typing import NDArray
 
 from ropt.config import EnOptConfig
 from ropt.evaluator import EvaluatorCallback, EvaluatorContext
-from ropt.transforms import OptModelTransforms
 
 
 @dataclass(slots=True)
@@ -102,7 +101,6 @@ def _get_active_realizations(
 
 def _get_function_results(
     config: EnOptConfig,
-    transforms: OptModelTransforms | None,
     evaluator: EvaluatorCallback,
     variables: NDArray[np.float64],
     active_realizations: NDArray[np.bool_],
@@ -116,6 +114,7 @@ def _get_function_results(
         realizations=realizations,
         active=active_realizations[realizations],
     )
+    transforms = config.transforms
     if transforms is not None and transforms.variables:
         variables = transforms.variables.from_optimizer(variables)
     evaluator_result = evaluator(np.repeat(variables, realization_num, axis=0), context)
@@ -159,11 +158,11 @@ def _get_function_results(
 
 def _get_gradient_results(
     config: EnOptConfig,
-    transforms: OptModelTransforms | None,
     evaluator: EvaluatorCallback,
     perturbed_variables: NDArray[np.float64],
     active_realizations: NDArray[np.bool_],
 ) -> _GradientEvaluatorResults:
+    transforms = config.transforms
     realization_num = config.realizations.weights.size
     perturbation_num = config.gradient.number_of_perturbations
     realizations = np.repeat(
@@ -205,14 +204,14 @@ def _get_gradient_results(
     )
 
 
-def _get_function_and_gradient_results(  # noqa: PLR0913, PLR0917
+def _get_function_and_gradient_results(
     config: EnOptConfig,
-    transforms: OptModelTransforms | None,
     evaluator: EvaluatorCallback,
     variables: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
     active_realizations: NDArray[np.bool_],
 ) -> tuple[_FunctionEvaluatorResults, _GradientEvaluatorResults]:
+    transforms = config.transforms
     realization_num = config.realizations.weights.size
     perturbation_num = config.gradient.number_of_perturbations
     realizations = np.arange(realization_num, dtype=np.intc)

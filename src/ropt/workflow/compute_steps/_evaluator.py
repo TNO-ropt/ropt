@@ -95,9 +95,7 @@ class EnsembleEvaluator(ComputeStep):
         if config.transforms is not None and config.transforms.variables is not None:
             variables = config.transforms.variables.to_optimizer(variables)
 
-        ensemble_evaluator = CoreEnsembleEvaluator(
-            config, config.transforms, self._evaluator.eval
-        )
+        ensemble_evaluator = CoreEnsembleEvaluator(config, self._evaluator.eval)
 
         exit_code = ExitCode.ENSEMBLE_EVALUATOR_FINISHED
 

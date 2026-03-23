@@ -115,12 +115,10 @@ class EnsembleOptimizer(ComputeStep):
 
         ensemble_evaluator = CoreEnsembleEvaluator(
             self._config,
-            self._config.transforms,
             self._evaluator.eval,
         )
         ensemble_optimizer = CoreEnsembleOptimizer(
             enopt_config=self._config,
-            transforms=self._config.transforms,
             ensemble_evaluator=ensemble_evaluator,
             signal_evaluation=self._signal_evaluation,
         )

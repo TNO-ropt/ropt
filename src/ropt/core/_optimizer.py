@@ -24,7 +24,6 @@ if TYPE_CHECKING:
     from ropt.config import EnOptConfig
     from ropt.plugins.optimizer.base import Optimizer
     from ropt.results import Functions, Gradients, Results
-    from ropt.transforms._transforms import OptModelTransforms
 
     from ._evaluator import EnsembleEvaluator
 
@@ -64,7 +63,6 @@ class EnsembleOptimizer:
     def __init__(
         self,
         enopt_config: EnOptConfig,
-        transforms: OptModelTransforms | None,
         ensemble_evaluator: EnsembleEvaluator,
         signal_evaluation: SignalEvaluationCallback | None = None,
     ) -> None:
@@ -79,10 +77,7 @@ class EnsembleOptimizer:
 
         1.  An [`EnOptConfig`][ropt.config.EnOptConfig] object: This contains
             all configuration settings for the optimization.
-        2.  A [`OptModelTransforms`][ropt.transforms.OptModelTransforms] object:
-            This handles the transforms to apply to the variables, objectives and
-            constraints.
-        3.  An [`EnsembleEvaluator`][ropt.core.EnsembleEvaluator]
+        2.  An [`EnsembleEvaluator`][ropt.core.EnsembleEvaluator]
             object: This object is responsible for evaluating functions.
 
         Additionally, an optional callbacks can be provided that is invoked
@@ -96,12 +91,10 @@ class EnsembleOptimizer:
 
         Args:
             enopt_config:       The ensemble optimization configuration.
-            transforms:         The transforms to apply to the model.
             ensemble_evaluator: The evaluator for function evaluations.
             signal_evaluation:  Optional callback to signal evaluations.
         """
         self._enopt_config = enopt_config
-        self._transforms = transforms
         self._function_evaluator = ensemble_evaluator
         self._signal_evaluation = signal_evaluation
 
@@ -218,9 +211,7 @@ class EnsembleOptimizer:
         return OptimizerCallbackResult(
             functions=functions,
             gradients=gradients,
-            nonlinear_constraint_bounds=_get_nonlinear_constraint_bounds(
-                self._enopt_config, self._transforms
-            ),
+            nonlinear_constraint_bounds=self._get_nonlinear_constraint_bounds(),
         )
 
     def _get_completed_variables(
@@ -329,6 +320,26 @@ class EnsembleOptimizer:
             else np.vstack((weighted_objective_gradient, constraint_gradients))
         )
 
+    def _get_nonlinear_constraint_bounds(
+        self,
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]] | None:
+        if self._enopt_config.nonlinear_constraints is None:
+            return None
+        if (
+            self._enopt_config.transforms is not None
+            and self._enopt_config.transforms.nonlinear_constraints is not None
+        ):
+            return (
+                self._enopt_config.transforms.nonlinear_constraints.bounds_to_optimizer(
+                    self._enopt_config.nonlinear_constraints.lower_bounds,
+                    self._enopt_config.nonlinear_constraints.upper_bounds,
+                )
+            )
+        return (
+            self._enopt_config.nonlinear_constraints.lower_bounds,
+            self._enopt_config.nonlinear_constraints.upper_bounds,
+        )
+
 
 class _Redirector:
     def __init__(self, config: EnOptConfig) -> None:
@@ -386,19 +397,3 @@ class _Redirector:
                 os.dup2(self._new_stderr, 2)
         else:
             yield
-
-
-def _get_nonlinear_constraint_bounds(
-    config: EnOptConfig, transforms: OptModelTransforms | None = None
-) -> tuple[NDArray[np.float64], NDArray[np.float64]] | None:
-    if config.nonlinear_constraints is None:
-        return None
-    if transforms is not None and transforms.nonlinear_constraints is not None:
-        return transforms.nonlinear_constraints.bounds_to_optimizer(
-            config.nonlinear_constraints.lower_bounds,
-            config.nonlinear_constraints.upper_bounds,
-        )
-    return (
-        config.nonlinear_constraints.lower_bounds,
-        config.nonlinear_constraints.upper_bounds,
-    )

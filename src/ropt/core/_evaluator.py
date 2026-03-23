@@ -38,7 +38,6 @@ if TYPE_CHECKING:
     from ropt.plugins.function_estimator.base import FunctionEstimator
     from ropt.plugins.realization_filter.base import RealizationFilter
     from ropt.plugins.sampler.base import Sampler
-    from ropt.transforms import OptModelTransforms
 
 
 class EnsembleEvaluator:
@@ -59,7 +58,6 @@ class EnsembleEvaluator:
     def __init__(
         self,
         config: EnOptConfig,
-        transforms: OptModelTransforms | None,
         evaluator: EvaluatorCallback,
     ) -> None:
         """Initialize the EnsembleEvaluator.
@@ -69,20 +67,16 @@ class EnsembleEvaluator:
 
         The `config` object contains all the settings required for the ensemble
         evaluation, such as the number of realizations, the function estimators,
-        and the gradient settings. The `transforms` object defines the domain
-        transforms that should be applied to variables, objectives and
-        constraints. The `evaluator` callable is usually provide by a
-        [`Evaluator`][ropt.workflow.evaluators.Evaluator] object. The
+        and the gradient settings. The `evaluator` callable is usually provide
+        by a [`Evaluator`][ropt.workflow.evaluators.Evaluator] object. The
         `plugin_manager` is used to load the realization filters, function
         estimators, and samplers.
 
         Args:
             config:         The configuration object.
-            transforms:     The domain transforms to apply.
             evaluator:      The callable for evaluating individual functions.
         """
         self._config = config
-        self._transforms = transforms
         self._evaluator = evaluator
         self._realization_filters = self._init_realization_filters()
         self._function_estimators = self._init_function_estimators()
@@ -156,7 +150,6 @@ class EnsembleEvaluator:
             )
             for idx, f_eval_results in _get_function_results(
                 self._config,
-                self._transforms,
                 self._evaluator,
                 variables,
                 active_realizations,
@@ -223,7 +216,6 @@ class EnsembleEvaluator:
             functions=functions,
             constraint_info=ConstraintInfo.create(
                 self._config,
-                self._transforms,
                 evaluations.variables,
                 functions.constraints if functions is not None else None,
             ),
@@ -255,7 +247,6 @@ class EnsembleEvaluator:
         )
         g_eval_results = _get_gradient_results(
             self._config,
-            self._transforms,
             self._evaluator,
             perturbed_variables,
             active_realizations,
@@ -321,7 +312,6 @@ class EnsembleEvaluator:
         active_realizations = _get_active_realizations(self._config)
         f_eval_results, g_eval_results = _get_function_and_gradient_results(
             self._config,
-            self._transforms,
             self._evaluator,
             variables,
             perturbed_variables,
@@ -374,7 +364,6 @@ class EnsembleEvaluator:
             functions=functions,
             constraint_info=ConstraintInfo.create(
                 self._config,
-                self._transforms,
                 evaluations.variables,
                 functions.constraints if functions is not None else None,
             ),
