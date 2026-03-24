@@ -1840,8 +1840,8 @@ the optimization workflow:</p>
 <p><strong>*Optimizer related plugins:</strong></p>
 <p>These plugins are used to implement specific features of the ensemble optimizer:</p>
 <ul>
-<li><a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer" href="../optimizer/optimizer/#ropt.plugins.optimizer"><code>optimizer</code></a>: Implements optimization algorithms.</li>
-<li><a class="autorefs autorefs-internal" title="            ropt.plugins.sampler" href="../optimizer/sampler/#ropt.plugins.sampler"><code>sampler</code></a>: Generates parameter perturbations, which
+<li><a class="autorefs autorefs-internal" title="            ropt.optimizer" href="../optimizer/optimizer/#ropt.optimizer"><code>optimizer</code></a>: Implements optimization algorithms.</li>
+<li><a class="autorefs autorefs-internal" title="            ropt.sampler" href="../optimizer/sampler/#ropt.sampler"><code>sampler</code></a>: Generates parameter perturbations, which
   are used for gradient estimation.</li>
 <li><a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter" href="../optimizer/realization_filter/#ropt.plugins.realization_filter"><code>realization_filter</code></a>: Selects subsets of
   ensemble realizations for calculating objectives or constraints.</li>
@@ -1860,12 +1860,12 @@ mechanism.</p>
 must inherit from:</p>
 <ul>
 <li><strong>Optimizer:</strong>
-  <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.OptimizerPlugin" href="../optimizer/optimizer/#ropt.plugins.optimizer.base.OptimizerPlugin"><code>OptimizerPlugin</code></a></li>
-<li><strong>Sampler:</strong> <a class="autorefs autorefs-internal" title="            ropt.plugins.sampler.base.SamplerPlugin" href="../optimizer/sampler/#ropt.plugins.sampler.base.SamplerPlugin"><code>SamplerPlugin</code></a></li>
+  <a class="autorefs autorefs-internal" title="            OptimizerPlugin" href="../optimizer/optimizer/#ropt.plugins.optimizer.OptimizerPlugin"><code>OptimizerPlugin</code></a></li>
+<li><strong>Sampler:</strong> <a class="autorefs autorefs-internal" title="            SamplerPlugin" href="../optimizer/sampler/#ropt.plugins.sampler.SamplerPlugin"><code>SamplerPlugin</code></a></li>
 <li><strong>Realization Filter:</strong>
-  <a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.base.RealizationFilterPlugin" href="../optimizer/realization_filter/#ropt.plugins.realization_filter.base.RealizationFilterPlugin"><code>RealizationFilterPlugin</code></a></li>
+  <a class="autorefs autorefs-internal" title="            RealizationFilterPlugin" href="../optimizer/realization_filter/#ropt.plugins.realization_filter.RealizationFilterPlugin"><code>RealizationFilterPlugin</code></a></li>
 <li><strong>Function Estimator:</strong>
-  <a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.base.FunctionEstimatorPlugin" href="../optimizer/function_estimator/#ropt.plugins.function_estimator.base.FunctionEstimatorPlugin"><code>FunctionEstimatorPlugin</code></a></li>
+  <a class="autorefs autorefs-internal" title="            FunctionEstimatorPlugin" href="../optimizer/function_estimator/#ropt.plugins.function_estimator.FunctionEstimatorPlugin"><code>FunctionEstimatorPlugin</code></a></li>
 </ul>
 <p><strong>Using Plugins</strong></p>
 <p>The <a class="autorefs autorefs-internal" title="            get_plugin" href="#ropt.plugins.manager.PluginManager.get_plugin"><code>PluginManager.get_plugin</code></a>
@@ -1891,12 +1891,12 @@ from the base class for the corresponding plugin type:</p>
   <a class="autorefs autorefs-internal" title="            ropt.workflow.compute_steps.ComputeStep" href="../../workflow/compute_steps/#ropt.workflow.compute_steps.ComputeStep"><code>ComputeStep</code></a>,
   <a class="autorefs autorefs-internal" title="            ropt.workflow.event_handlers.EventHandler" href="../../workflow/event_handler/#ropt.workflow.event_handlers.EventHandler"><code>EventHandler</code></a>,
   <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../workflow/evaluator/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a></li>
-<li>Optimizer: <a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.Optimizer" href="../optimizer/optimizer/#ropt.plugins.optimizer.base.Optimizer"><code>Optimizer</code></a></li>
-<li>Sampler: <a class="autorefs autorefs-internal" title="            ropt.plugins.sampler.base.Sampler" href="../optimizer/sampler/#ropt.plugins.sampler.base.Sampler"><code>Sampler</code></a></li>
+<li>Optimizer: <a class="autorefs autorefs-internal" title="            Optimizer" href="../optimizer/optimizer/#ropt.optimizer.Optimizer"><code>Optimizer</code></a></li>
+<li>Sampler: <a class="autorefs autorefs-internal" title="            Sampler" href="../optimizer/sampler/#ropt.sampler.Sampler"><code>Sampler</code></a></li>
 <li>Realization Filter:
-  <a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.base.RealizationFilter" href="../optimizer/realization_filter/#ropt.plugins.realization_filter.base.RealizationFilter"><code>RealizationFilter</code></a></li>
+  <a class="autorefs autorefs-internal" title="            ropt.realization_filter.RealizationFilter" href="../optimizer/realization_filter/#ropt.realization_filter.RealizationFilter"><code>RealizationFilter</code></a></li>
 <li>Function Estimator:
-  <a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.base.FunctionEstimator" href="../optimizer/function_estimator/#ropt.plugins.function_estimator.base.FunctionEstimator"><code>FunctionEstimator</code></a></li>
+  <a class="autorefs autorefs-internal" title="            ropt.function_estimator.FunctionEstimator" href="../optimizer/function_estimator/#ropt.function_estimator.FunctionEstimator"><code>FunctionEstimator</code></a></li>
 </ul>
 <p><strong>Pre-installed Plugins Included with <code>ropt</code></strong></p>
 <p><code>ropt</code> comes bundled with a set of pre-installed plugins:</p>
@@ -1908,7 +1908,7 @@ from the base class for the corresponding plugin type:</p>
 <li><strong>Sampler:</strong> The <a class="autorefs autorefs-internal" title="            ropt.plugins.sampler.scipy.SciPySampler" href="../optimizer/sampler/#ropt.plugins.sampler.scipy.SciPySampler"><code>scipy</code></a> plugin,
   using distributions from <code>scipy.stats</code>.</li>
 <li><strong>Realization Filter:</strong> The
-  <a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.default.DefaultRealizationFilter" href="../optimizer/realization_filter/#ropt.plugins.realization_filter.default.DefaultRealizationFilter"><code>default</code></a>
+  <a class="autorefs autorefs-internal" title="            ropt.realization_filter.default.DefaultRealizationFilter" href="../optimizer/realization_filter/#ropt.realization_filter.default.DefaultRealizationFilter"><code>default</code></a>
   plugin, offering filters based on ranking and for CVaR optimization.</li>
 <li><strong>Function Estimator:</strong> The
   <a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.default.DefaultFunctionEstimator" href="../optimizer/function_estimator/#ropt.plugins.function_estimator.default.DefaultFunctionEstimator"><code>default</code></a>
@@ -2564,13 +2564,13 @@ plugins within the <code>ropt</code> framework. Each identifier corresponds to a
 role in the optimization process:</p>
 <ul>
 <li><code>"optimizer"</code>: Plugins implementing optimization algorithms
-  (<a class="autorefs autorefs-internal" title="            ropt.plugins.optimizer.base.OptimizerPlugin" href="../optimizer/optimizer/#ropt.plugins.optimizer.base.OptimizerPlugin"><code>OptimizerPlugin</code></a>).</li>
+  (<a class="autorefs autorefs-internal" title="            OptimizerPlugin" href="../optimizer/optimizer/#ropt.plugins.optimizer.OptimizerPlugin"><code>OptimizerPlugin</code></a>).</li>
 <li><code>"sampler"</code>: Plugins for generating parameter samples
-  (<a class="autorefs autorefs-internal" title="            ropt.plugins.sampler.base.SamplerPlugin" href="../optimizer/sampler/#ropt.plugins.sampler.base.SamplerPlugin"><code>SamplerPlugin</code></a>).</li>
+  (<a class="autorefs autorefs-internal" title="            SamplerPlugin" href="../optimizer/sampler/#ropt.plugins.sampler.SamplerPlugin"><code>SamplerPlugin</code></a>).</li>
 <li><code>"realization_filter"</code>: Plugins for filtering ensemble realizations
-  (<a class="autorefs autorefs-internal" title="            ropt.plugins.realization_filter.base.RealizationFilterPlugin" href="../optimizer/realization_filter/#ropt.plugins.realization_filter.base.RealizationFilterPlugin"><code>RealizationFilterPlugin</code></a>).</li>
+  (<a class="autorefs autorefs-internal" title="            RealizationFilterPlugin" href="../optimizer/realization_filter/#ropt.plugins.realization_filter.RealizationFilterPlugin"><code>RealizationFilterPlugin</code></a>).</li>
 <li><code>"function_estimator"</code>: Plugins for estimating objective functions and gradients
-  (<a class="autorefs autorefs-internal" title="            ropt.plugins.function_estimator.base.FunctionEstimatorPlugin" href="../optimizer/function_estimator/#ropt.plugins.function_estimator.base.FunctionEstimatorPlugin"><code>FunctionEstimatorPlugin</code></a>).</li>
+  (<a class="autorefs autorefs-internal" title="            FunctionEstimatorPlugin" href="../optimizer/function_estimator/#ropt.plugins.function_estimator.FunctionEstimatorPlugin"><code>FunctionEstimatorPlugin</code></a>).</li>
 </ul>
 
     </div>
