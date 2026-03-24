@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
+from ropt.realization_filter import RealizationFilter
 from ropt.realization_filter.default import (
     _get_cvar_weights_from_percentile,
     _sort_and_select,
@@ -655,3 +656,25 @@ def test_cvar_filter_mixed(
 
     # The first objective values should differ.
     assert objective_values[0] != objective_values[1]
+
+
+class CustomRealizationFilter(RealizationFilter):
+    def get_realization_weights(  # noqa: PLR6301
+        self,
+        objectives: NDArray[np.float64],
+        _1: NDArray[np.float64] | None,
+    ) -> NDArray[np.float64]:
+        return np.ones(objectives.shape[0])
+
+
+def test_custom_realization_filter(
+    enopt_config: Any, evaluator: Any, test_functions: Any
+) -> None:
+    enopt_config["objectives"]["realization_filters"] = 0
+    enopt_config["realization_filters"] = [CustomRealizationFilter()]
+    optimizer = BasicOptimizer(enopt_config, evaluator(test_functions))
+    optimizer.run(initial_values)
+    assert optimizer.results is not None
+    assert np.allclose(
+        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+    )

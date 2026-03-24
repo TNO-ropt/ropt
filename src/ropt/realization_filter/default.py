@@ -6,7 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt
 
-from ropt.config import EnOptConfig
+from ropt.config import EnOptConfig, RealizationFilterConfig
 from ropt.enums import ExitCode
 from ropt.exceptions import ComputeStepAborted
 from ropt.realization_filter import RealizationFilter
@@ -228,6 +228,7 @@ class DefaultRealizationFilter(RealizationFilter):
             | CVaRConstraintOptions
         )
 
+        assert isinstance(self._filter_config, RealizationFilterConfig)
         _, _, self._method = self._filter_config.method.lower().rpartition("/")
         options = self._filter_config.options
         match self._method:

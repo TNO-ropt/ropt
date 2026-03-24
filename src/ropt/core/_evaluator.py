@@ -5,7 +5,9 @@ from typing import TYPE_CHECKING
 import numpy as np
 from numpy.random import default_rng
 
+from ropt.function_estimator import FunctionEstimator
 from ropt.plugins.manager import get_plugin
+from ropt.realization_filter import RealizationFilter
 from ropt.results import (
     ConstraintInfo,
     FunctionEvaluations,
@@ -17,6 +19,7 @@ from ropt.results import (
     Realizations,
     Results,
 )
+from ropt.sampler import Sampler
 
 from ._function import _calculate_estimated_functions
 from ._gradient import _calculate_estimated_gradients, _perturb_variables
@@ -35,9 +38,6 @@ if TYPE_CHECKING:
 
     from ropt.config import EnOptConfig
     from ropt.evaluator import EvaluatorCallback
-    from ropt.function_estimator import FunctionEstimator
-    from ropt.realization_filter import RealizationFilter
-    from ropt.sampler import Sampler
 
 
 class EnsembleEvaluator:
@@ -618,27 +618,39 @@ class EnsembleEvaluator:
 
     def _init_realization_filters(self) -> list[RealizationFilter]:
         return [
-            get_plugin("realization_filter", method=filter_config.method).create(
+            item
+            if isinstance(item, RealizationFilter)
+            else get_plugin("realization_filter", method=item.method).create(
                 self._config, idx
             )
-            for idx, filter_config in enumerate(self._config.realization_filters)
+            for idx, item in enumerate(self._config.realization_filters)
         ]
 
     def _init_function_estimators(self) -> list[FunctionEstimator]:
         return [
-            get_plugin("function_estimator", method=estimator_config.method).create(
+            item
+            if isinstance(item, FunctionEstimator)
+            else get_plugin("function_estimator", method=item.method).create(
                 self._config, idx
             )
-            for idx, estimator_config in enumerate(self._config.function_estimators)
+            for idx, item in enumerate(self._config.function_estimators)
         ]
 
     def _init_samplers(self, rng: Generator) -> list[Sampler]:
         samplers: list[Sampler] = []
-        for idx, sampler_config in enumerate(self._config.samplers):
+        for idx, item in enumerate(self._config.samplers):
             variable_indices = np.asarray(
                 self._config.variables.mask & (self._config.variables.samplers == idx)
             )
             if variable_indices is None or variable_indices.size:
-                plugin = get_plugin("sampler", method=sampler_config.method)
-                samplers.append(plugin.create(self._config, idx, variable_indices, rng))
+                plugin = (
+                    item
+                    if isinstance(item, Sampler)
+                    else get_plugin("sampler", method=item.method)
+                )
+                samplers.append(
+                    plugin
+                    if isinstance(plugin, Sampler)
+                    else plugin.create(self._config, idx, variable_indices, rng)
+                )
         return samplers

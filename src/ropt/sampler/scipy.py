@@ -10,7 +10,7 @@ from numpy.typing import NDArray
 from scipy.stats import norm, rv_continuous, truncnorm, uniform
 from scipy.stats.qmc import Halton, LatinHypercube, QMCEngine, Sobol, scale
 
-from ropt.config import EnOptConfig
+from ropt.config import EnOptConfig, SamplerConfig
 from ropt.sampler import Sampler
 
 _STATS_SAMPLERS: Final[dict[str, Any]] = {
@@ -76,12 +76,14 @@ class SciPySampler(Sampler):
     ) -> None:
         """Initialize the sampler object.
 
-        See the [ropt.plugins.sampler.base.Sample][] abstract base class.
+        See the [ropt.plugins.sampler.Sampler][] abstract base class.
 
         # noqa
         """
         self._enopt_config = enopt_config
-        self._sampler_config = enopt_config.samplers[sampler_index]
+        sampler_config = enopt_config.samplers[sampler_index]
+        assert isinstance(sampler_config, SamplerConfig)
+        self._sampler_config = sampler_config
         self._mask = mask
         _, _, self._method = self._sampler_config.method.lower().rpartition("/")
         if self._method == "default":

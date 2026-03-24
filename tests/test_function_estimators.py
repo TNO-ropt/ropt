@@ -5,6 +5,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
+from ropt.function_estimator import FunctionEstimator
 from ropt.workflow import BasicOptimizer
 
 initial_values = 3 * [0]
@@ -102,6 +103,34 @@ def test_stddev_function_estimator(
     enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
     enopt_config["function_estimators"] = [{"method": "stddev"}]
     optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer.run(initial_values)
+    assert optimizer.results is not None
+    assert np.allclose(
+        optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
+    )
+
+
+class CustomFunctionEstimator(FunctionEstimator):
+    def calculate_function(  # noqa: PLR6301
+        self, functions: NDArray[np.float64], weights: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
+        return np.asarray(np.dot(functions, weights) + 1.0)
+
+    def calculate_gradient(  # noqa: PLR6301
+        self,
+        _: NDArray[np.float64],
+        gradient: NDArray[np.float64],
+        weights: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
+        return np.asarray(np.dot(gradient, weights))
+
+
+def test_custom_function_estimator(
+    enopt_config: Any, evaluator: Any, test_functions: Any
+) -> None:
+    enopt_config["objectives"]["function_estimators"] = 0
+    enopt_config["function_estimators"] = [CustomFunctionEstimator()]
+    optimizer = BasicOptimizer(enopt_config, evaluator(test_functions))
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert np.allclose(

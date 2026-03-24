@@ -18,6 +18,11 @@ from ._realization_filter_config import RealizationFilterConfig  # noqa: TC001
 from ._realizations_config import RealizationsConfig
 from ._sampler_config import SamplerConfig
 from ._variables_config import VariablesConfig  # noqa: TC001
+from .validated_types import (  # noqa: TC001
+    FunctionEstimatorInstance,
+    RealizationFilterInstance,
+    SamplerInstance,
+)
 
 
 class EnOptConfig(BaseModel):
@@ -88,9 +93,13 @@ class EnOptConfig(BaseModel):
     realizations: RealizationsConfig = RealizationsConfig.model_validate({})
     optimizer: OptimizerConfig = OptimizerConfig.model_validate({})
     gradient: GradientConfig = GradientConfig.model_validate({})
-    realization_filters: tuple[RealizationFilterConfig, ...] = ()
-    function_estimators: tuple[FunctionEstimatorConfig, ...] = ()
-    samplers: tuple[SamplerConfig, ...] = ()
+    realization_filters: tuple[
+        RealizationFilterConfig | RealizationFilterInstance, ...
+    ] = ()
+    function_estimators: tuple[
+        FunctionEstimatorConfig | FunctionEstimatorInstance, ...
+    ] = ()
+    samplers: tuple[SamplerConfig | SamplerInstance, ...] = ()
     names: dict[str, tuple[str | int, ...]] = {}
 
     _context: OptModelTransforms | None = PrivateAttr(default=None)

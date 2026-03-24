@@ -5,7 +5,7 @@ from typing import Final
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.config import EnOptConfig
+from ropt.config import EnOptConfig, FunctionEstimatorConfig
 from ropt.enums import ExitCode
 from ropt.exceptions import ComputeStepAborted
 from ropt.function_estimator import FunctionEstimator
@@ -53,6 +53,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
         """  # noqa: DOC501
         self._enopt_config = enopt_config
         self._estimator_config = enopt_config.function_estimators[estimator_index]
+        assert isinstance(self._estimator_config, FunctionEstimatorConfig)
         _, _, self._method = self._estimator_config.method.lower().rpartition("/")
         if self._method == "default":
             self._method = "mean"

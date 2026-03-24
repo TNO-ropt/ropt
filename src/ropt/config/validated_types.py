@@ -29,7 +29,12 @@ from typing import Annotated, TypeVar
 
 import numpy as np
 from numpy.typing import NDArray
-from pydantic import BeforeValidator
+from pydantic import BeforeValidator, GetPydanticSchema
+from pydantic_core import core_schema
+
+from ropt.function_estimator import FunctionEstimator
+from ropt.realization_filter import RealizationFilter
+from ropt.sampler import Sampler
 
 from .utils import (
     _convert_1d_array,
@@ -63,3 +68,21 @@ ItemOrSet = Annotated[set[T], BeforeValidator(_convert_set)]
 
 ItemOrTuple = Annotated[tuple[T, ...], BeforeValidator(_convert_tuple)]
 """Convert to single value to a tuple containing that value, passes sets unchanged."""
+
+FunctionEstimatorInstance = Annotated[
+    FunctionEstimator,
+    GetPydanticSchema(lambda _0, _1: core_schema.is_instance_schema(FunctionEstimator)),
+]
+"""Validate that the value is an instance of FunctionEstimator."""
+
+RealizationFilterInstance = Annotated[
+    RealizationFilter,
+    GetPydanticSchema(lambda _0, _1: core_schema.is_instance_schema(RealizationFilter)),
+]
+"""Validate that the value is an instance of RealizationFilter."""
+
+SamplerInstance = Annotated[
+    Sampler,
+    GetPydanticSchema(lambda _0, _1: core_schema.is_instance_schema(Sampler)),
+]
+"""Validate that the value is an instance of Sampler."""

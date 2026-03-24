@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 from numpy.random import Generator, default_rng
 
-from ropt.config import EnOptConfig
+from ropt.config import EnOptConfig, SamplerConfig
 from ropt.core._gradient import _perturb_variables
 from ropt.sampler import Sampler
 from ropt.workflow import BasicOptimizer
@@ -54,7 +54,9 @@ class MockedSampler(Sampler):
         _: Generator,
     ) -> None:
         self._config = enopt_config
-        self._sampler = enopt_config.samplers[sampler_index]
+        sampler = enopt_config.samplers[sampler_index]
+        assert isinstance(sampler, SamplerConfig)
+        self._sampler_config = sampler
         self._mask = mask
         # This sampler only works if the number of perturbation equals the
         # number of variables:
@@ -80,8 +82,8 @@ class MockedSampler(Sampler):
                 dtype=np.float64,
             )
             samples[..., self._mask] = 1.0
-        if "scale" in self._sampler.options:
-            samples *= self._sampler.options["scale"]
+        if "scale" in self._sampler_config.options:
+            samples *= self._sampler_config.options["scale"]
         for idx in range(samples.shape[0]):
             diag = np.diag(samples[idx, ...])
             samples[idx, ...] = np.diag(diag)
