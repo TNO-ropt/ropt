@@ -6,10 +6,10 @@ from functools import cache
 from importlib.metadata import entry_points
 from typing import TYPE_CHECKING, Any, Final, Literal, cast
 
-from .function_estimator.base import FunctionEstimatorPlugin
-from .optimizer.base import OptimizerPlugin
-from .realization_filter.base import RealizationFilterPlugin
-from .sampler.base import SamplerPlugin
+from .function_estimator import FunctionEstimatorPlugin
+from .optimizer import OptimizerPlugin
+from .realization_filter import RealizationFilterPlugin
+from .sampler import SamplerPlugin
 
 if TYPE_CHECKING:
     from ropt.plugins.base import Plugin
@@ -28,13 +28,13 @@ plugins within the `ropt` framework. Each identifier corresponds to a specific
 role in the optimization process:
 
 * `"optimizer"`: Plugins implementing optimization algorithms
-  ([`OptimizerPlugin`][ropt.plugins.optimizer.base.OptimizerPlugin]).
+  ([`OptimizerPlugin`][ropt.plugins.optimizer.OptimizerPlugin]).
 * `"sampler"`: Plugins for generating parameter samples
-  ([`SamplerPlugin`][ropt.plugins.sampler.base.SamplerPlugin]).
+  ([`SamplerPlugin`][ropt.plugins.sampler.SamplerPlugin]).
 * `"realization_filter"`: Plugins for filtering ensemble realizations
-  ([`RealizationFilterPlugin`][ropt.plugins.realization_filter.base.RealizationFilterPlugin]).
+  ([`RealizationFilterPlugin`][ropt.plugins.realization_filter.RealizationFilterPlugin]).
 * `"function_estimator"`: Plugins for estimating objective functions and gradients
-  ([`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.base.FunctionEstimatorPlugin]).
+  ([`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.FunctionEstimatorPlugin]).
 """
 
 
@@ -100,11 +100,11 @@ class PluginManager:
         if self._plugins:
             return
 
-        from .optimizer.scipy import SciPyOptimizerPlugin
-        from .optimizer.external import ExternalOptimizerPlugin
         from .sampler.scipy import SciPySamplerPlugin
         from .realization_filter.default import DefaultRealizationFilterPlugin
         from .function_estimator.default import DefaultFunctionEstimatorPlugin
+        from .optimizer.external import ExternalOptimizerPlugin
+        from .optimizer.scipy import SciPyOptimizerPlugin
 
         self._add_plugin("optimizer", "scipy", SciPyOptimizerPlugin)
         self._add_plugin("optimizer", "external", ExternalOptimizerPlugin)

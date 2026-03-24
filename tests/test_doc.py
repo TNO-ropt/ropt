@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from ropt.config.options import gen_options_table
-from ropt.plugins.optimizer.scipy import _OPTIONS_SCHEMA
+from ropt.plugins.optimizer.scipy import SCIPY_OPTIONS_SCHEMA
 
 
 def test_scipy_options_table() -> None:
@@ -12,7 +12,7 @@ def test_scipy_options_table() -> None:
     if not md_file.exists():
         pytest.fail(f"File not found: {md_file}\n{msg}")
     saved = md_file.read_text()
-    generated = gen_options_table(_OPTIONS_SCHEMA)
+    generated = gen_options_table(SCIPY_OPTIONS_SCHEMA)
     if saved.strip() != generated.strip():
         pytest.fail(
             f"The generated options table does not match the saved version.\n{msg}"

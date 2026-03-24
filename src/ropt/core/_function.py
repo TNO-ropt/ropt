@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.plugins.function_estimator.base import FunctionEstimator
+from ropt.function_estimator import FunctionEstimator
 
 
 def _calculate_estimated_functions(

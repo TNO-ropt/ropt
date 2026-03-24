@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config import EnOptConfig
-    from ropt.plugins.optimizer.base import Optimizer
+    from ropt.optimizer import Optimizer
     from ropt.results import Functions, Gradients, Results
 
     from ._evaluator import EnsembleEvaluator

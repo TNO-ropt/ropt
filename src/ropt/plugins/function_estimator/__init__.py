@@ -15,12 +15,12 @@ deviation (`stddev`) of the realization results.
 **Core Concepts:**
 
 * **Plugin Interface:** Function estimator plugins must inherit from the
-  [`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.base.FunctionEstimatorPlugin]
+  [`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.FunctionEstimatorPlugin]
   base class. This class acts as a factory, defining a `create` method to
   instantiate estimator objects.
 * **Estimator Implementation:** The actual aggregation logic resides in classes
   that inherit from the
-  [`FunctionEstimator`][ropt.plugins.function_estimator.base.FunctionEstimator]
+  [`FunctionEstimator`][ropt.function_estimator.FunctionEstimator]
   abstract base class. These classes are initialized with the optimization
   configuration ([`EnOptConfig`][ropt.config.EnOptConfig]) and the index of the
   specific estimator configuration to use (`estimator_index`). The core
@@ -32,3 +32,9 @@ deviation (`stddev`) of the realization results.
   entry points) and uses them to create `FunctionEstimator` instances as needed
   during workflow execution.
 """
+
+from ._base import FunctionEstimatorPlugin
+
+__all__ = [
+    "FunctionEstimatorPlugin",
+]

@@ -378,7 +378,7 @@ class NormalizedConstraints:
         during initialization.
 
         This property should be accessed after calling
-        [`set_constraints`][ropt.plugins.optimizer.utils.NormalizedConstraints.set_constraints]
+        [`set_constraints`][ropt.optimizer.utils.NormalizedConstraints.set_constraints]
         with the raw constraint values for the current variable vector. Returns
         `None` if `set_constraints` has not been called since the last `reset`.
 
@@ -396,7 +396,7 @@ class NormalizedConstraints:
         provided during initialization.
 
         This property should be accessed after calling
-        [`set_gradients`][ropt.plugins.optimizer.utils.NormalizedConstraints.set_gradients]
+        [`set_gradients`][ropt.optimizer.utils.NormalizedConstraints.set_gradients]
         with the raw constraint gradients for the current variable vector.
         Returns `None` if `set_gradients` has not been called since the last
         `reset`.

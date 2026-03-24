@@ -7,7 +7,7 @@ from numpy.random import default_rng
 from ropt.config import EnOptConfig
 from ropt.core._gradient import _apply_bounds, _perturb_variables
 from ropt.enums import BoundaryType
-from ropt.plugins.sampler.scipy import SciPySampler
+from ropt.sampler.scipy import SciPySampler
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray

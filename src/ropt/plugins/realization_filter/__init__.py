@@ -8,7 +8,7 @@ of `ropt` with custom realization filtering strategies.
 **Built-in Realization Filter Plugins:**
 
 The default
-[`DefaultRealizationFilter`][ropt.plugins.realization_filter.default.DefaultRealizationFilter]
+[`DefaultRealizationFilter`][ropt.realization_filter.default.DefaultRealizationFilter]
 class provides several filtering methods, including sorting by
 objective/constraint values and Conditional Value-at-Risk (CVaR) based
 weighting.
@@ -16,12 +16,12 @@ weighting.
 **Core Concepts:**
 
 * **Plugin Interface:** Realization filter plugins must inherit from the
-  [`RealizationFilterPlugin`][ropt.plugins.realization_filter.base.RealizationFilterPlugin]
+  [`RealizationFilterPlugin`][ropt.plugins.realization_filter.RealizationFilterPlugin]
   base class. This class acts as a factory, defining a `create` method to
   instantiate filter objects.
 * **Filter Implementation:** The actual filtering logic resides in classes that
   inherit from the
-  [`RealizationFilter`][ropt.plugins.realization_filter.base.RealizationFilter]
+  [`RealizationFilter`][ropt.realization_filter.RealizationFilter]
   abstract base class. These classes are initialized with the optimization
   configuration ([`EnOptConfig`][ropt.config.EnOptConfig]) and the index of the
   specific filter configuration to use (`filter_index`). The core functionality
@@ -32,3 +32,9 @@ weighting.
   discovers available `RealizationFilterPlugin` implementations (typically via
   entry points) and uses them to create `RealizationFilter` instances as needed.
 """
+
+from ._base import RealizationFilterPlugin
+
+__all__ = [
+    "RealizationFilterPlugin",
+]

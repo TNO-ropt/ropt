@@ -11,8 +11,8 @@ the optimization workflow:
 
 These plugins are used to implement specific features of the ensemble optimizer:
 
-- [`optimizer`][ropt.plugins.optimizer]: Implements optimization algorithms.
-- [`sampler`][ropt.plugins.sampler]: Generates parameter perturbations, which
+- [`optimizer`][ropt.optimizer]: Implements optimization algorithms.
+- [`sampler`][ropt.sampler]: Generates parameter perturbations, which
   are used for gradient estimation.
 - [`realization_filter`][ropt.plugins.realization_filter]: Selects subsets of
   ensemble realizations for calculating objectives or constraints.
@@ -34,12 +34,12 @@ Each plugin type has a corresponding abstract base class that custom plugins
 must inherit from:
 
 - **Optimizer:**
-  [`OptimizerPlugin`][ropt.plugins.optimizer.base.OptimizerPlugin]
-- **Sampler:** [`SamplerPlugin`][ropt.plugins.sampler.base.SamplerPlugin]
+  [`OptimizerPlugin`][ropt.plugins.optimizer.OptimizerPlugin]
+- **Sampler:** [`SamplerPlugin`][ropt.plugins.sampler.SamplerPlugin]
 - **Realization Filter:**
-  [`RealizationFilterPlugin`][ropt.plugins.realization_filter.base.RealizationFilterPlugin]
+  [`RealizationFilterPlugin`][ropt.plugins.realization_filter.RealizationFilterPlugin]
 - **Function Estimator:**
-  [`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.base.FunctionEstimatorPlugin]
+  [`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.FunctionEstimatorPlugin]
 
 **Using Plugins**
 
@@ -68,12 +68,12 @@ from the base class for the corresponding plugin type:
   [`ComputeStep`][ropt.workflow.compute_steps.ComputeStep],
   [`EventHandler`][ropt.workflow.event_handlers.EventHandler],
   [`Evaluator`][ropt.workflow.evaluators.Evaluator]
-- Optimizer: [`Optimizer`][ropt.plugins.optimizer.base.Optimizer]
-- Sampler: [`Sampler`][ropt.plugins.sampler.base.Sampler]
+- Optimizer: [`Optimizer`][ropt.optimizer.Optimizer]
+- Sampler: [`Sampler`][ropt.sampler.Sampler]
 - Realization Filter:
-  [`RealizationFilter`][ropt.plugins.realization_filter.base.RealizationFilter]
+  [`RealizationFilter`][ropt.realization_filter.RealizationFilter]
 - Function Estimator:
-  [`FunctionEstimator`][ropt.plugins.function_estimator.base.FunctionEstimator]
+  [`FunctionEstimator`][ropt.function_estimator.FunctionEstimator]
 
 **Pre-installed Plugins Included with `ropt`**
 
@@ -86,7 +86,7 @@ from the base class for the corresponding plugin type:
 - **Sampler:** The [`scipy`][ropt.plugins.sampler.scipy.SciPySampler] plugin,
   using distributions from `scipy.stats`.
 - **Realization Filter:** The
-  [`default`][ropt.plugins.realization_filter.default.DefaultRealizationFilter]
+  [`default`][ropt.realization_filter.default.DefaultRealizationFilter]
   plugin, offering filters based on ranking and for CVaR optimization.
 - **Function Estimator:** The
   [`default`][ropt.plugins.function_estimator.default.DefaultFunctionEstimator]

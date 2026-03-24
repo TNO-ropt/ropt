@@ -3,8 +3,8 @@ from numpy.typing import NDArray
 
 from ropt.config import EnOptConfig
 from ropt.enums import BoundaryType, PerturbationType
-from ropt.plugins.function_estimator.base import FunctionEstimator
-from ropt.plugins.sampler.base import Sampler
+from ropt.function_estimator import FunctionEstimator
+from ropt.sampler import Sampler
 
 _SVD_TOLERANCE = 0.999
 _EPSILON = 1e-15

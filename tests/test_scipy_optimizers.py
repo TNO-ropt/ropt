@@ -6,14 +6,14 @@ import numpy as np
 import pytest
 from pydantic import ValidationError
 
-from ropt.plugins.optimizer.scipy import (
+from ropt.optimizer.scipy import (
     _CONSTRAINT_REQUIRES_BOUNDS,
     _CONSTRAINT_SUPPORT_BOUNDS,
     _CONSTRAINT_SUPPORT_LINEAR_EQ,
     _CONSTRAINT_SUPPORT_LINEAR_INEQ,
     _CONSTRAINT_SUPPORT_NONLINEAR_EQ,
     _CONSTRAINT_SUPPORT_NONLINEAR_INEQ,
-    _SUPPORTED_METHODS,
+    SUPPORTED_SCIPY_METHODS,
 )
 from ropt.results import Results
 from ropt.workflow import BasicOptimizer, validate_optimizer_options
@@ -26,7 +26,7 @@ _SUPPORTS_NONLINEAR_EQ = _CONSTRAINT_SUPPORT_NONLINEAR_EQ - {"differential_evolu
 _SUPPORTS_NONLINEAR_INEQ = _CONSTRAINT_SUPPORT_NONLINEAR_INEQ - {
     "differential_evolution"
 }
-_SUPPORTED = _SUPPORTED_METHODS - {"differential_evolution"}
+_SUPPORTED = SUPPORTED_SCIPY_METHODS - {"differential_evolution"}
 
 initial_values = [0.0, 0.0, 0.1]
 

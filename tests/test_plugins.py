@@ -8,7 +8,7 @@ from pydantic import ValidationError
 
 from ropt.config.options import OptionsSchemaModel
 from ropt.plugins.manager import PluginManager, get_plugin
-from ropt.plugins.optimizer.base import OptimizerPlugin
+from ropt.plugins.optimizer import OptimizerPlugin
 from ropt.plugins.optimizer.scipy import SciPyOptimizerPlugin
 
 if TYPE_CHECKING:

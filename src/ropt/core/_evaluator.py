@@ -35,9 +35,9 @@ if TYPE_CHECKING:
 
     from ropt.config import EnOptConfig
     from ropt.evaluator import EvaluatorCallback
-    from ropt.plugins.function_estimator.base import FunctionEstimator
-    from ropt.plugins.realization_filter.base import RealizationFilter
-    from ropt.plugins.sampler.base import Sampler
+    from ropt.function_estimator import FunctionEstimator
+    from ropt.realization_filter import RealizationFilter
+    from ropt.sampler import Sampler
 
 
 class EnsembleEvaluator:

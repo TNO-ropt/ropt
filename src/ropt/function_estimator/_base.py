@@ -1,36 +1,24 @@
-"""This module defines the abstract base classes for function estimators."""
+"""This module defines the abstract base class for function estimators."""
 
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from ropt.plugins.base import Plugin
-
 if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
-
-    from ropt.config import EnOptConfig
 
 
 class FunctionEstimator(ABC):
     """Abstract Base Class for Function Estimator Implementations.
 
     This class defines the fundamental interface for all concrete function
-    estimator implementations within the `ropt` framework. Function estimator
-    plugins provide classes derived from `FunctionEstimator` that encapsulate
+    estimator implementations within the `ropt` framework. Function estimators
+    provide classes derived from `FunctionEstimator` that encapsulate
     the logic for combining the objective function values and gradients from an
     ensemble of realizations into a single representative value. This aggregated
     value is then used by the core optimization algorithm.
-
-    Instances of `FunctionEstimator` subclasses are created by their
-    corresponding
-    [`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.base.FunctionEstimatorPlugin]
-    factories. They are initialized with an
-    [`EnOptConfig`][ropt.config.EnOptConfig] object detailing the optimization
-    setup and the `estimator_index` identifying the specific estimator
-    configuration to use from the config.
 
     The core functionality involves combining results using realization weights,
     performed by the `calculate_function` and `calculate_gradient` methods,
@@ -38,25 +26,10 @@ class FunctionEstimator(ABC):
 
     Subclasses must implement:
 
-    - `__init__`: To accept the configuration and index.
     - `calculate_function`: To combine function values from realizations.
     - `calculate_gradient`: To combine gradient values from realizations.
 
     """
-
-    def __init__(self, enopt_config: EnOptConfig, estimator_index: int) -> None:  # noqa: B027
-        """Initialize the function estimator object.
-
-        The `function_estimators` field in the `enopt_config` is a tuple of
-        estimator configurations
-        ([`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig]). The
-        `estimator_index` identifies which configuration from this tuple should
-        be used to initialize this specific estimator instance.
-
-        Args:
-            enopt_config:    The configuration of the optimizer.
-            estimator_index: The index of the estimator configuration to use.
-        """
 
     @abstractmethod
     def calculate_function(
@@ -122,46 +95,4 @@ class FunctionEstimator(ABC):
 
         Returns:
             The expected gradients.
-        """
-
-
-class FunctionEstimatorPlugin(Plugin):
-    """Abstract Base Class for Function Estimator Plugins (Factories).
-
-    This class defines the interface for plugins responsible for creating
-    [`FunctionEstimator`][ropt.plugins.function_estimator.base.FunctionEstimator]
-    instances. These plugins act as factories for specific function estimation
-    strategies.
-
-    During optimization execution, the
-    [`PluginManager`][ropt.plugins.manager.PluginManager] identifies the
-    appropriate function estimator plugin based on the configuration and uses
-    its `create` class method to instantiate the actual `FunctionEstimator`
-    object that will perform the aggregation of ensemble results (function
-    values and gradients).
-    """
-
-    @classmethod
-    @abstractmethod
-    def create(
-        cls, enopt_config: EnOptConfig, estimator_index: int
-    ) -> FunctionEstimator:
-        """Factory method to create a concrete FunctionEstimator instance.
-
-        This abstract class method serves as a factory for creating concrete
-        [`FunctionEstimator`][ropt.plugins.function_estimator.base.FunctionEstimator]
-        objects. Plugin implementations must override this method to return an
-        instance of their specific `FunctionEstimator` subclass.
-
-        The [`PluginManager`][ropt.plugins.manager.PluginManager] calls this
-        method when the optimization requires a function estimator provided by
-        this plugin.
-
-        Args:
-            enopt_config:    The main EnOpt configuration object.
-            estimator_index: Index into `enopt_config.function_estimators` for
-                             this estimator.
-
-        Returns:
-            An initialized FunctionEstimator object ready for use.
         """

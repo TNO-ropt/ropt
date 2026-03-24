@@ -1,7 +1,9 @@
 ::: ropt.plugins.optimizer
-::: ropt.plugins.optimizer.base.OptimizerPlugin
-::: ropt.plugins.optimizer.base.Optimizer
-::: ropt.plugins.optimizer.utils
+::: ropt.plugins.optimizer.OptimizerPlugin
+
+::: ropt.optimizer
+::: ropt.optimizer.Optimizer
+::: ropt.optimizer.utils
 
 ::: ropt.plugins.optimizer.scipy.SciPyOptimizer
     options:
