@@ -4,7 +4,7 @@ import numpy as np
 from numpy.random import Generator
 from numpy.typing import NDArray
 
-from ropt.config import EnOptConfig
+from ropt.config import EnOptConfig, SamplerConfig
 from ropt.sampler.scipy import SCIPY_SAMPLER_SUPPORTED_METHODS, SciPySampler
 
 from ._base import SamplerPlugin
@@ -27,7 +27,9 @@ class SciPySamplerPlugin(SamplerPlugin):
 
         # noqa
         """  # noqa: DOC201
-        return SciPySampler(enopt_config, sampler_index, mask, rng)
+        sampler_config = enopt_config.samplers[sampler_index]
+        assert isinstance(sampler_config, SamplerConfig)
+        return SciPySampler(enopt_config, sampler_config, mask, rng)
 
     @classmethod
     def is_supported(cls, method: str) -> bool:

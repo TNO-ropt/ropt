@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
-    from ropt.transforms import OptModelTransforms
+    from ropt.config import EnOptConfig
 
 
 @dataclass(slots=True)
@@ -146,32 +146,34 @@ class FunctionEvaluations(ResultField):
             evaluation_info={} if evaluation_info is None else evaluation_info,
         )
 
-    def transform_from_optimizer(
-        self, transforms: OptModelTransforms
-    ) -> FunctionEvaluations:
+    def transform_from_optimizer(self, config: EnOptConfig) -> FunctionEvaluations:
         """Apply transformations from optimizer space.
 
         Args:
-            transforms: The transforms to apply.
+            config: The ensemble optimizer configuration object.
 
         Returns:
             The transformed results.
         """
+        assert config.transforms is not None
         return FunctionEvaluations(
             variables=(
                 self.variables
-                if transforms.variables is None
-                else transforms.variables.from_optimizer(self.variables)
+                if config.transforms.variables is None
+                else config.transforms.variables.from_optimizer(self.variables)
             ),
             objectives=(
                 self.objectives
-                if transforms.objectives is None
-                else transforms.objectives.from_optimizer(self.objectives)
+                if config.transforms.objectives is None
+                else config.transforms.objectives.from_optimizer(self.objectives)
             ),
             constraints=(
                 self.constraints
-                if self.constraints is None or transforms.nonlinear_constraints is None
-                else transforms.nonlinear_constraints.from_optimizer(self.constraints)
+                if self.constraints is None
+                or config.transforms.nonlinear_constraints is None
+                else config.transforms.nonlinear_constraints.from_optimizer(
+                    self.constraints
+                )
             ),
             evaluation_info=self.evaluation_info,
         )

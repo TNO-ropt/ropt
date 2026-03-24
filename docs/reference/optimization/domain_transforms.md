@@ -2,7 +2,7 @@
     options:
         members: []
 ::: ropt.transforms.OptModelTransforms
-::: ropt.transforms.base.VariableTransform
-::: ropt.transforms.base.ObjectiveTransform
-::: ropt.transforms.base.NonLinearConstraintTransform
+::: ropt.transforms.VariableTransform
+::: ropt.transforms.ObjectiveTransform
+::: ropt.transforms.NonLinearConstraintTransform
 ::: ropt.transforms.VariableScaler

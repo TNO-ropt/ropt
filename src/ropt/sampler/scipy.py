@@ -70,7 +70,7 @@ class SciPySampler(Sampler):
     def __init__(
         self,
         enopt_config: EnOptConfig,
-        sampler_index: int,
+        sampler_config: SamplerConfig,
         mask: NDArray[np.bool_] | None,
         rng: Generator,
     ) -> None:
@@ -81,8 +81,6 @@ class SciPySampler(Sampler):
         # noqa
         """
         self._enopt_config = enopt_config
-        sampler_config = enopt_config.samplers[sampler_index]
-        assert isinstance(sampler_config, SamplerConfig)
         self._sampler_config = sampler_config
         self._mask = mask
         _, _, self._method = self._sampler_config.method.lower().rpartition("/")

@@ -229,7 +229,7 @@ class VariableScaler(VariableTransform):
 
         This is implemented by re-scaling the equations with the weights that
         were determined and stored by the
-        [`linear_constraints_to_optimizer`][ropt.transforms.base.VariableTransform.linear_constraints_to_optimizer]
+        [`linear_constraints_to_optimizer`][ropt.transforms.VariableTransform.linear_constraints_to_optimizer]
         method.
 
         Args:

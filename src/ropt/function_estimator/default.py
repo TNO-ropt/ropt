@@ -42,7 +42,9 @@ class DefaultFunctionEstimator(FunctionEstimator):
         for gradient calculation.
     """
 
-    def __init__(self, enopt_config: EnOptConfig, estimator_index: int) -> None:
+    def __init__(
+        self, enopt_config: EnOptConfig, estimator_config: FunctionEstimatorConfig
+    ) -> None:
         """Initialize the function estimator object.
 
         See the
@@ -52,8 +54,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
         # noqa
         """  # noqa: DOC501
         self._enopt_config = enopt_config
-        self._estimator_config = enopt_config.function_estimators[estimator_index]
-        assert isinstance(self._estimator_config, FunctionEstimatorConfig)
+        self._estimator_config = estimator_config
         _, _, self._method = self._estimator_config.method.lower().rpartition("/")
         if self._method == "default":
             self._method = "mean"

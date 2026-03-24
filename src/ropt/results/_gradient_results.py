@@ -60,7 +60,7 @@ class GradientResults(Results):
             batch_id=self.batch_id,
             metadata=self.metadata,
             names=self.names,
-            evaluations=self.evaluations.transform_from_optimizer(config.transforms),
+            evaluations=self.evaluations.transform_from_optimizer(config),
             realizations=self.realizations,
             gradients=(
                 None

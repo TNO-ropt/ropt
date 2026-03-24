@@ -14,7 +14,6 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.config import EnOptConfig
-    from ropt.transforms import OptModelTransforms
 
 
 @dataclass(slots=True)
@@ -205,37 +204,39 @@ class ConstraintInfo(ResultField):
 
         return None
 
-    def transform_from_optimizer(
-        self, transforms: OptModelTransforms
-    ) -> ConstraintInfo:
-        if transforms.variables is None and transforms.nonlinear_constraints is None:
+    def transform_from_optimizer(self, config: EnOptConfig) -> ConstraintInfo:
+        assert config.transforms is not None
+        if (
+            config.transforms.variables is None
+            and config.transforms.nonlinear_constraints is None
+        ):
             return self
 
         diffs: dict[str, NDArray[np.float64] | None] = asdict(self)
 
-        if transforms.variables is not None and self.bound_lower is not None:
+        if config.transforms.variables is not None and self.bound_lower is not None:
             assert self.bound_upper is not None
             diffs["bound_lower"], diffs["bound_upper"] = (
-                transforms.variables.bound_constraint_diffs_from_optimizer(
+                config.transforms.variables.bound_constraint_diffs_from_optimizer(
                     self.bound_lower, self.bound_upper
                 )
             )
 
-        if transforms.variables is not None and self.linear_lower is not None:
+        if config.transforms.variables is not None and self.linear_lower is not None:
             assert self.linear_upper is not None
             diffs["linear_lower"], diffs["linear_upper"] = (
-                transforms.variables.linear_constraints_diffs_from_optimizer(
+                config.transforms.variables.linear_constraints_diffs_from_optimizer(
                     self.linear_lower, self.linear_upper
                 )
             )
 
         if (
-            transforms.nonlinear_constraints is not None
+            config.transforms.nonlinear_constraints is not None
             and self.nonlinear_lower is not None
         ):
             assert self.nonlinear_upper is not None
             diffs["nonlinear_lower"], diffs["nonlinear_upper"] = (
-                transforms.nonlinear_constraints.nonlinear_constraint_diffs_from_optimizer(
+                config.transforms.nonlinear_constraints.nonlinear_constraint_diffs_from_optimizer(
                     self.nonlinear_lower, self.nonlinear_upper
                 )
             )

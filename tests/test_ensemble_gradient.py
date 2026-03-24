@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from numpy.random import default_rng
 
-from ropt.config import EnOptConfig
+from ropt.config import EnOptConfig, SamplerConfig
 from ropt.core._gradient import _apply_bounds, _perturb_variables
 from ropt.enums import BoundaryType
 from ropt.sampler.scipy import SciPySampler
@@ -269,6 +269,6 @@ def test_variable_perturbation_enopt() -> None:
     }
 
     config = EnOptConfig.model_validate(config_dict)
-    sampler = SciPySampler(config, 0, None, default_rng(123))
+    sampler = SciPySampler(config, SamplerConfig(), None, default_rng(123))
     perturbations = _perturb_variables(config, np.array(variables), [sampler])
     assert expected_perturbations == pytest.approx(perturbations)

@@ -1,6 +1,6 @@
 """This plugin contains realization filters that are installed by default."""
 
-from ropt.config import EnOptConfig
+from ropt.config import EnOptConfig, RealizationFilterConfig
 from ropt.realization_filter.default import (
     DEFAULT_REALIZATION_FILTER_METHODS,
     DefaultRealizationFilter,
@@ -23,7 +23,9 @@ class DefaultRealizationFilterPlugin(RealizationFilterPlugin):
 
         # noqa
         """  # noqa: DOC201
-        return DefaultRealizationFilter(enopt_config, filter_index)
+        filter_config = enopt_config.realization_filters[filter_index]
+        assert isinstance(filter_config, RealizationFilterConfig)
+        return DefaultRealizationFilter(enopt_config, filter_config)
 
     @classmethod
     def is_supported(cls, method: str) -> bool:

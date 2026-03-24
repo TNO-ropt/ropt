@@ -67,7 +67,7 @@ class FunctionResults(Results):
             batch_id=self.batch_id,
             metadata=self.metadata,
             names=self.names,
-            evaluations=self.evaluations.transform_from_optimizer(config.transforms),
+            evaluations=self.evaluations.transform_from_optimizer(config),
             realizations=self.realizations,
             functions=(
                 None
@@ -77,6 +77,6 @@ class FunctionResults(Results):
             constraint_info=(
                 None
                 if self.constraint_info is None
-                else self.constraint_info.transform_from_optimizer(config.transforms)
+                else self.constraint_info.transform_from_optimizer(config)
             ),
         )

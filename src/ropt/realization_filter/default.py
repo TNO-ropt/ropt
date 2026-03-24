@@ -210,7 +210,9 @@ class DefaultRealizationFilter(RealizationFilter):
         [`CVaRConstraintOptions`][ropt.realization_filter.default.CVaRConstraintOptions].
     """
 
-    def __init__(self, enopt_config: EnOptConfig, filter_index: int) -> None:  # D107
+    def __init__(
+        self, enopt_config: EnOptConfig, filter_config: RealizationFilterConfig
+    ) -> None:  # D107
         """Initialize the realization filter plugin.
 
         See the
@@ -219,8 +221,8 @@ class DefaultRealizationFilter(RealizationFilter):
 
         # noqa
         """  # noqa: DOC501
-        self._filter_config = enopt_config.realization_filters[filter_index]
         self._enopt_config = enopt_config
+        self._filter_config = filter_config
         self._filter_options: (
             SortObjectiveOptions
             | SortConstraintOptions

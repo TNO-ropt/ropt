@@ -23,33 +23,33 @@ class VariableTransform(ABC):
 
     - **Variable Value Transformation:** Mapping variable values between the
       user and optimizer domains. This is achieved by overriding the
-      [`to_optimizer`][ropt.transforms.base.VariableTransform.to_optimizer]
+      [`to_optimizer`][ropt.transforms.VariableTransform.to_optimizer]
       and
-      [`from_optimizer`][ropt.transforms.base.VariableTransform.from_optimizer]
+      [`from_optimizer`][ropt.transforms.VariableTransform.from_optimizer]
       methods.
     - **Perturbation Magnitude Transformation:** Stochastic gradient-based
       algorithms use perturbations with specified magnitudes (see
       [`perturbation_magnitudes`][ropt.config.GradientConfig]). These magnitudes
       are typically defined in the user domain and must be transformed to the
       optimizer domain using the
-      [`magnitudes_to_optimizer`][ropt.transforms.base.VariableTransform.magnitudes_to_optimizer]
+      [`magnitudes_to_optimizer`][ropt.transforms.VariableTransform.magnitudes_to_optimizer]
       method.
     - **Bound Constraint Difference Transformation:** To report violations of
       variable bounds, the differences between variable values and their
       lower/upper bounds must be transformed from the optimizer domain back
       to the user domain. This is done using the
-      [`bound_constraint_diffs_from_optimizer`][ropt.transforms.base.VariableTransform.bound_constraint_diffs_from_optimizer]
+      [`bound_constraint_diffs_from_optimizer`][ropt.transforms.VariableTransform.bound_constraint_diffs_from_optimizer]
       method.
     - **Linear Constraint Transformation:** Linear constraints are generally
       defined by coefficients and right-hand-side values in the user domain.
       These must be transformed to the optimizer domain using the
-      [`linear_constraints_to_optimizer`][ropt.transforms.base.VariableTransform.linear_constraints_to_optimizer]
+      [`linear_constraints_to_optimizer`][ropt.transforms.VariableTransform.linear_constraints_to_optimizer]
       method.
     - **Linear Constraint Difference Transformation:** To report violations of
       linear constraints, the differences between the linear constraint
       values and their right-hand-side values must be transformed back to the
       user domain. This is done using the
-      [`linear_constraints_diffs_from_optimizer`][ropt.transforms.base.VariableTransform.linear_constraints_diffs_from_optimizer]
+      [`linear_constraints_diffs_from_optimizer`][ropt.transforms.VariableTransform.linear_constraints_diffs_from_optimizer]
       method.
     """
 
@@ -210,8 +210,8 @@ class ObjectiveTransform(ABC):
     the user-defined domain and the optimizer's internal domain. Concrete
     implementations of this class handle the specific logic for each type of
     objective transformation. This is achieved by overriding the
-    [`to_optimizer`][ropt.transforms.base.ObjectiveTransform.to_optimizer] and
-    [`from_optimizer`][ropt.transforms.base.ObjectiveTransform.from_optimizer]
+    [`to_optimizer`][ropt.transforms.ObjectiveTransform.to_optimizer] and
+    [`from_optimizer`][ropt.transforms.ObjectiveTransform.from_optimizer]
     methods.
     """
 
@@ -270,20 +270,20 @@ class NonLinearConstraintTransform(ABC):
 
     - **Constraint Value Transformation:** Mapping constraint values between the
       user and optimizer domains. This is achieved by overriding the
-      [`to_optimizer`][ropt.transforms.base.NonLinearConstraintTransform.to_optimizer]
+      [`to_optimizer`][ropt.transforms.NonLinearConstraintTransform.to_optimizer]
       and
-      [`from_optimizer`][ropt.transforms.base.NonLinearConstraintTransform.from_optimizer]
+      [`from_optimizer`][ropt.transforms.NonLinearConstraintTransform.from_optimizer]
       methods.
     - **Right-Hand-Side Bound Transformation:** Mapping the right-hand-side
       bounds of the constraints between the user and optimizer domains. This is
       achieved by overriding the
-      [`bounds_to_optimizer`][ropt.transforms.base.NonLinearConstraintTransform.bounds_to_optimizer]
+      [`bounds_to_optimizer`][ropt.transforms.NonLinearConstraintTransform.bounds_to_optimizer]
       method.
     - **Constraint Difference Transformation:** To report violations of
       nonlinear constraints, the differences between constraint values and their
       lower/upper bounds must be transformed from the optimizer domain back to
       the user domain. This is done using the
-      [`nonlinear_constraint_diffs_from_optimizer`][ropt.transforms.base.NonLinearConstraintTransform.nonlinear_constraint_diffs_from_optimizer]
+      [`nonlinear_constraint_diffs_from_optimizer`][ropt.transforms.NonLinearConstraintTransform.nonlinear_constraint_diffs_from_optimizer]
       method.
     """
 

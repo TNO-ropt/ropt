@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
-    from ropt.transforms import OptModelTransforms
+    from ropt.config import EnOptConfig
 
 
 @dataclass(slots=True)
@@ -187,40 +187,43 @@ class GradientEvaluations(ResultField):
             evaluation_info={} if evaluation_info is None else evaluation_info,
         )
 
-    def transform_from_optimizer(
-        self, transforms: OptModelTransforms
-    ) -> GradientEvaluations:
+    def transform_from_optimizer(self, config: EnOptConfig) -> GradientEvaluations:
         """Apply transformations from optimizer space.
 
         Args:
-            transforms: The transforms to apply.
+            config: The ensemble optimizer configuration object.
 
         Returns:
             The transformed results.
         """
+        assert config.transforms is not None
         return GradientEvaluations(
             variables=(
                 self.variables
-                if transforms.variables is None
-                else transforms.variables.from_optimizer(self.variables)
+                if config.transforms.variables is None
+                else config.transforms.variables.from_optimizer(self.variables)
             ),
             perturbed_variables=(
                 self.perturbed_variables
-                if transforms.variables is None
-                else transforms.variables.from_optimizer(self.perturbed_variables)
+                if config.transforms.variables is None
+                else config.transforms.variables.from_optimizer(
+                    self.perturbed_variables
+                )
             ),
             perturbed_objectives=(
                 self.perturbed_objectives
-                if transforms.objectives is None
-                else transforms.objectives.from_optimizer(self.perturbed_objectives)
+                if config.transforms.objectives is None
+                else config.transforms.objectives.from_optimizer(
+                    self.perturbed_objectives
+                )
             ),
             perturbed_constraints=(
                 self.perturbed_constraints
                 if (
                     self.perturbed_constraints is None
-                    or transforms.nonlinear_constraints is None
+                    or config.transforms.nonlinear_constraints is None
                 )
-                else transforms.nonlinear_constraints.from_optimizer(
+                else config.transforms.nonlinear_constraints.from_optimizer(
                     self.perturbed_constraints
                 )
             ),

@@ -19,13 +19,13 @@ for:
 
 - **Abstract Base Classes:** Transform classes derive from abstract base classes
   that define the specific mapping logic between domains.
-    - **[`VariableTransform`][ropt.transforms.base.VariableTransform]:**
+    - **[`VariableTransform`][ropt.transforms.VariableTransform]:**
       Defines the interface for transforming variables between user and
       optimizer domains.
-    - **[`ObjectiveTransform`][ropt.transforms.base.ObjectiveTransform]:**
+    - **[`ObjectiveTransform`][ropt.transforms.ObjectiveTransform]:**
       Defines the interface for transforming objective values between user
       and optimizer domains.
-    - **[`NonLinearConstraintTransform`][ropt.transforms.base.NonLinearConstraintTransform]:**
+    - **[`NonLinearConstraintTransform`][ropt.transforms.NonLinearConstraintTransform]:**
       Defines the interface for transforming non-linear constraint values
       between user and optimizer domains.
 - **[`OptModelTransforms`][ropt.transforms.OptModelTransforms]:**
@@ -73,9 +73,13 @@ for:
 """
 
 from ._transforms import OptModelTransforms
+from .base import NonLinearConstraintTransform, ObjectiveTransform, VariableTransform
 from .variable_scaler import VariableScaler
 
 __all__ = [
+    "NonLinearConstraintTransform",
+    "ObjectiveTransform",
     "OptModelTransforms",
     "VariableScaler",
+    "VariableTransform",
 ]

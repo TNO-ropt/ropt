@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from ropt.config import EnOptConfig
+from ropt.config import EnOptConfig, FunctionEstimatorConfig
 from ropt.function_estimator.default import (
     DEFAULT_FUNCTION_ESTIMATOR_METHODS,
     DefaultFunctionEstimator,
@@ -30,7 +30,9 @@ class DefaultFunctionEstimatorPlugin(FunctionEstimatorPlugin):
 
         # noqa
         """  # noqa: DOC201
-        return DefaultFunctionEstimator(enopt_config, estimator_index)
+        estimator_config = enopt_config.function_estimators[estimator_index]
+        assert isinstance(estimator_config, FunctionEstimatorConfig)
+        return DefaultFunctionEstimator(enopt_config, estimator_config)
 
     @classmethod
     def is_supported(cls, method: str) -> bool:
