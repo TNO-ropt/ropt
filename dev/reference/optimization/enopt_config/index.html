@@ -724,6 +724,39 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.config.EnOptConfig.variable_transform_instances" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        variable_transform_instances
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.EnOptConfig.objective_transform_instances" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        objective_transform_instances
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.EnOptConfig.nonlinear_constraint_transform_instances" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        nonlinear_constraint_transform_instances
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1858,6 +1891,39 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#ropt.config.EnOptConfig.variable_transform_instances" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        variable_transform_instances
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.EnOptConfig.objective_transform_instances" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        objective_transform_instances
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ropt.config.EnOptConfig.nonlinear_constraint_transform_instances" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        nonlinear_constraint_transform_instances
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -2401,6 +2467,17 @@ transformations that are applied to the input upon creation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
+            <td><code><span title="ropt.config.EnOptConfig.variable_transforms">variable_transforms</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.config._transform_config.VariableTransformConfig">VariableTransformConfig</span>, ...]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration for variable transforms.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code><span title="ropt.config.EnOptConfig.names">names</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>, ...]]</code>
@@ -2451,6 +2528,97 @@ transformations that are applied to the input upon creation.</p>
     <div class="doc doc-contents ">
 
         <p>Return the transforms, if any.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.config.EnOptConfig.variable_transform_instances" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">variable_transform_instances</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">variable_transform_instances</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">VariableTransform</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the variable transform instances.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.config.EnOptConfig.objective_transform_instances" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">objective_transform_instances</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">objective_transform_instances</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">ObjectiveTransform</span><span class="p">,</span> <span class="o">...</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the objective transform instances.</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="ropt.config.EnOptConfig.nonlinear_constraint_transform_instances" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">nonlinear_constraint_transform_instances</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+</h4>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">nonlinear_constraint_transform_instances</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">NonLinearConstraintTransform</span><span class="p">,</span> <span class="o">...</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">]</span>
+</span></code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the nonlinear constraint transform instances.</p>
 
     </div>
 
@@ -2732,6 +2900,22 @@ conditions (see <a class="autorefs autorefs-internal" title="            Boundar
               </div>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.VariablesConfig.transforms">transforms</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Array1DInt
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.Array1DInt)" href="../../miscellaneous/utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Indices of the variable transforms to apply for each variable.</p>
+              </div>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -2858,6 +3042,22 @@ at all.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional indices of function estimators.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.ObjectiveFunctionsConfig.transforms">transforms</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Array1DInt
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.Array1DInt)" href="../../miscellaneous/utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional indices of objective transforms.</p>
               </div>
             </td>
           </tr>
@@ -3143,6 +3343,22 @@ applied at all.</p>
             <td>
               <div class="doc-md-description">
                 <p>Optional indices of function estimators.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.NonlinearConstraintsConfig.transforms">transforms</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="            Array1DInt
+
+
+  
+      module-attribute
+   (ropt.config.validated_types.Array1DInt)" href="../../miscellaneous/utilities/#ropt.config.validated_types.Array1DInt">Array1DInt</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional indices of constraint transforms.</p>
               </div>
             </td>
           </tr>
