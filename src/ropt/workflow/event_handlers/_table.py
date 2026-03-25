@@ -217,12 +217,7 @@ class Table(EventHandler):
         """
         if not (results := event.results):
             return
-        results = tuple(
-            item
-            if event.config.transforms is None
-            else item.transform_from_optimizer(event.config)
-            for item in results
-        )
+        results = tuple(item.transform_from_optimizer(event.config) for item in results)
 
         done = [table.add_results(results) for table in self._tables.values()]
         if any(done) and self._callback is not None:

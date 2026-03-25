@@ -155,25 +155,28 @@ class FunctionEvaluations(ResultField):
         Returns:
             The transformed results.
         """
-        assert config.transforms is not None
+        if (
+            not config.variable_transform_instances
+            and not config.objective_transform_instances
+            and not config.nonlinear_constraint_transform_instances
+        ):
+            return self
+
+        variables = self.variables
+        objectives = self.objectives
+        constraints = self.constraints
+
+        for variable_transform in config.variable_transform_instances:
+            variables = variable_transform.from_optimizer(variables)
+        for objective_transform in config.objective_transform_instances:
+            objectives = objective_transform.from_optimizer(objectives)
+        if constraints is not None:
+            for constraint_transform in config.nonlinear_constraint_transform_instances:
+                constraints = constraint_transform.from_optimizer(constraints)
+
         return FunctionEvaluations(
-            variables=(
-                self.variables
-                if config.transforms.variables is None
-                else config.transforms.variables.from_optimizer(self.variables)
-            ),
-            objectives=(
-                self.objectives
-                if config.transforms.objectives is None
-                else config.transforms.objectives.from_optimizer(self.objectives)
-            ),
-            constraints=(
-                self.constraints
-                if self.constraints is None
-                or config.transforms.nonlinear_constraints is None
-                else config.transforms.nonlinear_constraints.from_optimizer(
-                    self.constraints
-                )
-            ),
+            variables=variables,
+            objectives=objectives,
+            constraints=constraints,
             evaluation_info=self.evaluation_info,
         )

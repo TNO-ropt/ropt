@@ -642,7 +642,7 @@ class EnsembleEvaluator:
             variable_indices = np.asarray(
                 self._config.variables.mask & (self._config.variables.samplers == idx)
             )
-            if variable_indices is None or variable_indices.size:
+            if variable_indices.size:
                 plugin = (
                     item
                     if isinstance(item, Sampler)

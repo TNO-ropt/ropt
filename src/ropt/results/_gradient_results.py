@@ -55,7 +55,6 @@ class GradientResults(Results):
         Returns:
             The transformed results.
         """
-        assert config.transforms is not None
         return GradientResults(
             batch_id=self.batch_id,
             metadata=self.metadata,

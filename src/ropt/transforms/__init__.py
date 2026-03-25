@@ -28,16 +28,11 @@ for:
     - **[`NonLinearConstraintTransform`][ropt.transforms.NonLinearConstraintTransform]:**
       Defines the interface for transforming non-linear constraint values
       between user and optimizer domains.
-- **[`OptModelTransforms`][ropt.transforms.OptModelTransforms]:**
-  A container class for conveniently grouping and
-  passing multiple transformation objects (variable, objective, and
-  nonlinear constraint).
 
 **Workflow and Integration:**
 
 1.  **Configuration:** Transformation objects are passed to the
-    [`EnOptConfig`][ropt.config.EnOptConfig] during configuration validation,
-    using an [`OptModelTransforms`][ropt.transforms.OptModelTransforms]
+    [`EnOptConfig`][ropt.config.EnOptConfig] during configuration validation.
     instance. This ensures that the entire optimization process is aware of and
     configured for the transformed space. The transformation objects are stored
     in the configuration object.
@@ -72,14 +67,10 @@ for:
     method.
 """
 
-from ._transforms import OptModelTransforms
 from .base import NonLinearConstraintTransform, ObjectiveTransform, VariableTransform
-from .variable_scaler import VariableScaler
 
 __all__ = [
     "NonLinearConstraintTransform",
     "ObjectiveTransform",
-    "OptModelTransforms",
-    "VariableScaler",
     "VariableTransform",
 ]

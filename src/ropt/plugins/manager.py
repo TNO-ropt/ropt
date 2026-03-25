@@ -2,14 +2,8 @@
 
 from __future__ import annotations
 
-from functools import cache
 from importlib.metadata import entry_points
 from typing import TYPE_CHECKING, Any, Final, Literal, cast
-
-from .function_estimator import FunctionEstimatorPlugin
-from .optimizer import OptimizerPlugin
-from .realization_filter import RealizationFilterPlugin
-from .sampler import SamplerPlugin
 
 if TYPE_CHECKING:
     from ropt.plugins.base import Plugin
@@ -20,36 +14,25 @@ PluginType = Literal[
     "sampler",
     "realization_filter",
     "function_estimator",
+    "variable_transform",
+    "objective_transform",
+    "nonlinear_constraint_transform",
 ]
 """Represents the valid types of plugins supported by `ropt`.
 
 This type alias defines the string identifiers used to categorize different
-plugins within the `ropt` framework. Each identifier corresponds to a specific
-role in the optimization process:
-
-* `"optimizer"`: Plugins implementing optimization algorithms
-  ([`OptimizerPlugin`][ropt.plugins.optimizer.OptimizerPlugin]).
-* `"sampler"`: Plugins for generating parameter samples
-  ([`SamplerPlugin`][ropt.plugins.sampler.SamplerPlugin]).
-* `"realization_filter"`: Plugins for filtering ensemble realizations
-  ([`RealizationFilterPlugin`][ropt.plugins.realization_filter.RealizationFilterPlugin]).
-* `"function_estimator"`: Plugins for estimating objective functions and gradients
-  ([`FunctionEstimatorPlugin`][ropt.plugins.function_estimator.FunctionEstimatorPlugin]).
+plugins within the `ropt` framework.
 """
 
-
-_PLUGIN_TYPES: Final = {
-    "function_estimator": FunctionEstimatorPlugin,
-    "optimizer": OptimizerPlugin,
-    "sampler": SamplerPlugin,
-    "realization_filter": RealizationFilterPlugin,
-}
 
 _DEFAULT_PLUGINS: Final = {
     "function_estimator": "default",
     "optimizer": "scipy",
     "sampler": "scipy",
     "realization_filter": "default",
+    "variable_transform": "default",
+    "objective_transform": "default",
+    "nonlinear_constraint_transform": "default",
 }
 
 
@@ -92,6 +75,28 @@ class PluginManager:
 
     def __init__(self) -> None:
         """Initialize the plugin manager."""
+        # ruff: disable[PLC0415]
+        from .function_estimator import FunctionEstimatorPlugin
+        from .optimizer import OptimizerPlugin
+        from .realization_filter import RealizationFilterPlugin
+        from .sampler import SamplerPlugin
+        from .transforms import (
+            NonlinearConstraintTransformPlugin,
+            ObjectiveTransformPlugin,
+            VariableTransformPlugin,
+        )
+        # ruff: enable[PLC0415]
+
+        self._PLUGIN_TYPES: Final = {
+            "function_estimator": FunctionEstimatorPlugin,
+            "optimizer": OptimizerPlugin,
+            "sampler": SamplerPlugin,
+            "realization_filter": RealizationFilterPlugin,
+            "variable_transform": VariableTransformPlugin,
+            "objective_transform": ObjectiveTransformPlugin,
+            "nonlinear_constraint_transform": NonlinearConstraintTransformPlugin,
+        }
+
         self._plugins: dict[PluginType, dict[str, type[Plugin]]] = {}
         self._init()
 
@@ -105,6 +110,11 @@ class PluginManager:
         from .function_estimator.default import DefaultFunctionEstimatorPlugin
         from .optimizer.external import ExternalOptimizerPlugin
         from .optimizer.scipy import SciPyOptimizerPlugin
+        from .transforms.default import (
+            DefaultVariableTransformPlugin,
+            DefaultObjectiveTransformPlugin,
+            DefaultNonlinearConstraintTransformPlugin,
+        )
 
         self._add_plugin("optimizer", "scipy", SciPyOptimizerPlugin)
         self._add_plugin("optimizer", "external", ExternalOptimizerPlugin)
@@ -115,10 +125,21 @@ class PluginManager:
         self._add_plugin(
             "function_estimator", "default", DefaultFunctionEstimatorPlugin
         )
+        self._add_plugin(
+            "variable_transform", "default", DefaultVariableTransformPlugin
+        )
+        self._add_plugin(
+            "objective_transform", "default", DefaultObjectiveTransformPlugin
+        )
+        self._add_plugin(
+            "nonlinear_constraint_transform",
+            "default",
+            DefaultNonlinearConstraintTransformPlugin,
+        )
 
-        for plugin_type in _PLUGIN_TYPES:
-            for name, plugin in _from_entry_points(plugin_type).items():
-                assert plugin_type in _PLUGIN_TYPES
+        for plugin_type in self._PLUGIN_TYPES:
+            for name, plugin in self._from_entry_points(plugin_type).items():
+                assert plugin_type in self._PLUGIN_TYPES
                 self._add_plugin(cast("PluginType", plugin_type), name, plugin)
         # ruff: enable[I001,PLC0415]
 
@@ -234,20 +255,20 @@ class PluginManager:
             return None
         return plugin[0]
 
-
-@cache  # Without the cache, repeated calls are very slow
-def _from_entry_points(plugin_type: str) -> dict[str, type[Plugin]]:
-    plugins: dict[str, type[Plugin]] = {}
-    for entry_point in entry_points().select(group=f"ropt.plugins.{plugin_type}"):
-        plugin = entry_point.load()
-        plugins[entry_point.name] = plugin
-        if not issubclass(plugins[entry_point.name], _PLUGIN_TYPES[plugin_type]):
-            msg = (
-                f"Incorrect type for {plugin_type} plugin `{entry_point.name}`"
-                f": {type(plugins[entry_point.name])}"
-            )
-            raise TypeError(msg)
-    return plugins
+    def _from_entry_points(self, plugin_type: str) -> dict[str, type[Plugin]]:
+        plugins: dict[str, type[Plugin]] = {}
+        for entry_point in entry_points().select(group=f"ropt.plugins.{plugin_type}"):
+            plugin = entry_point.load()
+            plugins[entry_point.name] = plugin
+            if not issubclass(
+                plugins[entry_point.name], self._PLUGIN_TYPES[plugin_type]
+            ):
+                msg = (
+                    f"Incorrect type for {plugin_type} plugin `{entry_point.name}`"
+                    f": {type(plugins[entry_point.name])}"
+                )
+                raise TypeError(msg)
+        return plugins
 
 
 _plugin_manager = None

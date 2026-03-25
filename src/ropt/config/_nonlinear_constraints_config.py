@@ -51,12 +51,14 @@ class NonlinearConstraintsConfig(BaseModel):
         upper_bounds:        Upper bounds for the right-hand-side values.
         realization_filters: Optional indices of realization filters.
         function_estimators: Optional indices of function estimators.
+        transforms:          Optional indices of constraint transforms.
     """
 
     lower_bounds: Array1D
     upper_bounds: Array1D
     realization_filters: Array1DInt = np.array(-1)
     function_estimators: Array1DInt = np.array(0)
+    transforms: Array1DInt = np.array(-1)
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -79,6 +81,9 @@ class NonlinearConstraintsConfig(BaseModel):
                 ),
                 "function_estimators": broadcast_1d_array(
                     self.function_estimators, "function_estimators", lower_bounds.size
+                ),
+                "transforms": broadcast_1d_array(
+                    self.transforms, "transforms", lower_bounds.size
                 ),
             }
         )

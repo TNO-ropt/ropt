@@ -325,20 +325,13 @@ class EnsembleOptimizer:
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]] | None:
         if self._enopt_config.nonlinear_constraints is None:
             return None
-        if (
-            self._enopt_config.transforms is not None
-            and self._enopt_config.transforms.nonlinear_constraints is not None
-        ):
-            return (
-                self._enopt_config.transforms.nonlinear_constraints.bounds_to_optimizer(
-                    self._enopt_config.nonlinear_constraints.lower_bounds,
-                    self._enopt_config.nonlinear_constraints.upper_bounds,
-                )
+        lower_bounds = self._enopt_config.nonlinear_constraints.lower_bounds
+        upper_bounds = self._enopt_config.nonlinear_constraints.upper_bounds
+        for transform in self._enopt_config.nonlinear_constraint_transform_instances:
+            lower_bounds, upper_bounds = transform.bounds_to_optimizer(
+                lower_bounds, upper_bounds
             )
-        return (
-            self._enopt_config.nonlinear_constraints.lower_bounds,
-            self._enopt_config.nonlinear_constraints.upper_bounds,
-        )
+        return lower_bounds, upper_bounds
 
 
 class _Redirector:

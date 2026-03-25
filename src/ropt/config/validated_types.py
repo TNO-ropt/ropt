@@ -35,6 +35,11 @@ from pydantic_core import core_schema
 from ropt.function_estimator import FunctionEstimator
 from ropt.realization_filter import RealizationFilter
 from ropt.sampler import Sampler
+from ropt.transforms import (
+    NonLinearConstraintTransform,
+    ObjectiveTransform,
+    VariableTransform,
+)
 
 from .utils import (
     _convert_1d_array,
@@ -73,16 +78,38 @@ FunctionEstimatorInstance = Annotated[
     FunctionEstimator,
     GetPydanticSchema(lambda _0, _1: core_schema.is_instance_schema(FunctionEstimator)),
 ]
-"""Validate that the value is an instance of FunctionEstimator."""
+"""Validate that the value is an instance of a FunctionEstimator."""
 
 RealizationFilterInstance = Annotated[
     RealizationFilter,
     GetPydanticSchema(lambda _0, _1: core_schema.is_instance_schema(RealizationFilter)),
 ]
-"""Validate that the value is an instance of RealizationFilter."""
+"""Validate that the value is an instance of a RealizationFilter."""
 
 SamplerInstance = Annotated[
     Sampler,
     GetPydanticSchema(lambda _0, _1: core_schema.is_instance_schema(Sampler)),
 ]
-"""Validate that the value is an instance of Sampler."""
+"""Validate that the value is an instance of a Sampler."""
+
+ObjectiveTransformInstance = Annotated[
+    ObjectiveTransform,
+    GetPydanticSchema(
+        lambda _0, _1: core_schema.is_instance_schema(ObjectiveTransform)
+    ),
+]
+"""Validate that the value is an instance of an ObjectiveTransform."""
+
+NonLinearConstraintTransformInstance = Annotated[
+    NonLinearConstraintTransform,
+    GetPydanticSchema(
+        lambda _0, _1: core_schema.is_instance_schema(NonLinearConstraintTransform)
+    ),
+]
+"""Validate that the value is an instance of a NonLinearConstraintTransform."""
+
+VariableTransformInstance = Annotated[
+    VariableTransform,
+    GetPydanticSchema(lambda _0, _1: core_schema.is_instance_schema(VariableTransform)),
+]
+"""Validate that the value is an instance of a VariableTransform."""

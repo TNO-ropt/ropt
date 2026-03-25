@@ -47,11 +47,13 @@ class ObjectiveFunctionsConfig(BaseModel):
         weights:             Weights for the objective functions (default: 1.0).
         realization_filters: Optional indices of realization filters.
         function_estimators: Optional indices of function estimators.
+        transforms:          Optional indices of objective transforms.
     """
 
     weights: Array1D = np.array(1.0)
     realization_filters: Array1DInt = np.array(-1)
     function_estimators: Array1DInt = np.array(0)
+    transforms: Array1DInt = np.array(-1)
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -71,6 +73,9 @@ class ObjectiveFunctionsConfig(BaseModel):
                 ),
                 "function_estimators": broadcast_1d_array(
                     self.function_estimators, "function_estimators", weights.size
+                ),
+                "transforms": broadcast_1d_array(
+                    self.transforms, "transforms", weights.size
                 ),
             }
         )

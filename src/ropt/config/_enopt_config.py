@@ -4,9 +4,17 @@ from __future__ import annotations
 
 from typing import Any, Self
 
-from pydantic import BaseModel, ConfigDict, PrivateAttr, ValidationInfo, model_validator
+import numpy as np
+from pydantic import BaseModel, ConfigDict, PrivateAttr, model_validator
 
-from ropt.transforms import OptModelTransforms  # noqa: TC001
+from ropt.config.utils import immutable_array
+from ropt.enums import PerturbationType
+from ropt.plugins.manager import get_plugin
+from ropt.transforms import (
+    NonLinearConstraintTransform,
+    ObjectiveTransform,
+    VariableTransform,
+)
 
 from ._function_estimator_config import FunctionEstimatorConfig
 from ._gradient_config import GradientConfig
@@ -17,11 +25,19 @@ from ._optimizer_config import OptimizerConfig
 from ._realization_filter_config import RealizationFilterConfig  # noqa: TC001
 from ._realizations_config import RealizationsConfig
 from ._sampler_config import SamplerConfig
+from ._transform_config import (  # noqa: TC001
+    NonlinearConstraintTransformConfig,
+    ObjectiveTransformConfig,
+    VariableTransformConfig,
+)
 from ._variables_config import VariablesConfig  # noqa: TC001
 from .validated_types import (  # noqa: TC001
     FunctionEstimatorInstance,
+    NonLinearConstraintTransformInstance,
+    ObjectiveTransformInstance,
     RealizationFilterInstance,
     SamplerInstance,
+    VariableTransformInstance,
 )
 
 
@@ -73,17 +89,20 @@ class EnOptConfig(BaseModel):
         transformations that are applied to the input upon creation.
 
     Attributes:
-        variables:             Configuration for the optimization variables.
-        objectives:            Configuration for the objective functions.
-        linear_constraints:    Configuration for linear constraints.
-        nonlinear_constraints: Configuration for non-linear constraints.
-        realizations:          Configuration for the realizations.
-        optimizer:             Configuration for the optimization algorithm.
-        gradient:              Configuration for gradient calculations.
-        realization_filters:   Configuration for realization filters.
-        function_estimators:   Configuration for function estimators.
-        samplers:              Configuration for samplers.
-        names:                 Optional mapping of axis types to names.
+        variables:                       Configuration for the optimization variables.
+        objectives:                      Configuration for the objective functions.
+        linear_constraints:              Configuration for linear constraints.
+        nonlinear_constraints:           Configuration for non-linear constraints.
+        realizations:                    Configuration for the realizations.
+        optimizer:                       Configuration for the optimization algorithm.
+        gradient:                        Configuration for gradient calculations.
+        realization_filters:             Configuration for realization filters.
+        function_estimators:             Configuration for function estimators.
+        samplers:                        Configuration for samplers.
+        variable_transforms:             Configuration for variable transforms.
+        objective_transforms:            Configuration for objective transforms.
+        nonlinear_constraint_transforms: Configuration for nonlinear constraint transforms.
+        names:                           Optional mapping of axis types to names.
     """
 
     variables: VariablesConfig
@@ -100,9 +119,22 @@ class EnOptConfig(BaseModel):
         FunctionEstimatorConfig | FunctionEstimatorInstance, ...
     ] = ()
     samplers: tuple[SamplerConfig | SamplerInstance, ...] = ()
+    variable_transforms: tuple[
+        VariableTransformConfig | VariableTransformInstance, ...
+    ] = ()
+    objective_transforms: tuple[
+        ObjectiveTransformConfig | ObjectiveTransformInstance, ...
+    ] = ()
+    nonlinear_constraint_transforms: tuple[
+        NonlinearConstraintTransformConfig | NonLinearConstraintTransformInstance, ...
+    ] = ()
     names: dict[str, tuple[str | int, ...]] = {}
 
-    _context: OptModelTransforms | None = PrivateAttr(default=None)
+    _variable_transforms: tuple[VariableTransform, ...] = PrivateAttr(default=())
+    _objective_transforms: tuple[ObjectiveTransform, ...] = PrivateAttr(default=())
+    _nonlinear_constraint_transforms: tuple[NonLinearConstraintTransform, ...] = (
+        PrivateAttr(default=())
+    )
 
     model_config = ConfigDict(
         extra="forbid",
@@ -141,11 +173,118 @@ class EnOptConfig(BaseModel):
         return handler(self)
 
     @model_validator(mode="after")
-    def store_context(self, info: ValidationInfo) -> Self:
-        object.__setattr__(self, "_context", info.context)  # noqa: PLC2801
+    def _initialize_variable_transforms(self) -> Self:
+        transforms: list[VariableTransform] = []
+        for idx, item in enumerate(self.variable_transforms):
+            mask = np.asarray(self.variables.mask & (self.variables.transforms == idx))
+            if mask.size:
+                if isinstance(item, VariableTransform):
+                    instance = item
+                else:
+                    plugin = get_plugin("variable_transform", method=item.method)
+                    instance = plugin.create(self.variable_transforms[idx])
+                instance.init(mask)
+                transforms.append(instance)
+        self._variable_transforms = tuple(transforms)
+
+        if self._variable_transforms:
+            lower_bounds = self.variables.lower_bounds
+            upper_bounds = self.variables.upper_bounds
+            magnitudes = self.variables.perturbation_magnitudes
+            for transform in self._variable_transforms:
+                lower_bounds = transform.to_optimizer(lower_bounds)
+                upper_bounds = transform.to_optimizer(upper_bounds)
+                magnitudes = transform.magnitudes_to_optimizer(magnitudes)
+            absolute = self.variables.perturbation_types == PerturbationType.ABSOLUTE
+            updated_variables = self.variables.model_copy(
+                update={
+                    "lower_bounds": immutable_array(lower_bounds),
+                    "upper_bounds": immutable_array(upper_bounds),
+                    "perturbation_magnitudes": immutable_array(
+                        np.where(
+                            absolute,
+                            magnitudes,
+                            self.variables.perturbation_magnitudes,
+                        )
+                    ),
+                }
+            )
+            object.__setattr__(self, "variables", updated_variables)  # noqa: PLC2801
+
+            if self.linear_constraints is not None:
+                coefficients = self.linear_constraints.coefficients
+                lower_bounds = self.linear_constraints.lower_bounds
+                upper_bounds = self.linear_constraints.upper_bounds
+
+                for transform in self._variable_transforms:
+                    coefficients, lower_bounds, upper_bounds = (
+                        transform.linear_constraints_to_optimizer(
+                            coefficients, lower_bounds, upper_bounds
+                        )
+                    )
+                updated_linear_constraints = self.model_copy(
+                    update={
+                        "coefficients": immutable_array(coefficients),
+                        "lower_bounds": immutable_array(lower_bounds),
+                        "upper_bounds": immutable_array(upper_bounds),
+                    }
+                )
+
+                object.__setattr__(  # noqa: PLC2801
+                    self, "linear_constraints", updated_linear_constraints
+                )
+
         return self
 
     @property
-    def transforms(self) -> OptModelTransforms | None:
-        """Return the transforms, if any."""
-        return self._context
+    def variable_transform_instances(self) -> tuple[VariableTransform, ...]:
+        """Return the variable transform instances."""
+        return self._variable_transforms
+
+    @model_validator(mode="after")
+    def _initialize_objective_transforms(self) -> Self:
+        transforms: list[ObjectiveTransform] = []
+        for idx, item in enumerate(self.objective_transforms):
+            mask = np.asarray(self.objectives.transforms == idx)
+            if mask.size:
+                if isinstance(item, ObjectiveTransform):
+                    instance = item
+                else:
+                    plugin = get_plugin("objective_transform", method=item.method)
+                    instance = plugin.create(self.objective_transforms[idx])
+                instance.init(mask)
+                transforms.append(instance)
+        self._objective_transforms = tuple(transforms)
+        return self
+
+    @property
+    def objective_transform_instances(self) -> tuple[ObjectiveTransform, ...]:
+        """Return the objective transform instances."""
+        return self._objective_transforms
+
+    @model_validator(mode="after")
+    def _initialize_nonlinear_constraint_transforms(self) -> Self:
+        if self.nonlinear_constraints is None:
+            return self
+        transforms: list[NonLinearConstraintTransform] = []
+        for idx, item in enumerate(self.nonlinear_constraint_transforms):
+            mask = np.asarray(self.nonlinear_constraints.transforms == idx)
+            if mask.size:
+                if isinstance(item, NonLinearConstraintTransform):
+                    instance = item
+                else:
+                    plugin = get_plugin(
+                        "nonlinear_constraint_transform", method=item.method
+                    )
+                    instance = plugin.create(self.nonlinear_constraint_transforms[idx])
+                instance.init(mask)
+                transforms.append(instance)
+        self._nonlinear_constraint_transforms = tuple(transforms)
+        return self
+
+    @property
+    def nonlinear_constraint_transform_instances(
+        self,
+    ) -> tuple[NonLinearConstraintTransform, ...]:
+        """Return the nonlinear constraint transform instances."""
+        return self._nonlinear_constraint_transforms

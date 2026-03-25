@@ -10,7 +10,6 @@ from ropt.config import (
     VariablesConfig,
 )
 from ropt.enums import BoundaryType, PerturbationType
-from ropt.transforms import OptModelTransforms, VariableScaler
 
 initial_values = np.array([1, 2])
 
@@ -204,6 +203,10 @@ def test_perturbation_types_with_scaler(enopt_config: Any) -> None:
     enopt_config["variables"]["variable_count"] = 3
     enopt_config["variables"]["lower_bounds"] = [0.0, 100.0, 0.0]
     enopt_config["variables"]["upper_bounds"] = [np.inf, 600.0, 1.0]
+    enopt_config["variables"]["transforms"] = [0]
+    enopt_config["variable_transforms"] = [
+        {"method": "scaler", "options": {"scales": [1.0, 1.0, 50.0]}},
+    ]
 
     enopt_config["variables"].update(
         {
@@ -215,10 +218,5 @@ def test_perturbation_types_with_scaler(enopt_config: Any) -> None:
             ],
         }
     )
-    config = EnOptConfig.model_validate(
-        enopt_config,
-        context=OptModelTransforms(
-            variables=VariableScaler(np.array([1.0, 1.0, 50.0]), None)
-        ),
-    )
+    config = EnOptConfig.model_validate(enopt_config)
     assert np.allclose(config.variables.perturbation_magnitudes, [0.1, 0.01, 0.02])

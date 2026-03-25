@@ -123,27 +123,19 @@ class Functions(ResultField):
         Returns:
             The transformed results.
         """
-        assert config.transforms is not None
         if (
-            config.transforms.objectives is None
-            and config.transforms.nonlinear_constraints is None
+            not config.objective_transform_instances
+            and not config.nonlinear_constraint_transform_instances
         ):
             return self
 
         objectives = self.objectives
-        assert config.transforms is not None
-        if config.transforms.objectives is not None:
-            objectives = config.transforms.objectives.from_optimizer(self.objectives)
-
-        assert config.transforms is not None
-        constraints = (
-            self.constraints
-            if self.constraints is None
-            or config.transforms.nonlinear_constraints is None
-            else config.transforms.nonlinear_constraints.from_optimizer(
-                self.constraints
-            )
-        )
+        constraints = self.constraints
+        for objective_transform in config.objective_transform_instances:
+            objectives = objective_transform.from_optimizer(objectives)
+        if constraints is not None:
+            for constraint_transform in config.nonlinear_constraint_transform_instances:
+                constraints = constraint_transform.from_optimizer(constraints)
 
         return Functions(
             target_objective=self.target_objective,

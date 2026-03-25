@@ -114,29 +114,19 @@ def _get_function_results(
         realizations=realizations,
         active=active_realizations[realizations],
     )
-    transforms = config.transforms
-    if transforms is not None and transforms.variables:
-        variables = transforms.variables.from_optimizer(variables)
+    for variable_transform in config.variable_transform_instances:
+        variables = variable_transform.from_optimizer(variables)
     evaluator_result = evaluator(np.repeat(variables, realization_num, axis=0), context)
-    if transforms is not None:
-        if transforms.objectives is not None:
-            evaluator_result.objectives = transforms.objectives.to_optimizer(
-                evaluator_result.objectives
-            )
-        if (
-            evaluator_result.constraints is not None
-            and transforms.nonlinear_constraints is not None
-        ):
-            evaluator_result.constraints = (
-                transforms.nonlinear_constraints.to_optimizer(
-                    evaluator_result.constraints
-                )
-            )
-    split_objectives = np.vsplit(evaluator_result.objectives, variables.shape[0])
+    objectives = evaluator_result.objectives
+    constraints = evaluator_result.constraints
+    for objective_transform in config.objective_transform_instances:
+        objectives = objective_transform.to_optimizer(objectives)
+    if constraints is not None:
+        for constraint_transform in config.nonlinear_constraint_transform_instances:
+            constraints = constraint_transform.to_optimizer(constraints)
+    split_objectives = np.vsplit(objectives, variables.shape[0])
     split_constraints = (
-        []
-        if evaluator_result.constraints is None
-        else np.vsplit(evaluator_result.constraints, variables.shape[0])
+        [] if constraints is None else np.vsplit(constraints, variables.shape[0])
     )
     split_infos = {
         key: np.split(value, variables.shape[0])
@@ -162,7 +152,6 @@ def _get_gradient_results(
     perturbed_variables: NDArray[np.float64],
     active_realizations: NDArray[np.bool_],
 ) -> _GradientEvaluatorResults:
-    transforms = config.transforms
     realization_num = config.realizations.weights.size
     perturbation_num = config.gradient.number_of_perturbations
     realizations = np.repeat(
@@ -177,27 +166,20 @@ def _get_gradient_results(
     variables: NDArray[np.float64] = perturbed_variables.reshape(
         -1, perturbed_variables.shape[-1]
     )
-    if transforms is not None and transforms.variables:
-        variables = transforms.variables.from_optimizer(variables)
+    for variable_transform in config.variable_transform_instances:
+        variables = variable_transform.from_optimizer(variables)
     evaluator_result = evaluator(variables, context)
-    if transforms is not None:
-        if transforms.objectives is not None:
-            evaluator_result.objectives = transforms.objectives.to_optimizer(
-                evaluator_result.objectives
-            )
-        if (
-            evaluator_result.constraints is not None
-            and transforms.nonlinear_constraints is not None
-        ):
-            evaluator_result.constraints = (
-                transforms.nonlinear_constraints.to_optimizer(
-                    evaluator_result.constraints
-                )
-            )
+    objectives = evaluator_result.objectives
+    constraints = evaluator_result.constraints
+    for objective_transform in config.objective_transform_instances:
+        objectives = objective_transform.to_optimizer(objectives)
+    if constraints is not None:
+        for constraint_transform in config.nonlinear_constraint_transform_instances:
+            constraints = constraint_transform.to_optimizer(constraints)
     return _GradientEvaluatorResults(
         batch_id=evaluator_result.batch_id,
-        perturbed_objectives=evaluator_result.objectives,
-        perturbed_constraints=evaluator_result.constraints,
+        perturbed_objectives=objectives,
+        perturbed_constraints=constraints,
         evaluation_info=evaluator_result.evaluation_info,
         realization_count=config.realizations.weights.size,
         perturbation_count=config.gradient.number_of_perturbations,
@@ -211,7 +193,6 @@ def _get_function_and_gradient_results(
     perturbed_variables: NDArray[np.float64],
     active_realizations: NDArray[np.bool_],
 ) -> tuple[_FunctionEvaluatorResults, _GradientEvaluatorResults]:
-    transforms = config.transforms
     realization_num = config.realizations.weights.size
     perturbation_num = config.gradient.number_of_perturbations
     realizations = np.arange(realization_num, dtype=np.intc)
@@ -238,32 +219,21 @@ def _get_function_and_gradient_results(
             perturbed_variables.reshape(-1, perturbed_variables.shape[-1]),
         ),
     )
-    if transforms is not None and transforms.variables:
-        all_variables = transforms.variables.from_optimizer(all_variables)
+    for variable_transform in config.variable_transform_instances:
+        all_variables = variable_transform.from_optimizer(all_variables)
     evaluator_result = evaluator(all_variables, context)
-    if transforms is not None:
-        if transforms.objectives is not None:
-            evaluator_result.objectives = transforms.objectives.to_optimizer(
-                evaluator_result.objectives
-            )
-        if (
-            evaluator_result.constraints is not None
-            and transforms.nonlinear_constraints is not None
-        ):
-            evaluator_result.constraints = (
-                transforms.nonlinear_constraints.to_optimizer(
-                    evaluator_result.constraints
-                )
-            )
+    objectives = evaluator_result.objectives
+    constraints = evaluator_result.constraints
+    for objective_transform in config.objective_transform_instances:
+        objectives = objective_transform.to_optimizer(objectives)
+    if constraints is not None:
+        for constraint_transform in config.nonlinear_constraint_transform_instances:
+            constraints = constraint_transform.to_optimizer(constraints)
     return (
         _FunctionEvaluatorResults(
             batch_id=evaluator_result.batch_id,
-            objectives=evaluator_result.objectives[:realization_num],
-            constraints=(
-                None
-                if evaluator_result.constraints is None
-                else evaluator_result.constraints[:realization_num]
-            ),
+            objectives=objectives[:realization_num],
+            constraints=None if constraints is None else constraints[:realization_num],
             evaluation_info={
                 key: value[:realization_num]
                 for key, value in evaluator_result.evaluation_info.items()
@@ -271,11 +241,9 @@ def _get_function_and_gradient_results(
         ),
         _GradientEvaluatorResults(
             batch_id=evaluator_result.batch_id,
-            perturbed_objectives=evaluator_result.objectives[realization_num:, :],
+            perturbed_objectives=objectives[realization_num:, :],
             perturbed_constraints=(
-                None
-                if evaluator_result.constraints is None
-                else evaluator_result.constraints[realization_num:, :]
+                None if constraints is None else constraints[realization_num:, :]
             ),
             evaluation_info={
                 key: value[realization_num:]

@@ -5,18 +5,11 @@ from __future__ import annotations
 from typing import Self
 
 import numpy as np
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    ValidationInfo,
-    field_validator,
-    model_validator,
-)
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 from ropt.config.utils import (
     broadcast_1d_array,
     check_enum_values,
-    immutable_array,
 )
 from ropt.config.validated_types import (  # noqa: TC001  # noqa: TC001
     Array1D,
@@ -117,6 +110,7 @@ class VariablesConfig(BaseModel):
             [`DEFAULT_PERTURBATION_BOUNDARY_TYPE`][ropt.config.constants.DEFAULT_PERTURBATION_BOUNDARY_TYPE]).
         samplers:                 Indices of the samplers to use for each variable.
         seed:                     Seed for the random number generator used by the samplers.
+        transforms:               Indices of the variable transforms to apply for each variable.
     """
 
     variable_count: int
@@ -129,6 +123,7 @@ class VariablesConfig(BaseModel):
     boundary_types: ArrayEnum = np.array(DEFAULT_PERTURBATION_BOUNDARY_TYPE)
     samplers: Array1DInt = np.array(0)
     seed: ItemOrTuple[int] = (DEFAULT_SEED,)
+    transforms: Array1DInt = np.array(-1)
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -156,7 +151,7 @@ class VariablesConfig(BaseModel):
         return value
 
     @model_validator(mode="after")
-    def _broadcast_and_transform(self, info: ValidationInfo) -> Self:
+    def _broadcast_and_transform(self) -> Self:
         dim = self.variable_count
         lower_bounds = broadcast_1d_array(self.lower_bounds, "lower_bounds", dim)
         upper_bounds = broadcast_1d_array(self.upper_bounds, "upper_bounds", dim)
@@ -170,21 +165,7 @@ class VariablesConfig(BaseModel):
         )
         boundary_types = broadcast_1d_array(self.boundary_types, "boundary_types", dim)
         samplers = broadcast_1d_array(self.samplers, "samplers", dim)
-
-        if info.context is not None and info.context.variables is not None:
-            lower_bounds = immutable_array(
-                info.context.variables.to_optimizer(lower_bounds)
-            )
-            upper_bounds = immutable_array(
-                info.context.variables.to_optimizer(upper_bounds)
-            )
-            absolute = perturbation_types == PerturbationType.ABSOLUTE
-            transformed = info.context.variables.magnitudes_to_optimizer(
-                perturbation_magnitudes
-            )
-            perturbation_magnitudes = immutable_array(
-                np.where(absolute, transformed, perturbation_magnitudes)
-            )
+        transforms = broadcast_1d_array(self.transforms, "transforms", dim)
 
         if np.any(lower_bounds > upper_bounds):
             msg = "The lower bounds are larger than the upper bounds."
@@ -209,5 +190,6 @@ class VariablesConfig(BaseModel):
                 "perturbation_types": perturbation_types,
                 "boundary_types": boundary_types,
                 "samplers": samplers,
+                "transforms": transforms,
             }
         )

@@ -147,10 +147,10 @@ class Results(ABC):
         by the classes in the [`ropt.transforms`][ropt.transforms] module.
 
         For instance, variables might have been scaled and shifted to a range
-        more suitable for the optimizer. This method, using the provided
-        `OptModelTransforms` object, applies the inverse scaling and shifting to
-        restore the variables to their original scale and offset. Similarly,
-        objectives and constraints are transformed back to the user domain.
+        more suitable for the optimizer. This method applies the inverse scaling
+        and shifting to restore the variables to their original scale and
+        offset. Similarly, objectives and constraints are transformed back to
+        the user domain.
 
         Args:
             config:     The configuration used by the source of the results.

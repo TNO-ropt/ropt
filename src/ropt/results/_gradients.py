@@ -133,23 +133,23 @@ class Gradients(ResultField):
         Returns:
             The transformed results.
         """
-        objectives = self.objectives
-        assert config.transforms is not None
-        if config.transforms.objectives is not None:
-            objectives = np.moveaxis(self.objectives, 0, -1)
-            objectives = config.transforms.objectives.from_optimizer(objectives)
-            objectives = np.moveaxis(objectives, 0, -1)
-
-        constraints: NDArray[np.float64] | None = self.constraints
         if (
-            self.constraints is not None
-            and config.transforms.nonlinear_constraints is not None
+            not config.objective_transform_instances
+            and not config.nonlinear_constraint_transform_instances
         ):
-            constraints = np.moveaxis(self.constraints, 0, -1)
-            constraints = config.transforms.nonlinear_constraints.from_optimizer(
-                constraints
-            )
-            constraints = np.moveaxis(constraints, 0, -1)
+            return self
+
+        objectives = self.objectives
+        constraints = self.constraints
+        for objective_transform in config.objective_transform_instances:
+            objectives = np.moveaxis(objectives, 0, -1)
+            objectives = objective_transform.from_optimizer(objectives)
+            objectives = np.moveaxis(objectives, 0, -1)
+        if constraints is not None:
+            for constraint_transform in config.nonlinear_constraint_transform_instances:
+                constraints = np.moveaxis(constraints, 0, -1)
+                constraints = constraint_transform.from_optimizer(constraints)
+                constraints = np.moveaxis(constraints, 0, -1)
 
         return Gradients(
             target_objective=self.target_objective,

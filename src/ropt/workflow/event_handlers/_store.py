@@ -59,10 +59,7 @@ class Store(EventHandler):
         if not (results := event.results):
             return
         transformed_results = (
-            item
-            if event.config.transforms is None
-            else item.transform_from_optimizer(event.config)
-            for item in results
+            item.transform_from_optimizer(event.config) for item in results
         )
         self["results"] = tuple(
             results

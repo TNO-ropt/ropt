@@ -28,7 +28,6 @@ if TYPE_CHECKING:
     from ropt.evaluator import EvaluatorCallback, EvaluatorContext, EvaluatorResult
     from ropt.events import EnOptEvent
     from ropt.results import FunctionResults
-    from ropt.transforms import OptModelTransforms
 
 
 class BasicOptimizer:
@@ -136,7 +135,6 @@ class BasicOptimizer:
         enopt_config: dict[str, Any],
         evaluator: EvaluatorCallback | Evaluator,
         *,
-        transforms: OptModelTransforms | None = None,
         constraint_tolerance: float = 1e-10,
     ) -> None:
         """Initialize a `BasicOptimizer` object.
@@ -152,11 +150,9 @@ class BasicOptimizer:
         Args:
             enopt_config:         The configuration for the optimization.
             evaluator:            The evaluator object.
-            transforms:           Optional transforms to apply to the model.
             constraint_tolerance: The constraint violation tolerance.
         """
-        self._config = EnOptConfig.model_validate(enopt_config, context=transforms)
-        self._transforms = transforms
+        self._config = EnOptConfig.model_validate(enopt_config)
         self._constraint_tolerance = constraint_tolerance
         self._evaluator = evaluator
         self._observers: list[tuple[EnOptEventType, Callable[[EnOptEvent], None]]] = []
@@ -253,10 +249,7 @@ class BasicOptimizer:
 
         def _results_callback(event: EnOptEvent) -> None:
             results = tuple(
-                item
-                if event.config.transforms is None
-                else item.transform_from_optimizer(event.config)
-                for item in event.results
+                item.transform_from_optimizer(event.config) for item in event.results
             )
             callback(results)
 

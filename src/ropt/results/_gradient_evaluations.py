@@ -196,36 +196,35 @@ class GradientEvaluations(ResultField):
         Returns:
             The transformed results.
         """
-        assert config.transforms is not None
+        if (
+            not config.variable_transform_instances
+            and not config.objective_transform_instances
+            and not config.nonlinear_constraint_transform_instances
+        ):
+            return self
+
+        variables = self.variables
+        perturbed_variables = self.perturbed_variables
+        perturbed_objectives = self.perturbed_objectives
+        perturbed_constraints = self.perturbed_constraints
+
+        for variable_transform in config.variable_transform_instances:
+            variables = variable_transform.from_optimizer(variables)
+            perturbed_variables = variable_transform.from_optimizer(perturbed_variables)
+        for objective_transform in config.objective_transform_instances:
+            perturbed_objectives = objective_transform.from_optimizer(
+                perturbed_objectives
+            )
+        if perturbed_constraints is not None:
+            for constraint_transform in config.nonlinear_constraint_transform_instances:
+                perturbed_constraints = constraint_transform.from_optimizer(
+                    perturbed_constraints
+                )
+
         return GradientEvaluations(
-            variables=(
-                self.variables
-                if config.transforms.variables is None
-                else config.transforms.variables.from_optimizer(self.variables)
-            ),
-            perturbed_variables=(
-                self.perturbed_variables
-                if config.transforms.variables is None
-                else config.transforms.variables.from_optimizer(
-                    self.perturbed_variables
-                )
-            ),
-            perturbed_objectives=(
-                self.perturbed_objectives
-                if config.transforms.objectives is None
-                else config.transforms.objectives.from_optimizer(
-                    self.perturbed_objectives
-                )
-            ),
-            perturbed_constraints=(
-                self.perturbed_constraints
-                if (
-                    self.perturbed_constraints is None
-                    or config.transforms.nonlinear_constraints is None
-                )
-                else config.transforms.nonlinear_constraints.from_optimizer(
-                    self.perturbed_constraints
-                )
-            ),
+            variables=variables,
+            perturbed_variables=perturbed_variables,
+            perturbed_objectives=perturbed_objectives,
+            perturbed_constraints=perturbed_constraints,
             evaluation_info=self.evaluation_info,
         )

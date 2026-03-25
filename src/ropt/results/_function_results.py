@@ -62,7 +62,6 @@ class FunctionResults(Results):
         Returns:
             The transformed results.
         """
-        assert config.transforms is not None
         return FunctionResults(
             batch_id=self.batch_id,
             metadata=self.metadata,

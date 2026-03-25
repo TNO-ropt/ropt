@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     import numpy as np
@@ -52,6 +52,20 @@ class VariableTransform(ABC):
       [`linear_constraints_diffs_from_optimizer`][ropt.transforms.VariableTransform.linear_constraints_diffs_from_optimizer]
       method.
     """
+
+    @abstractmethod
+    def init(self, mask: NDArray[np.bool_]) -> None:
+        """Set the mask for the variable transform.
+
+        This method allows setting a mask that indicates which variables are
+        affected by this transform. The mask is a boolean array where `True`
+        values indicate the variables that should be transformed, and `False`
+        values indicate the variables that should remain unchanged.
+
+        Args:
+            mask: A boolean array indicating which variables are affected by this
+                transform.
+        """
 
     @abstractmethod
     def to_optimizer(self, values: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -202,6 +216,20 @@ class VariableTransform(ABC):
         msg = "This transformer does not support linear constraints."
         raise NotImplementedError(msg)
 
+    def update(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401, B027
+        """Update the variables transform.
+
+        This method allows updating the internal state of the transform after it
+        has been initialized. This can be useful in cases where relevant
+        parameters are not known at initialization time and need to be
+        determined based on information obtained during the optimization
+        process.
+
+        Args:
+            args:   Positional arguments for the update.
+            kwargs: Keyword arguments for the update.
+        """
+
 
 class ObjectiveTransform(ABC):
     """Abstract base class for objective transformations.
@@ -214,6 +242,20 @@ class ObjectiveTransform(ABC):
     [`from_optimizer`][ropt.transforms.ObjectiveTransform.from_optimizer]
     methods.
     """
+
+    @abstractmethod
+    def init(self, mask: NDArray[np.bool_]) -> None:
+        """Set the mask for the objective transform.
+
+        This method allows setting a mask that indicates which objectives are
+        affected by this transform. The mask is a boolean array where `True`
+        values indicate the objectives that should be transformed, and `False`
+        values indicate the objectives that should remain unchanged.
+
+        Args:
+            mask: A boolean array indicating which objectives are affected by this
+                transform.
+        """
 
     @abstractmethod
     def to_optimizer(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -256,6 +298,20 @@ class ObjectiveTransform(ABC):
             The transformed objective values in the user domain.
         """
 
+    def update(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401, B027
+        """Update the objective transform.
+
+        This method allows updating the internal state of the transform after it
+        has been initialized. This can be useful in cases where relevant
+        parameters are not known at initialization time and need to be
+        determined based on information obtained during the optimization
+        process.
+
+        Args:
+            args:   Positional arguments for the update.
+            kwargs: Keyword arguments for the update.
+        """
+
 
 class NonLinearConstraintTransform(ABC):
     """Abstract base class for nonlinear constraint transformations.
@@ -286,6 +342,20 @@ class NonLinearConstraintTransform(ABC):
       [`nonlinear_constraint_diffs_from_optimizer`][ropt.transforms.NonLinearConstraintTransform.nonlinear_constraint_diffs_from_optimizer]
       method.
     """
+
+    @abstractmethod
+    def init(self, mask: NDArray[np.bool_]) -> None:
+        """Set the mask for the constraint transform.
+
+        This method allows setting a mask that indicates which constraints are
+        affected by this transform. The mask is a boolean array where `True`
+        values indicate the constraints that should be transformed, and `False`
+        values indicate the constraints that should remain unchanged.
+
+        Args:
+            mask: A boolean array indicating which objectives are affected by this
+                transform.
+        """
 
     @abstractmethod
     def to_optimizer(self, constraints: NDArray[np.float64]) -> NDArray[np.float64]:
@@ -379,4 +449,18 @@ class NonLinearConstraintTransform(ABC):
 
         Returns:
             A tuple containing the transformed lower and upper differences.
+        """
+
+    def update(self, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401, B027
+        """Update the constraint transform.
+
+        This method allows updating the internal state of the transform after it
+        has been initialized. This can be useful in cases where relevant
+        parameters are not known at initialization time and need to be
+        determined based on information obtained during the optimization
+        process.
+
+        Args:
+            args:   Positional arguments for the update.
+            kwargs: Keyword arguments for the update.
         """

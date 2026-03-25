@@ -5,9 +5,9 @@ from __future__ import annotations
 from typing import Self
 
 import numpy as np
-from pydantic import BaseModel, ConfigDict, ValidationInfo, model_validator
+from pydantic import BaseModel, ConfigDict, model_validator
 
-from ropt.config.utils import broadcast_1d_array, immutable_array
+from ropt.config.utils import broadcast_1d_array
 from ropt.config.validated_types import Array1D, Array2D  # noqa: TC001
 
 
@@ -70,21 +70,11 @@ class LinearConstraintsConfig(BaseModel):
     )
 
     @model_validator(mode="after")
-    def _broadcast_and_check(self, info: ValidationInfo) -> Self:
+    def _broadcast_and_check(self) -> Self:
         coefficients = self.coefficients
         size = 0 if coefficients is None else coefficients.shape[0]
         lower_bounds = broadcast_1d_array(self.lower_bounds, "lower_bounds", size)
         upper_bounds = broadcast_1d_array(self.upper_bounds, "upper_bounds", size)
-
-        if info.context is not None and info.context.variables is not None:
-            coefficients, lower_bounds, upper_bounds = (
-                info.context.variables.linear_constraints_to_optimizer(
-                    coefficients, lower_bounds, upper_bounds
-                )
-            )
-            coefficients = immutable_array(coefficients)
-            lower_bounds = immutable_array(lower_bounds)
-            upper_bounds = immutable_array(upper_bounds)
 
         if np.any(lower_bounds > upper_bounds):
             msg = "The lower bounds are larger than the upper bounds."
