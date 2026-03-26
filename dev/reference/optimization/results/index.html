@@ -2265,10 +2265,10 @@ transformations, mapping the results back to the user-defined domain.
 The transformations between the user and optimizer domains are defined
 by the classes in the <a class="autorefs autorefs-internal" title="            ropt.transforms" href="../domain_transforms/#ropt.transforms"><code>ropt.transforms</code></a> module.</p>
 <p>For instance, variables might have been scaled and shifted to a range
-more suitable for the optimizer. This method, using the provided
-<code>OptModelTransforms</code> object, applies the inverse scaling and shifting to
-restore the variables to their original scale and offset. Similarly,
-objectives and constraints are transformed back to the user domain.</p>
+more suitable for the optimizer. This method applies the inverse scaling
+and shifting to restore the variables to their original scale and
+offset. Similarly, objectives and constraints are transformed back to
+the user domain.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

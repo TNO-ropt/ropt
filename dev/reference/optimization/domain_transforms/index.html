@@ -785,56 +785,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.transforms.OptModelTransforms" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        OptModelTransforms
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptModelTransforms">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.transforms.OptModelTransforms.variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        variables
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.transforms.OptModelTransforms.objectives" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        objectives
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.transforms.OptModelTransforms.nonlinear_constraints" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        nonlinear_constraints
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#ropt.transforms.VariableTransform" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1956,56 +1906,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#ropt.transforms.OptModelTransforms" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        OptModelTransforms
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="OptModelTransforms">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#ropt.transforms.OptModelTransforms.variables" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        variables
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.transforms.OptModelTransforms.objectives" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        objectives
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#ropt.transforms.OptModelTransforms.nonlinear_constraints" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        nonlinear_constraints
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#ropt.transforms.VariableTransform" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2424,26 +2324,11 @@ for:</p>
   between user and optimizer domains.</li>
 </ul>
 </li>
-<li><strong><a class="autorefs autorefs-internal" title="            ropt.transforms.OptModelTransforms
-
-
-  
-      dataclass
-  " href="#ropt.transforms.OptModelTransforms"><code>OptModelTransforms</code></a>:</strong>
-  A container class for conveniently grouping and
-  passing multiple transformation objects (variable, objective, and
-  nonlinear constraint).</li>
 </ul>
 <p><strong>Workflow and Integration:</strong></p>
 <ol>
 <li><strong>Configuration:</strong> Transformation objects are passed to the
-    <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> during configuration validation,
-    using an <a class="autorefs autorefs-internal" title="            ropt.transforms.OptModelTransforms
-
-
-  
-      dataclass
-  " href="#ropt.transforms.OptModelTransforms"><code>OptModelTransforms</code></a>
+    <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> during configuration validation.
     instance. This ensures that the entire optimization process is aware of and
     configured for the transformed space. The transformation objects are stored
     in the configuration object.</li>
@@ -2511,139 +2396,6 @@ for:</p>
 
 
 
-
-
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="ropt.transforms.OptModelTransforms" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">ropt.transforms.OptModelTransforms</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
-  </span>
-
-</h2>
-
-
-    <div class="doc doc-contents first">
-
-
-
-        <p>A container for optimization model transformers.</p>
-
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.transforms.OptModelTransforms.variables" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">variables</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">variables</span><span class="p">:</span> <span class="n">VariableTransform</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>A <code>VariableTransform</code> object that defines the transformation for
-variables.</p>
-<p>If <code>None</code>, no transformation is applied to variables.</p>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.transforms.OptModelTransforms.objectives" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">objectives</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">objectives</span><span class="p">:</span> <span class="n">ObjectiveTransform</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>An <code>ObjectiveTransform</code> object that defines the transformation for
-objectives.</p>
-<p>If <code>None</code>, no transformation is applied to objectives.</p>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-attribute">
-
-
-
-<h3 id="ropt.transforms.OptModelTransforms.nonlinear_constraints" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-attribute"></code>            <span class="doc doc-object-name doc-attribute-name">nonlinear_constraints</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-class-attribute"><code>class-attribute</code></small>
-      <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
-  </span>
-
-</h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">nonlinear_constraints</span><span class="p">:</span> <span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">NonLinearConstraintTransform</span> <span class="o">|</span> <span class="kc">None</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">)</span> <span class="o">=</span> <span class="kc">None</span>
-</span></code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>A <code>NonLinearConstraintTransform</code> object that defines the transformation
-for nonlinear constraints.</p>
-<p>If <code>None</code>, no transformation is applied to nonlinear constraints.</p>
-
-    </div>
-
-</div>
 
 
 
