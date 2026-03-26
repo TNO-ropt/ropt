@@ -31,7 +31,7 @@ initial_values = np.array([0.0, 0.0, 0.1])
 @pytest.fixture(name="enopt_config")
 def enopt_config_fixture() -> dict[str, Any]:
     return {
-        "optimizer": {
+        "backend": {
             "tolerance": 1e-5,
             "max_functions": 20,
         },
@@ -170,14 +170,14 @@ def test_two_optimizers_alternating(
                 completed_functions += 1
 
     enopt_config["gradient"] = {"evaluation_policy": "speculative"}
-    del enopt_config["optimizer"]["tolerance"]
+    del enopt_config["backend"]["tolerance"]
 
     enopt_config1 = deepcopy(enopt_config)
     enopt_config1["variables"]["mask"] = [True, False, True]
-    enopt_config1["optimizer"]["max_functions"] = 4
+    enopt_config1["backend"]["max_functions"] = 4
     enopt_config2 = deepcopy(enopt_config)
     enopt_config2["variables"]["mask"] = [False, True, False]
-    enopt_config2["optimizer"]["max_functions"] = 3
+    enopt_config2["backend"]["max_functions"] = 3
 
     tracker1 = Tracker()
     tracker2 = Tracker(what="last")
@@ -227,10 +227,10 @@ def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -
         ]
 
     enopt_config["gradient"] = {"evaluation_policy": "speculative"}
-    enopt_config["optimizer"]["max_functions"] = 2
+    enopt_config["backend"]["max_functions"] = 2
 
     enopt_config2 = deepcopy(enopt_config)
-    enopt_config2["optimizer"]["max_functions"] = 3
+    enopt_config2["backend"]["max_functions"] = 3
 
     tracker = Tracker(what="last")
     observer = Observer(
@@ -266,7 +266,7 @@ def test_restart_initial(enopt_config: dict[str, Any], evaluator: Any) -> None:
         ]
 
     enopt_config["gradient"] = {"evaluation_policy": "speculative"}
-    enopt_config["optimizer"]["max_functions"] = 3
+    enopt_config["backend"]["max_functions"] = 3
 
     step = EnsembleOptimizer(evaluator=evaluator())
     observer = Observer(
@@ -294,7 +294,7 @@ def test_restart_last(enopt_config: dict[str, Any], evaluator: Any) -> None:
         ]
 
     enopt_config["gradient"] = {"evaluation_policy": "speculative"}
-    enopt_config["optimizer"]["max_functions"] = 3
+    enopt_config["backend"]["max_functions"] = 3
 
     step = EnsembleOptimizer(evaluator=evaluator())
     observer = Observer(
@@ -330,7 +330,7 @@ def test_restart_optimum(enopt_config: dict[str, Any], evaluator: Any) -> None:
         ]
 
     enopt_config["gradient"] = {"evaluation_policy": "speculative"}
-    enopt_config["optimizer"]["max_functions"] = 4
+    enopt_config["backend"]["max_functions"] = 4
 
     step = EnsembleOptimizer(evaluator=evaluator())
     step.add_event_handler(
@@ -387,7 +387,7 @@ def test_restart_optimum_with_reset(
     )
 
     enopt_config["gradient"] = {"evaluation_policy": "speculative"}
-    enopt_config["optimizer"]["max_functions"] = max_functions
+    enopt_config["backend"]["max_functions"] = max_functions
 
     step = EnsembleOptimizer(evaluator=evaluator(new_functions))
     step.add_event_handler(
@@ -473,7 +473,7 @@ def test_evaluator(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
 def test_evaluator_multi(enopt_config: dict[str, Any], evaluator: Any) -> None:
     enopt_config["gradient"] = {"evaluation_policy": "speculative"}
-    enopt_config["optimizer"]["max_functions"] = 4
+    enopt_config["backend"]["max_functions"] = 4
 
     store = Store()
     step = EnsembleEvaluator(evaluator=evaluator())
@@ -500,7 +500,7 @@ def test_exit_code(
     max_enum: ExitCode,
 ) -> None:
     enopt_config["gradient"] = {"evaluation_policy": "speculative"}
-    enopt_config["optimizer"][max_criterion] = 4
+    enopt_config["backend"][max_criterion] = 4
 
     step = EnsembleOptimizer(evaluator=evaluator())
     exit_code = step.run(
@@ -513,7 +513,7 @@ def test_nested_optimization(
     enopt_config: dict[str, Any], evaluator: Any, test_functions: Any
 ) -> None:
 
-    enopt_config["optimizer"]["max_functions"] = 4
+    enopt_config["backend"]["max_functions"] = 4
     enopt_config["variables"]["mask"] = [True, False, True]
     nested_config = deepcopy(enopt_config)
     nested_config["variables"]["mask"] = [False, True, False]
@@ -643,7 +643,7 @@ def test_evaluator_cache(
 
     enopt_config["gradient"] = {"evaluation_policy": "speculative"}
     enopt_config["gradient"]["number_of_perturbations"] = "1"
-    enopt_config["optimizer"]["max_functions"] = 2
+    enopt_config["backend"]["max_functions"] = 2
 
     tracker = Tracker(what="last")
 
@@ -693,7 +693,7 @@ def test_evaluator_cache_with_store(
         "evaluation_policy": "speculative",
         "number_of_perturbations": "1",
     }
-    enopt_config["optimizer"]["max_functions"] = 2
+    enopt_config["backend"]["max_functions"] = 2
 
     store = Store()
     function_evaluator = evaluator((_test_function1, test_functions[1]))

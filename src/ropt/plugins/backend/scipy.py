@@ -5,40 +5,40 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
-from ropt.config.options import OptionsSchemaModel
-from ropt.optimizer.scipy import (
+from ropt.backend.scipy import (
     DEFAULT_SCIPY_METHOD,
     SUPPORTED_SCIPY_METHODS,
-    SciPyOptimizer,
+    SciPyBackend,
 )
+from ropt.config.options import OptionsSchemaModel
 
-from ._base import OptimizerPlugin
+from ._base import BackendPlugin
 
 if TYPE_CHECKING:
     from ropt.config import EnOptConfig
     from ropt.core import OptimizerCallback
 
 
-class SciPyOptimizerPlugin(OptimizerPlugin):
-    """The SciPY optimizer plugin class."""
+class SciPyBackendPlugin(BackendPlugin):
+    """The SciPy backend plugin class."""
 
     @classmethod
     def create(
         cls, config: EnOptConfig, optimizer_callback: OptimizerCallback
-    ) -> SciPyOptimizer:
-        """Initialize the optimizer plugin.
+    ) -> SciPyBackend:
+        """Initialize the backend plugin.
 
-        See the [ropt.plugins.optimizer.OptimizerPlugin][] abstract base class.
+        See the [ropt.plugins.backend.BackendPlugin][] abstract base class.
 
         # noqa
         """  # noqa: DOC201
-        return SciPyOptimizer(config, optimizer_callback)
+        return SciPyBackend(config, optimizer_callback)
 
     @classmethod
     def is_supported(cls, method: str) -> bool:
         """Check if a method is supported.
 
-        See the [ropt.plugins.optimizer.OptimizerPlugin][] abstract base class.
+        See the [ropt.plugins.backend.BackendPlugin][] abstract base class.
 
         # noqa
         """  # noqa: DOC201
@@ -50,13 +50,13 @@ class SciPyOptimizerPlugin(OptimizerPlugin):
     ) -> None:
         """Validate the options of a given method.
 
-        See the [ropt.plugins.optimizer.OptimizerPlugin][] abstract base class.
+        See the [ropt.plugins.backend.BackendPlugin][] abstract base class.
 
         # noqa
         """  # noqa: DOC501
         if options is not None:
             if not isinstance(options, dict):
-                msg = "SciPy optimizer options must be a dictionary"
+                msg = "SciPy backend options must be a dictionary"
                 raise ValueError(msg)
             *_, method = method.rpartition("/")
             OptionsSchemaModel.model_validate(SCIPY_OPTIONS_SCHEMA).get_options_model(

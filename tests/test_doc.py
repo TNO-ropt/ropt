@@ -3,11 +3,11 @@ from pathlib import Path
 import pytest
 
 from ropt.config.options import gen_options_table
-from ropt.plugins.optimizer.scipy import SCIPY_OPTIONS_SCHEMA
+from ropt.plugins.backend.scipy import SCIPY_OPTIONS_SCHEMA
 
 
 def test_scipy_options_table() -> None:
-    msg = "Regenerate using: python -m ropt.plugins.optimizer.scipy "
+    msg = "Regenerate using: python -m ropt.plugins.backend.scipy "
     md_file = Path(__file__).parent.parent / "docs" / "snippets" / "scipy.md"
     if not md_file.exists():
         pytest.fail(f"File not found: {md_file}\n{msg}")

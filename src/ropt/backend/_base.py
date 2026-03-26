@@ -10,15 +10,15 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
 
-class Optimizer(ABC):
-    """Abstract Base Class for Optimizer Implementations.
+class Backend(ABC):
+    """Abstract Base Class for Backend Implementations.
 
     This class defines the fundamental interface for all concrete optimizer
-    implementations within the `ropt` framework. Optimizer plugins provide
-    classes derived from `Optimizer` that encapsulate the logic of specific
+    implementations within the `ropt` framework. Backend plugins provide
+    classes derived from `Backend` that encapsulate the logic of specific
     optimization algorithms.
 
-    Instances of `Optimizer` subclasses must be initialized with an
+    Instances of `Backend` subclasses must be initialized with an
     [`EnOptConfig`][ropt.config.EnOptConfig] object detailing the optimization
     setup and an [`OptimizerCallback`][ropt.core.OptimizerCallback] function.
     The callback is crucial as it allows the optimizer to request function and
@@ -39,7 +39,7 @@ class Optimizer(ABC):
     def start(self, initial_values: NDArray[np.float64]) -> None:
         """Initiate the optimization process.
 
-        This abstract method must be implemented by concrete `Optimizer`
+        This abstract method must be implemented by concrete `Backend`
         subclasses to start the optimization process. It takes the initial set
         of variable values as input.
 

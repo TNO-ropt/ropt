@@ -8,10 +8,10 @@ from typing import TYPE_CHECKING, Any, Final
 
 import numpy as np
 
+from ropt.backend import Backend
 from ropt.core import OptimizerCallback, OptimizerCallbackResult
 from ropt.enums import ExitCode
 from ropt.exceptions import ComputeStepAborted
-from ropt.optimizer import Optimizer
 from ropt.plugins.manager import get_plugin
 
 if TYPE_CHECKING:
@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 _PROCESS_TIMEOUT: Final = 10
 
 
-class ExternalOptimizer(Optimizer):
+class ExternalBackend(Backend):
     """Plugin class for optimization using an external process.
 
     This class enables optimization via an external process, which performs the
@@ -31,7 +31,7 @@ class ExternalOptimizer(Optimizer):
     function evaluations, report optimizer states, and handle any errors.
 
     Typically, the optimizer is specified within an
-    [`OptimizerConfig`][ropt.config.OptimizerConfig] via the `method` field,
+    [`BackendConfig`][ropt.config.BackendConfig] via the `method` field,
     which either provides the algorithm name directly or follows the form
     `plugin-name/method-name`. In the first case, `ropt` searches among all
     available optimizer plugins to find the specified method. In the second
@@ -49,7 +49,7 @@ class ExternalOptimizer(Optimizer):
     ) -> None:
         """Initialize the optimizer.
 
-        See the [ropt.optimizer.Optimizer][] abstract base class.
+        See the [ropt.backend.Backend][] abstract base class.
 
         # noqa
         """
@@ -57,8 +57,8 @@ class ExternalOptimizer(Optimizer):
         self._optimizer_callback = optimizer_callback
         self._process_pid: int | None = None
 
-        optimizer: Optimizer = get_plugin(
-            "optimizer", config.optimizer.method.split("/", maxsplit=1)[1]
+        optimizer: Backend = get_plugin(
+            "backend", config.backend.method.split("/", maxsplit=1)[1]
         ).create(config, lambda *_: None)
         self._allow_nan = optimizer.allow_nan
         self._is_parallel = optimizer.is_parallel
@@ -67,7 +67,7 @@ class ExternalOptimizer(Optimizer):
     def start(self, initial_values: NDArray[np.float64]) -> None:
         """Start the optimization.
 
-        See the [ropt.optimizer.Optimizer][] abstract base class.
+        See the [ropt.backend.Backend][] abstract base class.
 
         # noqa
         """
@@ -123,7 +123,7 @@ class ExternalOptimizer(Optimizer):
     def allow_nan(self) -> bool:
         """Whether NaN is allowed.
 
-        See the [ropt.optimizer.Optimizer][] abstract base class.
+        See the [ropt.backend.Backend][] abstract base class.
 
         # noqa
         """
@@ -133,7 +133,7 @@ class ExternalOptimizer(Optimizer):
     def is_parallel(self) -> bool:
         """Whether the current run is parallel.
 
-        See the [ropt.optimizer.Optimizer][] abstract base class.
+        See the [ropt.backend.Backend][] abstract base class.
 
         # noqa
         """
@@ -146,11 +146,11 @@ def _run(
     request_queue: multiprocessing.Queue[dict[str, Any] | None],
     result_queue: multiprocessing.Queue[OptimizerCallbackResult | ExitCode],
 ) -> None:
-    optimizer = _PluginOptimizer(config, initial_values, request_queue, result_queue)
+    optimizer = _PluginBackend(config, initial_values, request_queue, result_queue)
     optimizer.run()
 
 
-class _PluginOptimizer:
+class _PluginBackend:
     def __init__(
         self,
         config: EnOptConfig,
@@ -185,7 +185,7 @@ class _PluginOptimizer:
 
     def run(self) -> None:
         optimizer = get_plugin(
-            "optimizer", self._config.optimizer.method.split("/", maxsplit=1)[1]
+            "backend", self._config.backend.method.split("/", maxsplit=1)[1]
         ).create(self._config, self._callback)
         try:
             optimizer.start(self._initial_values)

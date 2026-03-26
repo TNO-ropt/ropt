@@ -21,8 +21,8 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
+    from ropt.backend import Backend
     from ropt.config import EnOptConfig
-    from ropt.optimizer import Optimizer
     from ropt.results import Functions, Gradients, Results
 
     from ._evaluator import EnsembleEvaluator
@@ -51,7 +51,7 @@ class SignalEvaluationCallback(Protocol):
 
 
 class EnsembleOptimizer:
-    """Optimizer for ensemble-based optimizations.
+    """Backend for ensemble-based optimizations.
 
     The [`EnsembleOptimizer`][ropt.core.EnsembleOptimizer] class provides the
     core functionality for running ensemble-based optimizations. Direct use of
@@ -108,17 +108,17 @@ class EnsembleOptimizer:
         # Whether NaN values are allowed:
         self._allow_nan = False
 
-        plugin = get_plugin("optimizer", method=self._enopt_config.optimizer.method)
+        plugin = get_plugin("backend", method=self._enopt_config.backend.method)
 
         # Validate the optimizer options:
         plugin.validate_options(
-            self._enopt_config.optimizer.method, self._enopt_config.optimizer.options
+            self._enopt_config.backend.method, self._enopt_config.backend.options
         )
 
-        self._optimizer: Optimizer = plugin.create(
+        self._backend: Backend = plugin.create(
             self._enopt_config, self._optimizer_callback
         )
-        self._allow_nan = self._optimizer.allow_nan
+        self._allow_nan = self._backend.allow_nan
 
         # Optional redirection of standard output:
         self._redirector = _Redirector(self._enopt_config)
@@ -136,7 +136,7 @@ class EnsembleOptimizer:
             `True` if the optimization supports parallel evaluations, `False`
             otherwise.
         """
-        return self._optimizer.is_parallel
+        return self._backend.is_parallel
 
     def start(self, variables: NDArray[np.float64]) -> ExitCode:
         """Start the optimization process.
@@ -156,7 +156,7 @@ class EnsembleOptimizer:
         exit_code = ExitCode.OPTIMIZER_FINISHED
         try:
             with self._redirector.start():
-                self._optimizer.start(variables)
+                self._backend.start(variables)
         except ComputeStepAborted as exc:
             exit_code = exc.exit_code
         return exit_code
@@ -229,10 +229,10 @@ class EnsembleOptimizer:
         return tmp_variables
 
     def _check_stopping_criteria(self) -> None:
-        max_functions = self._enopt_config.optimizer.max_functions
+        max_functions = self._enopt_config.backend.max_functions
         if max_functions is not None and self._completed_functions >= max_functions:
             raise ComputeStepAborted(exit_code=ExitCode.MAX_FUNCTIONS_REACHED)
-        max_batches = self._enopt_config.optimizer.max_batches
+        max_batches = self._enopt_config.backend.max_batches
         if max_batches is not None and self._completed_batches >= max_batches:
             raise ComputeStepAborted(exit_code=ExitCode.MAX_BATCHES_REACHED)
 
@@ -336,9 +336,9 @@ class EnsembleOptimizer:
 
 class _Redirector:
     def __init__(self, config: EnOptConfig) -> None:
-        output_dir = config.optimizer.output_dir
-        stdout = config.optimizer.stdout
-        stderr = config.optimizer.stderr
+        output_dir = config.backend.output_dir
+        stdout = config.backend.stdout
+        stderr = config.backend.stderr
 
         if stdout is not None:
             self._redirect = True

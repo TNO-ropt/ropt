@@ -8,16 +8,16 @@ from typing import TYPE_CHECKING, Any
 from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
+    from ropt.backend import Backend
     from ropt.config import EnOptConfig
     from ropt.core import OptimizerCallback
-    from ropt.optimizer import Optimizer
 
 
-class OptimizerPlugin(Plugin):
-    """Abstract Base Class for Optimizer Plugins (Factories).
+class BackendPlugin(Plugin):
+    """Abstract Base Class for Backend Plugins (Factories).
 
     This class defines the interface for plugins responsible for creating
-    [`Optimizer`][ropt.optimizer.Optimizer] instances. These plugins
+    [`Backend`][ropt.backend.Backend] instances. These plugins
     act as factories for specific optimization algorithms or backends.
     """
 
@@ -25,13 +25,13 @@ class OptimizerPlugin(Plugin):
     @abstractmethod
     def create(
         cls, config: EnOptConfig, optimizer_callback: OptimizerCallback
-    ) -> Optimizer:
-        """Create an Optimizer instance.
+    ) -> Backend:
+        """Create an Backend instance.
 
         This abstract class method serves as a factory for creating concrete
-        [`Optimizer`][ropt.optimizer.Optimizer] objects. Plugin
+        [`Backend`][ropt.backend.Backend] objects. Plugin
         implementations must override this method to return an instance of their
-        specific `Optimizer` subclass.
+        specific `Backend` subclass.
 
         The [`PluginManager`][ropt.plugins.manager.PluginManager] calls this
         method when an optimization workflow requires an optimizer provided by
@@ -44,7 +44,7 @@ class OptimizerPlugin(Plugin):
                                 request evaluations.
 
         Returns:
-            An initialized instance of an `Optimizer` subclass.
+            An initialized instance of an `Backend` subclass.
         """
 
     @classmethod
@@ -57,7 +57,7 @@ class OptimizerPlugin(Plugin):
 
         This class method is intended to check if the `options` dictionary,
         typically provided in the
-        [`OptimizerConfig`][ropt.config.OptimizerConfig], contains valid keys
+        [`BackendConfig`][ropt.config.BackendConfig], contains valid keys
         and values for the specified optimization `method` supported by this
         plugin.
 
@@ -84,7 +84,7 @@ class OptimizerPlugin(Plugin):
 
         Args:
             method:  The specific optimization method name (e.g., "slsqp",
-                     "my_optimizer/variant1").
+                     "my_backend/variant1").
             options: The dictionary or a list of strings of options.
 
         Raises:

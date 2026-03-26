@@ -21,7 +21,7 @@ initial_values = [0.0, 0.0, 0.0]
 @pytest.fixture(name="enopt_config")
 def enopt_config_fixture() -> dict[str, Any]:
     return {
-        "optimizer": {
+        "backend": {
             "tolerance": 0.005,
             "max_functions": 4,
         },

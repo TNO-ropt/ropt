@@ -17,13 +17,13 @@ from scipy.optimize import (
     minimize,
 )
 
-from ropt.enums import VariableType
-from ropt.optimizer._base import Optimizer
-from ropt.optimizer.utils import (
+from ropt.backend._base import Backend
+from ropt.backend.utils import (
     NormalizedConstraints,
     get_masked_linear_constraints,
     validate_supported_constraints,
 )
+from ropt.enums import VariableType
 
 if TYPE_CHECKING:
     from ropt.config import EnOptConfig
@@ -86,7 +86,7 @@ _NO_GRADIENT: Final = {
 _ConstraintType = str | Callable[..., float] | Callable[..., NDArray[np.float64]]
 
 
-class SciPyOptimizer(Optimizer):
+class SciPyBackend(Backend):
     """SciPy optimization backend for ropt.
 
     This class provides an interface to several optimization algorithms from
@@ -95,12 +95,12 @@ class SciPyOptimizer(Optimizer):
     module, enabling their use within `ropt`.
 
     To select an optimizer, set the `method` field within the
-    [`optimizer`][ropt.config.OptimizerConfig] section of the
+    [`optimizer`][ropt.config.BackendConfig] section of the
     [`EnOptConfig`][ropt.config.EnOptConfig] configuration object to the desired
     algorithm's name. Most methods support the general options defined in the
     [`EnOptConfig`][ropt.config.EnOptConfig] object. For algorithm-specific
     options, use the `options` dictionary within the
-    [`optimizer`][ropt.config.OptimizerConfig] section.
+    [`optimizer`][ropt.config.BackendConfig] section.
 
     The table below lists the included methods together with the method-specific
     options that are supported. Click on the method name to consult the
@@ -127,13 +127,13 @@ class SciPyOptimizer(Optimizer):
     ) -> None:
         """Initialize the optimizer implemented by the SciPy plugin.
 
-        See the [ropt.optimizer.Optimizer][] abstract base class.
+        See the [ropt.backend.Backend][] abstract base class.
 
         # noqa
         """
         self._optimizer_callback = optimizer_callback
         self._config = config
-        _, _, self._method = self._config.optimizer.method.lower().rpartition("/")
+        _, _, self._method = self._config.backend.method.lower().rpartition("/")
         if self._method == "default":
             self._method = DEFAULT_SCIPY_METHOD
         if self._method not in SUPPORTED_SCIPY_METHODS:
@@ -147,7 +147,7 @@ class SciPyOptimizer(Optimizer):
         )
         self._options = self._parse_options()
         self._parallel = (
-            self._config.optimizer.parallel and self._method == "differential_evolution"
+            self._config.backend.parallel and self._method == "differential_evolution"
         )
 
         self._cached_variables: NDArray[np.float64] | None = None
@@ -157,7 +157,7 @@ class SciPyOptimizer(Optimizer):
     def start(self, initial_values: NDArray[np.float64]) -> None:
         """Start the optimization.
 
-        See the [ropt.optimizer.Optimizer][] abstract base class.
+        See the [ropt.backend.Backend][] abstract base class.
 
         # noqa
         """
@@ -186,7 +186,7 @@ class SciPyOptimizer(Optimizer):
             minimize(  # type: ignore[call-overload,misc]
                 fun=self._function,
                 x0=initial_values[self._config.variables.mask],
-                tol=self._config.optimizer.tolerance,
+                tol=self._config.backend.tolerance,
                 method=self._method,
                 bounds=self._bounds,
                 jac=(False if self._method in _NO_GRADIENT else self._gradient),
@@ -198,7 +198,7 @@ class SciPyOptimizer(Optimizer):
     def allow_nan(self) -> bool:
         """Whether NaN is allowed.
 
-        See the [ropt.optimizer.Optimizer][] abstract base class.
+        See the [ropt.backend.Backend][] abstract base class.
 
         # noqa
         """
@@ -208,7 +208,7 @@ class SciPyOptimizer(Optimizer):
     def is_parallel(self) -> bool:
         """Whether the current run is parallel.
 
-        See the [ropt.optimizer.Optimizer][] abstract base class.
+        See the [ropt.backend.Backend][] abstract base class.
 
         # noqa
         """
@@ -519,21 +519,21 @@ class SciPyOptimizer(Optimizer):
 
     def _parse_options(self) -> dict[str, Any]:
         options = (
-            copy.deepcopy(self._config.optimizer.options)
-            if isinstance(self._config.optimizer.options, dict)
+            copy.deepcopy(self._config.backend.options)
+            if isinstance(self._config.backend.options, dict)
             else {}
         )
         # The maximum number of iterations is passed as an option to ropt.
         # Setting maxiter directly as an entry in the options dict will also
         # work, but iterations will override it.
-        iterations = self._config.optimizer.max_iterations
+        iterations = self._config.backend.max_iterations
         if iterations is not None:
             if self._method == "tnc":
                 options["maxfun"] = iterations
             else:
                 options["maxiter"] = iterations
         # We switch on display if there is an output folder.
-        if self._config.optimizer.output_dir is not None:
+        if self._config.backend.output_dir is not None:
             options["disp"] = True
 
         if self._method == "differential_evolution" and "integrality" not in options:

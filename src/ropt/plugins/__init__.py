@@ -7,11 +7,11 @@ custom or third-party components, installed as separate packages.
 `ropt` supports several types of plugins, each addressing a specific aspect of
 the optimization workflow:
 
-***Optimizer related plugins:**
+***Backend related plugins:**
 
 These plugins are used to implement specific features of the ensemble optimizer:
 
-- [`optimizer`][ropt.optimizer]: Implements optimization algorithms.
+- [`optimizer`][ropt.backend]: Implements optimization algorithms.
 - [`sampler`][ropt.sampler]: Generates parameter perturbations, which
   are used for gradient estimation.
 - [`realization_filter`][ropt.plugins.realization_filter]: Selects subsets of
@@ -33,8 +33,8 @@ mechanism.
 Each plugin type has a corresponding abstract base class that custom plugins
 must inherit from:
 
-- **Optimizer:**
-  [`OptimizerPlugin`][ropt.plugins.optimizer.OptimizerPlugin]
+- **Backend:**
+  [`BackendPlugin`][ropt.plugins.backend.BackendPlugin]
 - **Sampler:** [`SamplerPlugin`][ropt.plugins.sampler.SamplerPlugin]
 - **Realization Filter:**
   [`RealizationFilterPlugin`][ropt.plugins.realization_filter.RealizationFilterPlugin]
@@ -68,7 +68,7 @@ from the base class for the corresponding plugin type:
   [`ComputeStep`][ropt.workflow.compute_steps.ComputeStep],
   [`EventHandler`][ropt.workflow.event_handlers.EventHandler],
   [`Evaluator`][ropt.workflow.evaluators.Evaluator]
-- Optimizer: [`Optimizer`][ropt.optimizer.Optimizer]
+- Backend: [`Backend`][ropt.backend.Backend]
 - Sampler: [`Sampler`][ropt.sampler.Sampler]
 - Realization Filter:
   [`RealizationFilter`][ropt.realization_filter.RealizationFilter]
@@ -79,9 +79,9 @@ from the base class for the corresponding plugin type:
 
 `ropt` comes bundled with a set of pre-installed plugins:
 
-- **Optimizer:** The [`scipy`][ropt.plugins.optimizer.scipy.SciPyOptimizer]
+- **Backend:** The [`scipy`][ropt.plugins.backend.scipy.SciPyBackend]
   plugin, leveraging algorithms from `scipy.optimize`, and the
-  [`ExternalOptimizer`][ropt.plugins.optimizer.external.ExternalOptimizer] plugin,
+  [`ExternalBackend`][ropt.plugins.backend.external.ExternalBackend] plugin,
   which is used to launch optimizers in separate processes.
 - **Sampler:** The [`scipy`][ropt.plugins.sampler.scipy.SciPySampler] plugin,
   using distributions from `scipy.stats`.

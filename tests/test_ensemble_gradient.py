@@ -263,7 +263,7 @@ def test_variable_perturbation_enopt() -> None:
             "lower_bounds": 0.0,
             "perturbation_magnitudes": 0.05,
         },
-        "optimizer": {"method": "opt"},
+        "backend": {"method": "opt"},
         "objectives": {"weights": [1.0]},
         "gradient": {"number_of_perturbations": 10},
     }

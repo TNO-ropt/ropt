@@ -109,7 +109,7 @@ nav:
           - "Basic Optimizer": reference/workflow/basic_optimizer.md
       - "Plugins":
         - "Plugin Manager": reference/plugins/plugin_manager.md
-        - "Optimizer Plugins": reference/plugins/optimizer/optimizer.md
+        - "Backend Plugins": reference/plugins/optimizer/backend.md
         - "Sampler Plugins": reference/plugins/optimizer/sampler.md
         - "Realization Filter Plugins": reference/plugins/optimizer/realization_filter.md
         - "Function estimator Plugins": reference/plugins/optimizer/function_estimator.md

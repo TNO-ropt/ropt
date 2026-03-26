@@ -21,7 +21,7 @@ def enopt_config_fixture() -> dict[str, Any]:
             "variable_count": len(initial_values),
             "perturbation_magnitudes": 0.01,
         },
-        "optimizer": {
+        "backend": {
             "tolerance": 1e-4,
             "max_functions": 20,
         },

@@ -23,7 +23,7 @@ def enopt_config_fixture() -> dict[str, Any]:
         "objectives": {
             "weights": [1.0],
         },
-        "optimizer": {
+        "backend": {
             "method": "dummy",
         },
     }

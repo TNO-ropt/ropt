@@ -14,10 +14,10 @@ from pydantic import (
 )
 
 
-class OptimizerConfig(BaseModel):
+class BackendConfig(BaseModel):
     """Configuration class for the optimization algorithm.
 
-    This class, `OptimizerConfig`, defines the configuration for the optimization
+    This class, `BackendConfig`, defines the configuration for the optimization
     algorithm used in an [`EnOptConfig`][ropt.config.EnOptConfig] object.
 
     While optimization methods can have diverse parameters, this class provides a

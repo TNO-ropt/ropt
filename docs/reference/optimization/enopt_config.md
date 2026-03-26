@@ -7,7 +7,7 @@
             - LinearConstraintsConfig
             - NonlinearConstraintsConfig
             - RealizationsConfig
-            - OptimizerConfig
+            - BackendConfig
             - GradientConfig
             - FunctionEstimatorConfig
             - RealizationFilterConfig

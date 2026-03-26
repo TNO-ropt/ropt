@@ -16,12 +16,12 @@ from ropt.transforms import (
     VariableTransform,
 )
 
+from ._backend_config import BackendConfig
 from ._function_estimator_config import FunctionEstimatorConfig
 from ._gradient_config import GradientConfig
 from ._linear_constraints_config import LinearConstraintsConfig  # noqa: TC001
 from ._nonlinear_constraints_config import NonlinearConstraintsConfig  # noqa: TC001
 from ._objective_functions_config import ObjectiveFunctionsConfig
-from ._optimizer_config import OptimizerConfig
 from ._realization_filter_config import RealizationFilterConfig  # noqa: TC001
 from ._realizations_config import RealizationsConfig
 from ._sampler_config import SamplerConfig
@@ -94,7 +94,7 @@ class EnOptConfig(BaseModel):
         linear_constraints:              Configuration for linear constraints.
         nonlinear_constraints:           Configuration for non-linear constraints.
         realizations:                    Configuration for the realizations.
-        optimizer:                       Configuration for the optimization algorithm.
+        backend:                         Configuration for the optimization backend.
         gradient:                        Configuration for gradient calculations.
         realization_filters:             Configuration for realization filters.
         function_estimators:             Configuration for function estimators.
@@ -110,7 +110,7 @@ class EnOptConfig(BaseModel):
     linear_constraints: LinearConstraintsConfig | None = None
     nonlinear_constraints: NonlinearConstraintsConfig | None = None
     realizations: RealizationsConfig = RealizationsConfig.model_validate({})
-    optimizer: OptimizerConfig = OptimizerConfig.model_validate({})
+    backend: BackendConfig = BackendConfig.model_validate({})
     gradient: GradientConfig = GradientConfig.model_validate({})
     realization_filters: tuple[
         RealizationFilterConfig | RealizationFilterInstance, ...

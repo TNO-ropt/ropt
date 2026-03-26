@@ -22,7 +22,7 @@ CONFIG: dict[str, Any] = {
         "lower_bounds": [0.0, 0.0],
         "upper_bounds": [10.0, 10.0],
     },
-    "optimizer": {
+    "backend": {
         "method": "differential_evolution",
         "options": {"rng": 4},
         "max_functions": 5,

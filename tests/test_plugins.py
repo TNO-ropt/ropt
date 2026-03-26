@@ -7,16 +7,16 @@ import pytest
 from pydantic import ValidationError
 
 from ropt.config.options import OptionsSchemaModel
+from ropt.plugins.backend import BackendPlugin
+from ropt.plugins.backend.scipy import SciPyBackendPlugin
 from ropt.plugins.manager import PluginManager, get_plugin
-from ropt.plugins.optimizer import OptimizerPlugin
-from ropt.plugins.optimizer.scipy import SciPyOptimizerPlugin
 
 if TYPE_CHECKING:
     from ropt.config import EnOptConfig
     from ropt.core import OptimizerCallback
 
 
-class MockedPlugin1(OptimizerPlugin):
+class MockedPlugin1(BackendPlugin):
     @classmethod
     def create(cls, _0: EnOptConfig, _1: OptimizerCallback) -> None:  # type: ignore[override]
         pass
@@ -26,7 +26,7 @@ class MockedPlugin1(OptimizerPlugin):
         return method.lower() == "test"
 
 
-class MockedPlugin2(OptimizerPlugin):
+class MockedPlugin2(BackendPlugin):
     @classmethod
     def create(cls, _0: EnOptConfig, _1: OptimizerCallback) -> None:  # type: ignore[override]
         pass
@@ -57,32 +57,32 @@ class MockedPluginWithValidation(MockedPlugin1):
 
 
 def test_default_plugins() -> None:
-    plugin = get_plugin("optimizer", "slsqp")
-    assert issubclass(plugin, SciPyOptimizerPlugin)
+    plugin = get_plugin("backend", "slsqp")
+    assert issubclass(plugin, SciPyBackendPlugin)
 
 
 def test_default_plugins_full_spec() -> None:
-    plugin = get_plugin("optimizer", "scipy/slsqp")
-    assert issubclass(plugin, SciPyOptimizerPlugin)
+    plugin = get_plugin("backend", "scipy/slsqp")
+    assert issubclass(plugin, SciPyBackendPlugin)
 
 
 def test_added_ambiguous_method(monkeypatch: Any) -> None:
     manager = PluginManager()
     monkeypatch.setattr(manager, "_init", lambda: None)
-    manager._add_plugin("optimizer", "test1", MockedPlugin1)
-    manager._add_plugin("optimizer", "test2", MockedPlugin2)
+    manager._add_plugin("backend", "test1", MockedPlugin1)
+    manager._add_plugin("backend", "test2", MockedPlugin2)
 
     with pytest.raises(
         ValueError, match="Ambiguous method: 'test' is available in multiple plugins"
     ):
-        manager.get_plugin("optimizer", "test")
+        manager.get_plugin("backend", "test")
 
 
 def test_validate_options(monkeypatch: Any) -> None:
     manager = PluginManager()
     monkeypatch.setattr(manager, "_init", lambda: None)
-    manager._add_plugin("optimizer", "test", MockedPluginWithValidation)
-    plugin = manager.get_plugin("optimizer", "test")
+    manager._add_plugin("backend", "test", MockedPluginWithValidation)
+    plugin = manager.get_plugin("backend", "test")
     assert issubclass(plugin, MockedPluginWithValidation)
     plugin.validate_options("test", {"a": 1.0})
     plugin.validate_options("test", {"a": "foo"})

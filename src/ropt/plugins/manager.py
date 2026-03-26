@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 PluginType = Literal[
-    "optimizer",
+    "backend",
     "sampler",
     "realization_filter",
     "function_estimator",
@@ -27,7 +27,7 @@ plugins within the `ropt` framework.
 
 _DEFAULT_PLUGINS: Final = {
     "function_estimator": "default",
-    "optimizer": "scipy",
+    "backend": "scipy",
     "sampler": "scipy",
     "realization_filter": "default",
     "variable_transform": "default",
@@ -45,7 +45,7 @@ class PluginManager:
     as optimizers, samplers, and workflow components.
 
     Upon initialization, the manager scans for entry points defined under the
-    `ropt.plugins.*` groups (e.g., `ropt.plugins.optimizer`). Plugins found
+    `ropt.plugins.*` groups (e.g., `ropt.plugins.backend`). Plugins found
     this way are loaded and stored internally, categorized by their type.
 
     The primary way to interact with the manager is through the
@@ -56,28 +56,28 @@ class PluginManager:
     method can be used to find the name of a plugin that supports a given
     method.
 
-    **Example: Registering a Custom Optimizer Plugin**
+    **Example: Registering a Custom Backend Plugin**
 
-    To make a custom optimizer plugin available to `ropt`, you would typically
-    define an entry point in your package's `pyproject.toml`:
+    To make a custom optimization backend plugin available to `ropt`, you would
+    typically define an entry point in your package's `pyproject.toml`:
 
     ```toml
-    [project.entry-points."ropt.plugins.optimizer"]
-    my_optimizer = "my_package.my_module:MyOptimizer"
+    [project.entry-points."ropt.plugins.backend"]
+    my_backend = "my_package.my_module:MyBackend"
     ```
 
     When `ropt` initializes the `PluginManager`, it will discover and load
-    `MyOptimizer` from `my_package.my_module`, making it accessible via
-    `plugin_manager.get_plugin("optimizer", "my_optimizer/some_method")` or
-    potentially `plugin_manager.get_plugin("optimizer", "some_method")` if
+    `MyBackend` from `my_package.my_module`, making it accessible via
+    `plugin_manager.get_plugin("backend", "my_backend/some_method")` or
+    potentially `plugin_manager.get_plugin("backend", "some_method")` if
     discovery is allowed and the method is unique.
     """
 
     def __init__(self) -> None:
         """Initialize the plugin manager."""
         # ruff: disable[PLC0415]
+        from .backend import BackendPlugin
         from .function_estimator import FunctionEstimatorPlugin
-        from .optimizer import OptimizerPlugin
         from .realization_filter import RealizationFilterPlugin
         from .sampler import SamplerPlugin
         from .transforms import (
@@ -89,7 +89,7 @@ class PluginManager:
 
         self._PLUGIN_TYPES: Final = {
             "function_estimator": FunctionEstimatorPlugin,
-            "optimizer": OptimizerPlugin,
+            "backend": BackendPlugin,
             "sampler": SamplerPlugin,
             "realization_filter": RealizationFilterPlugin,
             "variable_transform": VariableTransformPlugin,
@@ -108,16 +108,16 @@ class PluginManager:
         from .sampler.scipy import SciPySamplerPlugin
         from .realization_filter.default import DefaultRealizationFilterPlugin
         from .function_estimator.default import DefaultFunctionEstimatorPlugin
-        from .optimizer.external import ExternalOptimizerPlugin
-        from .optimizer.scipy import SciPyOptimizerPlugin
+        from .backend.external import ExternalBackendPlugin
+        from .backend.scipy import SciPyBackendPlugin
         from .transforms.default import (
             DefaultVariableTransformPlugin,
             DefaultObjectiveTransformPlugin,
             DefaultNonlinearConstraintTransformPlugin,
         )
 
-        self._add_plugin("optimizer", "scipy", SciPyOptimizerPlugin)
-        self._add_plugin("optimizer", "external", ExternalOptimizerPlugin)
+        self._add_plugin("backend", "scipy", SciPyBackendPlugin)
+        self._add_plugin("backend", "external", ExternalBackendPlugin)
         self._add_plugin("sampler", "scipy", SciPySamplerPlugin)
         self._add_plugin(
             "realization_filter", "default", DefaultRealizationFilterPlugin
@@ -206,7 +206,7 @@ class PluginManager:
             the `method-name`.
 
         Args:
-            plugin_type: The category of the plugin (e.g., "optimizer", "sampler").
+            plugin_type: The category of the plugin (e.g., "backend", "sampler").
             method:      The name of the method the plugin must support, potentially
                          prefixed with the plugin name and a slash (`/`).
 
@@ -243,7 +243,7 @@ class PluginManager:
             the `method-name`.
 
         Args:
-            plugin_type: The category of the plugin (e.g., "optimizer", "sampler").
+            plugin_type: The category of the plugin (e.g., "backend", "sampler").
             method:      The name of the method to check, potentially prefixed
                          with the plugin name and a slash (`/`).
 
@@ -294,7 +294,7 @@ def get_plugin(plugin_type: PluginType, method: str) -> Any:  # noqa: ANN401
         the `method-name`.
 
     Args:
-        plugin_type: The category of the plugin (e.g., "optimizer", "sampler").
+        plugin_type: The category of the plugin (e.g., "backend", "sampler").
         method:      The name of the method the plugin must support, potentially
                         prefixed with the plugin name and a slash (`/`).
 
@@ -326,7 +326,7 @@ def get_plugin_name(plugin_type: PluginType, method: str) -> str | None:
         the `method-name`.
 
     Args:
-        plugin_type: The category of the plugin (e.g., "optimizer", "sampler").
+        plugin_type: The category of the plugin (e.g., "backend", "sampler").
         method:      The name of the method to check, potentially prefixed
                         with the plugin name and a slash (`/`).
 

@@ -5,7 +5,7 @@ from typing import Any
 import numpy as np
 import pytest
 
-from ropt.workflow import BasicOptimizer, validate_optimizer_options
+from ropt.workflow import BasicOptimizer, validate_backend_options
 
 pytestmark = [pytest.mark.slow]
 
@@ -19,7 +19,7 @@ def enopt_config_fixture() -> dict[str, Any]:
             "variable_count": len(initial_values),
             "perturbation_magnitudes": 0.01,
         },
-        "optimizer": {
+        "backend": {
             "method": "differential_evolution",
             "tolerance": 1e-5,
             "options": {"rng": 1},
@@ -42,8 +42,8 @@ def test_scipy_bound_constraints_de(enopt_config: Any, evaluator: Any) -> None:
     enopt_config["variables"]["lower_bounds"] = [0.15, 0.0, 0.0]
     enopt_config["variables"]["upper_bounds"] = [0.5, 0.5, 0.2]
 
-    validate_optimizer_options(
-        "differential_evolution", enopt_config["optimizer"]["options"]
+    validate_backend_options(
+        "differential_evolution", enopt_config["backend"]["options"]
     )
 
     optimizer = BasicOptimizer(enopt_config, evaluator())

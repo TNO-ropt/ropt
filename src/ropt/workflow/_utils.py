@@ -26,7 +26,7 @@ def find_sampler_plugin(method: str) -> str | None:
     return get_plugin_name("sampler", method)
 
 
-def find_optimizer_plugin(method: str) -> str | None:
+def find_backend_plugin(method: str) -> str | None:
     """Find an optimizer plugin for a given method.
 
     The `method` argument can be specified in two ways:
@@ -42,12 +42,10 @@ def find_optimizer_plugin(method: str) -> str | None:
     Returns:
         The name of the plugin that implements the optimizer method or `None`.
     """
-    return get_plugin_name("optimizer", method)
+    return get_plugin_name("backend", method)
 
 
-def validate_optimizer_options(
-    method: str, options: dict[str, Any] | list[str]
-) -> None:
+def validate_backend_options(method: str, options: dict[str, Any] | list[str]) -> None:
     """Validate the optimizer-specific options for a given method.
 
     The `method` argument can be specified in two ways:
@@ -61,4 +59,4 @@ def validate_optimizer_options(
         method:  The specific optimization method name.
         options: The dictionary or a list of strings of options.
     """
-    get_plugin("optimizer", method).validate_options(method, options)
+    get_plugin("backend", method).validate_options(method, options)

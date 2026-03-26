@@ -5,7 +5,7 @@ variables, objectives, and constraints between user-defined domains and the
 domains used internally by the optimizer. These transformations are essential
 for:
 
-- **Improving Optimizer Performance:** Scaling, shifting, and other
+- **Improving Backend Performance:** Scaling, shifting, and other
   transformations can significantly enhance the efficiency, stability, and
   convergence of optimization algorithms.
 - **Implementing Custom Mappings:**  Beyond simple scaling, this framework
@@ -39,7 +39,7 @@ for:
 2.  **Optimization Workflow:** The same transformation objects are passed to the
     relevant optimization steps via the configuration object. (See, for example,
     the default implementation of an optimizer compute step in
-    [`Optimizer.run`][ropt.workflow.compute_steps.EnsembleOptimizer.run]).
+    [`Backend.run`][ropt.workflow.compute_steps.EnsembleOptimizer.run]).
 3.  **Evaluation:** When the optimizer requests an evaluation of a variable
     vector, the following occurs:
       -  **Transformation to the User Domain:** The variable vector is
@@ -48,7 +48,7 @@ for:
           the `VariableTransform`.
       -  **Function Evaluation:** Objective and constraint values are calculated
           in the user domain.
-      -  **Transformation to the Optimizer Domain:** The resulting objective and
+      -  **Transformation to the Backend Domain:** The resulting objective and
          constraint values are
           transformed to the optimizer domain using the `to_optimizer` methods
           of the `ObjectiveTransform` and `NonLinearConstraintTransform`.
@@ -59,7 +59,7 @@ for:
     [`transform_from_optimizer`][ropt.results.Results.transform_from_optimizer]
     method is used to create new `Results` objects with the transformed values.
     For example,
-    [`Optimizer.run`][ropt.workflow.compute_steps.EnsembleOptimizer.run]
+    [`Backend.run`][ropt.workflow.compute_steps.EnsembleOptimizer.run]
     emits events that include a dictionary with a `"results"` key That contains
     `Results` objects in the  optimizer domain. To obtain results in the user
     domain they must be converted using the

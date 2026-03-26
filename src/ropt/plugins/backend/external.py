@@ -4,30 +4,30 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from ropt.optimizer.external import ExternalOptimizer
+from ropt.backend.external import ExternalBackend
 from ropt.plugins.manager import get_plugin, get_plugin_name
 
-from ._base import OptimizerPlugin
+from ._base import BackendPlugin
 
 if TYPE_CHECKING:
     from ropt.config import EnOptConfig
     from ropt.core import OptimizerCallback
 
 
-class ExternalOptimizerPlugin(OptimizerPlugin):
+class ExternalBackendPlugin(BackendPlugin):
     """The external optimizer plugin class."""
 
     @classmethod
     def create(
         cls, config: EnOptConfig, optimizer_callback: OptimizerCallback
-    ) -> ExternalOptimizer:
-        """Initialize the optimizer plugin.
+    ) -> ExternalBackend:
+        """Initialize the backend plugin.
 
-        See the [ropt.plugins.optimizer.OptimizerPlugin][] abstract base class.
+        See the [ropt.plugins.backend.BackendPlugin][] abstract base class.
 
         # noqa
         """  # noqa: DOC201
-        return ExternalOptimizer(config, optimizer_callback)
+        return ExternalBackend(config, optimizer_callback)
 
     @classmethod
     def is_supported(cls, method: str) -> bool:
@@ -37,13 +37,13 @@ class ExternalOptimizerPlugin(OptimizerPlugin):
 
         # noqa
         """  # noqa: DOC201
-        return get_plugin_name("optimizer", method) is not None
+        return get_plugin_name("backend", method) is not None
 
     @classmethod
     def allows_discovery(cls) -> bool:
         """Check if the plugin can be discovered automatically.
 
-        See the [ropt.plugins.optimizer.OptimizerPlugin][] abstract base class.
+        See the [ropt.plugins.backend.BackendPlugin][] abstract base class.
 
         # noqa
         """  # noqa: DOC201
@@ -55,10 +55,9 @@ class ExternalOptimizerPlugin(OptimizerPlugin):
     ) -> None:
         """Validate the options of a given method.
 
-        See the [ropt.plugins.
-        optimizer.base.OptimizerPlugin][] abstract base class.
+        See the [ropt.plugins.backend.base.BackendPlugin][] abstract base class.
 
         # noqa
         """
         method = method.split("/", maxsplit=1)[1]
-        get_plugin("optimizer", method).validate_options(method, options)
+        get_plugin("backend", method).validate_options(method, options)
