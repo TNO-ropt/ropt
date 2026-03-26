@@ -9,6 +9,8 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
+    from ropt.config import EnOptConfig
+
 
 class RealizationFilter(ABC):
     """Abstract base class for realization filter classes."""
@@ -16,6 +18,7 @@ class RealizationFilter(ABC):
     @abstractmethod
     def get_realization_weights(
         self,
+        enopt_config: EnOptConfig,
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None,
     ) -> NDArray[np.float64]:
@@ -35,8 +38,9 @@ class RealizationFilter(ABC):
             before use, hence any non-negative weight value is permissible.
 
         Args:
-            objectives:  The objectives of all realizations.
-            constraints: The constraints for all realizations.
+            enopt_config: The main EnOpt configuration object.
+            objectives:   The objectives of all realizations.
+            constraints:  The constraints for all realizations.
 
         Returns:
             A vector of weights of the realizations.

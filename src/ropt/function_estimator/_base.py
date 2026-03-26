@@ -9,6 +9,8 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
+    from ropt.config import EnOptConfig
+
 
 class FunctionEstimator(ABC):
     """Abstract Base Class for Function Estimator Implementations.
@@ -33,7 +35,10 @@ class FunctionEstimator(ABC):
 
     @abstractmethod
     def calculate_function(
-        self, functions: NDArray[np.float64], weights: NDArray[np.float64]
+        self,
+        enopt_config: EnOptConfig,
+        functions: NDArray[np.float64],
+        weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         """Combine function values from realizations into an expected value.
 
@@ -43,8 +48,9 @@ class FunctionEstimator(ABC):
         weights.
 
         Args:
-            functions: The function values for each realization.
-            weights:   The weight for each realization.
+            enopt_config: The EnOpt configuration object.e
+            functions:    The function values for each realization.
+            weights:      The weight for each realization.
 
         Returns:
             A scalar or 1D array representing the combined function value(s).
@@ -53,6 +59,7 @@ class FunctionEstimator(ABC):
     @abstractmethod
     def calculate_gradient(
         self,
+        enopt_config: EnOptConfig,
         functions: NDArray[np.float64],
         gradient: NDArray[np.float64],
         weights: NDArray[np.float64],
@@ -89,9 +96,10 @@ class FunctionEstimator(ABC):
             (e.g., standard deviation).
 
         Args:
-            functions: The functions for each realization.
-            gradient:  The gradient for each realization.
-            weights:   The weight of each realization.
+            enopt_config: The EnOpt configuration object.e
+            functions:    The functions for each realization.
+            gradient:     The gradient for each realization.
+            weights:      The weight of each realization.
 
         Returns:
             The expected gradients.

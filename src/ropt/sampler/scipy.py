@@ -67,10 +67,25 @@ class SciPySampler(Sampler):
     documentation for available options.
     """
 
-    def __init__(
+    def __init__(self, sampler_config: SamplerConfig) -> None:
+        """Initialize the sampler object.
+
+        See the [ropt.plugins.sampler.Sampler][] abstract base class.
+
+        # noqa
+        """
+        self._sampler_config = sampler_config
+        _, _, self._method = self._sampler_config.method.lower().rpartition("/")
+        if self._method == "default":
+            self._method = "norm"
+        self._options: dict[str, Any]
+        if self._method not in SCIPY_SAMPLER_SUPPORTED_METHODS:
+            msg = f"Method `{self._method}` is not implemented by the SciPy plugin"
+            raise NotImplementedError(msg)
+        self._sampler: rv_continuous | QMCEngine | None = None
+
+    def init(
         self,
-        enopt_config: EnOptConfig,
-        sampler_config: SamplerConfig,
         mask: NDArray[np.bool_] | None,
         rng: Generator,
     ) -> None:
@@ -80,30 +95,24 @@ class SciPySampler(Sampler):
 
         # noqa
         """
-        self._enopt_config = enopt_config
-        self._sampler_config = sampler_config
         self._mask = mask
-        _, _, self._method = self._sampler_config.method.lower().rpartition("/")
-        if self._method == "default":
-            self._method = "norm"
         self._rng = rng
-        self._sampler: rv_continuous | QMCEngine
-        self._options: dict[str, Any]
-        if self._method not in SCIPY_SAMPLER_SUPPORTED_METHODS:
-            msg = f"Method `{self._method}` is not implemented by the SciPy plugin"
-            raise NotImplementedError(msg)
-        self._sampler, self._options = self._init_sampler(self._sampler_config.options)
 
-    def generate_samples(self) -> NDArray[np.float64]:
+    def generate_samples(self, enopt_config: EnOptConfig) -> NDArray[np.float64]:
         """Generate a set of samples.
 
         See the [ropt.plugins.sampler.base.Sampler][] abstract base class.
 
         # noqa
         """  # noqa: DOC201
-        variable_count = self._enopt_config.variables.variable_count
-        realization_count = self._enopt_config.realizations.weights.size
-        perturbation_count = self._enopt_config.gradient.number_of_perturbations
+        if self._sampler is None:
+            self._sampler, self._options = self._init_sampler(
+                enopt_config, self._sampler_config.options
+            )
+
+        variable_count = enopt_config.variables.variable_count
+        realization_count = enopt_config.realizations.weights.size
+        perturbation_count = enopt_config.gradient.number_of_perturbations
 
         sample_dim = variable_count if self._mask is None else self._mask.sum()
 
@@ -131,7 +140,7 @@ class SciPySampler(Sampler):
         return samples
 
     def _init_sampler(
-        self, options: dict[str, Any]
+        self, enopt_config: EnOptConfig, options: dict[str, Any]
     ) -> tuple[rv_continuous | QMCEngine, dict[str, Any]]:
         options = copy.deepcopy(options)
         if self._method in _STATS_SAMPLERS:
@@ -139,7 +148,7 @@ class SciPySampler(Sampler):
             sampler = _STATS_SAMPLERS[self._method]
         elif self._method in _QMC_ENGINES:
             sample_dim = (
-                self._enopt_config.variables.variable_count
+                enopt_config.variables.variable_count
                 if self._mask is None
                 else self._mask.sum()
             )

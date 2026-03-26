@@ -42,9 +42,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
         for gradient calculation.
     """
 
-    def __init__(
-        self, enopt_config: EnOptConfig, estimator_config: FunctionEstimatorConfig
-    ) -> None:
+    def __init__(self, estimator_config: FunctionEstimatorConfig) -> None:
         """Initialize the function estimator object.
 
         See the
@@ -52,21 +50,17 @@ class DefaultFunctionEstimator(FunctionEstimator):
         abstract base class.
 
         # noqa
-        """  # noqa: DOC501
-        self._enopt_config = enopt_config
+        """
         self._estimator_config = estimator_config
         _, _, self._method = self._estimator_config.method.lower().rpartition("/")
         if self._method == "default":
             self._method = "mean"
-        if self._method == "stddev" and self._enopt_config.gradient.merge_realizations:
-            msg = (
-                "The stddev estimator does not support merging "
-                "realizations in the gradient."
-            )
-            raise ValueError(msg)
 
     def calculate_function(
-        self, functions: NDArray[np.float64], weights: NDArray[np.float64]
+        self,
+        enopt_config: EnOptConfig,
+        functions: NDArray[np.float64],
+        weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         """Calculate a function from function values for each realization.
 
@@ -76,6 +70,12 @@ class DefaultFunctionEstimator(FunctionEstimator):
 
         # noqa
         """  # noqa: DOC201, DOC501
+        if self._method == "stddev" and enopt_config.gradient.merge_realizations:
+            msg = (
+                "The stddev estimator does not support merging "
+                "realizations in the gradient."
+            )
+            raise ValueError(msg)
         estimator_method = self._method
         if estimator_method == "mean":
             return self._calculate_function_mean(functions, weights)
@@ -86,6 +86,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
 
     def calculate_gradient(
         self,
+        enopt_config: EnOptConfig,
         functions: NDArray[np.float64],
         gradient: NDArray[np.float64],
         weights: NDArray[np.float64],
@@ -98,9 +99,20 @@ class DefaultFunctionEstimator(FunctionEstimator):
 
         # noqa
         """  # noqa: DOC201, DOC501
+        if self._method == "stddev" and enopt_config.gradient.merge_realizations:
+            msg = (
+                "The stddev estimator does not support merging "
+                "realizations in the gradient."
+            )
+            raise ValueError(msg)
         estimator_method = self._method
         if estimator_method == "mean":
-            return self._calculate_gradient_mean(functions, gradient, weights)
+            return self._calculate_gradient_mean(
+                functions,
+                gradient,
+                weights,
+                merge_realizations=enopt_config.gradient.merge_realizations,
+            )
         if estimator_method == "stddev":
             return _calculate_gradient_stddev(functions, gradient, weights)
         msg = f"Function estimator method not supported: {estimator_method}"
@@ -113,13 +125,15 @@ class DefaultFunctionEstimator(FunctionEstimator):
         functions = np.nan_to_num(functions)
         return np.dot(functions, weights)  # type: ignore[no-any-return]
 
+    @staticmethod
     def _calculate_gradient_mean(
-        self,
         _: NDArray[np.float64],
         gradient: NDArray[np.float64],
         weights: NDArray[np.float64],
+        *,
+        merge_realizations: bool = False,
     ) -> NDArray[np.float64]:
-        if self._enopt_config.gradient.merge_realizations:
+        if merge_realizations:
             return gradient
         return np.dot(gradient, weights)  # type: ignore[no-any-return]
 

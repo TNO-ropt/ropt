@@ -5,6 +5,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
+from ropt.config import EnOptConfig
 from ropt.function_estimator import FunctionEstimator
 from ropt.workflow import BasicOptimizer
 
@@ -112,13 +113,17 @@ def test_stddev_function_estimator(
 
 class CustomFunctionEstimator(FunctionEstimator):
     def calculate_function(  # noqa: PLR6301
-        self, functions: NDArray[np.float64], weights: NDArray[np.float64]
+        self,
+        _: EnOptConfig,
+        functions: NDArray[np.float64],
+        weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         return np.asarray(np.dot(functions, weights) + 1.0)
 
     def calculate_gradient(  # noqa: PLR6301
         self,
-        _: NDArray[np.float64],
+        _0: EnOptConfig,
+        _1: NDArray[np.float64],
         gradient: NDArray[np.float64],
         weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:

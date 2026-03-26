@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
-    from ropt.config import EnOptConfig
+    from ropt.config import RealizationFilterConfig
     from ropt.realization_filter import RealizationFilter
 
 
@@ -23,7 +23,7 @@ class RealizationFilterPlugin(Plugin):
 
     @classmethod
     @abstractmethod
-    def create(cls, enopt_config: EnOptConfig, filter_index: int) -> RealizationFilter:
+    def create(cls, filter_config: RealizationFilterConfig) -> RealizationFilter:
         """Factory method to create a concrete RealizationFilter instance.
 
         This abstract class method serves as a factory for creating concrete
@@ -36,9 +36,7 @@ class RealizationFilterPlugin(Plugin):
         this plugin.
 
         Args:
-            enopt_config: The main EnOpt configuration object.
-            filter_index: Index into `enopt_config.realization_filters` for
-                          this filter.
+            filter_config: The configuration object for this realization filter.
 
         Returns:
             An initialized RealizationFilter object ready for use.

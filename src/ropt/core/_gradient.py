@@ -73,9 +73,9 @@ def _perturb_variables(
         return_index=True,
     )
     sampler_indices = unique[np.argsort(indices)]
-    samples = samplers[sampler_indices[0]].generate_samples()
+    samples = samplers[sampler_indices[0]].generate_samples(config)
     for sampler_idx in sampler_indices[1:]:
-        samples += samplers[sampler_idx].generate_samples()
+        samples += samplers[sampler_idx].generate_samples(config)
     magnitudes = np.where(
         config.variables.perturbation_types == PerturbationType.RELATIVE,
         (config.variables.upper_bounds - config.variables.lower_bounds)
@@ -128,6 +128,7 @@ def _estimate_merged_gradient(
 
 
 def _calculate_gradient(  # noqa: PLR0913, PLR0917
+    enopt_config: EnOptConfig,
     functions: NDArray[np.float64],
     delta_variables: NDArray[np.float64],
     delta_functions: NDArray[np.float64],
@@ -143,10 +144,11 @@ def _calculate_gradient(  # noqa: PLR0913, PLR0917
         gradients = _estimate_merged_gradient(delta_variables, delta_functions, weights)
     else:
         gradients = _estimate_gradients(delta_variables, delta_functions, weights)
-    return estimator.calculate_gradient(functions, gradients, weights)
+    return estimator.calculate_gradient(enopt_config, functions, gradients, weights)
 
 
 def _calculate_estimated_gradients(  # noqa: PLR0913, PLR0917
+    enopt_config: EnOptConfig,
     function_estimators: list[FunctionEstimator],
     estimator_indices: NDArray[np.intc] | None,
     variables: NDArray[np.float64],
@@ -173,6 +175,7 @@ def _calculate_estimated_gradients(  # noqa: PLR0913, PLR0917
         mask = estimator_indices == estimator_idx
         for idx in np.where(mask)[0]:
             gradients[idx, ...] = _calculate_gradient(
+                enopt_config,
                 functions[..., idx],
                 delta_variables,
                 delta_functions[..., idx],

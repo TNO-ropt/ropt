@@ -442,6 +442,7 @@ class EnsembleEvaluator:
             target_objective = np.array(np.nan)
         else:
             objectives = _calculate_estimated_functions(
+                self._config,
                 self._function_estimators,
                 self._config.objectives.function_estimators,
                 objectives,
@@ -455,6 +456,7 @@ class EnsembleEvaluator:
             if constraints is not None:
                 assert self._config.nonlinear_constraints is not None
                 constraints = _calculate_estimated_functions(
+                    self._config,
                     self._function_estimators,
                     self._config.nonlinear_constraints.function_estimators,
                     constraints,
@@ -500,6 +502,7 @@ class EnsembleEvaluator:
 
         assert perturbed_objectives is not None
         objective_gradients = _calculate_estimated_gradients(
+            self._config,
             self._function_estimators,
             self._config.objectives.function_estimators,
             variables,
@@ -518,6 +521,7 @@ class EnsembleEvaluator:
             assert self._config.nonlinear_constraints is not None
             assert perturbed_constraints is not None
             constraint_gradients = _calculate_estimated_gradients(
+                self._config,
                 self._function_estimators,
                 self._config.nonlinear_constraints.function_estimators,
                 variables,
@@ -593,7 +597,7 @@ class EnsembleEvaluator:
                 continue
 
             weights = realization_filter.get_realization_weights(
-                objectives, constraints
+                self._config, objectives, constraints
             )
             if apply_to_objectives is not None:
                 if objective_weights is None:
@@ -621,7 +625,7 @@ class EnsembleEvaluator:
             item
             if isinstance(item, RealizationFilter)
             else get_plugin("realization_filter", method=item.method).create(
-                self._config, idx
+                self._config.realization_filters[idx]
             )
             for idx, item in enumerate(self._config.realization_filters)
         ]
@@ -631,7 +635,7 @@ class EnsembleEvaluator:
             item
             if isinstance(item, FunctionEstimator)
             else get_plugin("function_estimator", method=item.method).create(
-                self._config, idx
+                self._config.function_estimators[idx]
             )
             for idx, item in enumerate(self._config.function_estimators)
         ]
@@ -639,18 +643,15 @@ class EnsembleEvaluator:
     def _init_samplers(self, rng: Generator) -> list[Sampler]:
         samplers: list[Sampler] = []
         for idx, item in enumerate(self._config.samplers):
-            variable_indices = np.asarray(
+            mask = np.asarray(
                 self._config.variables.mask & (self._config.variables.samplers == idx)
             )
-            if variable_indices.size:
-                plugin = (
-                    item
-                    if isinstance(item, Sampler)
-                    else get_plugin("sampler", method=item.method)
-                )
-                samplers.append(
-                    plugin
-                    if isinstance(plugin, Sampler)
-                    else plugin.create(self._config, idx, variable_indices, rng)
-                )
+            if mask.size:
+                if isinstance(item, Sampler):
+                    instance = item
+                else:
+                    plugin = get_plugin("sampler", method=item.method)
+                    instance = plugin.create(self._config.samplers[idx])
+                instance.init(mask, rng)
+                samplers.append(instance)
         return samplers

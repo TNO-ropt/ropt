@@ -48,27 +48,28 @@ def enopt_config_fixture() -> dict[str, Any]:
 class MockedSampler(Sampler):
     def __init__(
         self,
-        enopt_config: EnOptConfig,
-        sampler_index: int,
+        sampler: SamplerConfig,
+    ) -> None:
+        assert isinstance(sampler, SamplerConfig)
+        self._sampler_config = sampler
+        # This sampler only works if the number of perturbation equals the
+        # number of variables:
+
+    def init(
+        self,
         mask: NDArray[np.bool_] | None,
         _: Generator,
     ) -> None:
-        self._config = enopt_config
-        sampler = enopt_config.samplers[sampler_index]
-        assert isinstance(sampler, SamplerConfig)
-        self._sampler_config = sampler
         self._mask = mask
-        # This sampler only works if the number of perturbation equals the
-        # number of variables:
+
+    def generate_samples(self, enopt_config: EnOptConfig) -> NDArray[np.float64]:
         assert (
             enopt_config.gradient.number_of_perturbations
             == enopt_config.variables.variable_count
         )
-
-    def generate_samples(self) -> NDArray[np.float64]:
-        variable_count = self._config.variables.variable_count
-        realization_count = self._config.realizations.weights.size
-        perturbation_count = self._config.gradient.number_of_perturbations
+        variable_count = enopt_config.variables.variable_count
+        realization_count = enopt_config.realizations.weights.size
+        perturbation_count = enopt_config.gradient.number_of_perturbations
 
         samples: NDArray[np.float64]
         if self._mask is None:
@@ -94,7 +95,10 @@ def test_sampler_simple(enopt_config: Any) -> None:
     enopt_config["gradient"]["number_of_perturbations"] = 3
     rng = default_rng(123)
     config = EnOptConfig.model_validate(enopt_config)
-    sampler = MockedSampler(config, 0, None, rng)
+    sampler_config = config.samplers[0]
+    assert isinstance(sampler_config, SamplerConfig)
+    sampler = MockedSampler(sampler_config)
+    sampler.init(None, rng)
 
     perturbed_variables = _perturb_variables(
         config,
@@ -109,7 +113,10 @@ def test_sampler_use_options(enopt_config: Any) -> None:
     samplers: list[dict[str, Any]] = enopt_config["samplers"]
     samplers[0]["options"] = {"scale": 100.0}
     config = EnOptConfig.model_validate(enopt_config)
-    sampler = MockedSampler(config, 0, None, rng)
+    sampler_config = config.samplers[0]
+    assert isinstance(sampler_config, SamplerConfig)
+    sampler = MockedSampler(sampler_config)
+    sampler.init(None, rng)
 
     perturbed_variables = _perturb_variables(
         config,
@@ -126,8 +133,16 @@ def test_sampler_indexed(enopt_config: Any) -> None:
     samplers[1]["options"] = {"scale": -1}
     enopt_config["variables"]["samplers"] = [0, 1, 1]
     config = EnOptConfig.model_validate(enopt_config)
-    sampler1 = MockedSampler(config, 0, np.array([0]), rng)
-    sampler2 = MockedSampler(config, 1, np.array([1, 2]), rng)
+
+    sampler_config = config.samplers[0]
+    assert isinstance(sampler_config, SamplerConfig)
+    sampler1 = MockedSampler(sampler_config)
+    sampler1.init(np.array([0]), rng)
+
+    sampler_config = config.samplers[1]
+    assert isinstance(sampler_config, SamplerConfig)
+    sampler2 = MockedSampler(sampler_config)
+    sampler2.init(np.array([1, 2]), rng)
 
     perturbed_variables = _perturb_variables(
         config,

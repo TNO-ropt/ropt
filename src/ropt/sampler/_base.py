@@ -7,7 +7,10 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     import numpy as np
+    from numpy.random import Generator
     from numpy.typing import NDArray
+
+    from ropt.config import EnOptConfig
 
 
 class Sampler(ABC):
@@ -27,7 +30,23 @@ class Sampler(ABC):
     """
 
     @abstractmethod
-    def generate_samples(self) -> NDArray[np.float64]:
+    def init(
+        self,
+        mask: NDArray[np.bool_] | None,
+        rng: Generator,
+    ) -> None:
+        """Initialize the sampler object.
+
+        Sets the internal state of the sampler, including the variable mask and
+        random number generator.
+
+        Args:
+            mask: Optional boolean mask for variable subset sampling.
+            rng:  NumPy random number generator instance.
+        """
+
+    @abstractmethod
+    def generate_samples(self, enopt_config: EnOptConfig) -> NDArray[np.float64]:
         """Generate and return an array of sampled perturbation values.
 
         This method must return a three-dimensional NumPy array containing the
@@ -61,6 +80,9 @@ class Sampler(ABC):
             uniformly distributed within `[-1, 1]`). This allows the
             `perturbation_magnitudes` to directly control the effective size of
             the perturbations applied to the variables.
+
+        Args:
+            enopt_config: The main EnOpt configuration object.
 
         Returns:
             A 3D NumPy array of sampled perturbation values.

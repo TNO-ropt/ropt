@@ -210,9 +210,7 @@ class DefaultRealizationFilter(RealizationFilter):
         [`CVaRConstraintOptions`][ropt.realization_filter.default.CVaRConstraintOptions].
     """
 
-    def __init__(
-        self, enopt_config: EnOptConfig, filter_config: RealizationFilterConfig
-    ) -> None:  # D107
+    def __init__(self, filter_config: RealizationFilterConfig) -> None:  # D107
         """Initialize the realization filter plugin.
 
         See the
@@ -220,8 +218,7 @@ class DefaultRealizationFilter(RealizationFilter):
         base class.
 
         # noqa
-        """  # noqa: DOC501
-        self._enopt_config = enopt_config
+        """
         self._filter_config = filter_config
         self._filter_options: (
             SortObjectiveOptions
@@ -232,24 +229,10 @@ class DefaultRealizationFilter(RealizationFilter):
 
         assert isinstance(self._filter_config, RealizationFilterConfig)
         _, _, self._method = self._filter_config.method.lower().rpartition("/")
-        options = self._filter_config.options
-        match self._method:
-            case "sort-objective":
-                self._filter_options = SortObjectiveOptions.model_validate(options)
-                self._check_range(self._filter_options)
-            case "sort-constraint":
-                self._filter_options = SortConstraintOptions.model_validate(options)
-                self._check_range(self._filter_options)
-            case "cvar-objective":
-                self._filter_options = CVaRObjectiveOptions.model_validate(options)
-            case "cvar-constraint":
-                self._filter_options = CVaRConstraintOptions.model_validate(options)
-            case _:
-                msg = f"Realization filter not supported: {self._method}"
-                raise ValueError(msg)
 
     def get_realization_weights(  # D107
         self,
+        enopt_config: EnOptConfig,
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None,
     ) -> NDArray[np.float64]:
@@ -261,16 +244,38 @@ class DefaultRealizationFilter(RealizationFilter):
 
         # noqa
         """  # noqa: DOC501
-        weights = self._enopt_config.realizations.weights
         match self._method:
             case "sort-objective":
-                weights = self._sort_objectives(objectives)
-            case "sort-constraint" if constraints is not None:
-                weights = self._sort_constraint(constraints)
+                self._filter_options = SortObjectiveOptions.model_validate(
+                    self._filter_config.options
+                )
+                self._check_range(enopt_config, self._filter_options)
+            case "sort-constraint":
+                self._filter_options = SortConstraintOptions.model_validate(
+                    self._filter_config.options
+                )
+                self._check_range(enopt_config, self._filter_options)
             case "cvar-objective":
-                weights = self._cvar_objectives(objectives)
+                self._filter_options = CVaRObjectiveOptions.model_validate(
+                    self._filter_config.options
+                )
+            case "cvar-constraint":
+                self._filter_options = CVaRConstraintOptions.model_validate(
+                    self._filter_config.options
+                )
+            case _:
+                msg = f"Realization filter not supported: {self._method}"
+                raise ValueError(msg)
+        weights = enopt_config.realizations.weights
+        match self._method:
+            case "sort-objective":
+                weights = self._sort_objectives(enopt_config, objectives)
+            case "sort-constraint" if constraints is not None:
+                weights = self._sort_constraint(enopt_config, constraints)
+            case "cvar-objective":
+                weights = self._cvar_objectives(enopt_config, objectives)
             case "cvar-constraint" if constraints is not None:
-                weights = self._cvar_constraint(constraints)
+                weights = self._cvar_constraint(enopt_config, constraints)
             case _:
                 msg = f"Realization filter not supported: {self._method}"
                 raise ValueError(msg)
@@ -280,10 +285,12 @@ class DefaultRealizationFilter(RealizationFilter):
 
         return weights
 
+    @staticmethod
     def _check_range(
-        self, options: SortObjectiveOptions | SortConstraintOptions
+        enopt_config: EnOptConfig,
+        options: SortObjectiveOptions | SortConstraintOptions,
     ) -> None:
-        realizations = self._enopt_config.realizations.weights.size
+        realizations = enopt_config.realizations.weights.size
         msg = f"Invalid range of realizations: [{options.first}, {options.last}]"
         if options.first < 0 or options.first >= realizations:
             raise ValueError(msg)
@@ -292,9 +299,11 @@ class DefaultRealizationFilter(RealizationFilter):
         if options.last < options.first:
             raise ValueError(msg)
 
-    def _sort_objectives(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
+    def _sort_objectives(
+        self, enopt_config: EnOptConfig, objectives: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
         assert isinstance(self._filter_options, SortObjectiveOptions)
-        objective_config = self._enopt_config.objectives
+        objective_config = enopt_config.objectives
         failed_realizations = np.isnan(objectives[..., 0])
         objectives = np.nan_to_num(objectives[..., self._filter_options.sort])
         if objective_config.weights.size > 1:
@@ -304,7 +313,7 @@ class DefaultRealizationFilter(RealizationFilter):
         objectives = objectives.flatten()
         return _sort_and_select(
             objectives,
-            self._enopt_config.realizations.weights,
+            enopt_config.realizations.weights,
             failed_realizations,
             self._filter_options.first,
             self._filter_options.last,
@@ -312,6 +321,7 @@ class DefaultRealizationFilter(RealizationFilter):
 
     def _sort_constraint(
         self,
+        enopt_config: EnOptConfig,
         constraints: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         assert isinstance(self._filter_options, SortConstraintOptions)
@@ -319,7 +329,7 @@ class DefaultRealizationFilter(RealizationFilter):
         constraints = np.nan_to_num(constraints[..., self._filter_options.sort])
         return _sort_and_select(
             constraints,
-            self._enopt_config.realizations.weights,
+            enopt_config.realizations.weights,
             failed_realizations,
             self._filter_options.first,
             self._filter_options.last,
@@ -327,10 +337,11 @@ class DefaultRealizationFilter(RealizationFilter):
 
     def _cvar_objectives(
         self,
+        enopt_config: EnOptConfig,
         objectives: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         assert isinstance(self._filter_options, CVaRObjectiveOptions)
-        objective_config = self._enopt_config.objectives
+        objective_config = enopt_config.objectives
         failed_realizations = np.isnan(objectives[..., 0])
         objectives = np.nan_to_num(objectives[..., self._filter_options.sort])
         if objective_config.weights.size > 1:
@@ -344,12 +355,13 @@ class DefaultRealizationFilter(RealizationFilter):
 
     def _cvar_constraint(
         self,
+        enopt_config: EnOptConfig,
         constraints: NDArray[np.float64],
     ) -> NDArray[np.float64]:
         assert isinstance(self._filter_options, CVaRConstraintOptions)
         failed_realizations = np.isnan(constraints[..., 0])
         constraints = np.nan_to_num(constraints[..., self._filter_options.sort])
-        assert self._enopt_config.nonlinear_constraints is not None
+        assert enopt_config.nonlinear_constraints is not None
         return _get_cvar_weights_from_percentile(
             -constraints, failed_realizations, self._filter_options.percentile
         )

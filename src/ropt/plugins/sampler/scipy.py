@@ -1,10 +1,6 @@
 """This module implements the SciPy sampler plugin."""
 
-import numpy as np
-from numpy.random import Generator
-from numpy.typing import NDArray
-
-from ropt.config import EnOptConfig, SamplerConfig
+from ropt.config import SamplerConfig
 from ropt.sampler.scipy import SCIPY_SAMPLER_SUPPORTED_METHODS, SciPySampler
 
 from ._base import SamplerPlugin
@@ -16,10 +12,7 @@ class SciPySamplerPlugin(SamplerPlugin):
     @classmethod
     def create(
         cls,
-        enopt_config: EnOptConfig,
-        sampler_index: int,
-        mask: NDArray[np.bool_] | None,
-        rng: Generator,
+        sampler_config: SamplerConfig,
     ) -> SciPySampler:
         """Initialize the sampler plugin.
 
@@ -27,9 +20,7 @@ class SciPySamplerPlugin(SamplerPlugin):
 
         # noqa
         """  # noqa: DOC201
-        sampler_config = enopt_config.samplers[sampler_index]
-        assert isinstance(sampler_config, SamplerConfig)
-        return SciPySampler(enopt_config, sampler_config, mask, rng)
+        return SciPySampler(sampler_config)
 
     @classmethod
     def is_supported(cls, method: str) -> bool:

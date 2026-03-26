@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
+from ropt.config._enopt_config import EnOptConfig
 from ropt.realization_filter import RealizationFilter
 from ropt.realization_filter.default import (
     _get_cvar_weights_from_percentile,
@@ -661,6 +662,7 @@ def test_cvar_filter_mixed(
 class CustomRealizationFilter(RealizationFilter):
     def get_realization_weights(  # noqa: PLR6301
         self,
+        _0: EnOptConfig,
         objectives: NDArray[np.float64],
         _1: NDArray[np.float64] | None,
     ) -> NDArray[np.float64]:

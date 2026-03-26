@@ -1,10 +1,12 @@
 import numpy as np
 from numpy.typing import NDArray
 
+from ropt.config import EnOptConfig
 from ropt.function_estimator import FunctionEstimator
 
 
-def _calculate_estimated_functions(
+def _calculate_estimated_functions(  # noqa: PLR0913, PLR0917
+    enopt_config: EnOptConfig,
     function_estimators: list[FunctionEstimator],
     estimator_indices: NDArray[np.intc] | None,
     functions: NDArray[np.float64],
@@ -26,6 +28,8 @@ def _calculate_estimated_functions(
             weights = realization_weights[idx, ...]
             weights = np.where(failed_realizations, 0.0, weights)
             weights /= weights.sum()
-            result[idx] = estimator.calculate_function(functions[..., idx], weights)
+            result[idx] = estimator.calculate_function(
+                enopt_config, functions[..., idx], weights
+            )
 
     return result

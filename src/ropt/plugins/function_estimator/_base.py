@@ -5,11 +5,10 @@ from __future__ import annotations
 from abc import abstractmethod
 from typing import TYPE_CHECKING
 
-from ropt.config import EnOptConfig
 from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
-    from ropt.config import EnOptConfig
+    from ropt.config import FunctionEstimatorConfig
     from ropt.function_estimator import FunctionEstimator
 
 
@@ -31,9 +30,7 @@ class FunctionEstimatorPlugin(Plugin):
 
     @classmethod
     @abstractmethod
-    def create(
-        cls, enopt_config: EnOptConfig, estimator_index: int
-    ) -> FunctionEstimator:
+    def create(cls, estimator_config: FunctionEstimatorConfig) -> FunctionEstimator:
         """Factory method to create a concrete FunctionEstimator instance.
 
         This abstract class method serves as a factory for creating concrete
@@ -46,9 +43,7 @@ class FunctionEstimatorPlugin(Plugin):
         this plugin.
 
         Args:
-            enopt_config:    The main EnOpt configuration object.
-            estimator_index: Index into `enopt_config.function_estimators` for
-                             this estimator.
+            estimator_config: The configuration object for this function estimator.
 
         Returns:
             An initialized FunctionEstimator object ready for use.
