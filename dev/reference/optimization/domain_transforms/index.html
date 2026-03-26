@@ -1452,14 +1452,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plugins/optimizer/optimizer/" class="md-nav__link">
+      <a href="../../plugins/optimizer/backend/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Optimizer Plugins
+    Backend Plugins
   
 
     
@@ -2299,7 +2299,7 @@ variables, objectives, and constraints between user-defined domains and the
 domains used internally by the optimizer. These transformations are essential
 for:</p>
 <ul>
-<li><strong>Improving Optimizer Performance:</strong> Scaling, shifting, and other
+<li><strong>Improving Backend Performance:</strong> Scaling, shifting, and other
   transformations can significantly enhance the efficiency, stability, and
   convergence of optimization algorithms.</li>
 <li><strong>Implementing Custom Mappings:</strong>  Beyond simple scaling, this framework
@@ -2335,7 +2335,7 @@ for:</p>
 <li><strong>Optimization Workflow:</strong> The same transformation objects are passed to the
     relevant optimization steps via the configuration object. (See, for example,
     the default implementation of an optimizer compute step in
-    <a class="autorefs autorefs-internal" title="            run" href="../../workflow/compute_steps/#ropt.workflow.compute_steps.EnsembleOptimizer.run"><code>Optimizer.run</code></a>).</li>
+    <a class="autorefs autorefs-internal" title="            run" href="../../workflow/compute_steps/#ropt.workflow.compute_steps.EnsembleOptimizer.run"><code>Backend.run</code></a>).</li>
 <li><strong>Evaluation:</strong> When the optimizer requests an evaluation of a variable
     vector, the following occurs:<ul>
 <li><strong>Transformation to the User Domain:</strong> The variable vector is
@@ -2344,7 +2344,7 @@ for:</p>
       the <code>VariableTransform</code>.</li>
 <li><strong>Function Evaluation:</strong> Objective and constraint values are calculated
       in the user domain.</li>
-<li><strong>Transformation to the Optimizer Domain:</strong> The resulting objective and
+<li><strong>Transformation to the Backend Domain:</strong> The resulting objective and
      constraint values are
       transformed to the optimizer domain using the <code>to_optimizer</code> methods
       of the <code>ObjectiveTransform</code> and <code>NonLinearConstraintTransform</code>.</li>
@@ -2367,7 +2367,7 @@ for:</p>
   " href="../results/#ropt.results.Results.transform_from_optimizer"><code>transform_from_optimizer</code></a>
     method is used to create new <code>Results</code> objects with the transformed values.
     For example,
-    <a class="autorefs autorefs-internal" title="            run" href="../../workflow/compute_steps/#ropt.workflow.compute_steps.EnsembleOptimizer.run"><code>Optimizer.run</code></a>
+    <a class="autorefs autorefs-internal" title="            run" href="../../workflow/compute_steps/#ropt.workflow.compute_steps.EnsembleOptimizer.run"><code>Backend.run</code></a>
     emits events that include a dictionary with a <code>"results"</code> key That contains
     <code>Results</code> objects in the  optimizer domain. To obtain results in the user
     domain they must be converted using the

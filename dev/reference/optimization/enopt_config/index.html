@@ -807,10 +807,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.config.OptimizerConfig" class="md-nav__link">
+  <a href="#ropt.config.BackendConfig" class="md-nav__link">
     <span class="md-ellipsis">
       
-        OptimizerConfig
+        BackendConfig
       
     </span>
   </a>
@@ -1403,14 +1403,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../../plugins/optimizer/optimizer/" class="md-nav__link">
+      <a href="../../plugins/optimizer/backend/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Optimizer Plugins
+    Backend Plugins
   
 
     
@@ -1963,10 +1963,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ropt.config.OptimizerConfig" class="md-nav__link">
+  <a href="#ropt.config.BackendConfig" class="md-nav__link">
     <span class="md-ellipsis">
       
-        OptimizerConfig
+        BackendConfig
       
     </span>
   </a>
@@ -2375,13 +2375,13 @@ transformations that are applied to the input upon creation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.EnOptConfig.optimizer">optimizer</span></code></td>
+            <td><code><span title="ropt.config.EnOptConfig.backend">backend</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            OptimizerConfig (ropt.config._optimizer_config.OptimizerConfig)" href="#ropt.config.OptimizerConfig">OptimizerConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            BackendConfig (ropt.config._backend_config.BackendConfig)" href="#ropt.config.BackendConfig">BackendConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Configuration for the optimization algorithm.</p>
+                <p>Configuration for the optimization backend.</p>
               </div>
             </td>
           </tr>
@@ -3492,8 +3492,8 @@ one successful realization.</p>
 
 
 
-<h3 id="ropt.config.OptimizerConfig" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">OptimizerConfig</span>
+<h3 id="ropt.config.BackendConfig" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">BackendConfig</span>
 
 
 </h3>
@@ -3504,7 +3504,7 @@ one successful realization.</p>
 
 
         <p>Configuration class for the optimization algorithm.</p>
-<p>This class, <code>OptimizerConfig</code>, defines the configuration for the optimization
+<p>This class, <code>BackendConfig</code>, defines the configuration for the optimization
 algorithm used in an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
 <p>While optimization methods can have diverse parameters, this class provides a
 standardized set of settings that are commonly used and forwarded to the
@@ -3583,7 +3583,7 @@ computational cost of the optimization process:</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.OptimizerConfig.method">method</span></code></td>
+            <td><code><span title="ropt.config.BackendConfig.method">method</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
             </td>
@@ -3594,7 +3594,7 @@ computational cost of the optimization process:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.OptimizerConfig.max_iterations">max_iterations</span></code></td>
+            <td><code><span title="ropt.config.BackendConfig.max_iterations">max_iterations</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" title="pydantic.PositiveInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.PositiveInt">PositiveInt</a> | None</code>
             </td>
@@ -3605,7 +3605,7 @@ computational cost of the optimization process:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.OptimizerConfig.max_functions">max_functions</span></code></td>
+            <td><code><span title="ropt.config.BackendConfig.max_functions">max_functions</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" title="pydantic.PositiveInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.PositiveInt">PositiveInt</a> | None</code>
             </td>
@@ -3616,7 +3616,7 @@ computational cost of the optimization process:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.OptimizerConfig.max_batches">max_batches</span></code></td>
+            <td><code><span title="ropt.config.BackendConfig.max_batches">max_batches</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" title="pydantic.PositiveInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.PositiveInt">PositiveInt</a> | None</code>
             </td>
@@ -3627,7 +3627,7 @@ computational cost of the optimization process:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.OptimizerConfig.tolerance">tolerance</span></code></td>
+            <td><code><span title="ropt.config.BackendConfig.tolerance">tolerance</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" title="pydantic.NonNegativeFloat" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.NonNegativeFloat">NonNegativeFloat</a> | None</code>
             </td>
@@ -3638,7 +3638,7 @@ computational cost of the optimization process:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.OptimizerConfig.parallel">parallel</span></code></td>
+            <td><code><span title="ropt.config.BackendConfig.parallel">parallel</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
             </td>
@@ -3649,7 +3649,7 @@ computational cost of the optimization process:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.OptimizerConfig.output_dir">output_dir</span></code></td>
+            <td><code><span title="ropt.config.BackendConfig.output_dir">output_dir</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>
             </td>
@@ -3660,7 +3660,7 @@ computational cost of the optimization process:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.OptimizerConfig.options">options</span></code></td>
+            <td><code><span title="ropt.config.BackendConfig.options">options</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" title="typing.Any" href="https://docs.python.org/3/library/typing.html#typing.Any">Any</a>] | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#list">list</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>] | None</code>
             </td>
@@ -3671,7 +3671,7 @@ computational cost of the optimization process:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.OptimizerConfig.stdout">stdout</span></code></td>
+            <td><code><span title="ropt.config.BackendConfig.stdout">stdout</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>
             </td>
@@ -3682,7 +3682,7 @@ computational cost of the optimization process:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.OptimizerConfig.stderr">stderr</span></code></td>
+            <td><code><span title="ropt.config.BackendConfig.stderr">stderr</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" title="pathlib.Path" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path">Path</a> | None</code>
             </td>
