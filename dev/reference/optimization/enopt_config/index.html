@@ -3658,7 +3658,8 @@ optimizer backend:</p>
   optimizer may choose to ignore this.
   optimizer callback may ask to evaluate a batch of multiple functions and
   gradients at once. This setting will limit the number of those calls.</li>
-<li><strong><code>tolerance</code></strong>: The convergence tolerance used as a stopping criterion.
+<li><strong><code>convergence_tolerance</code></strong>: The convergence tolerance used as a stopping
+  criterion.
   The exact definition depends on the optimizer, and it may be ignored.</li>
 <li><strong><code>parallel</code></strong>: If <code>True</code>, allows the optimizer to use parallelized
   function evaluations. This typically applies to gradient-free methods and
@@ -3706,7 +3707,7 @@ optimizer backend:</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.BackendConfig.tolerance">tolerance</span></code></td>
+            <td><code><span title="ropt.config.BackendConfig.convergence_tolerance">convergence_tolerance</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" title="pydantic.NonNegativeFloat" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.NonNegativeFloat">NonNegativeFloat</a> | None</code>
             </td>
