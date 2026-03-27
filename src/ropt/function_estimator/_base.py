@@ -34,11 +34,20 @@ class FunctionEstimator(ABC):
     """
 
     @abstractmethod
+    def init(self, enopt_config: EnOptConfig) -> None:
+        """Initialize the function estimator object.
+
+        This method is called by `ropt` during the setup phase of the optimization
+        process. It allows the function estimator to perform any necessary
+        initialization based on the provided configuration.
+
+        Args:
+            enopt_config: The EnOpt configuration object.
+        """
+
+    @abstractmethod
     def calculate_function(
-        self,
-        enopt_config: EnOptConfig,
-        functions: NDArray[np.float64],
-        weights: NDArray[np.float64],
+        self, functions: NDArray[np.float64], weights: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         """Combine function values from realizations into an expected value.
 
@@ -48,7 +57,6 @@ class FunctionEstimator(ABC):
         weights.
 
         Args:
-            enopt_config: The EnOpt configuration object.e
             functions:    The function values for each realization.
             weights:      The weight for each realization.
 
@@ -59,7 +67,6 @@ class FunctionEstimator(ABC):
     @abstractmethod
     def calculate_gradient(
         self,
-        enopt_config: EnOptConfig,
         functions: NDArray[np.float64],
         gradient: NDArray[np.float64],
         weights: NDArray[np.float64],
@@ -96,7 +103,6 @@ class FunctionEstimator(ABC):
             (e.g., standard deviation).
 
         Args:
-            enopt_config: The EnOpt configuration object.e
             functions:    The functions for each realization.
             gradient:     The gradient for each realization.
             weights:      The weight of each realization.

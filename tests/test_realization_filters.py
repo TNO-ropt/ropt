@@ -662,11 +662,13 @@ def test_cvar_filter_mixed(
 class CustomRealizationFilter(RealizationFilter):
     def get_realization_weights(  # noqa: PLR6301
         self,
-        _0: EnOptConfig,
         objectives: NDArray[np.float64],
-        _1: NDArray[np.float64] | None,
+        _: NDArray[np.float64] | None,
     ) -> NDArray[np.float64]:
         return np.ones(objectives.shape[0])
+
+    def init(self, _0: EnOptConfig) -> None:
+        pass
 
 
 def test_custom_realization_filter(

@@ -56,9 +56,19 @@ class DefaultFunctionEstimator(FunctionEstimator):
         if self._method == "default":
             self._method = "mean"
 
+    def init(self, enopt_config: EnOptConfig) -> None:
+        """Initialize the function estimator object.
+
+        See the
+        [ropt.function_estimator.FunctionEstimator][]
+        abstract base class.
+
+        # noqa
+        """
+        self._enopt_config = enopt_config
+
     def calculate_function(
         self,
-        enopt_config: EnOptConfig,
         functions: NDArray[np.float64],
         weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:
@@ -70,7 +80,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
 
         # noqa
         """  # noqa: DOC201, DOC501
-        if self._method == "stddev" and enopt_config.gradient.merge_realizations:
+        if self._method == "stddev" and self._enopt_config.gradient.merge_realizations:
             msg = (
                 "The stddev estimator does not support merging "
                 "realizations in the gradient."
@@ -86,7 +96,6 @@ class DefaultFunctionEstimator(FunctionEstimator):
 
     def calculate_gradient(
         self,
-        enopt_config: EnOptConfig,
         functions: NDArray[np.float64],
         gradient: NDArray[np.float64],
         weights: NDArray[np.float64],
@@ -99,7 +108,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
 
         # noqa
         """  # noqa: DOC201, DOC501
-        if self._method == "stddev" and enopt_config.gradient.merge_realizations:
+        if self._method == "stddev" and self._enopt_config.gradient.merge_realizations:
             msg = (
                 "The stddev estimator does not support merging "
                 "realizations in the gradient."
@@ -111,7 +120,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
                 functions,
                 gradient,
                 weights,
-                merge_realizations=enopt_config.gradient.merge_realizations,
+                merge_realizations=self._enopt_config.gradient.merge_realizations,
             )
         if estimator_method == "stddev":
             return _calculate_gradient_stddev(functions, gradient, weights)

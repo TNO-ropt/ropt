@@ -59,19 +59,23 @@ class MockedSampler(Sampler):
 
     def init(
         self,
+        enopt_config: EnOptConfig,
         mask: NDArray[np.bool_] | None,
         _: Generator,
     ) -> None:
+        self._enopt_config = enopt_config
         self._mask = mask
 
-    def generate_samples(self, enopt_config: EnOptConfig) -> NDArray[np.float64]:
+    def generate_samples(
+        self,
+    ) -> NDArray[np.float64]:
         assert (
-            enopt_config.gradient.number_of_perturbations
-            == enopt_config.variables.variable_count
+            self._enopt_config.gradient.number_of_perturbations
+            == self._enopt_config.variables.variable_count
         )
-        variable_count = enopt_config.variables.variable_count
-        realization_count = enopt_config.realizations.weights.size
-        perturbation_count = enopt_config.gradient.number_of_perturbations
+        variable_count = self._enopt_config.variables.variable_count
+        realization_count = self._enopt_config.realizations.weights.size
+        perturbation_count = self._enopt_config.gradient.number_of_perturbations
 
         samples: NDArray[np.float64]
         if self._mask is None:
@@ -100,7 +104,7 @@ def test_sampler_simple(enopt_config: Any) -> None:
     sampler_config = config.samplers[0]
     assert isinstance(sampler_config, SamplerConfig)
     sampler = MockedSampler(sampler_config)
-    sampler.init(None, rng)
+    sampler.init(config, None, rng)
 
     perturbed_variables = _perturb_variables(
         config,
@@ -118,7 +122,7 @@ def test_sampler_use_options(enopt_config: Any) -> None:
     sampler_config = config.samplers[0]
     assert isinstance(sampler_config, SamplerConfig)
     sampler = MockedSampler(sampler_config)
-    sampler.init(None, rng)
+    sampler.init(config, None, rng)
 
     perturbed_variables = _perturb_variables(
         config,
@@ -139,12 +143,12 @@ def test_sampler_indexed(enopt_config: Any) -> None:
     sampler_config = config.samplers[0]
     assert isinstance(sampler_config, SamplerConfig)
     sampler1 = MockedSampler(sampler_config)
-    sampler1.init(np.array([0]), rng)
+    sampler1.init(config, np.array([0]), rng)
 
     sampler_config = config.samplers[1]
     assert isinstance(sampler_config, SamplerConfig)
     sampler2 = MockedSampler(sampler_config)
-    sampler2.init(np.array([1, 2]), rng)
+    sampler2.init(config, np.array([1, 2]), rng)
 
     perturbed_variables = _perturb_variables(
         config,

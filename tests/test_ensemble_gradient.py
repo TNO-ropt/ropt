@@ -270,6 +270,6 @@ def test_variable_perturbation_enopt() -> None:
 
     config = EnOptConfig.model_validate(config_dict)
     sampler = SciPySampler(SamplerConfig())
-    sampler.init(None, default_rng(123))
+    sampler.init(config, None, default_rng(123))
     perturbations = _perturb_variables(config, np.array(variables), [sampler])
     assert expected_perturbations == pytest.approx(perturbations)

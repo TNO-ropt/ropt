@@ -115,17 +115,16 @@ def test_stddev_function_estimator(
 
 class CustomFunctionEstimator(FunctionEstimator):
     def calculate_function(  # noqa: PLR6301
-        self,
-        _: EnOptConfig,
-        functions: NDArray[np.float64],
-        weights: NDArray[np.float64],
+        self, functions: NDArray[np.float64], weights: NDArray[np.float64]
     ) -> NDArray[np.float64]:
         return np.asarray(np.dot(functions, weights) + 1.0)
 
+    def init(self, _: EnOptConfig) -> None:
+        pass
+
     def calculate_gradient(  # noqa: PLR6301
         self,
-        _0: EnOptConfig,
-        _1: NDArray[np.float64],
+        _: NDArray[np.float64],
         gradient: NDArray[np.float64],
         weights: NDArray[np.float64],
     ) -> NDArray[np.float64]:

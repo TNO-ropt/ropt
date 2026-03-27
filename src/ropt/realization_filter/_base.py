@@ -16,9 +16,16 @@ class RealizationFilter(ABC):
     """Abstract base class for realization filter classes."""
 
     @abstractmethod
+    def init(self, enopt_config: EnOptConfig) -> None:
+        """Initialize the realization filter.
+
+        Args:
+            enopt_config: The main EnOpt configuration object.
+        """
+
+    @abstractmethod
     def get_realization_weights(
         self,
-        enopt_config: EnOptConfig,
         objectives: NDArray[np.float64],
         constraints: NDArray[np.float64] | None,
     ) -> NDArray[np.float64]:
@@ -38,7 +45,6 @@ class RealizationFilter(ABC):
             before use, hence any non-negative weight value is permissible.
 
         Args:
-            enopt_config: The main EnOpt configuration object.
             objectives:   The objectives of all realizations.
             constraints:  The constraints for all realizations.
 
