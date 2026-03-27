@@ -19,7 +19,7 @@ def enopt_config_fixture() -> dict[str, Any]:
             "max_functions": 10,
         },
         "backend": {
-            "tolerance": 1e-4,
+            "convergence_tolerance": 1e-4,
         },
         "objectives": {
             "weights": [0.75, 0.25],

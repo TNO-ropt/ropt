@@ -35,7 +35,7 @@ def enopt_config_fixture() -> dict[str, Any]:
             "max_functions": 20,
         },
         "backend": {
-            "tolerance": 1e-5,
+            "convergence_tolerance": 1e-5,
         },
         "variables": {
             "variable_count": len(initial_values),
@@ -172,7 +172,7 @@ def test_two_optimizers_alternating(
                 completed_functions += 1
 
     enopt_config["gradient"] = {"evaluation_policy": "speculative"}
-    del enopt_config["backend"]["tolerance"]
+    del enopt_config["backend"]["convergence_tolerance"]
 
     enopt_config1 = deepcopy(enopt_config)
     enopt_config1["variables"]["mask"] = [True, False, True]

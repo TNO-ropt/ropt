@@ -186,7 +186,7 @@ class SciPyBackend(Backend):
             minimize(  # type: ignore[call-overload,misc]
                 fun=self._function,
                 x0=initial_values[self._config.variables.mask],
-                tol=self._config.backend.tolerance,
+                tol=self._config.backend.convergence_tolerance,
                 method=self._method,
                 bounds=self._bounds,
                 jac=(False if self._method in _NO_GRADIENT else self._gradient),

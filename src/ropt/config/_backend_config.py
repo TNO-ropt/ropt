@@ -28,7 +28,8 @@ class BackendConfig(BaseModel):
       optimizer may choose to ignore this.
       optimizer callback may ask to evaluate a batch of multiple functions and
       gradients at once. This setting will limit the number of those calls.
-    - **`tolerance`**: The convergence tolerance used as a stopping criterion.
+    - **`convergence_tolerance`**: The convergence tolerance used as a stopping
+      criterion.
       The exact definition depends on the optimizer, and it may be ignored.
     - **`parallel`**: If `True`, allows the optimizer to use parallelized
       function evaluations. This typically applies to gradient-free methods and
@@ -42,19 +43,19 @@ class BackendConfig(BaseModel):
     - **`stderr`**: Redirect optimizer standard error to the given file.
 
     Attributes:
-        method:         Name of the optimization method.
-        max_iterations: Maximum number of iterations (optional).
-        tolerance:      Convergence tolerance (optional).
-        parallel:       Allow parallelized function evaluations (default: `False`).
-        output_dir:     Output directory for the optimizer (optional).
-        options:        Generic options for the optimizer (optional).
-        stdout:         File to redirect optimizer standard output (optional).
-        stderr:         File to redirect optimizer standard error (optional).
+        method:                Name of the optimization method.
+        max_iterations:        Maximum number of iterations (optional).
+        convergence_tolerance: Convergence tolerance (optional).
+        parallel:              Allow parallelized function evaluations (default: `False`).
+        output_dir:            Output directory for the optimizer (optional).
+        options:               Generic options for the optimizer (optional).
+        stdout:                File to redirect optimizer standard output (optional).
+        stderr:                File to redirect optimizer standard error (optional).
     """
 
     method: str = "scipy/default"
     max_iterations: PositiveInt | None = None
-    tolerance: NonNegativeFloat | None = None
+    convergence_tolerance: NonNegativeFloat | None = None
     parallel: bool = False
     output_dir: Path | None = None
     options: dict[str, Any] | list[str] | None = None

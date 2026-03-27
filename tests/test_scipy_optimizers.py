@@ -39,7 +39,7 @@ def enopt_config_fixture() -> dict[str, Any]:
             "perturbation_magnitudes": 0.01,
         },
         "backend": {
-            "tolerance": 1e-4,
+            "convergence_tolerance": 1e-4,
             "max_iterations": 25,
         },
         "objectives": {

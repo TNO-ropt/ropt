@@ -202,7 +202,7 @@ def enopt_config_fixture() -> dict[str, Any]:
             "max_functions": 8,
         },
         "backend": {
-            "tolerance": 1e-2,
+            "convergence_tolerance": 1e-2,
         },
         "variables": {
             "variable_count": len(initial_values),

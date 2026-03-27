@@ -50,7 +50,7 @@ def enopt_config_fixture() -> dict[str, Any]:
         "backend": {
             "method": _SLSQP,
             "max_iterations": 15,
-            "tolerance": 1e-5,
+            "convergence_tolerance": 1e-5,
         },
         "variables": {
             "variable_count": len(initial_values),
