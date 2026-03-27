@@ -25,7 +25,7 @@ for:
     - **[`ObjectiveTransform`][ropt.transforms.ObjectiveTransform]:**
       Defines the interface for transforming objective values between user
       and optimizer domains.
-    - **[`NonLinearConstraintTransform`][ropt.transforms.NonLinearConstraintTransform]:**
+    - **[`NonlinearConstraintTransform`][ropt.transforms.NonlinearConstraintTransform]:**
       Defines the interface for transforming non-linear constraint values
       between user and optimizer domains.
 
@@ -51,7 +51,7 @@ for:
       -  **Transformation to the Backend Domain:** The resulting objective and
          constraint values are
           transformed to the optimizer domain using the `to_optimizer` methods
-          of the `ObjectiveTransform` and `NonLinearConstraintTransform`.
+          of the `ObjectiveTransform` and `NonlinearConstraintTransform`.
 4.  **Optimization:** The optimizer proceeds using the transformed values.
 5.  **Results:** The [`Results`][ropt.results.Results] objects produced during
     optimization hold values in the optimizer domain. To obtain results in the
@@ -67,10 +67,10 @@ for:
     method.
 """
 
-from .base import NonLinearConstraintTransform, ObjectiveTransform, VariableTransform
+from .base import NonlinearConstraintTransform, ObjectiveTransform, VariableTransform
 
 __all__ = [
-    "NonLinearConstraintTransform",
+    "NonlinearConstraintTransform",
     "ObjectiveTransform",
     "VariableTransform",
 ]

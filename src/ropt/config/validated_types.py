@@ -36,7 +36,7 @@ from ropt.function_estimator import FunctionEstimator
 from ropt.realization_filter import RealizationFilter
 from ropt.sampler import Sampler
 from ropt.transforms import (
-    NonLinearConstraintTransform,
+    NonlinearConstraintTransform,
     ObjectiveTransform,
     VariableTransform,
 )
@@ -100,13 +100,13 @@ ObjectiveTransformInstance = Annotated[
 ]
 """Validate that the value is an instance of an ObjectiveTransform."""
 
-NonLinearConstraintTransformInstance = Annotated[
-    NonLinearConstraintTransform,
+NonlinearConstraintTransformInstance = Annotated[
+    NonlinearConstraintTransform,
     GetPydanticSchema(
-        lambda _0, _1: core_schema.is_instance_schema(NonLinearConstraintTransform)
+        lambda _0, _1: core_schema.is_instance_schema(NonlinearConstraintTransform)
     ),
 ]
-"""Validate that the value is an instance of a NonLinearConstraintTransform."""
+"""Validate that the value is an instance of a NonlinearConstraintTransform."""
 
 VariableTransformInstance = Annotated[
     VariableTransform,

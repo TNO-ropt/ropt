@@ -3,5 +3,5 @@
         members: []
 ::: ropt.transforms.VariableTransform
 ::: ropt.transforms.ObjectiveTransform
-::: ropt.transforms.NonLinearConstraintTransform
+::: ropt.transforms.NonlinearConstraintTransform
 ::: ropt.transforms.default.DefaultVariableTransform

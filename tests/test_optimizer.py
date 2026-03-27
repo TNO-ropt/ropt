@@ -44,11 +44,13 @@ initial_values = [0.0, 0.0, 0.1]
 @pytest.fixture(name="enopt_config")
 def enopt_config_fixture() -> dict[str, Any]:
     return {
+        "optimizer": {
+            "max_functions": 20,
+        },
         "backend": {
             "method": _SLSQP,
             "max_iterations": 15,
             "tolerance": 1e-5,
-            "max_functions": 20,
         },
         "variables": {
             "variable_count": len(initial_values),
@@ -89,7 +91,7 @@ def test_max_functions_exceeded(
         last_evaluation += 1
 
     max_functions = 2
-    enopt_config["backend"]["max_functions"] = max_functions
+    enopt_config["optimizer"]["max_functions"] = max_functions
     enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
     optimizer = BasicOptimizer(enopt_config, evaluator())
     optimizer.set_results_callback(track_results)
@@ -106,7 +108,7 @@ def test_max_batches_exceeded(enopt_config: Any, evaluator: Any, external: str) 
         last_evaluation += 1
 
     max_batches = 2
-    enopt_config["backend"]["max_batches"] = max_batches
+    enopt_config["optimizer"]["max_batches"] = max_batches
     enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
     optimizer = BasicOptimizer(enopt_config, evaluator())
     optimizer.set_results_callback(track_results)
@@ -125,7 +127,7 @@ def test_max_functions_not_exceeded(
         last_evaluation += 1
 
     max_functions = 100
-    enopt_config["backend"]["max_functions"] = max_functions
+    enopt_config["optimizer"]["max_functions"] = max_functions
     enopt_config["gradient"] = {"evaluation_policy": "separate"}
     enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
     optimizer = BasicOptimizer(enopt_config, evaluator())
@@ -770,6 +772,7 @@ def test_optimizer_variables_subset_linear_constraints(
 
 
 def test_parallelize(enopt_config: Any, evaluator: Any, external: str) -> None:
+    enopt_config["optimizer"] = {}
     enopt_config["backend"] = {
         "method": f"{external}{_DIFFERENTIAL_EVOLUTION}",
         "max_iterations": 15,

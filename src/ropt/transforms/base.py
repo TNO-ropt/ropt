@@ -313,7 +313,7 @@ class ObjectiveTransform(ABC):
         """
 
 
-class NonLinearConstraintTransform(ABC):
+class NonlinearConstraintTransform(ABC):
     """Abstract base class for nonlinear constraint transformations.
 
     This class defines the interface for transforming nonlinear constraint
@@ -326,20 +326,20 @@ class NonLinearConstraintTransform(ABC):
 
     - **Constraint Value Transformation:** Mapping constraint values between the
       user and optimizer domains. This is achieved by overriding the
-      [`to_optimizer`][ropt.transforms.NonLinearConstraintTransform.to_optimizer]
+      [`to_optimizer`][ropt.transforms.NonlinearConstraintTransform.to_optimizer]
       and
-      [`from_optimizer`][ropt.transforms.NonLinearConstraintTransform.from_optimizer]
+      [`from_optimizer`][ropt.transforms.NonlinearConstraintTransform.from_optimizer]
       methods.
     - **Right-Hand-Side Bound Transformation:** Mapping the right-hand-side
       bounds of the constraints between the user and optimizer domains. This is
       achieved by overriding the
-      [`bounds_to_optimizer`][ropt.transforms.NonLinearConstraintTransform.bounds_to_optimizer]
+      [`bounds_to_optimizer`][ropt.transforms.NonlinearConstraintTransform.bounds_to_optimizer]
       method.
     - **Constraint Difference Transformation:** To report violations of
       nonlinear constraints, the differences between constraint values and their
       lower/upper bounds must be transformed from the optimizer domain back to
       the user domain. This is done using the
-      [`nonlinear_constraint_diffs_from_optimizer`][ropt.transforms.NonLinearConstraintTransform.nonlinear_constraint_diffs_from_optimizer]
+      [`nonlinear_constraint_diffs_from_optimizer`][ropt.transforms.NonlinearConstraintTransform.nonlinear_constraint_diffs_from_optimizer]
       method.
     """
 

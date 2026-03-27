@@ -229,10 +229,10 @@ class EnsembleOptimizer:
         return tmp_variables
 
     def _check_stopping_criteria(self) -> None:
-        max_functions = self._enopt_config.backend.max_functions
+        max_functions = self._enopt_config.optimizer.max_functions
         if max_functions is not None and self._completed_functions >= max_functions:
             raise ComputeStepAborted(exit_code=ExitCode.MAX_FUNCTIONS_REACHED)
-        max_batches = self._enopt_config.backend.max_batches
+        max_batches = self._enopt_config.optimizer.max_batches
         if max_batches is not None and self._completed_batches >= max_batches:
             raise ComputeStepAborted(exit_code=ExitCode.MAX_BATCHES_REACHED)
 

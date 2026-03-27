@@ -22,10 +22,12 @@ CONFIG: dict[str, Any] = {
         "lower_bounds": [0.0, 0.0],
         "upper_bounds": [10.0, 10.0],
     },
+    "optimizer": {
+        "max_functions": 5,
+    },
     "backend": {
         "method": "differential_evolution",
         "options": {"rng": 4},
-        "max_functions": 5,
         "parallel": False,
     },
     "nonlinear_constraints": {"lower_bounds": [-np.inf], "upper_bounds": [10.0]},

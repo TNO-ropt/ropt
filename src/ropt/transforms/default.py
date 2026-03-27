@@ -9,7 +9,7 @@ from ropt.config import (
     VariableTransformConfig,
 )
 
-from .base import NonLinearConstraintTransform, ObjectiveTransform, VariableTransform
+from .base import NonlinearConstraintTransform, ObjectiveTransform, VariableTransform
 
 DEFAULT_VARIABLE_TRANSFORM_METHODS = {"scaler"}
 DEFAULT_OBJECTIVE_TRANSFORM_METHODS = {"scaler"}
@@ -374,7 +374,7 @@ class DefaultObjectiveTransform(ObjectiveTransform):
         self._mask = mask
 
 
-class DefaultNonlinearConstraintTransform(NonLinearConstraintTransform):
+class DefaultNonlinearConstraintTransform(NonlinearConstraintTransform):
     r"""Linearly scales constraints between domains.
 
     This class implements a linear transformation for constraints, allowing for

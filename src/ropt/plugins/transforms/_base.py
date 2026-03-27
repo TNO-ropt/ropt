@@ -14,7 +14,7 @@ if TYPE_CHECKING:
         VariableTransformConfig,
     )
     from ropt.transforms import (
-        NonLinearConstraintTransform,
+        NonlinearConstraintTransform,
         ObjectiveTransform,
         VariableTransform,
     )
@@ -91,7 +91,7 @@ class NonlinearConstraintTransformPlugin(Plugin):
     """Abstract Base Class for Nonlinear Constraint Transform Plugins (Factories).
 
     This class defines the interface for plugins responsible for creating
-    [`NonLinearConstraintTransform`][ropt.transforms.NonLinearConstraintTransform]
+    [`NonlinearConstraintTransform`][ropt.transforms.NonlinearConstraintTransform]
     instances. These plugins act as factories for specific nonlinear constraint
     transformation algorithms or strategies.
     """
@@ -101,13 +101,13 @@ class NonlinearConstraintTransformPlugin(Plugin):
     def create(
         cls,
         config: NonlinearConstraintTransformConfig,
-    ) -> NonLinearConstraintTransform:
-        """Factory method to create a concrete NonLinearConstraintTransform instance.
+    ) -> NonlinearConstraintTransform:
+        """Factory method to create a concrete NonlinearConstraintTransform instance.
 
         This abstract class method serves as a factory for creating concrete
-        [`NonLinearConstraintTransform`][ropt.transforms.NonLinearConstraintTransform]
+        [`NonlinearConstraintTransform`][ropt.transforms.NonlinearConstraintTransform]
         objects. Plugin implementations must override this method to return an
-        instance of their specific `NonLinearConstraintTransform` subclass.
+        instance of their specific `NonlinearConstraintTransform` subclass.
 
         The [`PluginManager`][ropt.plugins.manager.PluginManager] calls this
         method when an optimization requires nonlinear constraint
@@ -117,5 +117,5 @@ class NonlinearConstraintTransformPlugin(Plugin):
             config:   The nonlinear constraint transform configuration object.
 
         Returns:
-            An initialized NonLinearConstraintTransform object ready for use.
+            An initialized NonlinearConstraintTransform object ready for use.
         """

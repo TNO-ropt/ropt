@@ -47,6 +47,7 @@ from ._gradient_config import GradientConfig
 from ._linear_constraints_config import LinearConstraintsConfig
 from ._nonlinear_constraints_config import NonlinearConstraintsConfig
 from ._objective_functions_config import ObjectiveFunctionsConfig
+from ._optimizer_config import OptimizerConfig
 from ._realization_filter_config import RealizationFilterConfig
 from ._realizations_config import RealizationsConfig
 from ._sampler_config import SamplerConfig
@@ -67,6 +68,7 @@ __all__ = [
     "NonlinearConstraintsConfig",
     "ObjectiveFunctionsConfig",
     "ObjectiveTransformConfig",
+    "OptimizerConfig",
     "RealizationFilterConfig",
     "RealizationsConfig",
     "SamplerConfig",

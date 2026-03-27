@@ -11,7 +11,7 @@ from ropt.config.utils import immutable_array
 from ropt.enums import PerturbationType
 from ropt.plugins.manager import get_plugin
 from ropt.transforms import (
-    NonLinearConstraintTransform,
+    NonlinearConstraintTransform,
     ObjectiveTransform,
     VariableTransform,
 )
@@ -22,6 +22,7 @@ from ._gradient_config import GradientConfig
 from ._linear_constraints_config import LinearConstraintsConfig  # noqa: TC001
 from ._nonlinear_constraints_config import NonlinearConstraintsConfig  # noqa: TC001
 from ._objective_functions_config import ObjectiveFunctionsConfig
+from ._optimizer_config import OptimizerConfig
 from ._realization_filter_config import RealizationFilterConfig  # noqa: TC001
 from ._realizations_config import RealizationsConfig
 from ._sampler_config import SamplerConfig
@@ -33,7 +34,7 @@ from ._transform_config import (  # noqa: TC001
 from ._variables_config import VariablesConfig  # noqa: TC001
 from .validated_types import (  # noqa: TC001
     FunctionEstimatorInstance,
-    NonLinearConstraintTransformInstance,
+    NonlinearConstraintTransformInstance,
     ObjectiveTransformInstance,
     RealizationFilterInstance,
     SamplerInstance,
@@ -94,6 +95,7 @@ class EnOptConfig(BaseModel):
         linear_constraints:              Configuration for linear constraints.
         nonlinear_constraints:           Configuration for non-linear constraints.
         realizations:                    Configuration for the realizations.
+        optimizer:                       Configuration for the ensemble optimizer.
         backend:                         Configuration for the optimization backend.
         gradient:                        Configuration for gradient calculations.
         realization_filters:             Configuration for realization filters.
@@ -110,6 +112,7 @@ class EnOptConfig(BaseModel):
     linear_constraints: LinearConstraintsConfig | None = None
     nonlinear_constraints: NonlinearConstraintsConfig | None = None
     realizations: RealizationsConfig = RealizationsConfig.model_validate({})
+    optimizer: OptimizerConfig = OptimizerConfig.model_validate({})
     backend: BackendConfig = BackendConfig.model_validate({})
     gradient: GradientConfig = GradientConfig.model_validate({})
     realization_filters: tuple[
@@ -126,13 +129,13 @@ class EnOptConfig(BaseModel):
         ObjectiveTransformConfig | ObjectiveTransformInstance, ...
     ] = ()
     nonlinear_constraint_transforms: tuple[
-        NonlinearConstraintTransformConfig | NonLinearConstraintTransformInstance, ...
+        NonlinearConstraintTransformConfig | NonlinearConstraintTransformInstance, ...
     ] = ()
     names: dict[str, tuple[str | int, ...]] = {}
 
     _variable_transforms: tuple[VariableTransform, ...] = PrivateAttr(default=())
     _objective_transforms: tuple[ObjectiveTransform, ...] = PrivateAttr(default=())
-    _nonlinear_constraint_transforms: tuple[NonLinearConstraintTransform, ...] = (
+    _nonlinear_constraint_transforms: tuple[NonlinearConstraintTransform, ...] = (
         PrivateAttr(default=())
     )
 
@@ -266,11 +269,11 @@ class EnOptConfig(BaseModel):
     def _initialize_nonlinear_constraint_transforms(self) -> Self:
         if self.nonlinear_constraints is None:
             return self
-        transforms: list[NonLinearConstraintTransform] = []
+        transforms: list[NonlinearConstraintTransform] = []
         for idx, item in enumerate(self.nonlinear_constraint_transforms):
             mask = np.asarray(self.nonlinear_constraints.transforms == idx)
             if mask.size:
-                if isinstance(item, NonLinearConstraintTransform):
+                if isinstance(item, NonlinearConstraintTransform):
                     instance = item
                 else:
                     plugin = get_plugin(
@@ -285,6 +288,6 @@ class EnOptConfig(BaseModel):
     @property
     def nonlinear_constraint_transform_instances(
         self,
-    ) -> tuple[NonLinearConstraintTransform, ...]:
+    ) -> tuple[NonlinearConstraintTransform, ...]:
         """Return the nonlinear constraint transform instances."""
         return self._nonlinear_constraint_transforms
