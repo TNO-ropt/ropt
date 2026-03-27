@@ -2375,6 +2375,17 @@ transformations that are applied to the input upon creation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
+            <td><code><span title="ropt.config.EnOptConfig.optimizer">optimizer</span></code></td>
+            <td>
+                  <code><span title="ropt.config._optimizer_config.OptimizerConfig">OptimizerConfig</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Configuration for the ensemble optimizer.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code><span title="ropt.config.EnOptConfig.backend">backend</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-internal" title="            BackendConfig (ropt.config._backend_config.BackendConfig)" href="#ropt.config.BackendConfig">BackendConfig</a></code>
@@ -2479,12 +2490,12 @@ transformations that are applied to the input upon creation.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.EnOptConfig.nonlinear_constraint_transforms">nonlinear_constraint_transforms</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.config._transform_config.NonlinearConstraintTransformConfig">NonlinearConstraintTransformConfig</span> | <a class="autorefs autorefs-internal" title="            NonLinearConstraintTransformInstance
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.config._transform_config.NonlinearConstraintTransformConfig">NonlinearConstraintTransformConfig</span> | <a class="autorefs autorefs-internal" title="            NonlinearConstraintTransformInstance
 
 
   
       module-attribute
-   (ropt.config.validated_types.NonLinearConstraintTransformInstance)" href="../../miscellaneous/utilities/#ropt.config.validated_types.NonLinearConstraintTransformInstance">NonLinearConstraintTransformInstance</a>, ...]</code>
+   (ropt.config.validated_types.NonlinearConstraintTransformInstance)" href="../../miscellaneous/utilities/#ropt.config.validated_types.NonlinearConstraintTransformInstance">NonlinearConstraintTransformInstance</a>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2598,7 +2609,7 @@ transformations that are applied to the input upon creation.</p>
 
 </h4>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">nonlinear_constraint_transform_instances</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">NonLinearConstraintTransform</span><span class="p">,</span> <span class="o">...</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">NonlinearConstraintTransform</span><span class="p">,</span> <span class="o">...</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="p">]</span>
 </span></code></pre></div>
 
@@ -3505,15 +3516,13 @@ one successful realization.</p>
 
         <p>Configuration class for the optimization algorithm.</p>
 <p>This class, <code>BackendConfig</code>, defines the configuration for the optimization
-algorithm used in an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+algorithms implemented in the optimization backends.</p>
 <p>While optimization methods can have diverse parameters, this class provides a
 standardized set of settings that are commonly used and forwarded to the
-optimizer:</p>
+optimizer backend:</p>
 <ul>
 <li><strong><code>max_iterations</code></strong>: The maximum number of iterations allowed. The
-  optimizer may choose to ignore this.</li>
-<li><strong><code>max_functions</code></strong>: The maximum number of function evaluations allowed.</li>
-<li><strong><code>max_batches</code></strong>: The maximum number of evaluations batches allowed. The
+  optimizer may choose to ignore this.
   optimizer callback may ask to evaluate a batch of multiple functions and
   gradients at once. This setting will limit the number of those calls.</li>
 <li><strong><code>tolerance</code></strong>: The convergence tolerance used as a stopping criterion.
@@ -3530,47 +3539,6 @@ optimizer:</p>
 <li><strong><code>stderr</code></strong>: Redirect optimizer standard error to the given file.</li>
 </ul>
 
-
-<details class="note" open>
-  <summary>Differences between <code>max_iterations</code>, <code>max_functions</code>, and <code>max_batches</code></summary>
-  <p>These three parameters provide different ways to limit the duration or
-computational cost of the optimization process:</p>
-<ul>
-<li>
-<p><strong><code>max_iterations</code></strong>: This limit is passed directly to the backend
-  optimization algorithm. Many optimizers define an "iteration" as a
-  distinct step in their process, which might involve one or more
-  function or gradient evaluations. The interpretation of <code>max_iterations</code>
-  depends on the specific backend optimizer; it typically caps the number
-  of these internal iterations. Some backends might ignore this setting if
-  they don't have a clear concept of iterations.</p>
-</li>
-<li>
-<p><strong><code>max_batches</code></strong>: This limit restricts the total number of <em>calls</em> made
-  to the evaluation function provided to <code>ropt</code>. An optimizer might request
-  a batch containing multiple function and/or gradient evaluations within
-  a single call. <code>max_batches</code> limits how many such batch requests are
-  processed sequentially. This is particularly useful for managing resource
-  usage when batches are evaluated in parallel (e.g., on an HPC cluster),
-  as it controls the number of sequential submission steps. The number of
-  batches does not necessarily correspond directly to the number of
-  optimizer iterations, especially if function and gradient evaluations
-  occur in separate batches.</p>
-</li>
-<li>
-<p><strong><code>max_functions</code></strong>: This imposes a hard limit on the total <em>number</em> of
-  individual objective function evaluations performed across all batches.
-  Since a single batch evaluation (limited by <code>max_batches</code>) can involve
-  multiple function evaluations, setting <code>max_functions</code> provides more
-  granular control over the total computational effort spent on function
-  calls. It can serve as an alternative stopping criterion if the backend
-  optimizer doesn't support <code>max_iterations</code> or if you need to strictly
-  limit the function evaluation count. Note that exceeding this limit might
-  cause the optimization to terminate mid-batch, potentially earlier than
-  a corresponding <code>max_batches</code> limit would.</p>
-</li>
-</ul>
-</details>
 
 <p><span class="doc-section-title">Attributes:</span></p>
     <table>
@@ -3601,28 +3569,6 @@ computational cost of the optimization process:</p>
             <td>
               <div class="doc-md-description">
                 <p>Maximum number of iterations (optional).</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.BackendConfig.max_functions">max_functions</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pydantic.PositiveInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.PositiveInt">PositiveInt</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Maximum number of function evaluations (optional).</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="ropt.config.BackendConfig.max_batches">max_batches</span></code></td>
-            <td>
-                  <code><a class="autorefs autorefs-external" title="pydantic.PositiveInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.PositiveInt">PositiveInt</a> | None</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Maximum number of batch evaluations (optional).</p>
               </div>
             </td>
           </tr>
