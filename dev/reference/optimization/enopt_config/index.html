@@ -807,6 +807,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.config.OptimizerConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptimizerConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.config.BackendConfig" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1963,6 +1974,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#ropt.config.OptimizerConfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptimizerConfig
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#ropt.config.BackendConfig" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2377,7 +2399,7 @@ transformations that are applied to the input upon creation.</p>
           <tr class="doc-section-item">
             <td><code><span title="ropt.config.EnOptConfig.optimizer">optimizer</span></code></td>
             <td>
-                  <code><span title="ropt.config._optimizer_config.OptimizerConfig">OptimizerConfig</span></code>
+                  <code><a class="autorefs autorefs-internal" title="            OptimizerConfig (ropt.config._optimizer_config.OptimizerConfig)" href="#ropt.config.OptimizerConfig">OptimizerConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3466,6 +3488,117 @@ one successful realization.</p>
               <div class="doc-md-description">
                 <p>Minimum number of successful realizations (default:
                     equal to the number of realizations).</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="ropt.config.OptimizerConfig" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">OptimizerConfig</span>
+
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Configuration class for the optimization algorithm.</p>
+<p>This class, <code>BackendConfig</code>, defines the configuration for the optimization
+algorithm used in an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+<p>While optimization methods can have diverse parameters, this class provides a
+standardized set of settings that are commonly used and forwarded to the
+optimizer:</p>
+<ul>
+<li>
+<p><strong><code>max_batches</code></strong>: This limit restricts the total number of <em>calls</em> made
+    to the evaluation function provided to <code>ropt</code>. An optimizer might request
+    a batch containing multiple function and/or gradient evaluations within
+    a single call. <code>max_batches</code> limits how many such batch requests are
+    processed sequentially. This is particularly useful for managing resource
+    usage when batches are evaluated in parallel (e.g., on an HPC cluster),
+    as it controls the number of sequential submission steps. The number of
+    batches does not necessarily correspond directly to the number of
+    optimizer iterations, especially if function and gradient evaluations
+    occur in separate batches.</p>
+</li>
+<li>
+<p><strong><code>max_functions</code></strong>: This imposes a hard limit on the total <em>number</em> of
+    individual objective function evaluations performed across all batches.
+    Since a single batch evaluation (limited by <code>max_batches</code>) can involve
+    multiple function evaluations, setting <code>max_functions</code> provides more
+    granular control over the total computational effort spent on function
+    calls. It can serve as an alternative stopping criterion if the backend
+    optimizer doesn't support <code>max_iterations</code> or if you need to strictly
+    limit the function evaluation count. Note that exceeding this limit might
+    cause the optimization to terminate mid-batch, potentially earlier than
+    a corresponding <code>max_batches</code> limit would.</p>
+</li>
+</ul>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.OptimizerConfig.max_functions">max_functions</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pydantic.PositiveInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.PositiveInt">PositiveInt</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum number of function evaluations (optional).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="ropt.config.OptimizerConfig.max_batches">max_batches</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="pydantic.PositiveInt" href="https://docs.pydantic.dev/latest/api/types/#pydantic.types.PositiveInt">PositiveInt</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum number of batch evaluations (optional).</p>
               </div>
             </td>
           </tr>
