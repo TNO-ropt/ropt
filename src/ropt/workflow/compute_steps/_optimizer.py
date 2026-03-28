@@ -98,6 +98,7 @@ class EnsembleOptimizer(ComputeStep):
             ValueError:   If the input variables have the wrong shape.
         """
         self._config = config
+        self._config.lock()
         self._metadata = metadata
 
         self._emit_event(
@@ -126,6 +127,7 @@ class EnsembleOptimizer(ComputeStep):
             EnOptEvent(event_type=EnOptEventType.FINISHED_OPTIMIZER, config=config)
         )
 
+        self._config.unlock()
         return exit_code
 
     def _emit_event(self, event: EnOptEvent) -> None:

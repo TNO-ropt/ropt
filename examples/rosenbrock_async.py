@@ -110,7 +110,7 @@ def run_optimization(
 
 
 async def async_run(  # noqa: PLR0913
-    config: EnOptConfig,
+    config: dict[str, Any],
     a_list: list[NDArray[np.float64]],
     b_list: list[NDArray[np.float64]],
     *,
@@ -145,7 +145,7 @@ async def async_run(  # noqa: PLR0913
                     run_optimization,
                     async_server,
                     partial(rosenbrock, a=a, b=b, delay=delay),
-                    config,
+                    EnOptConfig.model_validate(config),
                 )
                 for a, b in zip(a_list, b_list, strict=True)
             ),
@@ -176,7 +176,7 @@ async def main(
 
     start_time = time.perf_counter()
     results = await async_run(
-        EnOptConfig.model_validate(CONFIG),
+        CONFIG,
         a,
         b,
         multiprocessing=multiprocessing,

@@ -139,6 +139,8 @@ class EnOptConfig(BaseModel):
         PrivateAttr(default=())
     )
 
+    _locked: bool = PrivateAttr(default=False)
+
     model_config = ConfigDict(
         extra="forbid",
         validate_default=True,
@@ -291,3 +293,18 @@ class EnOptConfig(BaseModel):
     ) -> tuple[NonlinearConstraintTransform, ...]:
         """Return the nonlinear constraint transform instances."""
         return self._nonlinear_constraint_transforms
+
+    def lock(self) -> None:
+        """Lock the configuration to prevent sharing.
+
+        Raises:
+            RuntimeError: If the configuration is already locked.
+        """
+        if self._locked:
+            msg = "The EnOptConfig object is already in use."
+            raise RuntimeError(msg)
+        self._locked = True
+
+    def unlock(self) -> None:
+        """Unlock the configuration to allow reuse."""
+        self._locked = False

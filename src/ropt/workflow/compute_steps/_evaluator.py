@@ -83,6 +83,8 @@ class EnsembleEvaluator(ComputeStep):
         Raises:
             ValueError: If the input variables have the wrong shape.
         """
+        config.lock()
+
         self._emit_event(
             EnOptEvent(
                 event_type=EnOptEventType.START_ENSEMBLE_EVALUATOR, config=config
@@ -134,6 +136,8 @@ class EnsembleEvaluator(ComputeStep):
                 results=results,
             )
         )
+
+        config.unlock()
 
         return exit_code
 
