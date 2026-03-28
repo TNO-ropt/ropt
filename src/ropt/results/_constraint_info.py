@@ -206,14 +206,14 @@ class ConstraintInfo(ResultField):
 
     def transform_from_optimizer(self, config: EnOptConfig) -> ConstraintInfo:
         if (
-            not config.variable_transform_instances
-            and not config.nonlinear_constraint_transform_instances
+            not config.variable_transforms
+            and not config.nonlinear_constraint_transforms
         ):
             return self
 
         diffs: dict[str, NDArray[np.float64] | None] = asdict(self)
 
-        for variable_transform in config.variable_transform_instances:
+        for variable_transform in config.variable_transforms:
             if self.bound_lower is not None:
                 assert self.bound_upper is not None
                 diffs["bound_lower"], diffs["bound_upper"] = (
@@ -230,7 +230,7 @@ class ConstraintInfo(ResultField):
                     )
                 )
 
-        for constraint_transform in config.nonlinear_constraint_transform_instances:
+        for constraint_transform in config.nonlinear_constraint_transforms:
             if self.nonlinear_lower is not None:
                 assert self.nonlinear_upper is not None
                 diffs["nonlinear_lower"], diffs["nonlinear_upper"] = (
@@ -248,7 +248,7 @@ def _get_nonlinear_constraint_bounds(
     assert config.nonlinear_constraints is not None
     lower_bounds = config.nonlinear_constraints.lower_bounds
     upper_bounds = config.nonlinear_constraints.upper_bounds
-    for constraint_transform in config.nonlinear_constraint_transform_instances:
+    for constraint_transform in config.nonlinear_constraint_transforms:
         lower_bounds, upper_bounds = constraint_transform.bounds_to_optimizer(
             lower_bounds, upper_bounds
         )

@@ -336,7 +336,7 @@ def test_objective_with_lazy_scaler(
     checked = False
 
     def set_scales(event: EnOptEvent) -> None:
-        transform = event.config.objective_transform_instances[0]
+        transform = event.config.objective_transforms[0]
         transform.update([init1, init1])
 
     def check_value(event: EnOptEvent) -> None:
@@ -408,7 +408,7 @@ def test_nonlinear_constraint_with_scaler(
     config = EnOptConfig.model_validate(enopt_config)
     assert config.nonlinear_constraints is not None
     assert config.nonlinear_constraints.upper_bounds == 0.4
-    bounds = config.nonlinear_constraint_transform_instances[0].bounds_to_optimizer(
+    bounds = config.nonlinear_constraint_transforms[0].bounds_to_optimizer(
         config.nonlinear_constraints.lower_bounds,
         config.nonlinear_constraints.upper_bounds,
     )
@@ -489,7 +489,7 @@ def test_nonlinear_constraint_with_lazy_scaler(
     config = EnOptConfig.model_validate(enopt_config)
     assert config.nonlinear_constraints is not None
     assert config.nonlinear_constraints.upper_bounds == 0.4
-    bounds = config.nonlinear_constraint_transform_instances[0].bounds_to_optimizer(
+    bounds = config.nonlinear_constraint_transforms[0].bounds_to_optimizer(
         config.nonlinear_constraints.lower_bounds,
         config.nonlinear_constraints.upper_bounds,
     )
@@ -503,7 +503,7 @@ def test_nonlinear_constraint_with_lazy_scaler(
     check = True
 
     def set_scales(event: EnOptEvent) -> None:
-        transform = event.config.nonlinear_constraint_transform_instances[0]
+        transform = event.config.nonlinear_constraint_transforms[0]
         transform.update(scales)
 
     def check_constraints(event: EnOptEvent) -> None:
@@ -514,7 +514,7 @@ def test_nonlinear_constraint_with_lazy_scaler(
             if isinstance(item, FunctionResults) and check:
                 check = False
                 assert config.nonlinear_constraints is not None
-                _, upper_bounds = config.nonlinear_constraint_transform_instances[
+                _, upper_bounds = config.nonlinear_constraint_transforms[
                     0
                 ].bounds_to_optimizer(
                     config.nonlinear_constraints.lower_bounds,

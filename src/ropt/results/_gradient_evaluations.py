@@ -197,9 +197,9 @@ class GradientEvaluations(ResultField):
             The transformed results.
         """
         if (
-            not config.variable_transform_instances
-            and not config.objective_transform_instances
-            and not config.nonlinear_constraint_transform_instances
+            not config.variable_transforms
+            and not config.objective_transforms
+            and not config.nonlinear_constraint_transforms
         ):
             return self
 
@@ -208,15 +208,15 @@ class GradientEvaluations(ResultField):
         perturbed_objectives = self.perturbed_objectives
         perturbed_constraints = self.perturbed_constraints
 
-        for variable_transform in config.variable_transform_instances:
+        for variable_transform in config.variable_transforms:
             variables = variable_transform.from_optimizer(variables)
             perturbed_variables = variable_transform.from_optimizer(perturbed_variables)
-        for objective_transform in config.objective_transform_instances:
+        for objective_transform in config.objective_transforms:
             perturbed_objectives = objective_transform.from_optimizer(
                 perturbed_objectives
             )
         if perturbed_constraints is not None:
-            for constraint_transform in config.nonlinear_constraint_transform_instances:
+            for constraint_transform in config.nonlinear_constraint_transforms:
                 perturbed_constraints = constraint_transform.from_optimizer(
                     perturbed_constraints
                 )

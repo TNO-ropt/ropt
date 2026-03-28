@@ -327,7 +327,7 @@ class EnsembleOptimizer:
             return None
         lower_bounds = self._enopt_config.nonlinear_constraints.lower_bounds
         upper_bounds = self._enopt_config.nonlinear_constraints.upper_bounds
-        for transform in self._enopt_config.nonlinear_constraint_transform_instances:
+        for transform in self._enopt_config.nonlinear_constraint_transforms:
             lower_bounds, upper_bounds = transform.bounds_to_optimizer(
                 lower_bounds, upper_bounds
             )

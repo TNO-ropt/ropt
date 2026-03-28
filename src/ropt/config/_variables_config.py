@@ -7,19 +7,19 @@ from typing import Self
 import numpy as np
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
-from ropt.config.utils import (
+from ropt.enums import BoundaryType, PerturbationType, VariableType
+
+from ._utils import (
     broadcast_1d_array,
     check_enum_values,
 )
-from ropt.config.validated_types import (  # noqa: TC001  # noqa: TC001
+from ._validated_types import (  # noqa: TC001  # noqa: TC001
     Array1D,
     Array1DBool,
     Array1DInt,
     ArrayEnum,
     ItemOrTuple,
 )
-from ropt.enums import BoundaryType, PerturbationType, VariableType
-
 from .constants import (
     DEFAULT_PERTURBATION_BOUNDARY_TYPE,
     DEFAULT_PERTURBATION_MAGNITUDE,

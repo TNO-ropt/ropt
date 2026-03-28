@@ -7,8 +7,8 @@ from typing import Self
 import numpy as np
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from ropt.config.utils import broadcast_1d_array, broadcast_arrays
-from ropt.config.validated_types import (  # noqa: TC001
+from ._utils import broadcast_1d_array, broadcast_arrays
+from ._validated_types import (  # noqa: TC001
     Array1D,
     Array1DInt,
 )

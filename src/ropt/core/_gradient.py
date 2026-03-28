@@ -62,7 +62,7 @@ def _invert_linear_equations(
 def _perturb_variables(
     config: EnOptConfig,
     variables: NDArray[np.float64],
-    samplers: list[Sampler],
+    samplers: tuple[Sampler, ...],
 ) -> NDArray[np.float64]:
     # The results should be independent of the order of the samplers,
     # reordering would affect the random numbers they are based on. We
@@ -147,7 +147,7 @@ def _calculate_gradient(  # noqa: PLR0913, PLR0917
 
 
 def _calculate_estimated_gradients(  # noqa: PLR0913, PLR0917
-    function_estimators: list[FunctionEstimator],
+    function_estimators: tuple[FunctionEstimator, ...],
     estimator_indices: NDArray[np.intc] | None,
     variables: NDArray[np.float64],
     functions: NDArray[np.float64],

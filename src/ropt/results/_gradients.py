@@ -134,19 +134,19 @@ class Gradients(ResultField):
             The transformed results.
         """
         if (
-            not config.objective_transform_instances
-            and not config.nonlinear_constraint_transform_instances
+            not config.objective_transforms
+            and not config.nonlinear_constraint_transforms
         ):
             return self
 
         objectives = self.objectives
         constraints = self.constraints
-        for objective_transform in config.objective_transform_instances:
+        for objective_transform in config.objective_transforms:
             objectives = np.moveaxis(objectives, 0, -1)
             objectives = objective_transform.from_optimizer(objectives)
             objectives = np.moveaxis(objectives, 0, -1)
         if constraints is not None:
-            for constraint_transform in config.nonlinear_constraint_transform_instances:
+            for constraint_transform in config.nonlinear_constraint_transforms:
                 constraints = np.moveaxis(constraints, 0, -1)
                 constraints = constraint_transform.from_optimizer(constraints)
                 constraints = np.moveaxis(constraints, 0, -1)

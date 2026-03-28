@@ -107,7 +107,7 @@ def test_sampler_simple(enopt_config: Any) -> None:
     perturbed_variables = _perturb_variables(
         config,
         np.array([0.0, 0.0, 0.0]),
-        [sampler],
+        (sampler,),
     )
     assert np.allclose(perturbed_variables, 0.01 * np.eye(3))
 
@@ -124,7 +124,7 @@ def test_sampler_use_options(enopt_config: Any) -> None:
     perturbed_variables = _perturb_variables(
         config,
         np.array([0.0, 0.0, 0.0]),
-        [sampler],
+        (sampler,),
     )
     assert np.allclose(perturbed_variables, np.eye(3))
 
@@ -148,7 +148,7 @@ def test_sampler_indexed(enopt_config: Any) -> None:
     perturbed_variables = _perturb_variables(
         config,
         np.array([0.0, 0.0, 0.0]),
-        [sampler0, sampler1],
+        (sampler0, sampler1),
     )
     assert np.allclose(perturbed_variables[0, ...], np.diag([0.01, -0.01, -0.01]))
 

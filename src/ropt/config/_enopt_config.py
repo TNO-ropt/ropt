@@ -7,14 +7,8 @@ from typing import Any, Self
 import numpy as np
 from pydantic import BaseModel, ConfigDict, PrivateAttr, model_validator
 
-from ropt.config.utils import immutable_array
 from ropt.enums import PerturbationType
 from ropt.plugins.manager import get_plugin
-from ropt.transforms import (
-    NonlinearConstraintTransform,
-    ObjectiveTransform,
-    VariableTransform,
-)
 
 from ._backend_config import BackendConfig
 from ._function_estimator_config import FunctionEstimatorConfig
@@ -23,16 +17,10 @@ from ._linear_constraints_config import LinearConstraintsConfig  # noqa: TC001
 from ._nonlinear_constraints_config import NonlinearConstraintsConfig  # noqa: TC001
 from ._objective_functions_config import ObjectiveFunctionsConfig
 from ._optimizer_config import OptimizerConfig
-from ._realization_filter_config import RealizationFilterConfig  # noqa: TC001
 from ._realizations_config import RealizationsConfig
 from ._sampler_config import SamplerConfig
-from ._transform_config import (  # noqa: TC001
-    NonlinearConstraintTransformConfig,
-    ObjectiveTransformConfig,
-    VariableTransformConfig,
-)
-from ._variables_config import VariablesConfig  # noqa: TC001
-from .validated_types import (  # noqa: TC001
+from ._utils import immutable_array
+from ._validated_types import (  # noqa: TC001
     FunctionEstimatorInstance,
     NonlinearConstraintTransformInstance,
     ObjectiveTransformInstance,
@@ -40,6 +28,7 @@ from .validated_types import (  # noqa: TC001
     SamplerInstance,
     VariableTransformInstance,
 )
+from ._variables_config import VariablesConfig  # noqa: TC001
 
 
 class EnOptConfig(BaseModel):
@@ -115,29 +104,15 @@ class EnOptConfig(BaseModel):
     optimizer: OptimizerConfig = OptimizerConfig.model_validate({})
     backend: BackendConfig = BackendConfig.model_validate({})
     gradient: GradientConfig = GradientConfig.model_validate({})
-    realization_filters: tuple[
-        RealizationFilterConfig | RealizationFilterInstance, ...
-    ] = ()
-    function_estimators: tuple[
-        FunctionEstimatorConfig | FunctionEstimatorInstance, ...
-    ] = ()
-    samplers: tuple[SamplerConfig | SamplerInstance, ...] = ()
-    variable_transforms: tuple[
-        VariableTransformConfig | VariableTransformInstance, ...
-    ] = ()
-    objective_transforms: tuple[
-        ObjectiveTransformConfig | ObjectiveTransformInstance, ...
-    ] = ()
+    realization_filters: tuple[RealizationFilterInstance, ...] = ()
+    function_estimators: tuple[FunctionEstimatorInstance, ...] = ()
+    samplers: tuple[SamplerInstance, ...] = ()
+    variable_transforms: tuple[VariableTransformInstance, ...] = ()
+    objective_transforms: tuple[ObjectiveTransformInstance, ...] = ()
     nonlinear_constraint_transforms: tuple[
-        NonlinearConstraintTransformConfig | NonlinearConstraintTransformInstance, ...
+        NonlinearConstraintTransformInstance, ...
     ] = ()
     names: dict[str, tuple[str | int, ...]] = {}
-
-    _variable_transforms: tuple[VariableTransform, ...] = PrivateAttr(default=())
-    _objective_transforms: tuple[ObjectiveTransform, ...] = PrivateAttr(default=())
-    _nonlinear_constraint_transforms: tuple[NonlinearConstraintTransform, ...] = (
-        PrivateAttr(default=())
-    )
 
     _locked: bool = PrivateAttr(default=False)
 
@@ -162,41 +137,35 @@ class EnOptConfig(BaseModel):
     def _defaults(self) -> Self:
         updates: dict[str, Any] = {}
         if not self.function_estimators:
+            function_estimator_config = FunctionEstimatorConfig.model_validate({})
             updates["function_estimators"] = (
-                FunctionEstimatorConfig.model_validate({}),
+                get_plugin(
+                    "function_estimator", method=function_estimator_config.method
+                ).create(function_estimator_config),
             )
         if not self.samplers:
-            updates["samplers"] = (SamplerConfig.model_validate({}),)
+            sampler_config = SamplerConfig.model_validate({})
+            updates["samplers"] = (
+                get_plugin("sampler", method=sampler_config.method).create(
+                    sampler_config
+                ),
+            )
         if updates:
             return self.model_copy(update=updates)
         return self
 
-    @model_validator(mode="wrap")  # type: ignore[arg-type]
-    def _pass_enopt_config_unchanged(self, handler: Any) -> Any:  # noqa: ANN401
-        if isinstance(self, EnOptConfig):
-            return self
-        return handler(self)
-
     @model_validator(mode="after")
     def _initialize_variable_transforms(self) -> Self:
-        transforms: list[VariableTransform] = []
         for idx, item in enumerate(self.variable_transforms):
-            mask = np.asarray(self.variables.mask & (self.variables.transforms == idx))
-            if mask.size:
-                if isinstance(item, VariableTransform):
-                    instance = item
-                else:
-                    plugin = get_plugin("variable_transform", method=item.method)
-                    instance = plugin.create(self.variable_transforms[idx])
-                instance.init(mask)
-                transforms.append(instance)
-        self._variable_transforms = tuple(transforms)
+            item.init(
+                np.asarray(self.variables.mask & (self.variables.transforms == idx))
+            )
 
-        if self._variable_transforms:
+        if self.variable_transforms:
             lower_bounds = self.variables.lower_bounds
             upper_bounds = self.variables.upper_bounds
             magnitudes = self.variables.perturbation_magnitudes
-            for transform in self._variable_transforms:
+            for transform in self.variable_transforms:
                 lower_bounds = transform.to_optimizer(lower_bounds)
                 upper_bounds = transform.to_optimizer(upper_bounds)
                 magnitudes = transform.magnitudes_to_optimizer(magnitudes)
@@ -221,7 +190,7 @@ class EnOptConfig(BaseModel):
                 lower_bounds = self.linear_constraints.lower_bounds
                 upper_bounds = self.linear_constraints.upper_bounds
 
-                for transform in self._variable_transforms:
+                for transform in self.variable_transforms:
                     coefficients, lower_bounds, upper_bounds = (
                         transform.linear_constraints_to_optimizer(
                             coefficients, lower_bounds, upper_bounds
@@ -241,58 +210,26 @@ class EnOptConfig(BaseModel):
 
         return self
 
-    @property
-    def variable_transform_instances(self) -> tuple[VariableTransform, ...]:
-        """Return the variable transform instances."""
-        return self._variable_transforms
-
     @model_validator(mode="after")
     def _initialize_objective_transforms(self) -> Self:
-        transforms: list[ObjectiveTransform] = []
         for idx, item in enumerate(self.objective_transforms):
             mask = np.asarray(self.objectives.transforms == idx)
-            if mask.size:
-                if isinstance(item, ObjectiveTransform):
-                    instance = item
-                else:
-                    plugin = get_plugin("objective_transform", method=item.method)
-                    instance = plugin.create(self.objective_transforms[idx])
-                instance.init(mask)
-                transforms.append(instance)
-        self._objective_transforms = tuple(transforms)
+            item.init(mask)
         return self
-
-    @property
-    def objective_transform_instances(self) -> tuple[ObjectiveTransform, ...]:
-        """Return the objective transform instances."""
-        return self._objective_transforms
 
     @model_validator(mode="after")
     def _initialize_nonlinear_constraint_transforms(self) -> Self:
-        if self.nonlinear_constraints is None:
-            return self
-        transforms: list[NonlinearConstraintTransform] = []
-        for idx, item in enumerate(self.nonlinear_constraint_transforms):
-            mask = np.asarray(self.nonlinear_constraints.transforms == idx)
-            if mask.size:
-                if isinstance(item, NonlinearConstraintTransform):
-                    instance = item
-                else:
-                    plugin = get_plugin(
-                        "nonlinear_constraint_transform", method=item.method
-                    )
-                    instance = plugin.create(self.nonlinear_constraint_transforms[idx])
-                instance.init(mask)
-                transforms.append(instance)
-        self._nonlinear_constraint_transforms = tuple(transforms)
+        if self.nonlinear_constraints is not None:
+            for idx, item in enumerate(self.nonlinear_constraint_transforms):
+                mask = np.asarray(self.nonlinear_constraints.transforms == idx)
+                item.init(mask)
         return self
 
-    @property
-    def nonlinear_constraint_transform_instances(
-        self,
-    ) -> tuple[NonlinearConstraintTransform, ...]:
-        """Return the nonlinear constraint transform instances."""
-        return self._nonlinear_constraint_transforms
+    @model_validator(mode="wrap")  # type: ignore[arg-type]
+    def _pass_enopt_config_unchanged(self, handler: Any) -> Any:  # noqa: ANN401
+        if isinstance(self, EnOptConfig):
+            return self
+        return handler(self)
 
     def lock(self) -> None:
         """Lock the configuration to prevent sharing.

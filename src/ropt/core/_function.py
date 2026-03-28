@@ -5,7 +5,7 @@ from ropt.function_estimator import FunctionEstimator
 
 
 def _calculate_estimated_functions(
-    function_estimators: list[FunctionEstimator],
+    function_estimators: tuple[FunctionEstimator, ...],
     estimator_indices: NDArray[np.intc] | None,
     functions: NDArray[np.float64],
     realization_weights: NDArray[np.float64],

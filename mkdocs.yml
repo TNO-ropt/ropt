@@ -117,7 +117,6 @@ nav:
         - "Enumerations": reference/miscellaneous/enums.md
         - "Exceptions": reference/miscellaneous/exceptions.md
         - "Events": reference/miscellaneous/events.md
-        - "Utilities": reference/miscellaneous/utilities.md
       - "Core":
         - "Ensemble Evaluator": reference/core/evaluator.md
         - "Ensemble Optimizer": reference/core/optimizer.md

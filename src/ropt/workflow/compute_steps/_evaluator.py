@@ -95,7 +95,7 @@ class EnsembleEvaluator(ComputeStep):
         if variables.shape[-1] != config.variables.variable_count:
             msg = "The input variables have the wrong shape"
             raise ValueError(msg)
-        for transform in config.variable_transform_instances:
+        for transform in config.variable_transforms:
             variables = transform.to_optimizer(variables)
 
         ensemble_evaluator = CoreEnsembleEvaluator(config, self._evaluator.eval)

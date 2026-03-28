@@ -5,9 +5,6 @@ from typing import TYPE_CHECKING
 import numpy as np
 from numpy.random import default_rng
 
-from ropt.function_estimator import FunctionEstimator
-from ropt.plugins.manager import get_plugin
-from ropt.realization_filter import RealizationFilter
 from ropt.results import (
     ConstraintInfo,
     FunctionEvaluations,
@@ -19,7 +16,6 @@ from ropt.results import (
     Realizations,
     Results,
 )
-from ropt.sampler import Sampler
 
 from ._function import _calculate_estimated_functions
 from ._gradient import _calculate_estimated_gradients, _perturb_variables
@@ -38,6 +34,9 @@ if TYPE_CHECKING:
 
     from ropt.config import EnOptConfig
     from ropt.evaluator import EvaluatorCallback
+    from ropt.function_estimator import FunctionEstimator
+    from ropt.realization_filter import RealizationFilter
+    from ropt.sampler import Sampler
 
 
 class EnsembleEvaluator:
@@ -616,44 +615,20 @@ class EnsembleEvaluator:
                 constraint_weights[apply_to_constraints, :] = weights
         return objective_weights, constraint_weights
 
-    def _init_realization_filters(self) -> list[RealizationFilter]:
-        realization_filters = [
-            item
-            if isinstance(item, RealizationFilter)
-            else get_plugin("realization_filter", method=item.method).create(
-                self._config.realization_filters[idx]
-            )
-            for idx, item in enumerate(self._config.realization_filters)
-        ]
-        for realization_filter in realization_filters:
+    def _init_realization_filters(self) -> tuple[RealizationFilter, ...]:
+        for realization_filter in self._config.realization_filters:
             realization_filter.init(self._config)
-        return realization_filters
+        return self._config.realization_filters
 
-    def _init_function_estimators(self) -> list[FunctionEstimator]:
-        function_estimators = [
-            item
-            if isinstance(item, FunctionEstimator)
-            else get_plugin("function_estimator", method=item.method).create(
-                self._config.function_estimators[idx]
-            )
-            for idx, item in enumerate(self._config.function_estimators)
-        ]
-        for function_estimator in function_estimators:
+    def _init_function_estimators(self) -> tuple[FunctionEstimator, ...]:
+        for function_estimator in self._config.function_estimators:
             function_estimator.init(self._config)
-        return function_estimators
+        return self._config.function_estimators
 
-    def _init_samplers(self, rng: Generator) -> list[Sampler]:
-        samplers: list[Sampler] = []
+    def _init_samplers(self, rng: Generator) -> tuple[Sampler, ...]:
         for idx, item in enumerate(self._config.samplers):
             mask = np.asarray(
                 self._config.variables.mask & (self._config.variables.samplers == idx)
             )
-            if mask.size:
-                if isinstance(item, Sampler):
-                    instance = item
-                else:
-                    plugin = get_plugin("sampler", method=item.method)
-                    instance = plugin.create(self._config.samplers[idx])
-                instance.init(self._config, mask, rng)
-                samplers.append(instance)
-        return samplers
+            item.init(self._config, mask, rng)
+        return self._config.samplers

@@ -7,8 +7,8 @@ from typing import Self
 import numpy as np
 from pydantic import BaseModel, ConfigDict, NonNegativeInt, model_validator
 
-from ropt.config.utils import normalize
-from ropt.config.validated_types import Array1D  # noqa: TC001
+from ._utils import normalize
+from ._validated_types import Array1D  # noqa: TC001
 
 
 class RealizationsConfig(BaseModel):
