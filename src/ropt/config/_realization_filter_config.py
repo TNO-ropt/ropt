@@ -13,8 +13,8 @@ class RealizationFilterConfig(BaseModel):
     This class, `RealizationFilterConfig`, defines the configuration for
     realization filters. Realization filters are generally configured as a tuple
     in another configuration object. For instance, the `realization_filters`
-    field of the [`EnOptConfig`][ropt.config.EnOptConfig] defines the available
-    filters for the optimization.
+    field of the [`EnOptContext`][ropt.context.EnOptContext] context object
+    defines the available filters for the optimization.
 
     By default, objective and constraint functions, as well as their gradients,
     are calculated as a weighted function of all realizations. Realization

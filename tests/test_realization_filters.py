@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from ropt.config._enopt_config import EnOptConfig
+from ropt.context import EnOptContext
 from ropt.realization_filter import RealizationFilter
 from ropt.realization_filter.default import (
     _get_cvar_weights_from_percentile,
@@ -19,8 +19,8 @@ from ropt.workflow import BasicOptimizer
 initial_values = 3 * [0]
 
 
-@pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> dict[str, Any]:
+@pytest.fixture(name="config")
+def config_fixture() -> dict[str, Any]:
     return {
         "optimizer": {
             "max_functions": 10,
@@ -116,7 +116,7 @@ def _track_results(results: tuple[Results, ...], result_list: list[Results]) -> 
 
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_sort_filter_on_objectives(
-    enopt_config: Any,
+    config: Any,
     evaluator: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
@@ -125,16 +125,16 @@ def test_sort_filter_on_objectives(
         partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
     ]
 
-    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
+    config["gradient"]["evaluation_policy"] = evaluation_policy
 
-    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(functions))
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert not np.allclose(
         optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
 
-    enopt_config["realization_filters"] = [
+    config["realization_filters"] = [
         {
             "method": "sort-objective",
             "options": {
@@ -144,10 +144,10 @@ def test_sort_filter_on_objectives(
             },
         },
     ]
-    enopt_config["objectives"]["realization_filters"] = [0, 0]
+    config["objectives"]["realization_filters"] = [0, 0]
 
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(functions))
     optimizer.set_results_callback(partial(_track_results, result_list=result_list))
     optimizer.run(initial_values)
     assert optimizer.results is not None
@@ -173,7 +173,7 @@ def test_sort_filter_on_objectives(
 
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_sort_filter_on_objectives_with_constraints(
-    enopt_config: Any,
+    config: Any,
     evaluator: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
@@ -183,13 +183,13 @@ def test_sort_filter_on_objectives_with_constraints(
         partial(_constraint_function),
     ]
 
-    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
+    config["gradient"]["evaluation_policy"] = evaluation_policy
 
-    enopt_config["nonlinear_constraints"] = {
+    config["nonlinear_constraints"] = {
         "lower_bounds": -np.inf,
         "upper_bounds": 0.4,
     }
-    enopt_config["realization_filters"] = [
+    config["realization_filters"] = [
         {
             "method": "sort-objective",
             "options": {
@@ -199,10 +199,10 @@ def test_sort_filter_on_objectives_with_constraints(
             },
         },
     ]
-    enopt_config["objectives"]["realization_filters"] = [0, 0]
-    enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
+    config["objectives"]["realization_filters"] = [0, 0]
+    config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(functions))
     optimizer.set_results_callback(partial(_track_results, result_list=result_list))
     optimizer.run(initial_values)
     assert optimizer.results is not None
@@ -235,7 +235,7 @@ def test_sort_filter_on_objectives_with_constraints(
 
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_sort_filter_on_constraints(
-    enopt_config: Any,
+    config: Any,
     evaluator: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
@@ -245,12 +245,12 @@ def test_sort_filter_on_constraints(
         partial(_constraint_function),
     ]
 
-    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
-    enopt_config["nonlinear_constraints"] = {
+    config["gradient"]["evaluation_policy"] = evaluation_policy
+    config["nonlinear_constraints"] = {
         "lower_bounds": -np.inf,
         "upper_bounds": 0.4,
     }
-    enopt_config["realization_filters"] = [
+    config["realization_filters"] = [
         {
             "method": "sort-constraint",
             "options": {
@@ -260,10 +260,10 @@ def test_sort_filter_on_constraints(
             },
         },
     ]
-    enopt_config["objectives"]["realization_filters"] = [0, 0]
-    enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
+    config["objectives"]["realization_filters"] = [0, 0]
+    config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(functions))
     optimizer.set_results_callback(partial(_track_results, result_list=result_list))
     optimizer.run(initial_values)
     assert optimizer.results is not None
@@ -296,7 +296,7 @@ def test_sort_filter_on_constraints(
 
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_sort_filter_mixed(  # noqa: C901
-    enopt_config: Any,
+    config: Any,
     evaluator: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
@@ -307,8 +307,8 @@ def test_sort_filter_mixed(  # noqa: C901
         partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
     ]
 
-    enopt_config["objectives"]["weights"] = [0.75, 0.25, 0.75, 0.25]
-    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
+    config["objectives"]["weights"] = [0.75, 0.25, 0.75, 0.25]
+    config["gradient"]["evaluation_policy"] = evaluation_policy
 
     objective_values: list[NDArray[np.float64]] = []
 
@@ -321,7 +321,7 @@ def test_sort_filter_mixed(  # noqa: C901
         _track_results(results, result_list=result_list)
 
     # Apply the filtering to all objectives, giving the expected result.
-    enopt_config["realization_filters"] = [
+    config["realization_filters"] = [
         {
             "method": "sort-objective",
             "options": {
@@ -331,10 +331,10 @@ def test_sort_filter_mixed(  # noqa: C901
             },
         },
     ]
-    enopt_config["objectives"]["realization_filters"] = [0, 0, 0, 0]
+    config["objectives"]["realization_filters"] = [0, 0, 0, 0]
 
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(functions))
     optimizer.set_results_callback(_add_objective)
     optimizer.run(initial_values)
     assert optimizer.results is not None
@@ -358,7 +358,7 @@ def test_sort_filter_mixed(  # noqa: C901
                 )
 
     # Apply filtering only to the first two, giving a wrong result.
-    enopt_config["realization_filters"] = [
+    config["realization_filters"] = [
         {
             "method": "sort-objective",
             "options": {
@@ -368,10 +368,10 @@ def test_sort_filter_mixed(  # noqa: C901
             },
         },
     ]
-    enopt_config["objectives"]["realization_filters"] = [0, 0, -1, -1]
+    config["objectives"]["realization_filters"] = [0, 0, -1, -1]
 
     result_list = []
-    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(functions))
     optimizer.set_results_callback(_add_objective)
     optimizer.run(initial_values)
     assert optimizer.results is not None
@@ -391,7 +391,7 @@ def test_sort_filter_mixed(  # noqa: C901
 
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_cvar_filter_on_objectives(
-    enopt_config: Any,
+    config: Any,
     evaluator: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
@@ -400,16 +400,16 @@ def test_cvar_filter_on_objectives(
         partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
     ]
 
-    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
+    config["gradient"]["evaluation_policy"] = evaluation_policy
 
-    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(functions))
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert not np.allclose(
         optimizer.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
 
-    enopt_config["realization_filters"] = [
+    config["realization_filters"] = [
         {
             "method": "cvar-objective",
             "options": {
@@ -418,10 +418,10 @@ def test_cvar_filter_on_objectives(
             },
         },
     ]
-    enopt_config["objectives"]["realization_filters"] = [0, 0]
+    config["objectives"]["realization_filters"] = [0, 0]
     result_list: list[Results] = []
 
-    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(functions))
     optimizer.set_results_callback(partial(_track_results, result_list=result_list))
     optimizer.run(initial_values)
     assert optimizer.results is not None
@@ -447,7 +447,7 @@ def test_cvar_filter_on_objectives(
 
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_cvar_filter_on_objectives_with_constraints(
-    enopt_config: Any,
+    config: Any,
     evaluator: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
@@ -457,13 +457,13 @@ def test_cvar_filter_on_objectives_with_constraints(
         partial(_constraint_function),
     ]
 
-    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
+    config["gradient"]["evaluation_policy"] = evaluation_policy
 
-    enopt_config["nonlinear_constraints"] = {
+    config["nonlinear_constraints"] = {
         "lower_bounds": -np.inf,
         "upper_bounds": 0.4,
     }
-    enopt_config["realization_filters"] = [
+    config["realization_filters"] = [
         {
             "method": "cvar-objective",
             "options": {
@@ -472,10 +472,10 @@ def test_cvar_filter_on_objectives_with_constraints(
             },
         },
     ]
-    enopt_config["objectives"]["realization_filters"] = [0, 0]
-    enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
+    config["objectives"]["realization_filters"] = [0, 0]
+    config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(functions))
     optimizer.set_results_callback(partial(_track_results, result_list=result_list))
     optimizer.run(initial_values)
     assert optimizer.results is not None
@@ -508,7 +508,7 @@ def test_cvar_filter_on_objectives_with_constraints(
 
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_cvar_filter_on_constraints(
-    enopt_config: Any,
+    config: Any,
     evaluator: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
@@ -518,13 +518,13 @@ def test_cvar_filter_on_constraints(
         partial(_constraint_function),
     ]
 
-    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
+    config["gradient"]["evaluation_policy"] = evaluation_policy
 
-    enopt_config["nonlinear_constraints"] = {
+    config["nonlinear_constraints"] = {
         "lower_bounds": -np.inf,
         "upper_bounds": 0.4,
     }
-    enopt_config["realization_filters"] = [
+    config["realization_filters"] = [
         {
             "method": "cvar-constraint",
             "options": {
@@ -533,10 +533,10 @@ def test_cvar_filter_on_constraints(
             },
         },
     ]
-    enopt_config["objectives"]["realization_filters"] = [0, 0]
-    enopt_config["nonlinear_constraints"]["realization_filters"] = [0]
+    config["objectives"]["realization_filters"] = [0, 0]
+    config["nonlinear_constraints"]["realization_filters"] = [0]
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(functions))
     optimizer.set_results_callback(partial(_track_results, result_list=result_list))
     optimizer.run(initial_values)
     assert optimizer.results is not None
@@ -569,7 +569,7 @@ def test_cvar_filter_on_constraints(
 
 @pytest.mark.parametrize("evaluation_policy", ["separate", "speculative"])
 def test_cvar_filter_mixed(
-    enopt_config: Any,
+    config: Any,
     evaluator: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
@@ -580,8 +580,8 @@ def test_cvar_filter_mixed(
         partial(_objective_function, target=np.array([-1.5, -1.5, 0.5])),
     ]
 
-    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
-    enopt_config["objectives"]["weights"] = [0.75, 0.25, 0.75, 0.25]
+    config["gradient"]["evaluation_policy"] = evaluation_policy
+    config["objectives"]["weights"] = [0.75, 0.25, 0.75, 0.25]
 
     objective_values: list[NDArray[np.float64]] = []
 
@@ -593,7 +593,7 @@ def test_cvar_filter_mixed(
         _track_results(results, result_list=result_list)
 
     # Apply the filtering to all objectives, giving the expected result.
-    enopt_config["realization_filters"] = [
+    config["realization_filters"] = [
         {
             "method": "cvar-objective",
             "options": {
@@ -602,10 +602,10 @@ def test_cvar_filter_mixed(
             },
         },
     ]
-    enopt_config["objectives"]["realization_filters"] = [0, 0, 0, 0]
+    config["objectives"]["realization_filters"] = [0, 0, 0, 0]
 
     result_list: list[Results] = []
-    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(functions))
     optimizer.set_results_callback(_add_objective)
     optimizer.run(initial_values)
     assert optimizer.results is not None
@@ -629,7 +629,7 @@ def test_cvar_filter_mixed(
                 )
 
     # Apply filtering only to the first two, giving a wrong result.
-    enopt_config["realization_filters"] = [
+    config["realization_filters"] = [
         {
             "method": "cvar-objective",
             "options": {
@@ -638,10 +638,10 @@ def test_cvar_filter_mixed(
             },
         },
     ]
-    enopt_config["objectives"]["realization_filters"] = [0, 0, -1, -1]
+    config["objectives"]["realization_filters"] = [0, 0, -1, -1]
 
     result_list = []
-    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(functions))
     optimizer.set_results_callback(_add_objective)
     optimizer.run(initial_values)
     assert optimizer.results is not None
@@ -667,16 +667,16 @@ class CustomRealizationFilter(RealizationFilter):
     ) -> NDArray[np.float64]:
         return np.ones(objectives.shape[0])
 
-    def init(self, _0: EnOptConfig) -> None:
+    def init(self, _0: EnOptContext) -> None:
         pass
 
 
 def test_custom_realization_filter(
-    enopt_config: Any, evaluator: Any, test_functions: Any
+    config: Any, evaluator: Any, test_functions: Any
 ) -> None:
-    enopt_config["objectives"]["realization_filters"] = 0
-    enopt_config["realization_filters"] = [CustomRealizationFilter()]
-    optimizer = BasicOptimizer(enopt_config, evaluator(test_functions))
+    config["objectives"]["realization_filters"] = 0
+    config["realization_filters"] = [CustomRealizationFilter()]
+    optimizer = BasicOptimizer(config, evaluator(test_functions))
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert np.allclose(

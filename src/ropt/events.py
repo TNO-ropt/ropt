@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ropt.config import EnOptConfig
+    from ropt.context import EnOptContext
     from ropt.enums import EnOptEventType
     from ropt.results import Results
 
@@ -22,10 +22,10 @@ class EnOptEvent:
 
     Attributes:
         event_type: The type of event that occurred.
-        config:     The optimizer configuration associated with the event.
+        context:    The optimizer context associated with the event.
         results:    A tuple containing results.
     """
 
     event_type: EnOptEventType
-    config: EnOptConfig
+    context: EnOptContext
     results: tuple[Results, ...] = field(default_factory=tuple)

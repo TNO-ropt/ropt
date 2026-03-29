@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
-    from ropt.config import EnOptConfig
+    from ropt.context import EnOptContext
 
 
 @dataclass(slots=True)
@@ -146,19 +146,19 @@ class FunctionEvaluations(ResultField):
             evaluation_info={} if evaluation_info is None else evaluation_info,
         )
 
-    def transform_from_optimizer(self, config: EnOptConfig) -> FunctionEvaluations:
+    def transform_from_optimizer(self, context: EnOptContext) -> FunctionEvaluations:
         """Apply transformations from optimizer space.
 
         Args:
-            config: The ensemble optimizer configuration object.
+            context: The ensemble optimizer context object.
 
         Returns:
             The transformed results.
         """
         if (
-            not config.variable_transforms
-            and not config.objective_transforms
-            and not config.nonlinear_constraint_transforms
+            not context.variable_transforms
+            and not context.objective_transforms
+            and not context.nonlinear_constraint_transforms
         ):
             return self
 
@@ -166,12 +166,12 @@ class FunctionEvaluations(ResultField):
         objectives = self.objectives
         constraints = self.constraints
 
-        for variable_transform in config.variable_transforms:
+        for variable_transform in context.variable_transforms:
             variables = variable_transform.from_optimizer(variables)
-        for objective_transform in config.objective_transforms:
+        for objective_transform in context.objective_transforms:
             objectives = objective_transform.from_optimizer(objectives)
         if constraints is not None:
-            for constraint_transform in config.nonlinear_constraint_transforms:
+            for constraint_transform in context.nonlinear_constraint_transforms:
                 constraints = constraint_transform.from_optimizer(constraints)
 
         return FunctionEvaluations(

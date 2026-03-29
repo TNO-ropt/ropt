@@ -17,7 +17,7 @@ from ropt.plugins.manager import get_plugin
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt.config import EnOptConfig
+    from ropt.context import EnOptContext
 
 
 _PROCESS_TIMEOUT: Final = 10
@@ -45,7 +45,7 @@ class ExternalBackend(Backend):
     """
 
     def __init__(
-        self, config: EnOptConfig, optimizer_callback: OptimizerCallback
+        self, context: EnOptContext, optimizer_callback: OptimizerCallback
     ) -> None:
         """Initialize the optimizer.
 
@@ -53,13 +53,13 @@ class ExternalBackend(Backend):
 
         # noqa
         """
-        self._config = config
+        self._context = context
         self._optimizer_callback = optimizer_callback
         self._process_pid: int | None = None
 
         optimizer: Backend = get_plugin(
-            "backend", config.backend.method.split("/", maxsplit=1)[1]
-        ).create(config, lambda *_: None)
+            "backend", context.backend.method.split("/", maxsplit=1)[1]
+        ).create(context, lambda *_: None)
         self._allow_nan = optimizer.allow_nan
         self._is_parallel = optimizer.is_parallel
         del optimizer
@@ -76,7 +76,7 @@ class ExternalBackend(Backend):
         result_queue = context.Queue()
         process = context.Process(
             target=_run,
-            args=(self._config, initial_values, request_queue, result_queue),
+            args=(self._context, initial_values, request_queue, result_queue),
         )
 
         result: OptimizerCallbackResult | ExitCode
@@ -141,24 +141,24 @@ class ExternalBackend(Backend):
 
 
 def _run(
-    config: EnOptConfig,
+    context: EnOptContext,
     initial_values: NDArray[np.float64],
     request_queue: multiprocessing.Queue[dict[str, Any] | None],
     result_queue: multiprocessing.Queue[OptimizerCallbackResult | ExitCode],
 ) -> None:
-    optimizer = _PluginBackend(config, initial_values, request_queue, result_queue)
+    optimizer = _PluginBackend(context, initial_values, request_queue, result_queue)
     optimizer.run()
 
 
 class _PluginBackend:
     def __init__(
         self,
-        config: EnOptConfig,
+        context: EnOptContext,
         initial_values: NDArray[np.float64],
         request_queue: multiprocessing.Queue[dict[str, Any] | None],
         result_queue: multiprocessing.Queue[OptimizerCallbackResult | ExitCode],
     ) -> None:
-        self._config = config
+        self._context = context
         self._initial_values = np.asarray(initial_values, dtype=np.float64)
         self._request_queue = request_queue
         self._result_queue = result_queue
@@ -185,8 +185,8 @@ class _PluginBackend:
 
     def run(self) -> None:
         optimizer = get_plugin(
-            "backend", self._config.backend.method.split("/", maxsplit=1)[1]
-        ).create(self._config, self._callback)
+            "backend", self._context.backend.method.split("/", maxsplit=1)[1]
+        ).create(self._context, self._callback)
         try:
             optimizer.start(self._initial_values)
         except ComputeStepAborted:

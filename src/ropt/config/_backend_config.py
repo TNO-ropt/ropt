@@ -15,7 +15,7 @@ from pydantic import (
 
 
 class BackendConfig(BaseModel):
-    """Configuration class for the optimization algorithm.
+    """Configuration class for the optimization backend.
 
     This class, `BackendConfig`, defines the configuration for the optimization
     algorithms implemented in the optimization backends.

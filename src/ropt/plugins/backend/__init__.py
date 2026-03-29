@@ -24,7 +24,7 @@ third-party packages.
 * **Backend Implementation:** The actual optimization logic resides in classes
   that inherit from the [`Backend`][ropt.backend.Backend] abstract base
   class. These classes are initialized with the optimization configuration
-  ([`EnOptConfig`][ropt.config.EnOptConfig]) and an
+  ([`EnOptContext`][ropt.context.EnOptContext]) and an
   [`OptimizerCallback`][ropt.core.OptimizerCallback]. The callback is used by
   the backend to request function and gradient evaluations from `ropt`. The
   optimization process is initiated by calling the backend's `start` method.

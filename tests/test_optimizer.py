@@ -9,12 +9,12 @@ import pytest
 from pydantic import ValidationError
 
 from ropt.config import (
-    EnOptConfig,
     NonlinearConstraintTransformConfig,
     ObjectiveTransformConfig,
     VariableTransformConfig,
 )
 from ropt.config.constants import DEFAULT_SEED
+from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.results import FunctionResults, GradientResults, Results
 from ropt.transforms.default import (
@@ -41,8 +41,8 @@ pytestmark = [
 initial_values = [0.0, 0.0, 0.1]
 
 
-@pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> dict[str, Any]:
+@pytest.fixture(name="config")
+def config_fixture() -> dict[str, Any]:
     return {
         "optimizer": {
             "max_functions": 20,
@@ -62,28 +62,26 @@ def enopt_config_fixture() -> dict[str, Any]:
     }
 
 
-def test_basic_run(enopt_config: Any, evaluator: Any, external: str) -> None:
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+def test_basic_run(config: Any, evaluator: Any, external: str) -> None:
+    config["backend"]["method"] = f"{external}{_SLSQP}"
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert np.allclose(optimizer.results.evaluations.variables, [0, 0, 0.5], atol=0.02)
 
 
-def test_invalid_options(enopt_config: Any, external: str) -> None:
-    enopt_config["backend"]["options"] = {"ftol": 0.1, "foo": 1}
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
+def test_invalid_options(config: Any, external: str) -> None:
+    config["backend"]["options"] = {"ftol": 0.1, "foo": 1}
+    config["backend"]["method"] = f"{external}{_SLSQP}"
 
-    method = enopt_config["backend"]["method"]
+    method = config["backend"]["method"]
     with pytest.raises(
         ValidationError, match=r"Unknown or unsupported option\(s\): `foo`"
     ):
-        validate_backend_options(method, enopt_config["backend"]["options"])
+        validate_backend_options(method, config["backend"]["options"])
 
 
-def test_max_functions_exceeded(
-    enopt_config: Any, evaluator: Any, external: str
-) -> None:
+def test_max_functions_exceeded(config: Any, evaluator: Any, external: str) -> None:
     last_evaluation = 0
 
     def track_results(_: tuple[Results, ...]) -> None:
@@ -91,16 +89,16 @@ def test_max_functions_exceeded(
         last_evaluation += 1
 
     max_functions = 2
-    enopt_config["optimizer"]["max_functions"] = max_functions
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+    config["optimizer"]["max_functions"] = max_functions
+    config["backend"]["method"] = f"{external}{_SLSQP}"
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.set_results_callback(track_results)
     exit_code = optimizer.run(initial_values)
     assert last_evaluation == max_functions + 1
     assert exit_code == ExitCode.MAX_FUNCTIONS_REACHED
 
 
-def test_max_batches_exceeded(enopt_config: Any, evaluator: Any, external: str) -> None:
+def test_max_batches_exceeded(config: Any, evaluator: Any, external: str) -> None:
     last_evaluation = 0
 
     def track_results(_: tuple[Results, ...]) -> None:
@@ -108,18 +106,16 @@ def test_max_batches_exceeded(enopt_config: Any, evaluator: Any, external: str) 
         last_evaluation += 1
 
     max_batches = 2
-    enopt_config["optimizer"]["max_batches"] = max_batches
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+    config["optimizer"]["max_batches"] = max_batches
+    config["backend"]["method"] = f"{external}{_SLSQP}"
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.set_results_callback(track_results)
     exit_code = optimizer.run(initial_values)
     assert last_evaluation == max_batches
     assert exit_code == ExitCode.MAX_BATCHES_REACHED
 
 
-def test_max_functions_not_exceeded(
-    enopt_config: Any, evaluator: Any, external: str
-) -> None:
+def test_max_functions_not_exceeded(config: Any, evaluator: Any, external: str) -> None:
     last_evaluation = 0
 
     def track_results(_: tuple[Results, ...]) -> None:
@@ -127,65 +123,65 @@ def test_max_functions_not_exceeded(
         last_evaluation += 1
 
     max_functions = 100
-    enopt_config["optimizer"]["max_functions"] = max_functions
-    enopt_config["gradient"] = {"evaluation_policy": "separate"}
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+    config["optimizer"]["max_functions"] = max_functions
+    config["gradient"] = {"evaluation_policy": "separate"}
+    config["backend"]["method"] = f"{external}{_SLSQP}"
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.set_results_callback(track_results)
     exit_code = optimizer.run(initial_values)
     assert last_evaluation + 1 < 2 * max_functions
     assert exit_code == ExitCode.OPTIMIZER_FINISHED
 
 
-def test_failed_realizations(enopt_config: Any, evaluator: Any, external: str) -> None:
+def test_failed_realizations(config: Any, evaluator: Any, external: str) -> None:
     def _observer(results: tuple[Results, ...]) -> None:
         assert isinstance(results[0], FunctionResults)
         assert results[0].functions is None
 
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["backend"]["method"] = f"{external}{_SLSQP}"
 
     functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
-    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(functions))
     optimizer.set_results_callback(_observer)
     exit_code = optimizer.run(initial_values)
     assert exit_code == ExitCode.TOO_FEW_REALIZATIONS
 
 
 def test_failed_realizations_constraints(
-    enopt_config: Any, evaluator: Any, test_functions: Any, external: str
+    config: Any, evaluator: Any, test_functions: Any, external: str
 ) -> None:
     def _observer(results: tuple[Results, ...]) -> None:
         assert isinstance(results[0], FunctionResults)
         assert results[0].functions is None
 
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
-    enopt_config["nonlinear_constraints"] = {
+    config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["nonlinear_constraints"] = {
         "lower_bounds": 0.0,
         "upper_bounds": 0.4,
     }
 
     functions = (*test_functions, lambda _0, _1: np.array(np.nan))
 
-    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(functions))
     optimizer.set_results_callback(_observer)
     exit_code = optimizer.run(initial_values)
     assert exit_code == ExitCode.TOO_FEW_REALIZATIONS
 
 
 def test_all_failed_realizations_not_supported(
-    enopt_config: Any, evaluator: Any, external: str
+    config: Any, evaluator: Any, external: str
 ) -> None:
-    enopt_config["realizations"] = {"realization_min_success": 0}
+    config["realizations"] = {"realization_min_success": 0}
 
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["backend"]["method"] = f"{external}{_SLSQP}"
 
     functions = [lambda _0, _1: np.array(1.0), lambda _0, _1: np.array(np.nan)]
-    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer = BasicOptimizer(config, evaluator(functions))
     exit_code = optimizer.run(initial_values)
     assert exit_code == ExitCode.TOO_FEW_REALIZATIONS
 
 
-def test_user_abort(enopt_config: Any, evaluator: Any, external: str) -> None:
+def test_user_abort(config: Any, evaluator: Any, external: str) -> None:
     last_evaluation = 0
 
     def _abort() -> bool:
@@ -196,9 +192,9 @@ def test_user_abort(enopt_config: Any, evaluator: Any, external: str) -> None:
         last_evaluation += 1
         return False
 
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["backend"]["method"] = f"{external}{_SLSQP}"
 
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.set_abort_callback(_abort)
     exit_code = optimizer.run(initial_values)
     assert optimizer.results is not None
@@ -206,16 +202,16 @@ def test_user_abort(enopt_config: Any, evaluator: Any, external: str) -> None:
     assert exit_code == ExitCode.USER_ABORT
 
 
-def test_single_perturbation(enopt_config: Any, evaluator: Any, external: str) -> None:
-    enopt_config["gradient"] = {
+def test_single_perturbation(config: Any, evaluator: Any, external: str) -> None:
+    config["gradient"] = {
         "number_of_perturbations": 1,
         "merge_realizations": True,
     }
 
-    enopt_config["realizations"] = {"weights": 5 * [1]}
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["realizations"] = {"weights": 5 * [1]}
+    config["backend"]["method"] = f"{external}{_SLSQP}"
 
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert np.allclose(
@@ -223,24 +219,24 @@ def test_single_perturbation(enopt_config: Any, evaluator: Any, external: str) -
     )
 
 
-def test_external_error(enopt_config: Any, evaluator: Any, external: str) -> None:
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
-    enopt_config["backend"]["options"] = {"ftol": "foo"}
+def test_external_error(config: Any, evaluator: Any, external: str) -> None:
+    config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["backend"]["options"] = {"ftol": "foo"}
     err = "Input should be a valid number, unable to parse string as a number"
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer = BasicOptimizer(config, evaluator())
     with pytest.raises(ValueError, match=err):
         optimizer.run(initial_values)
 
 
 @pytest.mark.parametrize("use_plugin", [False, True])
 def test_objective_with_scaler(
-    enopt_config: Any,
+    config: Any,
     evaluator: Any,
     test_functions: Any,
     external: str,
     use_plugin: Any,
 ) -> None:
-    optimizer1 = BasicOptimizer(enopt_config, evaluator())
+    optimizer1 = BasicOptimizer(config, evaluator())
     optimizer1.run(initial_values)
     assert optimizer1.results is not None
     assert optimizer1.results.functions is not None
@@ -257,9 +253,9 @@ def test_objective_with_scaler(
 
     init1 = test_functions[1](initial_values, None)
 
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
-    enopt_config["objectives"]["transforms"] = [0]
-    enopt_config["objective_transforms"] = [
+    config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["objectives"]["transforms"] = [0]
+    config["objective_transforms"] = [
         {"method": "scaler", "options": {"scales": [init1, init1]}}
         if use_plugin
         else DefaultObjectiveTransform(
@@ -280,12 +276,12 @@ def test_objective_with_scaler(
                 assert item.functions is not None
                 assert item.functions.objectives is not None
                 assert np.allclose(item.functions.objectives[-1], 1.0)
-                transformed = item.transform_from_optimizer(event.config)
+                transformed = item.transform_from_optimizer(event.context)
                 assert transformed.functions is not None
                 assert transformed.functions.objectives is not None
                 assert np.allclose(transformed.functions.objectives[-1], init1)
 
-    optimizer2 = BasicOptimizer(enopt_config, evaluator([function1, function2]))
+    optimizer2 = BasicOptimizer(config, evaluator([function1, function2]))
     optimizer2._observers.append(  # noqa: SLF001
         (EnOptEventType.FINISHED_EVALUATION, check_value)
     )
@@ -298,15 +294,15 @@ def test_objective_with_scaler(
 
 @pytest.mark.parametrize("use_plugin", [False, True])
 def test_objective_with_lazy_scaler(
-    enopt_config: Any,
+    config: Any,
     evaluator: Any,
     test_functions: Any,
     external: str,
     use_plugin: Any,
 ) -> None:
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["backend"]["method"] = f"{external}{_SLSQP}"
 
-    optimizer1 = BasicOptimizer(enopt_config, evaluator())
+    optimizer1 = BasicOptimizer(config, evaluator())
     optimizer1.run(initial_values)
     assert optimizer1.results is not None
     assert optimizer1.results.functions is not None
@@ -315,9 +311,9 @@ def test_objective_with_lazy_scaler(
     assert np.allclose(variables1, [0.0, 0.0, 0.5], atol=0.02)
     assert np.allclose(objectives1, [0.5, 4.5], atol=0.02)
 
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
-    enopt_config["objectives"]["transforms"] = [0]
-    enopt_config["objective_transforms"] = [
+    config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["objectives"]["transforms"] = [0]
+    config["objective_transforms"] = [
         {"method": "scaler"}
         if use_plugin
         else DefaultObjectiveTransform(
@@ -336,7 +332,7 @@ def test_objective_with_lazy_scaler(
     checked = False
 
     def set_scales(event: EnOptEvent) -> None:
-        transform = event.config.objective_transforms[0]
+        transform = event.context.objective_transforms[0]
         transform.update([init1, init1])
 
     def check_value(event: EnOptEvent) -> None:
@@ -348,12 +344,12 @@ def test_objective_with_lazy_scaler(
                 assert item.functions is not None
                 assert item.functions.objectives is not None
                 assert np.allclose(item.functions.objectives[-1], 1.0)
-                transformed = item.transform_from_optimizer(event.config)
+                transformed = item.transform_from_optimizer(event.context)
                 assert transformed.functions is not None
                 assert transformed.functions.objectives is not None
                 assert np.allclose(transformed.functions.objectives[-1], init1)
 
-    optimizer2 = BasicOptimizer(enopt_config, evaluator([function1, function2]))
+    optimizer2 = BasicOptimizer(config, evaluator([function1, function2]))
     optimizer2._observers.append(  # noqa: SLF001
         (EnOptEventType.FINISHED_EVALUATION, check_value)
     )
@@ -369,13 +365,13 @@ def test_objective_with_lazy_scaler(
 
 @pytest.mark.parametrize("use_plugin", [False, True])
 def test_nonlinear_constraint_with_scaler(
-    enopt_config: Any,
+    config: Any,
     evaluator: Any,
     test_functions: Any,
     external: str,
     use_plugin: Any,
 ) -> None:
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["backend"]["method"] = f"{external}{_SLSQP}"
 
     functions = (
         *test_functions,
@@ -383,19 +379,19 @@ def test_nonlinear_constraint_with_scaler(
     )
     scales = np.array(functions[-1](initial_values, None), ndmin=1)
 
-    enopt_config["nonlinear_constraints"] = {
+    config["nonlinear_constraints"] = {
         "lower_bounds": 0.0,
         "upper_bounds": 0.4,
     }
 
-    optimizer1 = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer1 = BasicOptimizer(config, evaluator(functions))
     optimizer1.run(initial_values)
     assert optimizer1.results is not None
     assert optimizer1.results.evaluations.variables[[0, 2]].sum() > 0.0 - 1e-5
     assert optimizer1.results.evaluations.variables[[0, 2]].sum() < 0.4 + 1e-5
 
-    enopt_config["nonlinear_constraints"]["transforms"] = [0]
-    enopt_config["nonlinear_constraint_transforms"] = [
+    config["nonlinear_constraints"]["transforms"] = [0]
+    config["nonlinear_constraint_transforms"] = [
         {"method": "scaler", "options": {"scales": scales}}
         if use_plugin
         else DefaultNonlinearConstraintTransform(
@@ -405,12 +401,12 @@ def test_nonlinear_constraint_with_scaler(
         )
     ]
 
-    config = EnOptConfig.model_validate(enopt_config)
-    assert config.nonlinear_constraints is not None
-    assert config.nonlinear_constraints.upper_bounds == 0.4
-    bounds = config.nonlinear_constraint_transforms[0].bounds_to_optimizer(
-        config.nonlinear_constraints.lower_bounds,
-        config.nonlinear_constraints.upper_bounds,
+    context = EnOptContext.model_validate(config)
+    assert context.nonlinear_constraints is not None
+    assert context.nonlinear_constraints.upper_bounds == 0.4
+    bounds = context.nonlinear_constraint_transforms[0].bounds_to_optimizer(
+        context.nonlinear_constraints.lower_bounds,
+        context.nonlinear_constraints.upper_bounds,
     )
     assert bounds[1] == 0.4 / scales
 
@@ -425,12 +421,12 @@ def test_nonlinear_constraint_with_scaler(
                 assert item.functions is not None
                 assert item.functions.constraints is not None
                 assert np.allclose(item.functions.constraints, 1.0)
-                transformed = item.transform_from_optimizer(event.config)
+                transformed = item.transform_from_optimizer(event.context)
                 assert transformed.functions is not None
                 assert transformed.functions.constraints is not None
                 assert np.allclose(transformed.functions.constraints, scales)
 
-    optimizer2 = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer2 = BasicOptimizer(config, evaluator(functions))
     optimizer2._observers.append(  # noqa: SLF001
         (EnOptEventType.FINISHED_EVALUATION, check_constraints)
     )
@@ -452,15 +448,15 @@ def test_nonlinear_constraint_with_scaler(
 
 @pytest.mark.parametrize("use_plugin", [False, True])
 def test_nonlinear_constraint_with_lazy_scaler(
-    enopt_config: Any,
+    config: Any,
     evaluator: Any,
     test_functions: Any,
     external: str,
     use_plugin: Any,
 ) -> None:
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["backend"]["method"] = f"{external}{_SLSQP}"
 
-    enopt_config["nonlinear_constraints"] = {
+    config["nonlinear_constraints"] = {
         "lower_bounds": 0.0,
         "upper_bounds": 0.4,
     }
@@ -471,14 +467,14 @@ def test_nonlinear_constraint_with_lazy_scaler(
     )
     scales = np.array(functions[-1](initial_values, None), ndmin=1)
 
-    optimizer1 = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer1 = BasicOptimizer(config, evaluator(functions))
     optimizer1.run(initial_values)
     assert optimizer1.results is not None
     assert optimizer1.results.evaluations.variables[[0, 2]].sum() > 0.0 - 1e-5
     assert optimizer1.results.evaluations.variables[[0, 2]].sum() < 0.4 + 1e-5
 
-    enopt_config["nonlinear_constraints"]["transforms"] = [0]
-    enopt_config["nonlinear_constraint_transforms"] = [
+    config["nonlinear_constraints"]["transforms"] = [0]
+    config["nonlinear_constraint_transforms"] = [
         {"method": "scaler"}
         if use_plugin
         else DefaultNonlinearConstraintTransform(
@@ -486,12 +482,12 @@ def test_nonlinear_constraint_with_lazy_scaler(
         )
     ]
 
-    config = EnOptConfig.model_validate(enopt_config)
-    assert config.nonlinear_constraints is not None
-    assert config.nonlinear_constraints.upper_bounds == 0.4
-    bounds = config.nonlinear_constraint_transforms[0].bounds_to_optimizer(
-        config.nonlinear_constraints.lower_bounds,
-        config.nonlinear_constraints.upper_bounds,
+    context = EnOptContext.model_validate(config)
+    assert context.nonlinear_constraints is not None
+    assert context.nonlinear_constraints.upper_bounds == 0.4
+    bounds = context.nonlinear_constraint_transforms[0].bounds_to_optimizer(
+        context.nonlinear_constraints.lower_bounds,
+        context.nonlinear_constraints.upper_bounds,
     )
     assert bounds[1] == 0.4
 
@@ -503,33 +499,33 @@ def test_nonlinear_constraint_with_lazy_scaler(
     check = True
 
     def set_scales(event: EnOptEvent) -> None:
-        transform = event.config.nonlinear_constraint_transforms[0]
+        transform = event.context.nonlinear_constraint_transforms[0]
         transform.update(scales)
 
     def check_constraints(event: EnOptEvent) -> None:
         nonlocal check
         results = event.results
-        config = event.config
+        context = event.context
         for item in results:
             if isinstance(item, FunctionResults) and check:
                 check = False
-                assert config.nonlinear_constraints is not None
-                _, upper_bounds = config.nonlinear_constraint_transforms[
+                assert context.nonlinear_constraints is not None
+                _, upper_bounds = context.nonlinear_constraint_transforms[
                     0
                 ].bounds_to_optimizer(
-                    config.nonlinear_constraints.lower_bounds,
-                    config.nonlinear_constraints.upper_bounds,
+                    context.nonlinear_constraints.lower_bounds,
+                    context.nonlinear_constraints.upper_bounds,
                 )
                 assert np.allclose(upper_bounds, 0.4 / scales)
                 assert item.functions is not None
                 assert item.functions.constraints is not None
                 assert np.allclose(item.functions.constraints, 1.0)
-                transformed = item.transform_from_optimizer(event.config)
+                transformed = item.transform_from_optimizer(event.context)
                 assert transformed.functions is not None
                 assert transformed.functions.constraints is not None
                 assert np.allclose(transformed.functions.constraints, scales)
 
-    optimizer2 = BasicOptimizer(enopt_config, evaluator(functions))
+    optimizer2 = BasicOptimizer(config, evaluator(functions))
     optimizer2._observers.append(  # noqa: SLF001
         (EnOptEventType.FINISHED_EVALUATION, check_constraints)
     )
@@ -556,23 +552,23 @@ def test_nonlinear_constraint_with_lazy_scaler(
 @pytest.mark.parametrize("offsets", [None, np.array([1.0, 1.1, 1.2])])
 @pytest.mark.parametrize("scales", [None, np.array([2.0, 2.1, 2.2])])
 def test_variables_scale_with_scaler(  # noqa: PLR0917
-    enopt_config: Any,
+    config: Any,
     evaluator: Any,
     use_plugin: Any,
     offsets: NDArray[np.float64] | None,
     scales: NDArray[np.float64] | None,
     external: str,
 ) -> None:
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["backend"]["method"] = f"{external}{_SLSQP}"
 
     lower_bounds = np.array([-2.0, -np.inf, -3.0])
     upper_bounds = np.array([np.inf, 1.0, 4.0])
 
-    enopt_config["backend"]["max_iterations"] = 20
-    enopt_config["variables"]["lower_bounds"] = lower_bounds
-    enopt_config["variables"]["upper_bounds"] = upper_bounds
-    enopt_config["variables"]["transforms"] = [0]
-    enopt_config["variable_transforms"] = [
+    config["backend"]["max_iterations"] = 20
+    config["variables"]["lower_bounds"] = lower_bounds
+    config["variables"]["upper_bounds"] = upper_bounds
+    config["variables"]["transforms"] = [0]
+    config["variable_transforms"] = [
         {"method": "scaler", "options": {"scales": scales, "offsets": offsets}}
         if use_plugin
         else DefaultVariableTransform(
@@ -582,34 +578,34 @@ def test_variables_scale_with_scaler(  # noqa: PLR0917
         )
     ]
 
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.run(initial_values)
     assert optimizer.results is not None
 
-    config = EnOptConfig.model_validate(enopt_config)
+    context = EnOptContext.model_validate(config)
     if offsets is not None:
         lower_bounds -= offsets
         upper_bounds -= offsets
     if scales is not None:
         lower_bounds /= scales
         upper_bounds /= scales
-    assert np.allclose(config.variables.lower_bounds, lower_bounds)
-    assert np.allclose(config.variables.upper_bounds, upper_bounds)
+    assert np.allclose(context.variables.lower_bounds, lower_bounds)
+    assert np.allclose(context.variables.upper_bounds, upper_bounds)
     result = optimizer.results.evaluations.variables
     assert np.allclose(result, [0.0, 0.0, 0.5], atol=0.05)
 
 
 @pytest.mark.parametrize("use_plugin", [False, True])
 def test_variables_scale_linear_constraints_with_scaler(
-    enopt_config: Any, evaluator: Any, external: str, use_plugin: Any
+    config: Any, evaluator: Any, external: str, use_plugin: Any
 ) -> None:
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["backend"]["method"] = f"{external}{_SLSQP}"
 
     coefficients = [[1, 0, 1], [0, 1, 1]]
     lower_bounds = [1.0, 0.75]
     upper_bounds = [1.0, 0.75]
 
-    enopt_config["linear_constraints"] = {
+    config["linear_constraints"] = {
         "coefficients": coefficients,
         "lower_bounds": lower_bounds,
         "upper_bounds": upper_bounds,
@@ -617,8 +613,8 @@ def test_variables_scale_linear_constraints_with_scaler(
 
     offsets = np.array([1.0, 1.1, 1.2])
     scales = np.array([2.0, 2.1, 2.2])
-    enopt_config["variables"]["transforms"] = [0]
-    enopt_config["variable_transforms"] = [
+    config["variables"]["transforms"] = [0]
+    config["variable_transforms"] = [
         {"method": "scaler", "options": {"scales": scales, "offsets": offsets}}
         if use_plugin
         else DefaultVariableTransform(
@@ -628,25 +624,25 @@ def test_variables_scale_linear_constraints_with_scaler(
         )
     ]
 
-    config = EnOptConfig.model_validate(enopt_config)
-    assert config.linear_constraints is not None
+    context = EnOptContext.model_validate(config)
+    assert context.linear_constraints is not None
     transformed_coefficients = coefficients * scales
     transformed_scales = np.max(np.abs(transformed_coefficients), axis=-1)
     assert np.allclose(
-        config.linear_constraints.coefficients,
+        context.linear_constraints.coefficients,
         transformed_coefficients / transformed_scales[:, np.newaxis],
     )
     offsets = np.matmul(coefficients, offsets)
     assert np.allclose(
-        config.linear_constraints.lower_bounds,
+        context.linear_constraints.lower_bounds,
         (lower_bounds - offsets) / transformed_scales,
     )
     assert np.allclose(
-        config.linear_constraints.upper_bounds,
+        context.linear_constraints.upper_bounds,
         (upper_bounds - offsets) / transformed_scales,
     )
 
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert np.allclose(
@@ -654,22 +650,20 @@ def test_variables_scale_linear_constraints_with_scaler(
     )
 
 
-def test_check_linear_constraints(
-    enopt_config: Any, evaluator: Any, external: str
-) -> None:
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
-    enopt_config["linear_constraints"] = {
+def test_check_linear_constraints(config: Any, evaluator: Any, external: str) -> None:
+    config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["linear_constraints"] = {
         "coefficients": [[1, 1, 0], [1, 1, 0], [1, 1, 0]],
         "lower_bounds": [0.0, -np.inf, -1.0],
         "upper_bounds": [0.0, 1.0, np.inf],
     }
-    optimizer1 = BasicOptimizer(enopt_config, evaluator())
+    optimizer1 = BasicOptimizer(config, evaluator())
     optimizer1.run(initial_values)
     assert optimizer1.results is not None
 
-    enopt_config["linear_constraints"]["lower_bounds"] = [0.0, -np.inf, -1.0]
-    enopt_config["linear_constraints"]["upper_bounds"] = [0.0, 1.0, np.inf]
-    optimizer2 = BasicOptimizer(enopt_config, evaluator())
+    config["linear_constraints"]["lower_bounds"] = [0.0, -np.inf, -1.0]
+    config["linear_constraints"]["upper_bounds"] = [0.0, 1.0, np.inf]
+    optimizer2 = BasicOptimizer(config, evaluator())
     optimizer2.run(initial_values)
     assert optimizer2.results is not None
     assert np.allclose(
@@ -677,19 +671,19 @@ def test_check_linear_constraints(
         optimizer2.results.evaluations.variables,
     )
 
-    enopt_config["linear_constraints"]["lower_bounds"] = [1.0, -np.inf, 1.0]
-    enopt_config["linear_constraints"]["upper_bounds"] = [1.0, -1.0, np.inf]
+    config["linear_constraints"]["lower_bounds"] = [1.0, -np.inf, 1.0]
+    config["linear_constraints"]["upper_bounds"] = [1.0, -1.0, np.inf]
 
-    optimizer3 = BasicOptimizer(enopt_config, evaluator())
+    optimizer3 = BasicOptimizer(config, evaluator())
     optimizer3.run(initial_values)
     assert optimizer3.results is None
 
 
 def test_check_nonlinear_constraints(
-    enopt_config: Any, evaluator: Any, test_functions: Any, external: str
+    config: Any, evaluator: Any, test_functions: Any, external: str
 ) -> None:
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
-    enopt_config["nonlinear_constraints"] = {
+    config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["nonlinear_constraints"] = {
         "lower_bounds": [0.0, -np.inf, 0.0],
         "upper_bounds": [0.0, 0.0, np.inf],
     }
@@ -701,14 +695,14 @@ def test_check_nonlinear_constraints(
         lambda variables, _: variables[0],
     )
 
-    optimizer1 = BasicOptimizer(enopt_config, evaluator(test_functions))
+    optimizer1 = BasicOptimizer(config, evaluator(test_functions))
     optimizer1.run(initial_values)
     assert optimizer1.results is not None
 
     # Flipping the bounds should still work:
-    enopt_config["nonlinear_constraints"]["lower_bounds"] = [0.0, -np.inf, 0.0]
-    enopt_config["nonlinear_constraints"]["upper_bounds"] = [0.0, 0.0, np.inf]
-    optimizer2 = BasicOptimizer(enopt_config, evaluator(test_functions))
+    config["nonlinear_constraints"]["lower_bounds"] = [0.0, -np.inf, 0.0]
+    config["nonlinear_constraints"]["upper_bounds"] = [0.0, 0.0, np.inf]
+    optimizer2 = BasicOptimizer(config, evaluator(test_functions))
     optimizer2.run(initial_values)
     assert optimizer2.results is not None
     assert np.allclose(
@@ -716,21 +710,19 @@ def test_check_nonlinear_constraints(
         optimizer2.results.evaluations.variables,
     )
 
-    enopt_config["nonlinear_constraints"]["lower_bounds"] = [1.0, -np.inf, 1.0]
-    enopt_config["nonlinear_constraints"]["upper_bounds"] = [1.0, -1.0, np.inf]
+    config["nonlinear_constraints"]["lower_bounds"] = [1.0, -np.inf, 1.0]
+    config["nonlinear_constraints"]["upper_bounds"] = [1.0, -1.0, np.inf]
 
-    optimizer3 = BasicOptimizer(enopt_config, evaluator(test_functions))
+    optimizer3 = BasicOptimizer(config, evaluator(test_functions))
     optimizer3.run(initial_values)
     assert optimizer3.results is None
 
 
-def test_optimizer_variables_subset(
-    enopt_config: Any, evaluator: Any, external: str
-) -> None:
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
+def test_optimizer_variables_subset(config: Any, evaluator: Any, external: str) -> None:
+    config["backend"]["method"] = f"{external}{_SLSQP}"
     # Set the second variable a constant value, this will not affect the
     # optimization of the other variables in this particular test problem:
-    enopt_config["variables"]["mask"] = [True, False, True]
+    config["variables"]["mask"] = [True, False, True]
 
     def assert_gradient(results: tuple[Results, ...]) -> None:
         for item in results:
@@ -739,7 +731,7 @@ def test_optimizer_variables_subset(
                 assert item.gradients.target_objective[1] == 0.0
                 assert np.all(item.gradients.objectives[:, 1] == 0.0)
 
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.set_results_callback(assert_gradient)
     optimizer.run([0.0, 1.0, 0.1])
     assert optimizer.results is not None
@@ -749,21 +741,21 @@ def test_optimizer_variables_subset(
 
 
 def test_optimizer_variables_subset_linear_constraints(
-    enopt_config: Any, evaluator: Any, external: str
+    config: Any, evaluator: Any, external: str
 ) -> None:
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["backend"]["method"] = f"{external}{_SLSQP}"
     # Set the second variable a constant value, this will not affect the
     # optimization of the other variables in this particular test problem. The
     # second and third constraints are dropped because they involve variables
     # that are not optimized.
-    enopt_config["linear_constraints"] = {
+    config["linear_constraints"] = {
         "coefficients": [[1, 0, 1], [0, 1, 0], [1, 1, 1]],
         "lower_bounds": [1.0, 1.0, 2.0],
         "upper_bounds": [1.0, 1.0, 2.0],
     }
-    enopt_config["variables"]["mask"] = [True, False, True]
+    config["variables"]["mask"] = [True, False, True]
 
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.run([0.0, 1.0, 0.1])
     assert optimizer.results is not None
     assert np.allclose(
@@ -771,26 +763,26 @@ def test_optimizer_variables_subset_linear_constraints(
     )
 
 
-def test_parallelize(enopt_config: Any, evaluator: Any, external: str) -> None:
-    enopt_config["optimizer"] = {}
-    enopt_config["backend"] = {
+def test_parallelize(config: Any, evaluator: Any, external: str) -> None:
+    config["optimizer"] = {}
+    config["backend"] = {
         "method": f"{external}{_DIFFERENTIAL_EVOLUTION}",
         "max_iterations": 15,
         "options": {"rng": 123, "tol": 1e-10},
     }
-    enopt_config["variables"]["lower_bounds"] = [0.15, 0.0, 0.0]
-    enopt_config["variables"]["upper_bounds"] = [0.5, 0.5, 0.2]
+    config["variables"]["lower_bounds"] = [0.15, 0.0, 0.0]
+    config["variables"]["upper_bounds"] = [0.5, 0.5, 0.2]
 
-    enopt_config["backend"]["parallel"] = False
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+    config["backend"]["parallel"] = False
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.run([0.2, *initial_values[1:]])
     assert optimizer.results is not None
     assert np.allclose(
         optimizer.results.evaluations.variables, [0.15, 0.0, 0.2], atol=3e-2
     )
 
-    enopt_config["backend"]["parallel"] = True
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+    config["backend"]["parallel"] = True
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.run([0.2, *initial_values[1:]])
     assert optimizer.results is not None
     assert np.allclose(
@@ -798,16 +790,16 @@ def test_parallelize(enopt_config: Any, evaluator: Any, external: str) -> None:
     )
 
 
-def test_rng(enopt_config: Any, evaluator: Any, external: str) -> None:
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
-    optimizer1 = BasicOptimizer(enopt_config, evaluator())
+def test_rng(config: Any, evaluator: Any, external: str) -> None:
+    config["backend"]["method"] = f"{external}{_SLSQP}"
+    optimizer1 = BasicOptimizer(config, evaluator())
     optimizer1.run(initial_values)
     assert optimizer1.results is not None
     assert np.allclose(
         optimizer1.results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
 
-    optimizer2 = BasicOptimizer(enopt_config, evaluator())
+    optimizer2 = BasicOptimizer(config, evaluator())
     optimizer2.run(initial_values)
     assert optimizer2.results is not None
     assert np.allclose(
@@ -818,8 +810,8 @@ def test_rng(enopt_config: Any, evaluator: Any, external: str) -> None:
         == optimizer2.results.evaluations.variables
     )
 
-    enopt_config["variables"]["seed"] = (1, DEFAULT_SEED)
-    optimizer3 = BasicOptimizer(enopt_config, evaluator())
+    config["variables"]["seed"] = (1, DEFAULT_SEED)
+    optimizer3 = BasicOptimizer(config, evaluator())
     optimizer3.run(initial_values)
     assert optimizer3.results is not None
     assert np.allclose(
@@ -832,34 +824,34 @@ def test_rng(enopt_config: Any, evaluator: Any, external: str) -> None:
 
 
 def test_arbitrary_objective_weights(
-    enopt_config: Any, evaluator: Any, external: str, test_functions: Any
+    config: Any, evaluator: Any, external: str, test_functions: Any
 ) -> None:
-    enopt_config["backend"]["method"] = f"{external}{_SLSQP}"
+    config["backend"]["method"] = f"{external}{_SLSQP}"
     new_functions = (
         *test_functions,
         lambda variables, _: test_functions[1](variables, None),
     )
 
-    enopt_config["objectives"]["weights"] = [0.75, 0.25, -0.25]
-    optimizer = BasicOptimizer(enopt_config, evaluator(new_functions))
+    config["objectives"]["weights"] = [0.75, 0.25, -0.25]
+    optimizer = BasicOptimizer(config, evaluator(new_functions))
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert not np.allclose(
         optimizer.results.evaluations.variables, [0, 0, 0.5], atol=0.02
     )
 
-    enopt_config["objectives"]["weights"] = [0.75, 0.25, 0.0]
-    optimizer = BasicOptimizer(enopt_config, evaluator(new_functions))
+    config["objectives"]["weights"] = [0.75, 0.25, 0.0]
+    optimizer = BasicOptimizer(config, evaluator(new_functions))
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert np.allclose(optimizer.results.evaluations.variables, [0, 0, 0.5], atol=0.02)
 
-    enopt_config["objectives"]["weights"] = [0.75, 0.5, -0.25]
-    optimizer = BasicOptimizer(enopt_config, evaluator(new_functions))
+    config["objectives"]["weights"] = [0.75, 0.5, -0.25]
+    optimizer = BasicOptimizer(config, evaluator(new_functions))
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert np.allclose(optimizer.results.evaluations.variables, [0, 0, 0.5], atol=0.02)
 
-    enopt_config["objectives"]["weights"] = [-0.75, -0.25]
+    config["objectives"]["weights"] = [-0.75, -0.25]
     with pytest.raises(ValidationError, match="The sum of weights is not positive"):
-        EnOptConfig.model_validate(enopt_config)
+        EnOptContext.model_validate(config)

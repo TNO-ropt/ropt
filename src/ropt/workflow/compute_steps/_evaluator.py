@@ -18,7 +18,7 @@ from .base import ComputeStep
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
-    from ropt.config import EnOptConfig
+    from ropt.context import EnOptContext
     from ropt.workflow.evaluators import Evaluator
 
 
@@ -56,7 +56,7 @@ class EnsembleEvaluator(ComputeStep):
 
     def run(
         self,
-        config: EnOptConfig,
+        context: EnOptContext,
         variables: ArrayLike,
         *,
         metadata: dict[str, Any] | None = None,
@@ -64,8 +64,8 @@ class EnsembleEvaluator(ComputeStep):
         """Run the ensemble evaluator.
 
         This method executes the core logic of the ensemble evaluator. It
-        requires an optimizer configuration
-        ([`EnOptConfig`][ropt.config.EnOptConfig]) and optionally accepts
+        requires an optimizer context
+        ([`EnOptContext`][ropt.context.EnOptContext]) and optionally accepts
         specific variable vectors to evaluate.
 
         If `metadata` is provided, it is attached to the
@@ -73,7 +73,7 @@ class EnsembleEvaluator(ComputeStep):
         `FINISHED_EVALUATION` event.
 
         Args:
-            config:     Optimizer configuration.
+            context:    Optimizer context.
             variables:  Variable vector(s) to evaluate.
             metadata:   Optional dictionary to attach to emitted `FunctionResults`.
 
@@ -83,27 +83,27 @@ class EnsembleEvaluator(ComputeStep):
         Raises:
             ValueError: If the input variables have the wrong shape.
         """
-        config.lock()
+        context.lock()
 
         self._emit_event(
             EnOptEvent(
-                event_type=EnOptEventType.START_ENSEMBLE_EVALUATOR, config=config
+                event_type=EnOptEventType.START_ENSEMBLE_EVALUATOR, context=context
             )
         )
 
         variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=2)
-        if variables.shape[-1] != config.variables.variable_count:
+        if variables.shape[-1] != context.variables.variable_count:
             msg = "The input variables have the wrong shape"
             raise ValueError(msg)
-        for transform in config.variable_transforms:
+        for transform in context.variable_transforms:
             variables = transform.to_optimizer(variables)
 
-        ensemble_evaluator = CoreEnsembleEvaluator(config, self._evaluator.eval)
+        ensemble_evaluator = CoreEnsembleEvaluator(context, self._evaluator.eval)
 
         exit_code = ExitCode.ENSEMBLE_EVALUATOR_FINISHED
 
         self._emit_event(
-            EnOptEvent(event_type=EnOptEventType.START_EVALUATION, config=config)
+            EnOptEvent(event_type=EnOptEventType.START_EVALUATION, context=context)
         )
         try:
             results = ensemble_evaluator.calculate(
@@ -124,7 +124,7 @@ class EnsembleEvaluator(ComputeStep):
         self._emit_event(
             EnOptEvent(
                 event_type=EnOptEventType.FINISHED_EVALUATION,
-                config=config,
+                context=context,
                 results=results,
             )
         )
@@ -132,7 +132,7 @@ class EnsembleEvaluator(ComputeStep):
         self._emit_event(
             EnOptEvent(
                 event_type=EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR,
-                config=config,
+                context=context,
                 results=results,
             )
         )

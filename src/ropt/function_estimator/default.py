@@ -5,7 +5,8 @@ from typing import Final
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.config import EnOptConfig, FunctionEstimatorConfig
+from ropt.config import FunctionEstimatorConfig
+from ropt.context import EnOptContext
 from ropt.enums import ExitCode
 from ropt.exceptions import ComputeStepAborted
 from ropt.function_estimator import FunctionEstimator
@@ -22,7 +23,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
     gradients from an ensemble of realizations into a single representative
     value or gradient. The specific method is configured via the
     [`FunctionEstimatorConfig`][ropt.config.FunctionEstimatorConfig] in the main
-    [`EnOptConfig`][ropt.config.EnOptConfig].
+    [`EnOptContext`][ropt.context.EnOptContext].
 
     **Supported Methods:**
 
@@ -56,7 +57,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
         if self._method == "default":
             self._method = "mean"
 
-    def init(self, enopt_config: EnOptConfig) -> None:
+    def init(self, context: EnOptContext) -> None:
         """Initialize the function estimator object.
 
         See the
@@ -65,7 +66,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
 
         # noqa
         """
-        self._enopt_config = enopt_config
+        self._context = context
 
     def calculate_function(
         self,
@@ -80,7 +81,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
 
         # noqa
         """  # noqa: DOC201, DOC501
-        if self._method == "stddev" and self._enopt_config.gradient.merge_realizations:
+        if self._method == "stddev" and self._context.gradient.merge_realizations:
             msg = (
                 "The stddev estimator does not support merging "
                 "realizations in the gradient."
@@ -108,7 +109,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
 
         # noqa
         """  # noqa: DOC201, DOC501
-        if self._method == "stddev" and self._enopt_config.gradient.merge_realizations:
+        if self._method == "stddev" and self._context.gradient.merge_realizations:
             msg = (
                 "The stddev estimator does not support merging "
                 "realizations in the gradient."
@@ -120,7 +121,7 @@ class DefaultFunctionEstimator(FunctionEstimator):
                 functions,
                 gradient,
                 weights,
-                merge_realizations=self._enopt_config.gradient.merge_realizations,
+                merge_realizations=self._context.gradient.merge_realizations,
             )
         if estimator_method == "stddev":
             return _calculate_gradient_stddev(functions, gradient, weights)

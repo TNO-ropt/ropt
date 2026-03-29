@@ -10,7 +10,8 @@ from numpy.typing import NDArray
 from scipy.stats import norm, rv_continuous, truncnorm, uniform
 from scipy.stats.qmc import Halton, LatinHypercube, QMCEngine, Sobol, scale
 
-from ropt.config import EnOptConfig, SamplerConfig
+from ropt.config import SamplerConfig
+from ropt.context import EnOptContext
 from ropt.sampler import Sampler
 
 _STATS_SAMPLERS: Final[dict[str, Any]] = {
@@ -86,7 +87,7 @@ class SciPySampler(Sampler):
 
     def init(
         self,
-        enopt_config: EnOptConfig,
+        context: EnOptContext,
         mask: NDArray[np.bool_] | None,
         rng: Generator,
     ) -> None:
@@ -96,7 +97,7 @@ class SciPySampler(Sampler):
 
         # noqa
         """
-        self._enopt_config = enopt_config
+        self._context = context
         self._mask = mask
         self._rng = rng
         if self._sampler is None:
@@ -111,9 +112,9 @@ class SciPySampler(Sampler):
 
         # noqa
         """  # noqa: DOC201
-        variable_count = self._enopt_config.variables.variable_count
-        realization_count = self._enopt_config.realizations.weights.size
-        perturbation_count = self._enopt_config.gradient.number_of_perturbations
+        variable_count = self._context.variables.variable_count
+        realization_count = self._context.realizations.weights.size
+        perturbation_count = self._context.gradient.number_of_perturbations
 
         sample_dim = variable_count if self._mask is None else self._mask.sum()
 
@@ -149,7 +150,7 @@ class SciPySampler(Sampler):
             sampler = _STATS_SAMPLERS[self._method]
         elif self._method in _QMC_ENGINES:
             sample_dim = (
-                self._enopt_config.variables.variable_count
+                self._context.variables.variable_count
                 if self._mask is None
                 else self._mask.sum()
             )

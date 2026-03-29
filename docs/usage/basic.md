@@ -132,7 +132,7 @@ if __name__ == "__main__":
 ## Configuration
 
 The `BasicOptimizer` requires a configuration dictionary that is parsed into an
-[`EnOptConfing`][ropt.config.EnOptConfig] object. Most of the optimization
+[`EnOptConfing`][ropt.context.EnOptContext] object. Most of the optimization
 parameters are set to their defaults when parsing the dictionary, here we
 override only the most essential ones:
 

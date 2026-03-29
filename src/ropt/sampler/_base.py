@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from numpy.random import Generator
     from numpy.typing import NDArray
 
-    from ropt.config import EnOptConfig
+    from ropt.context import EnOptContext
 
 
 class Sampler(ABC):
@@ -31,7 +31,7 @@ class Sampler(ABC):
 
     @abstractmethod
     def init(
-        self, enopt_config: EnOptConfig, mask: NDArray[np.bool_] | None, rng: Generator
+        self, context: EnOptContext, mask: NDArray[np.bool_] | None, rng: Generator
     ) -> None:
         """Initialize the sampler object.
 
@@ -39,9 +39,9 @@ class Sampler(ABC):
         random number generator.
 
         Args:
-            enopt_config: The main EnOpt configuration object.
-            mask: Optional boolean mask for variable subset sampling.
-            rng:  NumPy random number generator instance.
+            context: The main EnOpt context object.
+            mask:    Optional boolean mask for variable subset sampling.
+            rng:     NumPy random number generator instance.
         """
 
     @abstractmethod

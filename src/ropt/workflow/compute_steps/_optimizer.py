@@ -17,7 +17,7 @@ from .base import ComputeStep
 if TYPE_CHECKING:
     from numpy.typing import ArrayLike
 
-    from ropt.config import EnOptConfig
+    from ropt.context import EnOptContext
     from ropt.results import Results
     from ropt.workflow.evaluators import Evaluator
 
@@ -29,7 +29,7 @@ class EnsembleOptimizer(ComputeStep):
     """The default optimizer compute step.
 
     This compute step executes an optimization algorithm based on a provided
-    configuration ([`EnOptConfig`][ropt.config.EnOptConfig] or a compatible
+    configuration ([`EnOptContext`][ropt.context.EnOptContext] or a compatible
     dictionary). It iteratively performs function and potentially gradient
     evaluations, yielding a sequence of
     [`FunctionResults`][ropt.results.FunctionResults] and
@@ -66,7 +66,7 @@ class EnsembleOptimizer(ComputeStep):
 
     def run(
         self,
-        config: EnOptConfig,
+        context: EnOptContext,
         variables: ArrayLike,
         *,
         metadata: dict[str, Any] | None = None,
@@ -74,20 +74,16 @@ class EnsembleOptimizer(ComputeStep):
         """Run the compute step to perform an optimization.
 
         This method executes the core logic of the optimizer compute step. It
-        requires an optimizer configuration
-        ([`EnOptConfig`][ropt.config.EnOptConfig]) and optionally accepts
+        requires an optimizer context
+        ([`EnOptContext`][ropt.context.EnOptContext]) and optionally accepts
         specific initial variable vectors and metadata.
-
-        If `variables` are not provided, the initial values specified in the
-        `config` are used. If `variables` are provided, they override the
-        config's initial values.
 
         If `metadata` is provided, it is attached to the
         [`Results`][ropt.results.Results] objects emitted via the
         `FINISHED_EVALUATION` event.
 
         Args:
-            config:     Optimizer configuration.
+            context:    The optimizer context.
             variables:  Optional initial variable vector(s) to start from.
             metadata:   Optional dictionary to attach to emitted `Results`.
 
@@ -97,35 +93,35 @@ class EnsembleOptimizer(ComputeStep):
         Raises:
             ValueError:   If the input variables have the wrong shape.
         """
-        config.lock()
+        context.lock()
 
-        self._config = config
+        self._context = context
         self._metadata = metadata
 
         self._emit_event(
-            EnOptEvent(event_type=EnOptEventType.START_OPTIMIZER, config=config)
+            EnOptEvent(event_type=EnOptEventType.START_OPTIMIZER, context=context)
         )
 
         variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
-        if variables.shape != (self._config.variables.variable_count,):
+        if variables.shape != (self._context.variables.variable_count,):
             msg = "The input variables have the wrong shape"
             raise ValueError(msg)
-        for transform in config.variable_transforms:
+        for transform in context.variable_transforms:
             variables = transform.to_optimizer(variables)
 
         ensemble_evaluator = CoreEnsembleEvaluator(
-            self._config,
+            self._context,
             self._evaluator.eval,
         )
         ensemble_optimizer = CoreEnsembleOptimizer(
-            enopt_config=self._config,
+            context=self._context,
             ensemble_evaluator=ensemble_evaluator,
             signal_evaluation=self._signal_evaluation,
         )
         exit_code = ensemble_optimizer.start(variables)
 
         self._emit_event(
-            EnOptEvent(event_type=EnOptEventType.FINISHED_OPTIMIZER, config=config)
+            EnOptEvent(event_type=EnOptEventType.FINISHED_OPTIMIZER, context=context)
         )
 
         return exit_code
@@ -139,7 +135,7 @@ class EnsembleOptimizer(ComputeStep):
         if results is None:
             self._emit_event(
                 EnOptEvent(
-                    event_type=EnOptEventType.START_EVALUATION, config=self._config
+                    event_type=EnOptEventType.START_EVALUATION, context=self._context
                 )
             )
         else:
@@ -150,7 +146,7 @@ class EnsembleOptimizer(ComputeStep):
             self._emit_event(
                 EnOptEvent(
                     event_type=EnOptEventType.FINISHED_EVALUATION,
-                    config=self._config,
+                    context=self._context,
                     results=results,
                 ),
             )

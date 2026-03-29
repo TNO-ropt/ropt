@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
-    from ropt.config import EnOptConfig
+    from ropt.context import EnOptContext
 
 
 class FunctionEstimator(ABC):
@@ -34,7 +34,7 @@ class FunctionEstimator(ABC):
     """
 
     @abstractmethod
-    def init(self, enopt_config: EnOptConfig) -> None:
+    def init(self, context: EnOptContext) -> None:
         """Initialize the function estimator object.
 
         This method is called by `ropt` during the setup phase of the optimization
@@ -42,7 +42,7 @@ class FunctionEstimator(ABC):
         initialization based on the provided configuration.
 
         Args:
-            enopt_config: The EnOpt configuration object.
+            context: The EnOpt context object.
         """
 
     @abstractmethod

@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.config import EnOptConfig
+from ropt.context import EnOptContext
 
 _MESSAGES = {
     "bounds": "bound constraints",
@@ -21,14 +21,14 @@ _MESSAGES = {
 
 
 def validate_supported_constraints(
-    config: EnOptConfig,
+    context: EnOptContext,
     method: str,
     supported_constraints: dict[str, set[str]],
     required_constraints: dict[str, set[str]],
 ) -> None:
     """Validate if the configured constraints are supported by the chosen method.
 
-    This function checks if the constraints defined in the `config` object
+    This function checks if the constraints defined in the `context` object
     (bounds, linear, non-linear) are compatible with the specified optimization
     `method`. It uses dictionaries mapping constraint types to sets of methods
     that support or require them.
@@ -49,19 +49,19 @@ def validate_supported_constraints(
     A similar structure is used for `required_constraints`.
 
     Args:
-        config:                The optimization configuration object.
+        context:               The optimization context object.
         method:                The name of the optimization method being used.
         supported_constraints: Dict mapping constraint types to sets of methods
                                that support them.
         required_constraints:  Dict mapping constraint types to sets of methods
                                that require them.
     """
-    _validate_bounds(config, method, supported_constraints, required_constraints)
+    _validate_bounds(context, method, supported_constraints, required_constraints)
     _validate_linear_constraints(
-        config, method, supported_constraints, required_constraints
+        context, method, supported_constraints, required_constraints
     )
     _validate_nonlinear_constraints(
-        config, method, supported_constraints, required_constraints
+        context, method, supported_constraints, required_constraints
     )
 
 
@@ -89,7 +89,7 @@ def _check_constraint(
 
 
 def _validate_bounds(
-    config: EnOptConfig,
+    context: EnOptContext,
     method: str,
     supported_constraints: dict[str, set[str]],
     required_constraints: dict[str, set[str]],
@@ -100,19 +100,19 @@ def _validate_bounds(
         supported_constraints,
         required_constraints,
         have_constraint=bool(
-            np.isfinite(config.variables.lower_bounds).any()
-            or np.isfinite(config.variables.upper_bounds).any(),
+            np.isfinite(context.variables.lower_bounds).any()
+            or np.isfinite(context.variables.upper_bounds).any(),
         ),
     )
 
 
 def _validate_linear_constraints(
-    config: EnOptConfig,
+    context: EnOptContext,
     method: str,
     supported_constraints: dict[str, set[str]],
     required_constraints: dict[str, set[str]],
 ) -> None:
-    if config.linear_constraints is None:
+    if context.linear_constraints is None:
         return
 
     _check_constraint(
@@ -122,8 +122,8 @@ def _validate_linear_constraints(
         required_constraints,
         have_constraint=not bool(
             np.allclose(
-                config.linear_constraints.lower_bounds,
-                config.linear_constraints.upper_bounds,
+                context.linear_constraints.lower_bounds,
+                context.linear_constraints.upper_bounds,
                 rtol=0.0,
                 atol=1e-15,
             )
@@ -137,8 +137,8 @@ def _validate_linear_constraints(
         required_constraints,
         have_constraint=bool(
             np.allclose(
-                config.linear_constraints.lower_bounds,
-                config.linear_constraints.upper_bounds,
+                context.linear_constraints.lower_bounds,
+                context.linear_constraints.upper_bounds,
                 rtol=0.0,
                 atol=1e-15,
             )
@@ -147,12 +147,12 @@ def _validate_linear_constraints(
 
 
 def _validate_nonlinear_constraints(
-    config: EnOptConfig,
+    context: EnOptContext,
     method: str,
     supported_constraints: dict[str, set[str]],
     required_constraints: dict[str, set[str]],
 ) -> None:
-    nonlinear_constraints = config.nonlinear_constraints
+    nonlinear_constraints = context.nonlinear_constraints
     if nonlinear_constraints is None:
         return
 
@@ -477,20 +477,20 @@ class NormalizedConstraints:
 
 
 def get_masked_linear_constraints(
-    config: EnOptConfig, initial_values: NDArray[np.float64]
+    context: EnOptContext, initial_values: NDArray[np.float64]
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
     """Adjust linear constraints based on a variable mask.
 
-    When an optimization problem uses a variable mask (`config.variables.mask`)
+    When an optimization problem uses a variable mask (`context.variables.mask`)
     to optimize only a subset of variables, the linear constraints need to be
     adapted. This function performs that adaptation.
 
     It removes columns from the constraint coefficient matrix
-    (`config.linear_constraints.coefficients`) that correspond to the masked
+    (`context.linear_constraints.coefficients`) that correspond to the masked
     (fixed) variables. The contribution of these fixed variables (using their
     `initial_values`) is then calculated and subtracted from the original lower
-    and upper bounds (`config.linear_constraints.lower_bounds`,
-    `config.linear_constraints.upper_bounds`) to produce adjusted bounds for the
+    and upper bounds (`context.linear_constraints.lower_bounds`,
+    `context.linear_constraints.upper_bounds`) to produce adjusted bounds for the
     optimization involving only the active variables.
 
     Additionally, any constraint rows that originally involved *only* masked
@@ -498,18 +498,18 @@ def get_masked_linear_constraints(
     are removed entirely, as they become trivial constants.
 
     Args:
-        config:         The [`EnOptConfig`][ropt.config.EnOptConfig] object
+        context:         The [`EnOptContext`][ropt.context.EnOptContext] object
                         containing the variable mask and linear constraints.
         initial_values: The initial values to use.
 
     Returns:
         The adjusted coefficients and bounds.
     """
-    assert config.linear_constraints is not None
-    mask = config.variables.mask
-    coefficients = config.linear_constraints.coefficients
-    lower_bounds = config.linear_constraints.lower_bounds
-    upper_bounds = config.linear_constraints.upper_bounds
+    assert context.linear_constraints is not None
+    mask = context.variables.mask
+    coefficients = context.linear_constraints.coefficients
+    lower_bounds = context.linear_constraints.lower_bounds
+    upper_bounds = context.linear_constraints.upper_bounds
     if not np.all(mask):
         # Keep rows that only contain non-zero values for the active variables:
         keep_rows = np.all(coefficients[:, ~mask] == 0, axis=1)

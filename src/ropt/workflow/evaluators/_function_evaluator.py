@@ -42,23 +42,23 @@ class FunctionEvaluator(Evaluator):
         self._batch_id = -1
 
     def eval(
-        self, variables: NDArray[np.float64], context: EvaluatorContext
+        self, variables: NDArray[np.float64], evaluator_context: EvaluatorContext
     ) -> EvaluatorResult:
         """Evaluate all objective and constraints.
 
         Args:
-            variables: The matrix of variables to evaluate.
-            context:   The evaluation context.
+            variables:         The matrix of variables to evaluate.
+            evaluator_context: The evaluation context.
 
         Returns:
             The result of calling the wrapped evaluator function.
         """
         self._batch_id += 1
-        no = context.config.objectives.weights.size
+        no = evaluator_context.context.objectives.weights.size
         nc = (
             0
-            if context.config.nonlinear_constraints is None
-            else context.config.nonlinear_constraints.lower_bounds.size
+            if evaluator_context.context.nonlinear_constraints is None
+            else evaluator_context.context.nonlinear_constraints.lower_bounds.size
         )
         results = np.zeros((variables.shape[0], no + nc), dtype=np.float64)
         evaluation_info: dict[str, NDArray[Any]] = {
@@ -66,13 +66,13 @@ class FunctionEvaluator(Evaluator):
             for key, dtype in self._evaluation_info.items()
         }
 
-        for eval_idx, realization in enumerate(context.realizations):
+        for eval_idx, realization in enumerate(evaluator_context.realizations):
             perturbation = (
                 -1
-                if context.perturbations is None
-                else int(context.perturbations[eval_idx])
+                if evaluator_context.perturbations is None
+                else int(evaluator_context.perturbations[eval_idx])
             )
-            if context.active is None or context.active[eval_idx]:
+            if evaluator_context.active is None or evaluator_context.active[eval_idx]:
                 _handle_result(
                     eval_idx,
                     self._function(

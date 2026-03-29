@@ -4,18 +4,15 @@ from typing import Any
 import numpy as np
 import pytest
 
-from ropt.config import (
-    EnOptConfig,
-    LinearConstraintsConfig,
-    VariablesConfig,
-)
+from ropt.config import LinearConstraintsConfig, VariablesConfig
+from ropt.context import EnOptContext
 from ropt.enums import BoundaryType, PerturbationType
 
 initial_values = np.array([1, 2])
 
 
-@pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> dict[str, Any]:
+@pytest.fixture(name="config")
+def config_fixture() -> dict[str, Any]:
     return {
         "variables": {
             "variable_count": len(initial_values),
@@ -77,12 +74,12 @@ def test_check_perturbations() -> None:
     assert variables.perturbation_magnitudes == np.array([0.1])
 
 
-def test_check_config(enopt_config: Any) -> None:
-    EnOptConfig.model_validate(enopt_config)
+def test_check_config(config: Any) -> None:
+    EnOptContext.model_validate(config)
 
 
-def test_check_config_linear_constraints(enopt_config: Any) -> None:
-    enopt_config["linear_constraints"] = {
+def test_check_config_linear_constraints(config: Any) -> None:
+    config["linear_constraints"] = {
         "coefficients": [[1, 2, 3], [2, 3, 4]],
         "lower_bounds": [1, 2],
         "upper_bounds": [np.inf, np.inf],
@@ -91,64 +88,64 @@ def test_check_config_linear_constraints(enopt_config: Any) -> None:
         ValueError,
         match="the coefficients matrix should have 2 columns",
     ):
-        EnOptConfig.model_validate(enopt_config)
+        EnOptContext.model_validate(config)
 
 
-def test_check_config_perturbations(enopt_config: Any) -> None:
-    enopt_config["variables"].update(
+def test_check_config_perturbations(config: Any) -> None:
+    config["variables"].update(
         {
             "perturbation_magnitudes": [1] * 2,
             "boundary_types": [BoundaryType.TRUNCATE_BOTH] * 2,
             "perturbation_types": [PerturbationType.ABSOLUTE] * 2,
         }
     )
-    EnOptConfig.model_validate(enopt_config)
+    EnOptContext.model_validate(config)
 
-    config_copy = copy.deepcopy(enopt_config)
+    config_copy = copy.deepcopy(config)
     config_copy["variables"]["perturbation_magnitudes"] = [1] * 3
     with pytest.raises(
         ValueError,
         match="perturbation_magnitudes cannot be broadcasted to a length of 2",
     ):
-        EnOptConfig.model_validate(config_copy)
+        EnOptContext.model_validate(config_copy)
 
-    config_copy = copy.deepcopy(enopt_config)
+    config_copy = copy.deepcopy(config)
     config_copy["variables"]["boundary_types"] = [BoundaryType.TRUNCATE_BOTH] * 3
     with pytest.raises(
         ValueError, match="boundary_types cannot be broadcasted to a length of 2"
     ):
-        EnOptConfig.model_validate(config_copy)
+        EnOptContext.model_validate(config_copy)
 
-    config_copy = copy.deepcopy(enopt_config)
+    config_copy = copy.deepcopy(config)
     config_copy["variables"]["perturbation_types"] = [PerturbationType.ABSOLUTE] * 3
     with pytest.raises(
         ValueError, match="perturbation_types cannot be broadcasted to a length of 2"
     ):
-        EnOptConfig.model_validate(config_copy)
+        EnOptContext.model_validate(config_copy)
 
 
-def test_check_config_min_success(enopt_config: Any) -> None:
+def test_check_config_min_success(config: Any) -> None:
     def gen_config(pert_min: int | None, real_min: int | None) -> dict[str, Any]:
-        config: dict[str, Any] = copy.deepcopy(enopt_config)
-        config["realizations"] = {"weights": 4 * [1.0]}
-        config["gradient"] = {}
+        config_copy: dict[str, Any] = copy.deepcopy(config)
+        config_copy["realizations"] = {"weights": 4 * [1.0]}
+        config_copy["gradient"] = {}
         if pert_min is not None:
-            config["gradient"]["perturbation_min_success"] = pert_min
+            config_copy["gradient"]["perturbation_min_success"] = pert_min
         if real_min is not None:
-            config["realizations"]["realization_min_success"] = real_min
-        return config
+            config_copy["realizations"]["realization_min_success"] = real_min
+        return config_copy
 
     pert_test_map = {None: 5, 1: 1, 4: 4, 7: 5}
     real_test_map = {None: 4, 1: 1, 3: 3, 7: 4}
     test_space = zip(pert_test_map.keys(), real_test_map.keys(), strict=False)
     for pert_in, real_in in test_space:
-        config = EnOptConfig.model_validate(gen_config(pert_in, real_in))
-        assert pert_test_map[pert_in] == config.gradient.perturbation_min_success
-        assert real_test_map[real_in] == config.realizations.realization_min_success
+        context = EnOptContext.model_validate(gen_config(pert_in, real_in))
+        assert pert_test_map[pert_in] == context.gradient.perturbation_min_success
+        assert real_test_map[real_in] == context.realizations.realization_min_success
 
 
-def test_perturbation_types(enopt_config: Any) -> None:
-    enopt_config["variables"].update(
+def test_perturbation_types(config: Any) -> None:
+    config["variables"].update(
         {
             "perturbation_magnitudes": [0.1, 0.01],
             "perturbation_types": [
@@ -157,18 +154,18 @@ def test_perturbation_types(enopt_config: Any) -> None:
             ],
         }
     )
-    enopt_config["variables"]["lower_bounds"] = [0.0, 600]
-    enopt_config["variables"]["upper_bounds"] = [1.0, np.inf]
+    config["variables"]["lower_bounds"] = [0.0, 600]
+    config["variables"]["upper_bounds"] = [1.0, np.inf]
     with pytest.raises(
         ValueError,
         match="The variable bounds must be finite to use relative perturbations",
     ):
-        config = EnOptConfig.model_validate(enopt_config)
+        context = EnOptContext.model_validate(config)
 
-    enopt_config["variables"]["variable_count"] = 3
-    enopt_config["variables"]["lower_bounds"] = [0.0, 100.0, 0.0]
-    enopt_config["variables"]["upper_bounds"] = [np.inf, 600.0, 1.0]
-    enopt_config["variables"].update(
+    config["variables"]["variable_count"] = 3
+    config["variables"]["lower_bounds"] = [0.0, 100.0, 0.0]
+    config["variables"]["upper_bounds"] = [np.inf, 600.0, 1.0]
+    config["variables"].update(
         {
             "perturbation_magnitudes": [0.1, 0.01, 1.0],
             "perturbation_types": [
@@ -178,12 +175,12 @@ def test_perturbation_types(enopt_config: Any) -> None:
             ],
         }
     )
-    config = EnOptConfig.model_validate(enopt_config)
-    assert np.allclose(config.variables.perturbation_magnitudes, [0.1, 0.01, 1.0])
+    context = EnOptContext.model_validate(config)
+    assert np.allclose(context.variables.perturbation_magnitudes, [0.1, 0.01, 1.0])
 
 
-def test_perturbation_types_with_scaler(enopt_config: Any) -> None:
-    enopt_config["variables"].update(
+def test_perturbation_types_with_scaler(config: Any) -> None:
+    config["variables"].update(
         {
             "perturbation_magnitudes": [0.1, 0.01],
             "perturbation_types": [
@@ -192,23 +189,23 @@ def test_perturbation_types_with_scaler(enopt_config: Any) -> None:
             ],
         }
     )
-    enopt_config["variables"]["lower_bounds"] = [0.0, 600]
-    enopt_config["variables"]["upper_bounds"] = [1.0, np.inf]
+    config["variables"]["lower_bounds"] = [0.0, 600]
+    config["variables"]["upper_bounds"] = [1.0, np.inf]
     with pytest.raises(
         ValueError,
         match="The variable bounds must be finite to use relative perturbations",
     ):
-        config = EnOptConfig.model_validate(enopt_config)
+        context = EnOptContext.model_validate(config)
 
-    enopt_config["variables"]["variable_count"] = 3
-    enopt_config["variables"]["lower_bounds"] = [0.0, 100.0, 0.0]
-    enopt_config["variables"]["upper_bounds"] = [np.inf, 600.0, 1.0]
-    enopt_config["variables"]["transforms"] = [0]
-    enopt_config["variable_transforms"] = [
+    config["variables"]["variable_count"] = 3
+    config["variables"]["lower_bounds"] = [0.0, 100.0, 0.0]
+    config["variables"]["upper_bounds"] = [np.inf, 600.0, 1.0]
+    config["variables"]["transforms"] = [0]
+    config["variable_transforms"] = [
         {"method": "scaler", "options": {"scales": [1.0, 1.0, 50.0]}},
     ]
 
-    enopt_config["variables"].update(
+    config["variables"].update(
         {
             "perturbation_magnitudes": [0.1, 0.01, 1.0],
             "perturbation_types": [
@@ -218,5 +215,5 @@ def test_perturbation_types_with_scaler(enopt_config: Any) -> None:
             ],
         }
     )
-    config = EnOptConfig.model_validate(enopt_config)
-    assert np.allclose(config.variables.perturbation_magnitudes, [0.1, 0.01, 0.02])
+    context = EnOptContext.model_validate(config)
+    assert np.allclose(context.variables.perturbation_magnitudes, [0.1, 0.01, 0.02])

@@ -7,7 +7,8 @@ from typing import Self
 import numpy as np
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from ._utils import broadcast_1d_array, broadcast_arrays
+from ropt._utils import broadcast_1d_array, broadcast_arrays
+
 from ._validated_types import (  # noqa: TC001
     Array1D,
     Array1DInt,
@@ -18,7 +19,7 @@ class NonlinearConstraintsConfig(BaseModel):
     r"""Configuration class for non-linear constraints.
 
     This class, `NonlinearConstraintsConfig`, defines non-linear constraints ,
-    for instance as part of an [`EnOptConfig`][ropt.config.EnOptConfig] object.
+    for instance as part of an [`EnOptContext`][ropt.context.EnOptContext] object.
 
     Non-linear constraints are defined by comparing a constraint function to a
     right-hand-side value, allowing for equality or inequality constraints. The
@@ -39,7 +40,7 @@ class NonlinearConstraintsConfig(BaseModel):
     constraint function (by position) and specifies which filter to use. The
     available filters must be defined elsewhere as a tuple of realization filter
     configurations. For instance, for optimization these are defined in the
-    [`EnOptConfig.realization_filters`][ropt.config.EnOptConfig] configuration
+    [`EnOptContext.realization_filters`][ropt.context.EnOptContext] configuration
     class. The same logic applies to the `function_estimators` array . If an
     index is invalid (e.g., out of bounds for the corresponding object tuple),
     no filter or estimator is applied to that specific constraint function. If

@@ -7,7 +7,7 @@ from typing import Self
 import numpy as np
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from ropt.config._utils import broadcast_1d_array
+from ropt._utils import broadcast_1d_array
 from ropt.config._validated_types import Array1D, Array2D  # noqa: TC001
 
 
@@ -16,7 +16,7 @@ class LinearConstraintsConfig(BaseModel):
 
     This class, `LinearConstraintsConfig`, defines linear constraints used in an
     optimization, for instance as part of an
-    [`EnOptConfig`][ropt.config.EnOptConfig] object.
+    [`EnOptContext`][ropt.context.EnOptContext] object.
 
     Linear constraints are defined by a set of linear equations involving the
     optimization variables. These equations can represent equality or inequality

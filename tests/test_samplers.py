@@ -6,7 +6,8 @@ import numpy as np
 import pytest
 from numpy.random import Generator, default_rng
 
-from ropt.config import EnOptConfig, SamplerConfig
+from ropt.config import SamplerConfig
+from ropt.context import EnOptContext
 from ropt.core._gradient import _perturb_variables
 from ropt.sampler import Sampler
 from ropt.workflow import BasicOptimizer
@@ -17,8 +18,8 @@ if TYPE_CHECKING:
 initial_values = [0.0, 0.0, 0.0]
 
 
-@pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> dict[str, Any]:
+@pytest.fixture(name="config")
+def config_fixture() -> dict[str, Any]:
     return {
         "optimizer": {
             "max_functions": 4,
@@ -58,23 +59,23 @@ class MockedSampler(Sampler):
 
     def init(
         self,
-        enopt_config: EnOptConfig,
+        context: EnOptContext,
         mask: NDArray[np.bool_] | None,
         _: Generator,
     ) -> None:
-        self._enopt_config = enopt_config
+        self._context = context
         self._mask = mask
 
     def generate_samples(
         self,
     ) -> NDArray[np.float64]:
         assert (
-            self._enopt_config.gradient.number_of_perturbations
-            == self._enopt_config.variables.variable_count
+            self._context.gradient.number_of_perturbations
+            == self._context.variables.variable_count
         )
-        variable_count = self._enopt_config.variables.variable_count
-        realization_count = self._enopt_config.realizations.weights.size
-        perturbation_count = self._enopt_config.gradient.number_of_perturbations
+        variable_count = self._context.variables.variable_count
+        realization_count = self._context.realizations.weights.size
+        perturbation_count = self._context.gradient.number_of_perturbations
 
         samples: NDArray[np.float64]
         if self._mask is None:
@@ -96,40 +97,40 @@ class MockedSampler(Sampler):
         return samples
 
 
-def test_sampler_simple(enopt_config: Any) -> None:
+def test_sampler_simple(config: Any) -> None:
     sampler_config = SamplerConfig.model_validate({"method": "test"})
     sampler = MockedSampler(sampler_config)
-    enopt_config["gradient"]["number_of_perturbations"] = 3
-    enopt_config["samplers"] = [sampler]
-    config = EnOptConfig.model_validate(enopt_config)
+    config["gradient"]["number_of_perturbations"] = 3
+    config["samplers"] = [sampler]
+    context = EnOptContext.model_validate(config)
     rng = default_rng(123)
-    sampler.init(config, None, rng)
+    sampler.init(context, None, rng)
     perturbed_variables = _perturb_variables(
-        config,
+        context,
         np.array([0.0, 0.0, 0.0]),
         (sampler,),
     )
     assert np.allclose(perturbed_variables, 0.01 * np.eye(3))
 
 
-def test_sampler_use_options(enopt_config: Any) -> None:
+def test_sampler_use_options(config: Any) -> None:
     sampler_config = SamplerConfig.model_validate(
         {"method": "test", "options": {"scale": 100.0}}
     )
     sampler = MockedSampler(sampler_config)
-    enopt_config["samplers"] = [sampler]
-    config = EnOptConfig.model_validate(enopt_config)
+    config["samplers"] = [sampler]
+    context = EnOptContext.model_validate(config)
     rng = default_rng(123)
-    sampler.init(config, None, rng)
+    sampler.init(context, None, rng)
     perturbed_variables = _perturb_variables(
-        config,
+        context,
         np.array([0.0, 0.0, 0.0]),
         (sampler,),
     )
     assert np.allclose(perturbed_variables, np.eye(3))
 
 
-def test_sampler_indexed(enopt_config: Any) -> None:
+def test_sampler_indexed(config: Any) -> None:
     sampler_config = SamplerConfig.model_validate({"method": "test"})
     sampler0 = MockedSampler(sampler_config)
     sampler_config = SamplerConfig.model_validate(
@@ -137,29 +138,29 @@ def test_sampler_indexed(enopt_config: Any) -> None:
     )
     sampler1 = MockedSampler(sampler_config)
 
-    enopt_config["variables"]["samplers"] = [0, 1, 1]
-    enopt_config["samplers"] = [sampler0, sampler1]
-    config = EnOptConfig.model_validate(enopt_config)
+    config["variables"]["samplers"] = [0, 1, 1]
+    config["samplers"] = [sampler0, sampler1]
+    context = EnOptContext.model_validate(config)
 
     rng = default_rng(123)
-    sampler0.init(config, np.array([0]), rng)
-    sampler1.init(config, np.array([1, 2]), rng)
+    sampler0.init(context, np.array([0]), rng)
+    sampler1.init(context, np.array([1, 2]), rng)
 
     perturbed_variables = _perturb_variables(
-        config,
+        context,
         np.array([0.0, 0.0, 0.0]),
         (sampler0, sampler1),
     )
     assert np.allclose(perturbed_variables[0, ...], np.diag([0.01, -0.01, -0.01]))
 
 
-def test_sampler_order(enopt_config: Any, evaluator: Any) -> None:
-    enopt_config["variables"]["samplers"] = [0, 0, 1]
-    enopt_config["samplers"] = [
+def test_sampler_order(config: Any, evaluator: Any) -> None:
+    config["variables"]["samplers"] = [0, 0, 1]
+    config["samplers"] = [
         {"method": "norm"},
         {"method": "uniform"},
     ]
-    optimizer1 = BasicOptimizer(enopt_config, evaluator())
+    optimizer1 = BasicOptimizer(config, evaluator())
     optimizer1.run(initial_values)
     assert optimizer1.results is not None
     assert np.allclose(
@@ -167,12 +168,12 @@ def test_sampler_order(enopt_config: Any, evaluator: Any) -> None:
     )
 
     # Switch the samplers:
-    enopt_config["samplers"] = [
+    config["samplers"] = [
         {"method": "uniform"},
         {"method": "norm"},
     ]
-    enopt_config["variables"]["samplers"] = [1, 1, 0]
-    optimizer2 = BasicOptimizer(enopt_config, evaluator())
+    config["variables"]["samplers"] = [1, 1, 0]
+    optimizer2 = BasicOptimizer(config, evaluator())
     optimizer2.run(initial_values)
     assert optimizer2.results is not None
     assert np.allclose(

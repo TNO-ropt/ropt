@@ -13,7 +13,7 @@ from ._utils import _immutable_copy
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
-    from ropt.config import EnOptConfig
+    from ropt.context import EnOptContext
 
 
 @dataclass(slots=True)
@@ -159,7 +159,7 @@ class ConstraintInfo(ResultField):
     @classmethod
     def create(
         cls,
-        config: EnOptConfig,
+        context: EnOptContext,
         variables: NDArray[np.float64],
         constraints: NDArray[np.float64] | None,
     ) -> ConstraintInfo | None:
@@ -173,7 +173,7 @@ class ConstraintInfo(ResultField):
            right-hand-side upper and lower bounds.
 
         Args:
-            config:      The ensemble optimizer configuration object.
+            context:      The ensemble optimizer context object.
             variables:   The variables to check.
             constraints: The constraints to check (optional).
 
@@ -182,20 +182,20 @@ class ConstraintInfo(ResultField):
         """
         diffs: dict[str, NDArray[np.float64] | None] = {}
 
-        if np.all(np.isfinite(config.variables.lower_bounds)) or np.all(
-            np.isfinite(config.variables.upper_bounds)
+        if np.all(np.isfinite(context.variables.lower_bounds)) or np.all(
+            np.isfinite(context.variables.upper_bounds)
         ):
-            diffs["bound_lower"] = variables - config.variables.lower_bounds
-            diffs["bound_upper"] = variables - config.variables.upper_bounds
+            diffs["bound_lower"] = variables - context.variables.lower_bounds
+            diffs["bound_upper"] = variables - context.variables.upper_bounds
 
-        if config.linear_constraints is not None:
-            values = np.matmul(config.linear_constraints.coefficients, variables)
-            diffs["linear_lower"] = values - config.linear_constraints.lower_bounds
-            diffs["linear_upper"] = values - config.linear_constraints.upper_bounds
+        if context.linear_constraints is not None:
+            values = np.matmul(context.linear_constraints.coefficients, variables)
+            diffs["linear_lower"] = values - context.linear_constraints.lower_bounds
+            diffs["linear_upper"] = values - context.linear_constraints.upper_bounds
 
         if constraints is not None:
-            assert config.nonlinear_constraints is not None
-            lower_bounds, upper_bounds = _get_nonlinear_constraint_bounds(config)
+            assert context.nonlinear_constraints is not None
+            lower_bounds, upper_bounds = _get_nonlinear_constraint_bounds(context)
             diffs["nonlinear_lower"] = constraints - lower_bounds
             diffs["nonlinear_upper"] = constraints - upper_bounds
 
@@ -204,16 +204,16 @@ class ConstraintInfo(ResultField):
 
         return None
 
-    def transform_from_optimizer(self, config: EnOptConfig) -> ConstraintInfo:
+    def transform_from_optimizer(self, context: EnOptContext) -> ConstraintInfo:
         if (
-            not config.variable_transforms
-            and not config.nonlinear_constraint_transforms
+            not context.variable_transforms
+            and not context.nonlinear_constraint_transforms
         ):
             return self
 
         diffs: dict[str, NDArray[np.float64] | None] = asdict(self)
 
-        for variable_transform in config.variable_transforms:
+        for variable_transform in context.variable_transforms:
             if self.bound_lower is not None:
                 assert self.bound_upper is not None
                 diffs["bound_lower"], diffs["bound_upper"] = (
@@ -230,7 +230,7 @@ class ConstraintInfo(ResultField):
                     )
                 )
 
-        for constraint_transform in config.nonlinear_constraint_transforms:
+        for constraint_transform in context.nonlinear_constraint_transforms:
             if self.nonlinear_lower is not None:
                 assert self.nonlinear_upper is not None
                 diffs["nonlinear_lower"], diffs["nonlinear_upper"] = (
@@ -243,12 +243,12 @@ class ConstraintInfo(ResultField):
 
 
 def _get_nonlinear_constraint_bounds(
-    config: EnOptConfig,
+    context: EnOptContext,
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-    assert config.nonlinear_constraints is not None
-    lower_bounds = config.nonlinear_constraints.lower_bounds
-    upper_bounds = config.nonlinear_constraints.upper_bounds
-    for constraint_transform in config.nonlinear_constraint_transforms:
+    assert context.nonlinear_constraints is not None
+    lower_bounds = context.nonlinear_constraints.lower_bounds
+    upper_bounds = context.nonlinear_constraints.upper_bounds
+    for constraint_transform in context.nonlinear_constraint_transforms:
         lower_bounds, upper_bounds = constraint_transform.bounds_to_optimizer(
             lower_bounds, upper_bounds
         )

@@ -12,10 +12,10 @@ class VariableTransformConfig(BaseModel):
 
     This class, `VariableTransformConfig`, defines the configuration for
     variable transforms. Variable transforms are generally configured as a tuple
-    of `VariableTransformConfig` objects in a configuration class of an
+    of `VariableTransformConfig` objects in the context object passed to an
     optimization step. For instance, `variable_transforms` field of the
-    `EnOptConfig` defines the available transforms for the optimization.
-
+    [`EnOptContext`][ropt.context.EnOptContext] context object defines the
+    available transforms for the optimization.
 
     The `method` field specifies the transform method to use for the variables.
     The `options` field allows passing a dictionary of key-value pairs to
@@ -46,7 +46,7 @@ class ObjectiveTransformConfig(BaseModel):
     objective transforms. Objective transforms are generally configured as a
     tuple of `ObjectiveTransformConfig` objects in a configuration class of an
     optimization step. For instance, `objective_transforms` field of the
-    `EnOptConfig` defines the available transforms for the optimization.
+    `EnOptContext` defines the available transforms for the optimization.
 
     The `method` field specifies the transform method to use for the objectives.
     The `options` field allows passing a dictionary of key-value pairs to
@@ -77,7 +77,7 @@ class NonlinearConstraintTransformConfig(BaseModel):
     for nonlinear constraint transforms. Nonlinear constraint transforms are
     generally configured as a tuple of `NonlinearConstraintTransformConfig`
     objects in a configuration class of an optimization step. For instance,
-    `nonlinear_constraint_transforms` field of the `EnOptConfig` defines the
+    `nonlinear_constraint_transforms` field of the `EnOptContext` defines the
     available transforms for the optimization.
 
     The `method` field specifies the transform method to use for the nonlinear

@@ -55,13 +55,13 @@ class AsyncEvaluator(Evaluator):
         self._get_name = get_name
 
     def eval(
-        self, variables: NDArray[np.float64], context: EvaluatorContext
+        self, variables: NDArray[np.float64], evaluator_context: EvaluatorContext
     ) -> EvaluatorResult:
         """Evaluate all objective and constraints.
 
         Args:
-            variables: The matrix of variables to evaluate.
-            context:   The evaluation context.
+            variables:      The matrix of variables to evaluate.
+            evaluator_context: The evaluation context.
 
         Returns:
             The result of calling the wrapped evaluator function.
@@ -74,18 +74,18 @@ class AsyncEvaluator(Evaluator):
 
         self._batch_id += 1
 
-        no = context.config.objectives.weights.size
+        no = evaluator_context.context.objectives.weights.size
         nc = (
             0
-            if context.config.nonlinear_constraints is None
-            else context.config.nonlinear_constraints.lower_bounds.size
+            if evaluator_context.context.nonlinear_constraints is None
+            else evaluator_context.context.nonlinear_constraints.lower_bounds.size
         )
 
         results_queue = ResultsQueue(self._queue_size)
         if self._server.loop is not None and self._server.task_group is not None:
             self._server.loop.call_soon_threadsafe(
                 self._server.task_group.create_task,
-                self._put_tasks(variables, context, results_queue),
+                self._put_tasks(variables, evaluator_context, results_queue),
             )
 
         results = np.zeros((variables.shape[0], no + nc), dtype=np.float64)
@@ -95,7 +95,9 @@ class AsyncEvaluator(Evaluator):
         }
 
         for _ in range(
-            variables.shape[0] if context.active is None else context.active.sum()
+            variables.shape[0]
+            if evaluator_context.active is None
+            else evaluator_context.active.sum()
         ):
             while self._server.is_running():
                 try:

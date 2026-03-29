@@ -7,7 +7,8 @@ from typing import Self
 import numpy as np
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from ._utils import broadcast_1d_array, normalize
+from ropt._utils import broadcast_1d_array, normalize
+
 from ._validated_types import (  # noqa: TC001
     Array1D,
     Array1DInt,
@@ -19,7 +20,7 @@ class ObjectiveFunctionsConfig(BaseModel):
 
     This class, `ObjectiveFunctionsConfig`, defines the configuration for
     objective functions. for instance, as part of an
-    [`EnOptConfig`][ropt.config.EnOptConfig] object.
+    [`EnOptContext`][ropt.context.EnOptContext] object.
 
     `ropt` supports multi-objective optimization. Multiple objectives are
     combined into a single value by summing them after weighting. The `weights`
@@ -36,7 +37,7 @@ class ObjectiveFunctionsConfig(BaseModel):
     objective (by position) and specifies which filter to use. The available
     filters must be defined elsewhere as a tuple of realization filter
     configurations. For instance, for optimization these are defined in the
-    [`EnOptConfig.realization_filters`][ropt.config.EnOptConfig] configuration
+    [`EnOptContext.realization_filters`][ropt.context.EnOptContext] context
     class. The same logic applies to the `function_estimators` array . If an
     index is invalid (e.g., out of bounds for the corresponding object tuple),
     no filter or estimator is applied to that specific objective. If these

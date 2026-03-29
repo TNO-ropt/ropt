@@ -97,7 +97,7 @@ nav:
       - "Optimization workflows": usage/workflows.md
   - "Reference":
       - "Optimization":
-        - "Configuration": reference/optimization/enopt_config.md
+        - "Configuration": reference/optimization/enopt_context.md
         - "Function Evaluations": reference/optimization/evaluator.md
         - "Optimization Results": reference/optimization/results.md
         - "Domain Transforms": reference/optimization/domain_transforms.md

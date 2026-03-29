@@ -13,7 +13,7 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt.config import EnOptConfig
+from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType
 from ropt.events import EnOptEvent
 from ropt.results import FunctionResults
@@ -102,7 +102,7 @@ def run_optimization(config: dict[str, Any]) -> FunctionResults:
     )
     step.add_event_handler(reporter)
 
-    step.run(variables=initial_values, config=EnOptConfig.model_validate(config))
+    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
 
     optimal_result: FunctionResults = tracker["results"]
     assert optimal_result is not None

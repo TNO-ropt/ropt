@@ -66,7 +66,7 @@ class CachedEvaluator(Evaluator):
         self._sources: list[EventHandler] = [] if sources is None else list(sources)
 
     def eval_cached(
-        self, variables: NDArray[np.float64], context: EvaluatorContext
+        self, variables: NDArray[np.float64], evaluator_context: EvaluatorContext
     ) -> tuple[EvaluatorResult, dict[int, tuple[int, FunctionResults]]]:
         """Evaluate objective and constraint functions, utilizing a cache.
 
@@ -102,17 +102,17 @@ class CachedEvaluator(Evaluator):
             respective configurations.
 
         Args:
-            variables: Matrix of variables to evaluate (each row is a vector).
-            context:   The evaluation context.
+            variables:         Matrix of variables to evaluate (each row is a vector).
+            evaluator_context: The evaluation context.
 
         Returns:
             An `EvaluatorResult` and the cache hits.
         """
         cached: dict[int, tuple[int, FunctionResults]] = {}
 
-        names = context.config.names.get("realization")
+        names = evaluator_context.context.names.get("realization")
         for idx in range(variables.shape[0]):
-            realization_index = context.realizations[idx]
+            realization_index = evaluator_context.realizations[idx]
             realization_name = names[realization_index] if names is not None else None
             results, cached_realization_index = _get_from_cache(
                 self._sources,
@@ -124,9 +124,9 @@ class CachedEvaluator(Evaluator):
                 cached[idx] = (cached_realization_index, results)
 
         if cached:
-            context.active[list(cached.keys())] = False
+            evaluator_context.active[list(cached.keys())] = False
 
-        evaluator_result = self._evaluator.eval(variables, context)
+        evaluator_result = self._evaluator.eval(variables, evaluator_context)
 
         for idx, (realization, item) in cached.items():
             objectives = item.evaluations.objectives

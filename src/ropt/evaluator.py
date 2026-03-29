@@ -6,7 +6,7 @@ from typing import Any, Protocol, TypeVar
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.config import EnOptConfig
+from ropt.context import EnOptContext
 
 T = TypeVar("T", bound=np.generic)
 
@@ -23,7 +23,7 @@ class EvaluatorContext:
 
     Specifically, it provides:
 
-    - The configuration object for the current optimization run.
+    - The context object for the current optimization run.
     - A boolean vector (`active`) indicating which variable rows require
       evaluation.
     - The realization index for each variable vector. This can be used to
@@ -33,7 +33,7 @@ class EvaluatorContext:
       less than 0 indicates that the vector is not a perturbation.
 
     Attributes:
-        config:        Configuration of the optimizer.
+        context:       Context of the optimizer.
         active:        Indicates which variable rows require evaluation.
         realizations:  Realization numbers for each requested evaluation.
         perturbations: Perturbation numbers for each requested evaluation.
@@ -41,7 +41,7 @@ class EvaluatorContext:
                        perturbation.
     """
 
-    config: EnOptConfig
+    context: EnOptContext
     active: NDArray[np.bool_]
     realizations: NDArray[np.intc]
     perturbations: NDArray[np.intc] | None = None

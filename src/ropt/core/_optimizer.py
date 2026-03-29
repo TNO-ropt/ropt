@@ -22,7 +22,7 @@ if TYPE_CHECKING:
     from numpy.typing import NDArray
 
     from ropt.backend import Backend
-    from ropt.config import EnOptConfig
+    from ropt.context import EnOptContext
     from ropt.results import Functions, Gradients, Results
 
     from ._evaluator import EnsembleEvaluator
@@ -62,21 +62,21 @@ class EnsembleOptimizer:
 
     def __init__(
         self,
-        enopt_config: EnOptConfig,
+        context: EnOptContext,
         ensemble_evaluator: EnsembleEvaluator,
         signal_evaluation: SignalEvaluationCallback | None = None,
     ) -> None:
         """Initialize the EnsembleOptimizer.
 
         This class orchestrates ensemble-based optimizations. It requires an
-        optimization configuration, an evaluator, and a plugin manager to
+        optimization context object, an evaluator, and a plugin manager to
         function.
 
         The `EnsembleOptimizer` needs the following to define a single
         optimization run:
 
-        1.  An [`EnOptConfig`][ropt.config.EnOptConfig] object: This contains
-            all configuration settings for the optimization.
+        1.  An [`EnOptContext`][ropt.context.EnOptContext] object: This contains
+            all necessary information for the optimization.
         2.  An [`EnsembleEvaluator`][ropt.core.EnsembleEvaluator]
             object: This object is responsible for evaluating functions.
 
@@ -90,11 +90,11 @@ class EnsembleOptimizer:
         [OptimizerCallback][ropt.core.OptimizerCallback])
 
         Args:
-            enopt_config:       The ensemble optimization configuration.
+            context:            The ensemble optimization context.
             ensemble_evaluator: The evaluator for function evaluations.
             signal_evaluation:  Optional callback to signal evaluations.
         """
-        self._enopt_config = enopt_config
+        self._context = context
         self._function_evaluator = ensemble_evaluator
         self._signal_evaluation = signal_evaluation
 
@@ -108,20 +108,18 @@ class EnsembleOptimizer:
         # Whether NaN values are allowed:
         self._allow_nan = False
 
-        plugin = get_plugin("backend", method=self._enopt_config.backend.method)
+        plugin = get_plugin("backend", method=self._context.backend.method)
 
         # Validate the optimizer options:
         plugin.validate_options(
-            self._enopt_config.backend.method, self._enopt_config.backend.options
+            self._context.backend.method, self._context.backend.options
         )
 
-        self._backend: Backend = plugin.create(
-            self._enopt_config, self._optimizer_callback
-        )
+        self._backend: Backend = plugin.create(self._context, self._optimizer_callback)
         self._allow_nan = self._backend.allow_nan
 
         # Optional redirection of standard output:
-        self._redirector = _Redirector(self._enopt_config)
+        self._redirector = _Redirector(self._context)
 
     @property
     def is_parallel(self) -> bool:
@@ -203,7 +201,7 @@ class EnsembleOptimizer:
                     for item in results
                     if isinstance(item, GradientResults)
                 ),
-                self._enopt_config.variables.mask,
+                self._context.variables.mask,
             )
 
         self._completed_batches += 1
@@ -217,7 +215,7 @@ class EnsembleOptimizer:
     def _get_completed_variables(
         self, variables: NDArray[np.float64]
     ) -> NDArray[np.float64]:
-        mask = self._enopt_config.variables.mask
+        mask = self._context.variables.mask
         if variables.ndim > 1:
             tmp_variables = np.repeat(
                 self._initial_variables[np.newaxis, :], variables.shape[0], axis=0
@@ -229,10 +227,10 @@ class EnsembleOptimizer:
         return tmp_variables
 
     def _check_stopping_criteria(self) -> None:
-        max_functions = self._enopt_config.optimizer.max_functions
+        max_functions = self._context.optimizer.max_functions
         if max_functions is not None and self._completed_functions >= max_functions:
             raise ComputeStepAborted(exit_code=ExitCode.MAX_FUNCTIONS_REACHED)
-        max_batches = self._enopt_config.optimizer.max_batches
+        max_batches = self._context.optimizer.max_batches
         if max_batches is not None and self._completed_batches >= max_batches:
             raise ComputeStepAborted(exit_code=ExitCode.MAX_BATCHES_REACHED)
 
@@ -257,9 +255,9 @@ class EnsembleOptimizer:
             # will always be results. However, they may all be equal to `np.nan`. If
             # the optimizer does not set the allow_nan flag, it cannot handle such a
             # case, and we need to check for it:
-            assert self._enopt_config.realizations.realization_min_success is not None
+            assert self._context.realizations.realization_min_success is not None
             check_failures = (
-                self._enopt_config.realizations.realization_min_success < 1
+                self._context.realizations.realization_min_success < 1
                 and not self._allow_nan
             )
             exit_code: ExitCode | None = None
@@ -323,11 +321,11 @@ class EnsembleOptimizer:
     def _get_nonlinear_constraint_bounds(
         self,
     ) -> tuple[NDArray[np.float64], NDArray[np.float64]] | None:
-        if self._enopt_config.nonlinear_constraints is None:
+        if self._context.nonlinear_constraints is None:
             return None
-        lower_bounds = self._enopt_config.nonlinear_constraints.lower_bounds
-        upper_bounds = self._enopt_config.nonlinear_constraints.upper_bounds
-        for transform in self._enopt_config.nonlinear_constraint_transforms:
+        lower_bounds = self._context.nonlinear_constraints.lower_bounds
+        upper_bounds = self._context.nonlinear_constraints.upper_bounds
+        for transform in self._context.nonlinear_constraint_transforms:
             lower_bounds, upper_bounds = transform.bounds_to_optimizer(
                 lower_bounds, upper_bounds
             )
@@ -335,10 +333,10 @@ class EnsembleOptimizer:
 
 
 class _Redirector:
-    def __init__(self, config: EnOptConfig) -> None:
-        output_dir = config.backend.output_dir
-        stdout = config.backend.stdout
-        stderr = config.backend.stderr
+    def __init__(self, context: EnOptContext) -> None:
+        output_dir = context.backend.output_dir
+        stdout = context.backend.stdout
+        stderr = context.backend.stderr
 
         if stdout is not None:
             self._redirect = True

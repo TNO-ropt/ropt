@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.config import EnOptConfig
+from ropt.context import EnOptContext
 from ropt.enums import BoundaryType, PerturbationType
 from ropt.function_estimator import FunctionEstimator
 from ropt.sampler import Sampler
@@ -60,7 +60,7 @@ def _invert_linear_equations(
 
 
 def _perturb_variables(
-    config: EnOptConfig,
+    context: EnOptContext,
     variables: NDArray[np.float64],
     samplers: tuple[Sampler, ...],
 ) -> NDArray[np.float64]:
@@ -69,7 +69,7 @@ def _perturb_variables(
     # obtain a consistent order by running multiple samplers in the order
     # that they appear in the config.variables.samplers array:
     unique, indices = np.unique(
-        np.compress(config.variables.samplers >= 0, config.variables.samplers),
+        np.compress(context.variables.samplers >= 0, context.variables.samplers),
         return_index=True,
     )
     sampler_indices = unique[np.argsort(indices)]
@@ -77,16 +77,16 @@ def _perturb_variables(
     for sampler_idx in sampler_indices[1:]:
         samples += samplers[sampler_idx].generate_samples()
     magnitudes = np.where(
-        config.variables.perturbation_types == PerturbationType.RELATIVE,
-        (config.variables.upper_bounds - config.variables.lower_bounds)
-        * config.variables.perturbation_magnitudes,
-        config.variables.perturbation_magnitudes,
+        context.variables.perturbation_types == PerturbationType.RELATIVE,
+        (context.variables.upper_bounds - context.variables.lower_bounds)
+        * context.variables.perturbation_magnitudes,
+        context.variables.perturbation_magnitudes,
     )
     return _apply_bounds(
         variables + magnitudes * samples,
-        config.variables.lower_bounds,
-        config.variables.upper_bounds,
-        config.variables.boundary_types,
+        context.variables.lower_bounds,
+        context.variables.upper_bounds,
+        context.variables.boundary_types,
     )
 
 

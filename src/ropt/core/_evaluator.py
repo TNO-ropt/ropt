@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from numpy.random import Generator
     from numpy.typing import NDArray
 
-    from ropt.config import EnOptConfig
+    from ropt.context import EnOptContext
     from ropt.evaluator import EvaluatorCallback
     from ropt.function_estimator import FunctionEstimator
     from ropt.realization_filter import RealizationFilter
@@ -44,7 +44,7 @@ class EnsembleEvaluator:
 
     The `EnsembleEvaluator` class is responsible for calculating functions and
     gradients from an ensemble of functions. It leverages the settings defined
-    in an [`EnOptConfig`][ropt.config.EnOptConfig] configuration object to guide
+    in an [`EnOptContext`][ropt.context.EnOptContext] context object to guide
     the calculations.
 
     The core functionality relies on an evaluator callable, (usually provided by
@@ -56,7 +56,7 @@ class EnsembleEvaluator:
 
     def __init__(
         self,
-        config: EnOptConfig,
+        context: EnOptContext,
         evaluator: EvaluatorCallback,
     ) -> None:
         """Initialize the EnsembleEvaluator.
@@ -64,7 +64,7 @@ class EnsembleEvaluator:
         This method sets up the `EnsembleEvaluator` with the necessary
         configuration, evaluator, and plugins.
 
-        The `config` object contains all the settings required for the ensemble
+        The `context` object contains all the settings required for the ensemble
         evaluation, such as the number of realizations, the function estimators,
         and the gradient settings. The `evaluator` callable is usually provide
         by a [`Evaluator`][ropt.workflow.evaluators.Evaluator] object. The
@@ -72,14 +72,14 @@ class EnsembleEvaluator:
         estimators, and samplers.
 
         Args:
-            config:         The configuration object.
-            evaluator:      The callable for evaluating individual functions.
+            context:   The optimization context object.
+            evaluator: The callable for evaluating individual functions.
         """
-        self._config = config
+        self._context = context
         self._evaluator = evaluator
         self._realization_filters = self._init_realization_filters()
         self._function_estimators = self._init_function_estimators()
-        rng = default_rng(config.variables.seed)
+        rng = default_rng(context.variables.seed)
         self._samplers = self._init_samplers(rng)
         self._cache_for_gradient: FunctionResults | None = None
 
@@ -131,24 +131,24 @@ class EnsembleEvaluator:
             # same parameters as the gradient is to be calculated. This is true
             # because each optimization step is a single optimizer run and uses
             # its own copy of an `EnsembleFunctionEvaluation` object.
-            return self._calculate_gradients(variables, self._config.variables.mask)
+            return self._calculate_gradients(variables, self._context.variables.mask)
 
         # A function + gradient, or a gradient without cached function:
         self._cache_for_gradient = None
-        return self._calculate_both(variables, self._config.variables.mask)
+        return self._calculate_both(variables, self._context.variables.mask)
 
     def _calculate_functions(
         self, variables: NDArray[np.float64]
     ) -> tuple[FunctionResults, ...]:
         if variables.ndim == 1:
             variables = variables[np.newaxis, :]
-        active_realizations = _get_active_realizations(self._config)
+        active_realizations = _get_active_realizations(self._context)
         function_results = tuple(
             self._calculate_one_set_of_functions(
                 f_eval_results, variables[idx, :], active_realizations
             )
             for idx, f_eval_results in _get_function_results(
-                self._config,
+                self._context,
                 self._evaluator,
                 variables,
                 active_realizations,
@@ -172,17 +172,17 @@ class EnsembleEvaluator:
             self._calculate_filtered_realization_weights(f_eval_results)
         )
 
-        assert self._config.gradient.perturbation_min_success is not None
+        assert self._context.gradient.perturbation_min_success is not None
         failed_realizations = _get_failed_realizations(
             f_eval_results.objectives,
             None,
-            self._config.gradient.perturbation_min_success,
+            self._context.gradient.perturbation_min_success,
         )
 
-        assert self._config.realizations.realization_min_success is not None
+        assert self._context.realizations.realization_min_success is not None
         if (
             np.count_nonzero(~failed_realizations)
-            >= self._config.realizations.realization_min_success
+            >= self._context.realizations.realization_min_success
         ):
             functions = self._compute_functions(
                 f_eval_results.objectives,
@@ -204,7 +204,7 @@ class EnsembleEvaluator:
         return FunctionResults(
             batch_id=f_eval_results.batch_id,
             metadata={},
-            names=self._config.names,
+            names=self._context.names,
             evaluations=evaluations,
             realizations=Realizations(
                 active_realizations=active_realizations,
@@ -214,7 +214,7 @@ class EnsembleEvaluator:
             ),
             functions=functions,
             constraint_info=ConstraintInfo.create(
-                self._config,
+                self._context,
                 evaluations.variables,
                 functions.constraints if functions is not None else None,
             ),
@@ -226,7 +226,7 @@ class EnsembleEvaluator:
         mask: NDArray[np.bool_] | None,
     ) -> tuple[GradientResults]:
         perturbed_variables = _perturb_variables(
-            self._config, variables, self._samplers
+            self._context, variables, self._samplers
         )
 
         # No functions are computed in this case, instead they must have been
@@ -240,27 +240,27 @@ class EnsembleEvaluator:
         constraint_weights = self._cache_for_gradient.realizations.constraint_weights
 
         active_realizations = _get_active_realizations(
-            self._config,
+            self._context,
             objective_weights=objective_weights,
             constraint_weights=constraint_weights,
         )
         g_eval_results = _get_gradient_results(
-            self._config,
+            self._context,
             self._evaluator,
             perturbed_variables,
             active_realizations,
         )
 
-        assert self._config.gradient.perturbation_min_success is not None
+        assert self._context.gradient.perturbation_min_success is not None
         failed_realizations = _get_failed_realizations(
             self._cache_for_gradient.evaluations.objectives,
             g_eval_results.perturbed_objectives,
-            self._config.gradient.perturbation_min_success,
+            self._context.gradient.perturbation_min_success,
         )
-        assert self._config.realizations.realization_min_success is not None
+        assert self._context.realizations.realization_min_success is not None
         if (
             np.count_nonzero(~failed_realizations)
-            >= self._config.realizations.realization_min_success
+            >= self._context.realizations.realization_min_success
         ):
             gradients = self._compute_gradients(
                 variables,
@@ -282,7 +282,7 @@ class EnsembleEvaluator:
             GradientResults(
                 batch_id=g_eval_results.batch_id,
                 metadata={},
-                names=self._config.names,
+                names=self._context.names,
                 evaluations=GradientEvaluations.create(
                     variables=variables,
                     perturbed_variables=perturbed_variables,
@@ -306,11 +306,11 @@ class EnsembleEvaluator:
         mask: NDArray[np.bool_] | None,
     ) -> tuple[FunctionResults, GradientResults]:
         perturbed_variables = _perturb_variables(
-            self._config, variables, self._samplers
+            self._context, variables, self._samplers
         )
-        active_realizations = _get_active_realizations(self._config)
+        active_realizations = _get_active_realizations(self._context)
         f_eval_results, g_eval_results = _get_function_and_gradient_results(
-            self._config,
+            self._context,
             self._evaluator,
             variables,
             perturbed_variables,
@@ -328,16 +328,16 @@ class EnsembleEvaluator:
             self._calculate_filtered_realization_weights(f_eval_results)
         )
 
-        assert self._config.gradient.perturbation_min_success is not None
+        assert self._context.gradient.perturbation_min_success is not None
         failed_realizations = _get_failed_realizations(
             f_eval_results.objectives,
             None,
-            self._config.gradient.perturbation_min_success,
+            self._context.gradient.perturbation_min_success,
         )
-        assert self._config.realizations.realization_min_success is not None
+        assert self._context.realizations.realization_min_success is not None
         if (
             np.count_nonzero(~failed_realizations)
-            >= self._config.realizations.realization_min_success
+            >= self._context.realizations.realization_min_success
         ):
             functions = self._compute_functions(
                 f_eval_results.objectives,
@@ -352,7 +352,7 @@ class EnsembleEvaluator:
         function_results = FunctionResults(
             batch_id=f_eval_results.batch_id,
             metadata={},
-            names=self._config.names,
+            names=self._context.names,
             evaluations=evaluations,
             realizations=Realizations(
                 active_realizations=active_realizations,
@@ -362,22 +362,22 @@ class EnsembleEvaluator:
             ),
             functions=functions,
             constraint_info=ConstraintInfo.create(
-                self._config,
+                self._context,
                 evaluations.variables,
                 functions.constraints if functions is not None else None,
             ),
         )
 
-        assert self._config.gradient.perturbation_min_success is not None
+        assert self._context.gradient.perturbation_min_success is not None
         failed_realizations = _get_failed_realizations(
             f_eval_results.objectives,
             g_eval_results.perturbed_objectives,
-            self._config.gradient.perturbation_min_success,
+            self._context.gradient.perturbation_min_success,
         )
-        assert self._config.realizations.realization_min_success is not None
+        assert self._context.realizations.realization_min_success is not None
         if (
             np.count_nonzero(~failed_realizations)
-            >= self._config.realizations.realization_min_success
+            >= self._context.realizations.realization_min_success
         ):
             gradients = self._compute_gradients(
                 variables,
@@ -397,7 +397,7 @@ class EnsembleEvaluator:
         gradient_results = GradientResults(
             batch_id=g_eval_results.batch_id,
             metadata={},
-            names=self._config.names,
+            names=self._context.names,
             evaluations=GradientEvaluations.create(
                 variables=variables,
                 perturbed_variables=perturbed_variables,
@@ -428,13 +428,13 @@ class EnsembleEvaluator:
         # realizations using one or more function estimators:
         if np.all(failed_realizations):
             objectives = np.empty(
-                self._config.objectives.weights.size, dtype=np.float64
+                self._context.objectives.weights.size, dtype=np.float64
             )
             objectives.fill(np.nan)
             if constraints is not None:
-                assert self._config.nonlinear_constraints is not None
+                assert self._context.nonlinear_constraints is not None
                 constraints = np.empty(
-                    self._config.nonlinear_constraints.lower_bounds.shape,
+                    self._context.nonlinear_constraints.lower_bounds.shape,
                     dtype=np.float64,
                 )
                 constraints.fill(np.nan)
@@ -442,23 +442,23 @@ class EnsembleEvaluator:
         else:
             objectives = _calculate_estimated_functions(
                 self._function_estimators,
-                self._config.objectives.function_estimators,
+                self._context.objectives.function_estimators,
                 objectives,
                 (
-                    self._config.realizations.weights
+                    self._context.realizations.weights
                     if objective_weights is None
                     else objective_weights
                 ),
                 failed_realizations,
             )
             if constraints is not None:
-                assert self._config.nonlinear_constraints is not None
+                assert self._context.nonlinear_constraints is not None
                 constraints = _calculate_estimated_functions(
                     self._function_estimators,
-                    self._config.nonlinear_constraints.function_estimators,
+                    self._context.nonlinear_constraints.function_estimators,
                     constraints,
                     (
-                        self._config.realizations.weights
+                        self._context.realizations.weights
                         if constraint_weights is None
                         else constraint_weights
                     ),
@@ -466,7 +466,7 @@ class EnsembleEvaluator:
                 )
 
             target_objective = np.array(
-                (self._config.objectives.weights * objectives).sum()
+                (self._context.objectives.weights * objectives).sum()
             )
 
         return Functions.create(
@@ -491,7 +491,7 @@ class EnsembleEvaluator:
         if mask is not None:
             variables = variables[mask]
         variables = np.repeat(
-            variables[np.newaxis, ...], self._config.realizations.weights.size, axis=0
+            variables[np.newaxis, ...], self._context.realizations.weights.size, axis=0
         )
 
         if mask is not None:
@@ -500,42 +500,42 @@ class EnsembleEvaluator:
         assert perturbed_objectives is not None
         objective_gradients = _calculate_estimated_gradients(
             self._function_estimators,
-            self._config.objectives.function_estimators,
+            self._context.objectives.function_estimators,
             variables,
             objectives,
             perturbed_variables,
             perturbed_objectives,
             (
-                self._config.realizations.weights
+                self._context.realizations.weights
                 if objective_weights is None
                 else objective_weights
             ),
             failed_realizations,
-            merge_realizations=self._config.gradient.merge_realizations,
+            merge_realizations=self._context.gradient.merge_realizations,
         )
         if constraints is not None:
-            assert self._config.nonlinear_constraints is not None
+            assert self._context.nonlinear_constraints is not None
             assert perturbed_constraints is not None
             constraint_gradients = _calculate_estimated_gradients(
                 self._function_estimators,
-                self._config.nonlinear_constraints.function_estimators,
+                self._context.nonlinear_constraints.function_estimators,
                 variables,
                 constraints,
                 perturbed_variables,
                 perturbed_constraints,
                 (
-                    self._config.realizations.weights
+                    self._context.realizations.weights
                     if constraint_weights is None
                     else constraint_weights
                 ),
                 failed_realizations,
-                merge_realizations=self._config.gradient.merge_realizations,
+                merge_realizations=self._context.gradient.merge_realizations,
             )
         else:
             constraint_gradients = None
 
         target_objective_gradient = np.array(
-            (self._config.objectives.weights[:, np.newaxis] * objective_gradients).sum(
+            (self._context.objectives.weights[:, np.newaxis] * objective_gradients).sum(
                 axis=0
             )
         )
@@ -572,11 +572,11 @@ class EnsembleEvaluator:
         assert objectives is not None
         constraints = evaluator_results.constraints
 
-        objective_filters = self._config.objectives.realization_filters
+        objective_filters = self._context.objectives.realization_filters
         constraint_filters = (
             None
-            if self._config.nonlinear_constraints is None
-            else self._config.nonlinear_constraints.realization_filters
+            if self._context.nonlinear_constraints is None
+            else self._context.nonlinear_constraints.realization_filters
         )
 
         for idx, realization_filter in enumerate(self._realization_filters):
@@ -598,37 +598,37 @@ class EnsembleEvaluator:
                 if objective_weights is None:
                     objective_weights = np.ones(
                         (
-                            self._config.objectives.weights.size,
-                            self._config.realizations.weights.size,
+                            self._context.objectives.weights.size,
+                            self._context.realizations.weights.size,
                         ),
                     )
                 objective_weights[apply_to_objectives, :] = weights
             if constraint_filters is not None and apply_to_constraints is not None:
-                assert self._config.nonlinear_constraints is not None
+                assert self._context.nonlinear_constraints is not None
                 if constraint_weights is None:
                     constraint_weights = np.ones(
                         (
-                            self._config.nonlinear_constraints.lower_bounds.size,
-                            self._config.realizations.weights.size,
+                            self._context.nonlinear_constraints.lower_bounds.size,
+                            self._context.realizations.weights.size,
                         ),
                     )
                 constraint_weights[apply_to_constraints, :] = weights
         return objective_weights, constraint_weights
 
     def _init_realization_filters(self) -> tuple[RealizationFilter, ...]:
-        for realization_filter in self._config.realization_filters:
-            realization_filter.init(self._config)
-        return self._config.realization_filters
+        for realization_filter in self._context.realization_filters:
+            realization_filter.init(self._context)
+        return self._context.realization_filters
 
     def _init_function_estimators(self) -> tuple[FunctionEstimator, ...]:
-        for function_estimator in self._config.function_estimators:
-            function_estimator.init(self._config)
-        return self._config.function_estimators
+        for function_estimator in self._context.function_estimators:
+            function_estimator.init(self._context)
+        return self._context.function_estimators
 
     def _init_samplers(self, rng: Generator) -> tuple[Sampler, ...]:
-        for idx, item in enumerate(self._config.samplers):
+        for idx, item in enumerate(self._context.samplers):
             mask = np.asarray(
-                self._config.variables.mask & (self._config.variables.samplers == idx)
+                self._context.variables.mask & (self._context.variables.samplers == idx)
             )
-            item.init(self._config, mask, rng)
-        return self._config.samplers
+            item.init(self._context, mask, rng)
+        return self._context.samplers

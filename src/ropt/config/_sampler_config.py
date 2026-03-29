@@ -11,9 +11,10 @@ class SamplerConfig(BaseModel):
     """Configuration class for samplers.
 
     This class, `SamplerConfig`, defines the configuration for samplers used in
-    an [`EnOptConfig`][ropt.config.EnOptConfig] object. Samplers are configured
-    as a tuple in the `samplers` field of the `EnOptConfig`, defining the
-    available samplers for the optimization. The `samplers` field in the
+    an [`EnOptContext`][ropt.context.EnOptContext] object. Samplers are
+    configured as a tuple in the `samplers` field of the
+    [`EnOptContext`][ropt.context.EnOptContext] class, defining the available
+    samplers for the optimization. The `samplers` field in the
     [`GradientConfig`][ropt.config.GradientConfig] specifies the index of the
     sampler to use for each variable.
 

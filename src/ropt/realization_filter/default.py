@@ -6,7 +6,8 @@ import numpy as np
 from numpy.typing import NDArray
 from pydantic import BaseModel, ConfigDict, Field, NonNegativeInt
 
-from ropt.config import EnOptConfig, RealizationFilterConfig
+from ropt.config import RealizationFilterConfig
+from ropt.context import EnOptContext
 from ropt.enums import ExitCode
 from ropt.exceptions import ComputeStepAborted
 from ropt.realization_filter import RealizationFilter
@@ -39,12 +40,12 @@ class SortObjectiveOptions(_ConfigBaseModel):
 
     1. A weighted sum is calculated for each realization using the objective
        values specified by the `sort` indices and the corresponding weights from
-       the main [`EnOptConfig`][ropt.config.EnOptConfig]. If only one objective
+       the main [`EnOptContext`][ropt.context.EnOptContext]. If only one objective
        index is provided in `sort`, no weighting is applied.
     2. Realizations are sorted based on this calculated value (ascending).
     3. Realizations whose rank falls within the range [`first`, `last`]
        (inclusive) are selected.
-    4. The original weights (from `EnOptConfig.realizations.weights`) of the
+    4. The original weights (from `EnOptContext.realizations.weights`) of the
        selected realizations are retained; all other realizations receive a
        weight of zero. Failed realizations (NaN objective values) are effectively
        given the lowest rank and are excluded before selection.
@@ -73,7 +74,7 @@ class SortConstraintOptions(_ConfigBaseModel):
     2. Realizations are sorted based on these constraint values (ascending).
     3. Realizations whose rank falls within the range [`first`, `last`]
        (inclusive) are selected.
-    4. The original weights (from `EnOptConfig.realizations.weights`) of the
+    4. The original weights (from `EnOptContext.realizations.weights`) of the
        selected realizations are retained; all other realizations receive a
        weight of zero. Failed realizations (NaN constraint values) are effectively
        given the lowest rank and are excluded before selection.
@@ -101,7 +102,7 @@ class CVaRObjectiveOptions(_ConfigBaseModel):
 
     1. A weighted sum is calculated for each realization using the objective
        values specified by the `sort` indices and the corresponding weights
-       from the main [`EnOptConfig`][ropt.config.EnOptConfig]. If only
+       from the main [`EnOptContext`][ropt.context.EnOptContext]. If only
        one objective index is provided in `sort`, no weighting is applied.
     2. Realizations are conceptually sorted based on this calculated value
        (ascending, assuming minimization).
@@ -172,7 +173,7 @@ class DefaultRealizationFilter(RealizationFilter):
     on objective or constraint values. The specific method and its parameters
     are configured via the
     [`RealizationFilterConfig`][ropt.config.RealizationFilterConfig]
-    in the main [`EnOptConfig`][ropt.config.EnOptConfig].
+    in the main [`EnOptContext`][ropt.context.EnOptContext].
 
     **Supported Methods:**
 
@@ -230,7 +231,7 @@ class DefaultRealizationFilter(RealizationFilter):
         assert isinstance(self._filter_config, RealizationFilterConfig)
         _, _, self._method = self._filter_config.method.lower().rpartition("/")
 
-    def init(self, enopt_config: EnOptConfig) -> None:
+    def init(self, context: EnOptContext) -> None:
         """Initialize the realization filter.
 
         See the
@@ -239,7 +240,7 @@ class DefaultRealizationFilter(RealizationFilter):
 
         # noqa
         """
-        self._enopt_config = enopt_config
+        self._context = context
 
     def get_realization_weights(  # D107
         self,
@@ -276,7 +277,7 @@ class DefaultRealizationFilter(RealizationFilter):
             case _:
                 msg = f"Realization filter not supported: {self._method}"
                 raise ValueError(msg)
-        weights = self._enopt_config.realizations.weights
+        weights = self._context.realizations.weights
         match self._method:
             case "sort-objective":
                 weights = self._sort_objectives(objectives)
@@ -299,7 +300,7 @@ class DefaultRealizationFilter(RealizationFilter):
         self,
         options: SortObjectiveOptions | SortConstraintOptions,
     ) -> None:
-        realizations = self._enopt_config.realizations.weights.size
+        realizations = self._context.realizations.weights.size
         msg = f"Invalid range of realizations: [{options.first}, {options.last}]"
         if options.first < 0 or options.first >= realizations:
             raise ValueError(msg)
@@ -310,7 +311,7 @@ class DefaultRealizationFilter(RealizationFilter):
 
     def _sort_objectives(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
         assert isinstance(self._filter_options, SortObjectiveOptions)
-        objective_config = self._enopt_config.objectives
+        objective_config = self._context.objectives
         failed_realizations = np.isnan(objectives[..., 0])
         objectives = np.nan_to_num(objectives[..., self._filter_options.sort])
         if objective_config.weights.size > 1:
@@ -320,7 +321,7 @@ class DefaultRealizationFilter(RealizationFilter):
         objectives = objectives.flatten()
         return _sort_and_select(
             objectives,
-            self._enopt_config.realizations.weights,
+            self._context.realizations.weights,
             failed_realizations,
             self._filter_options.first,
             self._filter_options.last,
@@ -335,7 +336,7 @@ class DefaultRealizationFilter(RealizationFilter):
         constraints = np.nan_to_num(constraints[..., self._filter_options.sort])
         return _sort_and_select(
             constraints,
-            self._enopt_config.realizations.weights,
+            self._context.realizations.weights,
             failed_realizations,
             self._filter_options.first,
             self._filter_options.last,
@@ -343,7 +344,7 @@ class DefaultRealizationFilter(RealizationFilter):
 
     def _cvar_objectives(self, objectives: NDArray[np.float64]) -> NDArray[np.float64]:
         assert isinstance(self._filter_options, CVaRObjectiveOptions)
-        objective_config = self._enopt_config.objectives
+        objective_config = self._context.objectives
         failed_realizations = np.isnan(objectives[..., 0])
         objectives = np.nan_to_num(objectives[..., self._filter_options.sort])
         if objective_config.weights.size > 1:
@@ -359,7 +360,7 @@ class DefaultRealizationFilter(RealizationFilter):
         assert isinstance(self._filter_options, CVaRConstraintOptions)
         failed_realizations = np.isnan(constraints[..., 0])
         constraints = np.nan_to_num(constraints[..., self._filter_options.sort])
-        assert self._enopt_config.nonlinear_constraints is not None
+        assert self._context.nonlinear_constraints is not None
         return _get_cvar_weights_from_percentile(
             -constraints, failed_realizations, self._filter_options.percentile
         )

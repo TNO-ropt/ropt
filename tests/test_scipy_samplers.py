@@ -14,8 +14,8 @@ if TYPE_CHECKING:
 initial_values = [0.0, 0.0, 0.1]
 
 
-@pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> dict[str, Any]:
+@pytest.fixture(name="config")
+def config_fixture() -> dict[str, Any]:
     return {
         "variables": {
             "variable_count": len(initial_values),
@@ -34,11 +34,9 @@ def enopt_config_fixture() -> dict[str, Any]:
 
 
 @pytest.mark.parametrize("method", sorted(SCIPY_SAMPLER_SUPPORTED_METHODS))
-def test_scipy_samplers_unconstrained(
-    enopt_config: Any, method: str, evaluator: Any
-) -> None:
-    enopt_config["samplers"] = [{"method": method}]
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+def test_scipy_samplers_unconstrained(config: Any, method: str, evaluator: Any) -> None:
+    config["samplers"] = [{"method": method}]
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert np.allclose(
@@ -46,15 +44,15 @@ def test_scipy_samplers_unconstrained(
     )
 
 
-def test_scipy_indexed_sampler(enopt_config: Any, evaluator: Any) -> None:
+def test_scipy_indexed_sampler(config: Any, evaluator: Any) -> None:
     # Removing the second variable will fix its value, since it will not be
     # perturbed and its gradient will always be zero.
-    enopt_config["variables"]["samplers"] = [0, -1, 0]
+    config["variables"]["samplers"] = [0, -1, 0]
 
     initial = initial_values.copy()
     initial[1] = 0.1
 
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.run(initial)
     assert optimizer.results is not None
     assert pytest.approx(optimizer.results.evaluations.variables[0]) != 0.0
@@ -63,9 +61,9 @@ def test_scipy_indexed_sampler(enopt_config: Any, evaluator: Any) -> None:
 
 
 @pytest.mark.parametrize("method", sorted(SCIPY_SAMPLER_SUPPORTED_METHODS))
-def test_scipy_samplers_shared(enopt_config: Any, method: str, evaluator: Any) -> None:
-    enopt_config["realizations"] = {"weights": [1.0, 1.0]}
-    enopt_config["samplers"] = [{"method": method}]
+def test_scipy_samplers_shared(config: Any, method: str, evaluator: Any) -> None:
+    config["realizations"] = {"weights": [1.0, 1.0]}
+    config["samplers"] = [{"method": method}]
 
     perturbations: dict[str, NDArray[np.float64]] = {}
 
@@ -74,14 +72,14 @@ def test_scipy_samplers_shared(enopt_config: Any, method: str, evaluator: Any) -
             if isinstance(item, GradientResults) and tag not in perturbations:
                 perturbations[tag] = item.evaluations.perturbed_variables
 
-    enopt_config["samplers"][0]["shared"] = False
-    optimizer1 = BasicOptimizer(enopt_config, evaluator())
+    config["samplers"][0]["shared"] = False
+    optimizer1 = BasicOptimizer(config, evaluator())
     optimizer1.set_results_callback(partial(_observer, tag="result1"))
     optimizer1.run(initial_values)
     assert optimizer1.results is not None
 
-    enopt_config["samplers"][0]["shared"] = True
-    optimizer2 = BasicOptimizer(enopt_config, evaluator())
+    config["samplers"][0]["shared"] = True
+    optimizer2 = BasicOptimizer(config, evaluator())
     optimizer2.set_results_callback(partial(_observer, tag="result2"))
     optimizer2.run(initial_values)
     assert optimizer2.results is not None

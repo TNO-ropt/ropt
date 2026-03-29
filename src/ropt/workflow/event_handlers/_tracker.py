@@ -108,7 +108,7 @@ class Tracker(EventHandler):
 
         if filtered_results is not None:
             self._tracked_results = filtered_results
-            self["results"] = filtered_results.transform_from_optimizer(event.config)
+            self["results"] = filtered_results.transform_from_optimizer(event.context)
 
     @property
     def event_types(self) -> set[EnOptEventType]:

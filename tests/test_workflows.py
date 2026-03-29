@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt.config import EnOptConfig
+from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.exceptions import ComputeStepAborted
 from ropt.results import FunctionResults
@@ -28,8 +28,8 @@ if TYPE_CHECKING:
 initial_values = np.array([0.0, 0.0, 0.1])
 
 
-@pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> dict[str, Any]:
+@pytest.fixture(name="config")
+def config_fixture() -> dict[str, Any]:
     return {
         "optimizer": {
             "max_functions": 20,
@@ -47,17 +47,17 @@ def enopt_config_fixture() -> dict[str, Any]:
     }
 
 
-def test_run_basic(enopt_config: dict[str, Any], evaluator: Any) -> None:
+def test_run_basic(config: dict[str, Any], evaluator: Any) -> None:
     tracker = Tracker()
     step = EnsembleOptimizer(evaluator=evaluator())
     step.add_event_handler(tracker)
-    step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
+    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     assert tracker["results"] is not None
     assert np.allclose(
         tracker["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
 
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert np.allclose(
@@ -66,7 +66,7 @@ def test_run_basic(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
 
 def test_function_evaluator_with_info(
-    enopt_config: dict[str, Any], evaluator: Any, test_functions: Any
+    config: dict[str, Any], evaluator: Any, test_functions: Any
 ) -> None:
 
     def _function_dict(
@@ -91,7 +91,7 @@ def test_function_evaluator_with_info(
     tracker = Tracker()
     step = EnsembleOptimizer(evaluator=evaluator)
     step.add_event_handler(tracker)
-    step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
+    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     assert tracker["results"] is not None
     assert np.allclose(
         tracker["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
@@ -99,24 +99,24 @@ def test_function_evaluator_with_info(
     assert tracker["results"].evaluations.evaluation_info["foo"] == "bar"
 
 
-def test_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:
-    enopt_config["variables"]["seed"] = 1
-    config2 = deepcopy(enopt_config)
+def test_rng(config: dict[str, Any], evaluator: Any) -> None:
+    config["variables"]["seed"] = 1
+    config2 = deepcopy(config)
     config2["variables"]["seed"] = 2
 
     tracker = Tracker()
     step = EnsembleOptimizer(evaluator=evaluator())
     step.add_event_handler(tracker)
 
-    step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
+    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     assert tracker["results"] is not None
     variables1 = tracker["results"].evaluations.variables
     tracker["results"] = None
-    step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
+    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     assert tracker["results"] is not None
     variables2 = tracker["results"].evaluations.variables
     tracker["results"] = None
-    step.run(variables=initial_values, config=EnOptConfig.model_validate(config2))
+    step.run(variables=initial_values, context=EnOptContext.model_validate(config2))
     assert tracker["results"] is not None
     variables3 = tracker["results"].evaluations.variables
 
@@ -124,16 +124,16 @@ def test_rng(enopt_config: dict[str, Any], evaluator: Any) -> None:
     assert not np.all(variables2 == variables3)
 
 
-def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> None:
+def test_set_initial_values(config: dict[str, Any], evaluator: Any) -> None:
     tracker = Tracker()
     step = EnsembleOptimizer(evaluator=evaluator())
     step.add_event_handler(tracker)
-    step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
+    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     assert tracker["results"] is not None
     variables1 = tracker["results"].evaluations.variables
     tracker["variables"] = None
     step.run(
-        config=EnOptConfig.model_validate(enopt_config),
+        context=EnOptContext.model_validate(config),
         variables=[0, 0, 0],
     )
     assert tracker["results"] is not None
@@ -148,20 +148,18 @@ def test_set_initial_values(enopt_config: dict[str, Any], evaluator: Any) -> Non
     assert not np.all(variables1 == variables2)
 
 
-def test_reset_results(enopt_config: dict[str, Any], evaluator: Any) -> None:
+def test_reset_results(config: dict[str, Any], evaluator: Any) -> None:
     tracker = Tracker()
     step = EnsembleOptimizer(evaluator=evaluator())
     step.add_event_handler(tracker)
-    step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
+    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     saved_results = deepcopy(tracker["results"])
     tracker["results"] = None
     assert saved_results is not None
     assert np.allclose(saved_results.evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
-def test_two_optimizers_alternating(
-    enopt_config: dict[str, Any], evaluator: Any
-) -> None:
+def test_two_optimizers_alternating(config: dict[str, Any], evaluator: Any) -> None:
     completed_functions = 0
 
     def _track_evaluations(event: EnOptEvent) -> None:
@@ -171,15 +169,15 @@ def test_two_optimizers_alternating(
             if isinstance(item, FunctionResults):
                 completed_functions += 1
 
-    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
-    del enopt_config["backend"]["convergence_tolerance"]
+    config["gradient"] = {"evaluation_policy": "speculative"}
+    del config["backend"]["convergence_tolerance"]
 
-    enopt_config1 = deepcopy(enopt_config)
-    enopt_config1["variables"]["mask"] = [True, False, True]
-    enopt_config1["optimizer"]["max_functions"] = 4
-    enopt_config2 = deepcopy(enopt_config)
-    enopt_config2["variables"]["mask"] = [False, True, False]
-    enopt_config2["optimizer"]["max_functions"] = 3
+    config1 = deepcopy(config)
+    config1["variables"]["mask"] = [True, False, True]
+    config1["optimizer"]["max_functions"] = 4
+    config2 = deepcopy(config)
+    config2["variables"]["mask"] = [False, True, False]
+    config2["optimizer"]["max_functions"] = 3
 
     tracker1 = Tracker()
     tracker2 = Tracker(what="last")
@@ -193,22 +191,20 @@ def test_two_optimizers_alternating(
             callback=_track_evaluations,
         )
     )
-    step.run(
-        variables=[0.0, 0.2, 0.1], config=EnOptConfig.model_validate(enopt_config1)
-    )
+    step.run(variables=[0.0, 0.2, 0.1], context=EnOptContext.model_validate(config1))
     assert tracker2["results"] is not None
     step.run(
-        config=EnOptConfig.model_validate(enopt_config2),
+        context=EnOptContext.model_validate(config2),
         variables=tracker2["results"].evaluations.variables,
     )
     assert tracker2["results"] is not None
     step.run(
-        config=EnOptConfig.model_validate(enopt_config1),
+        context=EnOptContext.model_validate(config1),
         variables=tracker2["results"].evaluations.variables,
     )
     assert tracker2["results"] is not None
     step.run(
-        config=EnOptConfig.model_validate(enopt_config2),
+        context=EnOptContext.model_validate(config2),
         variables=tracker2["results"].evaluations.variables,
     )
     assert completed_functions == 14
@@ -218,7 +214,7 @@ def test_two_optimizers_alternating(
     )
 
 
-def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -> None:
+def test_optimization_sequential(config: dict[str, Any], evaluator: Any) -> None:
     completed: list[FunctionResults] = []
 
     def _track_evaluations(event: EnOptEvent) -> None:
@@ -228,11 +224,11 @@ def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -
             item for item in event.results if isinstance(item, FunctionResults)
         ]
 
-    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
-    enopt_config["optimizer"]["max_functions"] = 2
+    config["gradient"] = {"evaluation_policy": "speculative"}
+    config["optimizer"]["max_functions"] = 2
 
-    enopt_config2 = deepcopy(enopt_config)
-    enopt_config2["optimizer"]["max_functions"] = 3
+    config2 = deepcopy(config)
+    config2["optimizer"]["max_functions"] = 3
 
     tracker = Tracker(what="last")
     observer = Observer(
@@ -241,10 +237,10 @@ def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -
     step = EnsembleOptimizer(evaluator=evaluator())
     step.add_event_handler(tracker)
     step.add_event_handler(observer)
-    step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
+    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     assert tracker["results"] is not None
     step.run(
-        config=EnOptConfig.model_validate(enopt_config2),
+        context=EnOptContext.model_validate(config2),
         variables=tracker["results"].evaluations.variables,
     )
 
@@ -257,7 +253,7 @@ def test_optimization_sequential(enopt_config: dict[str, Any], evaluator: Any) -
     assert np.allclose(completed[-1].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02)
 
 
-def test_restart_initial(enopt_config: dict[str, Any], evaluator: Any) -> None:
+def test_restart_initial(config: dict[str, Any], evaluator: Any) -> None:
     completed: list[FunctionResults] = []
 
     def _track_evaluations(event: EnOptEvent) -> None:
@@ -267,8 +263,8 @@ def test_restart_initial(enopt_config: dict[str, Any], evaluator: Any) -> None:
             item for item in event.results if isinstance(item, FunctionResults)
         ]
 
-    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
-    enopt_config["optimizer"]["max_functions"] = 3
+    config["gradient"] = {"evaluation_policy": "speculative"}
+    config["optimizer"]["max_functions"] = 3
 
     step = EnsembleOptimizer(evaluator=evaluator())
     observer = Observer(
@@ -276,16 +272,14 @@ def test_restart_initial(enopt_config: dict[str, Any], evaluator: Any) -> None:
     )
     step.add_event_handler(observer)
     for _ in range(2):
-        step.run(
-            variables=initial_values, config=EnOptConfig.model_validate(enopt_config)
-        )
+        step.run(variables=initial_values, context=EnOptContext.model_validate(config))
 
     assert len(completed) == 6
     assert np.all(completed[0].evaluations.variables == initial_values)
     assert np.all(completed[3].evaluations.variables == initial_values)
 
 
-def test_restart_last(enopt_config: dict[str, Any], evaluator: Any) -> None:
+def test_restart_last(config: dict[str, Any], evaluator: Any) -> None:
     completed: list[FunctionResults] = []
 
     def _track_evaluations(event: EnOptEvent) -> None:
@@ -295,8 +289,8 @@ def test_restart_last(enopt_config: dict[str, Any], evaluator: Any) -> None:
             item for item in event.results if isinstance(item, FunctionResults)
         ]
 
-    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
-    enopt_config["optimizer"]["max_functions"] = 3
+    config["gradient"] = {"evaluation_policy": "speculative"}
+    config["optimizer"]["max_functions"] = 3
 
     step = EnsembleOptimizer(evaluator=evaluator())
     observer = Observer(
@@ -312,7 +306,7 @@ def test_restart_last(enopt_config: dict[str, Any], evaluator: Any) -> None:
             else tracker["results"].evaluations.variables
         )
         step.run(
-            config=EnOptConfig.model_validate(enopt_config),
+            context=EnOptContext.model_validate(config),
             variables=variables,
         )
 
@@ -321,7 +315,7 @@ def test_restart_last(enopt_config: dict[str, Any], evaluator: Any) -> None:
     )
 
 
-def test_restart_optimum(enopt_config: dict[str, Any], evaluator: Any) -> None:
+def test_restart_optimum(config: dict[str, Any], evaluator: Any) -> None:
     completed: list[FunctionResults] = []
 
     def _track_evaluations(event: EnOptEvent) -> None:
@@ -331,8 +325,8 @@ def test_restart_optimum(enopt_config: dict[str, Any], evaluator: Any) -> None:
             item for item in event.results if isinstance(item, FunctionResults)
         ]
 
-    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
-    enopt_config["optimizer"]["max_functions"] = 4
+    config["gradient"] = {"evaluation_policy": "speculative"}
+    config["optimizer"]["max_functions"] = 4
 
     step = EnsembleOptimizer(evaluator=evaluator())
     step.add_event_handler(
@@ -350,7 +344,7 @@ def test_restart_optimum(enopt_config: dict[str, Any], evaluator: Any) -> None:
             else tracker["results"].evaluations.variables
         )
         step.run(
-            config=EnOptConfig.model_validate(enopt_config),
+            context=EnOptContext.model_validate(config),
             variables=variables,
         )
 
@@ -360,7 +354,7 @@ def test_restart_optimum(enopt_config: dict[str, Any], evaluator: Any) -> None:
 
 
 def test_restart_optimum_with_reset(
-    enopt_config: dict[str, Any], evaluator: Any, test_functions: Any
+    config: dict[str, Any], evaluator: Any, test_functions: Any
 ) -> None:
     completed: list[FunctionResults] = []
     max_functions = 5
@@ -388,8 +382,8 @@ def test_restart_optimum_with_reset(
         ),
     )
 
-    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
-    enopt_config["optimizer"]["max_functions"] = max_functions
+    config["gradient"] = {"evaluation_policy": "speculative"}
+    config["optimizer"]["max_functions"] = max_functions
 
     step = EnsembleOptimizer(evaluator=evaluator(new_functions))
     step.add_event_handler(
@@ -408,7 +402,7 @@ def test_restart_optimum_with_reset(
         )
         tracker["results"] = None
         step.run(
-            config=EnOptConfig.model_validate(enopt_config),
+            context=EnOptContext.model_validate(config),
             variables=variables,
         )
 
@@ -424,7 +418,7 @@ def test_restart_optimum_with_reset(
     )
 
 
-def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
+def test_repeat_metadata(config: dict[str, Any], evaluator: Any) -> None:
     restarts: list[int] = []
 
     def _track_results(event: EnOptEvent) -> None:
@@ -449,39 +443,39 @@ def test_repeat_metadata(enopt_config: dict[str, Any], evaluator: Any) -> None:
     for idx in range(2):
         metadata["restart"] = idx
         step.run(
-            config=EnOptConfig.model_validate(enopt_config),
+            context=EnOptContext.model_validate(config),
             metadata=metadata,
             variables=initial_values,
         )
     assert restarts == [0, 1]
 
 
-def test_evaluator(enopt_config: dict[str, Any], evaluator: Any) -> None:
+def test_evaluator(config: dict[str, Any], evaluator: Any) -> None:
     tracker = Tracker()
     step = EnsembleEvaluator(evaluator=evaluator())
     step.add_event_handler(tracker)
-    step.run(config=EnOptConfig.model_validate(enopt_config), variables=[0.0, 0.0, 0.1])
+    step.run(context=EnOptContext.model_validate(config), variables=[0.0, 0.0, 0.1])
     assert tracker["results"].functions is not None
     assert np.allclose(tracker["results"].functions.target_objective, 1.66)
 
     tracker["results"] = None
     step.run(
-        config=EnOptConfig.model_validate(enopt_config),
+        context=EnOptContext.model_validate(config),
         variables=[0, 0, 0],
     )
     assert tracker["results"].functions is not None
     assert np.allclose(tracker["results"].functions.target_objective, 1.75)
 
 
-def test_evaluator_multi(enopt_config: dict[str, Any], evaluator: Any) -> None:
-    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
-    enopt_config["optimizer"]["max_functions"] = 4
+def test_evaluator_multi(config: dict[str, Any], evaluator: Any) -> None:
+    config["gradient"] = {"evaluation_policy": "speculative"}
+    config["optimizer"]["max_functions"] = 4
 
     store = Store()
     step = EnsembleEvaluator(evaluator=evaluator())
     step.add_event_handler(store)
     step.run(
-        config=EnOptConfig.model_validate(enopt_config),
+        context=EnOptContext.model_validate(config),
         variables=np.array([[0, 0, 0.1], [0, 0, 0]]),
     )
     values = [results.functions.target_objective.item() for results in store["results"]]
@@ -496,32 +490,32 @@ def test_evaluator_multi(enopt_config: dict[str, Any], evaluator: Any) -> None:
     ],
 )
 def test_exit_code(
-    enopt_config: dict[str, Any],
+    config: dict[str, Any],
     evaluator: Any,
     max_criterion: str,
     max_enum: ExitCode,
 ) -> None:
-    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
+    config["gradient"] = {"evaluation_policy": "speculative"}
     match max_criterion:
         case "max_functions":
-            enopt_config["optimizer"]["max_functions"] = 4
+            config["optimizer"]["max_functions"] = 4
         case "max_batches":
-            enopt_config["optimizer"]["max_batches"] = 4
+            config["optimizer"]["max_batches"] = 4
 
     step = EnsembleOptimizer(evaluator=evaluator())
     exit_code = step.run(
-        variables=initial_values, config=EnOptConfig.model_validate(enopt_config)
+        variables=initial_values, context=EnOptContext.model_validate(config)
     )
     assert exit_code == max_enum
 
 
 def test_nested_optimization(
-    enopt_config: dict[str, Any], evaluator: Any, test_functions: Any
+    config: dict[str, Any], evaluator: Any, test_functions: Any
 ) -> None:
 
-    enopt_config["optimizer"]["max_functions"] = 4
-    enopt_config["variables"]["mask"] = [True, False, True]
-    nested_config = deepcopy(enopt_config)
+    config["optimizer"]["max_functions"] = 4
+    config["variables"]["mask"] = [True, False, True]
+    nested_config = deepcopy(config)
     nested_config["variables"]["mask"] = [False, True, False]
 
     initial = np.array([0.0, 0.2, 0.1])
@@ -545,7 +539,7 @@ def test_nested_optimization(
             step.add_event_handler(result_tracker)
             step.run(
                 variables=new_variables,
-                config=EnOptConfig.model_validate(nested_config),
+                context=EnOptContext.model_validate(nested_config),
             )
             return tracker["results"].functions.objectives
 
@@ -556,13 +550,13 @@ def test_nested_optimization(
 
     outer_evaluator = FunctionEvaluator(function=_outer_function)
     step = EnsembleOptimizer(evaluator=outer_evaluator)
-    step.run(variables=initial, config=EnOptConfig.model_validate(enopt_config))
+    step.run(variables=initial, context=EnOptContext.model_validate(config))
     assert np.allclose(
         result_tracker["results"].evaluations.variables, [0.0, 0.0, 0.5], atol=0.02
     )
 
 
-def test_optimization_abort(enopt_config: Any, evaluator: Any) -> None:
+def test_optimization_abort(config: Any, evaluator: Any) -> None:
     last_evaluation = 0
 
     def _observer(_: EnOptEvent) -> None:
@@ -579,7 +573,7 @@ def test_optimization_abort(enopt_config: Any, evaluator: Any) -> None:
         Observer(event_types={EnOptEventType.FINISHED_EVALUATION}, callback=_observer)
     )
     exit_code = step.run(
-        variables=initial_values, config=EnOptConfig.model_validate(enopt_config)
+        variables=initial_values, context=EnOptContext.model_validate(config)
     )
     assert tracker["results"] is not None
     assert exit_code == ExitCode.USER_ABORT
@@ -589,20 +583,20 @@ def test_optimization_abort(enopt_config: Any, evaluator: Any) -> None:
 def _cached_eval(
     obj: CachedEvaluator,
     variables: NDArray[np.float64],
-    context: EvaluatorContext,
+    evaluator_context: EvaluatorContext,
 ) -> EvaluatorResult:
-    results, cached = obj.eval_cached(variables, context)
+    results, cached = obj.eval_cached(variables, evaluator_context)
     cached_indices = list(cached.keys())
     info = np.zeros(variables.shape[0], dtype=np.bool_)
     info[cached_indices] = True
     results.evaluation_info = {"cached": info}
 
-    realizations = context.realizations.copy()
+    realizations = evaluator_context.realizations.copy()
     realizations[cached_indices] = [item[0] for item in cached.values()]
     names = (
         None
-        if context.config.names is None
-        else context.config.names.get("realization")
+        if evaluator_context.context.names is None
+        else evaluator_context.context.names.get("realization")
     )
     if names is not None:
         realizations = np.fromiter((names[idx] for idx in realizations), dtype="U1")
@@ -613,15 +607,15 @@ def _cached_eval(
 
 @pytest.mark.parametrize("names", [None, ["a", "b"]])
 def test_evaluator_cache(
-    enopt_config: dict[str, Any],
+    config: dict[str, Any],
     evaluator: Any,
     test_functions: Any,
     monkeypatch: Any,
     names: list[str] | None,
 ) -> None:
-    enopt_config["realizations"] = {"weights": [0.75, 0.25]}
+    config["realizations"] = {"weights": [0.75, 0.25]}
     if names is not None:
-        enopt_config["names"] = {"realization": names}
+        config["names"] = {"realization": names}
 
     completed_functions = 0
     completed_test_functions = 0
@@ -647,9 +641,9 @@ def test_evaluator_cache(
                         item.evaluations.evaluation_info["realizations"] == ["a", "b"]
                     )
 
-    enopt_config["gradient"] = {"evaluation_policy": "speculative"}
-    enopt_config["gradient"]["number_of_perturbations"] = "1"
-    enopt_config["optimizer"]["max_functions"] = 2
+    config["gradient"] = {"evaluation_policy": "speculative"}
+    config["gradient"]["number_of_perturbations"] = "1"
+    config["optimizer"]["max_functions"] = 2
 
     tracker = Tracker(what="last")
 
@@ -668,12 +662,12 @@ def test_evaluator_cache(
         )
     )
     step.add_event_handler(tracker)
-    step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
+    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     assert completed_test_functions == 8
 
     completed_test_functions = 0
     step.run(
-        config=EnOptConfig.model_validate(enopt_config),
+        context=EnOptContext.model_validate(config),
         variables=tracker["results"].evaluations.variables,
     )
     assert completed_test_functions == 6  # Two evaluations were cached
@@ -682,7 +676,7 @@ def test_evaluator_cache(
 
 
 def test_evaluator_cache_with_store(
-    enopt_config: dict[str, Any],
+    config: dict[str, Any],
     evaluator: Any,
     test_functions: Any,
     monkeypatch: Any,
@@ -695,11 +689,11 @@ def test_evaluator_cache_with_store(
         completed_test_functions += 1
         return float(test_functions[0](*args, **kwargs))
 
-    enopt_config["gradient"] = {
+    config["gradient"] = {
         "evaluation_policy": "speculative",
         "number_of_perturbations": "1",
     }
-    enopt_config["optimizer"]["max_functions"] = 2
+    config["optimizer"]["max_functions"] = 2
 
     store = Store()
     function_evaluator = evaluator((_test_function1, test_functions[1]))
@@ -712,9 +706,9 @@ def test_evaluator_cache_with_store(
         cached_evaluator, "eval", partial(_cached_eval, cached_evaluator)
     )
 
-    step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
+    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     assert completed_test_functions == 4
 
     completed_test_functions = 0
-    step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
+    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     assert completed_test_functions == 2

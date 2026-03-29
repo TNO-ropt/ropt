@@ -26,7 +26,7 @@ from ropt.backend.utils import (
 from ropt.enums import VariableType
 
 if TYPE_CHECKING:
-    from ropt.config import EnOptConfig
+    from ropt.context import EnOptContext
     from ropt.core import OptimizerCallback
 
 SUPPORTED_SCIPY_METHODS: Final[set[str]] = {
@@ -96,9 +96,9 @@ class SciPyBackend(Backend):
 
     To select an optimizer, set the `method` field within the
     [`optimizer`][ropt.config.BackendConfig] section of the
-    [`EnOptConfig`][ropt.config.EnOptConfig] configuration object to the desired
+    [`EnOptContext`][ropt.context.EnOptContext] configuration object to the desired
     algorithm's name. Most methods support the general options defined in the
-    [`EnOptConfig`][ropt.config.EnOptConfig] object. For algorithm-specific
+    [`EnOptContext`][ropt.context.EnOptContext] object. For algorithm-specific
     options, use the `options` dictionary within the
     [`optimizer`][ropt.config.BackendConfig] section.
 
@@ -123,7 +123,7 @@ class SciPyBackend(Backend):
     }
 
     def __init__(
-        self, config: EnOptConfig, optimizer_callback: OptimizerCallback
+        self, context: EnOptContext, optimizer_callback: OptimizerCallback
     ) -> None:
         """Initialize the optimizer implemented by the SciPy plugin.
 
@@ -132,22 +132,22 @@ class SciPyBackend(Backend):
         # noqa
         """
         self._optimizer_callback = optimizer_callback
-        self._config = config
-        _, _, self._method = self._config.backend.method.lower().rpartition("/")
+        self._context = context
+        _, _, self._method = self._context.backend.method.lower().rpartition("/")
         if self._method == "default":
             self._method = DEFAULT_SCIPY_METHOD
         if self._method not in SUPPORTED_SCIPY_METHODS:
             msg = f"SciPy optimizer algorithm {self._method} is not supported"
             raise NotImplementedError(msg)
         validate_supported_constraints(
-            self._config,
+            self._context,
             self._method,
             self._supported_constraints,
             self._required_constraints,
         )
         self._options = self._parse_options()
         self._parallel = (
-            self._config.backend.parallel and self._method == "differential_evolution"
+            self._context.backend.parallel and self._method == "differential_evolution"
         )
 
         self._cached_variables: NDArray[np.float64] | None = None
@@ -175,7 +175,7 @@ class SciPyBackend(Backend):
             assert self._bounds is not None
             differential_evolution(
                 func=self._function,  # type: ignore[arg-type]
-                x0=initial_values[self._config.variables.mask],
+                x0=initial_values[self._context.variables.mask],
                 bounds=self._bounds,
                 constraints=self._constraints,  # type: ignore[arg-type]
                 polish=False,
@@ -185,8 +185,8 @@ class SciPyBackend(Backend):
         else:
             minimize(  # type: ignore[call-overload,misc]
                 fun=self._function,
-                x0=initial_values[self._config.variables.mask],
-                tol=self._config.backend.convergence_tolerance,
+                x0=initial_values[self._context.variables.mask],
+                tol=self._context.backend.convergence_tolerance,
                 method=self._method,
                 bounds=self._bounds,
                 jac=(False if self._method in _NO_GRADIENT else self._gradient),
@@ -216,14 +216,14 @@ class SciPyBackend(Backend):
 
     def _initialize_bounds(self) -> Bounds | None:
         if (
-            np.isfinite(self._config.variables.lower_bounds).any()
-            or np.isfinite(self._config.variables.upper_bounds).any()
+            np.isfinite(self._context.variables.lower_bounds).any()
+            or np.isfinite(self._context.variables.upper_bounds).any()
         ):
-            lower_bounds = self._config.variables.lower_bounds[
-                self._config.variables.mask
+            lower_bounds = self._context.variables.lower_bounds[
+                self._context.variables.mask
             ]
-            upper_bounds = self._config.variables.upper_bounds[
-                self._config.variables.mask
+            upper_bounds = self._context.variables.upper_bounds[
+                self._context.variables.mask
             ]
             return Bounds(lower_bounds, upper_bounds)
         return None
@@ -256,17 +256,17 @@ class SciPyBackend(Backend):
         self._linear_constraint_bounds: (
             tuple[NDArray[np.float64], NDArray[np.float64]] | None
         ) = None
-        if self._config.linear_constraints is not None:
+        if self._context.linear_constraints is not None:
             lin_coef, lin_lower, lin_upper = get_masked_linear_constraints(
-                self._config, initial_values
+                self._context, initial_values
             )
             self._linear_constraint_bounds = (lin_lower, lin_upper)
         nonlinear_bounds = (
             None
-            if self._config.nonlinear_constraints is None
+            if self._context.nonlinear_constraints is None
             else (
-                self._config.nonlinear_constraints.lower_bounds,
-                self._config.nonlinear_constraints.upper_bounds,
+                self._context.nonlinear_constraints.lower_bounds,
+                self._context.nonlinear_constraints.upper_bounds,
             )
         )
         if (bounds := self._get_constraint_bounds(nonlinear_bounds)) is not None:
@@ -287,7 +287,7 @@ class SciPyBackend(Backend):
         functions = self._constraint_functions(variables).transpose()
         if self._normalized_constraints.constraints is None:
             constraints = []
-            if self._config.nonlinear_constraints is not None:
+            if self._context.nonlinear_constraints is not None:
                 constraints.append(functions)
             if lin_coef is not None:
                 constraints.append(np.matmul(lin_coef, variables))
@@ -307,7 +307,7 @@ class SciPyBackend(Backend):
         gradients = self._constraint_gradients(variables)
         if self._normalized_constraints.gradients is None:
             constraints = []
-            if self._config.nonlinear_constraints is not None:
+            if self._context.nonlinear_constraints is not None:
                 constraints.append(gradients)
             if lin_coef is not None:
                 constraints.append(lin_coef)
@@ -362,7 +362,7 @@ class SciPyBackend(Backend):
         lin_upper: NDArray[np.float64] | None,
     ) -> list[LinearConstraint | NonlinearConstraint]:
         constraints: list[LinearConstraint | NonlinearConstraint] = []
-        if self._config.linear_constraints is not None:
+        if self._context.linear_constraints is not None:
             assert lin_coef is not None
             assert lin_lower is not None
             assert lin_upper is not None
@@ -446,7 +446,7 @@ class SciPyBackend(Backend):
 
         if compute_functions or compute_gradients:
             self._cached_variables = variables.copy()
-            speculative = self._config.gradient.evaluation_policy == "speculative"
+            speculative = self._context.gradient.evaluation_policy == "speculative"
             compute_functions = compute_functions or speculative
             compute_gradients = compute_gradients or speculative
             new_function, new_gradient = self._compute_functions_and_gradients(
@@ -479,7 +479,7 @@ class SciPyBackend(Backend):
         if (
             compute_functions
             and compute_gradients
-            and self._config.gradient.evaluation_policy == "separate"
+            and self._context.gradient.evaluation_policy == "separate"
         ):
             callback_result = self._optimizer_callback(
                 variables,
@@ -519,26 +519,26 @@ class SciPyBackend(Backend):
 
     def _parse_options(self) -> dict[str, Any]:
         options = (
-            copy.deepcopy(self._config.backend.options)
-            if isinstance(self._config.backend.options, dict)
+            copy.deepcopy(self._context.backend.options)
+            if isinstance(self._context.backend.options, dict)
             else {}
         )
         # The maximum number of iterations is passed as an option to ropt.
         # Setting maxiter directly as an entry in the options dict will also
         # work, but iterations will override it.
-        iterations = self._config.backend.max_iterations
+        iterations = self._context.backend.max_iterations
         if iterations is not None:
             if self._method == "tnc":
                 options["maxfun"] = iterations
             else:
                 options["maxiter"] = iterations
         # We switch on display if there is an output folder.
-        if self._config.backend.output_dir is not None:
+        if self._context.backend.output_dir is not None:
             options["disp"] = True
 
         if self._method == "differential_evolution" and "integrality" not in options:
             options["integrality"] = (
-                self._config.variables.types == VariableType.INTEGER
+                self._context.variables.types == VariableType.INTEGER
             )
 
         return options

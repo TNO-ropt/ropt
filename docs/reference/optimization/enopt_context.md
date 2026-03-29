@@ -1,7 +1,11 @@
+::: ropt.context
+    options:
+        members:
+            - EnOptContext
+
 ::: ropt.config
     options:
         members:
-            - EnOptConfig
             - VariablesConfig
             - ObjectiveFunctionsConfig
             - LinearConstraintsConfig
@@ -15,6 +19,7 @@
             - SamplerConfig
         group_by_category: false
         show_bases: false
+
 ::: ropt.config.constants
 
 ::: ropt.config.options

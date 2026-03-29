@@ -15,8 +15,8 @@ import pandas as pd
 initial_values = [0.0, 0.0, 0.1]
 
 
-@pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> dict[str, Any]:
+@pytest.fixture(name="config")
+def config_fixture() -> dict[str, Any]:
     return {
         "optimizer": {
             "max_functions": 3,
@@ -57,9 +57,9 @@ def _handle_results(
         frames.append(frame)
 
 
-def test_dataframe_results_no_results(enopt_config: Any, evaluator: Any) -> None:
+def test_dataframe_results_no_results(config: Any, evaluator: Any) -> None:
     frames: list[pd.DataFrame] = []
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.set_results_callback(
         partial(_handle_results, frames=frames, fields=set(), result_type="functions")
     )
@@ -67,10 +67,10 @@ def test_dataframe_results_no_results(enopt_config: Any, evaluator: Any) -> None
     assert not frames
 
 
-def test_dataframe_results_function_results(enopt_config: Any, evaluator: Any) -> None:
-    del enopt_config["names"]
+def test_dataframe_results_function_results(config: Any, evaluator: Any) -> None:
+    del config["names"]
     frames: list[pd.DataFrame] = []
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.set_results_callback(
         partial(
             _handle_results,
@@ -90,10 +90,10 @@ def test_dataframe_results_function_results(enopt_config: Any, evaluator: Any) -
 
 
 def test_dataframe_results_function_results_formatted_names(
-    enopt_config: Any, evaluator: Any
+    config: Any, evaluator: Any
 ) -> None:
     frames: list[pd.DataFrame] = []
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.set_results_callback(
         partial(
             _handle_results,
@@ -112,9 +112,9 @@ def test_dataframe_results_function_results_formatted_names(
     ]
 
 
-def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -> None:
+def test_dataframe_results_gradient_results(config: Any, evaluator: Any) -> None:
     frames: list[pd.DataFrame] = []
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.set_results_callback(
         partial(
             _handle_results,
@@ -133,10 +133,10 @@ def test_dataframe_results_gradient_results(enopt_config: Any, evaluator: Any) -
     ]
 
 
-def test_dataframe_results_metadata(enopt_config: Any, evaluator: Any) -> None:
-    del enopt_config["names"]
+def test_dataframe_results_metadata(config: Any, evaluator: Any) -> None:
+    del config["names"]
     frames: list[pd.DataFrame] = []
-    optimizer = BasicOptimizer(enopt_config, evaluator())
+    optimizer = BasicOptimizer(config, evaluator())
     optimizer.set_results_callback(
         partial(
             _handle_results,

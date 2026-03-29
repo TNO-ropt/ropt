@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from ropt.config import EnOptConfig
+from ropt.context import EnOptContext
 from ropt.enums import EnOptEventType, ExitCode
 from ropt.exceptions import ComputeStepAborted
 from ropt.workflow.evaluators import Evaluator
@@ -132,7 +132,7 @@ class BasicOptimizer:
 
     def __init__(
         self,
-        enopt_config: dict[str, Any],
+        config: dict[str, Any],
         evaluator: EvaluatorCallback | Evaluator,
         *,
         constraint_tolerance: float = 1e-10,
@@ -148,11 +148,11 @@ class BasicOptimizer:
         constraint value is within this tolerance, it is considered satisfied.
 
         Args:
-            enopt_config:         The configuration for the optimization.
+            config:               The configuration for the optimization.
             evaluator:            The evaluator object.
             constraint_tolerance: The constraint violation tolerance.
         """
-        self._config = EnOptConfig.model_validate(enopt_config)
+        self._context = EnOptContext.model_validate(config)
         self._constraint_tolerance = constraint_tolerance
         self._evaluator = evaluator
         self._observers: list[tuple[EnOptEventType, Callable[[EnOptEvent], None]]] = []
@@ -202,7 +202,7 @@ class BasicOptimizer:
 
         exit_code = optimizer.run(
             variables=np.asarray(initial_values, dtype=np.float64),
-            config=self._config,
+            context=self._context,
         )
         self._results = tracker["results"]
 
@@ -249,7 +249,7 @@ class BasicOptimizer:
 
         def _results_callback(event: EnOptEvent) -> None:
             results = tuple(
-                item.transform_from_optimizer(event.config) for item in event.results
+                item.transform_from_optimizer(event.context) for item in event.results
             )
             callback(results)
 

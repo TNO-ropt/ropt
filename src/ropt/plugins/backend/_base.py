@@ -9,7 +9,7 @@ from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
     from ropt.backend import Backend
-    from ropt.config import EnOptConfig
+    from ropt.context import EnOptContext
     from ropt.core import OptimizerCallback
 
 
@@ -24,7 +24,7 @@ class BackendPlugin(Plugin):
     @classmethod
     @abstractmethod
     def create(
-        cls, config: EnOptConfig, optimizer_callback: OptimizerCallback
+        cls, context: EnOptContext, optimizer_callback: OptimizerCallback
     ) -> Backend:
         """Create an Backend instance.
 
@@ -38,7 +38,7 @@ class BackendPlugin(Plugin):
         this plugin.
 
         Args:
-            config:             The  configuration object containing the
+            context:            The  context object containing the
                                 optimization settings.
             optimizer_callback: The callback function used by the optimizer to
                                 request evaluations.

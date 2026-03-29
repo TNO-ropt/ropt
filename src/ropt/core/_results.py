@@ -6,7 +6,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import NDArray
 
-from ropt.config import EnOptConfig
+from ropt.context import EnOptContext
 from ropt.evaluator import EvaluatorCallback, EvaluatorContext
 
 
@@ -82,13 +82,13 @@ def _propagate_nan_values(
 
 
 def _get_active_realizations(
-    config: EnOptConfig,
+    context: EnOptContext,
     *,
     objective_weights: NDArray[np.float64] | None = None,
     constraint_weights: NDArray[np.float64] | None = None,
 ) -> NDArray[np.bool_]:
     if objective_weights is None:
-        return np.abs(config.realizations.weights) > 0
+        return np.abs(context.realizations.weights) > 0
     active_realizations: NDArray[np.bool_] = np.any(
         np.abs(objective_weights) > 0, axis=0
     )
@@ -100,29 +100,31 @@ def _get_active_realizations(
 
 
 def _get_function_results(
-    config: EnOptConfig,
+    context: EnOptContext,
     evaluator: EvaluatorCallback,
     variables: NDArray[np.float64],
     active_realizations: NDArray[np.bool_],
 ) -> Generator[tuple[int, _FunctionEvaluatorResults], None, None]:
-    realization_num = config.realizations.weights.size
+    realization_num = context.realizations.weights.size
     realizations = np.tile(
         np.arange(realization_num, dtype=np.intc), variables.shape[0]
     )
-    context = EvaluatorContext(
-        config=config,
+    evaluator_context = EvaluatorContext(
+        context=context,
         realizations=realizations,
         active=active_realizations[realizations],
     )
-    for variable_transform in config.variable_transforms:
+    for variable_transform in context.variable_transforms:
         variables = variable_transform.from_optimizer(variables)
-    evaluator_result = evaluator(np.repeat(variables, realization_num, axis=0), context)
+    evaluator_result = evaluator(
+        np.repeat(variables, realization_num, axis=0), evaluator_context
+    )
     objectives = evaluator_result.objectives
     constraints = evaluator_result.constraints
-    for objective_transform in config.objective_transforms:
+    for objective_transform in context.objective_transforms:
         objectives = objective_transform.to_optimizer(objectives)
     if constraints is not None:
-        for constraint_transform in config.nonlinear_constraint_transforms:
+        for constraint_transform in context.nonlinear_constraint_transforms:
             constraints = constraint_transform.to_optimizer(constraints)
     split_objectives = np.vsplit(objectives, variables.shape[0])
     split_constraints = (
@@ -147,18 +149,18 @@ def _get_function_results(
 
 
 def _get_gradient_results(
-    config: EnOptConfig,
+    context: EnOptContext,
     evaluator: EvaluatorCallback,
     perturbed_variables: NDArray[np.float64],
     active_realizations: NDArray[np.bool_],
 ) -> _GradientEvaluatorResults:
-    realization_num = config.realizations.weights.size
-    perturbation_num = config.gradient.number_of_perturbations
+    realization_num = context.realizations.weights.size
+    perturbation_num = context.gradient.number_of_perturbations
     realizations = np.repeat(
         np.arange(realization_num, dtype=np.intc), perturbation_num
     )
-    context = EvaluatorContext(
-        config=config,
+    evaluator_context = EvaluatorContext(
+        context=context,
         realizations=realizations,
         perturbations=np.tile(np.arange(perturbation_num), realization_num),
         active=active_realizations[realizations],
@@ -166,35 +168,35 @@ def _get_gradient_results(
     variables: NDArray[np.float64] = perturbed_variables.reshape(
         -1, perturbed_variables.shape[-1]
     )
-    for variable_transform in config.variable_transforms:
+    for variable_transform in context.variable_transforms:
         variables = variable_transform.from_optimizer(variables)
-    evaluator_result = evaluator(variables, context)
+    evaluator_result = evaluator(variables, evaluator_context)
     objectives = evaluator_result.objectives
     constraints = evaluator_result.constraints
-    for objective_transform in config.objective_transforms:
+    for objective_transform in context.objective_transforms:
         objectives = objective_transform.to_optimizer(objectives)
     if constraints is not None:
-        for constraint_transform in config.nonlinear_constraint_transforms:
+        for constraint_transform in context.nonlinear_constraint_transforms:
             constraints = constraint_transform.to_optimizer(constraints)
     return _GradientEvaluatorResults(
         batch_id=evaluator_result.batch_id,
         perturbed_objectives=objectives,
         perturbed_constraints=constraints,
         evaluation_info=evaluator_result.evaluation_info,
-        realization_count=config.realizations.weights.size,
-        perturbation_count=config.gradient.number_of_perturbations,
+        realization_count=context.realizations.weights.size,
+        perturbation_count=context.gradient.number_of_perturbations,
     )
 
 
 def _get_function_and_gradient_results(
-    config: EnOptConfig,
+    context: EnOptContext,
     evaluator: EvaluatorCallback,
     variables: NDArray[np.float64],
     perturbed_variables: NDArray[np.float64],
     active_realizations: NDArray[np.bool_],
 ) -> tuple[_FunctionEvaluatorResults, _GradientEvaluatorResults]:
-    realization_num = config.realizations.weights.size
-    perturbation_num = config.gradient.number_of_perturbations
+    realization_num = context.realizations.weights.size
+    perturbation_num = context.gradient.number_of_perturbations
     realizations = np.arange(realization_num, dtype=np.intc)
     realizations = np.hstack(
         (
@@ -202,8 +204,8 @@ def _get_function_and_gradient_results(
             np.repeat(realizations, perturbation_num),
         ),
     )
-    context = EvaluatorContext(
-        config=config,
+    evaluator_context = EvaluatorContext(
+        context=context,
         realizations=realizations,
         perturbations=np.hstack(
             (
@@ -219,15 +221,15 @@ def _get_function_and_gradient_results(
             perturbed_variables.reshape(-1, perturbed_variables.shape[-1]),
         ),
     )
-    for variable_transform in config.variable_transforms:
+    for variable_transform in context.variable_transforms:
         all_variables = variable_transform.from_optimizer(all_variables)
-    evaluator_result = evaluator(all_variables, context)
+    evaluator_result = evaluator(all_variables, evaluator_context)
     objectives = evaluator_result.objectives
     constraints = evaluator_result.constraints
-    for objective_transform in config.objective_transforms:
+    for objective_transform in context.objective_transforms:
         objectives = objective_transform.to_optimizer(objectives)
     if constraints is not None:
-        for constraint_transform in config.nonlinear_constraint_transforms:
+        for constraint_transform in context.nonlinear_constraint_transforms:
             constraints = constraint_transform.to_optimizer(constraints)
     return (
         _FunctionEvaluatorResults(
@@ -249,7 +251,7 @@ def _get_function_and_gradient_results(
                 key: value[realization_num:]
                 for key, value in evaluator_result.evaluation_info.items()
             },
-            realization_count=config.realizations.weights.size,
-            perturbation_count=config.gradient.number_of_perturbations,
+            realization_count=context.realizations.weights.size,
+            perturbation_count=context.gradient.number_of_perturbations,
         ),
     )

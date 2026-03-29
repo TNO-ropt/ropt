@@ -41,16 +41,16 @@ following axes:
 
 - [`AxisName.OBJECTIVE`][ropt.enums.AxisName.OBJECTIVE] The index along this
   axis refers to the objective number as specified in the
-  [`EnOptConfig`][ropt.config.EnOptConfig] configuration.
+  [`EnOptContext`][ropt.context.EnOptContext] configuration.
 - [`AxisName.NONLINEAR_CONSTRAINT`][ropt.enums.AxisName.NONLINEAR_CONSTRAINT]
   The index along this axis corresponds to the non-linear constraint index
-  defined in the [`EnOptConfig`][ropt.config.EnOptConfig] configuration.
+  defined in the [`EnOptContext`][ropt.context.EnOptContext] configuration.
 - [`AxisName.LINEAR_CONSTRAINT`][ropt.enums.AxisName.LINEAR_CONSTRAINT] The
   index along this axis corresponds to the linear constraint index defined in
-  the [`EnOptConfig`][ropt.config.EnOptConfig] configuration.
+  the [`EnOptContext`][ropt.context.EnOptContext] configuration.
 - [`AxisName.VARIABLE`][ropt.enums.AxisName.VARIABLE] The index along this axis
   refers to the variable number as specified by the
-  [`EnOptConfig`][ropt.config.EnOptConfig] configuration.
+  [`EnOptContext`][ropt.context.EnOptContext] configuration.
 - [`AxisName.REALIZATION`][ropt.enums.AxisName.REALIZATION]: When results
   involve an ensemble, this axis represents the different realizations, where
   the index corresponds to the realization number.

@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import pytest
 
-from ropt.config import EnOptConfig
+from ropt.context import EnOptContext
 from ropt.workflow.compute_steps import EnsembleOptimizer
 from ropt.workflow.evaluators import AsyncEvaluator
 from ropt.workflow.event_handlers import Tracker
@@ -195,8 +195,8 @@ async def test_server_error(server_name: str, tmp_path: Path, monkeypatch: Any) 
 initial_values = np.array([0.0, 0.0, 0.1])
 
 
-@pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> dict[str, Any]:
+@pytest.fixture(name="config")
+def config_fixture() -> dict[str, Any]:
     return {
         "optimizer": {
             "max_functions": 8,
@@ -235,14 +235,14 @@ def _opt_function(
 
 def _opt_workflow(
     server: Server,
-    enopt_config: dict[str, Any],
+    config: dict[str, Any],
     test_function: Callable[[NDArray[np.float64], int], NDArray[np.float64]],
 ) -> FunctionResults:
     evaluator = AsyncEvaluator(function=test_function, server=server)
     step = EnsembleOptimizer(evaluator=evaluator)
     tracker = Tracker()
     step.add_event_handler(tracker)
-    step.run(variables=initial_values, config=EnOptConfig.model_validate(enopt_config))
+    step.run(variables=initial_values, context=EnOptContext.model_validate(config))
     results: FunctionResults = tracker["results"]
     return results
 
@@ -289,7 +289,7 @@ if _TEST_HPC:
     ],
 )
 async def test_server_evaluator_ok(
-    enopt_config: dict[str, Any],
+    config: dict[str, Any],
     test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
     server_name: str,
     monkeypatch: Any,
@@ -315,7 +315,7 @@ async def test_server_evaluator_ok(
         results = await asyncio.to_thread(
             _opt_workflow,
             server,
-            enopt_config,
+            config,
             partial(_opt_function, test_functions=test_functions),
         )
         server.cancel()
@@ -343,7 +343,7 @@ async def test_server_evaluator_ok(
     ],
 )
 async def test_server_evaluator_error(
-    enopt_config: dict[str, Any],
+    config: dict[str, Any],
     test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
     server_name: str,
     monkeypatch: Any,
@@ -370,7 +370,7 @@ async def test_server_evaluator_error(
             await asyncio.to_thread(
                 _opt_workflow,
                 server,
-                enopt_config,
+                config,
                 partial(_opt_function, test_functions=test_functions, raise_error=True),
             )
             server.cancel()
@@ -398,7 +398,7 @@ async def test_server_evaluator_error(
     ],
 )
 async def test_server_evaluator_two_optimizations(
-    enopt_config: dict[str, Any],
+    config: dict[str, Any],
     test_functions: Sequence[Callable[[NDArray[np.float64], int], float]],
     server_name: str,
     monkeypatch: Any,
@@ -426,7 +426,7 @@ async def test_server_evaluator_two_optimizations(
                 asyncio.to_thread(
                     _opt_workflow,
                     server,
-                    enopt_config,
+                    config,
                     partial(_opt_function, test_functions=test_functions),
                 )
                 for _ in range(2)

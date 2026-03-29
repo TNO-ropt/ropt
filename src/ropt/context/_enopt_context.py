@@ -1,4 +1,4 @@
-"""The `EnOptConfig` configuration class."""
+"""The `EnOptContext` configuration class."""
 
 from __future__ import annotations
 
@@ -8,19 +8,22 @@ from typing import Any, Self
 import numpy as np
 from pydantic import BaseModel, ConfigDict, PrivateAttr, model_validator
 
+from ropt._utils import immutable_array
+from ropt.config import (
+    BackendConfig,
+    FunctionEstimatorConfig,
+    GradientConfig,
+    LinearConstraintsConfig,
+    NonlinearConstraintsConfig,
+    ObjectiveFunctionsConfig,
+    OptimizerConfig,
+    RealizationsConfig,
+    SamplerConfig,
+    VariablesConfig,
+)
 from ropt.enums import PerturbationType
 from ropt.plugins.manager import get_plugin
 
-from ._backend_config import BackendConfig
-from ._function_estimator_config import FunctionEstimatorConfig
-from ._gradient_config import GradientConfig
-from ._linear_constraints_config import LinearConstraintsConfig  # noqa: TC001
-from ._nonlinear_constraints_config import NonlinearConstraintsConfig  # noqa: TC001
-from ._objective_functions_config import ObjectiveFunctionsConfig
-from ._optimizer_config import OptimizerConfig
-from ._realizations_config import RealizationsConfig
-from ._sampler_config import SamplerConfig
-from ._utils import immutable_array
 from ._validated_types import (  # noqa: TC001
     FunctionEstimatorInstance,
     NonlinearConstraintTransformInstance,
@@ -29,15 +32,14 @@ from ._validated_types import (  # noqa: TC001
     SamplerInstance,
     VariableTransformInstance,
 )
-from ._variables_config import VariablesConfig  # noqa: TC001
 
 _global_lock = threading.Lock()
 
 
-class EnOptConfig(BaseModel):
-    """The primary configuration class for an optimization run.
+class EnOptContext(BaseModel):
+    """The primary context class for an optimization run.
 
-    `EnOptConfig` orchestrates the configuration of an entire optimization
+    `EnOptContext` orchestrates the configuration of an entire optimization
     workflow. It contains nested configuration classes that define specific
     aspects of the optimization, such as variables, objectives, constraints,
     realizations, and the optimizer itself.
@@ -48,7 +50,7 @@ class EnOptConfig(BaseModel):
     entities. For example, [`VariablesConfig`][ropt.config.VariablesConfig] has
     a `samplers` field, which is an array of indices specifying the sampler to
     use for each variable. If only a single sampler is needed, the `samplers`
-    field in `EnOptConfig` should contain a single sampler configuration, and
+    field in `EnOptContext` should contain a single sampler configuration, and
     the `samplers` field in the `VariablesConfig` configuration contains only
     zeros to specify that each variable should use this entry. In case of
     multiple samplers, multiple sampler configurations are defined, and each
@@ -72,9 +74,9 @@ class EnOptConfig(BaseModel):
         number of variables or have a size of one.
 
     Warning:
-        `EnOptConfig` objects are immutable and hold the in-memory configuration
+        `EnOptContext` objects are immutable and hold the in-memory configuration
         for an optimization run. For persistence, do not serialize the object
-        itself. Instead, store the original dictionary used for its creation.
+        itself. Instead, store the original contents used for its creation.
 
         Round-trip serialization (e.g., to/from JSON) is not a supported use
         case and may lead to data loss due to the complex types it contains,
@@ -229,8 +231,8 @@ class EnOptConfig(BaseModel):
         return self
 
     @model_validator(mode="wrap")  # type: ignore[arg-type]
-    def _pass_enopt_config_unchanged(self, handler: Any) -> Any:  # noqa: ANN401
-        if isinstance(self, EnOptConfig):
+    def _pass_context_unchanged(self, handler: Any) -> Any:  # noqa: ANN401
+        if isinstance(self, EnOptContext):
             return self
         return handler(self)
 
@@ -242,6 +244,6 @@ class EnOptConfig(BaseModel):
         """
         with _global_lock:
             if self._locked:
-                msg = "The EnOptConfig object has already been used."
+                msg = "The EnOptContext object has already been used."
                 raise RuntimeError(msg)
             object.__setattr__(self, "_locked", True)  # noqa: PLC2801

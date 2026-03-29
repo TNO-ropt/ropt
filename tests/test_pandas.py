@@ -15,14 +15,14 @@ from ropt.results import (
 )
 
 pandas = pytest.importorskip("pandas")
-from ropt.config import EnOptConfig  # noqa: E402
+from ropt.context import EnOptContext  # noqa: E402
 from ropt.results._pandas import _to_series  # noqa: E402
 
 initial_values = [0.0, 0.0]
 
 
-@pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> dict[str, Any]:
+@pytest.fixture(name="config")
+def config_fixture() -> dict[str, Any]:
     return {
         "variables": {
             "variable_count": len(initial_values),
@@ -45,7 +45,7 @@ def enopt_config_fixture() -> dict[str, Any]:
 
 
 @pytest.fixture(name="function_result")
-def function_result_fixture(enopt_config: dict[str, Any]) -> FunctionResults:
+def function_result_fixture(config: dict[str, Any]) -> FunctionResults:
     evaluations = FunctionEvaluations.create(
         variables=np.array([1.0, 2.0]),
         objectives=np.arange(6, dtype=np.float64).reshape((3, 2)),
@@ -58,11 +58,11 @@ def function_result_fixture(enopt_config: dict[str, Any]) -> FunctionResults:
     functions = Functions.create(
         target_objective=np.array(1.0), objectives=np.array([1.0, 2.0])
     )
-    config = EnOptConfig.model_validate(enopt_config)
+    context = EnOptContext.model_validate(config)
     return FunctionResults(
         batch_id=1,
         metadata={},
-        names=config.names,
+        names=context.names,
         evaluations=evaluations,
         realizations=realizations,
         functions=functions,
@@ -70,7 +70,7 @@ def function_result_fixture(enopt_config: dict[str, Any]) -> FunctionResults:
 
 
 @pytest.fixture(name="gradient_result")
-def gradient_result_fixture(enopt_config: dict[str, Any]) -> GradientResults:
+def gradient_result_fixture(config: dict[str, Any]) -> GradientResults:
     evaluations = GradientEvaluations(
         variables=np.array([1.0, 2.0]),
         perturbed_variables=np.arange(30, dtype=np.float64).reshape((3, 5, 2)),
@@ -81,11 +81,11 @@ def gradient_result_fixture(enopt_config: dict[str, Any]) -> GradientResults:
         target_objective=np.array([1.0, 2.0]),
         objectives=np.arange(4, dtype=np.float64).reshape((2, 2)),
     )
-    config = EnOptConfig.model_validate(enopt_config)
+    context = EnOptContext.model_validate(config)
     return GradientResults(
         batch_id=1,
         metadata={},
-        names=config.names,
+        names=context.names,
         evaluations=evaluations,
         realizations=Realizations(
             active_realizations=np.ones(36, dtype=np.bool_),

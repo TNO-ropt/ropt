@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
-    from ropt.config import EnOptConfig
+    from ropt.context import EnOptContext
 
 
 @dataclass(slots=True)
@@ -114,27 +114,27 @@ class Functions(ResultField):
             constraints=constraints,
         )
 
-    def transform_from_optimizer(self, config: EnOptConfig) -> Functions:
+    def transform_from_optimizer(self, context: EnOptContext) -> Functions:
         """Apply transformations from optimizer space.
 
         Args:
-            config:     The configuration used by the source of the results.
+            context: The context used by the source of the results.
 
         Returns:
             The transformed results.
         """
         if (
-            not config.objective_transforms
-            and not config.nonlinear_constraint_transforms
+            not context.objective_transforms
+            and not context.nonlinear_constraint_transforms
         ):
             return self
 
         objectives = self.objectives
         constraints = self.constraints
-        for objective_transform in config.objective_transforms:
+        for objective_transform in context.objective_transforms:
             objectives = objective_transform.from_optimizer(objectives)
         if constraints is not None:
-            for constraint_transform in config.nonlinear_constraint_transforms:
+            for constraint_transform in context.nonlinear_constraint_transforms:
                 constraints = constraint_transform.from_optimizer(constraints)
 
         return Functions(

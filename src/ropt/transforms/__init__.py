@@ -32,7 +32,7 @@ for:
 **Workflow and Integration:**
 
 1.  **Configuration:** Transformation objects are passed to the
-    [`EnOptConfig`][ropt.config.EnOptConfig] during configuration validation.
+    [`EnOptContext`][ropt.context.EnOptContext] during configuration validation.
     instance. This ensures that the entire optimization process is aware of and
     configured for the transformed space. The transformation objects are stored
     in the configuration object.

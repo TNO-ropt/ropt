@@ -23,7 +23,7 @@ weighting.
   inherit from the
   [`RealizationFilter`][ropt.realization_filter.RealizationFilter]
   abstract base class. These classes are initialized with the optimization
-  configuration ([`EnOptConfig`][ropt.config.EnOptConfig]) and the index of the
+  configuration ([`EnOptContext`][ropt.context.EnOptContext]) and the index of the
   specific filter configuration to use (`filter_index`). The core functionality
   is provided by the `get_realization_weights` method, which calculates and
   returns weights for each realization based on their objective and constraint

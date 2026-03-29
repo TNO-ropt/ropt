@@ -12,13 +12,13 @@ from ropt.plugins.backend.scipy import SciPyBackendPlugin
 from ropt.plugins.manager import PluginManager, get_plugin
 
 if TYPE_CHECKING:
-    from ropt.config import EnOptConfig
+    from ropt.context import EnOptContext
     from ropt.core import OptimizerCallback
 
 
 class MockedPlugin1(BackendPlugin):
     @classmethod
-    def create(cls, _0: EnOptConfig, _1: OptimizerCallback) -> None:  # type: ignore[override]
+    def create(cls, _0: EnOptContext, _1: OptimizerCallback) -> None:  # type: ignore[override]
         pass
 
     @classmethod
@@ -28,7 +28,7 @@ class MockedPlugin1(BackendPlugin):
 
 class MockedPlugin2(BackendPlugin):
     @classmethod
-    def create(cls, _0: EnOptConfig, _1: OptimizerCallback) -> None:  # type: ignore[override]
+    def create(cls, _0: EnOptContext, _1: OptimizerCallback) -> None:  # type: ignore[override]
         pass
 
     @classmethod

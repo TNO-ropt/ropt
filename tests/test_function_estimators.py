@@ -5,15 +5,15 @@ import numpy as np
 import pytest
 from numpy.typing import NDArray
 
-from ropt.config import EnOptConfig
+from ropt.context import EnOptContext
 from ropt.function_estimator import FunctionEstimator
 from ropt.workflow import BasicOptimizer
 
 initial_values = 3 * [0]
 
 
-@pytest.fixture(name="enopt_config")
-def enopt_config_fixture() -> dict[str, Any]:
+@pytest.fixture(name="config")
+def config_fixture() -> dict[str, Any]:
     return {
         "optimizer": {
             "max_functions": 10,
@@ -36,16 +36,16 @@ def enopt_config_fixture() -> dict[str, Any]:
 
 
 def test_stddev_function_estimator_merge_error(
-    enopt_config: Any, evaluator: Any, test_functions: Any
+    config: Any, evaluator: Any, test_functions: Any
 ) -> None:
     # Add dummy functions, these will be estimated using stddev.
     test_functions += test_functions
 
-    enopt_config["gradient"]["merge_realizations"] = True
-    enopt_config["objectives"]["weights"].extend([0.75, 0.25])
-    enopt_config["objectives"]["function_estimators"] = [0, 0, 1, 1]
-    enopt_config["function_estimators"] = [{"method": "mean"}, {"method": "stddev"}]
-    optimizer = BasicOptimizer(enopt_config, evaluator(test_functions))
+    config["gradient"]["merge_realizations"] = True
+    config["objectives"]["weights"].extend([0.75, 0.25])
+    config["objectives"]["function_estimators"] = [0, 0, 1, 1]
+    config["function_estimators"] = [{"method": "mean"}, {"method": "stddev"}]
+    optimizer = BasicOptimizer(config, evaluator(test_functions))
     with pytest.raises(
         ValueError,
         match=(
@@ -56,15 +56,15 @@ def test_stddev_function_estimator_merge_error(
 
 
 def test_mean_stddev_function_estimator(
-    enopt_config: Any, evaluator: Any, test_functions: Any
+    config: Any, evaluator: Any, test_functions: Any
 ) -> None:
     # Add dummy functions, these will be estimated using stddev.
     test_functions += test_functions
 
-    enopt_config["objectives"]["weights"].extend([0.75, 0.25])
-    enopt_config["objectives"]["function_estimators"] = [0, 0, 1, 1]
-    enopt_config["function_estimators"] = [{"method": "mean"}, {"method": "stddev"}]
-    optimizer = BasicOptimizer(enopt_config, evaluator(test_functions))
+    config["objectives"]["weights"].extend([0.75, 0.25])
+    config["objectives"]["function_estimators"] = [0, 0, 1, 1]
+    config["function_estimators"] = [{"method": "mean"}, {"method": "stddev"}]
+    optimizer = BasicOptimizer(config, evaluator(test_functions))
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert np.allclose(
@@ -94,7 +94,7 @@ def _compute_distance_squared_stddev(
 
 @pytest.mark.parametrize("evaluation_policy", ["separate", "auto"])
 def test_stddev_function_estimator(
-    enopt_config: Any,
+    config: Any,
     evaluator: Any,
     evaluation_policy: Literal["speculative", "separate", "auto"],
 ) -> None:
@@ -103,9 +103,9 @@ def test_stddev_function_estimator(
         partial(_compute_distance_squared_stddev, target=np.array([-1.5, -1.5, 0.5])),
     ]
 
-    enopt_config["gradient"]["evaluation_policy"] = evaluation_policy
-    enopt_config["function_estimators"] = [{"method": "stddev"}]
-    optimizer = BasicOptimizer(enopt_config, evaluator(functions))
+    config["gradient"]["evaluation_policy"] = evaluation_policy
+    config["function_estimators"] = [{"method": "stddev"}]
+    optimizer = BasicOptimizer(config, evaluator(functions))
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert np.allclose(
@@ -119,7 +119,7 @@ class CustomFunctionEstimator(FunctionEstimator):
     ) -> NDArray[np.float64]:
         return np.asarray(np.dot(functions, weights) + 1.0)
 
-    def init(self, _: EnOptConfig) -> None:
+    def init(self, _: EnOptContext) -> None:
         pass
 
     def calculate_gradient(  # noqa: PLR6301
@@ -132,11 +132,11 @@ class CustomFunctionEstimator(FunctionEstimator):
 
 
 def test_custom_function_estimator(
-    enopt_config: Any, evaluator: Any, test_functions: Any
+    config: Any, evaluator: Any, test_functions: Any
 ) -> None:
-    enopt_config["objectives"]["function_estimators"] = 0
-    enopt_config["function_estimators"] = [CustomFunctionEstimator()]
-    optimizer = BasicOptimizer(enopt_config, evaluator(test_functions))
+    config["objectives"]["function_estimators"] = 0
+    config["function_estimators"] = [CustomFunctionEstimator()]
+    optimizer = BasicOptimizer(config, evaluator(test_functions))
     optimizer.run(initial_values)
     assert optimizer.results is not None
     assert np.allclose(

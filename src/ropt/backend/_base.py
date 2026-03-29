@@ -19,7 +19,7 @@ class Backend(ABC):
     optimization algorithms.
 
     Instances of `Backend` subclasses must be initialized with an
-    [`EnOptConfig`][ropt.config.EnOptConfig] object detailing the optimization
+    [`EnOptContext`][ropt.context.EnOptContext] object detailing the optimization
     setup and an [`OptimizerCallback`][ropt.core.OptimizerCallback] function.
     The callback is crucial as it allows the optimizer to request function and
     gradient evaluations from the `ropt` core during its execution.
@@ -74,7 +74,7 @@ class Backend(ABC):
 
     @property
     def is_parallel(self) -> bool:
-        """Indicate whether the optimizer alows parallel evaluations.
+        """Indicate whether the optimizer allows parallel evaluations.
 
         If an optimizer algorithm is designed to evaluate multiple variable
         vectors concurrently, its implementation should override this property

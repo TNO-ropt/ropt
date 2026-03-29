@@ -22,7 +22,7 @@ deviation (`stddev`) of the realization results.
   that inherit from the
   [`FunctionEstimator`][ropt.function_estimator.FunctionEstimator]
   abstract base class. These classes are initialized with the optimization
-  configuration ([`EnOptConfig`][ropt.config.EnOptConfig]) and the index of the
+  configuration ([`EnOptContext`][ropt.context.EnOptContext]) and the index of the
   specific estimator configuration to use (`estimator_index`). The core
   functionality is provided by the `calculate_function` and `calculate_gradient`
   methods, which combine the function values and gradients from multiple

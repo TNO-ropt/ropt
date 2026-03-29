@@ -36,7 +36,7 @@ import numpy as np
 from numpy.random import default_rng
 from numpy.typing import NDArray
 
-from ropt.config import EnOptConfig
+from ropt.context import EnOptContext
 from ropt.results import FunctionResults
 from ropt.workflow.compute_steps import EnsembleOptimizer
 from ropt.workflow.evaluators import AsyncEvaluator
@@ -93,7 +93,7 @@ def rosenbrock(
 def run_optimization(
     server: Server,
     function: Callable[[NDArray[np.float64], int], NDArray[np.float64]],
-    config: EnOptConfig,
+    context: EnOptContext,
 ) -> FunctionResults:
     """Run the optimization.
 
@@ -104,7 +104,7 @@ def run_optimization(
     step = EnsembleOptimizer(evaluator=evaluator)
     tracker = Tracker()
     step.add_event_handler(tracker)
-    step.run(variables=initial_values, config=config)
+    step.run(variables=initial_values, context=context)
     results: FunctionResults = tracker["results"]
     return results
 
@@ -145,7 +145,7 @@ async def async_run(  # noqa: PLR0913
                     run_optimization,
                     async_server,
                     partial(rosenbrock, a=a, b=b, delay=delay),
-                    EnOptConfig.model_validate(config),
+                    EnOptContext.model_validate(config),
                 )
                 for a, b in zip(a_list, b_list, strict=True)
             ),
