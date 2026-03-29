@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import threading
 from typing import Any, Self
 
 import numpy as np
@@ -29,6 +30,8 @@ from ._validated_types import (  # noqa: TC001
     VariableTransformInstance,
 )
 from ._variables_config import VariablesConfig  # noqa: TC001
+
+_global_lock = threading.Lock()
 
 
 class EnOptConfig(BaseModel):
@@ -232,16 +235,13 @@ class EnOptConfig(BaseModel):
         return handler(self)
 
     def lock(self) -> None:
-        """Lock the configuration to prevent sharing.
+        """Lock the object to prevent sharing and re-use.
 
         Raises:
-            RuntimeError: If the configuration is already locked.
+            RuntimeError: If the object is already locked.
         """
-        if self._locked:
-            msg = "The EnOptConfig object is already in use."
-            raise RuntimeError(msg)
-        self._locked = True
-
-    def unlock(self) -> None:
-        """Unlock the configuration to allow reuse."""
-        self._locked = False
+        with _global_lock:
+            if self._locked:
+                msg = "The EnOptConfig object has already been used."
+                raise RuntimeError(msg)
+            object.__setattr__(self, "_locked", True)  # noqa: PLC2801

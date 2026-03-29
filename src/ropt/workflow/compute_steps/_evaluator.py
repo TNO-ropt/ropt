@@ -137,8 +137,6 @@ class EnsembleEvaluator(ComputeStep):
             )
         )
 
-        config.unlock()
-
         return exit_code
 
     def _emit_event(self, event: EnOptEvent) -> None:
