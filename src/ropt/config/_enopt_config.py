@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Any, Self
+import threading
+from contextlib import contextmanager
+from typing import TYPE_CHECKING, Any, Self
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict, PrivateAttr, model_validator
@@ -29,6 +31,9 @@ from ._validated_types import (  # noqa: TC001
     VariableTransformInstance,
 )
 from ._variables_config import VariablesConfig  # noqa: TC001
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 
 class EnOptConfig(BaseModel):
@@ -114,7 +119,7 @@ class EnOptConfig(BaseModel):
     ] = ()
     names: dict[str, tuple[str | int, ...]] = {}
 
-    _locked: bool = PrivateAttr(default=False)
+    _lock: threading.Lock | None = PrivateAttr(default=None)
 
     model_config = ConfigDict(
         extra="forbid",
@@ -231,17 +236,22 @@ class EnOptConfig(BaseModel):
             return self
         return handler(self)
 
-    def lock(self) -> None:
-        """Lock the configuration to prevent sharing.
+    @contextmanager
+    def lock(self) -> Generator[Self, None, None]:
+        """Lock the object to prevent sharing.
+
+        Yields:
+            Self: The locked object.
 
         Raises:
-            RuntimeError: If the configuration is already locked.
+            RuntimeError: If the object is already locked.
         """
-        if self._locked:
+        if self._lock is None:
+            object.__setattr__(self, "_lock", threading.Lock())  # noqa: PLC2801
+        if not self._lock.acquire(blocking=False):
             msg = "The EnOptConfig object is already in use."
             raise RuntimeError(msg)
-        self._locked = True
-
-    def unlock(self) -> None:
-        """Unlock the configuration to allow reuse."""
-        self._locked = False
+        try:
+            yield self
+        finally:
+            self._lock.release()

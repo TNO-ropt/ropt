@@ -98,36 +98,35 @@ class EnsembleOptimizer(ComputeStep):
             ValueError:   If the input variables have the wrong shape.
         """
         self._config = config
-        self._config.lock()
-        self._metadata = metadata
+        with self._config.lock():
+            self._metadata = metadata
 
-        self._emit_event(
-            EnOptEvent(event_type=EnOptEventType.START_OPTIMIZER, config=config)
-        )
+            self._emit_event(
+                EnOptEvent(event_type=EnOptEventType.START_OPTIMIZER, config=config)
+            )
 
-        variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
-        if variables.shape != (self._config.variables.variable_count,):
-            msg = "The input variables have the wrong shape"
-            raise ValueError(msg)
-        for transform in config.variable_transforms:
-            variables = transform.to_optimizer(variables)
+            variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=1)
+            if variables.shape != (self._config.variables.variable_count,):
+                msg = "The input variables have the wrong shape"
+                raise ValueError(msg)
+            for transform in config.variable_transforms:
+                variables = transform.to_optimizer(variables)
 
-        ensemble_evaluator = CoreEnsembleEvaluator(
-            self._config,
-            self._evaluator.eval,
-        )
-        ensemble_optimizer = CoreEnsembleOptimizer(
-            enopt_config=self._config,
-            ensemble_evaluator=ensemble_evaluator,
-            signal_evaluation=self._signal_evaluation,
-        )
-        exit_code = ensemble_optimizer.start(variables)
+            ensemble_evaluator = CoreEnsembleEvaluator(
+                self._config,
+                self._evaluator.eval,
+            )
+            ensemble_optimizer = CoreEnsembleOptimizer(
+                enopt_config=self._config,
+                ensemble_evaluator=ensemble_evaluator,
+                signal_evaluation=self._signal_evaluation,
+            )
+            exit_code = ensemble_optimizer.start(variables)
 
-        self._emit_event(
-            EnOptEvent(event_type=EnOptEventType.FINISHED_OPTIMIZER, config=config)
-        )
+            self._emit_event(
+                EnOptEvent(event_type=EnOptEventType.FINISHED_OPTIMIZER, config=config)
+            )
 
-        self._config.unlock()
         return exit_code
 
     def _emit_event(self, event: EnOptEvent) -> None:

@@ -83,61 +83,58 @@ class EnsembleEvaluator(ComputeStep):
         Raises:
             ValueError: If the input variables have the wrong shape.
         """
-        config.lock()
-
-        self._emit_event(
-            EnOptEvent(
-                event_type=EnOptEventType.START_ENSEMBLE_EVALUATOR, config=config
+        with config.lock():
+            self._emit_event(
+                EnOptEvent(
+                    event_type=EnOptEventType.START_ENSEMBLE_EVALUATOR, config=config
+                )
             )
-        )
 
-        variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=2)
-        if variables.shape[-1] != config.variables.variable_count:
-            msg = "The input variables have the wrong shape"
-            raise ValueError(msg)
-        for transform in config.variable_transforms:
-            variables = transform.to_optimizer(variables)
+            variables = np.array(np.asarray(variables, dtype=np.float64), ndmin=2)
+            if variables.shape[-1] != config.variables.variable_count:
+                msg = "The input variables have the wrong shape"
+                raise ValueError(msg)
+            for transform in config.variable_transforms:
+                variables = transform.to_optimizer(variables)
 
-        ensemble_evaluator = CoreEnsembleEvaluator(config, self._evaluator.eval)
+            ensemble_evaluator = CoreEnsembleEvaluator(config, self._evaluator.eval)
 
-        exit_code = ExitCode.ENSEMBLE_EVALUATOR_FINISHED
+            exit_code = ExitCode.ENSEMBLE_EVALUATOR_FINISHED
 
-        self._emit_event(
-            EnOptEvent(event_type=EnOptEventType.START_EVALUATION, config=config)
-        )
-        try:
-            results = ensemble_evaluator.calculate(
-                variables, compute_functions=True, compute_gradients=False
+            self._emit_event(
+                EnOptEvent(event_type=EnOptEventType.START_EVALUATION, config=config)
             )
-        except ComputeStepAborted as exc:
-            exit_code = exc.exit_code
+            try:
+                results = ensemble_evaluator.calculate(
+                    variables, compute_functions=True, compute_gradients=False
+                )
+            except ComputeStepAborted as exc:
+                exit_code = exc.exit_code
 
-        assert results
-        assert isinstance(results[0], FunctionResults)
-        if results[0].functions is None:
-            exit_code = ExitCode.TOO_FEW_REALIZATIONS
+            assert results
+            assert isinstance(results[0], FunctionResults)
+            if results[0].functions is None:
+                exit_code = ExitCode.TOO_FEW_REALIZATIONS
 
-        if metadata is not None:
-            for item in results:
-                item.metadata = deepcopy(metadata)
+            if metadata is not None:
+                for item in results:
+                    item.metadata = deepcopy(metadata)
 
-        self._emit_event(
-            EnOptEvent(
-                event_type=EnOptEventType.FINISHED_EVALUATION,
-                config=config,
-                results=results,
+            self._emit_event(
+                EnOptEvent(
+                    event_type=EnOptEventType.FINISHED_EVALUATION,
+                    config=config,
+                    results=results,
+                )
             )
-        )
 
-        self._emit_event(
-            EnOptEvent(
-                event_type=EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR,
-                config=config,
-                results=results,
+            self._emit_event(
+                EnOptEvent(
+                    event_type=EnOptEventType.FINISHED_ENSEMBLE_EVALUATOR,
+                    config=config,
+                    results=results,
+                )
             )
-        )
-
-        config.unlock()
 
         return exit_code
 
