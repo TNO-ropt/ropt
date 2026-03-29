@@ -275,7 +275,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../enopt_config/" class="md-tabs__link">
+        <a href="../enopt_context/" class="md-tabs__link">
           
   
   
@@ -634,7 +634,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../enopt_config/" class="md-nav__link">
+      <a href="../enopt_context/" class="md-nav__link">
         
   
   
@@ -1967,7 +1967,7 @@ following axes:</p>
       instance-attribute
   " href="../../miscellaneous/enums/#ropt.enums.AxisName.OBJECTIVE"><code>AxisName.OBJECTIVE</code></a> The index along this
   axis refers to the objective number as specified in the
-  <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> configuration.</li>
+  <a class="autorefs autorefs-internal" title="            EnOptContext" href="../enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> configuration.</li>
 <li><a class="autorefs autorefs-internal" title="            NONLINEAR_CONSTRAINT
 
 
@@ -1976,7 +1976,7 @@ following axes:</p>
       instance-attribute
   " href="../../miscellaneous/enums/#ropt.enums.AxisName.NONLINEAR_CONSTRAINT"><code>AxisName.NONLINEAR_CONSTRAINT</code></a>
   The index along this axis corresponds to the non-linear constraint index
-  defined in the <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> configuration.</li>
+  defined in the <a class="autorefs autorefs-internal" title="            EnOptContext" href="../enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> configuration.</li>
 <li><a class="autorefs autorefs-internal" title="            LINEAR_CONSTRAINT
 
 
@@ -1985,7 +1985,7 @@ following axes:</p>
       instance-attribute
   " href="../../miscellaneous/enums/#ropt.enums.AxisName.LINEAR_CONSTRAINT"><code>AxisName.LINEAR_CONSTRAINT</code></a> The
   index along this axis corresponds to the linear constraint index defined in
-  the <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> configuration.</li>
+  the <a class="autorefs autorefs-internal" title="            EnOptContext" href="../enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> configuration.</li>
 <li><a class="autorefs autorefs-internal" title="            VARIABLE
 
 
@@ -1994,7 +1994,7 @@ following axes:</p>
       instance-attribute
   " href="../../miscellaneous/enums/#ropt.enums.AxisName.VARIABLE"><code>AxisName.VARIABLE</code></a> The index along this axis
   refers to the variable number as specified by the
-  <a class="autorefs autorefs-internal" title="            EnOptConfig" href="../enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> configuration.</li>
+  <a class="autorefs autorefs-internal" title="            EnOptContext" href="../enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> configuration.</li>
 <li><a class="autorefs autorefs-internal" title="            REALIZATION
 
 
@@ -2217,7 +2217,7 @@ the contents of a specific field, or a subset of its sub-fields, to a
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">transform_from_optimizer</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Results</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">transform_from_optimizer</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Results</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2256,14 +2256,14 @@ the user domain.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>config</code>
+                <code>context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.EnOptConfig)" href="../enopt_config/#ropt.config.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../enopt_context/#ropt.context.EnOptContext">EnOptContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The configuration used by the source of the results.</p>
+                <p>The context used by the source of the results.</p>
               </div>
             </td>
             <td>

@@ -78,7 +78,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#ropt.config" class="md-skip">
+        <a href="#ropt.context" class="md-skip">
           Skip to content
         </a>
       
@@ -690,31 +690,31 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.config" class="md-nav__link">
+  <a href="#ropt.context" class="md-nav__link">
     <span class="md-ellipsis">
       
-        config
+        context
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="config">
+    <nav class="md-nav" aria-label="context">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.config.EnOptConfig" class="md-nav__link">
+  <a href="#ropt.context.EnOptContext" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EnOptConfig
+        EnOptContext
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="EnOptConfig">
+    <nav class="md-nav" aria-label="EnOptContext">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.config.EnOptConfig.lock" class="md-nav__link">
+  <a href="#ropt.context.EnOptContext.lock" class="md-nav__link">
     <span class="md-ellipsis">
       
         lock
@@ -728,6 +728,23 @@
     </nav>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        config
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="config">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#ropt.config.VariablesConfig" class="md-nav__link">
@@ -1807,31 +1824,31 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ropt.config" class="md-nav__link">
+  <a href="#ropt.context" class="md-nav__link">
     <span class="md-ellipsis">
       
-        config
+        context
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="config">
+    <nav class="md-nav" aria-label="context">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.config.EnOptConfig" class="md-nav__link">
+  <a href="#ropt.context.EnOptContext" class="md-nav__link">
     <span class="md-ellipsis">
       
-        EnOptConfig
+        EnOptContext
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="EnOptConfig">
+    <nav class="md-nav" aria-label="EnOptContext">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#ropt.config.EnOptConfig.lock" class="md-nav__link">
+  <a href="#ropt.context.EnOptContext.lock" class="md-nav__link">
     <span class="md-ellipsis">
       
         lock
@@ -1845,6 +1862,23 @@
     </nav>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ropt.config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        config
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="config">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#ropt.config.VariablesConfig" class="md-nav__link">
@@ -2137,48 +2171,15 @@
 
 
 
-<h2 id="ropt.config" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.config</span>
+<h2 id="ropt.context" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.context</span>
 
 
 </h2>
 
     <div class="doc doc-contents first">
 
-        <p>The <code>ropt.config</code> module provides configuration classes for optimization workflows.</p>
-<p>This module defines a set of classes that are used to configure various aspects
-of an optimization process, including variables, objectives, constraints,
-realizations, samplers, and more.</p>
-<p>The central configuration class for optimization is
-<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>, which encapsulates the complete
-configuration for a single optimization run. It is designed to be flexible and
-extensible, allowing users to customize the optimization process to their
-specific needs.</p>
-<p>These configuration classes are built using
-<a href="https://docs.pydantic.dev/"><code>pydantic</code></a>, which provides robust data validation
-and parsing capabilities. This ensures that the configuration data is consistent
-and adheres to the expected structure.</p>
-<p>Configuration objects are typically created from dictionaries of configuration
-values using the <code>model_validate</code> method provided by <code>pydantic</code>.</p>
-<p><strong>Key Features</strong>:</p>
-<ul>
-<li><strong>Modular Design:</strong> The configuration is broken down into smaller, manageable
-  components, each represented by a dedicated class.</li>
-<li><strong>Validation:</strong> <code>pydantic</code> ensures that the configuration data is valid and
-  consistent.</li>
-<li><strong>Extensibility:</strong> The modular design allows for easy extension and
-  customization of the optimization process.</li>
-<li><strong>Centralized Configuration:</strong> The
-  <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> class provides a single point
-  of entry for configuring an optimization run.</li>
-</ul>
-<p><strong>Parsing and Validation</strong></p>
-<p>The configuration classes are built using
-<a href="https://docs.pydantic.dev/"><code>pydantic</code></a>, which provides robust data validation.
-The primary configuration class is <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>, and
-it contains nested configuration classes for various aspects of the
-optimization. To parse a configuration from a dictionary, use the
-<a class="autorefs autorefs-external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel.model_validate"><code>model_validate</code></a> class method.</p>
+        <p>The <code>ropt.context</code> module provides the context class used by optimization workflows.</p>
 
 
 
@@ -2197,23 +2198,27 @@ optimization. To parse a configuration from a dictionary, use the
 
 
 
+
+
 <div class="doc doc-object doc-class">
 
 
 
-<h3 id="ropt.config.EnOptConfig" class="doc doc-heading">
-<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">EnOptConfig</span>
+<h3 id="ropt.context.EnOptContext" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-class"></code>            <span class="doc doc-object-name doc-class-name">EnOptContext</span>
 
 
 </h3>
 
 
     <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" title="pydantic.BaseModel" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel">BaseModel</a></code></p>
 
 
 
         <p>The primary configuration class for an optimization run.</p>
-<p><code>EnOptConfig</code> orchestrates the configuration of an entire optimization
+<p><code>EnOptContext</code> orchestrates the configuration of an entire optimization
 workflow. It contains nested configuration classes that define specific
 aspects of the optimization, such as variables, objectives, constraints,
 realizations, and the optimizer itself.</p>
@@ -2223,7 +2228,7 @@ within the tuples. This makes it possible to share these objects between
 entities. For example, <a class="autorefs autorefs-internal" title="            VariablesConfig" href="#ropt.config.VariablesConfig"><code>VariablesConfig</code></a> has
 a <code>samplers</code> field, which is an array of indices specifying the sampler to
 use for each variable. If only a single sampler is needed, the <code>samplers</code>
-field in <code>EnOptConfig</code> should contain a single sampler configuration, and
+field in <code>EnOptContext</code> should contain a single sampler configuration, and
 the <code>samplers</code> field in the <code>VariablesConfig</code> configuration contains only
 zeros to specify that each variable should use this entry. In case of
 multiple samplers, multiple sampler configurations are defined, and each
@@ -2250,7 +2255,7 @@ number of variables or have a size of one.</p>
 
 <details class="warning" open>
   <summary>Warning</summary>
-  <p><code>EnOptConfig</code> objects are immutable and hold the in-memory configuration
+  <p><code>EnOptContext</code> objects are immutable and hold the in-memory configuration
 for an optimization run. For persistence, do not serialize the object
 itself. Instead, store the original dictionary used for its creation.</p>
 <p>Round-trip serialization (e.g., to/from JSON) is not a supported use
@@ -2270,9 +2275,9 @@ transformations that are applied to the input upon creation.</p>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.EnOptConfig.variables">variables</span></code></td>
+            <td><code><span title="ropt.context.EnOptContext.variables">variables</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            VariablesConfig (ropt.config._variables_config.VariablesConfig)" href="#ropt.config.VariablesConfig">VariablesConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            VariablesConfig (ropt.config.VariablesConfig)" href="#ropt.config.VariablesConfig">VariablesConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2281,9 +2286,9 @@ transformations that are applied to the input upon creation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.EnOptConfig.objectives">objectives</span></code></td>
+            <td><code><span title="ropt.context.EnOptContext.objectives">objectives</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            ObjectiveFunctionsConfig (ropt.config._objective_functions_config.ObjectiveFunctionsConfig)" href="#ropt.config.ObjectiveFunctionsConfig">ObjectiveFunctionsConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            ObjectiveFunctionsConfig (ropt.config.ObjectiveFunctionsConfig)" href="#ropt.config.ObjectiveFunctionsConfig">ObjectiveFunctionsConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2292,9 +2297,9 @@ transformations that are applied to the input upon creation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.EnOptConfig.linear_constraints">linear_constraints</span></code></td>
+            <td><code><span title="ropt.context.EnOptContext.linear_constraints">linear_constraints</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            LinearConstraintsConfig (ropt.config._linear_constraints_config.LinearConstraintsConfig)" href="#ropt.config.LinearConstraintsConfig">LinearConstraintsConfig</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="            LinearConstraintsConfig (ropt.config.LinearConstraintsConfig)" href="#ropt.config.LinearConstraintsConfig">LinearConstraintsConfig</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2303,9 +2308,9 @@ transformations that are applied to the input upon creation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.EnOptConfig.nonlinear_constraints">nonlinear_constraints</span></code></td>
+            <td><code><span title="ropt.context.EnOptContext.nonlinear_constraints">nonlinear_constraints</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            NonlinearConstraintsConfig (ropt.config._nonlinear_constraints_config.NonlinearConstraintsConfig)" href="#ropt.config.NonlinearConstraintsConfig">NonlinearConstraintsConfig</a> | None</code>
+                  <code><a class="autorefs autorefs-internal" title="            NonlinearConstraintsConfig (ropt.config.NonlinearConstraintsConfig)" href="#ropt.config.NonlinearConstraintsConfig">NonlinearConstraintsConfig</a> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2314,9 +2319,9 @@ transformations that are applied to the input upon creation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.EnOptConfig.realizations">realizations</span></code></td>
+            <td><code><span title="ropt.context.EnOptContext.realizations">realizations</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            RealizationsConfig (ropt.config._realizations_config.RealizationsConfig)" href="#ropt.config.RealizationsConfig">RealizationsConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            RealizationsConfig (ropt.config.RealizationsConfig)" href="#ropt.config.RealizationsConfig">RealizationsConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2325,9 +2330,9 @@ transformations that are applied to the input upon creation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.EnOptConfig.optimizer">optimizer</span></code></td>
+            <td><code><span title="ropt.context.EnOptContext.optimizer">optimizer</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            OptimizerConfig (ropt.config._optimizer_config.OptimizerConfig)" href="#ropt.config.OptimizerConfig">OptimizerConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            OptimizerConfig (ropt.config.OptimizerConfig)" href="#ropt.config.OptimizerConfig">OptimizerConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2336,9 +2341,9 @@ transformations that are applied to the input upon creation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.EnOptConfig.backend">backend</span></code></td>
+            <td><code><span title="ropt.context.EnOptContext.backend">backend</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            BackendConfig (ropt.config._backend_config.BackendConfig)" href="#ropt.config.BackendConfig">BackendConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            BackendConfig (ropt.config.BackendConfig)" href="#ropt.config.BackendConfig">BackendConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2347,9 +2352,9 @@ transformations that are applied to the input upon creation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.EnOptConfig.gradient">gradient</span></code></td>
+            <td><code><span title="ropt.context.EnOptContext.gradient">gradient</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            GradientConfig (ropt.config._gradient_config.GradientConfig)" href="#ropt.config.GradientConfig">GradientConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            GradientConfig (ropt.config.GradientConfig)" href="#ropt.config.GradientConfig">GradientConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2358,9 +2363,9 @@ transformations that are applied to the input upon creation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.EnOptConfig.realization_filters">realization_filters</span></code></td>
+            <td><code><span title="ropt.context.EnOptContext.realization_filters">realization_filters</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.config._validated_types.RealizationFilterInstance">RealizationFilterInstance</span>, ...]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.context._validated_types.RealizationFilterInstance">RealizationFilterInstance</span>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2369,9 +2374,9 @@ transformations that are applied to the input upon creation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.EnOptConfig.function_estimators">function_estimators</span></code></td>
+            <td><code><span title="ropt.context.EnOptContext.function_estimators">function_estimators</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.config._validated_types.FunctionEstimatorInstance">FunctionEstimatorInstance</span>, ...]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.context._validated_types.FunctionEstimatorInstance">FunctionEstimatorInstance</span>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2380,9 +2385,9 @@ transformations that are applied to the input upon creation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.EnOptConfig.samplers">samplers</span></code></td>
+            <td><code><span title="ropt.context.EnOptContext.samplers">samplers</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.config._validated_types.SamplerInstance">SamplerInstance</span>, ...]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.context._validated_types.SamplerInstance">SamplerInstance</span>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2391,9 +2396,9 @@ transformations that are applied to the input upon creation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.EnOptConfig.variable_transforms">variable_transforms</span></code></td>
+            <td><code><span title="ropt.context.EnOptContext.variable_transforms">variable_transforms</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.config._validated_types.VariableTransformInstance">VariableTransformInstance</span>, ...]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.context._validated_types.VariableTransformInstance">VariableTransformInstance</span>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2402,9 +2407,9 @@ transformations that are applied to the input upon creation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.EnOptConfig.objective_transforms">objective_transforms</span></code></td>
+            <td><code><span title="ropt.context.EnOptContext.objective_transforms">objective_transforms</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.config._validated_types.ObjectiveTransformInstance">ObjectiveTransformInstance</span>, ...]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.context._validated_types.ObjectiveTransformInstance">ObjectiveTransformInstance</span>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2413,9 +2418,9 @@ transformations that are applied to the input upon creation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.EnOptConfig.nonlinear_constraint_transforms">nonlinear_constraint_transforms</span></code></td>
+            <td><code><span title="ropt.context.EnOptContext.nonlinear_constraint_transforms">nonlinear_constraint_transforms</span></code></td>
             <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.config._validated_types.NonlinearConstraintTransformInstance">NonlinearConstraintTransformInstance</span>, ...]</code>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<span title="ropt.context._validated_types.NonlinearConstraintTransformInstance">NonlinearConstraintTransformInstance</span>, ...]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2424,7 +2429,7 @@ transformations that are applied to the input upon creation.</p>
             </td>
           </tr>
           <tr class="doc-section-item">
-            <td><code><span title="ropt.config.EnOptConfig.names">names</span></code></td>
+            <td><code><span title="ropt.context.EnOptContext.names">names</span></code></td>
             <td>
                   <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#dict">dict</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a>, <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#tuple">tuple</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>, ...]]</code>
             </td>
@@ -2455,10 +2460,13 @@ transformations that are applied to the input upon creation.</p>
 
 
 
+
+
+
 <div class="doc doc-object doc-function">
 
 
-<h4 id="ropt.config.EnOptConfig.lock" class="doc doc-heading">
+<h4 id="ropt.context.EnOptContext.lock" class="doc doc-heading">
 <code class="doc-symbol doc-symbol-heading doc-symbol-method"></code>            <span class="doc doc-object-name doc-function-name">lock</span>
 
 
@@ -2500,12 +2508,46 @@ transformations that are applied to the input upon creation.</p>
 
 
 
+  </div>
+
+    </div>
+
+</div>
+
+
+
 
   </div>
 
     </div>
 
 </div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="ropt.config" class="doc doc-heading">
+<code class="doc-symbol doc-symbol-heading doc-symbol-module"></code>            <span class="doc doc-object-name doc-module-name">ropt.config</span>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>The <code>ropt.config</code> module provides configuration classes.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
 
 
 
@@ -2529,7 +2571,7 @@ transformations that are applied to the input upon creation.</p>
 
         <p>Configuration class for optimization variables.</p>
 <p>This class, <code>VariablesConfig</code>, defines the configuration for optimization
-variables. It is used in an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object
+variables. It is used in an <a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext</code></a> object
 to specify the initial values, bounds, types, and an optional mask for the
 variables.</p>
 <p>The <code>variables</code> field is required and determines the number of variables,
@@ -2561,7 +2603,7 @@ gradients.</p>
 <p>Perturbations are generated by sampler objects that are configured
 separately as a tuple of <a class="autorefs autorefs-internal" title="            SamplerConfig" href="#ropt.config.SamplerConfig"><code>SamplerConfig</code></a>
 objects in the configuration object used by an optimization step.
-<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object defines the available
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext</code></a> object defines the available
 samplers in its <code>samplers</code> field. The <code>samplers</code> field of the
 <code>VariablesConfig</code> object specifies, for each variable, the the sampler to
 use by its index into the <code>samplers</code> tuple. A random number generator is
@@ -2788,7 +2830,7 @@ conditions (see <a class="autorefs autorefs-internal" title="            Boundar
         <p>Configuration class for objective functions.</p>
 <p>This class, <code>ObjectiveFunctionsConfig</code>, defines the configuration for
 objective functions. for instance, as part of an
-<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext</code></a> object.</p>
 <p><code>ropt</code> supports multi-objective optimization. Multiple objectives are
 combined into a single value by summing them after weighting. The <code>weights</code>
 field, a <code>numpy</code> array, determines the weight of each objective function.
@@ -2803,7 +2845,7 @@ indices. Each index in the <code>realization_filters</code> array corresponds to
 objective (by position) and specifies which filter to use. The available
 filters must be defined elsewhere as a tuple of realization filter
 configurations. For instance, for optimization these are defined in the
-<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig.realization_filters</code></a> configuration
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext.realization_filters</code></a> configuration
 class. The same logic applies to the <code>function_estimators</code> array . If an
 index is invalid (e.g., out of bounds for the corresponding object tuple),
 no filter or estimator is applied to that specific objective. If these
@@ -2913,7 +2955,7 @@ at all.</p>
         <p>Configuration class for linear constraints.</p>
 <p>This class, <code>LinearConstraintsConfig</code>, defines linear constraints used in an
 optimization, for instance as part of an
-<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext</code></a> object.</p>
 <p>Linear constraints are defined by a set of linear equations involving the
 optimization variables. These equations can represent equality or inequality
 constraints. The <code>coefficients</code> field is a 2D <code>numpy</code> array where each row
@@ -3035,7 +3077,7 @@ follows:</p>
 
         <p>Configuration class for non-linear constraints.</p>
 <p>This class, <code>NonlinearConstraintsConfig</code>, defines non-linear constraints ,
-for instance as part of an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+for instance as part of an <a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext</code></a> object.</p>
 <p>Non-linear constraints are defined by comparing a constraint function to a
 right-hand-side value, allowing for equality or inequality constraints. The
 <code>lower_bounds</code> and <code>upper_bounds</code> fields, which are <code>numpy</code> arrays, specify the
@@ -3053,7 +3095,7 @@ indices. Each index in the <code>realization_filters</code> array corresponds to
 constraint function (by position) and specifies which filter to use. The
 available filters must be defined elsewhere as a tuple of realization filter
 configurations. For instance, for optimization these are defined in the
-<a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig.realization_filters</code></a> configuration
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext.realization_filters</code></a> configuration
 class. The same logic applies to the <code>function_estimators</code> array . If an
 index is invalid (e.g., out of bounds for the corresponding object tuple),
 no filter or estimator is applied to that specific constraint function. If
@@ -3278,7 +3320,7 @@ one successful realization.</p>
 
         <p>Configuration class for the optimization algorithm.</p>
 <p>This class, <code>BackendConfig</code>, defines the configuration for the optimization
-algorithm used in an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object.</p>
+algorithm used in an <a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext</code></a> object.</p>
 <p>While optimization methods can have diverse parameters, this class provides a
 standardized set of settings that are commonly used and forwarded to the
 optimizer:</p>
@@ -3559,7 +3601,7 @@ optimizer backend:</p>
 
         <p>Configuration class for gradient calculations.</p>
 <p>This class, <code>GradientConfig</code>, defines the configuration of gradient
-calculations. It is used in an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>
+calculations. It is used in an <a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext</code></a>
 object as the <code>gradient</code> field to specify how gradients are calculated in
 gradient-based optimizers.</p>
 <p>Gradients are estimated using function values calculated from perturbed
@@ -3708,7 +3750,7 @@ calculation (default: <code>False</code>).</p>
 function estimators. Function estimators are generally configured as a tuple
 of <code>FunctionEstimatorConfig</code> objects in a configuration class of an
 optimization step. For instance, <code>function_estimators</code> field of the
-<code>EnOptConfig</code> defines the available estimators for the optimization.</p>
+<code>EnOptContext</code> defines the available estimators for the optimization.</p>
 <p>By default, objective and constraint functions, as well as their gradients,
 are calculated from individual realizations using a weighted sum. Function
 estimators provide a way to modify this default calculation.</p>
@@ -3799,7 +3841,7 @@ interpretation of these options depends on the selected method.</p>
 <p>This class, <code>RealizationFilterConfig</code>, defines the configuration for
 realization filters. Realization filters are generally configured as a tuple
 in another configuration object. For instance, the <code>realization_filters</code>
-field of the <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> defines the available
+field of the <a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext</code></a> defines the available
 filters for the optimization.</p>
 <p>By default, objective and constraint functions, as well as their gradients,
 are calculated as a weighted function of all realizations. Realization
@@ -3892,8 +3934,8 @@ of these options depends on the selected method.</p>
 
         <p>Configuration class for samplers.</p>
 <p>This class, <code>SamplerConfig</code>, defines the configuration for samplers used in
-an <a class="autorefs autorefs-internal" title="            EnOptConfig" href="#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> object. Samplers are configured
-as a tuple in the <code>samplers</code> field of the <code>EnOptConfig</code>, defining the
+an <a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext</code></a> object. Samplers are configured
+as a tuple in the <code>samplers</code> field of the <code>EnOptContext</code>, defining the
 available samplers for the optimization. The <code>samplers</code> field in the
 <a class="autorefs autorefs-internal" title="            GradientConfig" href="#ropt.config.GradientConfig"><code>GradientConfig</code></a> specifies the index of the
 sampler to use for each variable.</p>

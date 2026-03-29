@@ -275,7 +275,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../optimization/enopt_config/" class="md-tabs__link">
+        <a href="../../optimization/enopt_context/" class="md-tabs__link">
           
   
   
@@ -634,7 +634,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../optimization/enopt_config/" class="md-nav__link">
+      <a href="../../optimization/enopt_context/" class="md-nav__link">
         
   
   
@@ -2227,7 +2227,7 @@ input variable vector evaluated.</p>
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2238,8 +2238,8 @@ input variable vector evaluated.</p>
 
         <p>Run the ensemble evaluator.</p>
 <p>This method executes the core logic of the ensemble evaluator. It
-requires an optimizer configuration
-(<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../../optimization/enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>) and optionally accepts
+requires an optimizer context
+(<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>) and optionally accepts
 specific variable vectors to evaluate.</p>
 <p>If <code>metadata</code> is provided, it is attached to the
 <a class="autorefs autorefs-internal" title="            ropt.results.Results
@@ -2264,14 +2264,14 @@ specific variable vectors to evaluate.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>config</code>
+                <code>context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.EnOptConfig)" href="../../optimization/enopt_config/#ropt.config.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../optimization/enopt_context/#ropt.context.EnOptContext">EnOptContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optimizer configuration.</p>
+                <p>Optimizer context.</p>
               </div>
             </td>
             <td>
@@ -2391,7 +2391,7 @@ specific variable vectors to evaluate.</p>
 
         <p>The default optimizer compute step.</p>
 <p>This compute step executes an optimization algorithm based on a provided
-configuration (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../../optimization/enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a> or a compatible
+configuration (<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> or a compatible
 dictionary). It iteratively performs function and potentially gradient
 evaluations, yielding a sequence of
 <a class="autorefs autorefs-internal" title="            ropt.results.FunctionResults
@@ -2535,7 +2535,7 @@ they can be overridden by passing them directly to the <code>run</code> method.<
 
 </h3>
 <div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">run</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">,</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">variables</span><span class="p">:</span> <span class="n">ArrayLike</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="o">*</span><span class="p">,</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2546,12 +2546,9 @@ they can be overridden by passing them directly to the <code>run</code> method.<
 
         <p>Run the compute step to perform an optimization.</p>
 <p>This method executes the core logic of the optimizer compute step. It
-requires an optimizer configuration
-(<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../../optimization/enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>) and optionally accepts
+requires an optimizer context
+(<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>) and optionally accepts
 specific initial variable vectors and metadata.</p>
-<p>If <code>variables</code> are not provided, the initial values specified in the
-<code>config</code> are used. If <code>variables</code> are provided, they override the
-config's initial values.</p>
 <p>If <code>metadata</code> is provided, it is attached to the
 <a class="autorefs autorefs-internal" title="            ropt.results.Results
 
@@ -2575,14 +2572,14 @@ config's initial values.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>config</code>
+                <code>context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.EnOptConfig)" href="../../optimization/enopt_config/#ropt.config.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../optimization/enopt_context/#ropt.context.EnOptContext">EnOptContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Optimizer configuration.</p>
+                <p>The optimizer context.</p>
               </div>
             </td>
             <td>

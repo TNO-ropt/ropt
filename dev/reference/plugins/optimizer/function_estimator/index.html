@@ -275,7 +275,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../../optimization/enopt_config/" class="md-tabs__link">
+        <a href="../../../optimization/enopt_context/" class="md-tabs__link">
           
   
   
@@ -634,7 +634,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../optimization/enopt_config/" class="md-nav__link">
+      <a href="../../../optimization/enopt_context/" class="md-nav__link">
         
   
   
@@ -1823,7 +1823,7 @@ deviation (<code>stddev</code>) of the realization results.</p>
   that inherit from the
   <a class="autorefs autorefs-internal" title="            ropt.function_estimator.FunctionEstimator" href="#ropt.function_estimator.FunctionEstimator"><code>FunctionEstimator</code></a>
   abstract base class. These classes are initialized with the optimization
-  configuration (<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../../../optimization/enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>) and the index of the
+  configuration (<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>) and the index of the
   specific estimator configuration to use (<code>estimator_index</code>). The core
   functionality is provided by the <code>calculate_function</code> and <code>calculate_gradient</code>
   methods, which combine the function values and gradients from multiple
@@ -1949,7 +1949,7 @@ this plugin.</p>
                 <code>estimator_config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig (ropt.config.FunctionEstimatorConfig)" href="../../../optimization/enopt_config/#ropt.config.FunctionEstimatorConfig">FunctionEstimatorConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig (ropt.config.FunctionEstimatorConfig)" href="../../../optimization/enopt_context/#ropt.config.FunctionEstimatorConfig">FunctionEstimatorConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2104,7 +2104,7 @@ this plugin.</p>
                 <code>estimator_config</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig (ropt.config.FunctionEstimatorConfig)" href="../../../optimization/enopt_config/#ropt.config.FunctionEstimatorConfig">FunctionEstimatorConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig (ropt.config.FunctionEstimatorConfig)" href="../../../optimization/enopt_context/#ropt.config.FunctionEstimatorConfig">FunctionEstimatorConfig</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2220,7 +2220,7 @@ which must be implemented by subclasses.</p>
   </span>
 
 </h3>
-<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">init</span><span class="p">(</span><span class="n">enopt_config</span><span class="p">:</span> <span class="n">EnOptConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<div class="language-python doc-signature highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">init</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">EnOptContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </span></code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2244,14 +2244,14 @@ initialization based on the provided configuration.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>enopt_config</code>
+                <code>context</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="            EnOptConfig (ropt.config.EnOptConfig)" href="../../../optimization/enopt_config/#ropt.config.EnOptConfig">EnOptConfig</a></code>
+                  <code><a class="autorefs autorefs-internal" title="            EnOptContext (ropt.context.EnOptContext)" href="../../../optimization/enopt_context/#ropt.context.EnOptContext">EnOptContext</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The EnOpt configuration object.</p>
+                <p>The EnOpt context object.</p>
               </div>
             </td>
             <td>
@@ -2398,7 +2398,7 @@ the chain rule applies).</p>
 <details class="note" open>
   <summary>Interaction with <code>merge_realizations</code></summary>
   <p>The <code>merge_realizations</code> flag in the
-<a class="autorefs autorefs-internal" title="            GradientConfig" href="../../../optimization/enopt_config/#ropt.config.GradientConfig"><code>GradientConfig</code></a> determines how the
+<a class="autorefs autorefs-internal" title="            GradientConfig" href="../../../optimization/enopt_context/#ropt.config.GradientConfig"><code>GradientConfig</code></a> determines how the
 initial gradient estimate(s) are computed by <code>ropt</code> <em>before</em> being
 passed to this <code>calculate_gradient</code> method.</p>
 <ul>
@@ -2539,8 +2539,8 @@ initialization (<code>__init__</code>) and raise a <code>ValueError</code> if
 <p>This class provides methods for combining objective function values and
 gradients from an ensemble of realizations into a single representative
 value or gradient. The specific method is configured via the
-<a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="../../../optimization/enopt_config/#ropt.config.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a> in the main
-<a class="autorefs autorefs-internal" title="            EnOptConfig" href="../../../optimization/enopt_config/#ropt.config.EnOptConfig"><code>EnOptConfig</code></a>.</p>
+<a class="autorefs autorefs-internal" title="            FunctionEstimatorConfig" href="../../../optimization/enopt_context/#ropt.config.FunctionEstimatorConfig"><code>FunctionEstimatorConfig</code></a> in the main
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="../../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a>.</p>
 <p><strong>Supported Methods:</strong></p>
 <ul>
 <li>
