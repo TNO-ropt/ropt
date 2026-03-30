@@ -1619,7 +1619,7 @@
         <p>Construct functions and gradients from an ensemble of functions.</p>
 <p>The <code>EnsembleEvaluator</code> class is responsible for calculating functions and
 gradients from an ensemble of functions. It leverages the settings defined
-in an <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> configuration object to guide
+in an <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> context object to guide
 the calculations.</p>
 <p>The core functionality relies on an evaluator callable, (usually provided by
 an <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../workflow/evaluator/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a> object), which is used to
@@ -1666,7 +1666,7 @@ provides the raw function values, which are then processed by the
         <p>Initialize the EnsembleEvaluator.</p>
 <p>This method sets up the <code>EnsembleEvaluator</code> with the necessary
 configuration, evaluator, and plugins.</p>
-<p>The <code>config</code> object contains all the settings required for the ensemble
+<p>The <code>context</code> object contains all the settings required for the ensemble
 evaluation, such as the number of realizations, the function estimators,
 and the gradient settings. The <code>evaluator</code> callable is usually provide
 by a <a class="autorefs autorefs-internal" title="            ropt.workflow.evaluators.Evaluator" href="../../workflow/evaluator/#ropt.workflow.evaluators.Evaluator"><code>Evaluator</code></a> object. The

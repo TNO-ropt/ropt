@@ -1879,13 +1879,13 @@ callback.</p>
 
         <p>Initialize the EnsembleOptimizer.</p>
 <p>This class orchestrates ensemble-based optimizations. It requires an
-optimization configuration, an evaluator, and a plugin manager to
+optimization context object, an evaluator, and a plugin manager to
 function.</p>
 <p>The <code>EnsembleOptimizer</code> needs the following to define a single
 optimization run:</p>
 <ol>
 <li>An <a class="autorefs autorefs-internal" title="            EnOptContext" href="../../optimization/enopt_context/#ropt.context.EnOptContext"><code>EnOptContext</code></a> object: This contains
-    all configuration settings for the optimization.</li>
+    all necessary information for the optimization.</li>
 <li>An <a class="autorefs autorefs-internal" title="            ropt.core.EnsembleEvaluator" href="../evaluator/#ropt.core.EnsembleEvaluator"><code>EnsembleEvaluator</code></a>
     object: This object is responsible for evaluating functions.</li>
 </ol>

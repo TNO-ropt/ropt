@@ -2217,7 +2217,7 @@
 
 
 
-        <p>The primary configuration class for an optimization run.</p>
+        <p>The primary context class for an optimization run.</p>
 <p><code>EnOptContext</code> orchestrates the configuration of an entire optimization
 workflow. It contains nested configuration classes that define specific
 aspects of the optimization, such as variables, objectives, constraints,
@@ -2257,7 +2257,7 @@ number of variables or have a size of one.</p>
   <summary>Warning</summary>
   <p><code>EnOptContext</code> objects are immutable and hold the in-memory configuration
 for an optimization run. For persistence, do not serialize the object
-itself. Instead, store the original dictionary used for its creation.</p>
+itself. Instead, store the original contents used for its creation.</p>
 <p>Round-trip serialization (e.g., to/from JSON) is not a supported use
 case and may lead to data loss due to the complex types it contains,
 such as <code>numpy</code> arrays, or to unexpected behavior because of the
@@ -2845,7 +2845,7 @@ indices. Each index in the <code>realization_filters</code> array corresponds to
 objective (by position) and specifies which filter to use. The available
 filters must be defined elsewhere as a tuple of realization filter
 configurations. For instance, for optimization these are defined in the
-<a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext.realization_filters</code></a> configuration
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext.realization_filters</code></a> context
 class. The same logic applies to the <code>function_estimators</code> array . If an
 index is invalid (e.g., out of bounds for the corresponding object tuple),
 no filter or estimator is applied to that specific objective. If these
@@ -3429,7 +3429,7 @@ optimizer:</p>
 
 
 
-        <p>Configuration class for the optimization algorithm.</p>
+        <p>Configuration class for the optimization backend.</p>
 <p>This class, <code>BackendConfig</code>, defines the configuration for the optimization
 algorithms implemented in the optimization backends.</p>
 <p>While optimization methods can have diverse parameters, this class provides a
@@ -3748,9 +3748,9 @@ calculation (default: <code>False</code>).</p>
         <p>Configuration class for function estimators.</p>
 <p>This class, <code>FunctionEstimatorConfig</code>, defines the configuration for
 function estimators. Function estimators are generally configured as a tuple
-of <code>FunctionEstimatorConfig</code> objects in a configuration class of an
-optimization step. For instance, <code>function_estimators</code> field of the
-<code>EnOptContext</code> defines the available estimators for the optimization.</p>
+of <code>FunctionEstimatorConfig</code> objects in an
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext</code></a> object passed to an optimization
+step.</p>
 <p>By default, objective and constraint functions, as well as their gradients,
 are calculated from individual realizations using a weighted sum. Function
 estimators provide a way to modify this default calculation.</p>
@@ -3841,8 +3841,8 @@ interpretation of these options depends on the selected method.</p>
 <p>This class, <code>RealizationFilterConfig</code>, defines the configuration for
 realization filters. Realization filters are generally configured as a tuple
 in another configuration object. For instance, the <code>realization_filters</code>
-field of the <a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext</code></a> defines the available
-filters for the optimization.</p>
+field of the <a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext</code></a> context object
+defines the available filters for the optimization.</p>
 <p>By default, objective and constraint functions, as well as their gradients,
 are calculated as a weighted function of all realizations. Realization
 filters provide a way to modify the weights of individual realizations. For
@@ -3934,9 +3934,10 @@ of these options depends on the selected method.</p>
 
         <p>Configuration class for samplers.</p>
 <p>This class, <code>SamplerConfig</code>, defines the configuration for samplers used in
-an <a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext</code></a> object. Samplers are configured
-as a tuple in the <code>samplers</code> field of the <code>EnOptContext</code>, defining the
-available samplers for the optimization. The <code>samplers</code> field in the
+an <a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext</code></a> object. Samplers are
+configured as a tuple in the <code>samplers</code> field of the
+<a class="autorefs autorefs-internal" title="            EnOptContext" href="#ropt.context.EnOptContext"><code>EnOptContext</code></a> class, defining the available
+samplers for the optimization. The <code>samplers</code> field in the
 <a class="autorefs autorefs-internal" title="            GradientConfig" href="#ropt.config.GradientConfig"><code>GradientConfig</code></a> specifies the index of the
 sampler to use for each variable.</p>
 <p>Samplers generate perturbations added to variables for gradient
