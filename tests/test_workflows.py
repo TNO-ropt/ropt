@@ -85,8 +85,7 @@ def test_function_evaluator_with_info(
         }
 
     evaluator = FunctionEvaluator(
-        function=partial(_function_dict, test_functions=test_functions),
-        evaluation_info={"foo": object},
+        function=partial(_function_dict, test_functions=test_functions)
     )
     tracker = Tracker()
     step = EnsembleOptimizer(evaluator=evaluator)

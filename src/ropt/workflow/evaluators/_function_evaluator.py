@@ -28,17 +28,14 @@ class FunctionEvaluator(Evaluator):
         self,
         *,
         function: Callable[..., NDArray[np.float64] | dict[str, Any]],
-        evaluation_info: dict[str, Any] | None = None,
     ) -> None:
         """Initialize the FunctionEvaluator.
 
         Args:
-            function:        The function used for objectives and constraints.
-            evaluation_info: Optional dictionary of evaluations info keys and data types.
+            function: The function used for objectives and constraints.
         """
         super().__init__()
         self._function = function
-        self._evaluation_info = {} if evaluation_info is None else evaluation_info
         self._batch_id = -1
 
     def eval(
@@ -61,10 +58,7 @@ class FunctionEvaluator(Evaluator):
             else evaluator_context.context.nonlinear_constraints.lower_bounds.size
         )
         results = np.zeros((variables.shape[0], no + nc), dtype=np.float64)
-        evaluation_info: dict[str, NDArray[Any]] = {
-            key: np.zeros(variables.shape[0], dtype=dtype)
-            for key, dtype in self._evaluation_info.items()
-        }
+        evaluation_info: dict[str, NDArray[Any]] = {}
 
         for eval_idx, realization in enumerate(evaluator_context.realizations):
             perturbation = (
@@ -84,6 +78,7 @@ class FunctionEvaluator(Evaluator):
                     ),
                     results,
                     evaluation_info,
+                    variables.shape[0],
                 )
         return EvaluatorResult(
             objectives=results[:, :no],
@@ -97,6 +92,7 @@ def _handle_result(
     result: NDArray[np.float64] | dict[str, Any],
     results: NDArray[np.float64],
     evaluation_info: dict[str, NDArray[Any]],
+    eval_count: int,
 ) -> None:
     if isinstance(result, np.ndarray):
         results[eval_idx, :] = result
@@ -106,5 +102,14 @@ def _handle_result(
         for key, value in result.items():
             if key == "result":
                 results[eval_idx, :] = value
-            elif key in evaluation_info:
+            else:
+                if key not in evaluation_info:
+                    evaluation_info[key] = np.zeros(
+                        eval_count,
+                        dtype=(
+                            np.array(value).dtype
+                            if isinstance(value, (int, float, complex, np.number))
+                            else object
+                        ),
+                    )
                 evaluation_info[key][eval_idx] = value

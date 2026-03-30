@@ -34,23 +34,20 @@ class AsyncEvaluator(Evaluator):
         function: Callable[..., NDArray[np.float64] | dict[str, Any]],
         server: Server,
         queue_size: int = 0,
-        evaluation_info: dict[str, np.dtype] | None = None,
         get_name: Callable[..., str] | None = None,
     ) -> None:
         """Initialize the FunctionEvaluator.
 
         Args:
-            function:        The function used for objectives and constraints.
-            server:          Optional evaluator server to use.
-            queue_size:      Maximum size of the result queue.
-            evaluation_info: Optional dictionary of evaluations info keys and data types.
-            get_name:        Optional callable to generate names for tasks.
+            function:   The function used for objectives and constraints.
+            server:     Optional evaluator server to use.
+            queue_size: Maximum size of the result queue.
+            get_name:   Optional callable to generate names for tasks.
         """
         super().__init__()
         self._function = function
         self._server = server
         self._queue_size = queue_size
-        self._evaluation_info = {} if evaluation_info is None else evaluation_info
         self._batch_id = -1
         self._get_name = get_name
 
@@ -89,10 +86,7 @@ class AsyncEvaluator(Evaluator):
             )
 
         results = np.zeros((variables.shape[0], no + nc), dtype=np.float64)
-        evaluation_info: dict[str, NDArray[Any]] = {
-            key: np.zeros(variables.shape[0], dtype=dtype)
-            for key, dtype in self._evaluation_info.items()
-        }
+        evaluation_info: dict[str, NDArray[Any]] = {}
 
         for _ in range(
             variables.shape[0]
@@ -103,7 +97,7 @@ class AsyncEvaluator(Evaluator):
                 try:
                     if (task := results_queue.get(timeout=1)) is None:
                         raise ComputeStepAborted(ExitCode.ABORT_FROM_ERROR)
-                    _handle_result(task, results, evaluation_info)
+                    _handle_result(task, results, evaluation_info, variables.shape[0])
                     break
                 except queue.Empty:
                     continue
@@ -169,6 +163,7 @@ def _handle_result(
     task: Task,
     results: NDArray[np.float64],
     evaluation_info: dict[str, NDArray[Any]],
+    eval_count: int,
 ) -> None:
     eval_idx = task.kwargs["eval_idx"]
     match task.result:
@@ -178,7 +173,16 @@ def _handle_result(
             for key, value in task.result.items():
                 if key == "result":
                     results[eval_idx, :] = value
-                elif key in evaluation_info:
+                else:
+                    if key not in evaluation_info:
+                        evaluation_info[key] = np.zeros(
+                            eval_count,
+                            dtype=(
+                                np.array(value).dtype
+                                if isinstance(value, (int, float, complex, np.number))
+                                else object
+                            ),
+                        )
                     evaluation_info[key][eval_idx] = value
         case ServerFailure():
             results[eval_idx, :] = np.nan
