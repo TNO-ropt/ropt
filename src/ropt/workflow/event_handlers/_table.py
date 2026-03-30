@@ -251,6 +251,16 @@ class Table(EventHandler):
             raise AttributeError(msg)
         return self._tables[key].get_table(self._sep)
 
+    def add_column(self, table: str, name: str, title: str) -> None:
+        """Add a column to a given table.
+
+        Args:
+            table: The name of the table to add the column to.
+            name:  The name of the field to add as a column, using attribute syntax.
+            title: The title of the column to add.
+        """
+        self._tables[table].add_column(name, title)
+
 
 class _ResultsTable:
     def __init__(
@@ -261,6 +271,9 @@ class _ResultsTable:
         self._columns = columns
         self._results_type = table_type
         self._frames: list[pd.DataFrame] = []
+
+    def add_column(self, name: str, title: str) -> None:
+        self._columns[name] = title
 
     def add_results(self, results: Sequence[Results]) -> bool:
         frame = results_to_dataframe(
