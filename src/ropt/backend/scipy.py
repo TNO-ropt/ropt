@@ -26,6 +26,7 @@ from ropt.backend.utils import (
 from ropt.enums import VariableType
 
 if TYPE_CHECKING:
+    from ropt.config import BackendConfig
     from ropt.context import EnOptContext
     from ropt.core import OptimizerCallback
 
@@ -122,7 +123,22 @@ class SciPyBackend(Backend):
         "bounds": _CONSTRAINT_REQUIRES_BOUNDS,
     }
 
-    def __init__(
+    def __init__(self, backend_config: BackendConfig) -> None:
+        """Initialize the SciPy optimizer backend.
+
+        Args:
+            backend_config: The configuration for the backend, containing the
+                            method name and options.
+        """
+        self._config = backend_config
+        _, _, self._method = backend_config.method.lower().rpartition("/")
+        if self._method == "default":
+            self._method = DEFAULT_SCIPY_METHOD
+        if self._method not in SUPPORTED_SCIPY_METHODS:
+            msg = f"SciPy optimizer algorithm {self._method} is not supported"
+            raise NotImplementedError(msg)
+
+    def init(
         self, context: EnOptContext, optimizer_callback: OptimizerCallback
     ) -> None:
         """Initialize the optimizer implemented by the SciPy plugin.
@@ -133,12 +149,6 @@ class SciPyBackend(Backend):
         """
         self._optimizer_callback = optimizer_callback
         self._context = context
-        _, _, self._method = self._context.backend.method.lower().rpartition("/")
-        if self._method == "default":
-            self._method = DEFAULT_SCIPY_METHOD
-        if self._method not in SUPPORTED_SCIPY_METHODS:
-            msg = f"SciPy optimizer algorithm {self._method} is not supported"
-            raise NotImplementedError(msg)
         validate_supported_constraints(
             self._context,
             self._method,
@@ -147,7 +157,7 @@ class SciPyBackend(Backend):
         )
         self._options = self._parse_options()
         self._parallel = (
-            self._context.backend.parallel and self._method == "differential_evolution"
+            self._config.parallel and self._method == "differential_evolution"
         )
 
         self._cached_variables: NDArray[np.float64] | None = None
@@ -186,7 +196,7 @@ class SciPyBackend(Backend):
             minimize(  # type: ignore[call-overload,misc]
                 fun=self._function,
                 x0=initial_values[self._context.variables.mask],
-                tol=self._context.backend.convergence_tolerance,
+                tol=self._config.convergence_tolerance,
                 method=self._method,
                 bounds=self._bounds,
                 jac=(False if self._method in _NO_GRADIENT else self._gradient),
@@ -519,21 +529,21 @@ class SciPyBackend(Backend):
 
     def _parse_options(self) -> dict[str, Any]:
         options = (
-            copy.deepcopy(self._context.backend.options)
-            if isinstance(self._context.backend.options, dict)
+            copy.deepcopy(self._config.options)
+            if isinstance(self._config.options, dict)
             else {}
         )
         # The maximum number of iterations is passed as an option to ropt.
         # Setting maxiter directly as an entry in the options dict will also
         # work, but iterations will override it.
-        iterations = self._context.backend.max_iterations
+        iterations = self._config.max_iterations
         if iterations is not None:
             if self._method == "tnc":
                 options["maxfun"] = iterations
             else:
                 options["maxiter"] = iterations
         # We switch on display if there is an output folder.
-        if self._context.backend.output_dir is not None:
+        if self._context.optimizer.output_dir is not None:
             options["disp"] = True
 
         if self._method == "differential_evolution" and "integrality" not in options:

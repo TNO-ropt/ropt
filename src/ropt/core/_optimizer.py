@@ -11,7 +11,6 @@ import numpy as np
 
 from ropt.enums import ExitCode
 from ropt.exceptions import ComputeStepAborted
-from ropt.plugins.manager import get_plugin
 from ropt.results import FunctionResults, GradientResults
 
 from ._callback import OptimizerCallbackResult
@@ -21,7 +20,6 @@ if TYPE_CHECKING:
 
     from numpy.typing import NDArray
 
-    from ropt.backend import Backend
     from ropt.context import EnOptContext
     from ropt.results import Functions, Gradients, Results
 
@@ -108,14 +106,8 @@ class EnsembleOptimizer:
         # Whether NaN values are allowed:
         self._allow_nan = False
 
-        plugin = get_plugin("backend", method=self._context.backend.method)
-
-        # Validate the optimizer options:
-        plugin.validate_options(
-            self._context.backend.method, self._context.backend.options
-        )
-
-        self._backend: Backend = plugin.create(self._context, self._optimizer_callback)
+        self._backend = self._context.backend
+        self._backend.init(self._context, self._optimizer_callback)
         self._allow_nan = self._backend.allow_nan
 
         # Optional redirection of standard output:
@@ -334,9 +326,9 @@ class EnsembleOptimizer:
 
 class _Redirector:
     def __init__(self, context: EnOptContext) -> None:
-        output_dir = context.backend.output_dir
-        stdout = context.backend.stdout
-        stderr = context.backend.stderr
+        output_dir = context.optimizer.output_dir
+        stdout = context.optimizer.stdout
+        stderr = context.optimizer.stderr
 
         if stdout is not None:
             self._redirect = True

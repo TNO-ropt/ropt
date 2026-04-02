@@ -223,9 +223,8 @@ def test_external_error(config: Any, evaluator: Any, external: str) -> None:
     config["backend"]["method"] = f"{external}{_SLSQP}"
     config["backend"]["options"] = {"ftol": "foo"}
     err = "Input should be a valid number, unable to parse string as a number"
-    optimizer = BasicOptimizer(config, evaluator())
     with pytest.raises(ValueError, match=err):
-        optimizer.run(initial_values)
+        BasicOptimizer(config, evaluator())
 
 
 @pytest.mark.parametrize("use_plugin", [False, True])

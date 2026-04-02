@@ -20,9 +20,6 @@ def config_fixture() -> dict[str, Any]:
         "objectives": {
             "weights": [1.0],
         },
-        "backend": {
-            "method": "dummy",
-        },
     }
 
 

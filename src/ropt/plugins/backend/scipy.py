@@ -15,24 +15,21 @@ from ropt.config.options import OptionsSchemaModel
 from ._base import BackendPlugin
 
 if TYPE_CHECKING:
-    from ropt.context import EnOptContext
-    from ropt.core import OptimizerCallback
+    from ropt.config import BackendConfig
 
 
 class SciPyBackendPlugin(BackendPlugin):
     """The SciPy backend plugin class."""
 
     @classmethod
-    def create(
-        cls, context: EnOptContext, optimizer_callback: OptimizerCallback
-    ) -> SciPyBackend:
+    def create(cls, backend_config: BackendConfig) -> SciPyBackend:
         """Initialize the backend plugin.
 
         See the [ropt.plugins.backend.BackendPlugin][] abstract base class.
 
         # noqa
         """  # noqa: DOC201
-        return SciPyBackend(context, optimizer_callback)
+        return SciPyBackend(backend_config)
 
     @classmethod
     def is_supported(cls, method: str) -> bool:

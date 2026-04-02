@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    PositiveInt,
-)
+from pathlib import Path  # noqa: TC003
+
+from pydantic import BaseModel, ConfigDict, PositiveInt
 
 
 class OptimizerConfig(BaseModel):
@@ -41,13 +39,24 @@ class OptimizerConfig(BaseModel):
         cause the optimization to terminate mid-batch, potentially earlier than
         a corresponding `max_batches` limit would.
 
+      - **`output_dir`**: An optional output directory where the optimizer can
+        store files.
+      - **`stdout`**: Redirect optimizer standard output to the given file.
+      - **`stderr`**: Redirect optimizer standard error to the given file.
+
     Attributes:
         max_functions:  Maximum number of function evaluations (optional).
         max_batches:    Maximum number of batch evaluations (optional).
+        output_dir:            Output directory for the optimizer (optional).
+        stdout:                File to redirect optimizer standard output (optional).
+        stderr:                File to redirect optimizer standard error (optional).
     """
 
     max_functions: PositiveInt | None = None
     max_batches: PositiveInt | None = None
+    output_dir: Path | None = None
+    stdout: Path | None = None
+    stderr: Path | None = None
 
     model_config = ConfigDict(
         extra="forbid",

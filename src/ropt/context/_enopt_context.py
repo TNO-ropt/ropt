@@ -10,7 +10,6 @@ from pydantic import BaseModel, ConfigDict, PrivateAttr, model_validator
 
 from ropt._utils import immutable_array
 from ropt.config import (
-    BackendConfig,
     FunctionEstimatorConfig,
     GradientConfig,
     LinearConstraintsConfig,
@@ -25,6 +24,7 @@ from ropt.enums import PerturbationType
 from ropt.plugins.manager import get_plugin
 
 from ._validated_types import (  # noqa: TC001
+    BackendInstance,
     FunctionEstimatorInstance,
     NonlinearConstraintTransformInstance,
     ObjectiveTransformInstance,
@@ -107,7 +107,7 @@ class EnOptContext(BaseModel):
     nonlinear_constraints: NonlinearConstraintsConfig | None = None
     realizations: RealizationsConfig = RealizationsConfig.model_validate({})
     optimizer: OptimizerConfig = OptimizerConfig.model_validate({})
-    backend: BackendConfig = BackendConfig.model_validate({})
+    backend: BackendInstance = {}  # type: ignore[assignment]
     gradient: GradientConfig = GradientConfig.model_validate({})
     realization_filters: tuple[RealizationFilterInstance, ...] = ()
     function_estimators: tuple[FunctionEstimatorInstance, ...] = ()
@@ -124,7 +124,6 @@ class EnOptContext(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         validate_default=True,
-        frozen=True,
     )
 
     @model_validator(mode="after")

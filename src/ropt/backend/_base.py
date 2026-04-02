@@ -9,6 +9,9 @@ if TYPE_CHECKING:
     import numpy as np
     from numpy.typing import NDArray
 
+    from ropt.context import EnOptContext
+    from ropt.core import OptimizerCallback
+
 
 class Backend(ABC):
     """Abstract Base Class for Backend Implementations.
@@ -34,6 +37,24 @@ class Backend(ABC):
     - `allow_nan`:   To indicate if the algorithm can handle NaN function values.
     - `is_parallel`: To indicate if the algorithm may perform parallel evaluations.
     """
+
+    @abstractmethod
+    def init(
+        self, context: EnOptContext, optimizer_callback: OptimizerCallback
+    ) -> None:
+        """Initialize the optimizer with the given context and callback.
+
+        This abstract method must be implemented by concrete `Backend` subclasses
+        to set up the optimizer with the provided optimization context and
+        callback function.
+
+        Args:
+            context:            An instance of `EnOptContext` containing details
+                                about the optimization problem setup.
+            optimizer_callback: An instance of `OptimizerCallback` that allows
+                                the optimizer to request function and gradient
+                                evaluations from the `ropt` core during execution.
+        """
 
     @abstractmethod
     def start(self, initial_values: NDArray[np.float64]) -> None:

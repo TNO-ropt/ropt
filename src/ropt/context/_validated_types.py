@@ -4,7 +4,9 @@ from typing import Annotated, Any, TypeVar
 
 from pydantic import PlainValidator
 
+from ropt.backend import Backend
 from ropt.config import (
+    BackendConfig,
     FunctionEstimatorConfig,
     NonlinearConstraintTransformConfig,
     ObjectiveTransformConfig,
@@ -23,6 +25,26 @@ from ropt.transforms import (
 )
 
 T = TypeVar("T")
+
+
+def _convert_backend(value: Backend | BackendConfig | dict[str, Any]) -> Backend:
+    if isinstance(value, Backend):
+        return value
+    if isinstance(value, BackendConfig):
+        plugin = get_plugin("backend", method=value.method)
+        plugin.validate_options(value.method, value.options)
+        result = plugin.create(value)
+        assert isinstance(result, Backend)
+        return result
+    if isinstance(value, dict):
+        backend_config = BackendConfig.model_validate(value)
+        plugin = get_plugin("backend", method=backend_config.method)
+        plugin.validate_options(backend_config.method, backend_config.options)
+        result = plugin.create(backend_config)
+        assert isinstance(result, Backend)
+        return result
+    msg = "Value must be a Backend instance, a BackendConfig instance, or a dict."
+    raise ValueError(msg)
 
 
 def _convert_sampler(value: Sampler | SamplerConfig | dict[str, Any]) -> Sampler:
@@ -149,6 +171,9 @@ def _convert_nonlinear_constraint_transform(
     msg = "Value must be a NonlinearConstraintTransform instance, a NonlinearConstraintTransformConfig instance, or a dict."
     raise ValueError(msg)
 
+
+BackendInstance = Annotated[Backend, PlainValidator(_convert_backend)]
+"""Validate that the value is an instance of a Backend."""
 
 SamplerInstance = Annotated[Sampler, PlainValidator(_convert_sampler)]
 """Validate that the value is an instance of a Sampler."""

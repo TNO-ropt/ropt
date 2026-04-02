@@ -9,8 +9,7 @@ from ropt.plugins.base import Plugin
 
 if TYPE_CHECKING:
     from ropt.backend import Backend
-    from ropt.context import EnOptContext
-    from ropt.core import OptimizerCallback
+    from ropt.config import BackendConfig
 
 
 class BackendPlugin(Plugin):
@@ -23,14 +22,12 @@ class BackendPlugin(Plugin):
 
     @classmethod
     @abstractmethod
-    def create(
-        cls, context: EnOptContext, optimizer_callback: OptimizerCallback
-    ) -> Backend:
+    def create(cls, backend_config: BackendConfig) -> Backend:
         """Create an Backend instance.
 
         This abstract class method serves as a factory for creating concrete
         [`Backend`][ropt.backend.Backend] objects. Plugin
-        implementations must override this method to return an instance of their
+        implementations must override this method to return an instance of  their
         specific `Backend` subclass.
 
         The [`PluginManager`][ropt.plugins.manager.PluginManager] calls this
@@ -38,10 +35,8 @@ class BackendPlugin(Plugin):
         this plugin.
 
         Args:
-            context:            The  context object containing the
-                                optimization settings.
-            optimizer_callback: The callback function used by the optimizer to
-                                request evaluations.
+            backend_config: The configuration object containing the
+                            backend settings.
 
         Returns:
             An initialized instance of an `Backend` subclass.

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path  # noqa: TC003
 from typing import Any, Self
 
 from pydantic import (
@@ -34,33 +33,23 @@ class BackendConfig(BaseModel):
     - **`parallel`**: If `True`, allows the optimizer to use parallelized
       function evaluations. This typically applies to gradient-free methods and
       may be ignored.
-    - **`output_dir`**: An optional output directory where the optimizer can
-      store files.
     - **`options`**: A dictionary or list of strings for generic optimizer
       options. The required format and interpretation depend on the specific
       optimization method.
-    - **`stdout`**: Redirect optimizer standard output to the given file.
-    - **`stderr`**: Redirect optimizer standard error to the given file.
 
     Attributes:
         method:                Name of the optimization method.
         max_iterations:        Maximum number of iterations (optional).
         convergence_tolerance: Convergence tolerance (optional).
         parallel:              Allow parallelized function evaluations (default: `False`).
-        output_dir:            Output directory for the optimizer (optional).
         options:               Generic options for the optimizer (optional).
-        stdout:                File to redirect optimizer standard output (optional).
-        stderr:                File to redirect optimizer standard error (optional).
     """
 
     method: str = "scipy/default"
     max_iterations: PositiveInt | None = None
     convergence_tolerance: NonNegativeFloat | None = None
     parallel: bool = False
-    output_dir: Path | None = None
     options: dict[str, Any] | list[str] | None = None
-    stdout: Path | None = None
-    stderr: Path | None = None
 
     model_config = ConfigDict(
         extra="forbid",

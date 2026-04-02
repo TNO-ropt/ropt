@@ -10,24 +10,21 @@ from ropt.plugins.manager import get_plugin, get_plugin_name
 from ._base import BackendPlugin
 
 if TYPE_CHECKING:
-    from ropt.context import EnOptContext
-    from ropt.core import OptimizerCallback
+    from ropt.config import BackendConfig
 
 
 class ExternalBackendPlugin(BackendPlugin):
     """The external optimizer plugin class."""
 
     @classmethod
-    def create(
-        cls, context: EnOptContext, optimizer_callback: OptimizerCallback
-    ) -> ExternalBackend:
+    def create(cls, backend_config: BackendConfig) -> ExternalBackend:
         """Initialize the backend plugin.
 
         See the [ropt.plugins.backend.BackendPlugin][] abstract base class.
 
         # noqa
         """  # noqa: DOC201
-        return ExternalBackend(context, optimizer_callback)
+        return ExternalBackend(backend_config)
 
     @classmethod
     def is_supported(cls, method: str) -> bool:

@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import multiprocessing
 import traceback
+from functools import partial
 from typing import TYPE_CHECKING, Any, Final
 
+import cloudpickle
 import numpy as np
 
 from ropt.backend import Backend
@@ -17,6 +19,7 @@ from ropt.plugins.manager import get_plugin
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
+    from ropt.config import BackendConfig
     from ropt.context import EnOptContext
 
 
@@ -44,7 +47,22 @@ class ExternalBackend(Backend):
     method `method-name` and launch it as an external process.
     """
 
-    def __init__(
+    def __init__(self, backend_config: BackendConfig) -> None:
+        """Initialize the external optimizer backend.
+
+        Args:
+            backend_config: The configuration for the backend, containing the
+                            method name and options.
+        """
+        self._backend_config = backend_config.model_copy(
+            update={"method": backend_config.method.split("/", maxsplit=1)[1]}
+        )
+        self._backend_plugin = get_plugin("backend", method=self._backend_config.method)
+        self._backend_plugin.validate_options(
+            self._backend_config.method, self._backend_config.options
+        )
+
+    def init(
         self, context: EnOptContext, optimizer_callback: OptimizerCallback
     ) -> None:
         """Initialize the optimizer.
@@ -55,14 +73,13 @@ class ExternalBackend(Backend):
         """
         self._context = context
         self._optimizer_callback = optimizer_callback
-        self._process_pid: int | None = None
-
-        optimizer: Backend = get_plugin(
-            "backend", context.backend.method.split("/", maxsplit=1)[1]
-        ).create(context, lambda *_: None)
-        self._allow_nan = optimizer.allow_nan
-        self._is_parallel = optimizer.is_parallel
-        del optimizer
+        backend = self._backend_plugin.create(self._backend_config)
+        backend.init(
+            context.model_copy(update={"backend": backend}), optimizer_callback
+        )
+        self._allow_nan: bool = backend.allow_nan
+        self._is_parallel: bool = backend.is_parallel
+        del backend
 
     def start(self, initial_values: NDArray[np.float64]) -> None:
         """Start the optimization.
@@ -74,9 +91,20 @@ class ExternalBackend(Backend):
         context = multiprocessing.get_context("spawn")
         request_queue = context.Queue()
         result_queue = context.Queue()
+
         process = context.Process(
             target=_run,
-            args=(self._context, initial_values, request_queue, result_queue),
+            args=(
+                cloudpickle.dumps(
+                    {
+                        "config": self._backend_config,
+                        "context": self._context,
+                        "initial_values": initial_values,
+                    }
+                ),
+                request_queue,
+                result_queue,
+            ),
         )
 
         result: OptimizerCallbackResult | ExitCode
@@ -141,60 +169,53 @@ class ExternalBackend(Backend):
 
 
 def _run(
-    context: EnOptContext,
-    initial_values: NDArray[np.float64],
+    data: bytes,
     request_queue: multiprocessing.Queue[dict[str, Any] | None],
     result_queue: multiprocessing.Queue[OptimizerCallbackResult | ExitCode],
 ) -> None:
-    optimizer = _PluginBackend(context, initial_values, request_queue, result_queue)
-    optimizer.run()
+    data_dict = cloudpickle.loads(data)
+    config = data_dict["config"]
+    context = data_dict["context"]
+    initial_values = data_dict["initial_values"]
 
+    backend_plugin = get_plugin("backend", method=config.method)
+    backend = backend_plugin.create(config)
+    context = context.model_copy(update={"backend": backend})
+    backend.init(
+        context,
+        partial(_callback, request_queue=request_queue, result_queue=result_queue),
+    )
 
-class _PluginBackend:
-    def __init__(
-        self,
-        context: EnOptContext,
-        initial_values: NDArray[np.float64],
-        request_queue: multiprocessing.Queue[dict[str, Any] | None],
-        result_queue: multiprocessing.Queue[OptimizerCallbackResult | ExitCode],
-    ) -> None:
-        self._context = context
-        self._initial_values = np.asarray(initial_values, dtype=np.float64)
-        self._request_queue = request_queue
-        self._result_queue = result_queue
-
-    def _callback(
-        self,
-        variables: NDArray[np.float64],
-        *,
-        return_functions: bool,
-        return_gradients: bool,
-    ) -> OptimizerCallbackResult:
-        self._request_queue.put(
-            {
-                "variables": variables,
-                "return_functions": return_functions,
-                "return_gradients": return_gradients,
-            },
+    try:
+        backend.start(np.asarray(initial_values, dtype=np.float64))
+    except ComputeStepAborted:
+        pass
+    except Exception as exc:  # noqa: BLE001
+        tb_str = traceback.format_exc()
+        request_queue.put(
+            {"error": type(exc).__name__, "message": str(exc), "traceback": tb_str}
         )
-        result = self._result_queue.get()
-        if isinstance(result, OptimizerCallbackResult):
-            return result
-        assert isinstance(result, ExitCode)
-        raise ComputeStepAborted(exit_code=result)
+    finally:
+        request_queue.put(None)
 
-    def run(self) -> None:
-        optimizer = get_plugin(
-            "backend", self._context.backend.method.split("/", maxsplit=1)[1]
-        ).create(self._context, self._callback)
-        try:
-            optimizer.start(self._initial_values)
-        except ComputeStepAborted:
-            pass
-        except Exception as exc:  # noqa: BLE001
-            tb_str = traceback.format_exc()
-            self._request_queue.put(
-                {"error": type(exc).__name__, "message": str(exc), "traceback": tb_str}
-            )
-        finally:
-            self._request_queue.put(None)
+
+def _callback(
+    variables: NDArray[np.float64],
+    *,
+    return_functions: bool,
+    return_gradients: bool,
+    request_queue: multiprocessing.Queue[dict[str, Any] | None],
+    result_queue: multiprocessing.Queue[OptimizerCallbackResult | ExitCode],
+) -> OptimizerCallbackResult:
+    request_queue.put(
+        {
+            "variables": variables,
+            "return_functions": return_functions,
+            "return_gradients": return_gradients,
+        },
+    )
+    result = result_queue.get()
+    if isinstance(result, OptimizerCallbackResult):
+        return result
+    assert isinstance(result, ExitCode)
+    raise ComputeStepAborted(exit_code=result)
